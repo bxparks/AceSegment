@@ -53,6 +53,8 @@ StyledDigit styledDigits[NUM_DIGITS + 1];
 DigitDriver digitDriver(&hardware, dimmingDigits, NUM_DIGITS);
 ModulatingDigitDriver modulatingDigitDriver(
     &hardware, dimmingDigits, NUM_DIGITS, NUM_SUB_FIELDS);
+ModulatingDigitDriver edgeCaseModulatingDigitDriver(
+    &hardware, dimmingDigits, NUM_DIGITS, 1 /* numSubFields */);
 SegmentDriver segmentDriver(&hardware, dimmingDigits, NUM_DIGITS);
 FakeDriver fakeDriver(&hardware, dimmingDigits, NUM_DIGITS);
 
@@ -634,7 +636,7 @@ testF(ModulatingDigitDriverTest, displayCurrentField_one_dark) {
   driver.displayCurrentField();
   assertPins(0);
 
-  // field 0.0
+  // field 4.0
   hardware.clear();
   driver.displayCurrentField();
   assertPins(10,
@@ -649,12 +651,12 @@ testF(ModulatingDigitDriverTest, displayCurrentField_one_dark) {
       11, SEGMENT_OFF,
       0, DIGIT_ON);
 
-  // field 0.1
+  // field 4.1
   hardware.clear();
   driver.displayCurrentField();
   assertPins(0);
 
-  // field 0.2
+  // field 4.2
   hardware.clear();
   driver.displayCurrentField();
   assertPins(0); // 255 is special, always on regardless of integer roundoff
@@ -753,7 +755,7 @@ testF(ModulatingDigitDriverTest,
   driver.displayCurrentField();
   assertPins(0);
 
-  // field 0.0, same segment pattern, so don't need to write the pins again
+  // field 4.0, same segment pattern, so don't need to write the pins again
   hardware.clear();
   driver.displayCurrentField();
   assertPins(10,
@@ -768,15 +770,87 @@ testF(ModulatingDigitDriverTest,
       11, SEGMENT_OFF,
       0, DIGIT_ON);
 
-  // field 0.1
+  // field 4.1
   hardware.clear();
   driver.displayCurrentField();
   assertPins(0);
 
-  // field 0.2
+  // field 4.2
   hardware.clear();
   driver.displayCurrentField();
   assertPins(0);
+}
+
+// ----------------------------------------------------------------------
+// Tests for ModulatingDigitDriver with an edge case of
+// numSubFieldsPerField = 1. This should not normally happen, but let's
+// make sure that the code doesn't blow up.
+// ----------------------------------------------------------------------
+
+class EdgeCaseModulatingDigitDriverTest: public BaseDriverTest {
+  protected:
+    virtual void setup() override {
+      BaseDriverTest::setup();
+      driver
+          .setDigitPins(digitPins)
+          .setSegmentPins(segmentPins)
+          .setCommonCathode()
+          .configure();
+      hardware.clear();
+    }
+
+    DigitDriver& driver = edgeCaseModulatingDigitDriver;
+};
+
+testF(EdgeCaseModulatingDigitDriverTest, displayCurrentField) {
+  enableVerbosity(Verbosity::kAssertionPassed);
+
+  driver.setPattern(0, 0x11, 255);
+  driver.setPattern(1, 0x22, 128);
+  driver.setPattern(2, 0x55, 64);
+  driver.setPattern(3, 0x11, 0);
+
+  // field 0.0, should be "on" even though integer round off with a
+  // numSubFields of 1 would normally cause a brightness of 0
+  hardware.clear();
+  driver.displayCurrentField();
+  assertPins(10,
+      3, DIGIT_OFF,
+      4, SEGMENT_ON,
+      5, SEGMENT_OFF,
+      6, SEGMENT_OFF,
+      7, SEGMENT_OFF,
+      8, SEGMENT_ON,
+      9, SEGMENT_OFF,
+      10, SEGMENT_OFF,
+      11, SEGMENT_OFF,
+      0, DIGIT_ON);
+
+  // field 1.0, the next iteration goes to the next frame
+  hardware.clear();
+  driver.displayCurrentField();
+  assertPins(1,
+      0, DIGIT_OFF);
+
+  // field 2.0, the next iteration goes to the next frame
+  hardware.clear();
+  driver.displayCurrentField();
+  assertPins(1,
+      1, DIGIT_OFF);
+
+  // field 3.0, the next iteration goes to the next frame
+  hardware.clear();
+  driver.displayCurrentField();
+  assertPins(1,
+      2, DIGIT_OFF);
+
+  // field 4.0, should be "on" again, and we reuse the bit patterns from
+  // the previous iteration.
+  hardware.clear();
+  driver.displayCurrentField();
+  assertPins(2,
+      3, DIGIT_OFF,
+      0, DIGIT_ON);
 }
 
 // ----------------------------------------------------------------------
