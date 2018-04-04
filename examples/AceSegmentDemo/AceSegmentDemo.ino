@@ -2,8 +2,9 @@
 using namespace ace_segment;
 
 #define USE_INTERRUPT 0
+#define USE_MODULATING_DIGIT_DRIVER 1
 
-const uint8_t NUM_SUBFIELDS = 8;
+const uint8_t NUM_SUBFIELDS = 12;
 const uint8_t FRAMES_PER_SECOND = 60;
 
 // 2 digits, resistors on digits
@@ -24,8 +25,7 @@ DimmingDigit dimmingDigits[NUM_DIGITS];
 StyledDigit styledDigits[NUM_DIGITS];
 //SegmentDriver driver(&hardware, dimmingDigits, NUM_DIGITS);
 //DigitDriver driver(&hardware, dimmingDigits, NUM_DIGITS);
-ModulatingDigitDriver driver(&hardware, dimmingDigits,
-    NUM_DIGITS, NUM_SUBFIELDS);
+ModulatingDigitDriver driver(&hardware, dimmingDigits, NUM_DIGITS);
 Renderer renderer(&hardware, &driver, styledDigits, NUM_DIGITS);
 CharWriter charWriter(&renderer);
 StringWriter stringWriter(&charWriter);
@@ -54,14 +54,16 @@ void setup() {
   Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
   while (!Serial); // Wait until Serial is ready - Leonardo/Micro
 
-  driver
-      .setDigitPins(digitPins)
-      .setSegmentPins(segmentPins)
-      .setCommonCathode()
-      .configure();
-  renderer
-      .setFramesPerSecond(FRAMES_PER_SECOND)
-      .configure();
+  driver.setDigitPins(digitPins);
+  driver.setSegmentPins(segmentPins);
+  driver.setCommonCathode();
+#if USE_MODULATING_DIGIT_DRIVER == 1
+  driver.setNumSubFields(NUM_STRINGS);
+#endif
+  driver.configure();
+
+  renderer.setFramesPerSecond(FRAMES_PER_SECOND);
+  renderer.configure();
 
 #if USE_INTERRUPT == 1
   // set up Timer 2

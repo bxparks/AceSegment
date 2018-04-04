@@ -29,20 +29,18 @@ SOFTWARE.
 
 namespace ace_segment {
 
-Driver& Driver::setCommonAnode() {
+void Driver::setCommonAnode() {
   mDigitOn = HIGH;
   mDigitOff = LOW;
   mSegmentOn = LOW;
   mSegmentOff = HIGH;
-  return *this;
 }
 
-Driver& Driver::setCommonCathode() {
+void Driver::setCommonCathode() {
   mDigitOn = LOW;
   mDigitOff = HIGH;
   mSegmentOn = HIGH;
   mSegmentOff = LOW;
-  return *this;
 }
 
 void Driver::configure() {

@@ -48,33 +48,35 @@ class Driver {
      */
     typedef uint8_t DigitPatternType;
 
-    // Builder methods
+    // Start configuration methods
 
-    /** LED positive terminals are wired together.  */
-    Driver& setCommonAnode();
+    /** LED positive terminals are wired together. Required. */
+    void setCommonAnode();
 
-    /** LED negative terminals are wired together.  */
-    Driver& setCommonCathode();
+    /** LED negative terminals are wired together. Required. */
+    void setCommonCathode();
 
-    /** Assume mNumDigits number of StyledDigits. Digit 0 is on the left. */
-    Driver& setDigitPins(const uint8_t* pins) {
+    /**
+     * Set the pins of the digits, assuming mNumDigits number of StyledDigits.
+     * Digit 0 is on the left. Required.
+     */
+    void setDigitPins(const uint8_t* pins) {
       mDigitPins = pins;
-      return *this;
     }
 
     /**
-     * Assume kNumSegments number of segments. Standard 7-segment mapping:
-     * abcdefgh -> 01234567 (h = decimal point)
+     * Set the pins of the segments, assuming kNumSegments number of segments.
+     * Standard 7-segment bit mapping: hgfedcba -> 76543210 (h = decimal
+     * point). Required.
      */
-    Driver& setSegmentPins(const uint8_t* pins) {
+    void setSegmentPins(const uint8_t* pins) {
       mSegmentPins = pins;
-      return *this;
     }
 
-    /** Configure the driver, e.g. setting the output mode of pins. */
+    /** Configure the driver after all the setXxx() methods have been called. */
     virtual void configure();
 
-    // End Builder methods
+    // End configuration methods
 
     /**
      * Display the current field of the frame. Automatically advances to the

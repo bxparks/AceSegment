@@ -45,16 +45,17 @@ const int8_t NUM_SUB_FIELDS = 3;
 const uint8_t digitPins[NUM_DIGITS] = {0, 1, 2, 3};
 const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
 
+// fake hardware methods to allow testing
 TestableHardware hardware;
+
 // create NUM_DIGITS+1 elements for doing array bound checking
 DimmingDigit dimmingDigits[NUM_DIGITS + 1];
 StyledDigit styledDigits[NUM_DIGITS + 1];
 
+// the various kinds of drivers that we will test
 DigitDriver digitDriver(&hardware, dimmingDigits, NUM_DIGITS);
 ModulatingDigitDriver modulatingDigitDriver(
-    &hardware, dimmingDigits, NUM_DIGITS, NUM_SUB_FIELDS);
-ModulatingDigitDriver edgeCaseModulatingDigitDriver(
-    &hardware, dimmingDigits, NUM_DIGITS, 1 /* numSubFields */);
+    &hardware, dimmingDigits, NUM_DIGITS);
 SegmentDriver segmentDriver(&hardware, dimmingDigits, NUM_DIGITS);
 FakeDriver fakeDriver(&hardware, dimmingDigits, NUM_DIGITS);
 
@@ -71,12 +72,14 @@ void setup() {
   //TestRunner::include("RendererTest_writePatternAt_outOfBounds");
 
   Serial.println(F("setup(): start"));
+  Serial.print(F("sizeof(Hardware): "));
+  Serial.println(sizeof(Hardware));
   Serial.print(F("sizeof(Driver): "));
   Serial.println(sizeof(Driver));
   Serial.print(F("sizeof(SegmentDriver): "));
   Serial.println(sizeof(SegmentDriver));
   Serial.print(F("sizeof(DigitDriver): "));
-  Serial.println(sizeof(SegmentDriver));
+  Serial.println(sizeof(DigitDriver));
   Serial.print(F("sizeof(ModulatingDigitDriver): "));
   Serial.println(sizeof(ModulatingDigitDriver));
   Serial.print(F("sizeof(Renderer): "));
@@ -139,11 +142,10 @@ class FakeDriverTest: public BaseDriverTest {
   protected:
     virtual void setup() override {
       BaseDriverTest::setup();
-      driver
-          .setDigitPins(digitPins)
-          .setSegmentPins(segmentPins)
-          .setCommonCathode()
-          .configure();
+      driver.setDigitPins(digitPins);
+      driver.setSegmentPins(segmentPins);
+      driver.setCommonCathode();
+      driver.configure();
       hardware.clear();
     }
 
@@ -208,11 +210,10 @@ class DigitDriverTest: public BaseDriverTest {
   protected:
     virtual void setup() override {
       BaseDriverTest::setup();
-      driver
-          .setDigitPins(digitPins)
-          .setSegmentPins(segmentPins)
-          .setCommonCathode()
-          .configure();
+      driver.setDigitPins(digitPins);
+      driver.setSegmentPins(segmentPins);
+      driver.setCommonCathode();
+      driver.configure();
       hardware.clear();
     }
 
@@ -398,11 +399,10 @@ class SegmentDriverTest: public BaseDriverTest {
   protected:
     virtual void setup() override {
       BaseDriverTest::setup();
-      driver
-          .setDigitPins(digitPins)
-          .setSegmentPins(segmentPins)
-          .setCommonCathode()
-          .configure();
+      driver.setDigitPins(digitPins);
+      driver.setSegmentPins(segmentPins);
+      driver.setCommonCathode();
+      driver.configure();
       hardware.clear();
     }
 
@@ -529,15 +529,15 @@ class ModulatingDigitDriverTest: public BaseDriverTest {
   protected:
     virtual void setup() override {
       BaseDriverTest::setup();
-      driver
-          .setDigitPins(digitPins)
-          .setSegmentPins(segmentPins)
-          .setCommonCathode()
-          .configure();
+      driver.setNumSubFields(NUM_SUB_FIELDS);
+      driver.setDigitPins(digitPins);
+      driver.setSegmentPins(segmentPins);
+      driver.setCommonCathode();
+      driver.configure();
       hardware.clear();
     }
 
-    DigitDriver& driver = modulatingDigitDriver;
+    ModulatingDigitDriver& driver = modulatingDigitDriver;
 };
 
 testF(ModulatingDigitDriverTest, configure) {
@@ -791,19 +791,19 @@ class EdgeCaseModulatingDigitDriverTest: public BaseDriverTest {
   protected:
     virtual void setup() override {
       BaseDriverTest::setup();
-      driver
-          .setDigitPins(digitPins)
-          .setSegmentPins(segmentPins)
-          .setCommonCathode()
-          .configure();
+      driver.setNumSubFields(1);
+      driver.setDigitPins(digitPins);
+      driver.setSegmentPins(segmentPins);
+      driver.setCommonCathode();
+      driver.configure();
       hardware.clear();
     }
 
-    DigitDriver& driver = edgeCaseModulatingDigitDriver;
+    ModulatingDigitDriver& driver = modulatingDigitDriver;
 };
 
 testF(EdgeCaseModulatingDigitDriverTest, displayCurrentField) {
-  enableVerbosity(Verbosity::kAssertionPassed);
+  //enableVerbosity(Verbosity::kAssertionPassed);
 
   driver.setPattern(0, 0x11, 255);
   driver.setPattern(1, 0x22, 128);
@@ -1049,15 +1049,13 @@ class RendererTest: public TestOnce {
     virtual void setup() override {
       TestOnce::setup();
       fakeDriver.setNumSubFields(NUM_SUB_FIELDS);
-      fakeDriver
-          .setDigitPins(digitPins)
-          .setSegmentPins(segmentPins)
-          .setCommonCathode()
-          .configure();
-      renderer
-          .setFramesPerSecond(FRAMES_PER_SECOND)
-          .setBrightness(255)
-          .configure();
+      fakeDriver.setDigitPins(digitPins);
+      fakeDriver.setSegmentPins(segmentPins);
+      fakeDriver.setCommonCathode();
+      fakeDriver.configure();
+      renderer.setFramesPerSecond(FRAMES_PER_SECOND);
+      renderer.setBrightness(255);
+      renderer.configure();
 
       hardware.clear();
     }
@@ -1209,9 +1207,8 @@ testF(RendererTest, displayCurrentField_noSubFieldDriver) {
 testF(RendererTest, displayCurrentField_dimmedBrightness) {
   //enableVerbosity(Verbosity::kAssertionPassed);
   assertEqual(true, driver.isBrightnessSupported());
-  renderer
-      .setBrightness(127)
-      .configure();
+  renderer.setBrightness(127);
+  renderer.configure();
 
   renderer.writePatternAt(0, 0x11, StyledDigit::kStyleBlinkSlow);
   renderer.writePatternAt(1, 0x22, StyledDigit::kStyleBlinkFast);
@@ -1245,15 +1242,13 @@ class CharWriterTest: public TestOnce {
     virtual void setup() override {
       TestOnce::setup();
       fakeDriver.setNumSubFields(NUM_SUB_FIELDS);
-      fakeDriver
-          .setDigitPins(digitPins)
-          .setSegmentPins(segmentPins)
-          .setCommonCathode()
-          .configure();
-      renderer
-          .setFramesPerSecond(FRAMES_PER_SECOND)
-          .setBrightness(255)
-          .configure();
+      fakeDriver.setDigitPins(digitPins);
+      fakeDriver.setSegmentPins(segmentPins);
+      fakeDriver.setCommonCathode();
+      fakeDriver.configure();
+      renderer.setFramesPerSecond(FRAMES_PER_SECOND);
+      renderer.setBrightness(255);
+      renderer.configure();
       hardware.clear();
     }
 };
@@ -1299,15 +1294,13 @@ class StringWriterTest: public TestOnce {
     virtual void setup() override {
       TestOnce::setup();
       fakeDriver.setNumSubFields(NUM_SUB_FIELDS);
-      fakeDriver
-          .setDigitPins(digitPins)
-          .setSegmentPins(segmentPins)
-          .setCommonCathode()
-          .configure();
-      renderer
-          .setFramesPerSecond(FRAMES_PER_SECOND)
-          .setBrightness(255)
-          .configure();
+      fakeDriver.setDigitPins(digitPins);
+      fakeDriver.setSegmentPins(segmentPins);
+      fakeDriver.setCommonCathode();
+      fakeDriver.configure();
+      renderer.setFramesPerSecond(FRAMES_PER_SECOND);
+      renderer.setBrightness(255);
+      renderer.configure();
       hardware.clear();
       clearStyledDigits();
     }

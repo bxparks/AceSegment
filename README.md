@@ -198,50 +198,48 @@ StringWriter stringWriter(&charWriter);
 ### Configuring the Driver and Renderer
 
 After the `Driver` and the `Renderer` instances have been created, they need to
-be configured. Each class contains a set of `setXxx()` methods. Each `setXxx()`
-returns a reference to `*this` so the setters can be chained (see example
-below). After the various configuration parameters have been set, the
-`configure()` method finishes the configuration of the object. (This is the
-usual "Builder" pattern, except that a separate `Builder` object is not used.
-This saves save memory in an embedded environment and avoids memory management
-issues with the `new` operator.)
+be configured. Each class contains a set of `setXxx()` methods. After the
+various configuration parameters have been set, the `configure()` method
+finishes the configuration of the object.
 
 The following parameters are configurable in `Driver`:
-* `Driver& setCommonAnode()`
-* `Driver& setCommonCathode()`
-* `Driver& setDigitPins(const uint8_t* pins)`
-* `Driver& setSegmentPins(const uint8_t* pins)`
+* `void setCommonAnode();` (required)
+* `void setCommonCathode();` (required)
+* `void setDigitPins(const uint8_t* pins);` (required)
+* `void setSegmentPins(const uint8_t* pins);` (required)
 
-All these parameters on `Driver` are required because they are tell the `Driver`
-how and where the seven-segment LED digits are found on the microcontroller.
+The `ModulatingDigitDriver` adds one more configuration:
+* `void setNumSubFields(uint8_t numSubFields);` (required)
+
+All these parameters on `Driver` and `ModulatingDigitDriver` are required
+because they tell the `Driver` how and where the seven-segment LED digits
+are connected to the microcontroller.
 
 The following parameters are configuration in `Renderer`:
-* `Renderer& setFramesPerSecond(uint8_t framesPerSecond)` [&ast;]
-* `Renderer& setBrightness(uint8_t brightness)`
-* `Renderer& setBlinkFastDuration(uint16_t durationMillis)`
-* `Renderer& setBlinkSlowDuration(uint16_t durationMillis)`
-* `Renderer& setPulseFastDuration(uint16_t durationMillis)`
-* `Renderer& setPulseSlowDuration(uint16_t durationMillis)`
-* `Renderer& setStatsResetInterval(uint16_t framesPerStatsReset)`
+* `void setFramesPerSecond(uint8_t framesPerSecond);` (required)
+* `void setBrightness(uint8_t brightness);`
+* `void setBlinkFastDuration(uint16_t durationMillis);`
+* `void setBlinkSlowDuration(uint16_t durationMillis);`
+* `void setPulseFastDuration(uint16_t durationMillis);`
+* `void setPulseSlowDuration(uint16_t durationMillis);`
+* `void setStatsResetInterval(uint16_t framesPerStatsReset);`
 
-Most of the parameters on `Renderer` are optional since many of
-them have reasonable defaults. The only parameter that's necessary is
-is the `setFramesPerSecond()` marked with [&ast;].
+Only the `setFramesPerSecond()` method is required. The others have reasonable
+defaults.
 
-An example of configuring the `Driver` is:
+An example of configuring the `ModulatingDigitDriver` is:
 ```
-driver
-  .setDigitPins(digitPins)
-  .setSegmentPins(segmentPins)
-  .setCommonCathode()
-  .configure();
+driver.setDigitPins(digitPins);
+driver.setSegmentPins(segmentPins);
+driver.setCommonCathode();
+driver.setNumSubFields(16);
+driver.configure();
 ```
 
 And example of configuring the `Renderer` is:
 ```
-renderer
-  .setFramesPerSecond(FRAMES_PER_SECOND)
-  .configure();
+renderer.setFramesPerSecond(FRAMES_PER_SECOND);
+renderer.configure();
 ```
 
 ### Writing Digit Bit Patterns

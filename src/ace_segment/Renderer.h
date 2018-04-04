@@ -58,15 +58,14 @@ class Renderer {
         mPulseFastDurationMillis(kPulseFastDurationMillisDefault)
     {}
 
-    // Builder methods
+    // Start configuration methods
 
     /**
      * Set brightness expressed as a fraction of 256. In other words, 255 is
      * brightest and is the default. Not implemented in any driver.
      */
-    Renderer& setBrightness(uint8_t brightness) {
+    void setBrightness(uint8_t brightness) {
       mBrightness = brightness;
-      return *this;
     }
 
     /**
@@ -84,33 +83,28 @@ class Renderer {
      * This constant is the desired number of frames per second. Default of 120
      * should produce minimal flickering.
      */
-    Renderer& setFramesPerSecond(uint8_t framesPerSecond) {
+    void setFramesPerSecond(uint8_t framesPerSecond) {
       mFramesPerSecond = framesPerSecond;
-      return *this;
     }
 
     /** Set blink slow duration millis. Default 800 millis. */
-    Renderer& setBlinkSlowDuration(uint16_t durationMillis) {
+    void setBlinkSlowDuration(uint16_t durationMillis) {
       mBlinkSlowDurationMillis = durationMillis;
-      return *this;
     }
 
     /** Set blink fast duration millis. Default 400 millis. */
-    Renderer& setBlinkFastDuration(uint16_t durationMillis) {
+    void setBlinkFastDuration(uint16_t durationMillis) {
       mBlinkFastDurationMillis = durationMillis;
-      return *this;
     }
 
     /** Set pulse slow duration millis. Default 3000 millis. */
-    Renderer& setPulseSlowDuration(uint16_t durationMillis) {
+    void setPulseSlowDuration(uint16_t durationMillis) {
       mPulseSlowDurationMillis = durationMillis;
-      return *this;
     }
 
     /** Set pulse fast duration millis. Default 1000 millis. */
-    Renderer& setPulseFastDuration(uint16_t durationMillis) {
+    void setPulseFastDuration(uint16_t durationMillis) {
       mPulseFastDurationMillis = durationMillis;
-      return *this;
     }
 
     /**
@@ -120,9 +114,8 @@ class Renderer {
      * kFramesPerStatsReset which is 300 frames, which at 60 frames per second
      * is 5 seconds.
      */
-    Renderer& setStatsResetInterval(uint16_t framesPerStatsReset) {
+    void setStatsResetInterval(uint16_t framesPerStatsReset) {
       mFramesPerStatsReset = framesPerStatsReset;
-      return *this;
     }
 
     /**
@@ -131,7 +124,7 @@ class Renderer {
      */
     void configure();
 
-    // End Builder methods
+    // End configuration methods
 
     /** Get the number of digits. */
     uint8_t getNumDigits() { return mNumDigits; }

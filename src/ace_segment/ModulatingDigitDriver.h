@@ -41,17 +41,25 @@ class ModulatingDigitDriver: public DigitDriver {
   public:
     /** Constructor. */
     explicit ModulatingDigitDriver(Hardware* hardware,
-            DimmingDigit* dimmingDigits,
-            int8_t numDigits, int8_t numSubFields):
+            DimmingDigit* dimmingDigits, int8_t numDigits):
         DigitDriver(hardware, dimmingDigits, numDigits),
-        mNumSubFields(numSubFields)
+        mNumSubFields(1) // a default that won't blow up the object
     {}
+
+    // Start configuration methods
+
+    /** Set the number of subfields per field. Required. */
+    void setNumSubFields(uint8_t numSubFields) {
+      mNumSubFields = numSubFields;
+    }
 
     virtual void configure() override {
       DigitDriver::configure();
       mCurrentSubField = 0;
       mCurrentSubFieldMax = 0;
     }
+
+    // End configuration methods
 
     virtual uint16_t getFieldsPerFrame() override {
       return mNumDigits * mNumSubFields;
@@ -66,7 +74,7 @@ class ModulatingDigitDriver: public DigitDriver {
     ModulatingDigitDriver(const ModulatingDigitDriver&) = delete;
     ModulatingDigitDriver& operator=(const ModulatingDigitDriver&) = delete;
 
-    const uint8_t mNumSubFields;
+    uint8_t mNumSubFields;
 
     uint8_t mCurrentSubField;
     uint8_t mCurrentSubFieldMax;
