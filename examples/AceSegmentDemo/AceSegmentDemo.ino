@@ -6,26 +6,26 @@ using namespace ace_segment;
 const uint8_t NUM_SUBFIELDS = 8;
 const uint8_t FRAMES_PER_SECOND = 60;
 
-// Nano - 2 digits
+// 2 digits, resistors on digits
 // Use SegmentDriver
-const uint8_t NUM_DIGITS = 2;
-uint8_t digitPins[NUM_DIGITS] = {12, 14};
-uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
+// const uint8_t NUM_DIGITS = 2;
+// uint8_t digitPins[NUM_DIGITS] = {12, 14};
+// uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
 
-// Pro Mini.
+// 4 digits, resistors on segments
 // Use DigitDriver or ModulatingDigitDriver
-//const uint8_t NUM_DIGITS = 4;
-//uint8_t digitPins[NUM_DIGITS] = {5, 6, 9, 10};
-//uint8_t segmentPins[8] = {4, 7, 8, 11, 12, 14, 15, 16};
+const uint8_t NUM_DIGITS = 4;
+uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
+uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
 
 // Set up the chain of resources and their dependencies.
 Hardware hardware;
 DimmingDigit dimmingDigits[NUM_DIGITS];
 StyledDigit styledDigits[NUM_DIGITS];
-SegmentDriver driver(&hardware, dimmingDigits, NUM_DIGITS);
+//SegmentDriver driver(&hardware, dimmingDigits, NUM_DIGITS);
 //DigitDriver driver(&hardware, dimmingDigits, NUM_DIGITS);
-//ModulatingDigitDriver driver(&hardware, dimmingDigits,
-//    NUM_DIGITS, NUM_SUBFIELDS);
+ModulatingDigitDriver driver(&hardware, dimmingDigits,
+    NUM_DIGITS, NUM_SUBFIELDS);
 Renderer renderer(&hardware, &driver, styledDigits, NUM_DIGITS);
 CharWriter charWriter(&renderer);
 StringWriter stringWriter(&charWriter);
@@ -145,7 +145,6 @@ void writeChars() {
   sprintf(buffer, "%02X", c);
   charWriter.writeCharAt(0, buffer[0], StyledDigit::kStylePulseFast);
   charWriter.writeCharAt(1, buffer[1], StyledDigit::kStylePulseSlow);
-  charWriter.writeDecimalPointAt(1);
   charWriter.writeCharAt(2, '-', StyledDigit::kStyleBlinkFast);
   charWriter.writeCharAt(3, c, StyledDigit::kStyleBlinkSlow);
 
