@@ -36,28 +36,23 @@ class Hardware {
     Hardware() {}
 
     /** Write value to pin. */
-    virtual void writePin(uint8_t pin, uint8_t value) {
-      digitalWrite(pin, value);
-    }
-
-    /** Write analog value to pin. */
-    virtual void writeAnalogPin(uint8_t pin, uint8_t value) {
-      analogWrite(pin, value);
+    virtual void digitalWrite(uint8_t pin, uint8_t value) {
+      ::digitalWrite(pin, value);
     }
 
     /** Set pin mode. */
-    virtual void setPinMode(uint8_t pin, uint8_t mode) {
-      pinMode(pin, mode);
+    virtual void pinMode(uint8_t pin, uint8_t mode) {
+      ::pinMode(pin, mode);
     }
 
     /** Get the current micros  */
-    virtual unsigned long getMicros() {
-      return micros();
+    virtual unsigned long micros() {
+      return ::micros();
     }
 
     /** Get the current millis  */
-    virtual unsigned long getMillis() {
-      return millis();
+    virtual unsigned long millis() {
+      return ::millis();
     }
 
   private:

@@ -35,7 +35,7 @@ SOFTWARE.
 namespace ace_segment {
 
 void Renderer::configure() {
-  uint16_t nowMicros = mHardware->getMicros();
+  uint16_t nowMicros = mHardware->micros();
 
   // Extract driver specific info.
   mIsPulseEnabled = mDriver->isBrightnessSupported();
@@ -114,7 +114,7 @@ void Renderer::writeDecimalPointAt(uint8_t digit, bool state) {
 }
 
 void Renderer::renderFieldWhenReady() {
-  uint16_t now = mHardware->getMicros();
+  uint16_t now = mHardware->micros();
   uint16_t elapsedMicros = now - mLastRenderFieldMicros;
   if (elapsedMicros >= mMicrosPerField) {
     renderField();
@@ -123,14 +123,14 @@ void Renderer::renderFieldWhenReady() {
 }
 
 void Renderer::renderField() {
-  uint16_t now = mHardware->getMicros();
+  uint16_t now = mHardware->micros();
   if (mCurrentField == 0) {
     updateFrame();
   }
   mDriver->displayCurrentField();
   Util::incrementMod(mCurrentField, mFieldsPerFrame);
 
-  uint16_t duration = mHardware->getMicros() - now;
+  uint16_t duration = mHardware->micros() - now;
   updateStats(duration);
 }
 

@@ -46,13 +46,13 @@ void Driver::setCommonCathode() {
 void Driver::configure() {
   for (uint8_t digit = 0; digit < mNumDigits; digit++) {
     uint8_t digitalPin = mDigitPins[digit];
-    mHardware->setPinMode(digitalPin, OUTPUT);
-    mHardware->writePin(digitalPin, mDigitOff);
+    mHardware->pinMode(digitalPin, OUTPUT);
+    mHardware->digitalWrite(digitalPin, mDigitOff);
   }
   for (uint8_t segment = 0; segment < kNumSegments; segment++) {
     uint8_t segmentPin = mSegmentPins[segment];
-    mHardware->setPinMode(segmentPin, OUTPUT);
-    mHardware->writePin(segmentPin, mSegmentOff);
+    mHardware->pinMode(segmentPin, OUTPUT);
+    mHardware->digitalWrite(segmentPin, mSegmentOff);
   }
 }
 
@@ -71,12 +71,12 @@ void Driver::setBrightness(uint8_t digit, uint8_t brightness) {
 
 void Driver::writeDigitPin(uint8_t digit, uint8_t output) {
   uint8_t digitPin = mDigitPins[digit];
-  mHardware->writePin(digitPin, output);
+  mHardware->digitalWrite(digitPin, output);
 }
 
 void Driver::writeSegmentPin(uint8_t segment, uint8_t output) {
   uint8_t segmentPin = mSegmentPins[segment];
-  mHardware->writePin(segmentPin, output);
+  mHardware->digitalWrite(segmentPin, output);
 }
 
 }

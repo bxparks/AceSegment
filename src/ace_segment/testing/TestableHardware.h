@@ -31,7 +31,7 @@ namespace ace_segment {
 
 namespace testing {
 
-/** A record of writePin() events. */
+/** A record of digitalWrite() events. */
 class PinRecord {
   public:
     uint8_t pin;
@@ -44,15 +44,15 @@ class TestableHardware: public Hardware {
       mNumRecords(0)
     {}
 
-    virtual unsigned long getMicros() override { return mMicros; }
+    virtual unsigned long micros() override { return mMicros; }
 
-    virtual unsigned long getMillis() override { return mMillis; }
+    virtual unsigned long millis() override { return mMillis; }
 
-    virtual void setPinMode(uint8_t pin, uint8_t mode) override {
+    virtual void pinMode(uint8_t pin, uint8_t mode) override {
       mPinMode = mode;
     }
 
-    virtual void writePin(uint8_t pin, uint8_t value) override {
+    virtual void digitalWrite(uint8_t pin, uint8_t value) override {
       if (mNumRecords < kMaxRecords) {
         PinRecord& record = mPinRecords[mNumRecords];
         record.pin = pin;
