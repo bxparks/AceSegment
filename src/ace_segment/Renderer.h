@@ -163,13 +163,15 @@ class Renderer {
      * blinking:
      *
      * DigitDriver:
-     *    avg: 47 micros; min: 16 micros; max: 96 micros
+     *    min: 16us; avg: 47us; max: 96us
      * ModulatingDigitDriver:
-     *    avg: 12-20 micros; min: 8 micros; max: 192 micros
+     *    min: 8us; avg: 12-20us; max: 192us
      * ModulatingDigitDriver w/ calcPulseFractionForFrameUsingInverse():
-     *    avg: 12-20 micros; min: 8 micros; max: 124 micros
+     *    min: 8us; avg: 12-20us; max: 124us
      * SegmentDriver:
-     *    avg: 36-59 micros; min: 28 micros; max: 80 micros
+     *    min: 28us; avg: 36-59us; max: 80us
+     * SerialToParallelDriver
+     *    min: 16us; avg: 132us; max: 180us
      */
     void renderField();
 

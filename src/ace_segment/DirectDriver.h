@@ -47,18 +47,14 @@ class DirectDriver: public Driver {
      * Set the pins of the digits, assuming mNumDigits number of StyledDigits.
      * Digit 0 is on the left. Required.
      */
-    void setDigitPins(const uint8_t* pins) {
-      mDigitPins = pins;
-    }
+    void setDigitPins(const uint8_t* pins) { mDigitPins = pins; }
 
     /**
      * Set the pins of the segments, assuming kNumSegments number of segments.
      * Standard 7-segment bit mapping: hgfedcba -> 76543210 (h = decimal
      * point). Required.
      */
-    void setSegmentPins(const uint8_t* pins) {
-      mSegmentPins = pins;
-    }
+    void setSegmentPins(const uint8_t* pins) { mSegmentPins = pins; }
 
     virtual void configure();
 

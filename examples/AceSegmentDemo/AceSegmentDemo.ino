@@ -1,31 +1,54 @@
 #include <AceSegment.h>
+#include <ace_segment/SerialToParallelDriver.h>
 using namespace ace_segment;
 
 #define USE_INTERRUPT 0
-#define USE_MODULATING_DIGIT_DRIVER 1
+
+#define DRIVER_MODE_DIGIT 1
+#define DRIVER_MODE_SEGMENT 2
+#define DRIVER_MODE_MODULATING 3
+#define DRIVER_MODE_SERIAL 4
+
+#define DRIVER_MODE DRIVER_MODE_SERIAL
 
 const uint8_t NUM_SUBFIELDS = 12;
 const uint8_t FRAMES_PER_SECOND = 60;
 
+#if DRIVER_MODE == DRIVER_MODE_SEGMENT
 // 2 digits, resistors on digits
 // Use SegmentDriver
-// const uint8_t NUM_DIGITS = 2;
-// uint8_t digitPins[NUM_DIGITS] = {12, 14};
-// uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
-
+const uint8_t NUM_DIGITS = 2;
+uint8_t digitPins[NUM_DIGITS] = {12, 14};
+uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
+#elif DRIVER_MODE == DRIVER_MODE_DIGIT || DRIVER_MODE == DRIVER_MODE_MODULATING
 // 4 digits, resistors on segments
 // Use DigitDriver or ModulatingDigitDriver
 const uint8_t NUM_DIGITS = 4;
 uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
 uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
+#elif DRIVER_MODE == DRIVER_MODE_SERIAL
+// 2 digits, resistors on segments, serial-to-parallel on segments
+// Use SerialToParallelDriver
+const uint8_t NUM_DIGITS = 4;
+uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
+uint8_t latchPin = 10; // ST_CP on 74HC595
+uint8_t clockPin = 13; // SH_CP on 74HC595
+uint8_t dataPin = 11; // DS on 74HC595
+#endif
 
 // Set up the chain of resources and their dependencies.
 Hardware hardware;
 DimmingDigit dimmingDigits[NUM_DIGITS];
 StyledDigit styledDigits[NUM_DIGITS];
-//SegmentDriver driver(&hardware, dimmingDigits, NUM_DIGITS);
-//DigitDriver driver(&hardware, dimmingDigits, NUM_DIGITS);
+#if DRIVER_MODE == DRIVER_MODE_DIGIT
+DigitDriver driver(&hardware, dimmingDigits, NUM_DIGITS);
+#elif DRIVER_MODE == DRIVER_MODE_SEGMENT
+SegmentDriver driver(&hardware, dimmingDigits, NUM_DIGITS);
+#elif DRIVER_MODE == DRIVER_MODE_MODULATING
 ModulatingDigitDriver driver(&hardware, dimmingDigits, NUM_DIGITS);
+#elif DRIVER_MODE == DRIVER_MODE_SERIAL
+SerialToParallelDriver driver(&hardware, dimmingDigits, NUM_DIGITS);
+#endif
 Renderer renderer(&hardware, &driver, styledDigits, NUM_DIGITS);
 CharWriter charWriter(&renderer);
 StringWriter stringWriter(&charWriter);
@@ -54,12 +77,20 @@ void setup() {
   Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
   while (!Serial); // Wait until Serial is ready - Leonardo/Micro
 
+#if DRIVER_MODE == DRIVER_MODE_DIGIT || DRIVER_MODE == DRIVER_MODE_SEGMENT \
+    || DRIVER_MODE == DRIVER_MODE_MODULATING
   driver.setDigitPins(digitPins);
   driver.setSegmentPins(segmentPins);
-  driver.setCommonCathode();
-#if USE_MODULATING_DIGIT_DRIVER == 1
-  driver.setNumSubFields(NUM_STRINGS);
+#else
+  driver.setDigitPins(digitPins);
+  driver.setLatchPin(latchPin);
+  driver.setClockPin(clockPin);
+  driver.setDataPin(dataPin);
 #endif
+#if DRIVER_MODE == DRIVER_MODE_MODULATING
+  driver.setNumSubFields(NUM_SUBFIELDS);
+#endif
+  driver.setCommonCathode();
   driver.configure();
 
   renderer.setFramesPerSecond(FRAMES_PER_SECOND);

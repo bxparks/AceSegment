@@ -27,6 +27,7 @@ SOFTWARE.
 #include <stdarg.h>
 #include <AUnit.h>
 #include <AceSegment.h>
+#include <ace_segment/SerialToParallelDriver.h>
 #include <ace_segment/testing/TestableHardware.h>
 #include <ace_segment/testing/FakeDriver.h>
 
@@ -58,6 +59,8 @@ ModulatingDigitDriver modulatingDigitDriver(
     &hardware, dimmingDigits, NUM_DIGITS);
 SegmentDriver segmentDriver(&hardware, dimmingDigits, NUM_DIGITS);
 FakeDriver fakeDriver(&hardware, dimmingDigits, NUM_DIGITS);
+SerialToParallelDriver serialToParallelDriver(
+    &hardware, dimmingDigits, NUM_DIGITS);
 
 Renderer renderer(&hardware, &fakeDriver, styledDigits, NUM_DIGITS);
 CharWriter charWriter(&renderer);
@@ -68,8 +71,8 @@ void setup() {
   Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
   while (!Serial); // Wait until Serial is ready - Leonardo/Micro
 
-  //TestRunner::exclude("*");
-  //TestRunner::include("RendererTest_writePatternAt_outOfBounds");
+  TestRunner::exclude("*");
+  TestRunner::include("SerialToParallelDriverTest*");
 
   Serial.println(F("setup(): start"));
   Serial.print(F("sizeof(Hardware): "));
@@ -897,6 +900,66 @@ testF(EdgeCaseModulatingDigitDriverTest, displayCurrentField) {
   assertEvents(2,
       Event::kTypeDigitalWrite, 3, DIGIT_OFF,
       Event::kTypeDigitalWrite, 0, DIGIT_ON);
+}
+
+// ----------------------------------------------------------------------
+// Tests for SerialToParallelDriver.
+// ----------------------------------------------------------------------
+
+class SerialToParallelDriverTest: public BaseDriverTest {
+  protected:
+    static const uint8_t kLatchPin = 10;
+    static const uint8_t kClockPin = 13;
+    static const uint8_t kDataPin = 11;
+
+    virtual void setup() override {
+      BaseDriverTest::setup();
+      driver.setDigitPins(digitPins);
+      driver.setLatchPin(kLatchPin);
+      driver.setDataPin(kDataPin);
+      driver.setClockPin(kClockPin);
+      driver.setCommonCathode();
+      driver.configure();
+      hardware.clear();
+    }
+
+    SerialToParallelDriver& driver = serialToParallelDriver;
+};
+
+testF(SerialToParallelDriverTest, configure) {
+  enableVerbosity(Verbosity::kAssertionPassed);
+  driver.configure();
+  assertPins(4,
+      0, HIGH, 1, HIGH, 2, HIGH, 3, HIGH);
+  assertEqual((uint16_t)(4), driver.getFieldsPerFrame());
+}
+
+testF(SerialToParallelDriverTest, displayCurrentField) {
+
+  driver.setPattern(0, 0x11, 255);
+  driver.setPattern(1, 0x22, 128);
+  driver.setPattern(2, 0x55, 64);
+  driver.setPattern(3, 0x11, 0);
+
+  // display field 0
+  hardware.clear();
+  driver.displayCurrentField();
+  assertPins(4,
+      3, DIGIT_OFF,
+      kLatchPin, LOW,
+      // shiftOut(kDataPin, kClockPin)
+      kLatchPin, HIGH,
+      0, DIGIT_ON);
+
+  // display field 1
+  hardware.clear();
+  driver.displayCurrentField();
+  assertPins(4,
+      0, DIGIT_OFF,
+      kLatchPin, LOW,
+      // shiftOut(kDataPin, kClockPin)
+      kLatchPin, HIGH,
+      1, DIGIT_ON);
 }
 
 // ----------------------------------------------------------------------
