@@ -22,38 +22,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <Arduino.h> // LOW and HIGH
+#include <Arduino.h>
 #include "Hardware.h"
-#include "StyledDigit.h"
-#include "Driver.h"
+#include "DirectDriver.h"
 
 namespace ace_segment {
 
-void Driver::setCommonAnode() {
-  mDigitOn = HIGH;
-  mDigitOff = LOW;
-  mSegmentOn = LOW;
-  mSegmentOff = HIGH;
+
+void DirectDriver::configure() {
+  for (uint8_t digit = 0; digit < mNumDigits; digit++) {
+    uint8_t digitalPin = mDigitPins[digit];
+    mHardware->pinMode(digitalPin, OUTPUT);
+    mHardware->digitalWrite(digitalPin, mDigitOff);
+  }
+  for (uint8_t segment = 0; segment < kNumSegments; segment++) {
+    uint8_t segmentPin = mSegmentPins[segment];
+    mHardware->pinMode(segmentPin, OUTPUT);
+    mHardware->digitalWrite(segmentPin, mSegmentOff);
+  }
 }
 
-void Driver::setCommonCathode() {
-  mDigitOn = LOW;
-  mDigitOff = HIGH;
-  mSegmentOn = HIGH;
-  mSegmentOff = LOW;
+void DirectDriver::writeDigitPin(uint8_t digit, uint8_t output) {
+  uint8_t digitPin = mDigitPins[digit];
+  mHardware->digitalWrite(digitPin, output);
 }
 
-void Driver::setPattern(uint8_t digit, SegmentPatternType pattern,
-    uint8_t brightness) {
-  if (digit >= mNumDigits) return;
-  DimmingDigit& dimmingDigit = mDimmingDigits[digit];
-  dimmingDigit.pattern = pattern;
-  dimmingDigit.brightness = brightness;
-}
-
-void Driver::setBrightness(uint8_t digit, uint8_t brightness) {
-  if (digit >= mNumDigits) return;
-  mDimmingDigits[digit].brightness = brightness;
+void DirectDriver::writeSegmentPin(uint8_t segment, uint8_t output) {
+  uint8_t segmentPin = mSegmentPins[segment];
+  mHardware->digitalWrite(segmentPin, output);
 }
 
 }

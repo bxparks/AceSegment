@@ -26,23 +26,23 @@ SOFTWARE.
 #define ACE_SEGMENT_DIGIT_DRIVER_H
 
 #include <stdint.h>
-#include "Driver.h"
+#include "DirectDriver.h"
 
 namespace ace_segment {
 
 class DimmingDigit;
 class Hardware;
 
-class DigitDriver: public Driver {
+class DigitDriver: public DirectDriver {
   public:
     /** Constructor. */
     explicit DigitDriver(Hardware* hardware, DimmingDigit* dimmingDigits,
             int8_t numDigits):
-        Driver(hardware, dimmingDigits, numDigits)
+        DirectDriver(hardware, dimmingDigits, numDigits)
     {}
 
     virtual void configure() override {
-      Driver::configure();
+      DirectDriver::configure();
 
       mCurrentDigit = 0;
       mPrevDigit = mNumDigits - 1;

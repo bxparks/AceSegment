@@ -25,22 +25,22 @@ SOFTWARE.
 #ifndef ACE_SEGMENT_FAKE_DRIVER_H
 #define ACE_SEGMENT_FAKE_DRIVER_H
 
-#include "../Driver.h"
+#include "../DirectDriver.h"
 
 namespace ace_segment {
 
 namespace testing {
 
 /**
- * A fake instance of Driver so that Renderer can be tested in isolation.
- * Acts kind of like a ModulatingDigitDriver.
+ * A fake instance of DirectDriver so that Renderer can be tested in isolation.
+ * Acts a bit like a ModulatingDigitDriver.
  */
-class FakeDriver: public Driver {
+class FakeDriver: public DirectDriver {
   public:
     /** Constructor. */
     explicit FakeDriver(Hardware* hardware, DimmingDigit* dimmingDigits,
             uint8_t numDigits):
-        Driver(hardware, dimmingDigits, numDigits)
+        DirectDriver(hardware, dimmingDigits, numDigits)
     {}
 
     virtual void displayCurrentField() {
