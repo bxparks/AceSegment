@@ -118,30 +118,54 @@ test(incrementMod) {
 }
 
 // ----------------------------------------------------------------------
-// Tests for base Driver class.
+// Tests for base Hardware class.
 // ----------------------------------------------------------------------
 
-class BaseDriverTest: public TestOnce {
+class BaseHardwareTest: public TestOnce {
   protected:
-    void assertPins(int8_t n, ...) {
+
+    /**
+     * assertEvents(numEvents,
+     *    type, arg1, arg2[, arg3],
+     *    ...
+     *    type, arg1, arg2[, arg3]);
+     */
+    void assertEvents(int8_t n, ...) {
       assertEqual(n, hardware.getNumRecords());
       va_list args;
       va_start(args, n);
       for (int i = 0; i < n; i++) {
-        uint8_t pin = va_arg(args, int);
-        uint8_t value = va_arg(args, int);
-        PinRecord& record = hardware.getPinRecord(i);
-        assertEqual(pin, record.pin);
-        assertEqual(value, record.value);
+        uint8_t type = va_arg(args, int);
+        switch (type) {
+          case Event::kTypeDigitalWrite: {
+              uint8_t pin = va_arg(args, int);
+              uint8_t value = va_arg(args, int);
+              Event& event = hardware.getEvent(i);
+              assertEqual(pin, event.arg1);
+              assertEqual(value, event.arg2);
+            }
+            break;
+          case Event::kTypePinMode: {
+              uint8_t pin = va_arg(args, int);
+              uint8_t mode = va_arg(args, int);
+              Event& event = hardware.getEvent(i);
+              assertEqual(pin, event.arg1);
+              assertEqual(mode, event.arg2);
+            }
+            break;
+          default:
+            // Unknown event type
+            fail();
+        }
       }
       va_end(args);
     }
 };
 
-class FakeDriverTest: public BaseDriverTest {
+class FakeDriverTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
-      BaseDriverTest::setup();
+      BaseHardwareTest::setup();
       driver.setDigitPins(digitPins);
       driver.setSegmentPins(segmentPins);
       driver.setCommonCathode();
@@ -194,22 +218,24 @@ testF(FakeDriverTest, setBrightness_outOfBounds) {
 
 testF(FakeDriverTest, writeDigitPin) {
   fakeDriver.writeDigitPin(2, 0);
-  assertPins(1, 2, 0);
+  assertEvents(1,
+      Event::kTypeDigitalWrite, 2, 0);
 }
 
 testF(FakeDriverTest, writeSegmentPin) {
   fakeDriver.writeSegmentPin(4, 1);
-  assertPins(1, 8, 1);
+  assertEvents(1,
+      Event::kTypeDigitalWrite, 8, 1);
 }
 
 // ----------------------------------------------------------------------
 // Tests for DigitDriver.
 // ----------------------------------------------------------------------
 
-class DigitDriverTest: public BaseDriverTest {
+class DigitDriverTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
-      BaseDriverTest::setup();
+      BaseHardwareTest::setup();
       driver.setDigitPins(digitPins);
       driver.setSegmentPins(segmentPins);
       driver.setCommonCathode();
@@ -222,8 +248,31 @@ class DigitDriverTest: public BaseDriverTest {
 
 testF(DigitDriverTest, configure) {
   driver.configure();
-  assertPins(12, 0, HIGH, 1, HIGH, 2, HIGH, 3, HIGH,
-      4, LOW, 5, LOW, 6, LOW, 7, LOW, 8, LOW, 9, LOW, 10, LOW, 11, LOW);
+  assertEvents(24,
+      Event::kTypePinMode, 0, OUTPUT,
+      Event::kTypeDigitalWrite, 0, HIGH,
+      Event::kTypePinMode, 1, OUTPUT,
+      Event::kTypeDigitalWrite, 1, HIGH,
+      Event::kTypePinMode, 2, OUTPUT,
+      Event::kTypeDigitalWrite, 2, HIGH,
+      Event::kTypePinMode, 3, OUTPUT,
+      Event::kTypeDigitalWrite, 3, HIGH,
+      Event::kTypePinMode, 4, OUTPUT,
+      Event::kTypeDigitalWrite, 4, LOW,
+      Event::kTypePinMode, 5, OUTPUT,
+      Event::kTypeDigitalWrite, 5, LOW,
+      Event::kTypePinMode, 6, OUTPUT,
+      Event::kTypeDigitalWrite, 6, LOW,
+      Event::kTypePinMode, 7, OUTPUT,
+      Event::kTypeDigitalWrite, 7, LOW,
+      Event::kTypePinMode, 8, OUTPUT,
+      Event::kTypeDigitalWrite, 8, LOW,
+      Event::kTypePinMode, 9, OUTPUT,
+      Event::kTypeDigitalWrite, 9, LOW,
+      Event::kTypePinMode, 10, OUTPUT,
+      Event::kTypeDigitalWrite, 10, LOW,
+      Event::kTypePinMode, 11, OUTPUT,
+      Event::kTypeDigitalWrite, 11, LOW);
   assertEqual((uint16_t)4, driver.getFieldsPerFrame());
 }
 
@@ -236,67 +285,68 @@ testF(DigitDriverTest, displayCurrentField_one_dark) {
   // display field 0
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(10,
-      3, DIGIT_OFF,
-      4, SEGMENT_ON,
-      5, SEGMENT_OFF,
-      6, SEGMENT_OFF,
-      7, SEGMENT_OFF,
-      8, SEGMENT_ON,
-      9, SEGMENT_OFF,
-      10, SEGMENT_OFF,
-      11, SEGMENT_OFF,
-      0, DIGIT_ON);
+  assertEvents(10,
+      Event::kTypeDigitalWrite, 3, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 4, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 5, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 6, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 7, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 8, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 9, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 10, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 11, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 0, DIGIT_ON);
 
   // display field 1
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(10,
-      0, DIGIT_OFF,
-      4, SEGMENT_OFF,
-      5, SEGMENT_ON,
-      6, SEGMENT_OFF,
-      7, SEGMENT_OFF,
-      8, SEGMENT_OFF,
-      9, SEGMENT_ON,
-      10, SEGMENT_OFF,
-      11, SEGMENT_OFF,
-      1, DIGIT_ON);
+  assertEvents(10,
+      Event::kTypeDigitalWrite, 0, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 4, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 5, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 6, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 7, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 8, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 9, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 10, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 11, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 1, DIGIT_ON);
 
   // display field 2
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(10,
-      1, DIGIT_OFF,
-      4, SEGMENT_ON,
-      5, SEGMENT_OFF,
-      6, SEGMENT_ON,
-      7, SEGMENT_OFF,
-      8, SEGMENT_ON,
-      9, SEGMENT_OFF,
-      10, SEGMENT_ON,
-      11, SEGMENT_OFF,
-      2, DIGIT_ON);
+  assertEvents(10,
+      Event::kTypeDigitalWrite, 1, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 4, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 5, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 6, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 7, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 8, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 9, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 10, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 11, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 2, DIGIT_ON);
 
   // display field 3
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(1, 2, DIGIT_OFF);
+  assertEvents(1,
+      Event::kTypeDigitalWrite, 2, DIGIT_OFF);
 
   // display field 0
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(10,
-      3, DIGIT_OFF,
-      4, SEGMENT_ON,
-      5, SEGMENT_OFF,
-      6, SEGMENT_OFF,
-      7, SEGMENT_OFF,
-      8, SEGMENT_ON,
-      9, SEGMENT_OFF,
-      10, SEGMENT_OFF,
-      11, SEGMENT_OFF,
-      0, DIGIT_ON);
+  assertEvents(10,
+      Event::kTypeDigitalWrite, 3, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 4, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 5, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 6, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 7, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 8, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 9, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 10, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 11, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 0, DIGIT_ON);
 }
 
 testF(DigitDriverTest, displayCurrentField_repeated_segment_pattern) {
@@ -309,96 +359,96 @@ testF(DigitDriverTest, displayCurrentField_repeated_segment_pattern) {
   // display field 0
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(10,
-      3, DIGIT_OFF,
-      4, SEGMENT_ON,
-      5, SEGMENT_OFF,
-      6, SEGMENT_OFF,
-      7, SEGMENT_OFF,
-      8, SEGMENT_ON,
-      9, SEGMENT_OFF,
-      10, SEGMENT_OFF,
-      11, SEGMENT_OFF,
-      0, DIGIT_ON);
+  assertEvents(10,
+      Event::kTypeDigitalWrite, 3, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 4, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 5, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 6, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 7, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 8, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 9, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 10, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 11, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 0, DIGIT_ON);
 
   // display field 1
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(10,
-      0, DIGIT_OFF,
-      4, SEGMENT_OFF,
-      5, SEGMENT_ON,
-      6, SEGMENT_OFF,
-      7, SEGMENT_OFF,
-      8, SEGMENT_OFF,
-      9, SEGMENT_ON,
-      10, SEGMENT_OFF,
-      11, SEGMENT_OFF,
-      1, DIGIT_ON);
+  assertEvents(10,
+      Event::kTypeDigitalWrite, 0, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 4, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 5, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 6, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 7, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 8, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 9, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 10, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 11, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 1, DIGIT_ON);
 
   // display field 2
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(10,
-      1, DIGIT_OFF,
-      4, SEGMENT_ON,
-      5, SEGMENT_OFF,
-      6, SEGMENT_ON,
-      7, SEGMENT_OFF,
-      8, SEGMENT_ON,
-      9, SEGMENT_OFF,
-      10, SEGMENT_ON,
-      11, SEGMENT_OFF,
-      2, DIGIT_ON);
+  assertEvents(10,
+      Event::kTypeDigitalWrite, 1, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 4, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 5, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 6, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 7, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 8, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 9, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 10, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 11, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 2, DIGIT_ON);
 
   // display field 3
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(10,
-      2, DIGIT_OFF,
-      4, SEGMENT_ON,
-      5, SEGMENT_OFF,
-      6, SEGMENT_OFF,
-      7, SEGMENT_OFF,
-      8, SEGMENT_ON,
-      9, SEGMENT_OFF,
-      10, SEGMENT_OFF,
-      11, SEGMENT_OFF,
-      3, DIGIT_ON);
+  assertEvents(10,
+      Event::kTypeDigitalWrite, 2, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 4, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 5, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 6, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 7, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 8, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 9, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 10, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 11, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 3, DIGIT_ON);
 
   // display field 0
   // Segment pattern is repeated from the previous cycle, so shouldn't see the
   // pins being set.
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(2,
-      3, DIGIT_OFF,
-      0, DIGIT_ON);
+  assertEvents(2,
+      Event::kTypeDigitalWrite, 3, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 0, DIGIT_ON);
 
   // display field 1
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(10,
-      0, DIGIT_OFF,
-      4, SEGMENT_OFF,
-      5, SEGMENT_ON,
-      6, SEGMENT_OFF,
-      7, SEGMENT_OFF,
-      8, SEGMENT_OFF,
-      9, SEGMENT_ON,
-      10, SEGMENT_OFF,
-      11, SEGMENT_OFF,
-      1, DIGIT_ON);
+  assertEvents(10,
+      Event::kTypeDigitalWrite, 0, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 4, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 5, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 6, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 7, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 8, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 9, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 10, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 11, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 1, DIGIT_ON);
 }
 
 // ----------------------------------------------------------------------
 // Tests for SegmentDriver.
 // ----------------------------------------------------------------------
 
-class SegmentDriverTest: public BaseDriverTest {
+class SegmentDriverTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
-      BaseDriverTest::setup();
+      BaseHardwareTest::setup();
       driver.setDigitPins(digitPins);
       driver.setSegmentPins(segmentPins);
       driver.setCommonCathode();
@@ -411,8 +461,6 @@ class SegmentDriverTest: public BaseDriverTest {
 
 testF(SegmentDriverTest, configure) {
   driver.configure();
-  assertPins(12, 0, HIGH, 1, HIGH, 2, HIGH, 3, HIGH,
-      4, LOW, 5, LOW, 6, LOW, 7, LOW, 8, LOW, 9, LOW, 10, LOW, 11, LOW);
   assertEqual((uint16_t)(8), driver.getFieldsPerFrame());
 }
 
@@ -428,107 +476,107 @@ testF(SegmentDriverTest, displayCurrentField_one_dark) {
   // field 0 (segment 0)
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(6,
-      11, SEGMENT_OFF,
-      0, DIGIT_ON,
-      1, DIGIT_OFF,
-      2, DIGIT_ON,
-      3, DIGIT_OFF,
-      4, SEGMENT_ON);
+  assertEvents(6,
+      Event::kTypeDigitalWrite, 11, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 0, DIGIT_ON,
+      Event::kTypeDigitalWrite, 1, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 2, DIGIT_ON,
+      Event::kTypeDigitalWrite, 3, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 4, SEGMENT_ON);
 
   // field 1 (segment 1)
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(6,
-      4, SEGMENT_OFF,
-      0, DIGIT_OFF,
-      1, DIGIT_ON,
-      2, DIGIT_OFF,
-      3, DIGIT_OFF,
-      5, SEGMENT_ON);
+  assertEvents(6,
+      Event::kTypeDigitalWrite, 4, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 0, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 1, DIGIT_ON,
+      Event::kTypeDigitalWrite, 2, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 3, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 5, SEGMENT_ON);
 
   // field 2 (segment 2)
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(6,
-      5, SEGMENT_OFF,
-      0, DIGIT_OFF,
-      1, DIGIT_OFF,
-      2, DIGIT_ON,
-      3, DIGIT_OFF,
-      6, SEGMENT_ON);
+  assertEvents(6,
+      Event::kTypeDigitalWrite, 5, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 0, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 1, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 2, DIGIT_ON,
+      Event::kTypeDigitalWrite, 3, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 6, SEGMENT_ON);
 
   // field 3 (segment 3)
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(6,
-      6, SEGMENT_OFF,
-      0, DIGIT_OFF,
-      1, DIGIT_OFF,
-      2, DIGIT_OFF,
-      3, DIGIT_OFF,
-      7, SEGMENT_ON);
+  assertEvents(6,
+      Event::kTypeDigitalWrite, 6, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 0, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 1, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 2, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 3, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 7, SEGMENT_ON);
 
   // field 4 (segment 4)
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(6,
-      7, SEGMENT_OFF,
-      0, DIGIT_ON,
-      1, DIGIT_OFF,
-      2, DIGIT_ON,
-      3, DIGIT_OFF,
-      8, SEGMENT_ON);
+  assertEvents(6,
+      Event::kTypeDigitalWrite, 7, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 0, DIGIT_ON,
+      Event::kTypeDigitalWrite, 1, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 2, DIGIT_ON,
+      Event::kTypeDigitalWrite, 3, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 8, SEGMENT_ON);
 
   // field 5 (segment 5)
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(6,
-      8, SEGMENT_OFF,
-      0, DIGIT_OFF,
-      1, DIGIT_ON,
-      2, DIGIT_OFF,
-      3, DIGIT_OFF,
-      9, SEGMENT_ON);
+  assertEvents(6,
+      Event::kTypeDigitalWrite, 8, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 0, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 1, DIGIT_ON,
+      Event::kTypeDigitalWrite, 2, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 3, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 9, SEGMENT_ON);
 
   // field 6 (segment 6)
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(6,
-      9, SEGMENT_OFF,
-      0, DIGIT_OFF,
-      1, DIGIT_OFF,
-      2, DIGIT_ON,
-      3, DIGIT_OFF,
-      10, SEGMENT_ON);
+  assertEvents(6,
+      Event::kTypeDigitalWrite, 9, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 0, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 1, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 2, DIGIT_ON,
+      Event::kTypeDigitalWrite, 3, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 10, SEGMENT_ON);
 
   // field 7 (segment 7)
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(6,
-      10, SEGMENT_OFF,
-      0, DIGIT_ON,
-      1, DIGIT_OFF,
-      2, DIGIT_ON,
-      3, DIGIT_OFF,
-      11, SEGMENT_ON);
+  assertEvents(6,
+      Event::kTypeDigitalWrite, 10, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 0, DIGIT_ON,
+      Event::kTypeDigitalWrite, 1, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 2, DIGIT_ON,
+      Event::kTypeDigitalWrite, 3, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 11, SEGMENT_ON);
 
   // field 0 (segment 0), reuse the digit pattern from the prev iteration
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(2,
-      11, SEGMENT_OFF,
-      4, SEGMENT_ON);
+  assertEvents(2,
+      Event::kTypeDigitalWrite, 11, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 4, SEGMENT_ON);
 }
 
 // ----------------------------------------------------------------------
 // Tests for ModulatingDigitDriver. numSubFieldsPerField = 3
 // ----------------------------------------------------------------------
 
-class ModulatingDigitDriverTest: public BaseDriverTest {
+class ModulatingDigitDriverTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
-      BaseDriverTest::setup();
+      BaseHardwareTest::setup();
       driver.setNumSubFields(NUM_SUB_FIELDS);
       driver.setDigitPins(digitPins);
       driver.setSegmentPins(segmentPins);
@@ -542,8 +590,6 @@ class ModulatingDigitDriverTest: public BaseDriverTest {
 
 testF(ModulatingDigitDriverTest, configure) {
   driver.configure();
-  assertPins(12, 0, HIGH, 1, HIGH, 2, HIGH, 3, HIGH,
-      4, LOW, 5, LOW, 6, LOW, 7, LOW, 8, LOW, 9, LOW, 10, LOW, 11, LOW);
   assertEqual((uint16_t)(3 * 4), driver.getFieldsPerFrame());
 }
 
@@ -556,110 +602,110 @@ testF(ModulatingDigitDriverTest, displayCurrentField_one_dark) {
   // field 0.0, stays on for 3 sub fields
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(10,
-      3, DIGIT_OFF,
-      4, SEGMENT_ON,
-      5, SEGMENT_OFF,
-      6, SEGMENT_OFF,
-      7, SEGMENT_OFF,
-      8, SEGMENT_ON,
-      9, SEGMENT_OFF,
-      10, SEGMENT_OFF,
-      11, SEGMENT_OFF,
-      0, DIGIT_ON);
+  assertEvents(10,
+      Event::kTypeDigitalWrite, 3, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 4, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 5, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 6, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 7, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 8, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 9, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 10, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 11, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 0, DIGIT_ON);
 
   // field 0.1
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(0);
+  assertEvents(0);
 
   // field 0.2
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(0); // 255 is special, always on regardless of integer roundoff
+  assertEvents(0); // 255 is special, always on regardless of integer roundoff
 
   // field 1.0, stays on for 1/3 subfields
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(10,
-      0, DIGIT_OFF,
-      4, SEGMENT_OFF,
-      5, SEGMENT_ON,
-      6, SEGMENT_OFF,
-      7, SEGMENT_OFF,
-      8, SEGMENT_OFF,
-      9, SEGMENT_ON,
-      10, SEGMENT_OFF,
-      11, SEGMENT_OFF,
-      1, DIGIT_ON);
+  assertEvents(10,
+      Event::kTypeDigitalWrite, 0, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 4, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 5, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 6, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 7, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 8, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 9, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 10, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 11, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 1, DIGIT_ON);
 
   // field 1.1
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(1,
-      1, DIGIT_OFF);
+  assertEvents(1,
+      Event::kTypeDigitalWrite, 1, DIGIT_OFF);
 
   // field 1.2
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(0);
+  assertEvents(0);
 
   // field 2.0, stays on for 0/3 subfields (because 64/256*3 is 0).
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(1,
-      1, DIGIT_OFF);
+  assertEvents(1,
+      Event::kTypeDigitalWrite, 1, DIGIT_OFF);
 
   // field 2.1
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(0);
+  assertEvents(0);
 
   // field 2.2
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(0);
+  assertEvents(0);
 
   // field 3.0, is off for 3/3 subfields
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(1,
-      2, DIGIT_OFF);
+  assertEvents(1,
+      Event::kTypeDigitalWrite, 2, DIGIT_OFF);
 
   // field 3.1
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(0);
+  assertEvents(0);
 
   // field 3.2
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(0);
+  assertEvents(0);
 
   // field 4.0
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(10,
-      3, DIGIT_OFF,
-      4, SEGMENT_ON,
-      5, SEGMENT_OFF,
-      6, SEGMENT_OFF,
-      7, SEGMENT_OFF,
-      8, SEGMENT_ON,
-      9, SEGMENT_OFF,
-      10, SEGMENT_OFF,
-      11, SEGMENT_OFF,
-      0, DIGIT_ON);
+  assertEvents(10,
+      Event::kTypeDigitalWrite, 3, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 4, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 5, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 6, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 7, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 8, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 9, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 10, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 11, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 0, DIGIT_ON);
 
   // field 4.1
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(0);
+  assertEvents(0);
 
   // field 4.2
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(0); // 255 is special, always on regardless of integer roundoff
+  assertEvents(0); // 255 is special, always on regardless of integer roundoff
 }
 
 testF(ModulatingDigitDriverTest,
@@ -673,112 +719,112 @@ testF(ModulatingDigitDriverTest,
   // field 0.0
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(10,
-      3, DIGIT_OFF,
-      4, SEGMENT_ON,
-      5, SEGMENT_OFF,
-      6, SEGMENT_OFF,
-      7, SEGMENT_OFF,
-      8, SEGMENT_ON,
-      9, SEGMENT_OFF,
-      10, SEGMENT_OFF,
-      11, SEGMENT_OFF,
-      0, DIGIT_ON);
+  assertEvents(10,
+      Event::kTypeDigitalWrite, 3, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 4, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 5, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 6, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 7, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 8, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 9, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 10, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 11, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 0, DIGIT_ON);
 
   // field 0.1
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(0);
+  assertEvents(0);
 
   // field 0.2
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(0);
+  assertEvents(0);
 
   // field 1.0
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(10,
-      0, DIGIT_OFF,
-      4, SEGMENT_OFF,
-      5, SEGMENT_ON,
-      6, SEGMENT_OFF,
-      7, SEGMENT_OFF,
-      8, SEGMENT_OFF,
-      9, SEGMENT_ON,
-      10, SEGMENT_OFF,
-      11, SEGMENT_OFF,
-      1, DIGIT_ON);
+  assertEvents(10,
+      Event::kTypeDigitalWrite, 0, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 4, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 5, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 6, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 7, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 8, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 9, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 10, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 11, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 1, DIGIT_ON);
 
   // field 1.1
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(1,
-      1, DIGIT_OFF);
+  assertEvents(1,
+      Event::kTypeDigitalWrite, 1, DIGIT_OFF);
 
   // field 1.2
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(0);
+  assertEvents(0);
 
   // field 2.0, stays on for 1/3 subfields reusing the previous pattern
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(2,
-      1, DIGIT_OFF,
-      2, DIGIT_ON);
+  assertEvents(2,
+      Event::kTypeDigitalWrite, 1, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 2, DIGIT_ON);
 
   // field 2.1
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(1,
-      2, DIGIT_OFF);
+  assertEvents(1,
+      Event::kTypeDigitalWrite, 2, DIGIT_OFF);
 
   // field 2.2
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(0);
+  assertEvents(0);
 
   // field 3.0, off for 3/3 subfields
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(1,
-      2, DIGIT_OFF);
+  assertEvents(1,
+      Event::kTypeDigitalWrite, 2, DIGIT_OFF);
 
   // field 3.1
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(0);
+  assertEvents(0);
 
   // field 3.2
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(0);
+  assertEvents(0);
 
   // field 4.0, same segment pattern, so don't need to write the pins again
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(10,
-      3, DIGIT_OFF,
-      4, SEGMENT_ON,
-      5, SEGMENT_OFF,
-      6, SEGMENT_OFF,
-      7, SEGMENT_OFF,
-      8, SEGMENT_ON,
-      9, SEGMENT_OFF,
-      10, SEGMENT_OFF,
-      11, SEGMENT_OFF,
-      0, DIGIT_ON);
+  assertEvents(10,
+      Event::kTypeDigitalWrite, 3, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 4, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 5, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 6, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 7, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 8, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 9, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 10, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 11, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 0, DIGIT_ON);
 
   // field 4.1
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(0);
+  assertEvents(0);
 
   // field 4.2
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(0);
+  assertEvents(0);
 }
 
 // ----------------------------------------------------------------------
@@ -787,10 +833,10 @@ testF(ModulatingDigitDriverTest,
 // make sure that the code doesn't blow up.
 // ----------------------------------------------------------------------
 
-class EdgeCaseModulatingDigitDriverTest: public BaseDriverTest {
+class EdgeCaseModulatingDigitDriverTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
-      BaseDriverTest::setup();
+      BaseHardwareTest::setup();
       driver.setNumSubFields(1);
       driver.setDigitPins(digitPins);
       driver.setSegmentPins(segmentPins);
@@ -814,43 +860,43 @@ testF(EdgeCaseModulatingDigitDriverTest, displayCurrentField) {
   // numSubFields of 1 would normally cause a brightness of 0
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(10,
-      3, DIGIT_OFF,
-      4, SEGMENT_ON,
-      5, SEGMENT_OFF,
-      6, SEGMENT_OFF,
-      7, SEGMENT_OFF,
-      8, SEGMENT_ON,
-      9, SEGMENT_OFF,
-      10, SEGMENT_OFF,
-      11, SEGMENT_OFF,
-      0, DIGIT_ON);
+  assertEvents(10,
+      Event::kTypeDigitalWrite, 3, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 4, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 5, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 6, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 7, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 8, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 9, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 10, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 11, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 0, DIGIT_ON);
 
   // field 1.0, the next iteration goes to the next frame
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(1,
-      0, DIGIT_OFF);
+  assertEvents(1,
+      Event::kTypeDigitalWrite, 0, DIGIT_OFF);
 
   // field 2.0, the next iteration goes to the next frame
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(1,
-      1, DIGIT_OFF);
+  assertEvents(1,
+      Event::kTypeDigitalWrite, 1, DIGIT_OFF);
 
   // field 3.0, the next iteration goes to the next frame
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(1,
-      2, DIGIT_OFF);
+  assertEvents(1,
+      Event::kTypeDigitalWrite, 2, DIGIT_OFF);
 
   // field 4.0, should be "on" again, and we reuse the bit patterns from
   // the previous iteration.
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(2,
-      3, DIGIT_OFF,
-      0, DIGIT_ON);
+  assertEvents(2,
+      Event::kTypeDigitalWrite, 3, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 0, DIGIT_ON);
 }
 
 // ----------------------------------------------------------------------

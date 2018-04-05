@@ -31,11 +31,16 @@ namespace ace_segment {
 
 namespace testing {
 
-/** A record of digitalWrite() events. */
-class PinRecord {
+/** A record of one Hardware event. */
+class Event {
   public:
-    uint8_t pin;
-    uint8_t value;
+    static const uint8_t kTypeDigitalWrite = 0;
+    static const uint8_t kTypePinMode = 1;
+
+    uint8_t type; // arg0
+    uint8_t arg1;
+    uint8_t arg2;
+    uint8_t arg3;
 };
 
 class TestableHardware: public Hardware {
@@ -49,14 +54,21 @@ class TestableHardware: public Hardware {
     virtual unsigned long millis() override { return mMillis; }
 
     virtual void pinMode(uint8_t pin, uint8_t mode) override {
-      mPinMode = mode;
+      if (mNumRecords < kMaxRecords) {
+        Event& event = mEvents[mNumRecords];
+        event.type = Event::kTypePinMode;
+        event.arg1 = pin;
+        event.arg2 = mode;
+        mNumRecords++;
+      }
     }
 
     virtual void digitalWrite(uint8_t pin, uint8_t value) override {
       if (mNumRecords < kMaxRecords) {
-        PinRecord& record = mPinRecords[mNumRecords];
-        record.pin = pin;
-        record.value = value;
+        Event& event = mEvents[mNumRecords];
+        event.type = Event::kTypeDigitalWrite;
+        event.arg1 = pin;
+        event.arg2 = value;
         mNumRecords++;
       }
     }
@@ -67,17 +79,14 @@ class TestableHardware: public Hardware {
 
     void setMillis(unsigned long millis) { mMillis = millis; }
 
-    uint8_t getPinMode(uint8_t pin) { return mPinMode; }
-
     void clear() { mNumRecords = 0; }
 
     int getNumRecords() { return mNumRecords; }
 
-    PinRecord& getPinRecord(int i) { return mPinRecords[i]; }
+    Event& getEvent(int i) { return mEvents[i]; }
 
   private:
-    // Max = #segments + 2 (digits) = 10, but let's make it 16 just in case.
-    static const int kMaxRecords = 16;
+    static const int kMaxRecords = 32;
 
     // Disable copy-constructor and assignment operator
     TestableHardware(const TestableHardware&) = delete;
@@ -85,9 +94,8 @@ class TestableHardware: public Hardware {
 
     unsigned long mMillis;
     unsigned long mMicros;
-    uint8_t mPinMode;
 
-    PinRecord mPinRecords[kMaxRecords];
+    Event mEvents[kMaxRecords];
     int mNumRecords;
 };
 
