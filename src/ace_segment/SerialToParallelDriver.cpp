@@ -34,14 +34,14 @@ void SerialToParallelDriver::displayCurrentField() {
 }
 
 void SerialToParallelDriver::drawSegments(SegmentPatternType segmentPattern) {
-  mHardware->writePin(mLatchPin, LOW);
+  mHardware->digitalWrite(mLatchPin, LOW);
   mHardware->shiftOut(mDataPin, mClockPin, MSBFIRST, segmentPattern);
-  mHardware->writePin(mLatchPin, HIGH);
+  mHardware->digitalWrite(mLatchPin, HIGH);
 }
 
 void SerialToParallelDriver::writeDigitPin(uint8_t digit, uint8_t output) {
   uint8_t digitPin = mDigitPins[digit];
-  mHardware->writePin(digitPin, output);
+  mHardware->digitalWrite(digitPin, output);
 }
 
 }

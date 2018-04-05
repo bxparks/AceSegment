@@ -36,11 +36,13 @@ class Event {
   public:
     static const uint8_t kTypeDigitalWrite = 0;
     static const uint8_t kTypePinMode = 1;
+    static const uint8_t kTypeShiftOut = 2;
 
     uint8_t type; // arg0
     uint8_t arg1;
     uint8_t arg2;
     uint8_t arg3;
+    uint8_t arg4;
 };
 
 class TestableHardware: public Hardware {
@@ -69,6 +71,19 @@ class TestableHardware: public Hardware {
         event.type = Event::kTypeDigitalWrite;
         event.arg1 = pin;
         event.arg2 = value;
+        mNumRecords++;
+      }
+    }
+
+    virtual void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder,
+        uint8_t value) {
+      if (mNumRecords < kMaxRecords) {
+        Event& event = mEvents[mNumRecords];
+        event.type = Event::kTypeShiftOut;
+        event.arg1 = dataPin;
+        event.arg2 = clockPin;
+        event.arg3 = bitOrder;
+        event.arg4 = value;
         mNumRecords++;
       }
     }

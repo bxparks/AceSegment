@@ -61,15 +61,16 @@ class SerialToParallelDriver: public Driver {
     virtual void configure() override {
       Driver::configure();
 
-      mHardware->setPinMode(mLatchPin, OUTPUT);
-      mHardware->setPinMode(mDataPin, OUTPUT);
-      mHardware->setPinMode(mClockPin, OUTPUT);
-      // TODO: Do I need to do anything to display the initial values?
+      mHardware->pinMode(mLatchPin, OUTPUT);
+      mHardware->pinMode(mDataPin, OUTPUT);
+      mHardware->pinMode(mClockPin, OUTPUT);
+
+      // TODO: Do I need to set the initial values of the 74HC595?
 
       for (uint8_t digit = 0; digit < mNumDigits; digit++) {
         uint8_t digitalPin = mDigitPins[digit];
-        mHardware->setPinMode(digitalPin, OUTPUT);
-        mHardware->writePin(digitalPin, mDigitOff);
+        mHardware->pinMode(digitalPin, OUTPUT);
+        mHardware->digitalWrite(digitalPin, mDigitOff);
       }
 
       mCurrentDigit = 0;

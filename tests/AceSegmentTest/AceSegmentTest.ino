@@ -71,8 +71,8 @@ void setup() {
   Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
   while (!Serial); // Wait until Serial is ready - Leonardo/Micro
 
-  TestRunner::exclude("*");
-  TestRunner::include("SerialToParallelDriverTest*");
+  //TestRunner::exclude("*");
+  //TestRunner::include("SerialToParallelDriverTest*");
 
   Serial.println(F("setup(): start"));
   Serial.print(F("sizeof(Hardware): "));
@@ -129,9 +129,9 @@ class BaseHardwareTest: public TestOnce {
 
     /**
      * assertEvents(numEvents,
-     *    type, arg1, arg2[, arg3],
+     *    type, arg1, arg2[, ...],
      *    ...
-     *    type, arg1, arg2[, arg3]);
+     *    type, arg1, arg2[, ...]);
      */
     void assertEvents(int8_t n, ...) {
       assertEqual(n, hardware.getNumRecords());
@@ -154,6 +154,18 @@ class BaseHardwareTest: public TestOnce {
               Event& event = hardware.getEvent(i);
               assertEqual(pin, event.arg1);
               assertEqual(mode, event.arg2);
+            }
+            break;
+          case Event::kTypeShiftOut: {
+              uint8_t dataPin = va_arg(args, int);
+              uint8_t clockPin = va_arg(args, int);
+              uint8_t bitOrder = va_arg(args, int);
+              uint8_t value = va_arg(args, int);
+              Event& event = hardware.getEvent(i);
+              assertEqual(dataPin, event.arg1);
+              assertEqual(clockPin, event.arg2);
+              assertEqual(bitOrder, event.arg3);
+              assertEqual(value, event.arg4);
             }
             break;
           default:
@@ -906,14 +918,14 @@ testF(EdgeCaseModulatingDigitDriverTest, displayCurrentField) {
 // Tests for SerialToParallelDriver.
 // ----------------------------------------------------------------------
 
-class SerialToParallelDriverTest: public BaseDriverTest {
+class SerialToParallelDriverTest: public BaseHardwareTest {
   protected:
     static const uint8_t kLatchPin = 10;
-    static const uint8_t kClockPin = 13;
     static const uint8_t kDataPin = 11;
+    static const uint8_t kClockPin = 13;
 
     virtual void setup() override {
-      BaseDriverTest::setup();
+      BaseHardwareTest::setup();
       driver.setDigitPins(digitPins);
       driver.setLatchPin(kLatchPin);
       driver.setDataPin(kDataPin);
@@ -927,14 +939,24 @@ class SerialToParallelDriverTest: public BaseDriverTest {
 };
 
 testF(SerialToParallelDriverTest, configure) {
-  enableVerbosity(Verbosity::kAssertionPassed);
   driver.configure();
-  assertPins(4,
-      0, HIGH, 1, HIGH, 2, HIGH, 3, HIGH);
+  assertEvents(11,
+      Event::kTypePinMode, kLatchPin, OUTPUT,
+      Event::kTypePinMode, kDataPin, OUTPUT,
+      Event::kTypePinMode, kClockPin, OUTPUT,
+      Event::kTypePinMode, 0, OUTPUT,
+      Event::kTypeDigitalWrite, 0, HIGH,
+      Event::kTypePinMode, 1, OUTPUT,
+      Event::kTypeDigitalWrite, 1, HIGH,
+      Event::kTypePinMode, 2, OUTPUT,
+      Event::kTypeDigitalWrite, 2, HIGH,
+      Event::kTypePinMode, 3, OUTPUT,
+      Event::kTypeDigitalWrite, 3, HIGH);
   assertEqual((uint16_t)(4), driver.getFieldsPerFrame());
 }
 
 testF(SerialToParallelDriverTest, displayCurrentField) {
+  //enableVerbosity(Verbosity::kAssertionPassed);
 
   driver.setPattern(0, 0x11, 255);
   driver.setPattern(1, 0x22, 128);
@@ -944,22 +966,22 @@ testF(SerialToParallelDriverTest, displayCurrentField) {
   // display field 0
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(4,
-      3, DIGIT_OFF,
-      kLatchPin, LOW,
-      // shiftOut(kDataPin, kClockPin)
-      kLatchPin, HIGH,
-      0, DIGIT_ON);
+  assertEvents(5,
+      Event::kTypeDigitalWrite, 3, DIGIT_OFF,
+      Event::kTypeDigitalWrite, kLatchPin, LOW,
+      Event::kTypeShiftOut, kDataPin, kClockPin, MSBFIRST, 0x11,
+      Event::kTypeDigitalWrite, kLatchPin, HIGH,
+      Event::kTypeDigitalWrite, 0, DIGIT_ON);
 
   // display field 1
   hardware.clear();
   driver.displayCurrentField();
-  assertPins(4,
-      0, DIGIT_OFF,
-      kLatchPin, LOW,
-      // shiftOut(kDataPin, kClockPin)
-      kLatchPin, HIGH,
-      1, DIGIT_ON);
+  assertEvents(5,
+      Event::kTypeDigitalWrite, 0, DIGIT_OFF,
+      Event::kTypeDigitalWrite, kLatchPin, LOW,
+      Event::kTypeShiftOut, kDataPin, kClockPin, MSBFIRST, 0x22,
+      Event::kTypeDigitalWrite, kLatchPin, HIGH,
+      Event::kTypeDigitalWrite, 1, DIGIT_ON);
 }
 
 // ----------------------------------------------------------------------
