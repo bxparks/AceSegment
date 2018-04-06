@@ -26,6 +26,7 @@ SOFTWARE.
 #define ACE_SEGMENT_LED_MATRIX_SERIAL_H
 
 #include "Hardware.h"
+#include "LedMatrix.h"
 
 namespace ace_segment {
 
@@ -75,7 +76,7 @@ class LedMatrixSerial: public LedMatrix {
       mHardware->digitalWrite(mLatchPin, HIGH);
     }
 
-  private:
+  protected:
     /** Write to group pin identified by 'group'. VisibleForTesting. */
     void writeGroupPin(uint8_t group, uint8_t output) {
       uint8_t groupPin = mGroupPins[group];

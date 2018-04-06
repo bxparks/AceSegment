@@ -7,8 +7,9 @@ using namespace ace_segment;
 #define DRIVER_MODE_MODULATING 2
 #define DRIVER_MODE_SEGMENT 3
 #define DRIVER_MODE_SERIAL 4
+#define DRIVER_MODE_SPI 5
 
-#define DRIVER_MODE DRIVER_MODE_SERIAL
+#define DRIVER_MODE DRIVER_MODE_SPI
 
 const uint8_t NUM_SUBFIELDS = 12;
 const uint8_t FRAMES_PER_SECOND = 60;
@@ -23,13 +24,13 @@ uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
 const uint8_t NUM_DIGITS = 4;
 uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
 uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
-#elif DRIVER_MODE == DRIVER_MODE_SERIAL
+#elif DRIVER_MODE == DRIVER_MODE_SERIAL || DRIVER_MODE == DRIVER_MODE_SPI
 // 2 digits, resistors on segments, serial-to-parallel on segments
 const uint8_t NUM_DIGITS = 4;
 uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
 uint8_t latchPin = 10; // ST_CP on 74HC595
-uint8_t clockPin = 13; // SH_CP on 74HC595
 uint8_t dataPin = 11; // DS on 74HC595
+uint8_t clockPin = 13; // SH_CP on 74HC595
 #endif
 
 // Set up the chain of resources and their dependencies.
@@ -77,6 +78,17 @@ Driver* driver = DriverBuilder()
     .setResistorsOnSegments()
     .setDigitPins(digitPins)
     .setSegmentSerialPins(latchPin, dataPin, clockPin)
+    .setDimmingDigits(dimmingDigits)
+    .build();
+#elif DRIVER_MODE == DRIVER_MODE_SPI
+Driver* driver = DriverBuilder()
+    .setHardware(&hardware)
+    .setNumDigits(NUM_DIGITS)
+    .setCommonCathode()
+    .setResistorsOnSegments()
+    .setDigitPins(digitPins)
+    .setSegmentSerialPins(latchPin, dataPin, clockPin)
+    .useSpi()
     .setDimmingDigits(dimmingDigits)
     .build();
 #endif

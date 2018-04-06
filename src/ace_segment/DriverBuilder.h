@@ -41,7 +41,8 @@ class DriverBuilder {
       mNumSegments(8),
       mResistorsOnSegments(true),
       mCommonCathode(true),
-      mUseDirect(true),
+      mUseSerialToParallel(false),
+      mUseSpi(false),
       mDigitPins(nullptr),
       mSegmentPins(nullptr),
       mUseModulatingDriver(false),
@@ -89,14 +90,14 @@ class DriverBuilder {
     }
 
     DriverBuilder& setSegmentDirectPins(const uint8_t* segmentPins) {
-      mUseDirect = true;
+      mUseSerialToParallel = false;
       mSegmentPins = segmentPins;
       return *this;
     }
 
     DriverBuilder& setSegmentSerialPins(uint8_t latchPin, uint8_t dataPin,
         uint8_t clockPin) {
-      mUseDirect = false;
+      mUseSerialToParallel = true;
       // We support only resistors on segments in this configuration.
       mResistorsOnSegments = true;
       mSegmentPins = nullptr;
@@ -104,6 +105,11 @@ class DriverBuilder {
       mLatchPin = latchPin;
       mDataPin = dataPin;
       mClockPin = clockPin;
+      return *this;
+    }
+
+    DriverBuilder& useSpi() {
+      mUseSpi = true;
       return *this;
     }
 
@@ -135,7 +141,8 @@ class DriverBuilder {
     uint8_t mNumSegments;
     bool mResistorsOnSegments;
     bool mCommonCathode;
-    bool mUseDirect;
+    bool mUseSerialToParallel;
+    bool mUseSpi;
     const uint8_t* mDigitPins;
     const uint8_t* mSegmentPins;
     uint8_t mLatchPin;

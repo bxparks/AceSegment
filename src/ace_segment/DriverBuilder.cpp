@@ -26,6 +26,7 @@ SOFTWARE.
 #include "LedMatrix.h"
 #include "LedMatrixDirect.h"
 #include "LedMatrixSerial.h"
+#include "LedMatrixSpi.h"
 #include "Driver.h"
 #include "DigitDriver.h"
 #include "ModulatingDigitDriver.h"
@@ -36,7 +37,7 @@ namespace ace_segment {
 
 /** The LedMatrix object returned must have its configure() called. */
 LedMatrix* DriverBuilder::buildLedMatrix() {
-  if (mUseDirect) {
+  if (!mUseSerialToParallel) {
     if (mResistorsOnSegments) {
       LedMatrixDirect* ledMatrix = new LedMatrixDirect(
           mHardware, mNumDigits, mNumSegments);
@@ -62,8 +63,14 @@ LedMatrix* DriverBuilder::buildLedMatrix() {
     }
   } else {
     // We support only resistors on segments for SerialToParallel
-    LedMatrixSerial* ledMatrix = new LedMatrixSerial(
-        mHardware, mNumDigits, mNumSegments);
+    LedMatrixSerial* ledMatrix;
+    if (mUseSpi) {
+      ledMatrix = new LedMatrixSpi(
+          mHardware, mNumDigits, mNumSegments);
+    } else {
+      ledMatrix = new LedMatrixSerial(
+          mHardware, mNumDigits, mNumSegments);
+    }
     ledMatrix->setGroupPins(mDigitPins);
     ledMatrix->setElementPins(mLatchPin, mDataPin, mClockPin);
     if (mCommonCathode) {
