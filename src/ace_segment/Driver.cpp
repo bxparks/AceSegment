@@ -23,24 +23,13 @@ SOFTWARE.
 */
 
 #include <Arduino.h> // LOW and HIGH
-#include "Hardware.h"
-#include "StyledDigit.h"
+#include "LedMatrix.h"
 #include "Driver.h"
 
 namespace ace_segment {
 
-void Driver::setCommonAnode() {
-  mDigitOn = HIGH;
-  mDigitOff = LOW;
-  mSegmentOn = LOW;
-  mSegmentOff = HIGH;
-}
-
-void Driver::setCommonCathode() {
-  mDigitOn = LOW;
-  mDigitOff = HIGH;
-  mSegmentOn = HIGH;
-  mSegmentOff = LOW;
+void Driver::configure() {
+  mLedMatrix->configure();
 }
 
 void Driver::setPattern(uint8_t digit, SegmentPatternType pattern,

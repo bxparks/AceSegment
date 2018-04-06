@@ -26,9 +26,10 @@ SOFTWARE.
 // Experimental
 //----------------------------------------------------------------
 
-#include "Hardware.h"
-#include "ModulatingDigitDriver.h"
 #include "Util.h"
+#include "Hardware.h"
+#include "LedMatrix.h"
+#include "ModulatingDigitDriver.h"
 
 namespace ace_segment {
 
@@ -36,7 +37,7 @@ void ModulatingDigitDriver::displayCurrentField() {
   DimmingDigit& dimmingDigit = mDimmingDigits[mCurrentDigit];
   uint8_t brightness = dimmingDigit.brightness;
   if (mCurrentDigit != mPrevDigit) {
-    writeDigitPin(mPrevDigit, mDigitOff);
+    mLedMatrix->disableGroup(mPrevDigit);
     mIsCurrentDigitOn = false;
     mCurrentSubFieldMax = ((uint16_t) mNumSubFields * brightness) / 256;
   }
@@ -47,7 +48,7 @@ void ModulatingDigitDriver::displayCurrentField() {
   if (brightness < 255 && mCurrentSubField >= mCurrentSubFieldMax) {
     // turn off
     if (mIsCurrentDigitOn) {
-      writeDigitPin(mCurrentDigit, mDigitOff);
+      mLedMatrix->disableGroup(mCurrentDigit);
       mIsCurrentDigitOn = false;
     }
   } else {
@@ -55,10 +56,10 @@ void ModulatingDigitDriver::displayCurrentField() {
     if (!mIsCurrentDigitOn) {
       SegmentPatternType segmentPattern = dimmingDigit.pattern;
       if (segmentPattern != mSegmentPattern) {
-        drawSegments(segmentPattern);
+        mLedMatrix->drawElements(segmentPattern);
         mSegmentPattern = segmentPattern;
       }
-      writeDigitPin(mCurrentDigit, mDigitOn);
+      mLedMatrix->enableGroup(mCurrentDigit);
       mIsCurrentDigitOn = true;
     }
   }

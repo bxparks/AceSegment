@@ -26,24 +26,22 @@ SOFTWARE.
 #define ACE_SEGMENT_SEGMENT_DRIVER_H
 
 #include <stdint.h>
-#include "DirectDriver.h"
+#include "Driver.h"
 
 namespace ace_segment {
 
 class DimmingDigit;
-class Hardware;
 
-class SegmentDriver: public DirectDriver {
+class SegmentDriver: public Driver {
   public:
     /** Constructor. */
-    explicit SegmentDriver(Hardware* hardware, DimmingDigit* dimmingDigits,
-            int8_t numDigits):
-        DirectDriver(hardware, dimmingDigits, numDigits)
+    explicit SegmentDriver(LedMatrix* ledMatrix, DimmingDigit* dimmingDigits,
+            uint8_t numDigits):
+        Driver(ledMatrix, dimmingDigits, numDigits)
     {}
 
     virtual void configure() override {
-      DirectDriver::configure();
-
+      Driver::configure();
       mCurrentSegment = 0;
       mPrevSegment = kNumSegments - 1;
       mDigitPattern = 0;
@@ -62,9 +60,6 @@ class SegmentDriver: public DirectDriver {
 
     /** Get the digit bit pattern for the given segment. */
     DigitPatternType getDigitBitPattern(uint8_t segment);
-
-    /** Draw the specified segment with its digits specified by pattern. */
-    void drawDigits(DigitPatternType digitPattern);
 
     uint8_t mCurrentSegment;
     uint8_t mPrevSegment;

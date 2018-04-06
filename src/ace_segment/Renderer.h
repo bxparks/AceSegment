@@ -31,6 +31,7 @@ SOFTWARE.
 namespace ace_segment {
 
 class StyledDigit;
+class Hardware;
 
 class Renderer {
   public:

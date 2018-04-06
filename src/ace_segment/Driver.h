@@ -30,7 +30,7 @@ SOFTWARE.
 
 namespace ace_segment {
 
-class Hardware;
+class LedMatrix;
 
 /**
  * Base class of drivers which knows how to transfer the bit patterns stored in
@@ -57,18 +57,7 @@ class Driver {
      */
     typedef uint8_t DigitPatternType;
 
-    // Start configuration methods
-
-    /** LED positive terminals are wired together. Required. */
-    void setCommonAnode();
-
-    /** LED negative terminals are wired together. Required. */
-    void setCommonCathode();
-
-    /** Configure the driver after all the setXxx() methods have been called. */
-    virtual void configure() {}
-
-    // End configuration methods
+    virtual void configure();
 
     /**
      * Display the current field of the frame. Automatically advances to the
@@ -119,21 +108,16 @@ class Driver {
     Driver& operator=(const Driver&) = delete;
 
     /** Constructor. */
-    explicit Driver(Hardware* hardware, DimmingDigit* dimmingDigits,
-            uint8_t numDigits):
-        mHardware(hardware),
+    explicit Driver(LedMatrix* ledMatrix, DimmingDigit* dimmingDigits,
+        uint8_t numDigits):
+        mLedMatrix(ledMatrix),
         mDimmingDigits(dimmingDigits),
         mNumDigits(numDigits)
     {}
 
-    Hardware* const mHardware;
+    LedMatrix* const mLedMatrix;
     DimmingDigit* const mDimmingDigits;
     uint8_t const mNumDigits;
-
-    uint8_t mDigitOn;
-    uint8_t mDigitOff;
-    uint8_t mSegmentOn;
-    uint8_t mSegmentOff;
 };
 
 }

@@ -27,7 +27,6 @@ SOFTWARE.
 #include <stdarg.h>
 #include <AUnit.h>
 #include <AceSegment.h>
-#include <ace_segment/SerialToParallelDriver.h>
 #include <ace_segment/testing/TestableHardware.h>
 #include <ace_segment/testing/FakeDriver.h>
 

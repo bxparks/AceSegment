@@ -28,7 +28,7 @@ namespace ace_segment {
 
 void StringWriter::writeStringAt(uint8_t digit, const char* s, bool padRight) {
   bool charWasWritten = false;
-  int8_t numDigits = mCharWriter->getNumDigits();
+  uint8_t numDigits = mCharWriter->getNumDigits();
 
   while (true) {
     char c = *s;
