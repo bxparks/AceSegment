@@ -36,59 +36,24 @@ class LedMatrixDirect: public LedMatrix {
         LedMatrix(hardware, numGroups, numElements)
     {}
 
-    void setGroupPins(const uint8_t* groupPins) {
-      mGroupPins = groupPins;
-    }
+    void setGroupPins(const uint8_t* groupPins);
 
-    void setElementPins(const uint8_t* elementPins) {
-      mElementPins = elementPins;
-    }
+    void setElementPins(const uint8_t* elementPins);
 
-    virtual void configure() override {
-      LedMatrix::configure();
+    virtual void configure() override;
 
-      for (uint8_t group = 0; group < mNumGroups; group++) {
-        uint8_t digitalPin = mGroupPins[group];
-        mHardware->pinMode(digitalPin, OUTPUT);
-        mHardware->digitalWrite(digitalPin, mGroupOff);
-      }
-      for (uint8_t element = 0; element < mNumElements; element++) {
-        uint8_t elementPin = mElementPins[element];
-        mHardware->pinMode(elementPin, OUTPUT);
-        mHardware->digitalWrite(elementPin, mElementOff);
-      }
-    }
+    virtual void enableGroup(uint8_t group) override;
 
-    virtual void enableGroup(uint8_t group) override {
-      writeGroupPin(group, mGroupOn);
-    }
+    virtual void disableGroup(uint8_t group) override;
 
-    virtual void disableGroup(uint8_t group) override {
-      writeGroupPin(group, mGroupOff);
-    }
-
-    virtual void drawElements(uint8_t pattern) override {
-      uint8_t elementMask = 0x1;
-      for (uint8_t element = 0; element < mNumElements; element++) {
-        uint8_t output =
-            (pattern & elementMask) ? mElementOn : mElementOff;
-        writeElementPin(element, output);
-        elementMask <<= 1;
-      }
-    }
+    virtual void drawElements(uint8_t pattern) override;
 
   private:
     /** Write to group pin identified by 'group'. VisibleForTesting. */
-    void writeGroupPin(uint8_t group, uint8_t output) {
-      uint8_t groupPin = mGroupPins[group];
-      mHardware->digitalWrite(groupPin, output);
-    }
+    void writeGroupPin(uint8_t group, uint8_t output);
 
     /** Write to the element pin identified by 'element'. VisibleForTesting. */
-    void writeElementPin(uint8_t element, uint8_t output) {
-      uint8_t elementPin = mElementPins[element];
-      mHardware->digitalWrite(elementPin, output);
-    }
+    void writeElementPin(uint8_t element, uint8_t output);
 
     const uint8_t* mGroupPins;
     const uint8_t* mElementPins;
