@@ -42,22 +42,20 @@ us a fields per second rate of 240Hz to 3840Hz.
 
 At the highest fields per second, a single field needs to be written in less
 than 260 microseconds. The AceSegment library is able to meet this timing
-requirement because the most complex driver `ModulatingDigitDriver` is able to
-render a single field with a maximum CPU time of 124 microseconds on a
+requirement because the most complex driver option (`useModulatingDriver()`) is
+able to render a single field with a maximum CPU time of 124 microseconds on a
 16MHz ATmega328P microcontroller (Arduino UNO, Nano, Mini, etc).
 
-The `ModulatingDigitDriver` is able to support the following features on
-a single, independently of the other digits:
+When the `useModulatingDriver()` option is enabled, the following features
+become enabled on a single digit, independently of the other digits:
 * blinking slow
 * blinking fast
 * pulsing slow
 * pulsing fast
 * a user-selectable global brightness
 
-Currently, the `Driver` classes in the framework support an LED display which
-are directly connected to the GPIO pins. However, a driver that supports a
-serial to parallel chip like the 74HC595 should fit easily into the
-library's framework and is planned for the near future.
+The framework supports an LED display which is either directly connected to the
+GPIO pins or through a serial-to-parallel chip like the 74HC595.
 
 ## Installation
 
@@ -125,17 +123,8 @@ depend on the lower-level classes:
   and its brightness. An array of these will be created, one for each digit.
 * `Driver`: A class that knows how to display bit patterns of a `DimmingDigit`
   to the seven segment leds. Different subclasses implement different types of
-  wiring:
-    * `SegmentDriver`: A class that enables one segment at a time, illuminating
-      all the relevant digits. This should be used if the current limiting
-      reisistors are on the digits.
-    * `DigitDriver`: A class that enables one digit at a time, illluminating
-      all the segments of a specific digit. This should be used if the
-      current limiting resistors are on the segments. (This is the recommended
-      configuration, as discussed below).
-    * `ModulatingDigitDriver`: A subclass of `DigitDriver` which uses pulse
-      width modulation (PWM) to control the brightness of a specific digit,
-      as specified in a `DimmingDigit` class.
+  wiring, but the user does not need to aware of the various subclasses. That
+  complexity is managed by the `DriverBuilder` class.
 * `StyledDigit`: A class that represents one digit which can have certain style
   attributes (e.g. blinking, or pulsing). A `StyledDigit` is converted into
   a `DimmingDigit`.
@@ -151,69 +140,412 @@ depend on the lower-level classes:
   It tries to be smart about collapsing decimal point `.` characters into
   the native decimal point on a seven segment LED display.
 
-Not all `Driver`s will support the brightness of a digit. In fact, in the
-current version of the library, only the `ModulatingDigitDriver` supports this.
+Not all `Driver`s and not all wiring configurations will support the brightness.
+See the *Modulating Driver* for details on which configuration supports this
+feature.
 
 The [Doxygen docs for these classes](https://bxparks.github.io/AceSegment/html)
 are published through GitHub Pages.
 
 ### Setting Up the Resources
 
-As noted above, the exact subclass of `Driver` will depend on whether
-the resistors are on the segments (recommended) or on the digits.
+With the exception of `Driver`, all of the classes in the previous section will
+most likely be created statically in the global memory area. The `Driver` object
+will be created by the `DriverBuilder` class on the heap and a pointer to the
+object will be returned. The client code will not normally need to delete this
+heap object so for all practical purposes, it can be treated as if it was
+created statically.
 
-* Resistors on segments
-    * `DigitDiver`
-    * `ModulatingDigitDriver`
-* Resistors on digits
-    * `SegmentDriver`
+The resource creation occurs in roughly 4 stages, with the objects in the
+later stages depending on the objects created in the earlier stage:
 
-Although it would be possible to make this decision at runtime, instead of
-at compile-time, making this decision at runtime means that the code for
-both types of wiring would be compiled into the program but one type
-of `Driver` would never be used and would waste flash memory space.
+1. Low level buffers and hardware interface.
+1. The `Driver` object through the `DriverBuilder`.
+1. The `Renderer` which knows how to send bit patterns to the `Driver`.
+1. The various `XxxWriter` classes which translate higher level characters and
+   strings into bit patterns.
 
-An instance of the various classes list above will probably be defined as static
-variables at the top of the client program. These instances don't have to be
-static resources --- they could be on the heap --- but static resources are
-usually more convenient in embedded environemnt so that we don't have to worry
-about memory management.
-
-For example, if the "resistors on segments" configuration was used and
-we decided to use the simple `DigitDriver` (instead of the more complicated
-`ModulatingDigitDriver`), then the setup code will look like this:
+A typical resource creation code looks like this:
 ```
 const uint16_t FRAMES_PER_SECOND = 60;
-const uint8_t NUM_DIGITS = 2;
+const uint8_t NUM_DIGITS = 4;
 
 Hardware hardware;
 DimmingDigit dimmingDigits[NUM_DIGITS];
 StyledDigit styledDigits[NUM_DIGITS];
-DigitDriver driver(&hardware, dimmingDigits, NUM_DIGITS);
-Renderer renderer(&hardware, &driver, styledDigits, NUM_DIGITS);
+
+Driver* driver = DriverBuilder()
+    .setHardware(&hardware)
+    .setNumDigits(NUM_DIGITS)
+    .setXxx()
+    .useXxx()
+    ...
+    .build();
+
+Renderer renderer(&hardware, driver, styledDigits, NUM_DIGITS);
 CharWriter charWriter(&renderer);
 StringWriter stringWriter(&charWriter);
 ```
 
-### Configuring the Driver and Renderer
+Then in the `setup()` method, the `driver` and the `renderer` need to be
+configured, like this:
+```
+  Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
+  while (!Serial); // Wait until Serial is ready - Leonardo/Micro
 
-After the `Driver` and the `Renderer` instances have been created, they need to
-be configured. Each class contains a set of `setXxx()` methods. After the
-various configuration parameters have been set, the `configure()` method
-finishes the configuration of the object.
+  driver->configure();
+  renderer
+      .setFramesPerSecond(FRAMES_PER_SECOND)
+      .setXxx()
+      .configure();
+  ...
+```
 
-The following parameters are configurable in `Driver`:
-* `void setCommonAnode();` (required)
-* `void setCommonCathode();` (required)
-* `void setDigitPins(const uint8_t* pins);` (required)
-* `void setSegmentPins(const uint8_t* pins);` (required)
+### Configuring the Driver
 
-The `ModulatingDigitDriver` adds one more configuration:
-* `void setNumSubFields(uint8_t numSubFields);` (required)
+The `Driver` is created indirectly through a helper class called the
+`DriverBuilder`. The helper class exists to hide the enormous complexity of
+configuring and adjusting the various subclasses and internal helper classes
+which work together to make a `Driver` object operate correctly for a given
+LED display configuration.
 
-All these parameters on `Driver` and `ModulatingDigitDriver` are required
-because they tell the `Driver` how and where the seven-segment LED digits
-are connected to the microcontroller.
+To use the `DriverBuilder`, create an instance of it, call the various
+`setXxx()` or `useXxx()` methods to tell the object how the LED display is
+wired, then finally call the `build()` method which returns an instance of a
+`Driver` (more accurately, one of its implementation subclasses) which was
+created on the heap. Normally, this heap object will never need to be
+deleted, so you don't have to worry about memory management. All of these
+methods on `DriverBuilder` return a reference to `*this`, so they can
+be chained together in one statement. This makes it very easy to use
+the `DriverBuilder` during the static initialization phase of the various
+resources.
+
+The following methods are available in `DriverBuilder`:
+
+* `DriverBuilder& setHardware(Hardware* hardware);`
+* `DriverBuilder& setNumDigits(uint8_t numDigits);`
+* `DriverBuilder& setNumSegments(uint8_t numSegments);`
+* `DriverBuilder& setCommonAnode();`
+* `DriverBuilder& setCommonCathode();`
+* `DriverBuilder& setResistorsOnDigits();`
+* `DriverBuilder& setResistorsOnSegments();`
+* `DriverBuilder& setDigitPins(const uint8_t* digitPins);`
+* `DriverBuilder& setSegmentDirectPins(const uint8_t* segmentPins);`
+* `DriverBuilder& setSegmentSerialPins(uint8_t latchPin, uint8_t dataPin,
+   uint8_t clockPin);`
+* `DriverBuilder& useSpi();`
+* `DriverBuilder& setDimmingDigits(DimmingDigit* dimmingDigits);`
+* `DriverBuilder& useModulatingDriver();`
+* `DriverBuilder& setNumSubFields(uint8_t numSubFields);`
+
+The best way to show how to use these methods is probably through
+examples.
+
+#### Pins Wired Directly, Resistors on Segments, Common Cathode
+
+The wiring for this configuration looks like this:
+```
+MCU                     LED display
++-----+                  +------------------------+
+|  D04|------ R ---------|a -------.              |
+|  D05|------ R ---------|b -------|--------.     |
+|  D06|------ R ---------|c        |        |     |
+|  D07|------ R ---------|d      -----    -----   |
+|  D08|------ R ---------|e       \ /      \ /    |
+|  D09|------ R ---------|f      --v--    --v--   |
+|  D10|------ R ---------|g        |        |     |
+|  D11|------ R ---------|h        |        |     |
+|     |                  |         |        |     |
+|  D12|------------------|D1 ------'--------'     |
+|  D14|------------------|D2                      |
+|  D15|------------------|D3                      |
+|  D16|------------------|D4                      |
++-----+                  +------------------------+
+```
+
+The `DriverBuilder` configuration is:
+```
+const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
+const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
+Driver* driver = DriverBuilder()
+    .setHardware(&hardware)
+    .setNumDigits(NUM_DIGITS)
+    .setCommonCathode()
+    .setResistorsOnSegments()
+    .setDigitPins(digitPins)
+    .setSegmentDirectPins(segmentPins)
+    .setDimmingDigits(dimmingDigits)
+    .build();
+```
+
+#### Pins Wired Directly, Resistors on Segments, Common Anode
+
+The wiring for this configuration looks like this:
+```
+MCU                    LED display
++-----+                  +------------------------+
+|  D04|------ R ---------|a -------.              |
+|  D05|------ R ---------|b -------|--------.     |
+|  D06|------ R ---------|c        |        |     |
+|  D07|------ R ---------|d      --^--    --^--   |
+|  D08|------ R ---------|e       / \      / \    |
+|  D09|------ R ---------|f      -----    -----   |
+|  D10|------ R ---------|g        |        |     |
+|  D11|------ R ---------|h        |        |     |
+|     |                  |         |        |     |
+|  D12|------------------|D1 ------'--------'     |
+|  D14|------------------|D2                      |
+|  D15|------------------|D3                      |
+|  D16|------------------|D4                      |
++-----+                  +------------------------+
+```
+
+The `DriverBuilder` configuration is:
+```
+const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
+const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
+Driver* driver = DriverBuilder()
+    .setHardware(&hardware)
+    .setNumDigits(NUM_DIGITS)
+    .setCommonAnode()
+    .setResistorsOnSegments()
+    .setDigitPins(digitPins)
+    .setSegmentDirectPins(segmentPins)
+    .setDimmingDigits(dimmingDigits)
+    .build();
+```
+
+#### Pins Wired Directly, Resistors on Digits, Common Cathode
+
+The wiring for this configuration looks like this:
+```
+MCU                     LED display
++-----+                  +------------------------+
+|  D04|------------------|a -------.              |
+|  D05|------------------|b -------|--------.     |
+|  D06|------------------|c        |        |     |
+|  D07|------------------|d      -----    -----   |
+|  D08|------------------|e       \ /      \ /    |
+|  D09|------------------|f      --v--    --v--   |
+|  D10|------------------|g        |        |     |
+|  D11|------------------|h        |        |     |
+|     |                  |         |        |     |
+|  D12|------ R---------| 1 ------'--------'      |
+|  D14|------ R---------| 2                       |
+|  D15|------ R---------| 3                       |
+|  D16|------ R---------| 4                       |
++-----+                  +------------------------+
+```
+
+The `DriverBuilder` configuration is:
+```
+const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
+const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
+Driver* driver = DriverBuilder()
+    .setHardware(&hardware)
+    .setNumDigits(NUM_DIGITS)
+    .setCommonAnode()
+    .setResistorsOnDigits()
+    .setDigitPins(digitPins)
+    .setSegmentDirectPins(segmentPins)
+    .setDimmingDigits(dimmingDigits)
+    .build();
+```
+
+#### Pins Wired Directly, Resistors on Digits, Common Anode
+
+The wiring for this configuration looks like this:
+```
+MCU                     LED display
++-----+                  +------------------------+
+|  D04|------------------|a -------.              |
+|  D05|------------------|b -------|--------.     |
+|  D06|------------------|c        |        |     |
+|  D07|------------------|d      --^--    --^--   |
+|  D08|------------------|e       / \      / \    |
+|  D09|------------------|f      -----    -----   |
+|  D10|------------------|g        |        |     |
+|  D11|------------------|h        |        |     |
+|     |                  |         |        |     |
+|  D12|------- R --------|D1 ------'--------'     |
+|  D14|------- R --------|D2                      |
+|  D15|------- R --------|D3                      |
+|  D16|------- R --------|D4                      |
++-----+                  +------------------------ +
+```
+
+The `DriverBuilder` configuration is:
+```
+const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
+const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
+Driver* driver = DriverBuilder()
+    .setHardware(&hardware)
+    .setNumDigits(NUM_DIGITS)
+    .setCommonAnode()
+    .setResistorsOnDigits()
+    .setDigitPins(digitPins)
+    .setSegmentDirectPins(segmentPins)
+    .setDimmingDigits(dimmingDigits)
+    .build();
+```
+
+#### Pins Wired Directly, Resistors on Segments, Common Cathode, PWM
+
+If the resistors are on the segments, then we have to option of
+using pulse width modulation (PWM) to get features like brightness
+and pulsing of digits. The wiring for this configuration looks like before:
+
+```
+MCU                     LED display
++-----+                  +------------------------+
+|  D04|------ R ---------|a -------.              |
+|  D05|------ R ---------|b -------|--------.     |
+|  D06|------ R ---------|c        |        |     |
+|  D07|------ R ---------|d      -----    -----   |
+|  D08|------ R ---------|e       \ /      \ /    |
+|  D09|------ R ---------|f      --v--    --v--   |
+|  D10|------ R ---------|g        |        |     |
+|  D11|------ R ---------|h        |        |     |
+|     |                  |         |        |     |
+|  D12|------------------|D1 ------'--------'     |
+|  D14|------------------|D2                      |
+|  D15|------------------|D3                      |
+|  D16|------------------|D4                      |
++-----+                  +------------------------+
+```
+
+The `DriverBuilder` configuration is similar to before but we add
+a `useModulatingDriver()` option along with the number of
+subfields to use with the `setNumSubFields()` method:
+```
+const uint8_t NUM_SUBFIELDS = 16;
+const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
+const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
+
+Driver* driver = DriverBuilder()
+    .setHardware(&hardware)
+    .setNumDigits(NUM_DIGITS)
+    .setCommonCathode()
+    .setResistorsOnSegments()
+    .setDigitPins(digitPins)
+    .setSegmentDirectPins(segmentPins)
+    .setDimmingDigits(dimmingDigits)
+    .useModulatingDriver()
+    .setNumSubFields(NUM_SUBFIELDS)
+    .build();
+```
+
+#### Segment Pins Wired through Serial-to-Parallel Converter
+
+There is experimental support for using an 74HC595 serial-to-parallel converter
+chip. The caveat is that this chip can supply only 6 mA per pin (as opposed to
+40 mA for an Arduino Nano for example). But it may be enough in some
+applications.
+
+We assume here that the registors are on the segment pins, and that we are using
+a common cathode LED display.
+
+```
+MCU       74HC595             LED display
++-----+   +---------+         +------------------------+
+|     |   |       Q0|--- R ---|a -------.              |
+|     |   |       Q1|--- R ---|b -------|--------.     |
+|  D10|---|ST_CP  Q2|--- R ---|c        |        |     |
+|  D11|---|DS     Q3|--- R ---|d      -----    -----   |
+|  D13|---|SH_CP  Q4|--- R ---|e       \ /      \ /    |
+|     |   |       Q5|--- R ---|f      --v--    --v--   |
+|     |   |       Q6|--- R ---|g        |        |     |
+|     |   |       Q7|--- R ---|h        |        |     |
+|     |   +---------+         |         |        |     |
+|  D04|-----------------------|D1 ------'--------'     |
+|  D05|-----------------------|D2                      |
+|  D06|-----------------------|D3                      |
+|  D07|-----------------------|D4                      |
++-----+                       +------------------------+
+```
+
+The `DriverBuilder` configuration is:
+```
+const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
+const uint8_t latchPin = 10; // ST_CP on 74HC595
+const uint8_t dataPin = 11; // DS on 74HC595
+const uint8_t clockPin = 13; // SH_CP on 74HC595
+
+Driver* driver = DriverBuilder()
+    .setHardware(&hardware)
+    .setNumDigits(NUM_DIGITS)
+    .setCommonCathode()
+    .setResistorsOnSegments()
+    .setDigitPins(digitPins)
+    .setSegmentSerialPins(latchPin, dataPin, clockPin)
+    .setDimmingDigits(dimmingDigits)
+    .build();
+```
+
+#### Segment Pins Wired through Serial-to-Parallel Converter using Hardware SPI
+
+With the same configuration as above, we can use the hardware
+[SPI](https://www.arduino.cc/en/Reference/SPI) instead of the
+software implementation given by
+[shiftOut()](https://www.arduino.cc/reference/en/language/functions/advanced-io/shiftout/).
+
+
+```
+MCU          74HC595             LED display
++--------+   +---------+         +------------------------+
+|        |   |       Q0|--- R ---|a -------.              |
+|        |   |       Q1|--- R ---|b -------|--------.     |
+|  SS/D10|---|ST_CP  Q2|--- R ---|c        |        |     |
+|MOSI/D11|---|DS     Q3|--- R ---|d      -----    -----   |
+| SCK/D13|---|SH_CP  Q4|--- R ---|e       \ /      \ /    |
+|        |   |       Q5|--- R ---|f      --v--    --v--   |
+|        |   |       Q6|--- R ---|g        |        |     |
+|        |   |       Q7|--- R ---|h        |        |     |
+|        |   +---------+         |         |        |     |
+|     D04|-----------------------|D1 ------'--------'     |
+|     D05|-----------------------|D2                      |
+|     D06|-----------------------|D3                      |
+|     D07|-----------------------|D4                      |
++--------+                       +------------------------+
+```
+
+The `DriverBuilder` configuration is the same as before, but we
+just add the `useSpi()` configuration option:
+```
+const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
+const uint8_t latchPin = 10; // ST_CP on 74HC595
+const uint8_t dataPin = 11; // DS on 74HC595
+const uint8_t clockPin = 13; // SH_CP on 74HC595
+
+Driver* driver = DriverBuilder()
+    .setHardware(&hardware)
+    .setNumDigits(NUM_DIGITS)
+    .setCommonCathode()
+    .setResistorsOnSegments()
+    .setDigitPins(digitPins)
+    .setSegmentSerialPins(latchPin, dataPin, clockPin)
+    .useSpi()
+    .setDimmingDigits(dimmingDigits)
+    .build();
+```
+
+#### Modulating Driver
+
+As indicated above, some driver options will support brightness control using
+pulse width modulation. There are some restrictions. First, the resistors must
+be on the segments. Second, the driver must be fast enough to do pulse width
+modulation. Currently, this means that the following `DriverBuilder` options
+(see below) must be used:
+* `useSpi()` - hardware API
+* `setSegmentDirectPins()` - direct wiring to the segment pins
+
+The following options:
+* `useSerial()` - software SPI
+
+is too slow, and `useModulatingDriver()` will not work for this option.
+
+
+### Configuring the Renderer
 
 The following parameters are configuration in `Renderer`:
 * `void setFramesPerSecond(uint8_t framesPerSecond);` (required)
@@ -226,15 +558,6 @@ The following parameters are configuration in `Renderer`:
 
 Only the `setFramesPerSecond()` method is required. The others have reasonable
 defaults.
-
-An example of configuring the `ModulatingDigitDriver` is:
-```
-driver.setDigitPins(digitPins);
-driver.setSegmentPins(segmentPins);
-driver.setCommonCathode();
-driver.setNumSubFields(16);
-driver.configure();
-```
 
 And example of configuring the `Renderer` is:
 ```
@@ -299,10 +622,10 @@ specific style:
   milliseconds per cycle which can be changed by
   `Renderer::setPulseFastDuration()`
 
-The `ModulatingDigitDriver` is required for the two pulsing modes, because the
-driver needs to be able to support intermediate brightness of the LED digits,
-which can currently be achieved using pulse width modulation implemented by
-`ModulatingDigitDriver`.
+The `useModulatingDriver()` option is required for the two pulsing modes,
+because the driver needs to be able to support intermediate brightness of the
+LED digits, which can currently be achieved using pulse width modulation.
+
 
 ### Global Brightness
 
@@ -349,21 +672,19 @@ know much of anything about fields. The only thing that the `Renderer` knows is
 how many fields there are in a frame and this information comes from the
 `Driver::getFieldsPerFrame()` method from the `Driver`.
 
-### Modulating Digit Driver
+### Use Modulating Driver Option
 
-When the `ModulatingDigitDriver` is configured in its constructor argument to
-have, say, 16 subfields within a single field, then each digit is rendered 16
-times within a single field, but modulated using pulse width modulation to
-control the width of that signal. The given digit will be "on" only a fraction
-of the full interval of the single field rendering and will appear dimmer to the
-human eye.
+When the `useModulatingDriver()` option is configured in `DriverBuilder` with,
+say, 16 subfields within a single field, then each digit is rendered 16 times
+within a single field, but modulated using pulse width modulation to control the
+width of that signal. The given digit will be "on" only a fraction of the full
+interval of the single field rendering and will appear dimmer to the human eye.
 
-Since PWM is used to control the brightness of the digit, we can see that only
-`ModulatingDigitDriver` returns `true` for `isBrightnessSupported()` which
-notifies the `Renderer` that brightness is supported. Both `DigitDriver` and
-`SegmentDriver` returns false for this method. This allows the `Renderer` to
-avoid performing certain time consuming calculatings related to pulsing, which
-saves CPU cycles.
+Since PWM is used to control the brightness of the digit, the
+`isBrightnessSupported()` method returns `true` only if the
+`useModulatingDriver()` is selected, which notifies the `Renderer` that
+brightness is supported. This allows the `Renderer` to avoid performing certain
+time consuming calculatings related to pulsing, which saves CPU cycles.
 
 ### Rendering
 
@@ -539,20 +860,24 @@ average, and maximum amount of time taken by a single call to `renderField()`
 method, over the last 300 frames (default which is adjustable). Here
 are the numbers for a 16MHz ATmega328P:
 
-* `DigitDriver`:
-    * avg: 47 micros; min: 16 micros; max: 96 micros
-* `ModulatingDigitDriver`:
-    * avg: 12-20 micros; min: 8 micros; max: 192 micros
-* `ModulatingDigitDriver` using `calcPulseFractionForFrameUsingInverse()`:
-    * avg: 12-20 micros; min: 8 micros; max: 124 micros
-* `SegmentDriver`:
-    * avg: 36-59 micros; min: 28 micros; max: 80 micros
+* `DigitDriver` w/ LedMatrixDirect
+    * min: 16us; avg: 47us; max: 96us
+* `DigitDriver` w/ LedMatrixSerial
+    * min: 16us; avg: 82us; max: 196us
+* `ModulatingDigitDriver` w/ LedMatrixDirect
+    * min: 8us; avg: 12-20us; max: 192us
+* `ModulatingDigitDriver` w/ LedMatrixDirect w/ `calcPulseFractionForFrameUsingInverse()`:
+    * min: 8us; avg: 12-20us; max: 124us
+* `ModulatingDigitDriver` w/ LedMatrixSpi
+    * min: 8us; avg: 16us; max: 92us
+* `SegmentDriver` w/ LedMatrixDirect
+    * min: 28us; avg: 36-59us; max: 80us
 
 If we want to drive a 4 digit LED display at 60 frames per second, using a
 subfield modulation of 16 subfields per field, we get a field rate of 3.84 kHz,
 or 260 microseconds per field. The worst case elapsed time for
-`Renderer::renderField()` using the `ModulatingDigitDriver` was observed to be
-124 microseconds. That means that we would have slightly less than 136
+`Renderer::renderField()` using the `useModulatingDriver()` option was observed
+to be 124 microseconds. That means that we would have slightly less than 136
 microseconds of spare CPU cyles to do any other work besides rendering the LED
 display.
 

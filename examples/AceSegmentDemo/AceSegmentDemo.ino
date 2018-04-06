@@ -9,28 +9,28 @@ using namespace ace_segment;
 #define DRIVER_MODE_SERIAL 4
 #define DRIVER_MODE_SPI 5
 
-#define DRIVER_MODE DRIVER_MODE_SPI
+#define DRIVER_MODE DRIVER_MODE_SERIAL
 
-const uint8_t NUM_SUBFIELDS = 12;
+const uint8_t NUM_SUBFIELDS = 16;
 const uint8_t FRAMES_PER_SECOND = 60;
 
 #if DRIVER_MODE == DRIVER_MODE_SEGMENT
 // 2 digits, resistors on digits
 const uint8_t NUM_DIGITS = 2;
-uint8_t digitPins[NUM_DIGITS] = {12, 14};
-uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
+const uint8_t digitPins[NUM_DIGITS] = {12, 14};
+const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
 #elif DRIVER_MODE == DRIVER_MODE_DIGIT || DRIVER_MODE == DRIVER_MODE_MODULATING
 // 4 digits, resistors on segments
 const uint8_t NUM_DIGITS = 4;
-uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
-uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
+const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
+const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
 #elif DRIVER_MODE == DRIVER_MODE_SERIAL || DRIVER_MODE == DRIVER_MODE_SPI
 // 2 digits, resistors on segments, serial-to-parallel on segments
 const uint8_t NUM_DIGITS = 4;
-uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
-uint8_t latchPin = 10; // ST_CP on 74HC595
-uint8_t dataPin = 11; // DS on 74HC595
-uint8_t clockPin = 13; // SH_CP on 74HC595
+const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
+const uint8_t latchPin = 10; // ST_CP on 74HC595
+const uint8_t dataPin = 11; // DS on 74HC595
+const uint8_t clockPin = 13; // SH_CP on 74HC595
 #endif
 
 // Set up the chain of resources and their dependencies.
@@ -57,8 +57,8 @@ Driver* driver = DriverBuilder()
     .setDigitPins(digitPins)
     .setSegmentDirectPins(segmentPins)
     .setDimmingDigits(dimmingDigits)
-    .setNumSubFields(NUM_SUBFIELDS)
     .useModulatingDriver()
+    .setNumSubFields(NUM_SUBFIELDS)
     .build();
 #elif DRIVER_MODE == DRIVER_MODE_SEGMENT
 Driver* driver = DriverBuilder()
@@ -89,6 +89,8 @@ Driver* driver = DriverBuilder()
     .setDigitPins(digitPins)
     .setSegmentSerialPins(latchPin, dataPin, clockPin)
     .useSpi()
+    //.useModulatingDriver()
+    .setNumSubFields(NUM_SUBFIELDS)
     .setDimmingDigits(dimmingDigits)
     .build();
 #endif
