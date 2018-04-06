@@ -39,6 +39,8 @@ class LedMatrix {
         mNumElements(numElements)
     {}
 
+    virtual ~LedMatrix() {}
+
     /** LED negative terminals are on the group line. Required. */
     void setCathodeOnGroup() {
       mGroupOn = LOW;

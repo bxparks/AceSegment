@@ -57,6 +57,14 @@ class Driver {
      */
     typedef uint8_t DigitPatternType;
 
+    /**
+     * Virtual destructor needed to clean up LedMatrix that was created on the
+     * heap by DriverBuilder. In an embedded environment, I expect the Driver
+     * to be created once and never deleted, so I don't expect this to be ever
+     * called, but added here to prevent memory leaks just in case.
+     */
+    virtual ~Driver();
+
     virtual void configure();
 
     /**
@@ -107,7 +115,10 @@ class Driver {
     Driver(const Driver&) = delete;
     Driver& operator=(const Driver&) = delete;
 
-    /** Constructor. */
+    /**
+     * Constructor. The driver takes ownership of the ledMatrix and will delete
+     * it in the destructor.
+     */
     explicit Driver(LedMatrix* ledMatrix, DimmingDigit* dimmingDigits,
         uint8_t numDigits):
         mLedMatrix(ledMatrix),

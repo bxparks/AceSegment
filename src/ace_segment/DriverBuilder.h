@@ -113,7 +113,6 @@ class DriverBuilder {
       return *this;
     }
 
-    /** The LedMatrix object returned must have its configure() called. */
     LedMatrix* buildLedMatrix();
 
     DriverBuilder& setDimmingDigits(DimmingDigit* dimmingDigits) {

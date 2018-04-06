@@ -28,6 +28,8 @@ SOFTWARE.
 
 namespace ace_segment {
 
+Driver::~Driver() { delete mLedMatrix; }
+
 void Driver::configure() {
   mLedMatrix->configure();
 }

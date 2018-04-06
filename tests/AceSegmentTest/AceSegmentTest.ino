@@ -79,8 +79,8 @@ Driver* modulatingDigitDriver = DriverBuilder()
     .setDigitPins(digitPins)
     .setSegmentDirectPins(segmentPins)
     .setDimmingDigits(dimmingDigits)
-    .setNumSubFields(NUM_SUB_FIELDS)
     .useModulatingDriver()
+    .setNumSubFields(NUM_SUB_FIELDS)
     .build();
 
 Driver* edgeCaseModulatingDigitDriver = DriverBuilder()
@@ -91,8 +91,8 @@ Driver* edgeCaseModulatingDigitDriver = DriverBuilder()
     .setDigitPins(digitPins)
     .setSegmentDirectPins(segmentPins)
     .setDimmingDigits(dimmingDigits)
-    .setNumSubFields(1) // edge case of 1 subfield/field
     .useModulatingDriver()
+    .setNumSubFields(1) // edge case of 1 subfield/field
     .build();
 
 Driver* segmentDriver = DriverBuilder()
@@ -125,9 +125,6 @@ void setup() {
   Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
   while (!Serial); // Wait until Serial is ready - Leonardo/Micro
 
-  //TestRunner::exclude("*");
-  //TestRunner::include("SerialToParallelDriverTest*");
-
   Serial.println(F("setup(): start"));
   Serial.print(F("sizeof(Hardware): "));
   Serial.println(sizeof(Hardware));
@@ -149,6 +146,9 @@ void setup() {
   Serial.println(sizeof(CharWriter));
   Serial.print(F("sizeof(StringWriter): "));
   Serial.println(sizeof(StringWriter));
+
+  //TestRunner::exclude("*");
+  //TestRunner::include("SerialToParallelDriverTest*");
 }
 
 void loop() {

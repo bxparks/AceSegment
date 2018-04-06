@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 #include "SPI.h"
+#include "Hardware.h"
 #include "LedMatrixSpi.h"
 
 namespace ace_segment {
@@ -30,6 +31,7 @@ namespace ace_segment {
 void LedMatrixSpi::configure() {
   LedMatrixSerial::configure();
 
+  // TODO: determine if 8000000 is the right value
   SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
 }
 

@@ -84,7 +84,6 @@ LedMatrix* DriverBuilder::buildLedMatrix() {
 
 Driver* DriverBuilder::build() {
   LedMatrix* ledMatrix = buildLedMatrix();
-  ledMatrix->configure();
 
   if (mResistorsOnSegments) {
     if (mUseModulatingDriver) {

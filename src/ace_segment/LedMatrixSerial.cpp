@@ -22,29 +22,44 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_LED_MATRIX_SPI_H
-#define ACE_SEGMENT_LED_MATRIX_SPI_H
-
+#include "Hardware.h"
 #include "LedMatrixSerial.h"
 
 namespace ace_segment {
 
-class Hardware;
+void LedMatrixSerial::configure() {
+  LedMatrix::configure();
 
-/**
- * Similar to LedMatrixSerial accept that it uses SPI to talk to the
- * 74HC595 chip instead of the shiftOut() method.
- */
-class LedMatrixSpi: public LedMatrixSerial {
-  public:
-    LedMatrixSpi(Hardware* hardware, uint8_t numGroups, uint8_t numElements):
-        LedMatrixSerial(hardware, numGroups, numElements)
-    {}
+  // TODO: Do I need to set the initial values of the 74HC595?
+  mHardware->pinMode(mLatchPin, OUTPUT);
+  mHardware->pinMode(mDataPin, OUTPUT);
+  mHardware->pinMode(mClockPin, OUTPUT);
 
-    virtual void configure() override;
+  for (uint8_t group = 0; group < mNumGroups; group++) {
+    uint8_t pin = mGroupPins[group];
+    mHardware->pinMode(pin, OUTPUT);
+    mHardware->digitalWrite(pin, mGroupOff);
+  }
+}
 
-    virtual void drawElements(uint8_t pattern) override;
-};
+void LedMatrixSerial::enableGroup(uint8_t group) {
+  writeGroupPin(group, mGroupOn);
+}
+
+void LedMatrixSerial::disableGroup(uint8_t group) {
+  writeGroupPin(group, mGroupOff);
+}
+
+void LedMatrixSerial::drawElements(uint8_t pattern) {
+  mHardware->digitalWrite(mLatchPin, LOW);
+  uint8_t actualPattern = (mElementOn == HIGH) ? pattern : ~pattern;
+  mHardware->shiftOut(mDataPin, mClockPin, MSBFIRST, actualPattern);
+  mHardware->digitalWrite(mLatchPin, HIGH);
+}
+
+void LedMatrixSerial::writeGroupPin(uint8_t group, uint8_t output) {
+  uint8_t groupPin = mGroupPins[group];
+  mHardware->digitalWrite(groupPin, output);
+}
 
 }
-#endif
