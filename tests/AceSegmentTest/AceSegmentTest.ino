@@ -27,6 +27,11 @@ SOFTWARE.
 #include <stdarg.h>
 #include <AUnit.h>
 #include <AceSegment.h>
+#include <ace_segment/SegmentDriver.h>
+#include <ace_segment/DigitDriver.h>
+#include <ace_segment/ModulatingDigitDriver.h>
+#include <ace_segment/LedMatrixDirect.h>
+#include <ace_segment/LedMatrixSerial.h>
 #include <ace_segment/testing/TestableHardware.h>
 #include <ace_segment/testing/FakeDriver.h>
 
@@ -44,6 +49,9 @@ const uint16_t FRAMES_PER_SECOND = 60;
 const int8_t NUM_SUB_FIELDS = 3;
 const uint8_t digitPins[NUM_DIGITS] = {0, 1, 2, 3};
 const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
+const uint8_t latchPin = 12;
+const uint8_t dataPin = 13;
+const uint8_t clockPin = 14;
 
 // fake hardware methods to allow testing
 TestableHardware hardware;
@@ -53,14 +61,61 @@ DimmingDigit dimmingDigits[NUM_DIGITS + 1];
 StyledDigit styledDigits[NUM_DIGITS + 1];
 
 // the various kinds of drivers that we will test
-DigitDriver digitDriver(&hardware, dimmingDigits, NUM_DIGITS);
-ModulatingDigitDriver modulatingDigitDriver(
-    &hardware, dimmingDigits, NUM_DIGITS);
-SegmentDriver segmentDriver(&hardware, dimmingDigits, NUM_DIGITS);
-FakeDriver fakeDriver(&hardware, dimmingDigits, NUM_DIGITS);
-SerialToParallelDriver serialToParallelDriver(
-    &hardware, dimmingDigits, NUM_DIGITS);
+Driver* digitDriver = DriverBuilder()
+    .setHardware(&hardware)
+    .setNumDigits(NUM_DIGITS)
+    .setCommonCathode()
+    .setResistorsOnSegments()
+    .setDigitPins(digitPins)
+    .setSegmentDirectPins(segmentPins)
+    .setDimmingDigits(dimmingDigits)
+    .build();
 
+Driver* modulatingDigitDriver = DriverBuilder()
+    .setHardware(&hardware)
+    .setNumDigits(NUM_DIGITS)
+    .setCommonCathode()
+    .setResistorsOnSegments()
+    .setDigitPins(digitPins)
+    .setSegmentDirectPins(segmentPins)
+    .setDimmingDigits(dimmingDigits)
+    .setNumSubFields(NUM_SUB_FIELDS)
+    .useModulatingDriver()
+    .build();
+
+Driver* edgeCaseModulatingDigitDriver = DriverBuilder()
+    .setHardware(&hardware)
+    .setNumDigits(NUM_DIGITS)
+    .setCommonCathode()
+    .setResistorsOnSegments()
+    .setDigitPins(digitPins)
+    .setSegmentDirectPins(segmentPins)
+    .setDimmingDigits(dimmingDigits)
+    .setNumSubFields(1) // edge case of 1 subfield/field
+    .useModulatingDriver()
+    .build();
+
+Driver* segmentDriver = DriverBuilder()
+    .setHardware(&hardware)
+    .setNumDigits(NUM_DIGITS)
+    .setCommonCathode()
+    .setResistorsOnDigits()
+    .setDigitPins(digitPins)
+    .setSegmentDirectPins(segmentPins)
+    .setDimmingDigits(dimmingDigits)
+    .build();
+
+Driver* serialToParallelDriver = DriverBuilder()
+    .setHardware(&hardware)
+    .setNumDigits(NUM_DIGITS)
+    .setCommonCathode()
+    .setResistorsOnSegments()
+    .setDigitPins(digitPins)
+    .setSegmentSerialPins(latchPin, dataPin, clockPin)
+    .setDimmingDigits(dimmingDigits)
+    .build();
+
+FakeDriver fakeDriver(dimmingDigits, NUM_DIGITS);
 Renderer renderer(&hardware, &fakeDriver, styledDigits, NUM_DIGITS);
 CharWriter charWriter(&renderer);
 StringWriter stringWriter(&charWriter);
@@ -76,6 +131,10 @@ void setup() {
   Serial.println(F("setup(): start"));
   Serial.print(F("sizeof(Hardware): "));
   Serial.println(sizeof(Hardware));
+  Serial.print(F("sizeof(LedMatrixDirect): "));
+  Serial.println(sizeof(LedMatrixDirect));
+  Serial.print(F("sizeof(LedMatrixSerial): "));
+  Serial.println(sizeof(LedMatrixSerial));
   Serial.print(F("sizeof(Driver): "));
   Serial.println(sizeof(Driver));
   Serial.print(F("sizeof(SegmentDriver): "));
@@ -120,7 +179,7 @@ test(incrementMod) {
 }
 
 // ----------------------------------------------------------------------
-// Tests for base Hardware class.
+// Base class to assert various hardware events on TestableHardware.
 // ----------------------------------------------------------------------
 
 class BaseHardwareTest: public TestOnce {
@@ -176,18 +235,16 @@ class BaseHardwareTest: public TestOnce {
     }
 };
 
+// ----------------------------------------------------------------------
+// Test some isolated methods of Driver using FakeDriver.
+// ----------------------------------------------------------------------
+
 class FakeDriverTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
       BaseHardwareTest::setup();
-      driver.setDigitPins(digitPins);
-      driver.setSegmentPins(segmentPins);
-      driver.setCommonCathode();
-      driver.configure();
       hardware.clear();
     }
-
-    FakeDriver &driver = fakeDriver;
 };
 
 testF(FakeDriverTest, setPattern) {
@@ -230,18 +287,6 @@ testF(FakeDriverTest, setBrightness_outOfBounds) {
   assertEqual(2, digitOutOfBounds.brightness);
 }
 
-testF(FakeDriverTest, writeDigitPin) {
-  fakeDriver.writeDigitPin(2, 0);
-  assertEvents(1,
-      Event::kTypeDigitalWrite, 2, 0);
-}
-
-testF(FakeDriverTest, writeSegmentPin) {
-  fakeDriver.writeSegmentPin(4, 1);
-  assertEvents(1,
-      Event::kTypeDigitalWrite, 8, 1);
-}
-
 // ----------------------------------------------------------------------
 // Tests for DigitDriver.
 // ----------------------------------------------------------------------
@@ -250,18 +295,15 @@ class DigitDriverTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
       BaseHardwareTest::setup();
-      driver.setDigitPins(digitPins);
-      driver.setSegmentPins(segmentPins);
-      driver.setCommonCathode();
-      driver.configure();
+      driver->configure();
       hardware.clear();
     }
 
-    DigitDriver& driver = digitDriver;
+    Driver* driver = digitDriver;
 };
 
 testF(DigitDriverTest, configure) {
-  driver.configure();
+  driver->configure();
   assertEvents(24,
       Event::kTypePinMode, 0, OUTPUT,
       Event::kTypeDigitalWrite, 0, HIGH,
@@ -287,18 +329,18 @@ testF(DigitDriverTest, configure) {
       Event::kTypeDigitalWrite, 10, LOW,
       Event::kTypePinMode, 11, OUTPUT,
       Event::kTypeDigitalWrite, 11, LOW);
-  assertEqual((uint16_t)4, driver.getFieldsPerFrame());
+  assertEqual((uint16_t)4, driver->getFieldsPerFrame());
 }
 
 testF(DigitDriverTest, displayCurrentField_one_dark) {
-  driver.setPattern(0, 0x11, 255);
-  driver.setPattern(1, 0x22, 128);
-  driver.setPattern(2, 0x55, 64);
-  driver.setPattern(3, 0x11, 0);
+  driver->setPattern(0, 0x11, 255);
+  driver->setPattern(1, 0x22, 128);
+  driver->setPattern(2, 0x55, 64);
+  driver->setPattern(3, 0x11, 0);
 
   // display field 0
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(10,
       Event::kTypeDigitalWrite, 3, DIGIT_OFF,
       Event::kTypeDigitalWrite, 4, SEGMENT_ON,
@@ -313,7 +355,7 @@ testF(DigitDriverTest, displayCurrentField_one_dark) {
 
   // display field 1
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(10,
       Event::kTypeDigitalWrite, 0, DIGIT_OFF,
       Event::kTypeDigitalWrite, 4, SEGMENT_OFF,
@@ -328,7 +370,7 @@ testF(DigitDriverTest, displayCurrentField_one_dark) {
 
   // display field 2
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(10,
       Event::kTypeDigitalWrite, 1, DIGIT_OFF,
       Event::kTypeDigitalWrite, 4, SEGMENT_ON,
@@ -343,13 +385,13 @@ testF(DigitDriverTest, displayCurrentField_one_dark) {
 
   // display field 3
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(1,
       Event::kTypeDigitalWrite, 2, DIGIT_OFF);
 
   // display field 0
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(10,
       Event::kTypeDigitalWrite, 3, DIGIT_OFF,
       Event::kTypeDigitalWrite, 4, SEGMENT_ON,
@@ -364,15 +406,15 @@ testF(DigitDriverTest, displayCurrentField_one_dark) {
 }
 
 testF(DigitDriverTest, displayCurrentField_repeated_segment_pattern) {
-  driver.setPattern(0, 0x11, 255);
-  driver.setPattern(1, 0x22, 128);
-  driver.setPattern(2, 0x55, 64);
+  driver->setPattern(0, 0x11, 255);
+  driver->setPattern(1, 0x22, 128);
+  driver->setPattern(2, 0x55, 64);
   // same segment pattern should optimize the next iteration
-  driver.setPattern(3, 0x11, 64);
+  driver->setPattern(3, 0x11, 64);
 
   // display field 0
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(10,
       Event::kTypeDigitalWrite, 3, DIGIT_OFF,
       Event::kTypeDigitalWrite, 4, SEGMENT_ON,
@@ -387,7 +429,7 @@ testF(DigitDriverTest, displayCurrentField_repeated_segment_pattern) {
 
   // display field 1
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(10,
       Event::kTypeDigitalWrite, 0, DIGIT_OFF,
       Event::kTypeDigitalWrite, 4, SEGMENT_OFF,
@@ -402,7 +444,7 @@ testF(DigitDriverTest, displayCurrentField_repeated_segment_pattern) {
 
   // display field 2
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(10,
       Event::kTypeDigitalWrite, 1, DIGIT_OFF,
       Event::kTypeDigitalWrite, 4, SEGMENT_ON,
@@ -417,7 +459,7 @@ testF(DigitDriverTest, displayCurrentField_repeated_segment_pattern) {
 
   // display field 3
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(10,
       Event::kTypeDigitalWrite, 2, DIGIT_OFF,
       Event::kTypeDigitalWrite, 4, SEGMENT_ON,
@@ -434,14 +476,14 @@ testF(DigitDriverTest, displayCurrentField_repeated_segment_pattern) {
   // Segment pattern is repeated from the previous cycle, so shouldn't see the
   // pins being set.
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(2,
       Event::kTypeDigitalWrite, 3, DIGIT_OFF,
       Event::kTypeDigitalWrite, 0, DIGIT_ON);
 
   // display field 1
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(10,
       Event::kTypeDigitalWrite, 0, DIGIT_OFF,
       Event::kTypeDigitalWrite, 4, SEGMENT_OFF,
@@ -463,33 +505,30 @@ class SegmentDriverTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
       BaseHardwareTest::setup();
-      driver.setDigitPins(digitPins);
-      driver.setSegmentPins(segmentPins);
-      driver.setCommonCathode();
-      driver.configure();
+      driver->configure();
       hardware.clear();
     }
 
-    SegmentDriver& driver = segmentDriver;
+    Driver* driver = segmentDriver;
 };
 
 testF(SegmentDriverTest, configure) {
-  driver.configure();
-  assertEqual((uint16_t)(8), driver.getFieldsPerFrame());
+  driver->configure();
+  assertEqual((uint16_t)(8), driver->getFieldsPerFrame());
 }
 
 testF(SegmentDriverTest, displayCurrentField_one_dark) {
   // The following segment patterns were crafted so that digitPattern(7) bits
   // have the same digitPattern as digitPattern(0), which should cause the digit
   // bits to be reused between the two iterations.
-  driver.setPattern(0, 0x91, 255);  // 1001 0001
-  driver.setPattern(1, 0x22, 128);  // 0010 0010
-  driver.setPattern(2, 0xD5, 64);   // 1101 0101
-  driver.setPattern(3, 0x91, 0);    // 0000 0000 <- 1001 0001 (brightness = 0)
+  driver->setPattern(0, 0x91, 255);  // 1001 0001
+  driver->setPattern(1, 0x22, 128);  // 0010 0010
+  driver->setPattern(2, 0xD5, 64);   // 1101 0101
+  driver->setPattern(3, 0x91, 0);    // 0000 0000 <- 1001 0001 (brightness = 0)
 
   // field 0 (segment 0)
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(6,
       Event::kTypeDigitalWrite, 11, SEGMENT_OFF,
       Event::kTypeDigitalWrite, 0, DIGIT_ON,
@@ -500,7 +539,7 @@ testF(SegmentDriverTest, displayCurrentField_one_dark) {
 
   // field 1 (segment 1)
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(6,
       Event::kTypeDigitalWrite, 4, SEGMENT_OFF,
       Event::kTypeDigitalWrite, 0, DIGIT_OFF,
@@ -511,7 +550,7 @@ testF(SegmentDriverTest, displayCurrentField_one_dark) {
 
   // field 2 (segment 2)
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(6,
       Event::kTypeDigitalWrite, 5, SEGMENT_OFF,
       Event::kTypeDigitalWrite, 0, DIGIT_OFF,
@@ -522,7 +561,7 @@ testF(SegmentDriverTest, displayCurrentField_one_dark) {
 
   // field 3 (segment 3)
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(6,
       Event::kTypeDigitalWrite, 6, SEGMENT_OFF,
       Event::kTypeDigitalWrite, 0, DIGIT_OFF,
@@ -533,7 +572,7 @@ testF(SegmentDriverTest, displayCurrentField_one_dark) {
 
   // field 4 (segment 4)
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(6,
       Event::kTypeDigitalWrite, 7, SEGMENT_OFF,
       Event::kTypeDigitalWrite, 0, DIGIT_ON,
@@ -544,7 +583,7 @@ testF(SegmentDriverTest, displayCurrentField_one_dark) {
 
   // field 5 (segment 5)
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(6,
       Event::kTypeDigitalWrite, 8, SEGMENT_OFF,
       Event::kTypeDigitalWrite, 0, DIGIT_OFF,
@@ -555,7 +594,7 @@ testF(SegmentDriverTest, displayCurrentField_one_dark) {
 
   // field 6 (segment 6)
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(6,
       Event::kTypeDigitalWrite, 9, SEGMENT_OFF,
       Event::kTypeDigitalWrite, 0, DIGIT_OFF,
@@ -566,7 +605,7 @@ testF(SegmentDriverTest, displayCurrentField_one_dark) {
 
   // field 7 (segment 7)
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(6,
       Event::kTypeDigitalWrite, 10, SEGMENT_OFF,
       Event::kTypeDigitalWrite, 0, DIGIT_ON,
@@ -577,7 +616,7 @@ testF(SegmentDriverTest, displayCurrentField_one_dark) {
 
   // field 0 (segment 0), reuse the digit pattern from the prev iteration
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(2,
       Event::kTypeDigitalWrite, 11, SEGMENT_OFF,
       Event::kTypeDigitalWrite, 4, SEGMENT_ON);
@@ -591,31 +630,27 @@ class ModulatingDigitDriverTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
       BaseHardwareTest::setup();
-      driver.setNumSubFields(NUM_SUB_FIELDS);
-      driver.setDigitPins(digitPins);
-      driver.setSegmentPins(segmentPins);
-      driver.setCommonCathode();
-      driver.configure();
+      driver->configure();
       hardware.clear();
     }
 
-    ModulatingDigitDriver& driver = modulatingDigitDriver;
+    Driver* driver = modulatingDigitDriver;
 };
 
 testF(ModulatingDigitDriverTest, configure) {
-  driver.configure();
-  assertEqual((uint16_t)(3 * 4), driver.getFieldsPerFrame());
+  driver->configure();
+  assertEqual((uint16_t)(3 * 4), driver->getFieldsPerFrame());
 }
 
 testF(ModulatingDigitDriverTest, displayCurrentField_one_dark) {
-  driver.setPattern(0, 0x11, 255);
-  driver.setPattern(1, 0x22, 128);
-  driver.setPattern(2, 0x55, 64);
-  driver.setPattern(3, 0x11, 0);
+  driver->setPattern(0, 0x11, 255);
+  driver->setPattern(1, 0x22, 128);
+  driver->setPattern(2, 0x55, 64);
+  driver->setPattern(3, 0x11, 0);
 
   // field 0.0, stays on for 3 sub fields
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(10,
       Event::kTypeDigitalWrite, 3, DIGIT_OFF,
       Event::kTypeDigitalWrite, 4, SEGMENT_ON,
@@ -630,17 +665,17 @@ testF(ModulatingDigitDriverTest, displayCurrentField_one_dark) {
 
   // field 0.1
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(0);
 
   // field 0.2
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(0); // 255 is special, always on regardless of integer roundoff
 
   // field 1.0, stays on for 1/3 subfields
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(10,
       Event::kTypeDigitalWrite, 0, DIGIT_OFF,
       Event::kTypeDigitalWrite, 4, SEGMENT_OFF,
@@ -655,50 +690,50 @@ testF(ModulatingDigitDriverTest, displayCurrentField_one_dark) {
 
   // field 1.1
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(1,
       Event::kTypeDigitalWrite, 1, DIGIT_OFF);
 
   // field 1.2
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(0);
 
   // field 2.0, stays on for 0/3 subfields (because 64/256*3 is 0).
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(1,
       Event::kTypeDigitalWrite, 1, DIGIT_OFF);
 
   // field 2.1
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(0);
 
   // field 2.2
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(0);
 
   // field 3.0, is off for 3/3 subfields
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(1,
       Event::kTypeDigitalWrite, 2, DIGIT_OFF);
 
   // field 3.1
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(0);
 
   // field 3.2
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(0);
 
   // field 4.0
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(10,
       Event::kTypeDigitalWrite, 3, DIGIT_OFF,
       Event::kTypeDigitalWrite, 4, SEGMENT_ON,
@@ -713,26 +748,26 @@ testF(ModulatingDigitDriverTest, displayCurrentField_one_dark) {
 
   // field 4.1
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(0);
 
   // field 4.2
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(0); // 255 is special, always on regardless of integer roundoff
 }
 
 testF(ModulatingDigitDriverTest,
     displayCurrentField_repeated_segment_pattern) {
-  driver.setPattern(0, 0x11, 255);
-  driver.setPattern(1, 0x22, 128);
+  driver->setPattern(0, 0x11, 255);
+  driver->setPattern(1, 0x22, 128);
   // same segment pattern should optimize the next iteration
-  driver.setPattern(2, 0x22, 128);
-  driver.setPattern(3, 0x11, 64);
+  driver->setPattern(2, 0x22, 128);
+  driver->setPattern(3, 0x11, 64);
 
   // field 0.0
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(10,
       Event::kTypeDigitalWrite, 3, DIGIT_OFF,
       Event::kTypeDigitalWrite, 4, SEGMENT_ON,
@@ -747,17 +782,17 @@ testF(ModulatingDigitDriverTest,
 
   // field 0.1
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(0);
 
   // field 0.2
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(0);
 
   // field 1.0
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(10,
       Event::kTypeDigitalWrite, 0, DIGIT_OFF,
       Event::kTypeDigitalWrite, 4, SEGMENT_OFF,
@@ -772,52 +807,52 @@ testF(ModulatingDigitDriverTest,
 
   // field 1.1
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(1,
       Event::kTypeDigitalWrite, 1, DIGIT_OFF);
 
   // field 1.2
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(0);
 
   // field 2.0, stays on for 1/3 subfields reusing the previous pattern
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(2,
       Event::kTypeDigitalWrite, 1, DIGIT_OFF,
       Event::kTypeDigitalWrite, 2, DIGIT_ON);
 
   // field 2.1
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(1,
       Event::kTypeDigitalWrite, 2, DIGIT_OFF);
 
   // field 2.2
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(0);
 
   // field 3.0, off for 3/3 subfields
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(1,
       Event::kTypeDigitalWrite, 2, DIGIT_OFF);
 
   // field 3.1
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(0);
 
   // field 3.2
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(0);
 
   // field 4.0, same segment pattern, so don't need to write the pins again
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(10,
       Event::kTypeDigitalWrite, 3, DIGIT_OFF,
       Event::kTypeDigitalWrite, 4, SEGMENT_ON,
@@ -832,12 +867,12 @@ testF(ModulatingDigitDriverTest,
 
   // field 4.1
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(0);
 
   // field 4.2
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(0);
 }
 
@@ -851,29 +886,23 @@ class EdgeCaseModulatingDigitDriverTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
       BaseHardwareTest::setup();
-      driver.setNumSubFields(1);
-      driver.setDigitPins(digitPins);
-      driver.setSegmentPins(segmentPins);
-      driver.setCommonCathode();
-      driver.configure();
+      driver->configure();
       hardware.clear();
     }
 
-    ModulatingDigitDriver& driver = modulatingDigitDriver;
+    Driver* driver = edgeCaseModulatingDigitDriver;
 };
 
 testF(EdgeCaseModulatingDigitDriverTest, displayCurrentField) {
-  //enableVerbosity(Verbosity::kAssertionPassed);
-
-  driver.setPattern(0, 0x11, 255);
-  driver.setPattern(1, 0x22, 128);
-  driver.setPattern(2, 0x55, 64);
-  driver.setPattern(3, 0x11, 0);
+  driver->setPattern(0, 0x11, 255);
+  driver->setPattern(1, 0x22, 128);
+  driver->setPattern(2, 0x55, 64);
+  driver->setPattern(3, 0x11, 0);
 
   // field 0.0, should be "on" even though integer round off with a
   // numSubFields of 1 would normally cause a brightness of 0
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(10,
       Event::kTypeDigitalWrite, 3, DIGIT_OFF,
       Event::kTypeDigitalWrite, 4, SEGMENT_ON,
@@ -888,26 +917,26 @@ testF(EdgeCaseModulatingDigitDriverTest, displayCurrentField) {
 
   // field 1.0, the next iteration goes to the next frame
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(1,
       Event::kTypeDigitalWrite, 0, DIGIT_OFF);
 
   // field 2.0, the next iteration goes to the next frame
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(1,
       Event::kTypeDigitalWrite, 1, DIGIT_OFF);
 
   // field 3.0, the next iteration goes to the next frame
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(1,
       Event::kTypeDigitalWrite, 2, DIGIT_OFF);
 
   // field 4.0, should be "on" again, and we reuse the bit patterns from
   // the previous iteration.
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(2,
       Event::kTypeDigitalWrite, 3, DIGIT_OFF,
       Event::kTypeDigitalWrite, 0, DIGIT_ON);
@@ -919,30 +948,21 @@ testF(EdgeCaseModulatingDigitDriverTest, displayCurrentField) {
 
 class SerialToParallelDriverTest: public BaseHardwareTest {
   protected:
-    static const uint8_t kLatchPin = 10;
-    static const uint8_t kDataPin = 11;
-    static const uint8_t kClockPin = 13;
-
     virtual void setup() override {
       BaseHardwareTest::setup();
-      driver.setDigitPins(digitPins);
-      driver.setLatchPin(kLatchPin);
-      driver.setDataPin(kDataPin);
-      driver.setClockPin(kClockPin);
-      driver.setCommonCathode();
-      driver.configure();
+      driver->configure();
       hardware.clear();
     }
 
-    SerialToParallelDriver& driver = serialToParallelDriver;
+    Driver* driver = serialToParallelDriver;
 };
 
 testF(SerialToParallelDriverTest, configure) {
-  driver.configure();
+  driver->configure();
   assertEvents(11,
-      Event::kTypePinMode, kLatchPin, OUTPUT,
-      Event::kTypePinMode, kDataPin, OUTPUT,
-      Event::kTypePinMode, kClockPin, OUTPUT,
+      Event::kTypePinMode, latchPin, OUTPUT,
+      Event::kTypePinMode, dataPin, OUTPUT,
+      Event::kTypePinMode, clockPin, OUTPUT,
       Event::kTypePinMode, 0, OUTPUT,
       Event::kTypeDigitalWrite, 0, HIGH,
       Event::kTypePinMode, 1, OUTPUT,
@@ -951,35 +971,34 @@ testF(SerialToParallelDriverTest, configure) {
       Event::kTypeDigitalWrite, 2, HIGH,
       Event::kTypePinMode, 3, OUTPUT,
       Event::kTypeDigitalWrite, 3, HIGH);
-  assertEqual((uint16_t)(4), driver.getFieldsPerFrame());
+  assertEqual((uint16_t)(4), driver->getFieldsPerFrame());
 }
 
 testF(SerialToParallelDriverTest, displayCurrentField) {
-  //enableVerbosity(Verbosity::kAssertionPassed);
 
-  driver.setPattern(0, 0x11, 255);
-  driver.setPattern(1, 0x22, 128);
-  driver.setPattern(2, 0x55, 64);
-  driver.setPattern(3, 0x11, 0);
+  driver->setPattern(0, 0x11, 255);
+  driver->setPattern(1, 0x22, 128);
+  driver->setPattern(2, 0x55, 64);
+  driver->setPattern(3, 0x11, 0);
 
   // display field 0
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(5,
       Event::kTypeDigitalWrite, 3, DIGIT_OFF,
-      Event::kTypeDigitalWrite, kLatchPin, LOW,
-      Event::kTypeShiftOut, kDataPin, kClockPin, MSBFIRST, 0x11,
-      Event::kTypeDigitalWrite, kLatchPin, HIGH,
+      Event::kTypeDigitalWrite, latchPin, LOW,
+      Event::kTypeShiftOut, dataPin, clockPin, MSBFIRST, 0x11,
+      Event::kTypeDigitalWrite, latchPin, HIGH,
       Event::kTypeDigitalWrite, 0, DIGIT_ON);
 
   // display field 1
   hardware.clear();
-  driver.displayCurrentField();
+  driver->displayCurrentField();
   assertEvents(5,
       Event::kTypeDigitalWrite, 0, DIGIT_OFF,
-      Event::kTypeDigitalWrite, kLatchPin, LOW,
-      Event::kTypeShiftOut, kDataPin, kClockPin, MSBFIRST, 0x22,
-      Event::kTypeDigitalWrite, kLatchPin, HIGH,
+      Event::kTypeDigitalWrite, latchPin, LOW,
+      Event::kTypeShiftOut, dataPin, clockPin, MSBFIRST, 0x22,
+      Event::kTypeDigitalWrite, latchPin, HIGH,
       Event::kTypeDigitalWrite, 1, DIGIT_ON);
 }
 
@@ -1179,10 +1198,6 @@ class RendererTest: public TestOnce {
     virtual void setup() override {
       TestOnce::setup();
       fakeDriver.setNumSubFields(NUM_SUB_FIELDS);
-      fakeDriver.setDigitPins(digitPins);
-      fakeDriver.setSegmentPins(segmentPins);
-      fakeDriver.setCommonCathode();
-      fakeDriver.configure();
       renderer.setFramesPerSecond(FRAMES_PER_SECOND);
       renderer.setBrightness(255);
       renderer.configure();
@@ -1335,8 +1350,8 @@ testF(RendererTest, displayCurrentField_noSubFieldDriver) {
 }
 
 testF(RendererTest, displayCurrentField_dimmedBrightness) {
-  //enableVerbosity(Verbosity::kAssertionPassed);
-  assertEqual(true, driver.isBrightnessSupported());
+  fakeDriver.setNumSubFields(3);
+  assertEqual(true, fakeDriver.isBrightnessSupported());
   renderer.setBrightness(127);
   renderer.configure();
 
@@ -1372,10 +1387,6 @@ class CharWriterTest: public TestOnce {
     virtual void setup() override {
       TestOnce::setup();
       fakeDriver.setNumSubFields(NUM_SUB_FIELDS);
-      fakeDriver.setDigitPins(digitPins);
-      fakeDriver.setSegmentPins(segmentPins);
-      fakeDriver.setCommonCathode();
-      fakeDriver.configure();
       renderer.setFramesPerSecond(FRAMES_PER_SECOND);
       renderer.setBrightness(255);
       renderer.configure();
@@ -1424,10 +1435,6 @@ class StringWriterTest: public TestOnce {
     virtual void setup() override {
       TestOnce::setup();
       fakeDriver.setNumSubFields(NUM_SUB_FIELDS);
-      fakeDriver.setDigitPins(digitPins);
-      fakeDriver.setSegmentPins(segmentPins);
-      fakeDriver.setCommonCathode();
-      fakeDriver.configure();
       renderer.setFramesPerSecond(FRAMES_PER_SECOND);
       renderer.setBrightness(255);
       renderer.configure();
@@ -1450,7 +1457,6 @@ class StringWriterTest: public TestOnce {
 };
 
 testF(StringWriterTest, writeStringAt) {
-  //enableVerbosity(Verbosity::kAssertionPassed);
   stringWriter.writeStringAt(0, ".1.2.3");
 
   // Should ge (".", "1.", "2.", "3") as the 4 digits

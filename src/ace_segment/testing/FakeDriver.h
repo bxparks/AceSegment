@@ -36,14 +36,11 @@ namespace testing {
 class FakeDriver: public Driver {
   public:
     /** Constructor. */
-    explicit FakeDriver(ResistorsOnSegments* resistorsOnSegments,
-          DimmingDigit* dimmingDigits, uint8_t numDigits):
-        Driver(dimmingDigits, numDigits)
+    explicit FakeDriver(DimmingDigit* dimmingDigits, uint8_t numDigits):
+        Driver(nullptr /* ledMatrix */, dimmingDigits, numDigits)
     {}
 
-    virtual void displayCurrentField() {
-      mIsDisplayCurrentFieldCalled = true;
-    }
+    virtual void displayCurrentField() override {}
 
     virtual uint16_t getFieldsPerFrame() override {
       return (uint16_t) mNumSubFields * mNumDigits;
@@ -53,17 +50,10 @@ class FakeDriver: public Driver {
       return (mNumSubFields > 1);
     }
 
-    void clear() {
-      mIsDisplayCurrentFieldCalled = false;
-      mIsGetFieldsPerSecondCalled = false;
-    }
-
     void setNumSubFields(uint8_t numSubFields) {
       mNumSubFields = numSubFields;
     }
 
-    bool mIsDisplayCurrentFieldCalled;
-    bool mIsGetFieldsPerSecondCalled;
     uint8_t mNumSubFields;
 };
 

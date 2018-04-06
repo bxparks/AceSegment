@@ -22,10 +22,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-//----------------------------------------------------------------
-// Experimental
-//----------------------------------------------------------------
-
 #ifndef ACE_SEGMENT_MODULATING_DIGIT_DRIVER_H
 #define ACE_SEGMENT_MODULATING_DIGIT_DRIVER_H
 
