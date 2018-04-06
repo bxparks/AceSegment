@@ -109,8 +109,9 @@ void setup() {
   Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
   while (!Serial); // Wait until Serial is ready - Leonardo/Micro
 
-  renderer.setFramesPerSecond(FRAMES_PER_SECOND);
-  renderer.configure();
+  renderer
+      .setFramesPerSecond(FRAMES_PER_SECOND)
+      .configure();
 
 #if USE_INTERRUPT == 1
   // set up Timer 2

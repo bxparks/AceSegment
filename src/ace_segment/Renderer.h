@@ -65,8 +65,9 @@ class Renderer {
      * Set brightness expressed as a fraction of 256. In other words, 255 is
      * brightest and is the default. Not implemented in any driver.
      */
-    void setBrightness(uint8_t brightness) {
+    Renderer& setBrightness(uint8_t brightness) {
       mBrightness = brightness;
+      return *this;
     }
 
     /**
@@ -84,28 +85,33 @@ class Renderer {
      * This constant is the desired number of frames per second. Default of 120
      * should produce minimal flickering.
      */
-    void setFramesPerSecond(uint8_t framesPerSecond) {
+    Renderer& setFramesPerSecond(uint8_t framesPerSecond) {
       mFramesPerSecond = framesPerSecond;
+      return *this;
     }
 
     /** Set blink slow duration millis. Default 800 millis. */
-    void setBlinkSlowDuration(uint16_t durationMillis) {
+    Renderer& setBlinkSlowDuration(uint16_t durationMillis) {
       mBlinkSlowDurationMillis = durationMillis;
+      return *this;
     }
 
     /** Set blink fast duration millis. Default 400 millis. */
-    void setBlinkFastDuration(uint16_t durationMillis) {
+    Renderer& setBlinkFastDuration(uint16_t durationMillis) {
       mBlinkFastDurationMillis = durationMillis;
+      return *this;
     }
 
     /** Set pulse slow duration millis. Default 3000 millis. */
-    void setPulseSlowDuration(uint16_t durationMillis) {
+    Renderer& setPulseSlowDuration(uint16_t durationMillis) {
       mPulseSlowDurationMillis = durationMillis;
+      return *this;
     }
 
     /** Set pulse fast duration millis. Default 1000 millis. */
-    void setPulseFastDuration(uint16_t durationMillis) {
+    Renderer& setPulseFastDuration(uint16_t durationMillis) {
       mPulseFastDurationMillis = durationMillis;
+      return *this;
     }
 
     /**
@@ -115,8 +121,9 @@ class Renderer {
      * kFramesPerStatsReset which is 300 frames, which at 60 frames per second
      * is 5 seconds.
      */
-    void setStatsResetInterval(uint16_t framesPerStatsReset) {
+    Renderer& setStatsResetInterval(uint16_t framesPerStatsReset) {
       mFramesPerStatsReset = framesPerStatsReset;
+      return *this;
     }
 
     /**
