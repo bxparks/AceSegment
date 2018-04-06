@@ -31,6 +31,7 @@ SOFTWARE.
 namespace ace_segment {
 
 class StyledDigit;
+class Hardware;
 
 class Renderer {
   public:
@@ -64,8 +65,9 @@ class Renderer {
      * Set brightness expressed as a fraction of 256. In other words, 255 is
      * brightest and is the default. Not implemented in any driver.
      */
-    void setBrightness(uint8_t brightness) {
+    Renderer& setBrightness(uint8_t brightness) {
       mBrightness = brightness;
+      return *this;
     }
 
     /**
@@ -83,28 +85,33 @@ class Renderer {
      * This constant is the desired number of frames per second. Default of 120
      * should produce minimal flickering.
      */
-    void setFramesPerSecond(uint8_t framesPerSecond) {
+    Renderer& setFramesPerSecond(uint8_t framesPerSecond) {
       mFramesPerSecond = framesPerSecond;
+      return *this;
     }
 
     /** Set blink slow duration millis. Default 800 millis. */
-    void setBlinkSlowDuration(uint16_t durationMillis) {
+    Renderer& setBlinkSlowDuration(uint16_t durationMillis) {
       mBlinkSlowDurationMillis = durationMillis;
+      return *this;
     }
 
     /** Set blink fast duration millis. Default 400 millis. */
-    void setBlinkFastDuration(uint16_t durationMillis) {
+    Renderer& setBlinkFastDuration(uint16_t durationMillis) {
       mBlinkFastDurationMillis = durationMillis;
+      return *this;
     }
 
     /** Set pulse slow duration millis. Default 3000 millis. */
-    void setPulseSlowDuration(uint16_t durationMillis) {
+    Renderer& setPulseSlowDuration(uint16_t durationMillis) {
       mPulseSlowDurationMillis = durationMillis;
+      return *this;
     }
 
     /** Set pulse fast duration millis. Default 1000 millis. */
-    void setPulseFastDuration(uint16_t durationMillis) {
+    Renderer& setPulseFastDuration(uint16_t durationMillis) {
       mPulseFastDurationMillis = durationMillis;
+      return *this;
     }
 
     /**
@@ -114,8 +121,9 @@ class Renderer {
      * kFramesPerStatsReset which is 300 frames, which at 60 frames per second
      * is 5 seconds.
      */
-    void setStatsResetInterval(uint16_t framesPerStatsReset) {
+    Renderer& setStatsResetInterval(uint16_t framesPerStatsReset) {
       mFramesPerStatsReset = framesPerStatsReset;
+      return *this;
     }
 
     /**
@@ -162,14 +170,18 @@ class Renderer {
      * using 8 sub-fields per frame, with 2 digits pulsing, and 2 digits
      * blinking:
      *
-     * DigitDriver:
-     *    avg: 47 micros; min: 16 micros; max: 96 micros
-     * ModulatingDigitDriver:
-     *    avg: 12-20 micros; min: 8 micros; max: 192 micros
+     * DigitDriver w/ LedMatrixDirect
+     *    min: 16us; avg: 47us; max: 96us
+     * ModulatingDigitDriver w/ LedMatrixDirect
+     *    min: 8us; avg: 12-20us; max: 192us
      * ModulatingDigitDriver w/ calcPulseFractionForFrameUsingInverse():
-     *    avg: 12-20 micros; min: 8 micros; max: 124 micros
-     * SegmentDriver:
-     *    avg: 36-59 micros; min: 28 micros; max: 80 micros
+     *    min: 8us; avg: 12-20us; max: 124us
+     * SegmentDriver w/ LedMatrixDirect
+     *    min: 28us; avg: 36-59us; max: 80us
+     * DigitDriver w/ LedMatrixSerial
+     *    min: 16us; avg: 132us; max: 180us
+     * DigitDriver w/ LedMatrixSpi
+     *    min: 16us; avg: 40us; max: 72us
      */
     void renderField();
 

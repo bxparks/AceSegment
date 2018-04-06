@@ -22,27 +22,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <Arduino.h> // LOW and HIGH
-#include "LedMatrix.h"
-#include "Driver.h"
+#ifndef ACE_SEGMENT_LED_MATRIX_SPI_H
+#define ACE_SEGMENT_LED_MATRIX_SPI_H
+
+#include "LedMatrixSerial.h"
 
 namespace ace_segment {
 
-void Driver::configure() {
-  mLedMatrix->configure();
-}
+class Hardware;
 
-void Driver::setPattern(uint8_t digit, SegmentPatternType pattern,
-    uint8_t brightness) {
-  if (digit >= mNumDigits) return;
-  DimmingDigit& dimmingDigit = mDimmingDigits[digit];
-  dimmingDigit.pattern = pattern;
-  dimmingDigit.brightness = brightness;
-}
+class LedMatrixSpi: public LedMatrixSerial {
+  public:
+    LedMatrixSpi(Hardware* hardware, uint8_t numGroups, uint8_t numElements):
+        LedMatrixSerial(hardware, numGroups, numElements)
+    {}
 
-void Driver::setBrightness(uint8_t digit, uint8_t brightness) {
-  if (digit >= mNumDigits) return;
-  mDimmingDigits[digit].brightness = brightness;
-}
+    virtual void configure() override;
+
+    virtual void drawElements(uint8_t pattern) override;
+};
 
 }
+#endif

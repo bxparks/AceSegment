@@ -31,19 +31,17 @@ SOFTWARE.
 namespace ace_segment {
 
 class DimmingDigit;
-class Hardware;
 
 class DigitDriver: public Driver {
   public:
     /** Constructor. */
-    explicit DigitDriver(Hardware* hardware, DimmingDigit* dimmingDigits,
-            int8_t numDigits):
-        Driver(hardware, dimmingDigits, numDigits)
+    explicit DigitDriver(LedMatrix* ledMatrix, DimmingDigit* dimmingDigits,
+            uint8_t numDigits):
+        Driver(ledMatrix, dimmingDigits, numDigits)
     {}
 
     virtual void configure() override {
       Driver::configure();
-
       mCurrentDigit = 0;
       mPrevDigit = mNumDigits - 1;
       mSegmentPattern = 0;
@@ -59,9 +57,6 @@ class DigitDriver: public Driver {
     // disable copy-constructor and assignment operator
     DigitDriver(const DigitDriver&) = delete;
     DigitDriver& operator=(const DigitDriver&) = delete;
-
-    /** Draw the specified segments. */
-    void drawSegments(SegmentPatternType segmentPattern);
 
     uint8_t mCurrentDigit;
     uint8_t mPrevDigit;

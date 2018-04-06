@@ -24,22 +24,23 @@ SOFTWARE.
 
 #include "Hardware.h"
 #include "SegmentDriver.h"
+#include "LedMatrix.h"
 #include "Util.h"
 
 namespace ace_segment {
 
 void SegmentDriver::displayCurrentField() {
   if (mCurrentSegment != mPrevSegment) {
-    writeSegmentPin(mPrevSegment, mSegmentOff);
+    mLedMatrix->disableGroup(mPrevSegment);
   }
 
   DigitPatternType digitPattern = getDigitBitPattern(mCurrentSegment);
   if (digitPattern != mDigitPattern) {
-    drawDigits(digitPattern);
+    mLedMatrix->drawElements(digitPattern);
     mDigitPattern = digitPattern;
   }
   if (mCurrentSegment != mPrevSegment) {
-    writeSegmentPin(mCurrentSegment, mSegmentOn);
+    mLedMatrix->enableGroup(mCurrentSegment);
   }
 
   mPrevSegment = mCurrentSegment;
@@ -52,22 +53,14 @@ Driver::DigitPatternType SegmentDriver::getDigitBitPattern(uint8_t segment) {
   DigitPatternType digitPattern = 0;
   for (uint8_t digit = 0; digit < mNumDigits; digit++) {
     DimmingDigit& dimmingDigit = mDimmingDigits[digit];
-    SegmentPatternType pattern = (dimmingDigit.brightness != 0) ? dimmingDigit.pattern : 0;
+    SegmentPatternType pattern = (dimmingDigit.brightness != 0)
+        ? dimmingDigit.pattern : 0;
     if (pattern & segmentMask) {
       digitPattern |= digitMask;
     }
     digitMask <<= 1;
   }
   return digitPattern;
-}
-
-void SegmentDriver::drawDigits(DigitPatternType digitPattern) {
-  DigitPatternType digitMask = 0x1;
-  for (uint8_t digit = 0; digit < mNumDigits; digit++) {
-    uint8_t output = (digitPattern & digitMask) ? mDigitOn : mDigitOff;
-    writeDigitPin(digit, output);
-    digitMask <<= 1;
-  }
 }
 
 }

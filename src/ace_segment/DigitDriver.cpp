@@ -24,46 +24,37 @@ SOFTWARE.
 
 #include "Hardware.h"
 #include "DigitDriver.h"
+#include "LedMatrix.h"
 #include "Util.h"
 
 namespace ace_segment {
 
 void DigitDriver::displayCurrentField() {
   if (mCurrentDigit != mPrevDigit) {
-    writeDigitPin(mPrevDigit, mDigitOff);
+    mLedMatrix->disableGroup(mPrevDigit);
     mIsCurrentDigitOn = false;
   }
 
   DimmingDigit& dimmingDigit = mDimmingDigits[mCurrentDigit];
   if (dimmingDigit.brightness == 0) {
     if (mIsCurrentDigitOn) {
-      writeDigitPin(mCurrentDigit, mDigitOff);
+      mLedMatrix->disableGroup(mCurrentDigit);
       mIsCurrentDigitOn = false;
     }
   } else {
     if (!mIsCurrentDigitOn) {
       SegmentPatternType segmentPattern = dimmingDigit.pattern;
       if (segmentPattern != mSegmentPattern) {
-        drawSegments(segmentPattern);
+        mLedMatrix->drawElements(segmentPattern);
         mSegmentPattern = segmentPattern;
       }
-      writeDigitPin(mCurrentDigit, mDigitOn);
+      mLedMatrix->enableGroup(mCurrentDigit);
       mIsCurrentDigitOn = true;
     }
   }
 
   mPrevDigit = mCurrentDigit;
   Util::incrementMod(mCurrentDigit, mNumDigits);
-}
-
-void DigitDriver::drawSegments(SegmentPatternType segmentPattern) {
-  SegmentPatternType segmentMask = 0x1;
-  for (uint8_t segment = 0; segment < kNumSegments; segment++) {
-    uint8_t output =
-        (segmentPattern & segmentMask) ? mSegmentOn : mSegmentOff;
-    writeSegmentPin(segment, output);
-    segmentMask <<= 1;
-  }
 }
 
 }

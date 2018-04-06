@@ -30,8 +30,17 @@ SOFTWARE.
 
 namespace ace_segment {
 
-class Hardware;
+class LedMatrix;
 
+/**
+ * Base class of drivers which knows how to transfer the bit patterns stored in
+ * the array of DimmingDigit objects to the actual LED display. Different
+ * wiring configuration will require different drivers.
+ *
+ * Each call to displayCurrentField() displays one field of a frame. The object
+ * is expected to keep internal state so that the next call to
+ * displayCurrentField() displays the next field.
+ */
 class Driver {
   public:
     /**
@@ -48,35 +57,7 @@ class Driver {
      */
     typedef uint8_t DigitPatternType;
 
-    // Start configuration methods
-
-    /** LED positive terminals are wired together. Required. */
-    void setCommonAnode();
-
-    /** LED negative terminals are wired together. Required. */
-    void setCommonCathode();
-
-    /**
-     * Set the pins of the digits, assuming mNumDigits number of StyledDigits.
-     * Digit 0 is on the left. Required.
-     */
-    void setDigitPins(const uint8_t* pins) {
-      mDigitPins = pins;
-    }
-
-    /**
-     * Set the pins of the segments, assuming kNumSegments number of segments.
-     * Standard 7-segment bit mapping: hgfedcba -> 76543210 (h = decimal
-     * point). Required.
-     */
-    void setSegmentPins(const uint8_t* pins) {
-      mSegmentPins = pins;
-    }
-
-    /** Configure the driver after all the setXxx() methods have been called. */
     virtual void configure();
-
-    // End configuration methods
 
     /**
      * Display the current field of the frame. Automatically advances to the
@@ -97,24 +78,22 @@ class Driver {
      */
     virtual bool isBrightnessSupported() = 0;
 
+    // TODO: The following setters don't need to configure() to run. How do I
+    // make that more clear?
+
     /**
      * Set the pattern for a given digit.
      *
-     * @pattern the segment bit pattern
+     * @param digit the digit index, 0 is the left most digit
+     * @param pattern the segment bit pattern
      * @param brightness optional brightness fraction of the digit in units of
      *    1/256, set to 255 if not specified
      */
     void setPattern(uint8_t digit, SegmentPatternType pattern,
         uint8_t brightness = DimmingDigit::kOn);
 
-    /** Set the brightness of the given digit. Not implemented. */
+    /** Set the brightness of the given digit. */
     void setBrightness(uint8_t digit, uint8_t brightness);
-
-    /** Write to digit pin identified by 'digit'. VisibleForTesting. */
-    void writeDigitPin(uint8_t digit, uint8_t output);
-
-    /** Write to the segment pin identified by 'segment'. VisibleForTesting. */
-    void writeSegmentPin(uint8_t segment, uint8_t output);
 
   protected:
     /**
@@ -129,24 +108,16 @@ class Driver {
     Driver& operator=(const Driver&) = delete;
 
     /** Constructor. */
-    explicit Driver(Hardware* hardware, DimmingDigit* dimmingDigits,
-            uint8_t numDigits):
-        mHardware(hardware),
+    explicit Driver(LedMatrix* ledMatrix, DimmingDigit* dimmingDigits,
+        uint8_t numDigits):
+        mLedMatrix(ledMatrix),
         mDimmingDigits(dimmingDigits),
         mNumDigits(numDigits)
     {}
 
-    Hardware* const mHardware;
+    LedMatrix* const mLedMatrix;
     DimmingDigit* const mDimmingDigits;
     uint8_t const mNumDigits;
-
-    const uint8_t* mDigitPins;
-    const uint8_t* mSegmentPins;
-
-    uint8_t mDigitOn;
-    uint8_t mDigitOff;
-    uint8_t mSegmentOn;
-    uint8_t mSegmentOff;
 };
 
 }
