@@ -9,7 +9,7 @@ using namespace ace_segment;
 #define DRIVER_MODE_SERIAL 4
 #define DRIVER_MODE_SPI 5
 
-#define DRIVER_MODE DRIVER_MODE_SPI
+#define DRIVER_MODE DRIVER_MODE_MODULATING
 
 const uint8_t NUM_SUBFIELDS = 16;
 const uint8_t FRAMES_PER_SECOND = 60;
