@@ -842,9 +842,14 @@ TBD
 Here are the sizes of the various classes on the 8-bit AVR microcontrollers
 (Arduino Uno, Nano, etc):
 
-* sizeof(SegmentDriver): 18
-* sizeof(DigitDriver): 18
-* sizeof(ModulatingDigitDriver): 22
+* sizeof(Hardware): 2
+* sizeof(LedMatrixDirect): 14
+* sizeof(LedMatrixSerial): 15
+* sizeof(LedMatrixSpi): 15
+* sizeof(Driver): 7
+* sizeof(SegmentDriver): 10
+* sizeof(DigitDriver): 11
+* sizeof(ModulatingDigitDriver): 14
 * sizeof(Renderer): 62
 * sizeof(CharWriter): 2
 * sizeof(StringWriter): 2
@@ -860,17 +865,17 @@ average, and maximum amount of time taken by a single call to `renderField()`
 method, over the last 300 frames (default which is adjustable). Here
 are the numbers for a 16MHz ATmega328P:
 
-* `DigitDriver` w/ LedMatrixDirect
+* DigitDriver w/ LedMatrixDirect
     * min: 16us; avg: 47us; max: 96us
-* `DigitDriver` w/ LedMatrixSerial
+* DigitDriver w/ LedMatrixSerial
     * min: 16us; avg: 82us; max: 196us
-* `ModulatingDigitDriver` w/ LedMatrixDirect
+* ModulatingDigitDriver w/ LedMatrixDirect
     * min: 8us; avg: 12-20us; max: 192us
-* `ModulatingDigitDriver` w/ LedMatrixDirect w/ `calcPulseFractionForFrameUsingInverse()`:
+* ModulatingDigitDriver w/ LedMatrixDirect w/ calcPulseFractionForFrameUsingInverse():
     * min: 8us; avg: 12-20us; max: 124us
-* `ModulatingDigitDriver` w/ LedMatrixSpi
+* ModulatingDigitDriver w/ LedMatrixSpi
     * min: 8us; avg: 16us; max: 92us
-* `SegmentDriver` w/ LedMatrixDirect
+* SegmentDriver w/ LedMatrixDirect
     * min: 28us; avg: 36-59us; max: 80us
 
 If we want to drive a 4 digit LED display at 60 frames per second, using a

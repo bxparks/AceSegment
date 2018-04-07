@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "SPI.h"
+#include <SPI.h>
 #include "Hardware.h"
 #include "LedMatrixSpi.h"
 
@@ -31,15 +31,13 @@ namespace ace_segment {
 void LedMatrixSpi::configure() {
   LedMatrixSerial::configure();
 
-  // TODO: determine if 8000000 is the right value
-  SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
+  SPI.begin();
 }
 
 void LedMatrixSpi::drawElements(uint8_t pattern) {
   mHardware->digitalWrite(mLatchPin, LOW);
   uint8_t actualPattern = (mElementOn == HIGH) ? pattern : ~pattern;
-  // TODO: replace this with mHardware->spiTransfer(pattern);
-  SPI.transfer(actualPattern);
+  mHardware->spiTransfer(actualPattern);
   mHardware->digitalWrite(mLatchPin, HIGH);
 }
 }

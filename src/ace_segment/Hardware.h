@@ -25,8 +25,9 @@ SOFTWARE.
 #ifndef ACE_SEGMENT_HARDWARE_H
 #define ACE_SEGMENT_HARDWARE_H
 
-#include <Arduino.h>
 #include <stdint.h>
+#include <Arduino.h>
+#include <SPI.h>
 
 namespace ace_segment {
 
@@ -60,6 +61,13 @@ class Hardware {
     /** Get the current millis  */
     virtual unsigned long millis() {
       return ::millis();
+    }
+
+    /** Send byte through SPI. */
+    virtual void spiTransfer(uint8_t value) {
+      SPI.beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
+      SPI.transfer(value);
+      SPI.endTransaction();
     }
 
   private:
