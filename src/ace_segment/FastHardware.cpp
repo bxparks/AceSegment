@@ -57,16 +57,16 @@ void FastHardware::shiftOut(uint8_t dataPin, uint8_t clockPin,
     uint8_t mask = 0x01;
     for (uint8_t i = 0; i < 8; i++)  {
       digitalWrite(dataPin, (val & mask) != 0);
-      CALL_MEMBER_FN(*this, fastClockPinHighWriter)();
-      CALL_MEMBER_FN(*this, fastClockPinLowWriter)();
+      fastClockPinHighWriter();
+      fastClockPinLowWriter();
       mask <<= 1;
     }
   } else {
     uint8_t mask = 0x80;
     for (uint8_t i = 0; i < 8; i++)  {
       digitalWrite(dataPin, (val & mask) != 0);
-      CALL_MEMBER_FN(*this, fastClockPinHighWriter)();
-      CALL_MEMBER_FN(*this, fastClockPinLowWriter)();
+      fastClockPinHighWriter();
+      fastClockPinLowWriter();
       mask >>= 1;
     }
   }

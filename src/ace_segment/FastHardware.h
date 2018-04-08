@@ -31,11 +31,6 @@ SOFTWARE.
 #include <digitalWriteFast.h>
 #include "Hardware.h"
 
-// Helper macro from https://isocpp.org/wiki/faq/pointers-to-members
-#ifndef CALL_MEMBER_FN
-#define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))
-#endif
-
 namespace ace_segment {
 
 /**
@@ -54,84 +49,82 @@ class FastHardware: public Hardware {
       if (pin >= kNumWriters) return;
       uint8_t index = 2 * pin + value;
       FastWriter writer = kFastWriters[index];
-      CALL_MEMBER_FN(*this, writer)();
+      writer();
     }
 
     virtual void shiftOut(uint8_t dataPin, uint8_t clockPin,
         uint8_t bitOrder, uint8_t val) override;
 
   private:
-    typedef void (FastHardware::*FastWriter)();
+    typedef void (*FastWriter)();
 
     // digitalWriteFast() requires both argments to be compile-time constants,
     // so we create an array of member functions with the compile-time
     // constants built for D00 to D19.
-    void digitalWriteFastLow00() { digitalWriteFast(0, LOW); }
-    void digitalWriteFastHigh00() { digitalWriteFast(0, HIGH); }
+    static void digitalWriteFastLow00() { digitalWriteFast(0, LOW); }
+    static void digitalWriteFastHigh00() { digitalWriteFast(0, HIGH); }
 
-    void digitalWriteFastLow01() { digitalWriteFast(1, LOW); }
-    void digitalWriteFastHigh01() { digitalWriteFast(1, HIGH); }
+    static void digitalWriteFastLow01() { digitalWriteFast(1, LOW); }
+    static void digitalWriteFastHigh01() { digitalWriteFast(1, HIGH); }
 
-    void digitalWriteFastLow02() { digitalWriteFast(2, LOW); }
-    void digitalWriteFastHigh02() { digitalWriteFast(2, HIGH); }
+    static void digitalWriteFastLow02() { digitalWriteFast(2, LOW); }
+    static void digitalWriteFastHigh02() { digitalWriteFast(2, HIGH); }
 
-    void digitalWriteFastLow03() { digitalWriteFast(3, LOW); }
-    void digitalWriteFastHigh03() { digitalWriteFast(3, HIGH); }
+    static void digitalWriteFastLow03() { digitalWriteFast(3, LOW); }
+    static void digitalWriteFastHigh03() { digitalWriteFast(3, HIGH); }
 
-    void digitalWriteFastLow04() { digitalWriteFast(4, LOW); }
-    void digitalWriteFastHigh04() { digitalWriteFast(4, HIGH); }
+    static void digitalWriteFastLow04() { digitalWriteFast(4, LOW); }
+    static void digitalWriteFastHigh04() { digitalWriteFast(4, HIGH); }
 
-    void digitalWriteFastLow05() { digitalWriteFast(5, LOW); }
-    void digitalWriteFastHigh05() { digitalWriteFast(5, HIGH); }
+    static void digitalWriteFastLow05() { digitalWriteFast(5, LOW); }
+    static void digitalWriteFastHigh05() { digitalWriteFast(5, HIGH); }
 
-    void digitalWriteFastLow06() { digitalWriteFast(6, LOW); }
-    void digitalWriteFastHigh06() { digitalWriteFast(6, HIGH); }
+    static void digitalWriteFastLow06() { digitalWriteFast(6, LOW); }
+    static void digitalWriteFastHigh06() { digitalWriteFast(6, HIGH); }
 
-    void digitalWriteFastLow07() { digitalWriteFast(7, LOW); }
-    void digitalWriteFastHigh07() { digitalWriteFast(7, HIGH); }
+    static void digitalWriteFastLow07() { digitalWriteFast(7, LOW); }
+    static void digitalWriteFastHigh07() { digitalWriteFast(7, HIGH); }
 
-    void digitalWriteFastLow08() { digitalWriteFast(8, LOW); }
-    void digitalWriteFastHigh08() { digitalWriteFast(8, HIGH); }
+    static void digitalWriteFastLow08() { digitalWriteFast(8, LOW); }
+    static void digitalWriteFastHigh08() { digitalWriteFast(8, HIGH); }
 
-    void digitalWriteFastLow09() { digitalWriteFast(9, LOW); }
-    void digitalWriteFastHigh09() { digitalWriteFast(9, HIGH); }
+    static void digitalWriteFastLow09() { digitalWriteFast(9, LOW); }
+    static void digitalWriteFastHigh09() { digitalWriteFast(9, HIGH); }
 
-    void digitalWriteFastLow10() { digitalWriteFast(10, LOW); }
-    void digitalWriteFastHigh10() { digitalWriteFast(10, HIGH); }
+    static void digitalWriteFastLow10() { digitalWriteFast(10, LOW); }
+    static void digitalWriteFastHigh10() { digitalWriteFast(10, HIGH); }
 
-    void digitalWriteFastLow11() { digitalWriteFast(11, LOW); }
-    void digitalWriteFastHigh11() { digitalWriteFast(11, HIGH); }
+    static void digitalWriteFastLow11() { digitalWriteFast(11, LOW); }
+    static void digitalWriteFastHigh11() { digitalWriteFast(11, HIGH); }
 
-    void digitalWriteFastLow12() { digitalWriteFast(12, LOW); }
-    void digitalWriteFastHigh12() { digitalWriteFast(12, HIGH); }
+    static void digitalWriteFastLow12() { digitalWriteFast(12, LOW); }
+    static void digitalWriteFastHigh12() { digitalWriteFast(12, HIGH); }
 
-    void digitalWriteFastLow13() { digitalWriteFast(13, LOW); }
-    void digitalWriteFastHigh13() { digitalWriteFast(13, HIGH); }
+    static void digitalWriteFastLow13() { digitalWriteFast(13, LOW); }
+    static void digitalWriteFastHigh13() { digitalWriteFast(13, HIGH); }
 
-    void digitalWriteFastLow14() { digitalWriteFast(14, LOW); }
-    void digitalWriteFastHigh14() { digitalWriteFast(14, HIGH); }
+    static void digitalWriteFastLow14() { digitalWriteFast(14, LOW); }
+    static void digitalWriteFastHigh14() { digitalWriteFast(14, HIGH); }
 
-    void digitalWriteFastLow15() { digitalWriteFast(15, LOW); }
-    void digitalWriteFastHigh15() { digitalWriteFast(15, HIGH); }
+    static void digitalWriteFastLow15() { digitalWriteFast(15, LOW); }
+    static void digitalWriteFastHigh15() { digitalWriteFast(15, HIGH); }
 
-    void digitalWriteFastLow16() { digitalWriteFast(16, LOW); }
-    void digitalWriteFastHigh16() { digitalWriteFast(16, HIGH); }
+    static void digitalWriteFastLow16() { digitalWriteFast(16, LOW); }
+    static void digitalWriteFastHigh16() { digitalWriteFast(16, HIGH); }
 
-    void digitalWriteFastLow17() { digitalWriteFast(17, LOW); }
-    void digitalWriteFastHigh17() { digitalWriteFast(17, HIGH); }
+    static void digitalWriteFastLow17() { digitalWriteFast(17, LOW); }
+    static void digitalWriteFastHigh17() { digitalWriteFast(17, HIGH); }
 
-    void digitalWriteFastLow18() { digitalWriteFast(18, LOW); }
-    void digitalWriteFastHigh18() { digitalWriteFast(18, HIGH); }
+    static void digitalWriteFastLow18() { digitalWriteFast(18, LOW); }
+    static void digitalWriteFastHigh18() { digitalWriteFast(18, HIGH); }
 
-    void digitalWriteFastLow19() { digitalWriteFast(19, LOW); }
-    void digitalWriteFastHigh19() { digitalWriteFast(19, HIGH); }
+    static void digitalWriteFastLow19() { digitalWriteFast(19, LOW); }
+    static void digitalWriteFastHigh19() { digitalWriteFast(19, HIGH); }
 
     static const FastWriter kFastWriters[];
     static const size_t kNumWriters;
 
-  private:
-
-    FastWriter getFastWriter(uint8_t pin, uint8_t value) {
+    static FastWriter getFastWriter(uint8_t pin, uint8_t value) {
       uint8_t index = 2 * pin + value;
       FastWriter writer = kFastWriters[index];
       return writer;

@@ -181,17 +181,17 @@ class Renderer {
      * ModulatingDigitDriver w/ LedMatrixDirect
      *    min: 8us; avg: 12-20us; max: 132
      * ModulatingDigitDriver w/ LedMatrixDirect w/ FastHardware
-     *    min: 8us; avg: 12-20us; max: 116
+     *    min: 8us; avg: 12-20us; max: 108
      * ModulatingDigitDriver w/ LedMatrixDirect w/ calcPulseFractionForFrame():
      *    min: 8us; avg: 12-20us; max: 192us
      * ModulatingDigitDriver w/ LedMatrixSerial
      *    min: 8us; avg: 10-12us; max: 204us
      * ModulatingDigitDriver w/ LedMatrixSerial w/ FastHardware
-     *    min: 8us; avg: 10-12us; max: 140us
+     *    min: 8us; avg: 10-12us; max: 120us
      * ModulatingDigitDriver w/ LedMatrixSpi
      *    min: 8us; avg: 12-20us; max: 92us
      * ModulatingDigitDriver w/ LedMatrixSpi w/ FastHardware
-     *    min: 8us; avg: 12-20us; max: 84us
+     *    min: 8us; avg: 12-20us; max: 80us
      */
     void renderField();
 
