@@ -31,9 +31,10 @@ SOFTWARE.
 #include <digitalWriteFast.h>
 #include "Hardware.h"
 
+// Helper macro from https://isocpp.org/wiki/faq/pointers-to-members
 #ifndef CALL_MEMBER_FN
 #define CALL_MEMBER_FN(object,ptrToMember)  ((object).*(ptrToMember))
-#endif 
+#endif
 
 namespace ace_segment {
 
@@ -50,14 +51,17 @@ class FastHardware: public Hardware {
     FastHardware() {}
 
     virtual void digitalWrite(uint8_t pin, uint8_t value) override {
-      if (pin >= kNumFns) return;
+      if (pin >= kNumWriters) return;
       uint8_t index = 2 * pin + value;
-      FastHardwareFn fn = kDigitalWriteFns[index];
-      CALL_MEMBER_FN(*this, fn)();
+      FastWriter writer = kFastWriters[index];
+      CALL_MEMBER_FN(*this, writer)();
     }
 
+    virtual void shiftOut(uint8_t dataPin, uint8_t clockPin,
+        uint8_t bitOrder, uint8_t val) override;
+
   private:
-    typedef void (FastHardware::*FastHardwareFn)();
+    typedef void (FastHardware::*FastWriter)();
 
     // digitalWriteFast() requires both argments to be compile-time constants,
     // so we create an array of member functions with the compile-time
@@ -122,10 +126,17 @@ class FastHardware: public Hardware {
     void digitalWriteFastLow19() { digitalWriteFast(19, LOW); }
     void digitalWriteFastHigh19() { digitalWriteFast(19, HIGH); }
 
-    static const FastHardwareFn kDigitalWriteFns[];
-    static const size_t kNumFns;
+    static const FastWriter kFastWriters[];
+    static const size_t kNumWriters;
 
   private:
+
+    FastWriter getFastWriter(uint8_t pin, uint8_t value) {
+      uint8_t index = 2 * pin + value;
+      FastWriter writer = kFastWriters[index];
+      return writer;
+    }
+
     // disable copy-constructor and assignment operator
     FastHardware(const FastHardware&) = delete;
     FastHardware& operator=(const FastHardware&) = delete;

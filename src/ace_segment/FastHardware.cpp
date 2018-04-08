@@ -2,7 +2,7 @@
 
 namespace ace_segment {
 
-const FastHardware::FastHardwareFn FastHardware::kDigitalWriteFns[] = {
+const FastHardware::FastWriter FastHardware::kFastWriters[] = {
   &FastHardware::digitalWriteFastLow00,
   &FastHardware::digitalWriteFastHigh00,
   &FastHardware::digitalWriteFastLow01,
@@ -45,7 +45,31 @@ const FastHardware::FastHardwareFn FastHardware::kDigitalWriteFns[] = {
   &FastHardware::digitalWriteFastHigh19,
 };
 
-const size_t FastHardware::kNumFns =
-    sizeof(kDigitalWriteFns)/sizeof(kDigitalWriteFns[0]);
+const size_t FastHardware::kNumWriters =
+    sizeof(kFastWriters)/sizeof(kFastWriters[0]);
+
+void FastHardware::shiftOut(uint8_t dataPin, uint8_t clockPin,
+    uint8_t bitOrder, uint8_t val) {
+  FastWriter fastClockPinHighWriter = getFastWriter(clockPin, HIGH);
+  FastWriter fastClockPinLowWriter = getFastWriter(clockPin, LOW);
+
+  if (bitOrder == LSBFIRST) {
+    uint8_t mask = 0x01;
+    for (uint8_t i = 0; i < 8; i++)  {
+      digitalWrite(dataPin, (val & mask) != 0);
+      CALL_MEMBER_FN(*this, fastClockPinHighWriter)();
+      CALL_MEMBER_FN(*this, fastClockPinLowWriter)();
+      mask <<= 1;
+    }
+  } else {
+    uint8_t mask = 0x80;
+    for (uint8_t i = 0; i < 8; i++)  {
+      digitalWrite(dataPin, (val & mask) != 0);
+      CALL_MEMBER_FN(*this, fastClockPinHighWriter)();
+      CALL_MEMBER_FN(*this, fastClockPinLowWriter)();
+      mask >>= 1;
+    }
+  }
+}
 
 }
