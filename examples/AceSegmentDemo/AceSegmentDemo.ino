@@ -9,7 +9,7 @@ using namespace ace_segment;
 #define DRIVER_MODE_SERIAL 4
 #define DRIVER_MODE_SPI 5
 
-#define DRIVER_MODE DRIVER_MODE_MODULATING
+#define DRIVER_MODE DRIVER_MODE_SPI
 
 const uint8_t NUM_SUBFIELDS = 16;
 const uint8_t FRAMES_PER_SECOND = 60;
@@ -34,7 +34,8 @@ const uint8_t clockPin = 13; // SH_CP on 74HC595
 #endif
 
 // Set up the chain of resources and their dependencies.
-Hardware hardware;
+FastHardware hardware;
+//Hardware hardware;
 DimmingDigit dimmingDigits[NUM_DIGITS];
 StyledDigit styledDigits[NUM_DIGITS];
 
@@ -78,6 +79,8 @@ Driver* driver = DriverBuilder()
     .setResistorsOnSegments()
     .setDigitPins(digitPins)
     .setSegmentSerialPins(latchPin, dataPin, clockPin)
+    .useModulatingDriver()
+    .setNumSubFields(NUM_SUBFIELDS)
     .setDimmingDigits(dimmingDigits)
     .build();
 #elif DRIVER_MODE == DRIVER_MODE_SPI

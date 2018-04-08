@@ -170,18 +170,26 @@ class Renderer {
      * using 8 sub-fields per frame, with 2 digits pulsing, and 2 digits
      * blinking:
      *
-     * DigitDriver w/ LedMatrixDirect
-     *    min: 16us; avg: 47us; max: 96us
-     * ModulatingDigitDriver w/ LedMatrixDirect
-     *    min: 8us; avg: 12-20us; max: 192us
-     * ModulatingDigitDriver w/ calcPulseFractionForFrameUsingInverse():
-     *    min: 8us; avg: 12-20us; max: 124us
      * SegmentDriver w/ LedMatrixDirect
      *    min: 28us; avg: 36-59us; max: 80us
+     * DigitDriver w/ LedMatrixDirect
+     *    min: 16us; avg: 47us; max: 96us
      * DigitDriver w/ LedMatrixSerial
      *    min: 16us; avg: 132us; max: 180us
      * DigitDriver w/ LedMatrixSpi
      *    min: 16us; avg: 40us; max: 72us
+     * ModulatingDigitDriver w/ LedMatrixDirect
+     *    min: 8us; avg: 12-20us; max: 124us
+     * ModulatingDigitDriver w/ LedMatrixDirect w/ calcPulseFractionForFrame():
+     *    min: 8us; avg: 12-20us; max: 192us
+     * ModulatingDigitDriver w/ LedMatrixSerial
+     *    min: 8us; avg: 10-12us; max: 204
+     * ModulatingDigitDriver w/ LedMatrixSerial w/ FastHardware
+     *    min: 8us; avg: 10-12us; max: 196
+     * ModulatingDigitDriver w/ LedMatrixSpi
+     *    min: 8us; avg: 12-20us; max: 92us
+     * ModulatingDigitDriver w/ LedMatrixSpi w/ FastHardware
+     *    min: 8us; avg: 12-20us; max: 84us
      */
     void renderField();
 

@@ -34,6 +34,7 @@ SOFTWARE.
 
 #include "ace_segment/Util.h"
 #include "ace_segment/Hardware.h"
+#include "ace_segment/FastHardware.h"
 #include "ace_segment/DimmingDigit.h"
 #include "ace_segment/DriverBuilder.h"
 #include "ace_segment/Driver.h"

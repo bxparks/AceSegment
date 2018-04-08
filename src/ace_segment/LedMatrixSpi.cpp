@@ -40,4 +40,5 @@ void LedMatrixSpi::drawElements(uint8_t pattern) {
   mHardware->spiTransfer(actualPattern);
   mHardware->digitalWrite(mLatchPin, HIGH);
 }
+
 }
