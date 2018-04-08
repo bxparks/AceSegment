@@ -285,7 +285,7 @@ testF(FakeDriverTest, setBrightness_outOfBounds) {
   DimmingDigit& digitOutOfBounds = dimmingDigits[4];
   digitOutOfBounds.pattern = 1;
   digitOutOfBounds.brightness = 2;
-  fakeDriver.setBrightness(5, 10);
+  fakeDriver.setBrightness(4, 96);
   assertEqual(1, digitOutOfBounds.pattern);
   assertEqual(2, digitOutOfBounds.brightness);
 }
@@ -1206,9 +1206,9 @@ class RendererTest: public TestOnce {
       fakeDriver.setNumSubFields(NUM_SUB_FIELDS);
       renderer
           .setFramesPerSecond(FRAMES_PER_SECOND)
-          .setBrightness(255)
           .configure();
 
+      renderer.writeBrightness(255);
       hardware.clear();
     }
 
@@ -1359,10 +1359,9 @@ testF(RendererTest, displayCurrentField_noSubFieldDriver) {
 testF(RendererTest, displayCurrentField_dimmedBrightness) {
   fakeDriver.setNumSubFields(3);
   assertEqual(true, fakeDriver.isBrightnessSupported());
-  renderer
-      .setBrightness(127)
-      .configure();
+  renderer.configure();
 
+  renderer.writeBrightness(127);
   renderer.writePatternAt(0, 0x11, StyledDigit::kStyleBlinkSlow);
   renderer.writePatternAt(1, 0x22, StyledDigit::kStyleBlinkFast);
   renderer.writePatternAt(2, 0x33, StyledDigit::kStylePulseSlow);
@@ -1397,8 +1396,8 @@ class CharWriterTest: public TestOnce {
       fakeDriver.setNumSubFields(NUM_SUB_FIELDS);
       renderer
           .setFramesPerSecond(FRAMES_PER_SECOND)
-          .setBrightness(255)
           .configure();
+      renderer.writeBrightness(255);
       hardware.clear();
     }
 };
@@ -1446,8 +1445,8 @@ class StringWriterTest: public TestOnce {
       fakeDriver.setNumSubFields(NUM_SUB_FIELDS);
       renderer
           .setFramesPerSecond(FRAMES_PER_SECOND)
-          .setBrightness(255)
           .configure();
+      renderer.writeBrightness(255);
       hardware.clear();
       clearStyledDigits();
     }

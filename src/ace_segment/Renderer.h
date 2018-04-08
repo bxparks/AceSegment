@@ -59,16 +59,8 @@ class Renderer {
         mPulseFastDurationMillis(kPulseFastDurationMillisDefault)
     {}
 
-    // Start configuration methods
-
-    /**
-     * Set brightness expressed as a fraction of 256. In other words, 255 is
-     * brightest and is the default. Not implemented in any driver.
-     */
-    Renderer& setBrightness(uint8_t brightness) {
-      mBrightness = brightness;
-      return *this;
-    }
+    // Start configuration methods. These methods are expected to be set during
+    // setup() and configure() should be called after changing them.
 
     /**
      * Set the desired frame rate. Default is 120.
@@ -143,6 +135,14 @@ class Renderer {
     /** Return the fields per second. */
     uint16_t getFieldsPerSecond() {
       return mFramesPerSecond * mDriver->getFieldsPerFrame();
+    }
+
+    /**
+     * Set brightness expressed as a fraction of 256. In other words, 255 is
+     * brightest and is the default. Not implemented in any driver.
+     */
+    void writeBrightness(uint8_t brightness) {
+      mBrightness = brightness;
     }
 
     /** Write the pattern and style for a given digit. */
