@@ -48,18 +48,22 @@ class FastHardware: public Hardware {
     virtual void digitalWrite(uint8_t pin, uint8_t value) override {
       if (pin >= kNumWriters) return;
       uint8_t index = 2 * pin + value;
-      FastWriter writer = kFastWriters[index];
+      DigitalWriter writer = kDigitalWriters[index];
       writer();
     }
 
     virtual void shiftOut(uint8_t dataPin, uint8_t clockPin,
         uint8_t bitOrder, uint8_t val) override;
 
-  private:
-    typedef void (*FastWriter)();
+    virtual DigitalWriter getDigitalWriter(uint8_t pin, uint8_t value) {
+      uint8_t index = 2 * pin + value;
+      DigitalWriter writer = kDigitalWriters[index];
+      return writer;
+    }
 
+  private:
     // digitalWriteFast() requires both argments to be compile-time constants,
-    // so we create an array of member functions with the compile-time
+    // so we create an array of pointer to functions with the compile-time
     // constants built for D00 to D19.
     static void digitalWriteFastLow00() { digitalWriteFast(0, LOW); }
     static void digitalWriteFastHigh00() { digitalWriteFast(0, HIGH); }
@@ -121,14 +125,8 @@ class FastHardware: public Hardware {
     static void digitalWriteFastLow19() { digitalWriteFast(19, LOW); }
     static void digitalWriteFastHigh19() { digitalWriteFast(19, HIGH); }
 
-    static const FastWriter kFastWriters[];
+    static const DigitalWriter kDigitalWriters[];
     static const size_t kNumWriters;
-
-    static FastWriter getFastWriter(uint8_t pin, uint8_t value) {
-      uint8_t index = 2 * pin + value;
-      FastWriter writer = kFastWriters[index];
-      return writer;
-    }
 
     // disable copy-constructor and assignment operator
     FastHardware(const FastHardware&) = delete;

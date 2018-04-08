@@ -2,7 +2,7 @@
 
 namespace ace_segment {
 
-const FastHardware::FastWriter FastHardware::kFastWriters[] = {
+const Hardware::DigitalWriter FastHardware::kDigitalWriters[] = {
   &FastHardware::digitalWriteFastLow00,
   &FastHardware::digitalWriteFastHigh00,
   &FastHardware::digitalWriteFastLow01,
@@ -46,12 +46,12 @@ const FastHardware::FastWriter FastHardware::kFastWriters[] = {
 };
 
 const size_t FastHardware::kNumWriters =
-    sizeof(kFastWriters)/sizeof(kFastWriters[0]);
+    sizeof(kDigitalWriters)/sizeof(kDigitalWriters[0]);
 
 void FastHardware::shiftOut(uint8_t dataPin, uint8_t clockPin,
     uint8_t bitOrder, uint8_t val) {
-  FastWriter fastClockPinHighWriter = getFastWriter(clockPin, HIGH);
-  FastWriter fastClockPinLowWriter = getFastWriter(clockPin, LOW);
+  DigitalWriter fastClockPinHighWriter = getDigitalWriter(clockPin, HIGH);
+  DigitalWriter fastClockPinLowWriter = getDigitalWriter(clockPin, LOW);
 
   if (bitOrder == LSBFIRST) {
     uint8_t mask = 0x01;
