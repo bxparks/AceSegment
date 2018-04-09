@@ -28,7 +28,6 @@ SOFTWARE.
 #include "../Hardware.h"
 
 namespace ace_segment {
-
 namespace testing {
 
 /** A record of one Hardware event. */
@@ -37,7 +36,8 @@ class Event {
     static const uint8_t kTypeDigitalWrite = 0;
     static const uint8_t kTypePinMode = 1;
     static const uint8_t kTypeShiftOut = 2;
-    static const uint8_t kTypeSpiTransfer = 2;
+    static const uint8_t kTypeSpiBegin = 3;
+    static const uint8_t kTypeSpiTransfer = 4;
 
     uint8_t type; // arg0
     uint8_t arg1;
@@ -51,6 +51,8 @@ class TestableHardware: public Hardware {
     explicit TestableHardware():
       mNumRecords(0)
     {}
+
+    virtual ~TestableHardware() {}
 
     virtual unsigned long micros() override { return mMicros; }
 
@@ -89,6 +91,14 @@ class TestableHardware: public Hardware {
       }
     }
 
+    virtual void spiBegin() override {
+      if (mNumRecords < kMaxRecords) {
+        Event& event = mEvents[mNumRecords];
+        event.type = Event::kTypeSpiBegin;
+        mNumRecords++;
+      }
+    }
+
     virtual void spiTransfer(uint8_t value) override {
       if (mNumRecords < kMaxRecords) {
         Event& event = mEvents[mNumRecords];
@@ -106,7 +116,7 @@ class TestableHardware: public Hardware {
 
     void clear() { mNumRecords = 0; }
 
-    int getNumRecords() { return mNumRecords; }
+    uint8_t getNumRecords() { return mNumRecords; }
 
     Event& getEvent(int i) { return mEvents[i]; }
 
@@ -121,11 +131,10 @@ class TestableHardware: public Hardware {
     unsigned long mMicros;
 
     Event mEvents[kMaxRecords];
-    int mNumRecords;
+    uint8_t mNumRecords;
 };
 
-}
-
-}
+} // namespace testing
+} // namespace ace_segment
 
 #endif

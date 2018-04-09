@@ -72,15 +72,4 @@ void LedMatrixDirect::drawElements(uint8_t pattern) {
   }
 }
 
-void LedMatrixDirect::writeGroupPin(uint8_t group, uint8_t output) {
-  uint8_t groupPin = mGroupPins[group];
-  mHardware->digitalWrite(groupPin, output);
-}
-
-void LedMatrixDirect::writeElementPin(uint8_t element, uint8_t output) {
-  uint8_t elementPin = mElementPins[element];
-  mHardware->digitalWrite(elementPin, output);
-}
-
-
 }

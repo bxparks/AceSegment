@@ -2,7 +2,7 @@
 An adjustable, configurable, and extensible framework for rendering seven
 segment LED displays on Arduino platforms
 
-Version: Work-in-progress (2018-04-06)
+Version: Work-in-progress (2018-04-08)
 
 ## Summary
 
@@ -80,14 +80,11 @@ AceSegment library supports the following wiring configurations:
 
 The driver classes assume that the pins are connected directly to the GPIO pins
 of the microcontroller. In other words, for a 4 digit x 8 segment LED display,
-you would need 12 GPIO pins. This is the cheapest and simplest option if
-you have enough pins available because you need nothing else because the
-current limiting resistors.
-
-If the project is not able to allocate this many pins, then the usual solution
-is to use a Serial to Parallel converter such as the 74HC595 chip. Currently,
-the AceSegment library does not support this configuration but it is planned
-to be added in the near future.
+you would need 12 GPIO pins. This is the cheapest and simplest option if you
+have enough pins available because you need nothing else because the current
+limiting resistors. If the project is not able to allocate this many pins, then
+the usual solution is to use a Serial to Parallel converter such as the 74HC595
+chip.
 
 At first glance, there is not an obvious difference between "resistors on
 segments" configuration and "resistors on digits". I recommend using resistors
@@ -125,6 +122,8 @@ depend on the lower-level classes:
   to the seven segment leds. Different subclasses implement different types of
   wiring, but the user does not need to aware of the various subclasses. That
   complexity is managed by the `DriverBuilder` class.
+* `DriverBuilder`: A class that knows how to select and configure the
+  appropriate subclass of `Driver`.
 * `StyledDigit`: A class that represents one digit which can have certain style
   attributes (e.g. blinking, or pulsing). A `StyledDigit` is converted into
   a `DimmingDigit`.
@@ -141,25 +140,34 @@ depend on the lower-level classes:
   the native decimal point on a seven segment LED display.
 
 Not all `Driver`s and not all wiring configurations will support the brightness.
-See the *Modulating Driver* for details on which configuration supports this
-feature.
+See the *Modulating Driver* section for details on which configuration supports
+this feature.
 
 The [Doxygen docs for these classes](https://bxparks.github.io/AceSegment/html)
 are published through GitHub Pages.
 
 ### Setting Up the Resources
 
-With the exception of `Driver`, all of the classes in the previous section will
-most likely be created statically in the global memory area. The `Driver` object
-will be created by the `DriverBuilder` class on the heap and a pointer to the
-object will be returned. The client code will not normally need to delete this
-heap object so for all practical purposes, it can be treated as if it was
-created statically.
+The instances of the various classes mentioned above are recommended to
+be created in the `setup()` method in the heap using the `new` operator, instead
+of creating them statically. There are 2 reasons:
+1. The `DriverBuilder` does not know which subclass of `Driver` to build until
+   it is given its build parameters, so it must create the `Driver` object
+   on the heap. For consistency, it's easier to create all the other objects
+   on the heap as well.
+1. It's sometimes necessary to debug the construction of some of these objects,
+   and the `Serial.print()` method does not work if used during static
+   initialization. It must be called after the `Serial` object is initialized
+   in the `setup()` method.
 
-The resource creation occurs in roughly 4 stages, with the objects in the
+The client code will not normally need to delete these heap objects so for all
+practical purposes, they can be treated as if they were created statically.
+
+The resource creation occurs in roughly 5 stages, with the objects in the
 later stages depending on the objects created in the earlier stage:
 
-1. Low level buffers and hardware interface.
+1. Low level buffers which are created statically.
+1. The `Hardware` object which provides access to the various pins.
 1. The `Driver` object through the `DriverBuilder`.
 1. The `Renderer` which knows how to send bit patterns to the `Driver`.
 1. The various `XxxWriter` classes which translate higher level characters and
@@ -169,56 +177,69 @@ A typical resource creation code looks like this:
 ```
 const uint16_t FRAMES_PER_SECOND = 60;
 const uint8_t NUM_DIGITS = 4;
+const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
+const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
 
-Hardware hardware;
 DimmingDigit dimmingDigits[NUM_DIGITS];
 StyledDigit styledDigits[NUM_DIGITS];
 
-Driver* driver = DriverBuilder()
-    .setHardware(&hardware)
-    .setNumDigits(NUM_DIGITS)
-    .setXxx()
-    .useXxx()
-    ...
-    .build();
+// The chain of resources.
+Hardware* hardware;
+Driver* driver;
+Renderer* renderer;
+CharWriter* charWriter;
+StringWriter* stringWriter;
 
-Renderer renderer(&hardware, driver, styledDigits, NUM_DIGITS);
-CharWriter charWriter(&renderer);
-StringWriter stringWriter(&charWriter);
-```
+...
 
-Then in the `setup()` method, the `driver` and the `renderer` need to be
-configured, like this:
-```
+void setup() {
+  delay(1000); // Wait for stability on some boards, otherwise garage on Serial
   Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
   while (!Serial); // Wait until Serial is ready - Leonardo/Micro
+  Serial.println(F("setup(): begin"));
 
+  // Create an instance of Hardware that will be shared.
+  hardware = new Hardware();
+
+  // Create and configure the Driver.
+  driver = DriverBuilder()
+      .setHardware(hardware)
+      .setNumDigits(NUM_DIGITS)
+      .setCommonCathode()
+      .setResistorsOnSegments()
+      .setDigitPins(digitPins)
+      .setSegmentDirectPins(segmentPins)
+      ...
+      .build();
   driver->configure();
-  renderer
-      .setFramesPerSecond(FRAMES_PER_SECOND)
-      .setXxx()
-      .configure();
+
+  // Create and configure the Renderer.
+  renderer = new Renderer(hardware, driver, styledDigits, NUM_DIGITS);
+  renderer->setFramesPerSecond(FRAMES_PER_SECOND);
+  renderer->configure();
+
+  // Create higher level Writers.
+  charWriter = new CharWriter(renderer);
+  stringWriter = new StringWriter(charWriter);
+
   ...
+}
+
 ```
 
 ### Configuring the Driver
 
 The `Driver` is created indirectly through a helper class called the
-`DriverBuilder`. The helper class exists to hide the enormous complexity of
-configuring and adjusting the various subclasses and internal helper classes
-which work together to make a `Driver` object operate correctly for a given
-LED display configuration.
+`DriverBuilder` which hides the complexity of configuring and adjusting the
+various Driver options. To use the `DriverBuilder`, create a temporary instance
+of it (on the stack), call the various `setXxx()` or `useXxx()` methods to tell
+the object how the LED display is wired, then finally call the `build()` method
+which returns an instance of a `Driver` (more accurately, one of its
+implementation subclasses) which was created on the heap.
 
-To use the `DriverBuilder`, create an instance of it, call the various
-`setXxx()` or `useXxx()` methods to tell the object how the LED display is
-wired, then finally call the `build()` method which returns an instance of a
-`Driver` (more accurately, one of its implementation subclasses) which was
-created on the heap. Normally, this heap object will never need to be
-deleted, so you don't have to worry about memory management. All of these
-methods on `DriverBuilder` return a reference to `*this`, so they can
-be chained together in one statement. This makes it very easy to use
-the `DriverBuilder` during the static initialization phase of the various
-resources.
+Normally, the `Driver` object will never need to be deleted, so you don't have
+to worry about memory management. All of these methods on `DriverBuilder` return
+a reference to `*this`, so they can be chained together in one statement.
 
 The following methods are available in `DriverBuilder`:
 
@@ -233,7 +254,8 @@ The following methods are available in `DriverBuilder`:
 * `DriverBuilder& setSegmentDirectPins(const uint8_t* segmentPins);`
 * `DriverBuilder& setSegmentSerialPins(uint8_t latchPin, uint8_t dataPin,
    uint8_t clockPin);`
-* `DriverBuilder& useSpi();`
+* `DriverBuilder& setSegmentSpiPins(uint8_t latchPin, uint8_t dataPin,
+   uint8_t clockPin);`
 * `DriverBuilder& setDimmingDigits(DimmingDigit* dimmingDigits);`
 * `DriverBuilder& useModulatingDriver();`
 * `DriverBuilder& setNumSubFields(uint8_t numSubFields);`
@@ -280,7 +302,7 @@ The `DriverBuilder` configuration is:
 const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
 const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
 Driver* driver = DriverBuilder()
-    .setHardware(&hardware)
+    .setHardware(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonCathode()
     .setResistorsOnSegments()
@@ -317,7 +339,7 @@ The `DriverBuilder` configuration is:
 const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
 const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
 Driver* driver = DriverBuilder()
-    .setHardware(&hardware)
+    .setHardware(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonAnode()
     .setResistorsOnSegments()
@@ -354,7 +376,7 @@ The `DriverBuilder` configuration is:
 const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
 const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
 Driver* driver = DriverBuilder()
-    .setHardware(&hardware)
+    .setHardware(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonAnode()
     .setResistorsOnDigits()
@@ -391,7 +413,7 @@ The `DriverBuilder` configuration is:
 const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
 const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
 Driver* driver = DriverBuilder()
-    .setHardware(&hardware)
+    .setHardware(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonAnode()
     .setResistorsOnDigits()
@@ -435,7 +457,7 @@ const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
 const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
 
 Driver* driver = DriverBuilder()
-    .setHardware(&hardware)
+    .setHardware(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonCathode()
     .setResistorsOnSegments()
@@ -484,7 +506,7 @@ const uint8_t dataPin = 11; // DS on 74HC595
 const uint8_t clockPin = 13; // SH_CP on 74HC595
 
 Driver* driver = DriverBuilder()
-    .setHardware(&hardware)
+    .setHardware(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonCathode()
     .setResistorsOnSegments()
@@ -521,8 +543,9 @@ MCU          74HC595             LED display
 +--------+                       +------------------------+
 ```
 
-The `DriverBuilder` configuration is the same as before, but we
-just add the `useSpi()` configuration option:
+The `DriverBuilder` configuration is similar to before but we use the
+`setSegmentSpiPins()` method instead:
+
 ```
 const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
 const uint8_t latchPin = 10; // ST_CP on 74HC595
@@ -530,15 +553,16 @@ const uint8_t dataPin = 11; // DS on 74HC595
 const uint8_t clockPin = 13; // SH_CP on 74HC595
 
 Driver* driver = DriverBuilder()
-    .setHardware(&hardware)
+    .setHardware(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonCathode()
     .setResistorsOnSegments()
     .setDigitPins(digitPins)
-    .setSegmentSerialPins(latchPin, dataPin, clockPin)
-    .useSpi()
+    .setSegmentSpiPins(latchPin, dataPin, clockPin)
     .setDimmingDigits(dimmingDigits)
     .build();
+
+driver->configure();
 ```
 
 #### Modulating Driver
@@ -546,22 +570,21 @@ Driver* driver = DriverBuilder()
 As indicated above, some driver options will support brightness control using
 pulse width modulation. There are some restrictions. First, the resistors must
 be on the segments. Second, the driver must be fast enough to do pulse width
-modulation. Currently, this means that the following `DriverBuilder` options
-(see below) must be used:
-* `useSpi()` - hardware API
-* `setSegmentDirectPins()` - direct wiring to the segment pins
+modulation. The modulating driver is activated using the `useModulatingDriver()`
+option and it requires the `setNumSubFields()` to be specified:
 
-The following options:
-* `useSerial()` - software SPI
-
-is too slow, and `useModulatingDriver()` will not work for this option.
-
+```
+Driver* driver = DriverBuilder()
+    ...
+    .useModulatingDriver()
+    .setNumSubFields(NUM_SUBFIELDS)
+    ...
+```
 
 ### Configuring the Renderer
 
-The following parameters are configuration in `Renderer`:
+The following parameters can be configured for the `Renderer`:
 * `void setFramesPerSecond(uint8_t framesPerSecond);` (required)
-* `void setBrightness(uint8_t brightness);`
 * `void setBlinkFastDuration(uint16_t durationMillis);`
 * `void setBlinkSlowDuration(uint16_t durationMillis);`
 * `void setPulseFastDuration(uint16_t durationMillis);`
@@ -573,11 +596,14 @@ defaults.
 
 And example of configuring the `Renderer` is:
 ```
-renderer.setFramesPerSecond(FRAMES_PER_SECOND);
-renderer.configure();
+Renderer* renderer = new Renderer(hardware, driver, styledDigits, NUM_DIGITS);
+renderer->setFramesPerSecond(FRAMES_PER_SECOND);
+renderer->configure();
 ```
 
-### Writing Digit Bit Patterns
+### Using the Renderer
+
+#### Writing Digit Bit Patterns
 
 The `Renderer` contains a number of methods to write the bit patterns of
 the seven segment display:
@@ -639,19 +665,28 @@ because the driver needs to be able to support intermediate brightness of the
 LED digits, which can currently be achieved using pulse width modulation.
 
 
-### Global Brightness
+#### Global Brightness
 
 If the `Driver` supports it, we can control the global brightness of the
 entire LED display using:
 
 ```
-renderer.setBrightness(value);
+renderer->writeBrightness(value);
 ```
 
 Note that the `value` is a fraction (0.0 - 1.0) represented in units of
 1/256. In other words, 3 means (3/256) and 255 means (255/256).
 
-### Frames and Fields
+The global brightness is enabled only if the `useModulatingDriver()` option was
+configured in `DriverBuilder`. If the `setNumSubFields()` was set to 16, then
+each digit is rendered 16 times within a single field, but modulated using pulse
+width modulation to control the width of that signal. The given digit will be
+"on" only a fraction of the full interval of the single field rendering and will
+appear dimmer to the human eye.
+
+### Rendering
+
+#### Frames and Fields
 
 To understand how to use the `Renderer`, we first need to explain a couple of
 terms that we
@@ -684,22 +719,6 @@ know much of anything about fields. The only thing that the `Renderer` knows is
 how many fields there are in a frame and this information comes from the
 `Driver::getFieldsPerFrame()` method from the `Driver`.
 
-### Use Modulating Driver Option
-
-When the `useModulatingDriver()` option is configured in `DriverBuilder` with,
-say, 16 subfields within a single field, then each digit is rendered 16 times
-within a single field, but modulated using pulse width modulation to control the
-width of that signal. The given digit will be "on" only a fraction of the full
-interval of the single field rendering and will appear dimmer to the human eye.
-
-Since PWM is used to control the brightness of the digit, the
-`isBrightnessSupported()` method returns `true` only if the
-`useModulatingDriver()` is selected, which notifies the `Renderer` that
-brightness is supported. This allows the `Renderer` to avoid performing certain
-time consuming calculatings related to pulsing, which saves CPU cycles.
-
-### Rendering
-
 With the distinction between *frames* and *fields* explained, we can now explain
 how `Renderer::renderField()` works. The `Renderer` keeps an internal counter,
 and if the call occurs at a frame boundary, the `Renderer` calculates the
@@ -728,7 +747,7 @@ There are 2 methods to achieve this:
 * Polling
 * Interrupts
 
-### Rendering By Polling
+#### Rendering By Polling
 
 For convenience, we provided one method, `Renderer::renderFieldWhenReady()` that
 actually knows the real clock, and can be polled repeated to generated the calls
@@ -740,7 +759,7 @@ The code looks like this:
 
 ```
 void loop() {
-  renderer.renderFieldWhenReady();
+  renderer->renderFieldWhenReady();
 }
 ```
 
@@ -750,7 +769,7 @@ then we need a field rate of 2000-4000 Hz or 250-500 microseconds per frame. If
 the `loop()` method executes anything else that affects the timing requirements,
 then the user will notice this problem as flickering of the LED segments.
 
-### Rendering Using Interrupts
+#### Rendering Using Interrupts
 
 This is the recommended way of drawing the bit patterns to the LED display.
 
@@ -765,14 +784,14 @@ example, an ATmega328 (e.g. Arduino UNO, Nano, Mini), using an 8-bit timer on
 Timer 2 looks like this:
 ```
 ISR(TIMER2_COMPA_vect) {
-  renderer.renderField();
+  renderer->renderField();
 }
 
 void setup() {
   ...
   // set up Timer 2
   uint8_t timerCompareValue =
-      (long) F_CPU / 1024 / renderer.getFieldsPerSecond() - 1;
+      (long) F_CPU / 1024 / renderer->getFieldsPerSecond() - 1;
   noInterrupts();
   TCNT2  = 0;	// Initialize counter value to 0
   TCCR2A = 0;
@@ -874,29 +893,29 @@ TBD
 
 The `Renderer` has a number of statistics variables which track the minimum,
 average, and maximum amount of time taken by a single call to `renderField()`
-method, over the last 300 frames (default which is adjustable). Here
-are the numbers for a 16MHz ATmega328P:
+method, over the last 300 frames (default which is adjustable). Here are the
+numbers for a 16MHz ATmega328P, using a frame rate of 60Hz, with 16 subfields
+per field for the `useModulatingDriver()` option:
 
 * DigitDriver w/ LedMatrixDirect
-    * min: 16us; avg: 47us; max: 96us
+    * min: 16us; avg: 80us; max: 108us
 * DigitDriver w/ LedMatrixSerial
-    * min: 16us; avg: 82us; max: 196us
+    * min: 16us; avg: 84-139us; max: 204us
+* DigitDriver w/ LedMatrixSpi
+    * min: 16us; avg: 30-55us; max: 80us
 * ModulatingDigitDriver w/ LedMatrixDirect
-    * min: 8us; avg: 12-20us; max: 192us
-* ModulatingDigitDriver w/ LedMatrixDirect w/ calcPulseFractionForFrameUsingInverse():
-    * min: 8us; avg: 12-20us; max: 124us
+    * min: 8us; avg: 12-20us; max: 140us
+* ModulatingDigitDriver w/ LedMatrixSerial
+    * min: 8us; avg: 12-20us; max: 212us
 * ModulatingDigitDriver w/ LedMatrixSpi
-    * min: 8us; avg: 16us; max: 92us
+    * min: 8us; avg: 12-20us; max: 100us
 * SegmentDriver w/ LedMatrixDirect
-    * min: 28us; avg: 36-59us; max: 80us
+    * min: 28us; avg: 36-76; max: 96us
 
 If we want to drive a 4 digit LED display at 60 frames per second, using a
 subfield modulation of 16 subfields per field, we get a field rate of 3.84 kHz,
-or 260 microseconds per field. The worst case elapsed time for
-`Renderer::renderField()` using the `useModulatingDriver()` option was observed
-to be 124 microseconds. That means that we would have slightly less than 136
-microseconds of spare CPU cyles to do any other work besides rendering the LED
-display.
+or 260 microseconds per field. All of the options had a maximum time
+of less than 260 microseconds.
 
 ## System Requirements
 

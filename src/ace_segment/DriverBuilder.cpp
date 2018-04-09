@@ -37,10 +37,11 @@ namespace ace_segment {
 
 /** The LedMatrix object returned must have its configure() called. */
 LedMatrix* DriverBuilder::buildLedMatrix() {
-  if (!mUseSerialToParallel) {
+  if (mLedMatrixType == kTypeLedMatrixDirect) {
     if (mResistorsOnSegments) {
-      LedMatrixDirect* ledMatrix = new LedMatrixDirect(
-          mHardware, mNumDigits, mNumSegments);
+      Serial.println(F("DriverBuilder(): creating LedMatrixDirect w/ resistorsOnSegments"));
+      LedMatrixDirect* ledMatrix =
+          new LedMatrixDirect(mHardware, mNumDigits, mNumSegments);
       ledMatrix->setGroupPins(mDigitPins);
       ledMatrix->setElementPins(mSegmentPins);
       if (mCommonCathode) {
@@ -50,8 +51,9 @@ LedMatrix* DriverBuilder::buildLedMatrix() {
       }
       return ledMatrix;
     } else {
-      LedMatrixDirect* ledMatrix = new LedMatrixDirect(
-          mHardware, mNumSegments, mNumDigits);
+      Serial.println(F("DriverBuilder(): creating LedMatrixDirect w/ resistorsOnDigits"));
+      LedMatrixDirect* ledMatrix =
+          new LedMatrixDirect(mHardware, mNumSegments, mNumDigits);
       ledMatrix->setGroupPins(mSegmentPins);
       ledMatrix->setElementPins(mDigitPins);
       if (mCommonCathode) {
@@ -64,12 +66,12 @@ LedMatrix* DriverBuilder::buildLedMatrix() {
   } else {
     // We support only resistors on segments for SerialToParallel
     LedMatrixSerial* ledMatrix;
-    if (mUseSpi) {
-      ledMatrix = new LedMatrixSpi(
-          mHardware, mNumDigits, mNumSegments);
+    if (mLedMatrixType == kTypeLedMatrixSerial) {
+      Serial.println(F("DriverBuilder(): creating LedMatrixSerial w/ resistorsOnSegments"));
+      ledMatrix = new LedMatrixSerial(mHardware, mNumDigits, mNumSegments);
     } else {
-      ledMatrix = new LedMatrixSerial(
-          mHardware, mNumDigits, mNumSegments);
+      Serial.println(F("DriverBuilder(): creating LedMatrixSpi w/ resistorsOnSegments"));
+      ledMatrix = new LedMatrixSpi(mHardware, mNumDigits, mNumSegments);
     }
     ledMatrix->setGroupPins(mDigitPins);
     ledMatrix->setElementPins(mLatchPin, mDataPin, mClockPin);
@@ -87,12 +89,15 @@ Driver* DriverBuilder::build() {
 
   if (mResistorsOnSegments) {
     if (mUseModulatingDriver) {
+      Serial.println(F("DriverBuilder(): creating ModulatingDigitDriver"));
       return new ModulatingDigitDriver(ledMatrix, mDimmingDigits,
           mNumDigits, mNumSubFields);
     } else {
+      Serial.println(F("DriverBuilder(): creating DigitDriver"));
       return new DigitDriver(ledMatrix, mDimmingDigits, mNumDigits);
     }
   } else {
+    Serial.println(F("DriverBuilder(): creating SegmentDriver"));
     return new SegmentDriver(ledMatrix, mDimmingDigits, mNumDigits);
   }
 }

@@ -49,11 +49,17 @@ class LedMatrixDirect: public LedMatrix {
     virtual void drawElements(uint8_t pattern) override;
 
   private:
-    /** Write to group pin identified by 'group'. VisibleForTesting. */
-    void writeGroupPin(uint8_t group, uint8_t output);
+    /** Write to group pin identified by 'group'. */
+    void writeGroupPin(uint8_t group, uint8_t output) {
+      uint8_t groupPin = mGroupPins[group];
+      mHardware->digitalWrite(groupPin, output);
+    }
 
-    /** Write to the element pin identified by 'element'. VisibleForTesting. */
-    void writeElementPin(uint8_t element, uint8_t output);
+    /** Write to the element pin identified by 'element'. */
+    void writeElementPin(uint8_t element, uint8_t output) {
+      uint8_t elementPin = mElementPins[element];
+      mHardware->digitalWrite(elementPin, output);
+    }
 
     const uint8_t* mGroupPins;
     const uint8_t* mElementPins;

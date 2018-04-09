@@ -3,104 +3,51 @@ using namespace ace_segment;
 
 #define USE_INTERRUPT 0
 
+#define LED_MATRIX_MODE_DIRECT 1
+#define LED_MATRIX_MODE_SERIAL 2
+#define LED_MATRIX_MODE_SPI 3
+
 #define DRIVER_MODE_DIGIT 1
-#define DRIVER_MODE_MODULATING 2
+#define DRIVER_MODE_DIGIT_MODULATING 2
 #define DRIVER_MODE_SEGMENT 3
-#define DRIVER_MODE_SERIAL 4
-#define DRIVER_MODE_SPI 5
 
-#define DRIVER_MODE DRIVER_MODE_SPI
+#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
+#define DRIVER_MODE DRIVER_MODE_DIGIT_MODULATING
 
-const uint8_t NUM_SUBFIELDS = 16;
 const uint8_t FRAMES_PER_SECOND = 60;
+const uint8_t NUM_SUBFIELDS = 16;
 
 #if DRIVER_MODE == DRIVER_MODE_SEGMENT
-// 2 digits, resistors on digits
-const uint8_t NUM_DIGITS = 2;
-const uint8_t digitPins[NUM_DIGITS] = {12, 14};
-const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
-#elif DRIVER_MODE == DRIVER_MODE_DIGIT || DRIVER_MODE == DRIVER_MODE_MODULATING
-// 4 digits, resistors on segments
+// 4 digits, resistors on digits
 const uint8_t NUM_DIGITS = 4;
 const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
 const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
-#elif DRIVER_MODE == DRIVER_MODE_SERIAL || DRIVER_MODE == DRIVER_MODE_SPI
-// 2 digits, resistors on segments, serial-to-parallel on segments
-const uint8_t NUM_DIGITS = 4;
-const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
-const uint8_t latchPin = 10; // ST_CP on 74HC595
-const uint8_t dataPin = 11; // DS on 74HC595
-const uint8_t clockPin = 13; // SH_CP on 74HC595
+#else
+  #if LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT
+  // 4 digits, resistors on segments
+  const uint8_t NUM_DIGITS = 4;
+  const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
+  const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
+  #else
+  // 4 digits, resistors on segments, serial-to-parallel converter on segments
+  const uint8_t NUM_DIGITS = 4;
+  const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
+  const uint8_t latchPin = 10; // ST_CP on 74HC595
+  const uint8_t dataPin = 11; // DS on 74HC595
+  const uint8_t clockPin = 13; // SH_CP on 74HC595
+  #endif
 #endif
 
 // Set up the chain of resources and their dependencies.
-FastHardware hardware;
-//Hardware hardware;
 DimmingDigit dimmingDigits[NUM_DIGITS];
 StyledDigit styledDigits[NUM_DIGITS];
 
-#if DRIVER_MODE == DRIVER_MODE_DIGIT
-Driver* driver = DriverBuilder()
-    .setHardware(&hardware)
-    .setNumDigits(NUM_DIGITS)
-    .setCommonCathode()
-    .setResistorsOnSegments()
-    .setDigitPins(digitPins)
-    .setSegmentDirectPins(segmentPins)
-    .setDimmingDigits(dimmingDigits)
-    .build();
-#elif DRIVER_MODE == DRIVER_MODE_MODULATING
-Driver* driver = DriverBuilder()
-    .setHardware(&hardware)
-    .setNumDigits(NUM_DIGITS)
-    .setCommonCathode()
-    .setResistorsOnSegments()
-    .setDigitPins(digitPins)
-    .setSegmentDirectPins(segmentPins)
-    .setDimmingDigits(dimmingDigits)
-    .useModulatingDriver()
-    .setNumSubFields(NUM_SUBFIELDS)
-    .build();
-#elif DRIVER_MODE == DRIVER_MODE_SEGMENT
-Driver* driver = DriverBuilder()
-    .setHardware(&hardware)
-    .setNumDigits(NUM_DIGITS)
-    .setCommonCathode()
-    .setResistorsOnDigits()
-    .setDigitPins(digitPins)
-    .setSegmentDirectPins(segmentPins)
-    .setDimmingDigits(dimmingDigits)
-    .build();
-#elif DRIVER_MODE == DRIVER_MODE_SERIAL
-Driver* driver = DriverBuilder()
-    .setHardware(&hardware)
-    .setNumDigits(NUM_DIGITS)
-    .setCommonCathode()
-    .setResistorsOnSegments()
-    .setDigitPins(digitPins)
-    .setSegmentSerialPins(latchPin, dataPin, clockPin)
-    .useModulatingDriver()
-    .setNumSubFields(NUM_SUBFIELDS)
-    .setDimmingDigits(dimmingDigits)
-    .build();
-#elif DRIVER_MODE == DRIVER_MODE_SPI
-Driver* driver = DriverBuilder()
-    .setHardware(&hardware)
-    .setNumDigits(NUM_DIGITS)
-    .setCommonCathode()
-    .setResistorsOnSegments()
-    .setDigitPins(digitPins)
-    .setSegmentSerialPins(latchPin, dataPin, clockPin)
-    .useSpi()
-    .useModulatingDriver()
-    .setNumSubFields(NUM_SUBFIELDS)
-    .setDimmingDigits(dimmingDigits)
-    .build();
-#endif
-
-Renderer renderer(&hardware, driver, styledDigits, NUM_DIGITS);
-CharWriter charWriter(&renderer);
-StringWriter stringWriter(&charWriter);
+// The chain of resources.
+Hardware* hardware;
+Driver* driver;
+Renderer* renderer;
+CharWriter* charWriter;
+StringWriter* stringWriter;
 
 const char* STRINGS[] = {
   "0123",
@@ -117,7 +64,7 @@ const int NUM_STRINGS = sizeof(STRINGS) / sizeof(STRINGS[0]);
 #if USE_INTERRUPT == 1
 // interrupt handler for timer 2
 ISR(TIMER2_COMPA_vect) {
-  renderer.renderField();
+  renderer->renderField();
 }
 #endif
 
@@ -125,16 +72,59 @@ void setup() {
   delay(1000); // Wait for stability on some boards, otherwise garage on Serial
   Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
   while (!Serial); // Wait until Serial is ready - Leonardo/Micro
+  Serial.println(F("setup(): begin"));
 
+  // Create the resources. Hardware is exposed to the client code because it's
+  // shared between Drive and Renderer.
+  hardware = new Hardware();
+#if DRIVER_MODE == DRIVER_MODE_DIGIT \
+    || DRIVER_MODE == DRIVER_MODE_DIGIT_MODULATING
+  driver = DriverBuilder()
+      .setHardware(hardware)
+      .setNumDigits(NUM_DIGITS)
+      .setCommonCathode()
+      .setResistorsOnSegments()
+      .setDigitPins(digitPins)
+  #if LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT
+      .setSegmentDirectPins(segmentPins)
+  #elif LED_MATRIX_MODE == LED_MATRIX_MODE_SERIAL
+      .setSegmentSerialPins(latchPin, dataPin, clockPin)
+  #else
+      .setSegmentSpiPins(latchPin, dataPin, clockPin)
+  #endif
+  #if DRIVER_MODE == DRIVER_MODE_DIGIT_MODULATING
+      .useModulatingDriver()
+      .setNumSubFields(NUM_SUBFIELDS)
+  #endif
+      .setDimmingDigits(dimmingDigits)
+      .build();
+#elif DRIVER_MODE == DRIVER_MODE_SEGMENT
+  driver = DriverBuilder()
+      .setHardware(hardware)
+      .setNumDigits(NUM_DIGITS)
+      .setCommonCathode()
+      .setResistorsOnDigits()
+      .setDigitPins(digitPins)
+      .setSegmentDirectPins(segmentPins)
+      .setDimmingDigits(dimmingDigits)
+      .build();
+#endif
   driver->configure();
-  renderer
-      .setFramesPerSecond(FRAMES_PER_SECOND)
-      .configure();
+
+  renderer = new Renderer(hardware, driver, styledDigits, NUM_DIGITS);
+  // TODO: Move setFramesPerSecond() into constructor, since it's a required
+  // parameter, unlike all the other setXxx() methods on Renderer. Or
+  // create a RendererBuilder class.
+  renderer->setFramesPerSecond(FRAMES_PER_SECOND);
+  renderer->configure();
+
+  charWriter = new CharWriter(renderer);
+  stringWriter = new StringWriter(charWriter);
 
 #if USE_INTERRUPT == 1
   // set up Timer 2
   uint8_t timerCompareValue =
-      (long) F_CPU / 1024 / renderer.getFieldsPerSecond() - 1;
+      (long) F_CPU / 1024 / renderer->getFieldsPerSecond() - 1;
   Serial.print(F("Timer 2, Compare A: "));
   Serial.println(timerCompareValue);
 
@@ -171,11 +161,11 @@ void loop() {
   // Print out statistics every 10 seconds.
   unsigned long elapsedTime = now - stopWatchStart;
   if (elapsedTime >= 2000) {
-    uint16_t renderCounter = renderer.getRenderFieldCounter();
+    uint16_t renderCounter = renderer->getRenderFieldCounter();
     uint16_t elapsedCount = renderCounter - lastRenderCount;
-    uint16_t renderDurationAverage = renderer.getRenderFieldDurationAverage();
-    uint16_t renderDurationMin = renderer.getRenderFieldDurationMin();
-    uint16_t renderDurationMax = renderer.getRenderFieldDurationMax();
+    uint16_t renderDurationAverage = renderer->getRenderFieldDurationAverage();
+    uint16_t renderDurationMin = renderer->getRenderFieldDurationMin();
+    uint16_t renderDurationMax = renderer->getRenderFieldDurationMax();
 
     Serial.print("loops: ");
     Serial.print(loopCount);
@@ -192,7 +182,7 @@ void loop() {
     Serial.print("us; max: ");
     Serial.print(renderDurationMax);
     Serial.println("us");
-    
+
     stopWatchStart = now;
     lastRenderCount = renderCounter;
     loopCount = 0;
@@ -201,7 +191,7 @@ void loop() {
   }
 
 #if USE_INTERRUPT == 0
-  renderer.renderFieldWhenReady();
+  renderer->renderFieldWhenReady();
 #endif
 }
 
@@ -211,10 +201,10 @@ void writeChars() {
 
   char buffer[3];
   sprintf(buffer, "%02X", c);
-  charWriter.writeCharAt(0, buffer[0], StyledDigit::kStylePulseFast);
-  charWriter.writeCharAt(1, buffer[1], StyledDigit::kStylePulseSlow);
-  charWriter.writeCharAt(2, '-', StyledDigit::kStyleBlinkFast);
-  charWriter.writeCharAt(3, c, StyledDigit::kStyleBlinkSlow);
+  charWriter->writeCharAt(0, buffer[0], StyledDigit::kStylePulseFast);
+  charWriter->writeCharAt(1, buffer[1], StyledDigit::kStylePulseSlow);
+  charWriter->writeCharAt(2, '-', StyledDigit::kStyleBlinkFast);
+  charWriter->writeCharAt(3, c, StyledDigit::kStyleBlinkSlow);
 
   c++;
 }
@@ -222,7 +212,7 @@ void writeChars() {
 void writeStrings() {
   static uint8_t i = 0;
   if (i >= NUM_STRINGS) i = 0;
-  stringWriter.writeStringAt(0, STRINGS[i]);
+  stringWriter->writeStringAt(0, STRINGS[i]);
   i++;
 }
 
@@ -230,6 +220,6 @@ void scrollString(const char* s) {
   static uint8_t i = 0;
 
   if (i >= strlen(s)) i = 0;
-  stringWriter.writeStringAt(0, &s[i], true /* padRight */);
+  stringWriter->writeStringAt(0, &s[i], true /* padRight */);
   i++;
 }

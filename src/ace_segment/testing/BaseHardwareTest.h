@@ -22,31 +22,45 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <Arduino.h> // LOW and HIGH
-#include "LedMatrix.h"
-#include "Driver.h"
+#ifndef ACE_SEGMENT_BASE_HARDWARE_TEST_H
+#define ACE_SEGMENT_BASE_HARDWARE_TEST_H
+
+#include <AUnit.h>
+#include "TestableHardware.h"
+
+using aunit::TestOnce;
 
 namespace ace_segment {
+namespace testing {
 
-Driver::~Driver() {
-  delete mLedMatrix;
-}
+/**
+ * Base class to assert various hardware events on TestableHardware.
+ */
+class BaseHardwareTest: public TestOnce {
+  protected:
+    virtual void setup() override {
+      TestOnce::setup();
+      mHardware = new TestableHardware();
+    }
 
-void Driver::configure() {
-  mLedMatrix->configure();
-}
+    virtual void teardown() override {
+      delete mHardware;
+      TestOnce::teardown();
+    }
 
-void Driver::setPattern(uint8_t digit, SegmentPatternType pattern,
-    uint8_t brightness) {
-  if (digit >= mNumDigits) return;
-  DimmingDigit& dimmingDigit = mDimmingDigits[digit];
-  dimmingDigit.pattern = pattern;
-  dimmingDigit.brightness = brightness;
-}
+    /**
+     * assertEvents(numEvents,
+     *    type, arg1, arg2[, ...],
+     *    ...
+     *    type, arg1, arg2[, ...]);
+     */
+    void assertEvents(int8_t n, ...);
 
-void Driver::setBrightness(uint8_t digit, uint8_t brightness) {
-  if (digit >= mNumDigits) return;
-  mDimmingDigits[digit].brightness = brightness;
-}
+    TestableHardware* mHardware;
+};
 
-}
+} // namespace testing
+} // namespace ace_segment
+
+
+#endif

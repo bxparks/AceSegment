@@ -41,8 +41,7 @@ class DriverBuilder {
       mNumSegments(8),
       mResistorsOnSegments(true),
       mCommonCathode(true),
-      mUseSerialToParallel(false),
-      mUseSpi(false),
+      mLedMatrixType(kTypeLedMatrixDirect),
       mDigitPins(nullptr),
       mSegmentPins(nullptr),
       mUseModulatingDriver(false),
@@ -90,14 +89,15 @@ class DriverBuilder {
     }
 
     DriverBuilder& setSegmentDirectPins(const uint8_t* segmentPins) {
-      mUseSerialToParallel = false;
+      mLedMatrixType = kTypeLedMatrixDirect;
       mSegmentPins = segmentPins;
       return *this;
     }
 
     DriverBuilder& setSegmentSerialPins(uint8_t latchPin, uint8_t dataPin,
         uint8_t clockPin) {
-      mUseSerialToParallel = true;
+      mLedMatrixType = kTypeLedMatrixSerial;
+
       // We support only resistors on segments in this configuration.
       mResistorsOnSegments = true;
       mSegmentPins = nullptr;
@@ -108,8 +108,17 @@ class DriverBuilder {
       return *this;
     }
 
-    DriverBuilder& useSpi() {
-      mUseSpi = true;
+    DriverBuilder& setSegmentSpiPins(uint8_t latchPin, uint8_t dataPin,
+        uint8_t clockPin) {
+      mLedMatrixType = kTypeLedMatrixSpi;
+
+      // We support only resistors on segments in this configuration.
+      mResistorsOnSegments = true;
+      mSegmentPins = nullptr;
+
+      mLatchPin = latchPin;
+      mDataPin = dataPin;
+      mClockPin = clockPin;
       return *this;
     }
 
@@ -134,14 +143,17 @@ class DriverBuilder {
     Driver* build();
 
   private:
+    static const uint8_t kTypeLedMatrixDirect = 0;
+    static const uint8_t kTypeLedMatrixSerial = 1;
+    static const uint8_t kTypeLedMatrixSpi = 2;
+
     // parameters for LedMatrix
     Hardware* mHardware;
     uint8_t mNumDigits;
     uint8_t mNumSegments;
     bool mResistorsOnSegments;
     bool mCommonCathode;
-    bool mUseSerialToParallel;
-    bool mUseSpi;
+    uint8_t mLedMatrixType;
     const uint8_t* mDigitPins;
     const uint8_t* mSegmentPins;
     uint8_t mLatchPin;
