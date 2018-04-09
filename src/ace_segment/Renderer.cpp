@@ -43,7 +43,6 @@ void Renderer::configure() {
 
   // Counters for frames and fields.
   mCurrentField = 0;
-  mRenderFieldCounter = 0;
 
   // Set up durations for polling.
   mMicrosPerField = 1000000UL / getFieldsPerSecond();
@@ -79,9 +78,7 @@ void Renderer::configure() {
 
 void Renderer::resetStats() {
   mCurrentStatsResetFrame = 0;
-  mRenderFieldDurationAverage = 0;
-  mRenderFieldDurationMin = 0xffff;
-  mRenderFieldDurationMax = 0;
+  mStats.reset();
 }
 
 void Renderer::writePatternAt(uint8_t digit, uint8_t pattern, uint8_t style) {
@@ -131,7 +128,7 @@ void Renderer::renderField() {
   Util::incrementMod(mCurrentField, mFieldsPerFrame);
 
   uint16_t duration = mHardware->micros() - now;
-  updateStats(duration);
+  mStats.update(duration);
 }
 
 void Renderer::updateFrame() {
@@ -144,48 +141,11 @@ void Renderer::updateFrame() {
   mCurrentStatsResetFrame++;
 }
 
-void Renderer::updateStats(uint16_t duration) {
-  // an exponential decay average
-  mRenderFieldDurationAverage = (mRenderFieldDurationAverage + duration) / 2;
-  if (duration < mRenderFieldDurationMin) {
-    mRenderFieldDurationMin = duration;
-  }
-  if (duration > mRenderFieldDurationMax) {
-    mRenderFieldDurationMax = duration;
-  }
-  mRenderFieldCounter++;
-}
-
-uint16_t Renderer::getRenderFieldDurationAverage() {
-  uint16_t durationMicros;
+TimingStats Renderer::getTimingStats() {
   noInterrupts();
-  durationMicros = mRenderFieldDurationAverage;
+  TimingStats stats = mStats;
   interrupts();
-  return durationMicros;
-}
-
-uint16_t Renderer::getRenderFieldDurationMin() {
-  uint16_t durationMicros;
-  noInterrupts();
-  durationMicros = mRenderFieldDurationMin;
-  interrupts();
-  return durationMicros;
-}
-
-uint16_t Renderer::getRenderFieldDurationMax() {
-  uint16_t durationMicros;
-  noInterrupts();
-  durationMicros = mRenderFieldDurationMax;
-  interrupts();
-  return durationMicros;
-}
-
-uint16_t Renderer::getRenderFieldCounter() {
-  uint16_t count;
-  noInterrupts();
-  count = mRenderFieldCounter;
-  interrupts();
-  return count;
+  return stats;
 }
 
 void Renderer::renderStyledDigits() {

@@ -143,8 +143,8 @@ void setup() {
 void loop() {
   static unsigned long lastUpdateTime = millis();
   static unsigned long stopWatchStart = lastUpdateTime;
-  static uint16_t lastRenderCount = 0;
   static uint32_t loopCount = 0;
+  static uint16_t lastStatsCounter = 0;
 
   // Print something every 400 ms.
   unsigned long now = millis();
@@ -159,11 +159,12 @@ void loop() {
   // Print out statistics every 10 seconds.
   unsigned long elapsedTime = now - stopWatchStart;
   if (elapsedTime >= 2000) {
-    uint16_t renderCounter = renderer->getRenderFieldCounter();
-    uint16_t elapsedCount = renderCounter - lastRenderCount;
-    uint16_t renderDurationAverage = renderer->getRenderFieldDurationAverage();
-    uint16_t renderDurationMin = renderer->getRenderFieldDurationMin();
-    uint16_t renderDurationMax = renderer->getRenderFieldDurationMax();
+    TimingStats stats = renderer->getTimingStats();
+    uint32_t elapsedCount = stats.getCounter() - lastStatsCounter;
+    lastStatsCounter = stats.getCounter();
+    uint16_t renderDurationAverage = stats.getAvg();
+    uint16_t renderDurationMin = stats.getMin();
+    uint16_t renderDurationMax = stats.getMax();
 
     Serial.print("loops: ");
     Serial.print(loopCount);
@@ -182,7 +183,6 @@ void loop() {
     Serial.println("us");
 
     stopWatchStart = now;
-    lastRenderCount = renderCounter;
     loopCount = 0;
   } else {
     loopCount++;

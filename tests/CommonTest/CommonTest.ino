@@ -33,6 +33,7 @@ SOFTWARE.
 #include <ace_segment/DigitDriver.h>
 #include <ace_segment/ModulatingDigitDriver.h>
 #include <ace_segment/SegmentDriver.h>
+#include <ace_segment/TimingStats.h>
 #include <ace_segment/testing/FakeDriver.h>
 
 using namespace aunit;
@@ -94,6 +95,49 @@ test(incrementMod) {
   assertEqual(i, 2);
   Util::incrementMod(i, n);
   assertEqual(i, 0);
+}
+
+// ----------------------------------------------------------------------
+// Tests for TimingStats.
+// ----------------------------------------------------------------------
+
+class TimingStatsTest: public TestOnce {
+  protected:
+    virtual void setup() override {
+      mStats = new TimingStats();
+    }
+
+    virtual void teardown() override {
+      delete mStats;
+    }
+
+    TimingStats* mStats;
+};
+
+testF(TimingStatsTest, reset) {
+  assertEqual(0U, mStats->getCount());
+  assertEqual(0U, mStats->getCounter());
+  assertEqual(0xffffU, mStats->getMin());
+  assertEqual(0U, mStats->getMax());
+  assertEqual(0U, mStats->getAvg());
+  assertEqual(0U, mStats->getExpDecayAvg());
+}
+
+testF(TimingStatsTest, update) {
+  mStats->update(1);
+  mStats->update(3);
+  mStats->update(10);
+
+  assertEqual(3U, mStats->getCount());
+  assertEqual(3U, mStats->getCounter());
+  assertEqual(1U, mStats->getMin());
+  assertEqual(10U, mStats->getMax());
+  assertEqual(4U, mStats->getAvg());
+  assertEqual(5U, mStats->getExpDecayAvg());
+
+  mStats->reset();
+  assertEqual(0U, mStats->getCount());
+  assertEqual(3U, mStats->getCounter());
 }
 
 // ----------------------------------------------------------------------

@@ -27,6 +27,7 @@ SOFTWARE.
 
 #include <stdint.h>
 #include "Driver.h"
+#include "TimingStats.h"
 
 namespace ace_segment {
 
@@ -171,49 +172,29 @@ class Renderer {
      * blinking:
      *
      * DigitDriver w/ LedMatrixDirect
-     *    min: 16us; avg: 80us; max: 108us
+     *    min: 16us; avg: 73; max: 120us
      * DigitDriver w/ LedMatrixSerial
-     *    min: 16us; avg: 84-139us; max: 204us
+     *    min: 16us; avg: 128us; max: 200us
      * DigitDriver w/ LedMatrixSpi
      *    min: 16us; avg: 30-55us; max: 80us
      * ModulatingDigitDriver w/ LedMatrixDirect
-     *    min: 8us; avg: 12-20us; max: 140us
+     *    min: 8us; avg: 16us; max: 140us
      * ModulatingDigitDriver w/ LedMatrixDirect w/ calcPulseFractionForFrame():
      *    min: 8us; avg: 12-20us; max: 192us
      * ModulatingDigitDriver w/ LedMatrixSerial
-     *    min: 8us; avg: 12-20us; max: 212us
+     *    min: 8us; avg: 19us; max: 212us
      * ModulatingDigitDriver w/ LedMatrixSpi
-     *    min: 8us; avg: 12-20us; max: 100us
+     *    min: 8us; avg: 14us; max: 104us
      * SegmentDriver w/ LedMatrixDirect
-     *    min: 28us; avg: 36-76; max: 96us
+     *    min: 32us; avg: 57us; max: 96us
      */
     void renderField();
 
     /**
-     * Return the average duration of the renderField() method.
-     * Currently implemented as an exponential decay average.
-     * For debugging only.
+     * Return stats. For debugging only. TimingStats is returned by 'value' to
+     * be safe from interrupts.
      */
-    uint16_t getRenderFieldDurationAverage();
-
-    /**
-     * Return the min duration of the renderField() method.
-     * For debugging only.
-     */
-    uint16_t getRenderFieldDurationMin();
-
-    /**
-     * Return the min duration of the renderField() method.
-     * For debugging only.
-     */
-    uint16_t getRenderFieldDurationMax();
-
-    /**
-     * Return a running counter (the integer may overflow) of how many times
-     * renderField() was called since the most recent stats reset. For debugging
-     * purposes only.
-     */
-    uint16_t getRenderFieldCounter();
+    TimingStats getTimingStats();
 
     /** Return a reference the styled digit. VisibleForTesting. */
     StyledDigit& getStyledDigit(uint8_t i) {
@@ -283,9 +264,6 @@ class Renderer {
     /** Reset the stats every setStatsResetInterval(). VisibleForTesting. */
     void resetStats();
 
-    /** Update the stats given the duration of the renderField() method. */
-    void updateStats(uint16_t duration);
-
     Hardware* const mHardware;
     Driver* const mDriver;
     StyledDigit* const mStyledDigits;
@@ -307,10 +285,7 @@ class Renderer {
     // statistics
     uint16_t mFramesPerStatsReset;
     uint16_t mCurrentStatsResetFrame;
-    uint16_t mRenderFieldDurationAverage;
-    uint16_t mRenderFieldDurationMin;
-    uint16_t mRenderFieldDurationMax;
-    uint16_t mRenderFieldCounter;
+    TimingStats mStats;
 
     // TODO: Maybe generalize the following into an array of styles, because the
     // calculations seem so similar.
