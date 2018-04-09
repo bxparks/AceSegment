@@ -81,8 +81,7 @@ class DigitDriverTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
       BaseHardwareTest::setup();
-      mDriver = DriverBuilder()
-          .setHardware(mHardware)
+      mDriver = DriverBuilder(mHardware)
           .setNumDigits(NUM_DIGITS)
           .setCommonCathode()
           .setResistorsOnSegments()
@@ -306,8 +305,7 @@ class SegmentDriverTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
       BaseHardwareTest::setup();
-      mDriver = DriverBuilder()
-          .setHardware(mHardware)
+      mDriver = DriverBuilder(mHardware)
           .setNumDigits(NUM_DIGITS)
           .setCommonCathode()
           .setResistorsOnDigits()
@@ -445,8 +443,7 @@ class ModulatingDigitDriverTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
       BaseHardwareTest::setup();
-      mDriver = DriverBuilder()
-          .setHardware(mHardware)
+      mDriver = DriverBuilder(mHardware)
           .setNumDigits(NUM_DIGITS)
           .setCommonCathode()
           .setResistorsOnSegments()
@@ -717,8 +714,7 @@ class EdgeCaseModulatingDigitDriverTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
       BaseHardwareTest::setup();
-      mDriver = DriverBuilder()
-          .setHardware(mHardware)
+      mDriver = DriverBuilder(mHardware)
           .setNumDigits(NUM_DIGITS)
           .setCommonCathode()
           .setResistorsOnSegments()
@@ -798,8 +794,7 @@ class DigitDriverSerialLedMatrixTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
       BaseHardwareTest::setup();
-      mDriver = DriverBuilder()
-          .setHardware(mHardware)
+      mDriver = DriverBuilder(mHardware)
           .setNumDigits(NUM_DIGITS)
           .setCommonCathode()
           .setResistorsOnSegments()

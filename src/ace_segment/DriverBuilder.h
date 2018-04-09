@@ -37,7 +37,8 @@ class Driver;
 
 class DriverBuilder {
   public:
-    DriverBuilder():
+    DriverBuilder(Hardware* hardware):
+      mHardware(hardware),
       mNumSegments(8),
       mResistorsOnSegments(true),
       mCommonCathode(true),
@@ -47,11 +48,6 @@ class DriverBuilder {
       mUseModulatingDriver(false),
       mNumSubFields(1)
     {}
-
-    DriverBuilder& setHardware(Hardware* hardware) {
-      mHardware = hardware;
-      return *this;
-    }
 
     DriverBuilder& setNumDigits(uint8_t numDigits) {
       mNumDigits = numDigits;
@@ -148,7 +144,7 @@ class DriverBuilder {
     static const uint8_t kTypeLedMatrixSpi = 2;
 
     // parameters for LedMatrix
-    Hardware* mHardware;
+    Hardware* const mHardware;
     uint8_t mNumDigits;
     uint8_t mNumSegments;
     bool mResistorsOnSegments;

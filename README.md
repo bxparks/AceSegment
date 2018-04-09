@@ -202,8 +202,7 @@ void setup() {
   hardware = new Hardware();
 
   // Create and configure the Driver.
-  driver = DriverBuilder()
-      .setHardware(hardware)
+  driver = DriverBuilder(hardware)
       .setNumDigits(NUM_DIGITS)
       .setCommonCathode()
       .setResistorsOnSegments()
@@ -243,7 +242,6 @@ a reference to `*this`, so they can be chained together in one statement.
 
 The following methods are available in `DriverBuilder`:
 
-* `DriverBuilder& setHardware(Hardware* hardware);`
 * `DriverBuilder& setNumDigits(uint8_t numDigits);`
 * `DriverBuilder& setNumSegments(uint8_t numSegments);`
 * `DriverBuilder& setCommonAnode();`
@@ -301,8 +299,7 @@ The `DriverBuilder` configuration is:
 ```
 const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
 const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
-Driver* driver = DriverBuilder()
-    .setHardware(hardware)
+Driver* driver = DriverBuilder(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonCathode()
     .setResistorsOnSegments()
@@ -338,8 +335,7 @@ The `DriverBuilder` configuration is:
 ```
 const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
 const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
-Driver* driver = DriverBuilder()
-    .setHardware(hardware)
+Driver* driver = DriverBuilder(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonAnode()
     .setResistorsOnSegments()
@@ -375,8 +371,7 @@ The `DriverBuilder` configuration is:
 ```
 const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
 const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
-Driver* driver = DriverBuilder()
-    .setHardware(hardware)
+Driver* driver = DriverBuilder(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonAnode()
     .setResistorsOnDigits()
@@ -412,8 +407,7 @@ The `DriverBuilder` configuration is:
 ```
 const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
 const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
-Driver* driver = DriverBuilder()
-    .setHardware(hardware)
+Driver* driver = DriverBuilder(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonAnode()
     .setResistorsOnDigits()
@@ -456,8 +450,7 @@ const uint8_t NUM_SUBFIELDS = 16;
 const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
 const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
 
-Driver* driver = DriverBuilder()
-    .setHardware(hardware)
+Driver* driver = DriverBuilder(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonCathode()
     .setResistorsOnSegments()
@@ -505,8 +498,7 @@ const uint8_t latchPin = 10; // ST_CP on 74HC595
 const uint8_t dataPin = 11; // DS on 74HC595
 const uint8_t clockPin = 13; // SH_CP on 74HC595
 
-Driver* driver = DriverBuilder()
-    .setHardware(hardware)
+Driver* driver = DriverBuilder(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonCathode()
     .setResistorsOnSegments()
@@ -552,8 +544,7 @@ const uint8_t latchPin = 10; // ST_CP on 74HC595
 const uint8_t dataPin = 11; // DS on 74HC595
 const uint8_t clockPin = 13; // SH_CP on 74HC595
 
-Driver* driver = DriverBuilder()
-    .setHardware(hardware)
+Driver* driver = DriverBuilder(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonCathode()
     .setResistorsOnSegments()

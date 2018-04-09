@@ -79,8 +79,7 @@ void setup() {
   hardware = new Hardware();
 #if DRIVER_MODE == DRIVER_MODE_DIGIT \
     || DRIVER_MODE == DRIVER_MODE_DIGIT_MODULATING
-  driver = DriverBuilder()
-      .setHardware(hardware)
+  driver = DriverBuilder(hardware)
       .setNumDigits(NUM_DIGITS)
       .setCommonCathode()
       .setResistorsOnSegments()
@@ -99,8 +98,7 @@ void setup() {
       .setDimmingDigits(dimmingDigits)
       .build();
 #elif DRIVER_MODE == DRIVER_MODE_SEGMENT
-  driver = DriverBuilder()
-      .setHardware(hardware)
+  driver = DriverBuilder(hardware)
       .setNumDigits(NUM_DIGITS)
       .setCommonCathode()
       .setResistorsOnDigits()
