@@ -74,9 +74,13 @@ void setup() {
   while (!Serial); // Wait until Serial is ready - Leonardo/Micro
   Serial.println(F("setup(): begin"));
 
-  // Create the resources. Hardware is exposed to the client code because it's
-  // shared between Drive and Renderer.
+  // Create the resources.
+
+  // Hardware is exposed to the client code because it's shared between Drive
+  // and Renderer.
   hardware = new Hardware();
+
+  // Create the Driver.
 #if DRIVER_MODE == DRIVER_MODE_DIGIT \
     || DRIVER_MODE == DRIVER_MODE_DIGIT_MODULATING
   driver = DriverBuilder(hardware)
@@ -109,11 +113,10 @@ void setup() {
 #endif
   driver->configure();
 
-  renderer = new Renderer(hardware, driver, styledDigits, NUM_DIGITS);
-  // TODO: Move setFramesPerSecond() into constructor, since it's a required
-  // parameter, unlike all the other setXxx() methods on Renderer. Or
-  // create a RendererBuilder class.
-  renderer->setFramesPerSecond(FRAMES_PER_SECOND);
+  // Create the Renderer.
+  renderer = RendererBuilder(hardware, driver, styledDigits, NUM_DIGITS)
+      .setFramesPerSecond(FRAMES_PER_SECOND)
+      .build();
   renderer->configure();
 
   charWriter = new CharWriter(renderer);

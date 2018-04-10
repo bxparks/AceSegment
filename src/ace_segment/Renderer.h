@@ -34,95 +34,53 @@ namespace ace_segment {
 class StyledDigit;
 class Hardware;
 
+/**
+ * A class that knows how to translate an array of led segement bit patterns
+ * with style attributes to a displayable frame for the Driver class.
+ * The supported style for each digit are (blinkSlow, blinkFast, pulseSlow,
+ * pulseFast).
+ *
+ * A frame is divided into fields, which is a partial rendering of a frame. The
+ * renderField() (or renderFieldWhenReady()) method should be called to
+ * successively render each field of a frame.
+ */
 class Renderer {
   public:
+    // VisibleForTesting.
     static const uint8_t kBlinkStateOff = 0;
     static const uint8_t kBlinkStateOn = 1;
 
-    /** Default frame rate. */
-    static const uint8_t kFramesPerSecondDefault = 60;
-
     /** Constructor. */
     explicit Renderer(Hardware* hardware, Driver* driver,
-            StyledDigit* styledDigits, uint8_t numDigits):
+            StyledDigit* styledDigits, uint8_t numDigits,
+            uint8_t framesPerSecond,
+            uint16_t statsResetInterval,
+            uint16_t blinkSlowDurationMillis,
+            uint16_t blinkFastDurationMillis,
+            uint16_t pulseSlowDurationMillis,
+            uint16_t pulseFastDurationMillis):
         mHardware(hardware),
         mDriver(driver),
         mStyledDigits(styledDigits),
         mNumDigits(numDigits),
-        mFramesPerSecond(kFramesPerSecondDefault),
+        mFramesPerSecond(framesPerSecond),
+        mStatsResetInterval(statsResetInterval),
+        mBlinkSlowDurationMillis(blinkSlowDurationMillis),
+        mBlinkFastDurationMillis(blinkFastDurationMillis),
+        mPulseSlowDurationMillis(pulseSlowDurationMillis),
+        mPulseFastDurationMillis(pulseFastDurationMillis),
         mBrightness(255),
-        mStatsResetInterval(kStatsResetIntervalDefault),
-        mBlinkSlowDurationMillis(kBlinkSlowDurationMillisDefault),
+        mIsPulseEnabled(false),
         mBlinkSlowState(kBlinkStateOn),
-        mBlinkFastDurationMillis(kBlinkFastDurationMillisDefault),
-        mBlinkFastState(kBlinkStateOn),
-        mPulseSlowDurationMillis(kPulseSlowDurationMillisDefault),
-        mPulseFastDurationMillis(kPulseFastDurationMillisDefault)
+        mBlinkFastState(kBlinkStateOn)
     {}
-
-    // Start configuration methods. These methods are expected to be set during
-    // setup() and configure() should be called after changing them.
-
-    /**
-     * Set the desired frame rate. Default is 60.
-     *
-     * Borrowing some terminology from motion picture videos, a "frame" is a
-     * full rendering of an image, and a field is a partial rendering of the
-     * frame. Each call to renderField() will process a single field of a frame.
-     * Different wiring will require different number of fields to produce an
-     * entire frame.
-     *
-     * fieldsPerSec(resistorsOnDigits) =  mFramesPerSecond * kNumSegments
-     * fieldsPerSec(resistorsOnSegments) =  mFramesPerSecond * mNumDigits
-     */
-    Renderer& setFramesPerSecond(uint8_t framesPerSecond) {
-      mFramesPerSecond = framesPerSecond;
-      return *this;
-    }
-
-    /** Set blink slow duration millis. Default 800 millis. */
-    Renderer& setBlinkSlowDuration(uint16_t durationMillis) {
-      mBlinkSlowDurationMillis = durationMillis;
-      return *this;
-    }
-
-    /** Set blink fast duration millis. Default 400 millis. */
-    Renderer& setBlinkFastDuration(uint16_t durationMillis) {
-      mBlinkFastDurationMillis = durationMillis;
-      return *this;
-    }
-
-    /** Set pulse slow duration millis. Default 3000 millis. */
-    Renderer& setPulseSlowDuration(uint16_t durationMillis) {
-      mPulseSlowDurationMillis = durationMillis;
-      return *this;
-    }
-
-    /** Set pulse fast duration millis. Default 1000 millis. */
-    Renderer& setPulseFastDuration(uint16_t durationMillis) {
-      mPulseFastDurationMillis = durationMillis;
-      return *this;
-    }
-
-    /**
-     * Set the maximum number of stats updates after which it is periodicallly
-     * reset. Set to 0 for no auto reset. Periodic resets are useful to remove
-     * spurious min and max. The default is kStatsResetIntervalDefault which is
-     * 1200 samples. At 60 frames per second with 4 fields per frame, that's
-     * about 5 seconds.
-     */
-    Renderer& setStatsResetInterval(uint16_t statsResetInterval) {
-      mStatsResetInterval = statsResetInterval;
-      return *this;
-    }
 
     /**
      * Configure the driver with the parameters given by the various setXxx()
      * methods.
      */
+    // TODO: rename to init()
     void configure();
-
-    // End configuration methods
 
     /** Get the number of digits. */
     uint8_t getNumDigits() { return mNumDigits; }
@@ -137,7 +95,10 @@ class Renderer {
 
     /**
      * Set brightness expressed as a fraction of 256. In other words, 255 is
-     * brightest and is the default. Not implemented in any driver.
+     * brightest (default); 1 is 1/256 of full brightness. Requires the support
+     * of useModulatingDriver() option in DriverBuilder. If the driver doesn't
+     * support brightness, then anything above 0 is full brightness and 0 turns
+     * off the digit.
      */
     void writeBrightness(uint8_t brightness) {
       mBrightness = brightness;
@@ -191,6 +152,7 @@ class Renderer {
      * Return stats. For debugging only. TimingStats is returned by 'value' to
      * be safe from interrupts.
      */
+    // TODO: make this a pointer and make stats gathering optional
     TimingStats getTimingStats();
 
     /** Return a reference the styled digit. VisibleForTesting. */
@@ -235,16 +197,6 @@ class Renderer {
         uint8_t pulseSlowFraction, uint8_t pulseFastFraction);
 
   protected:
-    static const uint16_t kBlinkSlowDurationMillisDefault = 800;
-
-    static const uint16_t kBlinkFastDurationMillisDefault = 400;
-
-    static const uint16_t kPulseSlowDurationMillisDefault = 3000;
-
-    static const uint16_t kPulseFastDurationMillisDefault = 1000;
-
-    static const uint16_t kStatsResetIntervalDefault = 1200;
-
     // disable copy-constructor and assignment operator
     Renderer(const Renderer&) = delete;
     Renderer& operator=(const Renderer&) = delete;
@@ -262,12 +214,25 @@ class Renderer {
     Driver* const mDriver;
     StyledDigit* const mStyledDigits;
     const uint8_t mNumDigits;
+    const uint8_t mFramesPerSecond;
 
-    uint8_t mFramesPerSecond;
+    // statistics
+    const uint16_t mStatsResetInterval;
+    TimingStats mStats;
+
+    // digit style attributes
+    const uint16_t mBlinkSlowDurationMillis;
+    const uint16_t mBlinkFastDurationMillis;
+    const uint16_t mPulseSlowDurationMillis;
+    const uint16_t mPulseFastDurationMillis;
+
+    // global brightness, can be changed during runtime
     uint8_t mBrightness;
+
+    // depends on the Driver
     bool mIsPulseEnabled;
 
-    // support polling
+    // variables to support renderFieldWhenReady()
     uint16_t mMicrosPerField;
     uint16_t mLastRenderFieldMicros;
 
@@ -276,30 +241,22 @@ class Renderer {
     uint16_t mFieldsPerFrame;
     uint16_t mCurrentField;
 
-    // statistics
-    uint16_t mStatsResetInterval;
-    TimingStats mStats;
-
     // TODO: Maybe generalize the following into an array of styles, because the
     // calculations seem so similar.
 
-    uint16_t mBlinkSlowDurationMillis;
     uint16_t mFramesPerBlinkSlow;
     uint16_t mCurrentBlinkSlowFrame;
     uint8_t mBlinkSlowState;
 
-    uint16_t mBlinkFastDurationMillis;
     uint16_t mFramesPerBlinkFast;
     uint16_t mCurrentBlinkFastFrame;
     uint8_t mBlinkFastState;
 
-    uint16_t mPulseSlowDurationMillis;
     uint16_t mFramesPerPulseSlow;
     uint16_t mFramesPerPulseSlowInverse; // 65536/mFramesPerPulseSlow
     uint16_t mCurrentPulseSlowFrame;
     uint8_t mPulseSlowFraction;
 
-    uint16_t mPulseFastDurationMillis;
     uint16_t mFramesPerPulseFast;
     uint16_t mFramesPerPulseFastInverse; // 65536/mFramesPerPulseFast
     uint16_t mCurrentPulseFastFrame;

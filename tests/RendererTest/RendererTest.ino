@@ -42,19 +42,11 @@ const int8_t NUM_SUB_FIELDS = 3;
 DimmingDigit dimmingDigits[NUM_DIGITS + 1];
 StyledDigit styledDigits[NUM_DIGITS + 1];
 
-TestableHardware *hardware;
-FakeDriver *driver;
-Renderer *renderer;
-
 void setup() {
   delay(1000); // Wait for stability on some boards, otherwise garage on Serial
   Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
   while (!Serial); // Wait until Serial is ready - Leonardo/Micro
   Serial.println(F("setup(): start"));
-
-  hardware = new TestableHardware();
-  driver = new FakeDriver(dimmingDigits, NUM_DIGITS);
-  renderer = new Renderer(hardware, driver, styledDigits, NUM_DIGITS);
 
   Serial.println(F("setup(): end"));
 }
@@ -64,7 +56,7 @@ void loop() {
 }
 
 // ----------------------------------------------------------------------
-// Tests for Renderer.
+// Tests for static methods of Renderer.
 // ----------------------------------------------------------------------
 
 test(calcBlinkStateForFrame) {
@@ -254,20 +246,36 @@ test(calcBrightness) {
   assertEqual(48, brightness);
 }
 
+// ----------------------------------------------------------------------
+// Tests for dynamic methods of Renderer.
+// ----------------------------------------------------------------------
+
 class RendererTest: public TestOnce {
   protected:
     virtual void setup() override {
       TestOnce::setup();
-      driver->setNumSubFields(NUM_SUB_FIELDS);
-      (*renderer)
-          .setFramesPerSecond(FRAMES_PER_SECOND)
-          .configure();
 
+      hardware = new TestableHardware();
+      driver = new FakeDriver(dimmingDigits, NUM_DIGITS);
+      driver->setNumSubFields(NUM_SUB_FIELDS);
+
+      renderer = RendererBuilder(hardware, driver, styledDigits, NUM_DIGITS)
+          .setFramesPerSecond(FRAMES_PER_SECOND)
+          .build();
       renderer->writeBrightness(255);
+      renderer->configure();
       hardware->clear();
     }
 
+    virtual void teardown() override {
+      delete renderer;
+      delete driver;
+      delete hardware;
+      TestOnce::teardown();
+    }
+
     void assertDimmingDigitsEqual(int n, ...) {
+      assertEqual(NUM_DIGITS, n);
       va_list args;
       va_start(args, n);
       for (int i = 0; i < n; i++) {
@@ -285,6 +293,10 @@ class RendererTest: public TestOnce {
         renderer->renderField();
       }
     }
+
+    TestableHardware* hardware;
+    FakeDriver* driver;
+    Renderer* renderer;
 };
 
 testF(RendererTest, frames_and_fields) {
@@ -359,12 +371,14 @@ testF(RendererTest, writeDecimalPointAt_outOfBounds) {
 //  - pulse slow: 180 frames/cycle = 4*3*180 = 2160 fields/cycle
 //  - pulse fast: 60 frames/cycle - 4*3*60 = 720 fields/cycle
 testF(RendererTest, displayCurrentField) {
+  enableVerbosity(Verbosity::kAssertionPassed);
   renderer->writePatternAt(0, 0x11, StyledDigit::kStyleBlinkSlow);
   renderer->writePatternAt(1, 0x22, StyledDigit::kStyleBlinkFast);
   renderer->writePatternAt(2, 0x33, StyledDigit::kStylePulseSlow);
   renderer->writePatternAt(3, 0x44, StyledDigit::kStylePulseFast);
 
-  assertEqual((uint16_t) (60 * 4 * 3), renderer->getFieldsPerSecond());
+  assertEqual((uint16_t) (FRAMES_PER_SECOND * 4 * 3),
+      renderer->getFieldsPerSecond());
 
   renderer->renderField();
   assertDimmingDigitsEqual(4, 0x11, 255, 0x22, 255, 0x33, 0, 0x44, 0);
@@ -394,7 +408,8 @@ testF(RendererTest, displayCurrentField_noSubFieldDriver) {
   renderer->writePatternAt(2, 0x33, StyledDigit::kStylePulseSlow);
   renderer->writePatternAt(3, 0x44, StyledDigit::kStylePulseFast);
 
-  assertEqual((uint16_t) (60 * 4 * 1), renderer->getFieldsPerSecond());
+  assertEqual((uint16_t) (FRAMES_PER_SECOND * 4 * 1),
+      renderer->getFieldsPerSecond());
 
   renderer->renderField(); // #0
   assertDimmingDigitsEqual(4, 0x11, 255, 0x22, 255, 0x33, 255, 0x44, 255);
@@ -420,7 +435,8 @@ testF(RendererTest, displayCurrentField_dimmedBrightness) {
   renderer->writePatternAt(2, 0x33, StyledDigit::kStylePulseSlow);
   renderer->writePatternAt(3, 0x44, StyledDigit::kStylePulseFast);
 
-  assertEqual((uint16_t) (60 * 4 * 3), renderer->getFieldsPerSecond());
+  assertEqual((uint16_t) (FRAMES_PER_SECOND * 4 * 3),
+      renderer->getFieldsPerSecond());
 
   // Verify that the digit brightness is about 1/2 the value of
   // the testF(RendererTest, displayCurrentField) test case.
