@@ -22,35 +22,39 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <Arduino.h> // LOW and HIGH
-#include "LedMatrix.h"
-#include "Driver.h"
+#ifndef ACE_SEGMENT_FAKE_RENDERER_H
+#define ACE_SEGMENT_FAKE_RENDERER_H
+
+#include <stdint.h>
+#include "../Renderer.h"
 
 namespace ace_segment {
 
-Driver::~Driver() {
-  if (mLedMatrix) {
-    delete mLedMatrix;
-  }
+class StyledDigit;
+
+namespace testing {
+
+/**
+ * A fake version of Renderer for testing purposes.
+ */
+class FakeRenderer: public Renderer {
+  public:
+    FakeRenderer(StyledDigit* styledDigits, uint8_t numDigits):
+        Renderer(nullptr /* hardware */, nullptr /* driver */,
+            styledDigits, numDigits,
+            60 /* framesPerSecond */,
+            1200 /* statsResetInterval */,
+            600 /* blinkSlowDurationMillis */,
+            300 /* blinkFastDurationMillis */,
+            1200 /* pulseSlowDurationMillis */,
+            600 /* pulseFastDurationMillis */)
+    {}
+
+    /** A stub implementation to prevent dependency on Hardware and Driver. */
+    virtual void configure()  override {}
+};
+
+}
 }
 
-void Driver::configure() {
-  if (mLedMatrix) {
-    mLedMatrix->configure();
-  }
-}
-
-void Driver::setPattern(uint8_t digit, SegmentPatternType pattern,
-    uint8_t brightness) {
-  if (digit >= mNumDigits) return;
-  DimmingDigit& dimmingDigit = mDimmingDigits[digit];
-  dimmingDigit.pattern = pattern;
-  dimmingDigit.brightness = brightness;
-}
-
-void Driver::setBrightness(uint8_t digit, uint8_t brightness) {
-  if (digit >= mNumDigits) return;
-  mDimmingDigits[digit].brightness = brightness;
-}
-
-}
+#endif

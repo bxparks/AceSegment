@@ -258,12 +258,14 @@ class RendererTest: public TestOnce {
       hardware = new TestableHardware();
       driver = new FakeDriver(dimmingDigits, NUM_DIGITS);
       driver->setNumSubFields(NUM_SUB_FIELDS);
+      driver->configure();
 
       renderer = RendererBuilder(hardware, driver, styledDigits, NUM_DIGITS)
           .setFramesPerSecond(FRAMES_PER_SECOND)
           .build();
       renderer->writeBrightness(255);
       renderer->configure();
+
       hardware->clear();
     }
 
@@ -371,7 +373,7 @@ testF(RendererTest, writeDecimalPointAt_outOfBounds) {
 //  - pulse slow: 180 frames/cycle = 4*3*180 = 2160 fields/cycle
 //  - pulse fast: 60 frames/cycle - 4*3*60 = 720 fields/cycle
 testF(RendererTest, displayCurrentField) {
-  enableVerbosity(Verbosity::kAssertionPassed);
+  //enableVerbosity(Verbosity::kAssertionPassed);
   renderer->writePatternAt(0, 0x11, StyledDigit::kStyleBlinkSlow);
   renderer->writePatternAt(1, 0x22, StyledDigit::kStyleBlinkFast);
   renderer->writePatternAt(2, 0x33, StyledDigit::kStylePulseSlow);

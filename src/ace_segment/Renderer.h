@@ -75,12 +75,14 @@ class Renderer {
         mBlinkFastState(kBlinkStateOn)
     {}
 
+    /** Destructor. */
+    virtual ~Renderer() {}
+
     /**
      * Configure the driver with the parameters given by the various setXxx()
      * methods.
      */
-    // TODO: rename to init()
-    void configure();
+    virtual void configure();
 
     /** Get the number of digits. */
     uint8_t getNumDigits() { return mNumDigits; }

@@ -27,39 +27,23 @@ SOFTWARE.
 #include <stdarg.h>
 #include <AUnit.h>
 #include <AceSegment.h>
-#include <ace_segment/testing/TestableHardware.h>
-#include <ace_segment/testing/FakeDriver.h>
+#include <ace_segment/testing/FakeRenderer.h>
 
 using namespace aunit;
 using namespace ace_segment;
 using namespace ace_segment::testing;
 
 const int8_t NUM_DIGITS = 4;
-const uint16_t FRAMES_PER_SECOND = 60;
-const int8_t NUM_SUB_FIELDS = 3;
 
 // create NUM_DIGITS+1 elements for doing array bound checking
 DimmingDigit dimmingDigits[NUM_DIGITS + 1];
 StyledDigit styledDigits[NUM_DIGITS + 1];
-
-// TODO: create a fake Renderer that doesn't need a Driver
-TestableHardware *hardware;
-FakeDriver *driver;
-Renderer *renderer;
-CharWriter *charWriter;
-StringWriter *stringWriter;
 
 void setup() {
   delay(1000); // Wait for stability on some boards, otherwise garage on Serial
   Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
   while (!Serial); // Wait until Serial is ready - Leonardo/Micro
   Serial.println(F("setup(): start"));
-
-  hardware = new TestableHardware();
-  driver = new FakeDriver(dimmingDigits, NUM_DIGITS);
-  renderer = new Renderer(hardware, driver, styledDigits, NUM_DIGITS);
-  charWriter = new CharWriter(renderer);
-  stringWriter = new StringWriter(charWriter);
 
   Serial.println(F("setup(): end"));
 }
@@ -83,43 +67,52 @@ class CharWriterTest: public TestOnce {
   protected:
     virtual void setup() override {
       TestOnce::setup();
-      driver->setNumSubFields(NUM_SUB_FIELDS);
-      (*renderer)
-          .setFramesPerSecond(FRAMES_PER_SECOND)
-          .configure();
-      renderer->writeBrightness(255);
-      hardware->clear();
+
+      mRenderer = new FakeRenderer(styledDigits, NUM_DIGITS);
+      mRenderer->configure();
+      mCharWriter = new CharWriter(mRenderer);
+      clearStyledDigits();
     }
+
+    virtual void teardown() override {
+      delete mCharWriter;
+      delete mRenderer;
+
+      TestOnce::teardown();
+    }
+
+    FakeRenderer *mRenderer;
+    CharWriter *mCharWriter;
 };
 
 testF(CharWriterTest, getNumDigits) {
-  assertEqual(NUM_DIGITS, charWriter->getNumDigits());
+  assertEqual(NUM_DIGITS, mCharWriter->getNumDigits());
 }
 
 testF(CharWriterTest, writeAt) {
-  charWriter->writeCharAt(0, '0');
+  mCharWriter->writeCharAt(0, '0');
   assertEqual(0b00111111, styledDigits[0].pattern);
   assertEqual(StyledDigit::kStyleNormal, styledDigits[0].style);
 
-  charWriter->writeCharAt(1, '0', StyledDigit::kStyleBlinkSlow);
+  mCharWriter->writeCharAt(1, '0', StyledDigit::kStyleBlinkSlow);
   assertEqual(0b00111111, styledDigits[1].pattern);
   assertEqual(StyledDigit::kStyleBlinkSlow, styledDigits[1].style);
 
-  charWriter->writeStyleAt(1, StyledDigit::kStyleBlinkFast);
+  mCharWriter->writeStyleAt(1, StyledDigit::kStyleBlinkFast);
   assertEqual(StyledDigit::kStyleBlinkFast, styledDigits[1].style);
 
-  charWriter->writeDecimalPointAt(1);
+  mCharWriter->writeDecimalPointAt(1);
   assertEqual(0b00111111 | 0x80, styledDigits[1].pattern);
 
-  charWriter->writeDecimalPointAt(1, false);
+  mCharWriter->writeDecimalPointAt(1, false);
   assertEqual(0b00111111, styledDigits[1].pattern);
 }
 
 testF(CharWriterTest, writeAt_outOfBounds) {
   styledDigits[4].pattern = 0;
   styledDigits[4].style = StyledDigit::kStyleNormal;
-  charWriter->writeCharAt(4, 'a', StyledDigit::kStyleBlinkSlow);
-  charWriter->writeDecimalPointAt(4);
+  mCharWriter->writeCharAt(4, 'a', StyledDigit::kStyleBlinkSlow);
+  mCharWriter->writeDecimalPointAt(4);
   assertEqual(0, styledDigits[4].pattern);
   assertEqual(StyledDigit::kStyleNormal, styledDigits[4].style);
 }
@@ -132,13 +125,20 @@ class StringWriterTest: public TestOnce {
   protected:
     virtual void setup() override {
       TestOnce::setup();
-      driver->setNumSubFields(NUM_SUB_FIELDS);
-      (*renderer)
-          .setFramesPerSecond(FRAMES_PER_SECOND)
-          .configure();
-      renderer->writeBrightness(255);
-      hardware->clear();
+
+      mRenderer = new FakeRenderer(styledDigits, NUM_DIGITS);
+      mRenderer->configure();
+      mCharWriter = new CharWriter(mRenderer);
+      mStringWriter = new StringWriter(mCharWriter);
       clearStyledDigits();
+    }
+
+    virtual void teardown() override {
+      delete mStringWriter;
+      delete mCharWriter;
+      delete mRenderer;
+
+      TestOnce::teardown();
     }
 
     void assertStyledDigitsEqual(int n, ...) {
@@ -153,10 +153,14 @@ class StringWriterTest: public TestOnce {
       }
       va_end(args);
     }
+
+    FakeRenderer *mRenderer;
+    CharWriter *mCharWriter;
+    StringWriter *mStringWriter;
 };
 
 testF(StringWriterTest, writeStringAt) {
-  stringWriter->writeStringAt(0, ".1.2.3");
+  mStringWriter->writeStringAt(0, ".1.2.3");
 
   // Should ge (".", "1.", "2.", "3") as the 4 digits
   assertStyledDigitsEqual(4,

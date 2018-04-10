@@ -67,8 +67,12 @@ void setup() {
   Serial.println(sizeof(DigitDriver));
   Serial.print(F("sizeof(ModulatingDigitDriver): "));
   Serial.println(sizeof(ModulatingDigitDriver));
+  Serial.print(F("sizeof(DriverBuilder): "));
+  Serial.println(sizeof(DriverBuilder));
   Serial.print(F("sizeof(Renderer): "));
   Serial.println(sizeof(Renderer));
+  Serial.print(F("sizeof(RendererBuilder): "));
+  Serial.println(sizeof(RendererBuilder));
   Serial.print(F("sizeof(CharWriter): "));
   Serial.println(sizeof(CharWriter));
   Serial.print(F("sizeof(StringWriter): "));
@@ -148,11 +152,14 @@ testF(TimingStatsTest, update) {
 class FakeDriverTest: public TestOnce {
   protected:
     virtual void setup() override {
+      TestOnce::setup();
       mDriver = new FakeDriver(dimmingDigits, NUM_DIGITS);
+      mDriver->configure();
     }
 
     virtual void teardown() override {
       delete mDriver;
+      TestOnce::teardown();
     }
 
     FakeDriver* mDriver;

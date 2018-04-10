@@ -59,9 +59,9 @@ class Driver {
 
     /**
      * Virtual destructor needed to clean up LedMatrix that was created on the
-     * heap by DriverBuilder. In an embedded environment, I expect the Driver
-     * to be created once and never deleted, so I don't expect this to be ever
-     * called, but added here to prevent memory leaks just in case.
+     * heap by DriverBuilder. Normally, the Driver will be created once and
+     * never deleted, however unit tests will create multiple versions of
+     * Driver and will call the destructor to clean up after each test.
      */
     virtual ~Driver();
 
@@ -85,9 +85,6 @@ class Driver {
      * greater than 0 will be considered ON, and 0 will be OFF.
      */
     virtual bool isBrightnessSupported() = 0;
-
-    // TODO: The following setters don't need to configure() to run. How do I
-    // make that more clear?
 
     /**
      * Set the pattern for a given digit.
@@ -117,10 +114,11 @@ class Driver {
 
     /**
      * Constructor. The driver takes ownership of the ledMatrix and will delete
-     * it in the destructor.
+     * it in the destructor. The ledMatrix can be null for a FakeDriver but
+     * normally it is expected to be non-null.
      */
     explicit Driver(LedMatrix* ledMatrix, DimmingDigit* dimmingDigits,
-        uint8_t numDigits):
+            uint8_t numDigits):
         mLedMatrix(ledMatrix),
         mDimmingDigits(dimmingDigits),
         mNumDigits(numDigits)

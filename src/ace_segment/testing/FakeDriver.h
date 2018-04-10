@@ -25,8 +25,9 @@ SOFTWARE.
 #ifndef ACE_SEGMENT_FAKE_DRIVER_H
 #define ACE_SEGMENT_FAKE_DRIVER_H
 
-namespace ace_segment {
+#include "../Driver.h"
 
+namespace ace_segment {
 namespace testing {
 
 /**
@@ -58,7 +59,6 @@ class FakeDriver: public Driver {
 };
 
 }
-
 }
 
 #endif
