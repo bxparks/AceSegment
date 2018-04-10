@@ -168,10 +168,10 @@ later stages depending on the objects created in the earlier stage:
 
 1. Low level buffers which are created statically.
 1. The `Hardware` object which provides access to the various pins.
-1. The `Driver` object through the `DriverBuilder`.
-1. The `Renderer` which knows how to send bit patterns to the `Driver`.
+1. The `Driver` object created through the `DriverBuilder`.
+1. The `Renderer` object created through the `RendererBuilder`.
 1. The various `XxxWriter` classes which translate higher level characters and
-   strings into bit patterns.
+   strings into bit patterns used by `Renderer`.
 
 A typical resource creation code looks like this:
 ```
@@ -189,7 +189,6 @@ Driver* driver;
 Renderer* renderer;
 CharWriter* charWriter;
 StringWriter* stringWriter;
-
 ...
 
 void setup() {
@@ -213,8 +212,10 @@ void setup() {
   driver->configure();
 
   // Create and configure the Renderer.
-  renderer = new Renderer(hardware, driver, styledDigits, NUM_DIGITS);
-  renderer->setFramesPerSecond(FRAMES_PER_SECOND);
+  renderer = RendererBuilder(hardware, driver, styledDigits, NUM_DIGITS)
+      .setFramesPerSecond(FRAMES_PER_SECOND)
+      ...
+      .build();
   renderer->configure();
 
   // Create higher level Writers.
@@ -222,6 +223,8 @@ void setup() {
   stringWriter = new StringWriter(charWriter);
 
   ...
+
+  Serial.println(F("setup(): end"));
 }
 
 ```
@@ -574,22 +577,43 @@ Driver* driver = DriverBuilder()
 
 ### Configuring the Renderer
 
-The following parameters can be configured for the `Renderer`:
-* `void setFramesPerSecond(uint8_t framesPerSecond);` (required)
-* `void setBlinkFastDuration(uint16_t durationMillis);`
-* `void setBlinkSlowDuration(uint16_t durationMillis);`
-* `void setPulseFastDuration(uint16_t durationMillis);`
-* `void setPulseSlowDuration(uint16_t durationMillis);`
-* `void setStatsResetInterval(uint16_t framesPerStatsReset);`
+The `Renderer` is dependent on the following resources, and these required
+parameters are given in the constructor of `RendererBuilder`:
+* `Hardware`
+* `Driver`
+* an array of `StyledDigit`
 
-Only the `setFramesPerSecond()` method is required. The others have reasonable
-defaults.
+The following optional parameters can be given to `RendererBuilder` to override
+the defaults. Each of these methods returns a reference to `*this` so they can
+be chained (see below):
+* `setFramesPerSecond(uint8_t framesPerSecond);` (default: 60)
+* `setStatsResetInterval(uint16_t framesPerStatsReset);` (default: 120)
+* `setBlinkSlowDuration(uint16_t durationMillis);` (default: 800)
+* `setBlinkFastDuration(uint16_t durationMillis);` (default: 400)
+* `setPulseSlowDuration(uint16_t durationMillis);` (default: 3000)
+* `setPulseFastDuration(uint16_t durationMillis);` (default: 1000)
 
-And example of configuring the `Renderer` is:
+The `build()` method creates an instance of `Renderer` with the given
+parameters. An example of configuring the `Renderer` is:
 ```
-Renderer* renderer = new Renderer(hardware, driver, styledDigits, NUM_DIGITS);
-renderer->setFramesPerSecond(FRAMES_PER_SECOND);
-renderer->configure();
+const uint8_t NUM_DIGITS = 4;
+StyledDigit styledDigits[NUM_DIGITS];
+const int FRAMES_PER_SECOND = 90;
+const int BLINK_FAST_DURATION_MILLIS = 500;
+
+void setup() {
+  ...
+  Hardware* hardware = ...;
+  Driver* driver = ...;
+
+  Renderer* renderer =
+      RendererBuilder(hardware, driver, styledDigits, NUM_DIGITS)
+      .setFramesPerSecond(FRAMES_PER_SECOND)
+      .setBlinkFastDuration(BLINK_FAST_DURATION_MILLIS)
+      .build();
+  renderer->configure();
+  ...
+}
 ```
 
 ### Using the Renderer
@@ -674,8 +698,6 @@ each digit is rendered 16 times within a single field, but modulated using pulse
 width modulation to control the width of that signal. The given digit will be
 "on" only a fraction of the full interval of the single field rendering and will
 appear dimmer to the human eye.
-
-### Rendering
 
 #### Frames and Fields
 
