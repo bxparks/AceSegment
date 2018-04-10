@@ -229,6 +229,80 @@ void setup() {
 
 ```
 
+#### Heap Objects versus Static Objects
+
+Usually in embedded environments, resources (objects) are created statically
+instead of the heap. That's usually because resources are created once and
+never deleted for the life of the application. In the `Driver` and `Renderer`
+objects, I chose to create them on the heap through the `DriverBuilder` and
+`RendererBuilder` objects (respectively). For `DriverBuilder`, it was a
+necessity since it creates different versions (subclasses) of `Driver` and an
+internal class called `LedMatrix`, and it's not possible to statically create
+those subclasses. Then for consistency, I chose to do the same for
+`RendererBuilder` even though that was not strictly necessary.
+
+In the example shown above, I chose to use the heap for all resources for
+consistency of style. In a normal program, all of those heap objects are created
+once and never deleted, so the static memory usage will be about the same as if
+they were created statically.
+
+If the user prefer, it *is* possible to create most of these objects statically,
+like this:
+```
+const uint16_t FRAMES_PER_SECOND = 60;
+const uint8_t NUM_DIGITS = 4;
+const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
+const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
+
+DimmingDigit dimmingDigits[NUM_DIGITS];
+StyledDigit styledDigits[NUM_DIGITS];
+
+// The chain of resources.
+Hardware hardware;
+Driver* driver = DriverBuilder(&hardware)
+    .setNumDigits(NUM_DIGITS)
+    .setCommonCathode()
+    .setResistorsOnSegments()
+    .setDigitPins(digitPins)
+    .setSegmentDirectPins(segmentPins)
+    ...
+    .build();
+Renderer* renderer = RendererBuilder(
+        &hardware, driver, styledDigits, NUM_DIGITS)
+    .setFramesPerSecond(FRAMES_PER_SECOND)
+    ...
+    .build();
+CharWriter charWriter(renderer);
+StringWriter stringWriter(&charWriter);
+...
+
+void setup() {
+  delay(1000); // Wait for stability on some boards, otherwise garage on Serial
+  Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
+  while (!Serial); // Wait until Serial is ready - Leonardo/Micro
+  Serial.println(F("setup(): begin"));
+
+  driver->configure();
+  renderer->configure();
+  ...
+
+  Serial.println(F("setup(): end"));
+
+```
+
+The disadvantages are:
+* there is mixing style, using objects by value and some objects by pointer
+* debugging the `DriverBuilder::build()` and `RendererBuilder::build()` is
+  more difficult because we cannot insert a `Serial.print()` statement in there,
+  `Serial` cannot be used until it is configured in the `setup()` method
+
+In unit tests, multiple test objects are created and deleted with various
+configuration parameters, so creating these objects on the heap makes the test
+code cleaner and more robust. Once I got used to creating them on the heap, then
+it seemed easier sense to use the same style within an application. As I point
+out above, these heap objects are created just once in an application, so
+there's little difference in the overall static memory usage.
+
 ### Configuring the Driver
 
 The `Driver` is created indirectly through a helper class called the
