@@ -40,7 +40,7 @@ class Renderer {
     static const uint8_t kBlinkStateOn = 1;
 
     /** Default frame rate. */
-    static const uint8_t kFramesPerSecondDefault = 120;
+    static const uint8_t kFramesPerSecondDefault = 60;
 
     /** Constructor. */
     explicit Renderer(Hardware* hardware, Driver* driver,
@@ -51,7 +51,7 @@ class Renderer {
         mNumDigits(numDigits),
         mFramesPerSecond(kFramesPerSecondDefault),
         mBrightness(255),
-        mFramesPerStatsReset(kFramesPerStatsReset),
+        mStatsResetInterval(kStatsResetIntervalDefault),
         mBlinkSlowDurationMillis(kBlinkSlowDurationMillisDefault),
         mBlinkSlowState(kBlinkStateOn),
         mBlinkFastDurationMillis(kBlinkFastDurationMillisDefault),
@@ -64,19 +64,16 @@ class Renderer {
     // setup() and configure() should be called after changing them.
 
     /**
-     * Set the desired frame rate. Default is 120.
+     * Set the desired frame rate. Default is 60.
      *
      * Borrowing some terminology from motion picture videos, a "frame" is a
      * full rendering of an image, and a field is a partial rendering of the
-     * image. Each call to renderField() will process a single field of a frame.
+     * frame. Each call to renderField() will process a single field of a frame.
      * Different wiring will require different number of fields to produce an
      * entire frame.
      *
      * fieldsPerSec(resistorsOnDigits) =  mFramesPerSecond * kNumSegments
      * fieldsPerSec(resistorsOnSegments) =  mFramesPerSecond * mNumDigits
-     *
-     * This constant is the desired number of frames per second. Default of 120
-     * should produce minimal flickering.
      */
     Renderer& setFramesPerSecond(uint8_t framesPerSecond) {
       mFramesPerSecond = framesPerSecond;
@@ -108,14 +105,14 @@ class Renderer {
     }
 
     /**
-     * Set the number of frames after which the stats variables are
-     * periodicallly reset. Set to 0 for no auto reset. Periodic resets are
-     * useful to remove spurious min and max. The default is
-     * kFramesPerStatsReset which is 300 frames, which at 60 frames per second
-     * is 5 seconds.
+     * Set the maximum number of stats updates after which it is periodicallly
+     * reset. Set to 0 for no auto reset. Periodic resets are useful to remove
+     * spurious min and max. The default is kStatsResetIntervalDefault which is
+     * 1200 samples. At 60 frames per second with 4 fields per frame, that's
+     * about 5 seconds.
      */
-    Renderer& setStatsResetInterval(uint16_t framesPerStatsReset) {
-      mFramesPerStatsReset = framesPerStatsReset;
+    Renderer& setStatsResetInterval(uint16_t statsResetInterval) {
+      mStatsResetInterval = statsResetInterval;
       return *this;
     }
 
@@ -246,7 +243,7 @@ class Renderer {
 
     static const uint16_t kPulseFastDurationMillisDefault = 1000;
 
-    static const uint16_t kFramesPerStatsReset = 300;
+    static const uint16_t kStatsResetIntervalDefault = 1200;
 
     // disable copy-constructor and assignment operator
     Renderer(const Renderer&) = delete;
@@ -283,8 +280,7 @@ class Renderer {
     uint16_t mCurrentField;
 
     // statistics
-    uint16_t mFramesPerStatsReset;
-    uint16_t mCurrentStatsResetFrame;
+    uint16_t mStatsResetInterval;
     TimingStats mStats;
 
     // TODO: Maybe generalize the following into an array of styles, because the

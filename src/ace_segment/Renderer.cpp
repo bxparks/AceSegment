@@ -77,7 +77,6 @@ void Renderer::configure() {
 }
 
 void Renderer::resetStats() {
-  mCurrentStatsResetFrame = 0;
   mStats.reset();
 }
 
@@ -134,11 +133,10 @@ void Renderer::renderField() {
 void Renderer::updateFrame() {
   calcBlinkAndPulseForFrame();
   renderStyledDigits();
-  if (mFramesPerStatsReset > 0 &&
-      mCurrentStatsResetFrame >= mFramesPerStatsReset) {
+  if (mStatsResetInterval > 0 &&
+      mStats.getCount() >= mStatsResetInterval) {
     resetStats();
   }
-  mCurrentStatsResetFrame++;
 }
 
 TimingStats Renderer::getTimingStats() {
