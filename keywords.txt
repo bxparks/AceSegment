@@ -1,0 +1,82 @@
+#######################################
+# Syntax Coloring Map for AUnit library
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+Hardware	KEYWORD1
+LedMatrix	KEYWORD1
+Driver	KEYWORD1
+Renderer	KEYWORD1
+RendererBuilder	KEYWORD1
+StyledDigit	KEYWORD1
+DimmingDigit	KEYWORD1
+CharWriter	KEYWORD1
+StringWriter	KEYWORD1
+TimingStats	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+# Hardware.h
+digitalWrite	KEYWORD2
+pinMode	KEYWORD2
+shiftOut	KEYWORD2
+micros	KEYWORD2
+millis	KEYWORD2
+spiBegin	KEYWORD2
+spiTransfer	KEYWORD2
+
+# LedMatrix.h
+setCathodeOnGroup	KEYWORD2
+setAnodeOnGroup	KEYWORD2
+configure	KEYWORD2
+enableGroup	KEYWORD2
+disableGroup	KEYWORD2
+drawElements	KEYWORD2
+
+# Driver.h
+configure	KEYWORD2
+displayCurrentField	KEYWORD2
+isBrightnessSupported	KEYWORD2
+setPattern	KEYWORD2
+setBrightness	KEYWORD2
+
+# Renderer.h
+configure	KEYWORD2
+getNumDigits	KEYWORD2
+getFramesPerSecond	KEYWORD2
+getFieldsPerSecond	KEYWORD2
+writeBrightness	KEYWORD2
+writePatternAt	KEYWORD2
+writeStyleAt	KEYWORD2
+writeDecimalPointAt	KEYWORD2
+renderField	KEYWORD2
+renderFieldWhenReady	KEYWORD2
+getTimingStats	KEYWORD2
+getStyledDigit	KEYWORD2
+calcBlinkStateForFrame	KEYWORD2
+calcPulseFractionForFrame	KEYWORD2
+calcBlinkStateForFrame	KEYWORD2
+calcPulseFractionForFrame	KEYWORD2
+calcBrightness	KEYWORD2
+
+# CharWriter
+getNumDigits	KEYWORD2
+writeCharAt	KEYWORD2
+writeStyleAt	KEYWORD2
+writeDecimalPointAt	KEYWORD2
+
+# StringWriter
+writeStringAt	KEYWORD2
+
+#######################################
+# Instances (KEYWORD2)
+#######################################
+
+#######################################
+# Constants (LITERAL1)
+#######################################
