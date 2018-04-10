@@ -49,7 +49,7 @@ void Renderer::configure() {
   mLastRenderFieldMicros = nowMicros;
 
   // Reset statistics
-  resetStats();
+  mStats.reset();
 
   // Set up for blinking slow.
   mFramesPerBlinkSlow = (uint32_t) mFramesPerSecond
@@ -74,10 +74,6 @@ void Renderer::configure() {
   mFramesPerPulseFastInverse = (uint32_t) 65536 * 1000
       / mFramesPerSecond / mPulseFastDurationMillis;
   mCurrentPulseFastFrame = 0;
-}
-
-void Renderer::resetStats() {
-  mStats.reset();
 }
 
 void Renderer::writePatternAt(uint8_t digit, uint8_t pattern, uint8_t style) {
@@ -135,7 +131,7 @@ void Renderer::updateFrame() {
   renderStyledDigits();
   if (mStatsResetInterval > 0 &&
       mStats.getCount() >= mStatsResetInterval) {
-    resetStats();
+    mStats.reset();
   }
 }
 

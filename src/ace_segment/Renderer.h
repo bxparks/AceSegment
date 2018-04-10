@@ -258,9 +258,6 @@ class Renderer {
     /** Translate the StyledDigits to DimmingDigits for the Driver. */
     void renderStyledDigits();
 
-    /** Reset the stats every setStatsResetInterval(). VisibleForTesting. */
-    void resetStats();
-
     Hardware* const mHardware;
     Driver* const mDriver;
     StyledDigit* const mStyledDigits;
