@@ -2,7 +2,7 @@
 An adjustable, configurable, and extensible framework for rendering seven
 segment LED displays on Arduino platforms
 
-Version: Work-in-progress (2018-04-08)
+Version: 0.1.0 (2018-04-10)
 
 ## Summary
 
