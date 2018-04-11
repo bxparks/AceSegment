@@ -1,4 +1,5 @@
 #include <AceSegment.h>
+#include "FastDriver.h"
 using namespace ace_segment;
 
 #define USE_INTERRUPT 0
@@ -10,9 +11,10 @@ using namespace ace_segment;
 #define DRIVER_MODE_DIGIT 1
 #define DRIVER_MODE_DIGIT_MODULATING 2
 #define DRIVER_MODE_SEGMENT 3
+#define DRIVER_MODE_FAST 4
 
 #define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
-#define DRIVER_MODE DRIVER_MODE_DIGIT_MODULATING
+#define DRIVER_MODE DRIVER_MODE_FAST
 
 const uint8_t FRAMES_PER_SECOND = 60;
 const uint8_t NUM_SUBFIELDS = 16;
@@ -110,6 +112,8 @@ void setup() {
       .setSegmentDirectPins(segmentPins)
       .setDimmingDigits(dimmingDigits)
       .build();
+#elif DRIVER_MODE == DRIVER_MODE_FAST
+  driver = new FastDriver(dimmingDigits, NUM_DIGITS, NUM_SUBFIELDS);
 #endif
   driver->configure();
 

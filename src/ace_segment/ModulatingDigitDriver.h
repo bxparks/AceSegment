@@ -56,14 +56,15 @@ class ModulatingDigitDriver: public DigitDriver {
 
     virtual void displayCurrentField() override;
 
+  protected:
+    uint8_t const mNumSubFields;
+    uint8_t mCurrentSubField;
+    uint8_t mCurrentSubFieldMax;
+
   private:
     // disable copy-constructor and assignment operator
     ModulatingDigitDriver(const ModulatingDigitDriver&) = delete;
     ModulatingDigitDriver& operator=(const ModulatingDigitDriver&) = delete;
-
-    uint8_t const mNumSubFields;
-    uint8_t mCurrentSubField;
-    uint8_t mCurrentSubFieldMax;
 };
 
 }
