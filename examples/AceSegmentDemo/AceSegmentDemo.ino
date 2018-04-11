@@ -1,6 +1,7 @@
 #include <AceSegment.h>
 #include "FastDirectDriver.h"
 #include "FastSerialDriver.h"
+#include "FastSpiDriver.h"
 using namespace ace_segment;
 
 #define USE_INTERRUPT 0
@@ -10,6 +11,7 @@ using namespace ace_segment;
 #define DRIVER_MODE_SEGMENT 3
 #define DRIVER_MODE_FAST_DIRECT 4
 #define DRIVER_MODE_FAST_SERIAL 5
+#define DRIVER_MODE_FAST_SPI 6
 
 // Applies only for DRIVER_MODE_DIGIT, DRIVER_MODE_DIGIT_MODULATING,
 // DRIVER_MODE_SEGMENT. Ignored for others.
@@ -18,7 +20,7 @@ using namespace ace_segment;
 #define LED_MATRIX_MODE_SPI 3
 
 #define DRIVER_MODE DRIVER_MODE_DIGIT_MODULATING
-#define LED_MATRIX_MODE LED_MATRIX_MODE_SERIAL
+#define LED_MATRIX_MODE LED_MATRIX_MODE_SPI
 
 const uint8_t FRAMES_PER_SECOND = 60;
 const uint8_t NUM_SUBFIELDS = 16;
@@ -124,6 +126,8 @@ void setup() {
   driver = new FastDirectDriver(dimmingDigits, NUM_DIGITS, NUM_SUBFIELDS);
 #elif DRIVER_MODE == DRIVER_MODE_FAST_SERIAL
   driver = new FastSerialDriver(dimmingDigits, NUM_DIGITS, NUM_SUBFIELDS);
+#elif DRIVER_MODE == DRIVER_MODE_FAST_SPI
+  driver = new FastSpiDriver(dimmingDigits, NUM_DIGITS, NUM_SUBFIELDS);
 #endif
   driver->configure();
 

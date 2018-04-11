@@ -3,8 +3,8 @@
 # MIT License
 """
 Generate a version of ModulatingDigitDriver using digitalWriteFast()
-with the segment pins connected through a 74HC595 serial-to-parallel chip.
-Similar to LedMatrixSerial class.
+with the segment pins connected through a 74HC595 serial-to-parallel chip,
+using SPI to transfer bits to the chip. Similar to LedMatrixSpi class.
 """
 
 import logging
@@ -18,6 +18,8 @@ class DriverGenerator:
 // DO NOT EDIT
 
 #include <stdint.h>
+#include <Arduino.h>
+#include <SPI.h>
 #include <digitalWriteFast.h>
 #include <ace_segment/ModulatingDigitDriver.h>
 #include <ace_segment/Util.h>
@@ -68,22 +70,10 @@ class {1}: public ace_segment::ModulatingDigitDriver {{
     static void drawSegments(uint8_t pattern) {{
       digitalWriteFast(kLatchPin, LOW);
       uint8_t actualPattern = (kSegmentOn == HIGH) ? pattern : ~pattern;
-      shiftOutFast(actualPattern);
+      SPI.beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
+      SPI.transfer(actualPattern);
+      SPI.endTransaction();
       digitalWriteFast(kLatchPin, HIGH);
-    }}
-
-    static void shiftOutFast(uint8_t pattern) {{
-      uint8_t mask = 0x80;
-      for (uint8_t i = 0; i < 8; i++)  {{
-        if (pattern & mask) {{
-          digitalWriteFast(kDataPin, HIGH);
-        }} else {{
-          digitalWriteFast(kDataPin, LOW);
-        }}
-        digitalWriteFast(kClockPin, HIGH);
-        digitalWriteFast(kClockPin, LOW);            
-        mask >>= 1;
-      }}
     }}
 
     // DigitalWriter functions for writing digit pins.
@@ -101,6 +91,7 @@ class {1}: public ace_segment::ModulatingDigitDriver {{
 
 #include <stdint.h>
 #include <Arduino.h>
+#include <SPI.h>
 #include <digitalWriteFast.h>
 #include "{1}.h"
 
@@ -122,6 +113,8 @@ void {1}::configure() {{
   pinMode(kLatchPin, OUTPUT);
   pinMode(kDataPin, OUTPUT);
   pinMode(kClockPin, OUTPUT);
+
+  SPI.begin();
 
   ace_segment::ModulatingDigitDriver::configure();
 }}
@@ -161,17 +154,17 @@ void {1}::displayCurrentField() {{
 }}
 """
 
-    def __init__(self, invocation, class_name, segment_serial_pins, digit_pins,
+    def __init__(self, invocation, class_name, segment_spi_pins, digit_pins,
                  common_cathode, output_header, output_source, output_files,
                  digital_write_fast):
-        if len(segment_serial_pins) != 3:
+        if len(segment_spi_pins) != 3:
             logging.error("Must provide (latch, data, clock) pins")
             sys.exit(1)
         self.invocation = invocation
         self.class_name = class_name
-        self.latch = segment_serial_pins[0]
-        self.data = segment_serial_pins[1]
-        self.clock = segment_serial_pins[2]
+        self.latch = segment_spi_pins[0]
+        self.data = segment_spi_pins[1]
+        self.clock = segment_spi_pins[2]
         self.digit_pins = digit_pins
         self.common_cathode = common_cathode
         self.output_header = output_header
@@ -180,7 +173,7 @@ void {1}::displayCurrentField() {{
         self.digital_write_fast = digital_write_fast
         logging.info("invocation: %s", self.invocation)
         logging.info("class_name: %s", self.class_name)
-        logging.info("segment_serial_pins: %s", segment_serial_pins)
+        logging.info("segment_spi_pins: %s", segment_spi_pins)
         logging.info("digit_pins: %s", self.digit_pins)
         logging.info("common_cathode: %s", self.common_cathode)
         logging.info("digital_write_fast: %s", self.digital_write_fast)

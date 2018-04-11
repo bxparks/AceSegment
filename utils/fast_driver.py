@@ -7,7 +7,10 @@
 Generate an implementation of ace_segment::Driver which uses the
 digitalWriteFast() methods of https://github.com/NicksonYap/digitalWriteFast.
 The resulting class can be used where a 'Driver' object created by
-'DriverBuilder' would normally be used.
+'DriverBuilder' would normally be used. There are 3 versions:
+  * --segment_pins - equivalent to LedMatrixDirect
+  * --segment_serial_pins - equivalent to LedMatrixSerial
+  * --segment_spi_pins - equivalent to LedMatrixSpi
 
 Usage: fast_driver.py [-h] [flags ...]
 
@@ -21,29 +24,42 @@ Usage: fast_driver.py [-h] [flags ...]
   --output_files generate the {class_name}.h and {class_name}.cpp files
   --[no]digital_write_fast
 
-Example:
-  $ ./fast_driver.py --digit_pins 10 12 13 --segment_pins 4 5 6 \
-      --class_name FastDriver --output_files
+Examples:
+
+  $ ./fast_driver.py --digit_pins 12 14 15 16 --segment_pins 4 5 6 7 8 9 10 11 \
+      --class_name FastDirectDriver --output_files
+  $ ./fast_driver.py --digit_pins 4 5 6 7 --segment_serial_pins 10 11 13 \
+      --class_name FastSerialDriver --output_files
+  $ ./fast_driver.py --digit_pins 4 5 6 7 --segment_spi_pins 10 11 13 \
+      --class_name FastSpiDriver --output_files
 
 Benchmarks for AceSegmentDemo
 (frame rate: 60Hz, 4 fields/frame, 16 subfields/field):
+
   --segment_pins:
       LedMatrixDirect
-          min: 8us; avg: 16us; max: 140us
           flash/static: 9252/506
+          min: 8us; avg: 16us; max: 140us
       --digital_write_fast
-          min: 8us; avg: 13us; max: 84us
           flash/static: 8544/490
+          min: 8us; avg: 13us; max: 84us
       --nodigital_write_fast
-          min: 8us; avg: 15us; max: 120us
           flash/static: 8640/490
+          min: 8us; avg: 15us; max: 120us
   --segment_serial_pins:
       LedMatrixSerial
-          min: 8us; avg: 20us; max: 212us
           flash/static: 9248/498
+          min: 8us; avg: 20us; max: 212us
       --digital_write_fast
-          min: 8us; avg: 13us; max: 80us
           flash/static: 8394/450
+          min: 8us; avg: 13us; max: 80us
+  --segment_spi_pins:
+      LedMatrixSpi
+          flash/static: 9248/498
+          min: 12us; avg: 14us; max: 100us
+      --digital_write_fast
+          flash/static: 8434/451
+          min: 8us; avg: 13us; max: 76us
 """
 
 import argparse
@@ -51,6 +67,7 @@ import logging
 import sys
 import direct_generator
 import serial_generator
+import spi_generator
 
 def main():
     # Configure command line flags.
@@ -65,6 +82,11 @@ def main():
     parser.add_argument(
         '--segment_serial_pins',
         help='Space-separated list of segment pins (latch, data, clock)',
+        nargs='+',
+        type=int)
+    parser.add_argument(
+        '--segment_spi_pins',
+        help='Space-separated list of SPI segment pins (latch, data, clock)',
         nargs='+',
         type=int)
     parser.add_argument(
@@ -129,9 +151,16 @@ def main():
             args.digit_pins, args.common_cathode,
             args.output_header, args.output_source,
             args.output_files, args.digital_write_fast)
+    elif args.segment_spi_pins:
+        generator = spi_generator.DriverGenerator(
+            invocation, args.class_name, args.segment_spi_pins,
+            args.digit_pins, args.common_cathode,
+            args.output_header, args.output_source,
+            args.output_files, args.digital_write_fast)
     else:
         logging.error(
-            "Must provide one of --segment_pins or --segment_serial_pins")
+            "Must provide one of " +
+            "(--segment_pins, --segment_serial_pins, --segment_spi_pins)")
         sys.exit(1)
           
 
