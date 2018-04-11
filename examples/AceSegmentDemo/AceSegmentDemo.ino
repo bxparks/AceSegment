@@ -1,20 +1,24 @@
 #include <AceSegment.h>
-#include "FastDriver.h"
+#include "FastDirectDriver.h"
+#include "FastSerialDriver.h"
 using namespace ace_segment;
 
 #define USE_INTERRUPT 0
 
+#define DRIVER_MODE_DIGIT 1
+#define DRIVER_MODE_DIGIT_MODULATING 2
+#define DRIVER_MODE_SEGMENT 3
+#define DRIVER_MODE_FAST_DIRECT 4
+#define DRIVER_MODE_FAST_SERIAL 5
+
+// Applies only for DRIVER_MODE_DIGIT, DRIVER_MODE_DIGIT_MODULATING,
+// DRIVER_MODE_SEGMENT. Ignored for others.
 #define LED_MATRIX_MODE_DIRECT 1
 #define LED_MATRIX_MODE_SERIAL 2
 #define LED_MATRIX_MODE_SPI 3
 
-#define DRIVER_MODE_DIGIT 1
-#define DRIVER_MODE_DIGIT_MODULATING 2
-#define DRIVER_MODE_SEGMENT 3
-#define DRIVER_MODE_FAST 4
-
-#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
-#define DRIVER_MODE DRIVER_MODE_FAST
+#define DRIVER_MODE DRIVER_MODE_DIGIT_MODULATING
+#define LED_MATRIX_MODE LED_MATRIX_MODE_SERIAL
 
 const uint8_t FRAMES_PER_SECOND = 60;
 const uint8_t NUM_SUBFIELDS = 16;
@@ -25,7 +29,11 @@ const uint8_t NUM_DIGITS = 4;
 const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
 const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
 #else
-  #if LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT
+  #if ((DRIVER_MODE == DRIVER_MODE_DIGIT \
+      || DRIVER_MODE == DRIVER_MODE_DIGIT_MODULATING \
+      || DRIVER_MODE == DRIVER_MODE_SEGMENT) \
+        && LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT) \
+      || DRIVER_MODE == DRIVER_MODE_FAST_DIRECT
   // 4 digits, resistors on segments
   const uint8_t NUM_DIGITS = 4;
   const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
@@ -112,8 +120,10 @@ void setup() {
       .setSegmentDirectPins(segmentPins)
       .setDimmingDigits(dimmingDigits)
       .build();
-#elif DRIVER_MODE == DRIVER_MODE_FAST
-  driver = new FastDriver(dimmingDigits, NUM_DIGITS, NUM_SUBFIELDS);
+#elif DRIVER_MODE == DRIVER_MODE_FAST_DIRECT
+  driver = new FastDirectDriver(dimmingDigits, NUM_DIGITS, NUM_SUBFIELDS);
+#elif DRIVER_MODE == DRIVER_MODE_FAST_SERIAL
+  driver = new FastSerialDriver(dimmingDigits, NUM_DIGITS, NUM_SUBFIELDS);
 #endif
   driver->configure();
 
