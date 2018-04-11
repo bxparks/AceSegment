@@ -69,6 +69,7 @@ import direct_generator
 import serial_generator
 import spi_generator
 
+
 def main():
     # Configure command line flags.
     parser = argparse.ArgumentParser(description='Generate Fast Driver.')
@@ -141,28 +142,24 @@ def main():
     # Get the DriverGenerator for the given segment_pin configuration.
     if args.segment_pins:
         generator = direct_generator.DriverGenerator(
-            invocation, args.class_name, args.segment_pins,
-            args.digit_pins, args.common_cathode,
-            args.output_header, args.output_source,
+            invocation, args.class_name, args.segment_pins, args.digit_pins,
+            args.common_cathode, args.output_header, args.output_source,
             args.output_files, args.digital_write_fast)
     elif args.segment_serial_pins:
         generator = serial_generator.DriverGenerator(
             invocation, args.class_name, args.segment_serial_pins,
-            args.digit_pins, args.common_cathode,
-            args.output_header, args.output_source,
-            args.output_files, args.digital_write_fast)
+            args.digit_pins, args.common_cathode, args.output_header,
+            args.output_source, args.output_files, args.digital_write_fast)
     elif args.segment_spi_pins:
         generator = spi_generator.DriverGenerator(
             invocation, args.class_name, args.segment_spi_pins,
-            args.digit_pins, args.common_cathode,
-            args.output_header, args.output_source,
-            args.output_files, args.digital_write_fast)
+            args.digit_pins, args.common_cathode, args.output_header,
+            args.output_source, args.output_files, args.digital_write_fast)
     else:
         logging.error(
             "Must provide one of " +
             "(--segment_pins, --segment_serial_pins, --segment_spi_pins)")
         sys.exit(1)
-          
 
     generator.run()
 

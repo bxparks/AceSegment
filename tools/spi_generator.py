@@ -180,9 +180,7 @@ void {1}::displayCurrentField() {{
 
     def run(self):
         header = self.HEADER_FILE.format(self.invocation, self.class_name,
-                                         self.latch,
-                                         self.data,
-                                         self.clock,
+                                         self.latch, self.data, self.clock,
                                          self.get_on_off_constants(),
                                          self.get_digit_writers())
         if self.output_header:
