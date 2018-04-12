@@ -1039,7 +1039,7 @@ for a subclass of `Driver` that uses the `digitalWriteFast()`. The
 script is called like this:
 ```
 $ ./tools/fast_driver.py --digit_pins 12 14 15 16 \
-        --segment_pins 4 5 6 7 8 9 10 11 \
+        --segment_direct_pins 4 5 6 7 8 9 10 11 \
         --class_name FastDirectDriver --output_files
 ```
 which generates two files in the current directory:

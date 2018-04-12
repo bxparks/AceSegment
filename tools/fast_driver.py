@@ -8,14 +8,14 @@ Generate an implementation of ace_segment::Driver which uses the
 digitalWriteFast() methods of https://github.com/NicksonYap/digitalWriteFast.
 The resulting class can be used where a 'Driver' object created by
 'DriverBuilder' would normally be used. There are 3 versions:
-  * --segment_pins - equivalent to LedMatrixDirect
+  * --segment_direct_pins - equivalent to LedMatrixDirect
   * --segment_serial_pins - equivalent to LedMatrixSerial
   * --segment_spi_pins - equivalent to LedMatrixSpi
 
 Usage: fast_driver.py [-h] [flags ...]
 
   --class_name name of class
-  --segment_pins space-separated list of segment pins
+  --segment_direct_pins space-separated list of segment pins
   --digit_pins space-separate list of digit pins
   --common_cathode
   --common_anode
@@ -26,7 +26,8 @@ Usage: fast_driver.py [-h] [flags ...]
 
 Examples:
 
-  $ ./fast_driver.py --digit_pins 12 14 15 16 --segment_pins 4 5 6 7 8 9 10 11 \
+  $ ./fast_driver.py --digit_pins 12 14 15 16 \
+      --segment_direct_pins 4 5 6 7 8 9 10 11 \
       --class_name FastDirectDriver --output_files
   $ ./fast_driver.py --digit_pins 4 5 6 7 --segment_serial_pins 10 11 13 \
       --class_name FastSerialDriver --output_files
@@ -36,7 +37,7 @@ Examples:
 Benchmarks for AceSegmentDemo
 (frame rate: 60Hz, 4 fields/frame, 16 subfields/field):
 
-  --segment_pins:
+  --segment_direct_pins:
       LedMatrixDirect
           flash/static: 9252/506
           min: 8us; avg: 16us; max: 140us
@@ -76,7 +77,7 @@ def main():
     parser.add_argument(
         '--class_name', help='Name of the Driver class', required=True)
     parser.add_argument(
-        '--segment_pins',
+        '--segment_direct_pins',
         help='Space-separated list of segment pins (ordered from 0 to 7)',
         nargs='+',
         type=int)
@@ -140,11 +141,11 @@ def main():
     invocation = " ".join(sys.argv)
 
     # Get the DriverGenerator for the given segment_pin configuration.
-    if args.segment_pins:
+    if args.segment_direct_pins:
         generator = direct_generator.DriverGenerator(
-            invocation, args.class_name, args.segment_pins, args.digit_pins,
-            args.common_cathode, args.output_header, args.output_source,
-            args.output_files, args.digital_write_fast)
+            invocation, args.class_name, args.segment_direct_pins,
+            args.digit_pins, args.common_cathode, args.output_header,
+            args.output_source, args.output_files, args.digital_write_fast)
     elif args.segment_serial_pins:
         generator = serial_generator.DriverGenerator(
             invocation, args.class_name, args.segment_serial_pins,
@@ -156,9 +157,9 @@ def main():
             args.digit_pins, args.common_cathode, args.output_header,
             args.output_source, args.output_files, args.digital_write_fast)
     else:
-        logging.error(
-            "Must provide one of " +
-            "(--segment_pins, --segment_serial_pins, --segment_spi_pins)")
+        logging.error("Must provide one of " +
+                      "(--segment_direct_pins, --segment_serial_pins, " +
+                      "--segment_spi_pins)")
         sys.exit(1)
 
     generator.run()
