@@ -303,6 +303,14 @@ it seemed easier sense to use the same style within an application. As I point
 out above, these heap objects are created just once in an application, so
 there's little difference in the overall static memory usage.
 
+If you are still not convinced, it **is** possible to bypass the `DriverBuilder`
+and `RendererBuilder` and create *all* resources statically. You just need to
+follow the logic of `DriverBuilder` and `RendererBuilder`, create the
+intermediary `LedMatrix` object, and call the constructors of the various
+subclasses of `Driver` and the constructor of `Renderer` manually. Send me an
+email if you need help with this. If there is sufficient demand, I will write up
+more detailed instructions.
+
 ### Configuring the Driver
 
 The `Driver` is created indirectly through a helper class called the
@@ -647,6 +655,44 @@ Driver* driver = DriverBuilder()
     .useModulatingDriver()
     .setNumSubFields(NUM_SUBFIELDS)
     ...
+```
+
+#### Feature Matrix
+
+Here is a table that summarizes the various combinations which are supported by
+`DriverBuilder`. As you can see, PWM is only available if
+"Resistors-on-Segments" are used, because the modulation happens on a per-digit
+basis.
+
+The "Resistors" options are selected by:
+* `setResistorsOnSegments()`
+* `setResistorsOnDigits()`
+
+The "Wiring" options are selected by:
+* `setSegmentDirectPins(segmentPins)`
+* `setSegmentSerialPins(latch, data, clock)`
+* `setSegmentSpiPins(latch, data, clock)`
+
+The "PWM" options are selected by:
+* `useModulatingDriver()`
+* `setNumSubFields(NUM_SUBFIELDS)
+
+```
+Resistors | Wiring | PWM | Available? |
+----------+--------+-----+------------|
+Segments  | Direct | -   | y          |
+Segments  | Direct | On  | y          |
+Segments  | Serial | -   | y          |
+Segments  | Serial | On  | y          |
+Segments  | SPI    | -   | y          |
+Segments  | SPI    | On  | y          |
+Digits    | Direct | -   | y          |
+Digits    | Direct | On  | -          |
+Digits    | Serial | -   | y          |
+Digits    | Serial | On  | -          |
+Digits    | SPI    | -   | y          |
+Digits    | SPI    | On  | -          |
+----------+--------+-----+------------|
 ```
 
 ### Configuring the Renderer

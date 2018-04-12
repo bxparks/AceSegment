@@ -29,7 +29,7 @@ SOFTWARE.
 namespace ace_segment {
 
 Driver::~Driver() {
-  if (mLedMatrix) {
+  if (mOwnsLedMatrix && mLedMatrix) {
     delete mLedMatrix;
   }
 }

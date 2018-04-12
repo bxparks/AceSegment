@@ -37,8 +37,8 @@ class ModulatingDigitDriver: public DigitDriver {
     /** Constructor. */
     explicit ModulatingDigitDriver(LedMatrix* ledMatrix,
             DimmingDigit* dimmingDigits, uint8_t numDigits,
-            uint8_t numSubFields):
-        DigitDriver(ledMatrix, dimmingDigits, numDigits),
+            uint8_t numSubFields, bool ownsLedMatrix = false):
+        DigitDriver(ledMatrix, dimmingDigits, numDigits, ownsLedMatrix),
         mNumSubFields(numSubFields)
     {}
 

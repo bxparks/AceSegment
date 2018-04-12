@@ -36,8 +36,8 @@ class DigitDriver: public Driver {
   public:
     /** Constructor. */
     explicit DigitDriver(LedMatrix* ledMatrix, DimmingDigit* dimmingDigits,
-            uint8_t numDigits):
-        Driver(ledMatrix, dimmingDigits, numDigits)
+            uint8_t numDigits, bool ownsLedMatrix = false):
+        Driver(ledMatrix, dimmingDigits, numDigits, ownsLedMatrix)
     {}
 
     virtual void configure() override {
