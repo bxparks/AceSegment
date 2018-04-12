@@ -13,13 +13,15 @@ using namespace ace_segment;
 #define DRIVER_MODE_FAST_SERIAL 5
 #define DRIVER_MODE_FAST_SPI 6
 
-// Applies only for DRIVER_MODE_DIGIT, DRIVER_MODE_DIGIT_MODULATING,
-// DRIVER_MODE_SEGMENT. Ignored for others.
 #define LED_MATRIX_MODE_DIRECT 1
 #define LED_MATRIX_MODE_SERIAL 2
 #define LED_MATRIX_MODE_SPI 3
 
-#define DRIVER_MODE DRIVER_MODE_DIGIT_MODULATING
+// Define the Driver to use.
+#define DRIVER_MODE DRIVER_MODE_FAST_DIRECT
+
+// Applies only for DRIVER_MODE_DIGIT, DRIVER_MODE_DIGIT_MODULATING,
+// DRIVER_MODE_SEGMENT. Ignored for others.
 #define LED_MATRIX_MODE LED_MATRIX_MODE_SPI
 
 const uint8_t FRAMES_PER_SECOND = 60;
@@ -108,8 +110,7 @@ void setup() {
       .setSegmentSpiPins(latchPin, dataPin, clockPin)
   #endif
   #if DRIVER_MODE == DRIVER_MODE_DIGIT_MODULATING
-      .useModulatingDriver()
-      .setNumSubFields(NUM_SUBFIELDS)
+      .useModulatingDriver(NUM_SUBFIELDS)
   #endif
       .setDimmingDigits(dimmingDigits)
       .build();

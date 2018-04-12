@@ -125,14 +125,15 @@ class DriverBuilder {
       return *this;
     }
 
-    DriverBuilder& useModulatingDriver() {
+    /**
+     * Use a driver that provides pulse width modulation.
+     *
+     * @param numSubFields number subfields per field, 16 seems to be a good
+     * reasonable. A minimum of 1 is imposed if set to 0.
+     */
+    DriverBuilder& useModulatingDriver(uint8_t numSubFields) {
       mUseModulatingDriver = true;
-      return *this;
-    }
-
-    /** Used only if useModulatingDriver() is true. */
-    DriverBuilder& setNumSubFields(uint8_t numSubFields) {
-      mNumSubFields = numSubFields;
+      mNumSubFields = (numSubFields > 0) ? numSubFields : 1;
       return *this;
     }
 
