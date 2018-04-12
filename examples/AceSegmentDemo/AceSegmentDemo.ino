@@ -4,10 +4,12 @@
 #include "FastSpiDriver.h"
 using namespace ace_segment;
 
+// Use polling or interrupt.
 #define USE_INTERRUPT 0
 
+#define DRIVER_MODE_NONE 0
 #define DRIVER_MODE_DIGIT 1
-#define DRIVER_MODE_DIGIT_MODULATING 2
+#define DRIVER_MODE_MODULATING_DIGIT 2
 #define DRIVER_MODE_SEGMENT 3
 #define DRIVER_MODE_FAST_DIRECT 4
 #define DRIVER_MODE_FAST_SERIAL 5
@@ -17,10 +19,12 @@ using namespace ace_segment;
 #define LED_MATRIX_MODE_SERIAL 2
 #define LED_MATRIX_MODE_SPI 3
 
-// Define the Driver to use.
-#define DRIVER_MODE DRIVER_MODE_FAST_DIRECT
+// Define the Driver to use. Use DRIVER_MODE_NONE to get flash/static
+// consumption without any AceSegment code. Then set to the other modes to get
+// flash/static memory usage.
+#define DRIVER_MODE DRIVER_MODE_MODULATING_DIGIT
 
-// Applies only for DRIVER_MODE_DIGIT, DRIVER_MODE_DIGIT_MODULATING,
+// Applies only for DRIVER_MODE_DIGIT, DRIVER_MODE_MODULATING_DIGIT,
 // DRIVER_MODE_SEGMENT. Ignored for others.
 #define LED_MATRIX_MODE LED_MATRIX_MODE_SPI
 
@@ -34,7 +38,7 @@ const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
 const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
 #else
   #if ((DRIVER_MODE == DRIVER_MODE_DIGIT \
-      || DRIVER_MODE == DRIVER_MODE_DIGIT_MODULATING \
+      || DRIVER_MODE == DRIVER_MODE_MODULATING_DIGIT \
       || DRIVER_MODE == DRIVER_MODE_SEGMENT) \
         && LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT) \
       || DRIVER_MODE == DRIVER_MODE_FAST_DIRECT
@@ -52,6 +56,7 @@ const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
   #endif
 #endif
 
+#if DRIVER_MODE > DRIVER_MODE_NONE
 // Set up the chain of resources and their dependencies.
 DimmingDigit dimmingDigits[NUM_DIGITS];
 StyledDigit styledDigits[NUM_DIGITS];
@@ -63,23 +68,13 @@ Renderer* renderer;
 CharWriter* charWriter;
 StringWriter* stringWriter;
 
-const char* STRINGS[] = {
-  "0123",
-  "1.123",
-  "2.1 ",
-  "3.2.3.4.",
-  "4bc.d",
-  ".1.2..3",
-  "brian"
-};
-
-const int NUM_STRINGS = sizeof(STRINGS) / sizeof(STRINGS[0]);
-
 #if USE_INTERRUPT == 1
 // interrupt handler for timer 2
 ISR(TIMER2_COMPA_vect) {
   renderer->renderField();
 }
+#endif
+
 #endif
 
 void setup() {
@@ -88,15 +83,23 @@ void setup() {
   while (!Serial); // Wait until Serial is ready - Leonardo/Micro
   Serial.println(F("setup(): begin"));
 
-  // Create the resources.
+#if DRIVER_MODE > DRIVER_MODE_NONE
+  setupAceSegment();
+#endif
 
+  Serial.println(F("setup(): end"));
+}
+
+#if DRIVER_MODE > DRIVER_MODE_NONE
+// Create the resources.
+void setupAceSegment() {
   // Hardware is exposed to the client code because it's shared between Drive
   // and Renderer.
   hardware = new Hardware();
 
   // Create the Driver.
 #if DRIVER_MODE == DRIVER_MODE_DIGIT \
-    || DRIVER_MODE == DRIVER_MODE_DIGIT_MODULATING
+    || DRIVER_MODE == DRIVER_MODE_MODULATING_DIGIT
   driver = DriverBuilder(hardware)
       .setNumDigits(NUM_DIGITS)
       .setCommonCathode()
@@ -109,7 +112,7 @@ void setup() {
   #else
       .setSegmentSpiPins(latchPin, dataPin, clockPin)
   #endif
-  #if DRIVER_MODE == DRIVER_MODE_DIGIT_MODULATING
+  #if DRIVER_MODE == DRIVER_MODE_MODULATING_DIGIT
       .useModulatingDriver(NUM_SUBFIELDS)
   #endif
       .setDimmingDigits(dimmingDigits)
@@ -158,9 +161,8 @@ void setup() {
   OCR2A =  timerCompareValue;
   interrupts();
 #endif
-
-  Serial.println(F("setup(): end"));
 }
+#endif
 
 void loop() {
   static unsigned long lastUpdateTime = millis();
@@ -168,41 +170,46 @@ void loop() {
   static uint32_t loopCount = 0;
   static uint16_t lastStatsCounter = 0;
 
-  // Print something every 400 ms.
   unsigned long now = millis();
   if (now - lastUpdateTime > 1000) {
     lastUpdateTime = now;
 
-    writeChars();
+#if DRIVER_MODE > DRIVER_MODE_NONE
+    //writeChars();
     //writeStrings();
     //scrollString("   Angela is the best.");
+#endif
   }
 
-  // Print out statistics every 10 seconds.
+  // Print out statistics every N seconds.
   unsigned long elapsedTime = now - stopWatchStart;
   if (elapsedTime >= 2000) {
+#if DRIVER_MODE > DRIVER_MODE_NONE
     TimingStats stats = renderer->getTimingStats();
+#else
+    TimingStats stats;
+#endif
     uint32_t elapsedCount = stats.getCounter() - lastStatsCounter;
     lastStatsCounter = stats.getCounter();
     uint16_t renderDurationAverage = stats.getAvg();
     uint16_t renderDurationMin = stats.getMin();
     uint16_t renderDurationMax = stats.getMax();
 
-    Serial.print("loops: ");
+    Serial.print(F("loops: "));
     Serial.print(loopCount);
-    Serial.print("; renders: ");
+    Serial.print(F("; renders: "));
     Serial.print(elapsedCount);
-    Serial.print("; t: ");
+    Serial.print(F("; t: "));
     Serial.print(elapsedTime / 1000);
-    Serial.print("s; fields/s: ");
+    Serial.print(F("s; fields/s: "));
     Serial.print((uint32_t) elapsedCount * 1000 / elapsedTime);
-    Serial.print("Hz; min: ");
+    Serial.print(F("Hz; min: "));
     Serial.print(renderDurationMin);
-    Serial.print("us; avg: ");
+    Serial.print(F("us; avg: "));
     Serial.print(renderDurationAverage);
-    Serial.print("us; max: ");
+    Serial.print(F("us; max: "));
     Serial.print(renderDurationMax);
-    Serial.println("us");
+    Serial.println(F("us"));
 
     stopWatchStart = now;
     loopCount = 0;
@@ -210,11 +217,14 @@ void loop() {
     loopCount++;
   }
 
+#if DRIVER_MODE > DRIVER_MODE_NONE
 #if USE_INTERRUPT == 0
   renderer->renderFieldWhenReady();
 #endif
+#endif
 }
 
+#if DRIVER_MODE > DRIVER_MODE_NONE
 void writeChars() {
   static uint8_t c = 0;
   if (c >= 128) c = 0;
@@ -230,16 +240,34 @@ void writeChars() {
 }
 
 void writeStrings() {
+  static const char* STRINGS[] = {
+    "0123",
+    "1.123",
+    "2.1 ",
+    "3.2.3.4.",
+    "4bc.d",
+    ".1.2..3",
+    "brian"
+  };
+
+  static const int NUM_STRINGS = sizeof(STRINGS) / sizeof(STRINGS[0]);
+
   static uint8_t i = 0;
-  if (i >= NUM_STRINGS) i = 0;
+
   stringWriter->writeStringAt(0, STRINGS[i]);
   i++;
+  if (i >= NUM_STRINGS) {
+    i = 0;
+  }
 }
 
 void scrollString(const char* s) {
   static uint8_t i = 0;
 
-  if (i >= strlen(s)) i = 0;
   stringWriter->writeStringAt(0, &s[i], true /* padRight */);
   i++;
+  if (i >= strlen(s)) {
+    i = 0;
+  }
 }
+#endif

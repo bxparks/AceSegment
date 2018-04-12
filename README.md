@@ -978,6 +978,8 @@ The class supports the following methods:
 * `void writeStyleAt(uint8_t digit, StyledDigit::StyleType style)`
 * `void writeDecimalPointAt(uint8_t digit, bool state = true)`
 
+A `CharWriter` consumes significant amount of flash storage, about 1800 bytes.
+
 ### StringWriter
 
 A `StringWriter` is a class that builds on top of the `CharWriter`. It knows how
@@ -1092,7 +1094,24 @@ Here are the sizes of the various classes on the 8-bit AVR microcontrollers
 
 **Program size:**
 
-TBD
+Here are the flash and static memory consumptions for various options.
+Tested on `examples/AceSegmentDemo`:
+
+```
+Configuration    | flash/static | Incremental Size |
+-----------------+--------------+------------------|
+No AceSegment    | 2562/218     | 0/0              |
+ModDigit/Direct  |              |                  |
+ (no CharWriter) | 7468/419     | 4906/201         |
+ModDigit/Direct  | 9266/432     | 6704/214         |
+ModDigit/Serial  | 9266/424     | 6704/206         |
+ModDigit/SPI     | 9266/424     | 6704/206         |
+Segment/Direct   | 9266/427     | 6704/209         |
+FastDirectDriver | 8570/416     | 6008/198         |
+FastSerialDriver | 8410/376     | 5848/158         |
+FastSpiDriver    | 8450/377     | 5888/159         |
+-----------------+--------------+------------------|
+```
 
 **CPU cycles:**
 
