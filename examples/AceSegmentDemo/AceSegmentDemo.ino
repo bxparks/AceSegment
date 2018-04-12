@@ -19,6 +19,12 @@ using namespace ace_segment;
 #define LED_MATRIX_MODE_SERIAL 2
 #define LED_MATRIX_MODE_SPI 3
 
+#define WRITE_MODE_NONE 0
+#define WRITE_MODE_HEX 1
+#define WRITE_MODE_CHAR 2
+#define WRITE_MODE_STRING 3
+#define WRITE_MODE_SCROLL 4
+
 // Define the Driver to use. Use DRIVER_MODE_NONE to get flash/static
 // consumption without any AceSegment code. Then set to the other modes to get
 // flash/static memory usage.
@@ -26,7 +32,10 @@ using namespace ace_segment;
 
 // Applies only for DRIVER_MODE_DIGIT, DRIVER_MODE_MODULATING_DIGIT,
 // DRIVER_MODE_SEGMENT. Ignored for others.
-#define LED_MATRIX_MODE LED_MATRIX_MODE_SPI
+#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
+
+// Type of characters to write to the LED display
+#define WRITE_MODE WRITE_MODE_STRING
 
 const uint8_t FRAMES_PER_SECOND = 60;
 const uint8_t NUM_SUBFIELDS = 16;
@@ -66,6 +75,7 @@ Hardware* hardware;
 Driver* driver;
 Renderer* renderer;
 CharWriter* charWriter;
+HexWriter* hexWriter;
 StringWriter* stringWriter;
 
 #if USE_INTERRUPT == 1
@@ -141,8 +151,14 @@ void setupAceSegment() {
       .build();
   renderer->configure();
 
+#if WRITE_MODE == WRITE_MODE_HEX
+  hexWriter = new HexWriter(renderer);
+#elif WRITE_MODE == WRITE_MODE_CHAR
+  charWriter = new CharWriter(renderer);
+#elif WRITE_MODE == WRITE_MODE_STRING || WRITE_MODE == WRITE_MODE_SCROLL
   charWriter = new CharWriter(renderer);
   stringWriter = new StringWriter(charWriter);
+#endif
 
 #if USE_INTERRUPT == 1
   // set up Timer 2
@@ -175,9 +191,15 @@ void loop() {
     lastUpdateTime = now;
 
 #if DRIVER_MODE > DRIVER_MODE_NONE
-    //writeChars();
-    //writeStrings();
-    //scrollString("   Angela is the best.");
+  #if WRITE_MODE == WRITE_MODE_HEX
+    writeHexes();
+  #elif WRITE_MODE == WRITE_MODE_CHAR
+    writeChars();
+  #elif WRITE_MODE == WRITE_MODE_STRING
+    writeStrings();
+  #elif WRITE_MODE == WRITE_MODE_SCROLL
+    scrollString("   Angela is the best.");
+  #endif
 #endif
   }
 
@@ -224,50 +246,67 @@ void loop() {
 #endif
 }
 
-#if DRIVER_MODE > DRIVER_MODE_NONE
+#if DRIVER_MODE > DRIVER_MODE_NONE && WRITE_MODE > WRITE_MODE_NONE
+
+#if WRITE_MODE == WRITE_MODE_HEX
+void writeHexes() {
+  static uint8_t c = 0;
+
+  uint8_t buffer[3];
+  buffer[0] = (c & 0xf0) >> 4;
+  buffer[1] = (c & 0x0f);
+  hexWriter->writeHexAt(0, buffer[0], StyledDigit::kStylePulseFast);
+  hexWriter->writeHexAt(1, buffer[1], StyledDigit::kStylePulseSlow);
+  hexWriter->writeHexAt(2, HexWriter::kMinus, StyledDigit::kStyleBlinkFast);
+  hexWriter->writeHexAt(3, c, StyledDigit::kStyleBlinkSlow);
+
+  Util::incrementMod(c, HexWriter::kNumCharacters);
+}
+#endif
+
+#if WRITE_MODE == WRITE_MODE_CHAR
 void writeChars() {
   static uint8_t c = 0;
-  if (c >= 128) c = 0;
 
   char buffer[3];
-  sprintf(buffer, "%02X", c);
+  buffer[0] = (c & 0xf0) >> 4;
+  buffer[1] = (c & 0x0f);
   charWriter->writeCharAt(0, buffer[0], StyledDigit::kStylePulseFast);
   charWriter->writeCharAt(1, buffer[1], StyledDigit::kStylePulseSlow);
   charWriter->writeCharAt(2, '-', StyledDigit::kStyleBlinkFast);
   charWriter->writeCharAt(3, c, StyledDigit::kStyleBlinkSlow);
 
-  c++;
+  Util::incrementMod(c, CharWriter::kNumCharacters);
 }
+#endif
 
+#if WRITE_MODE == WRITE_MODE_STRING
 void writeStrings() {
   static const char* STRINGS[] = {
+    /*
     "0123",
     "1.123",
     "2.1 ",
     "3.2.3.4.",
     "4bc.d",
     ".1.2..3",
+    */
     "brian"
   };
 
-  static const int NUM_STRINGS = sizeof(STRINGS) / sizeof(STRINGS[0]);
+  static const uint8_t NUM_STRINGS = sizeof(STRINGS) / sizeof(STRINGS[0]);
 
   static uint8_t i = 0;
 
   stringWriter->writeStringAt(0, STRINGS[i]);
-  i++;
-  if (i >= NUM_STRINGS) {
-    i = 0;
-  }
+  Util::incrementMod(i, NUM_STRINGS);
 }
+#endif
 
 void scrollString(const char* s) {
   static uint8_t i = 0;
 
   stringWriter->writeStringAt(0, &s[i], true /* padRight */);
-  i++;
-  if (i >= strlen(s)) {
-    i = 0;
-  }
+  Util::incrementMod(i, (uint8_t) strlen(s));
 }
 #endif

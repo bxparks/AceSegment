@@ -22,8 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_CHAR_WRITER_H
-#define ACE_SEGMENT_CHAR_WRITER_H
+#ifndef ACE_SEGMENT_HEX_WRITER_H
+#define ACE_SEGMENT_HEX_WRITER_H
 
 #include <stdint.h>
 #include "StyledDigit.h"
@@ -32,28 +32,32 @@ SOFTWARE.
 namespace ace_segment {
 
 /**
- * The CharWriter supports mapping of ASCII (0 - 127) characters to segment
- * patterns supported by Renderer.
+ * The HexWriter supports mapping of Hex characters to segment patterns
+ * supported by Renderer. A few other characters are supported which
+ * should be self-explanatory: kSpace, kPeriod, kMinus.
  */
-class CharWriter {
+class HexWriter {
   public:
-    static const uint8_t kNumCharacters = 128;
+    static const uint8_t kNumCharacters;
+    static const uint8_t kSpace = 0x10;
+    static const uint8_t kPeriod = 0x11;
+    static const uint8_t kMinus = 0x12;
 
     /** Constructor. */
-    explicit CharWriter(Renderer* renderer):
+    explicit HexWriter(Renderer* renderer):
         mRenderer(renderer)
     {}
 
     /** Get the number of digits. */
     uint8_t getNumDigits() { return mRenderer->getNumDigits(); }
 
-    /** Write the character at the specified position. */
-    void writeCharAt(uint8_t digit, char c);
+    /** Write the hex at the specified position. */
+    void writeHexAt(uint8_t digit, uint8_t c);
 
-    /** Write the character at the specified position. */
-    void writeCharAt(uint8_t digit, char c, StyledDigit::StyleType style);
+    /** Write the hex at the specified position. */
+    void writeHexAt(uint8_t digit, uint8_t c, StyledDigit::StyleType style);
 
-    /** Write the style for a given digit, leaving character unchanged. */
+    /** Write the style for a given digit, leaving hex unchanged. */
     void writeStyleAt(uint8_t digit, StyledDigit::StyleType style) {
       if (digit >= getNumDigits()) return;
       mRenderer->writeStyleAt(digit, style);
@@ -66,12 +70,12 @@ class CharWriter {
     }
 
   private:
-    // Bit pattern map for ASCII characters.
+    // Bit pattern map for hex characters.
     static const uint8_t kCharacterArray[];
 
     // disable copy-constructor and assignment operator
-    CharWriter(const CharWriter&) = delete;
-    CharWriter& operator=(const CharWriter&) = delete;
+    HexWriter(const HexWriter&) = delete;
+    HexWriter& operator=(const HexWriter&) = delete;
 
     Renderer* const mRenderer;
 };

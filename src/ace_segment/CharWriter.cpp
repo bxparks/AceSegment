@@ -46,7 +46,7 @@ static const uint8_t UNKNOWN = 0b10000011;
 // Segment: DP G F E D C B A
 //    Bits: 7  6 5 4 3 2 1 0
 //
-const uint8_t CharWriter::kCharacterArray[kNumCharacters] PROGMEM = {
+const uint8_t CharWriter::kCharacterArray[] PROGMEM = {
      UNKNOWN, /* 00 */
      UNKNOWN, /* 01 */
      UNKNOWN, /* 02 */

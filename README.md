@@ -138,10 +138,14 @@ depend on the lower-level classes:
   `DimmingDigit` that a `Driver` knows how to diplay. A `Renderer` also
   knows how to modulate the brightness of a `DimmingDigit` to achieve
   the style indicated by `StyledDigit`.
-* `CharWriter`: A class that convert an ASCII character
-  represented by a `char` (code 0-127) to a bit pattern used by the `Renderer`
-  class. Not all ASCII characters can be rendered on a seven segment display
-  legibly but the `CharWriter` tries its best.
+* `HexWriter`: A class that print a hexadecimal numeral (0-F) to a bit pattern
+  used by the `Renderer` class. Three additional characters are supported:
+  `kSpace`, `kMinus` and `kPeriod`. (Note that decimal numerals are a subset of
+  hexadecimal numerals.)
+* `CharWriter`: A class that convert an ASCII character represented by a `char`
+  (code 0-127) to a bit pattern used by the `Renderer` class. Not all ASCII
+  characters can be rendered on a seven segment display legibly but the
+  `CharWriter` tries its best.
 * `StringWriter`: A class that can print strings of `char` to a `CharWriter`.
   It tries to be smart about collapsing decimal point `.` characters into
   the native decimal point on a seven segment LED display.
@@ -194,6 +198,7 @@ StyledDigit styledDigits[NUM_DIGITS];
 Hardware* hardware;
 Driver* driver;
 Renderer* renderer;
+HexWriter* hexWriter;
 CharWriter* charWriter;
 StringWriter* stringWriter;
 ...
@@ -226,6 +231,7 @@ void setup() {
   renderer->configure();
 
   // Create higher level Writers.
+  hexWriter = new HexWriter(renderer);
   charWriter = new CharWriter(renderer);
   stringWriter = new StringWriter(charWriter);
 
@@ -962,15 +968,37 @@ void loop() {
 }
 ```
 
-### CharWriter
+### HexWriter
 
 While it is exciting to be able to write any bit patterns to the LED display,
-it is often easier to write ASCII characters represented by the `char` type. The
-`CharWriter` contains a
-[mapping of ASCII](https://github.com/dmadison/LED-Segment-ASCII)
-characters (0-127) to seven-segment bit patterns. On platforms that support it
-(ATmega and ESP8266), the bit mapping table is stored in flash memory to
-conserve static memory.
+we often want to just write numerals to the LED display.
+The `HexWriter` converts an integer to the seven-segment bit patterns used by
+`Renderer`. On platforms that support it (ATmega and ESP8266), the bit mapping
+table is stored in flash memory to conserve static memory.
+
+The class supports the following methods:
+* `void writeHexAt(uint8_t digit, uint8_t c)`
+* `void writeHexAt(uint8_t digit, uint8_t c, StyledDigit::StyleType style)`
+* `void writeStyleAt(uint8_t digit, StyledDigit::StyleType style)`
+* `void writeDecimalPointAt(uint8_t digit, bool state = true)`
+
+In addition to the numerals 0-15 (or 0x0-0xF), the class also supports these
+additional symbols:
+* `HexWriter::kSpace`
+* `HexWriter::kMinus`
+* `HexWriter::kPeriod`
+
+A `HexWriter` consumes about 200 bytes of flash memory.
+
+### CharWriter
+
+It is possible to represent many of the ASCII (0-127) characters on a
+seven-segment LED display, although some of the characters will necessarily
+be crude given the limited number of segments. The `CharWriter` contains a
+[mapping of ASCII](https://github.com/dmadison/LED-Segment-ASCII) characters
+(0-127) to seven-segment bit patterns. On platforms that support it (ATmega and
+ESP8266), the bit mapping table is stored in flash memory to conserve static
+memory.
 
 The class supports the following methods:
 * `void writeCharAt(uint8_t digit, char c)`
@@ -978,7 +1006,7 @@ The class supports the following methods:
 * `void writeStyleAt(uint8_t digit, StyledDigit::StyleType style)`
 * `void writeDecimalPointAt(uint8_t digit, bool state = true)`
 
-A `CharWriter` consumes significant amount of flash storage, about 1800 bytes.
+A `CharWriter` consumes about 300 bytes of flash memory.
 
 ### StringWriter
 
@@ -1020,6 +1048,9 @@ display. Also, it turns out the precalcuted strings won't really work, because
 the exact `StyledDigit` of the first digit depends on the scroll position. In
 other words, a period '.' character will occupy an entire digit on the first LED
 digit, but will be collapsed into the previous character at other positions.)
+
+A `StringWriter` consumes about 384 bytes of flash memory, mostly because
+it uses `CharWriter`.
 
 ### NumberWriter
 
@@ -1098,20 +1129,41 @@ Here are the flash and static memory consumptions for various options.
 Tested on `examples/AceSegmentDemo`:
 
 ```
-Configuration    | flash/static | Incremental Size |
------------------+--------------+------------------|
-No AceSegment    | 2562/218     | 0/0              |
-ModDigit/Direct  |              |                  |
- (no CharWriter) | 7468/419     | 4906/201         |
-ModDigit/Direct  | 9266/432     | 6704/214         |
-ModDigit/Serial  | 9266/424     | 6704/206         |
-ModDigit/SPI     | 9266/424     | 6704/206         |
-Segment/Direct   | 9266/427     | 6704/209         |
-FastDirectDriver | 8570/416     | 6008/198         |
-FastSerialDriver | 8410/376     | 5848/158         |
-FastSpiDriver    | 8450/377     | 5888/159         |
+Configuration    | flash/static | Delta    | Delta |
+-----------------+--------------+----------+--------|
+No AceSegment    | 2562/218     | 0/0      |        |
+                 |              |          |        |
+No Writers       | 7416/423     | 4854/205 | 0/0    |
+HexWriter        | 7616/426     | 5054/208 | 200/3  |
+CharWriter       | 7728/426     | 5166/208 | 312/3  |
+StringWriter     | 7800/434     | 5238/216 | 384/11 |
+                 |              |          |        |
+ModDigit/Direct  | 7416/423     | 4854/205 |        |
+ModDigit/Serial  | 7412/415     | 4840/197 |        |
+ModDigit/SPI     | 7412/415     | 4840/197 |        |
+Segment/Direct   | 7412/423     | 4840/205 |        |
+FastDirectDriver | 6714/407     | 4152/189 |        |
+FastSerialDriver | 6564/367     | 4002/149 |        |
+FastSpiDriver    | 6604/368     | 4042/150 |        |
 -----------------+--------------+------------------|
 ```
+
+To summarize:
+
+* `DriverBuilder` (and all of the wiring variations) brings in 4850 bytes of
+  flash
+* `fast_driver.py` code generator makes the wiring configuration into
+  a compile-time constant and generates code that takes about 4000 bytes of
+  flash, saving about 800 bytes compared to using `DriverBuilder`
+* `HexWriter` consumes an additional 200 bytes of flash
+* `CharWriter` consumes about 312 bytes of flash (most of that due to the
+  bit-pattern array for 128 ASCII characters)
+* `StringWriter` consumes about 384 bytes of flash (most of which is
+  `CharWriter`)
+
+So the AceSegment library consumes between 4000-5500 bytes of flash memory and
+between 150-250 bytes of static memory (plus another maybe 50 bytes in the
+heap).
 
 **CPU cycles:**
 
@@ -1135,13 +1187,12 @@ per field for the `useModulatingDriver()` option:
     * min: 8us; avg: 12-20us; max: 100us
 * SegmentDriver w/ LedMatrixDirect
     * min: 28us; avg: 36-76; max: 96us
-* fast_driver.py w/ segment_direct_pins
+* FastDirectDriver (fast_driver.py w/ segment_direct_pins)
     * min: 8us; avg: 13us; max: 84us
-* fast_driver.py, segment_serial_pins
+* FastSerialDriver (fast_driver.py, segment_serial_pins)
     * min: 8us; avg: 13us; max: 80us
-* fast_driver.py, segment_spi_pins
+* FastSpiDriver (fast_driver.py, segment_spi_pins)
     * min: 8us; avg: 13us; max: 76us
-
 
 If we want to drive a 4 digit LED display at 60 frames per second, using a
 subfield modulation of 16 subfields per field, we get a field rate of 3.84 kHz,
