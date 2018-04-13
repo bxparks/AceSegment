@@ -32,8 +32,8 @@ namespace ace_segment {
 class Hardware;
 
 /**
- * Similar to LedMatrixSerial accept that it uses SPI to talk to the
- * 74HC595 chip instead of the shiftOut() method.
+ * Similar to LedMatrixSerial but uses SPI to talk to the 74HC595 chip instead
+ * of the shiftOut() method.
  */
 class LedMatrixSpi: public LedMatrixSerial {
   public:
