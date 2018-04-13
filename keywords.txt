@@ -9,10 +9,12 @@
 Hardware	KEYWORD1
 LedMatrix	KEYWORD1
 Driver	KEYWORD1
+DriverBuilder	KEYWORD1
 Renderer	KEYWORD1
 RendererBuilder	KEYWORD1
 StyledDigit	KEYWORD1
 DimmingDigit	KEYWORD1
+HexWriter	KEYWORD1
 CharWriter	KEYWORD1
 StringWriter	KEYWORD1
 TimingStats	KEYWORD1
@@ -20,6 +22,16 @@ TimingStats	KEYWORD1
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
+
+# TimeingStats.h
+reset	KEYWORD2
+getMax	KEYWORD2
+getMin	KEYWORD2
+getAvg	KEYWORD2
+getExpDecayAvg	KEYWORD2
+getCount	KEYWORD2
+getCounter	KEYWORD2
+update	KEYWORD2
 
 # Hardware.h
 digitalWrite	KEYWORD2
@@ -64,14 +76,44 @@ calcBlinkStateForFrame	KEYWORD2
 calcPulseFractionForFrame	KEYWORD2
 calcBrightness	KEYWORD2
 
-# CharWriter
+# HexWriter.h
+getNumDigits	KEYWORD2
+writeHexAt	KEYWORD2
+writeStyleAt	KEYWORD2
+writeDecimalPointAt	KEYWORD2
+
+# CharWriter.h
 getNumDigits	KEYWORD2
 writeCharAt	KEYWORD2
 writeStyleAt	KEYWORD2
 writeDecimalPointAt	KEYWORD2
 
-# StringWriter
+# StringWriter.
 writeStringAt	KEYWORD2
+
+# DriverBuilder.h
+setNumDigits	KEYWORD2
+setNumSegments	KEYWORD2
+setCommonAnode	KEYWORD2
+setCommonCathode	KEYWORD2
+setResistorsOnDigits	KEYWORD2
+setResistorsOnSegments	KEYWORD2
+setDigitPins	KEYWORD2
+setSegmentDirectPins	KEYWORD2
+setSegmentSerialPins	KEYWORD2
+setSegmentSpiPins	KEYWORD2
+setDimmingDigits	KEYWORD2
+useModulatingDriver	KEYWORD2
+build	KEYWORD2
+
+# RendererBuilder.h
+setFramesPerSecond	KEYWORD2
+setStatsResetInterval	KEYWORD2
+setBlinkSlowDuration	KEYWORD2
+setBlinkFastDuration	KEYWORD2
+setPulseSlowDuration	KEYWORD2
+setPulseFastDuration	KEYWORD2
+build	KEYWORD2
 
 #######################################
 # Instances (KEYWORD2)
@@ -80,3 +122,12 @@ writeStringAt	KEYWORD2
 #######################################
 # Constants (LITERAL1)
 #######################################
+
+# HexWriter.h
+kNumCharacters	LITERAL1
+kSpace	LITERAL1
+kPeriod	LITERAL1
+kMinus	LITERAL1
+
+# CharWriter.h
+kNumCharacters	LITERAL1

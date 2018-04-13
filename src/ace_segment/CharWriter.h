@@ -37,6 +37,8 @@ namespace ace_segment {
  */
 class CharWriter {
   public:
+    static const uint8_t kNumCharacters = 128;
+
     /** Constructor. */
     explicit CharWriter(Renderer* renderer):
         mRenderer(renderer)
@@ -64,7 +66,6 @@ class CharWriter {
     }
 
   private:
-    static const uint8_t kNumCharacters = 128;
     // Bit pattern map for ASCII characters.
     static const uint8_t kCharacterArray[];
 

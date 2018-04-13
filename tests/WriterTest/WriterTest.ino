@@ -170,3 +170,61 @@ testF(StringWriterTest, writeStringAt) {
     0b01001111, StyledDigit::kStyleNormal);
 }
 
+// ----------------------------------------------------------------------
+// Tests for HexWriter.
+// ----------------------------------------------------------------------
+
+class HexWriterTest: public TestOnce {
+  protected:
+    virtual void setup() override {
+      TestOnce::setup();
+
+      mRenderer = new FakeRenderer(styledDigits, NUM_DIGITS);
+      mRenderer->configure();
+      mHexWriter = new HexWriter(mRenderer);
+      clearStyledDigits();
+    }
+
+    virtual void teardown() override {
+      delete mHexWriter;
+      delete mRenderer;
+
+      TestOnce::teardown();
+    }
+
+    FakeRenderer *mRenderer;
+    HexWriter *mHexWriter;
+};
+
+testF(HexWriterTest, getNumDigits) {
+  assertEqual(NUM_DIGITS, mHexWriter->getNumDigits());
+}
+
+testF(HexWriterTest, writeAt) {
+  mHexWriter->writeHexAt(0, 0);
+  assertEqual(0b00111111, styledDigits[0].pattern);
+  assertEqual(StyledDigit::kStyleNormal, styledDigits[0].style);
+
+  mHexWriter->writeHexAt(1, 0, StyledDigit::kStyleBlinkSlow);
+  assertEqual(0b00111111, styledDigits[1].pattern);
+  assertEqual(StyledDigit::kStyleBlinkSlow, styledDigits[1].style);
+
+  mHexWriter->writeStyleAt(1, StyledDigit::kStyleBlinkFast);
+  assertEqual(StyledDigit::kStyleBlinkFast, styledDigits[1].style);
+
+  mHexWriter->writeDecimalPointAt(1);
+  assertEqual(0b00111111 | 0x80, styledDigits[1].pattern);
+
+  mHexWriter->writeDecimalPointAt(1, false);
+  assertEqual(0b00111111, styledDigits[1].pattern);
+}
+
+testF(HexWriterTest, writeAt_outOfBounds) {
+  styledDigits[4].pattern = 0;
+  styledDigits[4].style = StyledDigit::kStyleNormal;
+  mHexWriter->writeHexAt(4, HexWriter::kMinus, StyledDigit::kStyleBlinkSlow);
+  mHexWriter->writeDecimalPointAt(4);
+  assertEqual(0, styledDigits[4].pattern);
+  assertEqual(StyledDigit::kStyleNormal, styledDigits[4].style);
+}
+

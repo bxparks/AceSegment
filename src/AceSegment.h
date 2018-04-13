@@ -41,9 +41,10 @@ SOFTWARE.
 #include "ace_segment/Renderer.h"
 #include "ace_segment/RendererBuilder.h"
 #include "ace_segment/CharWriter.h"
+#include "ace_segment/HexWriter.h"
 #include "ace_segment/StringWriter.h"
 
 // Version format: xxyyzz == "xx.yy.zz"
-#define ACE_SEGMENT_VERSION 000100
+#define ACE_SEGMENT_VERSION 000200
 
 #endif

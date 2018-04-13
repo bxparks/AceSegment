@@ -35,7 +35,6 @@ void LedMatrixSpi::configure() {
 }
 
 void LedMatrixSpi::drawElements(uint8_t pattern) {
-  // TODO: optimize this by pre-calculating the pointer to function
   mHardware->digitalWrite(mLatchPin, LOW);
   uint8_t actualPattern = (mElementOn == HIGH) ? pattern : ~pattern;
   mHardware->spiTransfer(actualPattern);

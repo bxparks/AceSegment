@@ -73,6 +73,8 @@ void setup() {
   Serial.println(sizeof(Renderer));
   Serial.print(F("sizeof(RendererBuilder): "));
   Serial.println(sizeof(RendererBuilder));
+  Serial.print(F("sizeof(HexWriter): "));
+  Serial.println(sizeof(HexWriter));
   Serial.print(F("sizeof(CharWriter): "));
   Serial.println(sizeof(CharWriter));
   Serial.print(F("sizeof(StringWriter): "));

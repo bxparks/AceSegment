@@ -450,8 +450,7 @@ class ModulatingDigitDriverTest: public BaseHardwareTest {
           .setDigitPins(digitPins)
           .setSegmentDirectPins(segmentPins)
           .setDimmingDigits(dimmingDigits)
-          .useModulatingDriver()
-          .setNumSubFields(NUM_SUB_FIELDS)
+          .useModulatingDriver(NUM_SUB_FIELDS)
           .build();
       mDriver->configure();
       mHardware->clear();
@@ -721,8 +720,7 @@ class EdgeCaseModulatingDigitDriverTest: public BaseHardwareTest {
           .setDigitPins(digitPins)
           .setSegmentDirectPins(segmentPins)
           .setDimmingDigits(dimmingDigits)
-          .useModulatingDriver()
-          .setNumSubFields(1) // edge case of 1 subfield/field
+          .useModulatingDriver(1) // edge case of 1 subfield/field
           .build();
 
       mDriver->configure();

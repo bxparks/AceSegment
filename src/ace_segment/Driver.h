@@ -114,19 +114,29 @@ class Driver {
 
     /**
      * Constructor. The driver takes ownership of the ledMatrix and will delete
-     * it in the destructor. The ledMatrix can be null for a FakeDriver but
-     * normally it is expected to be non-null.
+     * it in the destructor.
+     *
+     * @param ledMatrix The ledMatrix can be null for a FakeDriver but normally
+     * it is expected to be non-null.
+     * @param dimmingDigits An array of DimmingDigit objects that represents
+     * each digit.
+     * @param numDigits
+     * @param ownsLedMatrix If true, the Driver object owns the ledMatrix and
+     * will delete it in the destructor. Default is false, but set to true
+     * by DriverBuidler.
      */
     explicit Driver(LedMatrix* ledMatrix, DimmingDigit* dimmingDigits,
-            uint8_t numDigits):
+            uint8_t numDigits, bool ownsLedMatrix = false):
         mLedMatrix(ledMatrix),
         mDimmingDigits(dimmingDigits),
-        mNumDigits(numDigits)
+        mNumDigits(numDigits),
+        mOwnsLedMatrix(ownsLedMatrix)
     {}
 
     LedMatrix* const mLedMatrix;
     DimmingDigit* const mDimmingDigits;
-    uint8_t const mNumDigits;
+    const uint8_t mNumDigits;
+    const bool mOwnsLedMatrix;
 };
 
 }

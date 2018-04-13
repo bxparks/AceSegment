@@ -118,21 +118,20 @@ class DriverBuilder {
       return *this;
     }
 
-    LedMatrix* buildLedMatrix();
-
     DriverBuilder& setDimmingDigits(DimmingDigit* dimmingDigits) {
       mDimmingDigits = dimmingDigits;
       return *this;
     }
 
-    DriverBuilder& useModulatingDriver() {
+    /**
+     * Use a driver that provides pulse width modulation.
+     *
+     * @param numSubFields number subfields per field, 16 seems to be a good
+     * reasonable. A minimum of 1 is imposed if set to 0.
+     */
+    DriverBuilder& useModulatingDriver(uint8_t numSubFields) {
       mUseModulatingDriver = true;
-      return *this;
-    }
-
-    /** Used only if useModulatingDriver() is true. */
-    DriverBuilder& setNumSubFields(uint8_t numSubFields) {
-      mNumSubFields = numSubFields;
+      mNumSubFields = (numSubFields > 0) ? numSubFields : 1;
       return *this;
     }
 
@@ -142,6 +141,8 @@ class DriverBuilder {
     static const uint8_t kTypeLedMatrixDirect = 0;
     static const uint8_t kTypeLedMatrixSerial = 1;
     static const uint8_t kTypeLedMatrixSpi = 2;
+
+    LedMatrix* buildLedMatrix();
 
     // parameters for LedMatrix
     Hardware* const mHardware;

@@ -2,7 +2,7 @@
 An adjustable, configurable, and extensible framework for rendering seven
 segment LED displays on Arduino platforms
 
-Version: 0.1.0 (2018-04-10)
+Version: 0.2.0 (2018-04-12)
 
 ## Summary
 
@@ -56,6 +56,13 @@ become enabled on a single digit, independently of the other digits:
 
 The framework supports an LED display which is either directly connected to the
 GPIO pins or through a serial-to-parallel chip like the 74HC595.
+
+A Python script in the `./tools` directory extends the framework to implement
+C++ code generation to create subclasses of `Driver` that uses
+[digitalWriteFast()](https://github.com/NicksonYap/digitalWriteFast) routines
+which are 10-20X faster than the default `digitalWrite()` methods in Arduino.
+The generated code makes `Driver::renderField()` consume 25% to 65% fewer CPU
+cycles (i.e. 1.3 to 2.7 times faster).
 
 ## Installation
 
@@ -131,10 +138,14 @@ depend on the lower-level classes:
   `DimmingDigit` that a `Driver` knows how to diplay. A `Renderer` also
   knows how to modulate the brightness of a `DimmingDigit` to achieve
   the style indicated by `StyledDigit`.
-* `CharWriter`: A class that convert an ASCII character
-  represented by a `char` (code 0-127) to a bit pattern used by the `Renderer`
-  class. Not all ASCII characters can be rendered on a seven segment display
-  legibly but the `CharWriter` tries its best.
+* `HexWriter`: A class that print a hexadecimal numeral (0-F) to a bit pattern
+  used by the `Renderer` class. Three additional characters are supported:
+  `kSpace`, `kMinus` and `kPeriod`. (Note that decimal numerals are a subset of
+  hexadecimal numerals.)
+* `CharWriter`: A class that convert an ASCII character represented by a `char`
+  (code 0-127) to a bit pattern used by the `Renderer` class. Not all ASCII
+  characters can be rendered on a seven segment display legibly but the
+  `CharWriter` tries its best.
 * `StringWriter`: A class that can print strings of `char` to a `CharWriter`.
   It tries to be smart about collapsing decimal point `.` characters into
   the native decimal point on a seven segment LED display.
@@ -187,6 +198,7 @@ StyledDigit styledDigits[NUM_DIGITS];
 Hardware* hardware;
 Driver* driver;
 Renderer* renderer;
+HexWriter* hexWriter;
 CharWriter* charWriter;
 StringWriter* stringWriter;
 ...
@@ -219,6 +231,7 @@ void setup() {
   renderer->configure();
 
   // Create higher level Writers.
+  hexWriter = new HexWriter(renderer);
   charWriter = new CharWriter(renderer);
   stringWriter = new StringWriter(charWriter);
 
@@ -302,6 +315,27 @@ code cleaner and more robust. Once I got used to creating them on the heap, then
 it seemed easier sense to use the same style within an application. As I point
 out above, these heap objects are created just once in an application, so
 there's little difference in the overall static memory usage.
+
+The biggest disadvantage of using the `DriverBuilder` helper object is not the
+static memory consumption, but *flash* memory consumption. The `DriverBuilder`
+contains the ability to dynamically create various subclasses of `Driver` and an
+internal helper class called `LedMatrix`. Even though the wiring and other
+configuration options are known at compile-time, the code for creating all the
+other configuration options are loaded into flash and *not removed*, even after
+the `DriverBuilder` instance is created, used, and destroyed.
+
+Therefore, I've made it possible to bypass the `DriverBuilder` and
+`RendererBuilder` and create *all* resources statically. You just need to follow
+the logic of `DriverBuilder` and `RendererBuilder`, create the intermediary
+`LedMatrix` object, and call the constructors of the various subclasses of
+`Driver` and the constructor of `Renderer` manually. Send me an email if you
+need help with this. (If there is sufficient demand, I will write up more
+detailed instructions.)
+
+However, I suspect that if flash memory consumption is an issue, then you will
+probably also be concerned about CPU cycles, and there's an even better way to
+reduce both. See the section __Code Generation to Use DigitalWriteFast__ section
+below.
 
 ### Configuring the Driver
 
@@ -649,6 +683,44 @@ Driver* driver = DriverBuilder()
     ...
 ```
 
+#### Feature Matrix
+
+Here is a table that summarizes the various combinations which are supported by
+`DriverBuilder`. As you can see, PWM is only available if
+"Resistors-on-Segments" are used, because the modulation happens on a per-digit
+basis.
+
+The "Resistors" options are selected by:
+* `setResistorsOnSegments()`
+* `setResistorsOnDigits()`
+
+The "Wiring" options are selected by:
+* `setSegmentDirectPins(segmentPins)`
+* `setSegmentSerialPins(latch, data, clock)`
+* `setSegmentSpiPins(latch, data, clock)`
+
+The "PWM" options are selected by:
+* `useModulatingDriver()`
+* `setNumSubFields(NUM_SUBFIELDS)
+
+```
+Resistors | Wiring | PWM | Available? |
+----------+--------+-----+------------|
+Segments  | Direct | -   | y          |
+Segments  | Direct | On  | y          |
+Segments  | Serial | -   | y          |
+Segments  | Serial | On  | y          |
+Segments  | SPI    | -   | y          |
+Segments  | SPI    | On  | y          |
+Digits    | Direct | -   | y          |
+Digits    | Direct | On  | -          |
+Digits    | Serial | -   | y          |
+Digits    | Serial | On  | -          |
+Digits    | SPI    | -   | y          |
+Digits    | SPI    | On  | -          |
+----------+--------+-----+------------|
+```
+
 ### Configuring the Renderer
 
 The `Renderer` is dependent on the following resources, and these required
@@ -896,19 +968,45 @@ void loop() {
 }
 ```
 
-### CharWriter
+### HexWriter
 
 While it is exciting to be able to write any bit patterns to the LED display,
-it is often easier to write ASCII characters represented by the `char` type. The
-`CharWriter` contains a mapping of all ASCII characters (0-127) to seven-segment
-bit patterns. On platforms that support it (ATmega and ESP8266), the bit mapping
+we often want to just write numerals to the LED display.
+The `HexWriter` converts an integer to the seven-segment bit patterns used by
+`Renderer`. On platforms that support it (ATmega and ESP8266), the bit mapping
 table is stored in flash memory to conserve static memory.
+
+The class supports the following methods:
+* `void writeHexAt(uint8_t digit, uint8_t c)`
+* `void writeHexAt(uint8_t digit, uint8_t c, StyledDigit::StyleType style)`
+* `void writeStyleAt(uint8_t digit, StyledDigit::StyleType style)`
+* `void writeDecimalPointAt(uint8_t digit, bool state = true)`
+
+In addition to the numerals 0-15 (or 0x0-0xF), the class also supports these
+additional symbols:
+* `HexWriter::kSpace`
+* `HexWriter::kMinus`
+* `HexWriter::kPeriod`
+
+A `HexWriter` consumes about 200 bytes of flash memory.
+
+### CharWriter
+
+It is possible to represent many of the ASCII (0-127) characters on a
+seven-segment LED display, although some of the characters will necessarily
+be crude given the limited number of segments. The `CharWriter` contains a
+[mapping of ASCII](https://github.com/dmadison/LED-Segment-ASCII) characters
+(0-127) to seven-segment bit patterns. On platforms that support it (ATmega and
+ESP8266), the bit mapping table is stored in flash memory to conserve static
+memory.
 
 The class supports the following methods:
 * `void writeCharAt(uint8_t digit, char c)`
 * `void writeCharAt(uint8_t digit, char c, StyledDigit::StyleType style)`
 * `void writeStyleAt(uint8_t digit, StyledDigit::StyleType style)`
 * `void writeDecimalPointAt(uint8_t digit, bool state = true)`
+
+A `CharWriter` consumes about 300 bytes of flash memory.
 
 ### StringWriter
 
@@ -951,11 +1049,66 @@ the exact `StyledDigit` of the first digit depends on the scroll position. In
 other words, a period '.' character will occupy an entire digit on the first LED
 digit, but will be collapsed into the previous character at other positions.)
 
+A `StringWriter` consumes about 384 bytes of flash memory, mostly because
+it uses `CharWriter`.
+
 ### NumberWriter
 
 TBD
 
+### Code Generation to Use DigitalWriteFast
+
+Looking at the CPU cycles in the __Resource Consumption__ section below, the
+time taken for a single `Renderer::renderField()` can range from 80 to 204
+microseconds. A significant contribution to the CPU cycles is the slow
+implementation of
+[digitalWrite() in Arduino](https://forum.arduino.cc/index.php?topic=46896.0).
+A faster version called
+[digitalWriteFast](https://github.com/NicksonYap/digitalWriteFast)
+is available on GitHub based on the Forum discussions.
+
+I wrote a Python script called `./tools/fast_driver.py` which generates C++ code
+for a subclass of `Driver` that uses the `digitalWriteFast()`. The
+script is called like this:
+```
+$ ./tools/fast_driver.py --digit_pins 12 14 15 16 \
+        --segment_direct_pins 4 5 6 7 8 9 10 11 \
+        --class_name FastDirectDriver --output_files
+```
+which generates two files in the current directory:
+```
+FastDirectDriver.h
+FastDirectDriver.cpp
+```
+
+These generated classes will replace the class generated by `DriverBuilder`:
+```
+Driver* driver = DriverBuilder(hardware)
+    .setDimmingDigits(dimmingDigits)
+    .setNumDigits(NUM_DIGITS)
+    .useModulatingDriver()
+    .setNumSubFields(NUM_SUBFIELDS)
+    ...
+    .build();
+```
+with just
+```
+Driver* driver = new FastDirectDriver(dimmingDigits, NUM_DIGITS, NUM_SUBFIELDS);
+```
+
+The generated code has no dependency to `Hardware`, it writes directly to the
+`digitalWriteFast()` method (which is actually implemented as macros). The
+resulting generated code in all configurations runs `renderField()` between
+76-84 microseconds, which is 1.3 to 2.7 times faster than the `Driver` versions
+created by `DriverBuilder`.
+
+For "production" code that uses the AceSegment library, the code generation is
+the recommended procedure. See the example code in `examples/AceSegmentDemo/`
+for more details.
+
 ## Resource Consumption
+
+### Static Memory
 
 Here are the sizes of the various classes on the 8-bit AVR microcontrollers
 (Arduino Uno, Nano, etc):
@@ -969,14 +1122,53 @@ Here are the sizes of the various classes on the 8-bit AVR microcontrollers
 * sizeof(DigitDriver): 11
 * sizeof(ModulatingDigitDriver): 14
 * sizeof(Renderer): 62
+* sizeof(HexWriter): 2
 * sizeof(CharWriter): 2
 * sizeof(StringWriter): 2
 
-**Program size:**
+### Flash Memory
 
-TBD
+Here are the flash and static memory consumptions for various options.
+Tested on `examples/AceSegmentDemo`:
 
-**CPU cycles:**
+```
+Configuration    | flash/static | Delta    | Delta |
+-----------------+--------------+----------+--------|
+No AceSegment    | 2562/218     | 0/0      |        |
+                 |              |          |        |
+No Writers       | 7416/423     | 4854/205 | 0/0    |
+HexWriter        | 7616/426     | 5054/208 | 200/3  |
+CharWriter       | 7728/426     | 5166/208 | 312/3  |
+StringWriter     | 7800/434     | 5238/216 | 384/11 |
+                 |              |          |        |
+ModDigit/Direct  | 7416/423     | 4854/205 |        |
+ModDigit/Serial  | 7412/415     | 4840/197 |        |
+ModDigit/SPI     | 7412/415     | 4840/197 |        |
+Segment/Direct   | 7412/423     | 4840/205 |        |
+FastDirectDriver | 6714/407     | 4152/189 |        |
+FastSerialDriver | 6564/367     | 4002/149 |        |
+FastSpiDriver    | 6604/368     | 4042/150 |        |
+-----------------+--------------+------------------|
+```
+
+To summarize:
+
+* `DriverBuilder` (and all of the wiring variations) brings in 4850 bytes of
+  flash
+* `fast_driver.py` code generator makes the wiring configuration into
+  a compile-time constant and generates code that takes about 4000 bytes of
+  flash, saving about 800 bytes compared to using `DriverBuilder`
+* `HexWriter` consumes an additional 200 bytes of flash
+* `CharWriter` consumes about 312 bytes of flash (most of that due to the
+  bit-pattern array for 128 ASCII characters)
+* `StringWriter` consumes about 384 bytes of flash (most of which is
+  `CharWriter`)
+
+So the AceSegment library consumes between 4000-5500 bytes of flash memory and
+between 150-250 bytes of static memory (plus another maybe 50 bytes in the
+heap).
+
+### CPU Cycles
 
 The `Renderer` has a number of statistics variables which track the minimum,
 average, and maximum amount of time taken by a single call to `renderField()`
@@ -998,11 +1190,22 @@ per field for the `useModulatingDriver()` option:
     * min: 8us; avg: 12-20us; max: 100us
 * SegmentDriver w/ LedMatrixDirect
     * min: 28us; avg: 36-76; max: 96us
+* FastDirectDriver (fast_driver.py w/ segment_direct_pins)
+    * min: 8us; avg: 13us; max: 84us
+* FastSerialDriver (fast_driver.py, segment_serial_pins)
+    * min: 8us; avg: 13us; max: 80us
+* FastSpiDriver (fast_driver.py, segment_spi_pins)
+    * min: 8us; avg: 13us; max: 76us
 
 If we want to drive a 4 digit LED display at 60 frames per second, using a
 subfield modulation of 16 subfields per field, we get a field rate of 3.84 kHz,
 or 260 microseconds per field. All of the options had a maximum time
 of less than 260 microseconds.
+
+The `fast_driver.py` generates code that is fast enough to drive a 4-digit LED
+display on an 8MHz ATmega328P microcontroller at a frame rate of 60Hz, with 16
+subfields per field for pulse width modulation.
+
 
 ## System Requirements
 
