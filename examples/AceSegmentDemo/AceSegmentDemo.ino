@@ -35,7 +35,7 @@ using namespace ace_segment;
 #define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
 
 // Type of characters to write to the LED display
-#define WRITE_MODE WRITE_MODE_STRING
+#define WRITE_MODE WRITE_MODE_HEX
 
 const uint8_t FRAMES_PER_SECOND = 60;
 const uint8_t NUM_SUBFIELDS = 16;
