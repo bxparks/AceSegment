@@ -1103,10 +1103,12 @@ resulting generated code in all configurations runs `renderField()` between
 created by `DriverBuilder`.
 
 For "production" code that uses the AceSegment library, the code generation is
-the recommended procedure. See the example code in `examples/AceSegmentDemo/'
+the recommended procedure. See the example code in `examples/AceSegmentDemo/`
 for more details.
 
 ## Resource Consumption
+
+### Static Memory
 
 Here are the sizes of the various classes on the 8-bit AVR microcontrollers
 (Arduino Uno, Nano, etc):
@@ -1120,10 +1122,11 @@ Here are the sizes of the various classes on the 8-bit AVR microcontrollers
 * sizeof(DigitDriver): 11
 * sizeof(ModulatingDigitDriver): 14
 * sizeof(Renderer): 62
+* sizeof(HexWriter): 2
 * sizeof(CharWriter): 2
 * sizeof(StringWriter): 2
 
-**Program size:**
+### Flash Memory
 
 Here are the flash and static memory consumptions for various options.
 Tested on `examples/AceSegmentDemo`:
@@ -1165,7 +1168,7 @@ So the AceSegment library consumes between 4000-5500 bytes of flash memory and
 between 150-250 bytes of static memory (plus another maybe 50 bytes in the
 heap).
 
-**CPU cycles:**
+### CPU Cycles
 
 The `Renderer` has a number of statistics variables which track the minimum,
 average, and maximum amount of time taken by a single call to `renderField()`
