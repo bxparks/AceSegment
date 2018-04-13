@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.1.0</span>
+   &#160;<span id="projectnumber">0.2.0</span>
    </div>
    <div id="projectbrief">An adjustable, configurable, and extensible framework for rendering seven segment LED displays.</div>
   </td>
@@ -66,9 +66,6 @@ $(function() {
 <li>build()
 : <a class="el" href="classace__segment_1_1RendererBuilder.html#acc76950294a29bac11b29ce5a8ad9a28">ace_segment::RendererBuilder</a>
 </li>
-<li>buildLedMatrix()
-: <a class="el" href="classace__segment_1_1DriverBuilder.html#a983374cde382581d4f65a397acda726e">ace_segment::DriverBuilder</a>
-</li>
 </ul>
 
 
@@ -102,7 +99,7 @@ $(function() {
 : <a class="el" href="classace__segment_1_1Hardware.html#a6a0afa1ca729e820ef2d822bfeb64d02">ace_segment::Hardware</a>
 </li>
 <li>DigitDriver()
-: <a class="el" href="classace__segment_1_1DigitDriver.html#a8e4e69265940e113bc08a601916e38d4">ace_segment::DigitDriver</a>
+: <a class="el" href="classace__segment_1_1DigitDriver.html#ab69a30528c066738598f4c8bd7fe1c70">ace_segment::DigitDriver</a>
 </li>
 <li>DigitPatternType
 : <a class="el" href="classace__segment_1_1Driver.html#a116d1569c86b24020e1ed5462d270eef">ace_segment::Driver</a>
@@ -114,7 +111,7 @@ $(function() {
 , <a class="el" href="classace__segment_1_1SegmentDriver.html#abe0415978d1d5d6f70f53a9087fc6f03">ace_segment::SegmentDriver</a>
 </li>
 <li>Driver()
-: <a class="el" href="classace__segment_1_1Driver.html#a5eb3274ddd6e3b7eb83187989fd52545">ace_segment::Driver</a>
+: <a class="el" href="classace__segment_1_1Driver.html#a253f84d975df329275a4d591e1eb6de8">ace_segment::Driver</a>
 </li>
 </ul>
 
@@ -143,6 +140,7 @@ $(function() {
 </li>
 <li>getNumDigits()
 : <a class="el" href="classace__segment_1_1CharWriter.html#ac41ec5b90980fbcd3065ec73277674ac">ace_segment::CharWriter</a>
+, <a class="el" href="classace__segment_1_1HexWriter.html#a87a5795c996d66dd3c323c9095508da8">ace_segment::HexWriter</a>
 , <a class="el" href="classace__segment_1_1Renderer.html#a5be6cf55a88ba5c241528ecab7977059">ace_segment::Renderer</a>
 </li>
 <li>getStyledDigit()
@@ -157,6 +155,9 @@ $(function() {
 <h3><a id="index_h"></a>- h -</h3><ul>
 <li>Hardware()
 : <a class="el" href="classace__segment_1_1Hardware.html#a37dcfdef3fd2e016a79da7b4dc9db727">ace_segment::Hardware</a>
+</li>
+<li>HexWriter()
+: <a class="el" href="classace__segment_1_1HexWriter.html#af43d83f92cee41c078276dd7ac86f91f">ace_segment::HexWriter</a>
 </li>
 </ul>
 
@@ -189,7 +190,7 @@ $(function() {
 : <a class="el" href="classace__segment_1_1Hardware.html#a967adfe2fb7acb7eecca011e34a4a690">ace_segment::Hardware</a>
 </li>
 <li>ModulatingDigitDriver()
-: <a class="el" href="classace__segment_1_1ModulatingDigitDriver.html#ac2ebc2b78610a703de8c8481f773fecc">ace_segment::ModulatingDigitDriver</a>
+: <a class="el" href="classace__segment_1_1ModulatingDigitDriver.html#acb7ea555663d194616f47d9605956c8d">ace_segment::ModulatingDigitDriver</a>
 </li>
 </ul>
 
@@ -222,7 +223,7 @@ $(function() {
 
 <h3><a id="index_s"></a>- s -</h3><ul>
 <li>SegmentDriver()
-: <a class="el" href="classace__segment_1_1SegmentDriver.html#ac5c0131ae8329e297db5314594108451">ace_segment::SegmentDriver</a>
+: <a class="el" href="classace__segment_1_1SegmentDriver.html#ab34b3e012f551568b94e6d573eff4659">ace_segment::SegmentDriver</a>
 </li>
 <li>SegmentPatternType
 : <a class="el" href="classace__segment_1_1Driver.html#a851393f9d1f557871e259b295e733920">ace_segment::Driver</a>
@@ -244,9 +245,6 @@ $(function() {
 </li>
 <li>setFramesPerSecond()
 : <a class="el" href="classace__segment_1_1RendererBuilder.html#af0c9855f22aab430b469c16779b8253b">ace_segment::RendererBuilder</a>
-</li>
-<li>setNumSubFields()
-: <a class="el" href="classace__segment_1_1DriverBuilder.html#a7f0ad00b3791bb28ee1662b1a167cb23">ace_segment::DriverBuilder</a>
 </li>
 <li>setPattern()
 : <a class="el" href="classace__segment_1_1Driver.html#a84f21c38b72a4c576a44e2d370356520">ace_segment::Driver</a>
@@ -286,6 +284,9 @@ $(function() {
 <li>updateFrame()
 : <a class="el" href="classace__segment_1_1Renderer.html#aa0151565ff7b9f4fbd41f799b6e85186">ace_segment::Renderer</a>
 </li>
+<li>useModulatingDriver()
+: <a class="el" href="classace__segment_1_1DriverBuilder.html#a8303f5066da98e26189047d5623ce64b">ace_segment::DriverBuilder</a>
+</li>
 </ul>
 
 
@@ -298,19 +299,24 @@ $(function() {
 </li>
 <li>writeDecimalPointAt()
 : <a class="el" href="classace__segment_1_1CharWriter.html#a9ab26594cdbecfe58007f3b990b3bcd2">ace_segment::CharWriter</a>
+, <a class="el" href="classace__segment_1_1HexWriter.html#a28ddf4bd480c77c5d028b75e500b1e70">ace_segment::HexWriter</a>
 , <a class="el" href="classace__segment_1_1Renderer.html#a5ed17712b9d7ce2e76477a1f75ef7de9">ace_segment::Renderer</a>
 </li>
 <li>writeGroupPin()
 : <a class="el" href="classace__segment_1_1LedMatrixSerial.html#a5df4ebf97172e9a5afdc5cd5e2112ce2">ace_segment::LedMatrixSerial</a>
 </li>
+<li>writeHexAt()
+: <a class="el" href="classace__segment_1_1HexWriter.html#a2c4e501eab2809f6a35b2bee4ef8ac67">ace_segment::HexWriter</a>
+</li>
 <li>writePatternAt()
-: <a class="el" href="classace__segment_1_1Renderer.html#a76dc3413764941fa3e11eba44998dcf1">ace_segment::Renderer</a>
+: <a class="el" href="classace__segment_1_1Renderer.html#a0db68d388c70dd6e61da7a3b66d5acef">ace_segment::Renderer</a>
 </li>
 <li>writeStringAt()
 : <a class="el" href="classace__segment_1_1StringWriter.html#a98276cf0a19743b379ad29cd8d863ac4">ace_segment::StringWriter</a>
 </li>
 <li>writeStyleAt()
 : <a class="el" href="classace__segment_1_1CharWriter.html#adac718eaa427c6ab4046674b8fad504b">ace_segment::CharWriter</a>
+, <a class="el" href="classace__segment_1_1HexWriter.html#a1663bd6c3307b0bf0f90394f96126e78">ace_segment::HexWriter</a>
 , <a class="el" href="classace__segment_1_1Renderer.html#a0d5c3d6c38a134552ddef550173055eb">ace_segment::Renderer</a>
 </li>
 </ul>

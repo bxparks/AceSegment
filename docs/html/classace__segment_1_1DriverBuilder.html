@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.1.0</span>
+   &#160;<span id="projectnumber">0.2.0</span>
    </div>
    <div id="projectbrief">An adjustable, configurable, and extensible framework for rendering seven segment LED displays.</div>
   </td>
@@ -107,18 +107,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:abd0d42c77c4785fea73f12747c9ae486"><td class="memItemLeft" align="right" valign="top"><a id="abd0d42c77c4785fea73f12747c9ae486"></a>
 <a class="el" href="classace__segment_1_1DriverBuilder.html">DriverBuilder</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>setSegmentSpiPins</b> (uint8_t latchPin, uint8_t dataPin, uint8_t clockPin)</td></tr>
 <tr class="separator:abd0d42c77c4785fea73f12747c9ae486"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a983374cde382581d4f65a397acda726e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classace__segment_1_1LedMatrix.html">LedMatrix</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1DriverBuilder.html#a983374cde382581d4f65a397acda726e">buildLedMatrix</a> ()</td></tr>
-<tr class="memdesc:a983374cde382581d4f65a397acda726e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The <a class="el" href="classace__segment_1_1LedMatrix.html">LedMatrix</a> object returned must have its configure() called.  <a href="#a983374cde382581d4f65a397acda726e">More...</a><br /></td></tr>
-<tr class="separator:a983374cde382581d4f65a397acda726e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a05f77d475fe2faa6900d0483e235e707"><td class="memItemLeft" align="right" valign="top"><a id="a05f77d475fe2faa6900d0483e235e707"></a>
 <a class="el" href="classace__segment_1_1DriverBuilder.html">DriverBuilder</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>setDimmingDigits</b> (<a class="el" href="classace__segment_1_1DimmingDigit.html">DimmingDigit</a> *dimmingDigits)</td></tr>
 <tr class="separator:a05f77d475fe2faa6900d0483e235e707"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3b0b525919cd034112f995b9cc8f733d"><td class="memItemLeft" align="right" valign="top"><a id="a3b0b525919cd034112f995b9cc8f733d"></a>
-<a class="el" href="classace__segment_1_1DriverBuilder.html">DriverBuilder</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>useModulatingDriver</b> ()</td></tr>
-<tr class="separator:a3b0b525919cd034112f995b9cc8f733d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7f0ad00b3791bb28ee1662b1a167cb23"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classace__segment_1_1DriverBuilder.html">DriverBuilder</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1DriverBuilder.html#a7f0ad00b3791bb28ee1662b1a167cb23">setNumSubFields</a> (uint8_t numSubFields)</td></tr>
-<tr class="memdesc:a7f0ad00b3791bb28ee1662b1a167cb23"><td class="mdescLeft">&#160;</td><td class="mdescRight">Used only if useModulatingDriver() is true.  <a href="#a7f0ad00b3791bb28ee1662b1a167cb23">More...</a><br /></td></tr>
-<tr class="separator:a7f0ad00b3791bb28ee1662b1a167cb23"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8303f5066da98e26189047d5623ce64b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classace__segment_1_1DriverBuilder.html">DriverBuilder</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1DriverBuilder.html#a8303f5066da98e26189047d5623ce64b">useModulatingDriver</a> (uint8_t numSubFields)</td></tr>
+<tr class="memdesc:a8303f5066da98e26189047d5623ce64b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Use a driver that provides pulse width modulation.  <a href="#a8303f5066da98e26189047d5623ce64b">More...</a><br /></td></tr>
+<tr class="separator:a8303f5066da98e26189047d5623ce64b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7b275533d06e044a85296c08e512b2a2"><td class="memItemLeft" align="right" valign="top"><a id="a7b275533d06e044a85296c08e512b2a2"></a>
 <a class="el" href="classace__segment_1_1Driver.html">Driver</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>build</b> ()</td></tr>
 <tr class="separator:a7b275533d06e044a85296c08e512b2a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -127,29 +121,8 @@ Public Member Functions</h2></td></tr>
 <div class="textblock">
 <p class="definition">Definition at line <a class="el" href="DriverBuilder_8h_source.html#l00038">38</a> of file <a class="el" href="DriverBuilder_8h_source.html">DriverBuilder.h</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a983374cde382581d4f65a397acda726e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a983374cde382581d4f65a397acda726e">&#9670;&nbsp;</a></span>buildLedMatrix()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classace__segment_1_1LedMatrix.html">LedMatrix</a> * ace_segment::DriverBuilder::buildLedMatrix </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>The <a class="el" href="classace__segment_1_1LedMatrix.html">LedMatrix</a> object returned must have its configure() called. </p>
-
-<p class="definition">Definition at line <a class="el" href="DriverBuilder_8cpp_source.html#l00039">39</a> of file <a class="el" href="DriverBuilder_8cpp_source.html">DriverBuilder.cpp</a>.</p>
-
-</div>
-</div>
-<a id="a7f0ad00b3791bb28ee1662b1a167cb23"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7f0ad00b3791bb28ee1662b1a167cb23">&#9670;&nbsp;</a></span>setNumSubFields()</h2>
+<a id="a8303f5066da98e26189047d5623ce64b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8303f5066da98e26189047d5623ce64b">&#9670;&nbsp;</a></span>useModulatingDriver()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -158,7 +131,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classace__segment_1_1DriverBuilder.html">DriverBuilder</a>&amp; ace_segment::DriverBuilder::setNumSubFields </td>
+          <td class="memname"><a class="el" href="classace__segment_1_1DriverBuilder.html">DriverBuilder</a>&amp; ace_segment::DriverBuilder::useModulatingDriver </td>
           <td>(</td>
           <td class="paramtype">uint8_t&#160;</td>
           <td class="paramname"><em>numSubFields</em></td><td>)</td>
@@ -172,9 +145,15 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Used only if useModulatingDriver() is true. </p>
+<p>Use a driver that provides pulse width modulation. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">numSubFields</td><td>number subfields per field, 16 seems to be a good reasonable. A minimum of 1 is imposed if set to 0. </td></tr>
+  </table>
+  </dd>
+</dl>
 
-<p class="definition">Definition at line <a class="el" href="DriverBuilder_8h_source.html#l00134">134</a> of file <a class="el" href="DriverBuilder_8h_source.html">DriverBuilder.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="DriverBuilder_8h_source.html#l00132">132</a> of file <a class="el" href="DriverBuilder_8h_source.html">DriverBuilder.h</a>.</p>
 
 </div>
 </div>
