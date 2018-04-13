@@ -45,6 +45,6 @@ SOFTWARE.
 #include "ace_segment/StringWriter.h"
 
 // Version format: xxyyzz == "xx.yy.zz"
-#define ACE_SEGMENT_VERSION 000100
+#define ACE_SEGMENT_VERSION 000200
 
 #endif
