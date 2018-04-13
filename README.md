@@ -353,21 +353,20 @@ a reference to `*this`, so they can be chained together in one statement.
 
 The following methods are available in `DriverBuilder`:
 
-* `DriverBuilder& setNumDigits(uint8_t numDigits);`
-* `DriverBuilder& setNumSegments(uint8_t numSegments);`
-* `DriverBuilder& setCommonAnode();`
-* `DriverBuilder& setCommonCathode();`
-* `DriverBuilder& setResistorsOnDigits();`
-* `DriverBuilder& setResistorsOnSegments();`
-* `DriverBuilder& setDigitPins(const uint8_t* digitPins);`
-* `DriverBuilder& setSegmentDirectPins(const uint8_t* segmentPins);`
+* `DriverBuilder& setNumDigits(uint8_t numDigits)`
+* `DriverBuilder& setNumSegments(uint8_t numSegments)`
+* `DriverBuilder& setCommonAnode()`
+* `DriverBuilder& setCommonCathode()`
+* `DriverBuilder& setResistorsOnDigits()`
+* `DriverBuilder& setResistorsOnSegments()`
+* `DriverBuilder& setDigitPins(const uint8_t* digitPins)`
+* `DriverBuilder& setSegmentDirectPins(const uint8_t* segmentPins)`
 * `DriverBuilder& setSegmentSerialPins(uint8_t latchPin, uint8_t dataPin,
-   uint8_t clockPin);`
+   uint8_t clockPin)`
 * `DriverBuilder& setSegmentSpiPins(uint8_t latchPin, uint8_t dataPin,
-   uint8_t clockPin);`
-* `DriverBuilder& setDimmingDigits(DimmingDigit* dimmingDigits);`
-* `DriverBuilder& useModulatingDriver();`
-* `DriverBuilder& setNumSubFields(uint8_t numSubFields);`
+   uint8_t clockPin)`
+* `DriverBuilder& setDimmingDigits(DimmingDigit* dimmingDigits)`
+* `DriverBuilder& useModulatingDriver(uint8_t numSubFields)`
 
 The best way to show how to use these methods is probably through
 examples.
@@ -555,7 +554,7 @@ MCU                     LED display
 
 The `DriverBuilder` configuration is similar to before but we add
 a `useModulatingDriver()` option along with the number of
-subfields to use with the `setNumSubFields()` method:
+subfields to use:
 ```
 const uint8_t NUM_SUBFIELDS = 16;
 const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
@@ -568,8 +567,7 @@ Driver* driver = DriverBuilder(hardware)
     .setDigitPins(digitPins)
     .setSegmentDirectPins(segmentPins)
     .setDimmingDigits(dimmingDigits)
-    .useModulatingDriver()
-    .setNumSubFields(NUM_SUBFIELDS)
+    .useModulatingDriver(NUM_SUBFIELDS)
     .build();
 ```
 
@@ -673,13 +671,12 @@ As indicated above, some driver options will support brightness control using
 pulse width modulation. There are some restrictions. First, the resistors must
 be on the segments. Second, the driver must be fast enough to do pulse width
 modulation. The modulating driver is activated using the `useModulatingDriver()`
-option and it requires the `setNumSubFields()` to be specified:
+option:
 
 ```
 Driver* driver = DriverBuilder()
     ...
-    .useModulatingDriver()
-    .setNumSubFields(NUM_SUBFIELDS)
+    .useModulatingDriver(NUM_SUBFIELDS)
     ...
 ```
 
@@ -700,8 +697,7 @@ The "Wiring" options are selected by:
 * `setSegmentSpiPins(latch, data, clock)`
 
 The "PWM" options are selected by:
-* `useModulatingDriver()`
-* `setNumSubFields(NUM_SUBFIELDS)
+* `useModulatingDriver(NUM_SUBFIELDS)`
 
 ```
 Resistors | Wiring | PWM | Available? |
@@ -732,12 +728,12 @@ parameters are given in the constructor of `RendererBuilder`:
 The following optional parameters can be given to `RendererBuilder` to override
 the defaults. Each of these methods returns a reference to `*this` so they can
 be chained (see below):
-* `setFramesPerSecond(uint8_t framesPerSecond);` (default: 60)
-* `setStatsResetInterval(uint16_t framesPerStatsReset);` (default: 120)
-* `setBlinkSlowDuration(uint16_t durationMillis);` (default: 800)
-* `setBlinkFastDuration(uint16_t durationMillis);` (default: 400)
-* `setPulseSlowDuration(uint16_t durationMillis);` (default: 3000)
-* `setPulseFastDuration(uint16_t durationMillis);` (default: 1000)
+* `setFramesPerSecond(uint8_t framesPerSecond)` (default: 60)
+* `setStatsResetInterval(uint16_t framesPerStatsReset)` (default: 120)
+* `setBlinkSlowDuration(uint16_t durationMillis)` (default: 800)
+* `setBlinkFastDuration(uint16_t durationMillis)` (default: 400)
+* `setPulseSlowDuration(uint16_t durationMillis)` (default: 3000)
+* `setPulseFastDuration(uint16_t durationMillis)` (default: 1000)
 
 The `build()` method creates an instance of `Renderer` with the given
 parameters. An example of configuring the `Renderer` is:
@@ -839,7 +835,7 @@ Note that the `value` is a fraction (0.0 - 1.0) represented in units of
 1/256. In other words, 3 means (3/256) and 255 means (255/256).
 
 The global brightness is enabled only if the `useModulatingDriver()` option was
-configured in `DriverBuilder`. If the `setNumSubFields()` was set to 16, then
+configured in `DriverBuilder`. If the numSubFields was set to 16, then
 each digit is rendered 16 times within a single field, but modulated using pulse
 width modulation to control the width of that signal. The given digit will be
 "on" only a fraction of the full interval of the single field rendering and will
@@ -1086,8 +1082,7 @@ These generated classes will replace the class generated by `DriverBuilder`:
 Driver* driver = DriverBuilder(hardware)
     .setDimmingDigits(dimmingDigits)
     .setNumDigits(NUM_DIGITS)
-    .useModulatingDriver()
-    .setNumSubFields(NUM_SUBFIELDS)
+    .useModulatingDriver(NUM_SUBFIELDS)
     ...
     .build();
 ```
@@ -1165,8 +1160,8 @@ To summarize:
   `CharWriter`)
 
 So the AceSegment library consumes between 4000-5500 bytes of flash memory and
-between 150-250 bytes of static memory (plus another maybe 50 bytes in the
-heap).
+between 200-300 bytes of static memory (including objects in the heap
+created by `DriverBuilder` and `RendererBuilder`).
 
 ### CPU Cycles
 
