@@ -118,8 +118,6 @@ class DriverBuilder {
       return *this;
     }
 
-    LedMatrix* buildLedMatrix();
-
     DriverBuilder& setDimmingDigits(DimmingDigit* dimmingDigits) {
       mDimmingDigits = dimmingDigits;
       return *this;
@@ -143,6 +141,8 @@ class DriverBuilder {
     static const uint8_t kTypeLedMatrixDirect = 0;
     static const uint8_t kTypeLedMatrixSerial = 1;
     static const uint8_t kTypeLedMatrixSpi = 2;
+
+    LedMatrix* buildLedMatrix();
 
     // parameters for LedMatrix
     Hardware* const mHardware;
