@@ -25,6 +25,7 @@ class FastSerialDriver: public ace_segment::ModulatingDigitDriver {
 
     virtual void configure() override;
     virtual void displayCurrentField() override;
+    virtual void prepareToSleep() override;
 
   private:
     typedef void (*DigitalWriter)(void);
@@ -70,7 +71,7 @@ class FastSerialDriver: public ace_segment::ModulatingDigitDriver {
           digitalWriteFast(kDataPin, LOW);
         }
         digitalWriteFast(kClockPin, HIGH);
-        digitalWriteFast(kClockPin, LOW);            
+        digitalWriteFast(kClockPin, LOW);
         mask >>= 1;
       }
     }

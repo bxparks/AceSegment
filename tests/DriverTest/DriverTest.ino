@@ -186,8 +186,9 @@ testF(DigitDriverTest, displayCurrentField_one_dark) {
   // display field 3
   mHardware->clear();
   mDriver->displayCurrentField();
-  assertEvents(1,
-      Event::kTypeDigitalWrite, 2, DIGIT_OFF);
+  assertEvents(2,
+      Event::kTypeDigitalWrite, 2, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 3, DIGIT_OFF);
 
   // display field 0
   mHardware->clear();
@@ -280,6 +281,58 @@ testF(DigitDriverTest, displayCurrentField_repeated_segment_pattern) {
   assertEvents(2,
       Event::kTypeDigitalWrite, 3, DIGIT_OFF,
       Event::kTypeDigitalWrite, 0, DIGIT_ON);
+
+  // display field 1
+  mHardware->clear();
+  mDriver->displayCurrentField();
+  assertEvents(10,
+      Event::kTypeDigitalWrite, 0, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 4, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 5, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 6, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 7, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 8, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 9, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 10, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 11, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 1, DIGIT_ON);
+}
+
+testF(DigitDriverTest, prepareToSleep) {
+  //enableVerbosity(Verbosity::kAssertionPassed);
+
+  mDriver->setPattern(0, 0x11, 255);
+  mDriver->setPattern(1, 0x22, 128);
+  mDriver->setPattern(2, 0x55, 64);
+  mDriver->setPattern(3, 0x11, 0);
+
+  // display field 0
+  mHardware->clear();
+  mDriver->displayCurrentField();
+  assertEvents(10,
+      Event::kTypeDigitalWrite, 3, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 4, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 5, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 6, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 7, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 8, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 9, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 10, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 11, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 0, DIGIT_ON);
+
+  mHardware->clear();
+  mDriver->prepareToSleep();
+  assertEvents(1,
+      Event::kTypeDigitalWrite, 0, DIGIT_OFF);
+
+  mHardware->clear();
+  mDriver->displayCurrentField();
+  assertEvents(0);
+
+  mHardware->clear();
+  mDriver->wakeFromSleep();
+  assertEvents(0);
 
   // display field 1
   mHardware->clear();
@@ -435,6 +488,48 @@ testF(SegmentDriverTest, displayCurrentField_one_dark) {
       Event::kTypeDigitalWrite, 4, SEGMENT_ON);
 }
 
+testF(SegmentDriverTest, prepareToSleep) {
+  mDriver->setPattern(0, 0x91, 255);  // 1001 0001
+  mDriver->setPattern(1, 0x22, 128);  // 0010 0010
+  mDriver->setPattern(2, 0xD5, 64);   // 1101 0101
+  mDriver->setPattern(3, 0x91, 0);    // 0000 0000 <- 1001 0001 (brightness = 0)
+
+  // display field 0
+  mHardware->clear();
+  mDriver->displayCurrentField();
+  assertEvents(6,
+      Event::kTypeDigitalWrite, 11, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 0, DIGIT_ON,
+      Event::kTypeDigitalWrite, 1, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 2, DIGIT_ON,
+      Event::kTypeDigitalWrite, 3, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 4, SEGMENT_ON);
+
+  mHardware->clear();
+  mDriver->prepareToSleep();
+  assertEvents(1,
+      Event::kTypeDigitalWrite, 4, SEGMENT_OFF);
+
+  mHardware->clear();
+  mDriver->displayCurrentField();
+  assertEvents(0);
+
+  mHardware->clear();
+  mDriver->wakeFromSleep();
+  assertEvents(0);
+
+  // field 1 (segment 1)
+  mHardware->clear();
+  mDriver->displayCurrentField();
+  assertEvents(6,
+      Event::kTypeDigitalWrite, 4, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 0, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 1, DIGIT_ON,
+      Event::kTypeDigitalWrite, 2, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 3, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 5, SEGMENT_ON);
+}
+
 // ----------------------------------------------------------------------
 // Tests for ModulatingDigitDriver. numSubFieldsPerField = 3
 // ----------------------------------------------------------------------
@@ -558,7 +653,7 @@ testF(ModulatingDigitDriverTest, displayCurrentField_one_dark) {
   mDriver->displayCurrentField();
   assertEvents(0);
 
-  // field 4.0
+  // field 0.0
   mHardware->clear();
   mDriver->displayCurrentField();
   assertEvents(10,
@@ -573,12 +668,12 @@ testF(ModulatingDigitDriverTest, displayCurrentField_one_dark) {
       Event::kTypeDigitalWrite, 11, SEGMENT_OFF,
       Event::kTypeDigitalWrite, 0, DIGIT_ON);
 
-  // field 4.1
+  // field 0.1
   mHardware->clear();
   mDriver->displayCurrentField();
   assertEvents(0);
 
-  // field 4.2
+  // field 0.2
   mHardware->clear();
   mDriver->displayCurrentField();
   assertEvents(0); // 255 is special, always on regardless of integer roundoff
@@ -703,6 +798,68 @@ testF(ModulatingDigitDriverTest,
   assertEvents(0);
 }
 
+testF(ModulatingDigitDriverTest, prepareToSleep) {
+  mDriver->setPattern(0, 0x11, 255);
+  mDriver->setPattern(1, 0x22, 128);
+  mDriver->setPattern(2, 0x55, 64);
+  mDriver->setPattern(3, 0x11, 0);
+
+  // field 0.0, stays on for 3 sub fields
+  mHardware->clear();
+  mDriver->displayCurrentField();
+  assertEvents(10,
+      Event::kTypeDigitalWrite, 3, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 4, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 5, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 6, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 7, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 8, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 9, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 10, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 11, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 0, DIGIT_ON);
+
+  // field 0.1
+  mHardware->clear();
+  mDriver->displayCurrentField();
+  assertEvents(0);
+
+  // field 0.2
+  mHardware->clear();
+  mDriver->displayCurrentField();
+  assertEvents(0); // 255 is special, always on regardless of integer roundoff
+
+  // prepareToSleep() on digit-to-digit boundary must turn off the previous
+  // digit, not the "current" digit (this was an early bug).
+  mHardware->clear();
+  mDriver->prepareToSleep();
+  assertEvents(1,
+      Event::kTypeDigitalWrite, 0, DIGIT_OFF);
+
+  mHardware->clear();
+  mDriver->displayCurrentField();
+  assertEvents(0);
+
+  mHardware->clear();
+  mDriver->wakeFromSleep();
+  assertEvents(0);
+
+  // field 1.0, stays on for 1/3 subfields
+  mHardware->clear();
+  mDriver->displayCurrentField();
+  assertEvents(10,
+      Event::kTypeDigitalWrite, 0, DIGIT_OFF,
+      Event::kTypeDigitalWrite, 4, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 5, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 6, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 7, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 8, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 9, SEGMENT_ON,
+      Event::kTypeDigitalWrite, 10, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 11, SEGMENT_OFF,
+      Event::kTypeDigitalWrite, 1, DIGIT_ON);
+}
+
 // ----------------------------------------------------------------------
 // Tests for ModulatingDigitDriver with an edge case of
 // numSubFieldsPerField = 1. This should not normally happen, but let's
@@ -775,7 +932,7 @@ testF(EdgeCaseModulatingDigitDriverTest, displayCurrentField) {
   assertEvents(1,
       Event::kTypeDigitalWrite, 2, DIGIT_OFF);
 
-  // field 4.0, should be "on" again, and we reuse the bit patterns from
+  // field 0.0, should be "on" again, and we reuse the bit patterns from
   // the previous iteration.
   mHardware->clear();
   mDriver->displayCurrentField();

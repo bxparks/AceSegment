@@ -77,6 +77,19 @@ class Driver {
      */
     virtual void displayCurrentField() = 0;
 
+    /**
+     * Prepare to go to sleep by clearing the frame, and setting a flag so that
+     * it doesn't turn itself back on through an interrupt.
+     */
+    virtual void prepareToSleep() {
+      mPreparedToSleep = true;
+    }
+
+    /** Wake up from sleep. */
+    virtual void wakeFromSleep() {
+      mPreparedToSleep = false;
+    }
+
     /** Return number of fields per frame. */
     virtual uint16_t getFieldsPerFrame() = 0;
 
@@ -130,13 +143,16 @@ class Driver {
         mLedMatrix(ledMatrix),
         mDimmingDigits(dimmingDigits),
         mNumDigits(numDigits),
-        mOwnsLedMatrix(ownsLedMatrix)
+        mOwnsLedMatrix(ownsLedMatrix),
+        mPreparedToSleep(false)
     {}
 
     LedMatrix* const mLedMatrix;
     DimmingDigit* const mDimmingDigits;
     const uint8_t mNumDigits;
     const bool mOwnsLedMatrix;
+
+    volatile bool mPreparedToSleep;
 };
 
 }

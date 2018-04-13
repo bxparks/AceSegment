@@ -30,6 +30,8 @@ SOFTWARE.
 namespace ace_segment {
 
 void SegmentDriver::displayCurrentField() {
+  if (mPreparedToSleep) return;
+
   if (mCurrentSegment != mPrevSegment) {
     mLedMatrix->disableGroup(mPrevSegment);
   }
@@ -61,6 +63,13 @@ Driver::DigitPatternType SegmentDriver::getDigitBitPattern(uint8_t segment) {
     digitMask <<= 1;
   }
   return digitPattern;
+}
+
+void SegmentDriver::prepareToSleep() {
+  Driver::prepareToSleep();
+  if (mCurrentSegment != mPrevSegment) {
+    mLedMatrix->disableGroup(mPrevSegment);
+  }
 }
 
 }

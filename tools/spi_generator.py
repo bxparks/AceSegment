@@ -41,6 +41,7 @@ class {1}: public ace_segment::ModulatingDigitDriver {{
 
     virtual void configure() override;
     virtual void displayCurrentField() override;
+    virtual void prepareToSleep() override;
 
   private:
     typedef void (*DigitalWriter)(void);
@@ -120,37 +121,48 @@ void {1}::configure() {{
 }}
 
 void {1}::displayCurrentField() {{
+  if (mPreparedToSleep) return;
+
+  bool isCurrentDigitOn;
   ace_segment::DimmingDigit& dimmingDigit = mDimmingDigits[mCurrentDigit];
   uint8_t brightness = dimmingDigit.brightness;
   if (mCurrentDigit != mPrevDigit) {{
     disableDigit(mPrevDigit);
-    mIsCurrentDigitOn = false;
+    isCurrentDigitOn = false;
     mCurrentSubFieldMax = ((uint16_t) mNumSubFields * brightness) / 256;
+  }} else {{
+    isCurrentDigitOn = mIsPrevDigitOn;
   }}
 
   if (brightness < 255 && mCurrentSubField >= mCurrentSubFieldMax) {{
-    if (mIsCurrentDigitOn) {{
+    if (isCurrentDigitOn) {{
       disableDigit(mCurrentDigit);
-      mIsCurrentDigitOn = false;
+      isCurrentDigitOn = false;
     }}
   }} else {{
-    if (!mIsCurrentDigitOn) {{
+    if (!isCurrentDigitOn) {{
       SegmentPatternType segmentPattern = dimmingDigit.pattern;
       if (segmentPattern != mSegmentPattern) {{
         drawSegments(segmentPattern);
         mSegmentPattern = segmentPattern;
       }}
       enableDigit(mCurrentDigit);
-      mIsCurrentDigitOn = true;
+      isCurrentDigitOn = true;
     }}
   }}
 
   mCurrentSubField++;
   mPrevDigit = mCurrentDigit;
+  mIsPrevDigitOn = isCurrentDigitOn;
   if (mCurrentSubField >= mNumSubFields) {{
     ace_segment::Util::incrementMod(mCurrentDigit, mNumDigits);
     mCurrentSubField = 0;
   }}
+}}
+
+void {1}::prepareToSleep() {{
+  Driver::prepareToSleep();
+  disableDigit(mPrevDigit);
 }}
 """
 

@@ -1,3 +1,5 @@
+#line 2 "BaseHardwareTest.h"
+
 /*
 MIT License
 

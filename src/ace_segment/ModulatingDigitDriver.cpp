@@ -30,38 +30,51 @@ SOFTWARE.
 namespace ace_segment {
 
 void ModulatingDigitDriver::displayCurrentField() {
+  if (mPreparedToSleep) return;
+
+  bool isCurrentDigitOn;
   DimmingDigit& dimmingDigit = mDimmingDigits[mCurrentDigit];
   uint8_t brightness = dimmingDigit.brightness;
   if (mCurrentDigit != mPrevDigit) {
+    // NOTE: The following could be optimized away by wrapping it around an 'if
+    // (mIsPrevDigitOn)' statement. But I think it's safer to issue a redundant
+    // disable-digit command just in case some else (interrupts or other
+    // unpredicatble things) causes the mIsPrevDigitOn state to be wrong. We
+    // want to be absolutely sure that 2 digits cannot be turned on at the same
+    // time.
     mLedMatrix->disableGroup(mPrevDigit);
-    mIsCurrentDigitOn = false;
+
+    isCurrentDigitOn = false;
     mCurrentSubFieldMax = ((uint16_t) mNumSubFields * brightness) / 256;
+  } else {
+    isCurrentDigitOn = mIsPrevDigitOn;
   }
 
   // No matter how small the mNumSubFields, we want:
   // * If brightness == 0, then subfield 0 should be OFF.
   // * If birghtness == 255, then special case that to be ON.
   if (brightness < 255 && mCurrentSubField >= mCurrentSubFieldMax) {
-    // turn off
-    if (mIsCurrentDigitOn) {
+    // turn off the current digit
+    if (isCurrentDigitOn) {
       mLedMatrix->disableGroup(mCurrentDigit);
-      mIsCurrentDigitOn = false;
+      isCurrentDigitOn = false;
     }
   } else {
-    // turn on
-    if (!mIsCurrentDigitOn) {
+    // turn on the current digit
+    if (!isCurrentDigitOn) {
       SegmentPatternType segmentPattern = dimmingDigit.pattern;
       if (segmentPattern != mSegmentPattern) {
         mLedMatrix->drawElements(segmentPattern);
         mSegmentPattern = segmentPattern;
       }
       mLedMatrix->enableGroup(mCurrentDigit);
-      mIsCurrentDigitOn = true;
+      isCurrentDigitOn = true;
     }
   }
 
   mCurrentSubField++;
   mPrevDigit = mCurrentDigit;
+  mIsPrevDigitOn = isCurrentDigitOn;
   if (mCurrentSubField >= mNumSubFields) {
     Util::incrementMod(mCurrentDigit, mNumDigits);
     mCurrentSubField = 0;

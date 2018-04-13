@@ -32,6 +32,10 @@ namespace ace_segment {
 
 class DimmingDigit;
 
+/**
+ * A Driver that assumes that the resistors are on the segments so the
+ * multiplexing occurs by scanning through the digits.
+ */
 class DigitDriver: public Driver {
   public:
     /** Constructor. */
@@ -53,15 +57,30 @@ class DigitDriver: public Driver {
 
     virtual void displayCurrentField() override;
 
+    virtual void prepareToSleep() override;
+
   protected:
+    /**
+     * Within the displayCurrentField() method, mCurrentDigit is the current
+     * digit that is being drawn. It is incremented to the next digit just
+     * before returning from that method.
+     */
+    uint8_t mCurrentDigit;
+
+    /**
+     * Within the displayCurrentField() method, the mPrevDigit is the digit
+     * that was displayed on the previous call to displayCurrentField(). It
+     * is set to the digit that was just displayed before returning.
+     */
+    uint8_t mPrevDigit;
+
+    SegmentPatternType mSegmentPattern;
+
+  private:
     // disable copy-constructor and assignment operator
     DigitDriver(const DigitDriver&) = delete;
     DigitDriver& operator=(const DigitDriver&) = delete;
 
-    uint8_t mCurrentDigit;
-    uint8_t mPrevDigit;
-    bool mIsCurrentDigitOn; // whether the current digit is on or off
-    SegmentPatternType mSegmentPattern;
 };
 
 }

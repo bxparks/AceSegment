@@ -46,6 +46,7 @@ class ModulatingDigitDriver: public DigitDriver {
       DigitDriver::configure();
       mCurrentSubField = 0;
       mCurrentSubFieldMax = 0;
+      mIsPrevDigitOn = true; // setting true forces it off on next interation
     }
 
     virtual uint16_t getFieldsPerFrame() override {
@@ -60,6 +61,9 @@ class ModulatingDigitDriver: public DigitDriver {
     uint8_t const mNumSubFields;
     uint8_t mCurrentSubField;
     uint8_t mCurrentSubFieldMax;
+
+    /** Whether the previous digit was turned on or off. */
+    bool mIsPrevDigitOn;
 
   private:
     // disable copy-constructor and assignment operator

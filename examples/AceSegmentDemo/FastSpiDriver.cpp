@@ -44,35 +44,46 @@ void FastSpiDriver::configure() {
 }
 
 void FastSpiDriver::displayCurrentField() {
+  if (mPreparedToSleep) return;
+
+  bool isCurrentDigitOn;
   ace_segment::DimmingDigit& dimmingDigit = mDimmingDigits[mCurrentDigit];
   uint8_t brightness = dimmingDigit.brightness;
   if (mCurrentDigit != mPrevDigit) {
     disableDigit(mPrevDigit);
-    mIsCurrentDigitOn = false;
+    isCurrentDigitOn = false;
     mCurrentSubFieldMax = ((uint16_t) mNumSubFields * brightness) / 256;
+  } else {
+    isCurrentDigitOn = mIsPrevDigitOn;
   }
 
   if (brightness < 255 && mCurrentSubField >= mCurrentSubFieldMax) {
-    if (mIsCurrentDigitOn) {
+    if (isCurrentDigitOn) {
       disableDigit(mCurrentDigit);
-      mIsCurrentDigitOn = false;
+      isCurrentDigitOn = false;
     }
   } else {
-    if (!mIsCurrentDigitOn) {
+    if (!isCurrentDigitOn) {
       SegmentPatternType segmentPattern = dimmingDigit.pattern;
       if (segmentPattern != mSegmentPattern) {
         drawSegments(segmentPattern);
         mSegmentPattern = segmentPattern;
       }
       enableDigit(mCurrentDigit);
-      mIsCurrentDigitOn = true;
+      isCurrentDigitOn = true;
     }
   }
 
   mCurrentSubField++;
   mPrevDigit = mCurrentDigit;
+  mIsPrevDigitOn = isCurrentDigitOn;
   if (mCurrentSubField >= mNumSubFields) {
     ace_segment::Util::incrementMod(mCurrentDigit, mNumDigits);
     mCurrentSubField = 0;
   }
+}
+
+void FastSpiDriver::prepareToSleep() {
+  Driver::prepareToSleep();
+  disableDigit(mPrevDigit);
 }
