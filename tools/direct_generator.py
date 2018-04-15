@@ -71,14 +71,7 @@ class {1}: public ace_segment::ModulatingDigitDriver {{
       writer();
     }}
 
-    static void drawSegments(uint8_t pattern) {{
-      uint8_t elementMask = 0x1;
-      for (uint8_t segment = 0; segment < kNumSegments; segment++) {{
-        uint8_t output = (pattern & elementMask) ? kSegmentOn : kSegmentOff;
-        writeSegment(segment, output);
-        elementMask <<= 1;
-      }}
-    }}
+    static void drawSegments(uint8_t pattern);
 
     // DigitalWriter functions for writing segment pins.
     {4}
@@ -170,6 +163,15 @@ void {1}::displayCurrentField() {{
   if (mCurrentSubField >= mNumSubFields) {{
     ace_segment::Util::incrementMod(mCurrentDigit, mNumDigits);
     mCurrentSubField = 0;
+  }}
+}}
+
+void {1}::drawSegments(uint8_t pattern) {{
+  uint8_t elementMask = 0x1;
+  for (uint8_t segment = 0; segment < kNumSegments; segment++) {{
+    uint8_t output = (pattern & elementMask) ? kSegmentOn : kSegmentOff;
+    writeSegment(segment, output);
+    elementMask <<= 1;
   }}
 }}
 

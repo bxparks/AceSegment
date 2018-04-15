@@ -68,14 +68,7 @@ class {1}: public ace_segment::ModulatingDigitDriver {{
       writer();
     }}
 
-    static void drawSegments(uint8_t pattern) {{
-      digitalWriteFast(kLatchPin, LOW);
-      uint8_t actualPattern = (kSegmentOn == HIGH) ? pattern : ~pattern;
-      SPI.beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
-      SPI.transfer(actualPattern);
-      SPI.endTransaction();
-      digitalWriteFast(kLatchPin, HIGH);
-    }}
+    static void drawSegments(uint8_t pattern);
 
     // DigitalWriter functions for writing digit pins.
     {6}
@@ -158,6 +151,15 @@ void {1}::displayCurrentField() {{
     ace_segment::Util::incrementMod(mCurrentDigit, mNumDigits);
     mCurrentSubField = 0;
   }}
+}}
+
+void {1}::drawSegments(uint8_t pattern) {{
+  digitalWriteFast(kLatchPin, LOW);
+  uint8_t actualPattern = (kSegmentOn == HIGH) ? pattern : ~pattern;
+  SPI.beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
+  SPI.transfer(actualPattern);
+  SPI.endTransaction();
+  digitalWriteFast(kLatchPin, HIGH);
 }}
 
 void {1}::prepareToSleep() {{

@@ -28,7 +28,7 @@ using namespace ace_segment;
 // Define the Driver to use. Use DRIVER_MODE_NONE to get flash/static
 // consumption without any AceSegment code. Then set to the other modes to get
 // flash/static memory usage.
-#define DRIVER_MODE DRIVER_MODE_FAST_DIRECT
+#define DRIVER_MODE DRIVER_MODE_FAST_SERIAL
 
 // Applies only for DRIVER_MODE_DIGIT, DRIVER_MODE_MODULATING_DIGIT,
 // DRIVER_MODE_SEGMENT. Ignored for others.

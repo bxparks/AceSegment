@@ -112,6 +112,15 @@ void FastDirectDriver::displayCurrentField() {
   }
 }
 
+void FastDirectDriver::drawSegments(uint8_t pattern) {
+  uint8_t elementMask = 0x1;
+  for (uint8_t segment = 0; segment < kNumSegments; segment++) {
+    uint8_t output = (pattern & elementMask) ? kSegmentOn : kSegmentOff;
+    writeSegment(segment, output);
+    elementMask <<= 1;
+  }
+}
+
 void FastDirectDriver::prepareToSleep() {
   Driver::prepareToSleep();
   disableDigit(mPrevDigit);

@@ -80,6 +80,20 @@ void FastSerialDriver::displayCurrentField() {
   }
 }
 
+void FastSerialDriver::shiftOutFast(uint8_t pattern) {
+  uint8_t mask = 0x80;
+  for (uint8_t i = 0; i < 8; i++)  {
+    digitalWriteFast(kClockPin, LOW);
+    if (pattern & mask) {
+      digitalWriteFast(kDataPin, HIGH);
+    } else {
+      digitalWriteFast(kDataPin, LOW);
+    }
+    digitalWriteFast(kClockPin, HIGH);
+    mask >>= 1;
+  }
+}
+
 void FastSerialDriver::prepareToSleep() {
   Driver::prepareToSleep();
   disableDigit(mPrevDigit);

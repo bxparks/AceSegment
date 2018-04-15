@@ -73,19 +73,7 @@ class {1}: public ace_segment::ModulatingDigitDriver {{
       digitalWriteFast(kLatchPin, HIGH);
     }}
 
-    static void shiftOutFast(uint8_t pattern) {{
-      uint8_t mask = 0x80;
-      for (uint8_t i = 0; i < 8; i++)  {{
-        if (pattern & mask) {{
-          digitalWriteFast(kDataPin, HIGH);
-        }} else {{
-          digitalWriteFast(kDataPin, LOW);
-        }}
-        digitalWriteFast(kClockPin, HIGH);
-        digitalWriteFast(kClockPin, LOW);
-        mask >>= 1;
-      }}
-    }}
+    static void shiftOutFast(uint8_t pattern);
 
     // DigitalWriter functions for writing digit pins.
     {6}
@@ -164,6 +152,20 @@ void {1}::displayCurrentField() {{
   if (mCurrentSubField >= mNumSubFields) {{
     ace_segment::Util::incrementMod(mCurrentDigit, mNumDigits);
     mCurrentSubField = 0;
+  }}
+}}
+
+void {1}::shiftOutFast(uint8_t pattern) {{
+  uint8_t mask = 0x80;
+  for (uint8_t i = 0; i < 8; i++)  {{
+    digitalWriteFast(kClockPin, LOW);
+    if (pattern & mask) {{
+      digitalWriteFast(kDataPin, HIGH);
+    }} else {{
+      digitalWriteFast(kDataPin, LOW);
+    }}
+    digitalWriteFast(kClockPin, HIGH);
+    mask >>= 1;
   }}
 }}
 

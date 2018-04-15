@@ -83,6 +83,15 @@ void FastSpiDriver::displayCurrentField() {
   }
 }
 
+void FastSpiDriver::drawSegments(uint8_t pattern) {
+  digitalWriteFast(kLatchPin, LOW);
+  uint8_t actualPattern = (kSegmentOn == HIGH) ? pattern : ~pattern;
+  SPI.beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
+  SPI.transfer(actualPattern);
+  SPI.endTransaction();
+  digitalWriteFast(kLatchPin, HIGH);
+}
+
 void FastSpiDriver::prepareToSleep() {
   Driver::prepareToSleep();
   disableDigit(mPrevDigit);

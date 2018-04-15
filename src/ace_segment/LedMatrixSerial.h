@@ -33,7 +33,11 @@ class Hardware;
 
 /**
  * An LedMatrix with an 74HC595 Serial-To-Parallel converter chip on the
- * segment pins.
+ * segment pins. The wiring is as follows:
+ *
+ *   latchPin/D10/SS -- ST_CP (Phillips) / RCK (TI) / Pin 12 (rising)
+ *   dataPin/D11/MOSI -- DS (Phillips) / SER (TI) / Pin 14
+ *   clockPin/D13/SCK -- SH_CP (Phillips) / SRCK (TI) / Pin 11 (rising)
  */
 class LedMatrixSerial: public LedMatrix {
   public:

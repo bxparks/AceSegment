@@ -61,14 +61,7 @@ class FastDirectDriver: public ace_segment::ModulatingDigitDriver {
       writer();
     }
 
-    static void drawSegments(uint8_t pattern) {
-      uint8_t elementMask = 0x1;
-      for (uint8_t segment = 0; segment < kNumSegments; segment++) {
-        uint8_t output = (pattern & elementMask) ? kSegmentOn : kSegmentOff;
-        writeSegment(segment, output);
-        elementMask <<= 1;
-      }
-    }
+    static void drawSegments(uint8_t pattern);
 
     // DigitalWriter functions for writing segment pins.
     static void digitalWriteFastSegment00Low() { digitalWriteFast(4, LOW); }
