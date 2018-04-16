@@ -171,10 +171,7 @@ class LedMatrixSerialTest: public BaseHardwareTest {
 
 testF(LedMatrixSerialTest, configure) {
   mLedMatrix->configure();
-  assertEvents(14,
-      Event::kTypeDigitalWrite, latchPin, LOW,
-      Event::kTypeDigitalWrite, dataPin, LOW,
-      Event::kTypeDigitalWrite, clockPin, LOW,
+  assertEvents(11,
       Event::kTypePinMode, latchPin, OUTPUT,
       Event::kTypePinMode, dataPin, OUTPUT,
       Event::kTypePinMode, clockPin, OUTPUT,
@@ -238,10 +235,7 @@ class LedMatrixSpiTest: public BaseHardwareTest {
 
 testF(LedMatrixSpiTest, configure) {
   mLedMatrix->configure();
-  assertEvents(15,
-      Event::kTypeDigitalWrite, latchPin, LOW,
-      Event::kTypeDigitalWrite, dataPin, LOW,
-      Event::kTypeDigitalWrite, clockPin, LOW,
+  assertEvents(12,
       Event::kTypePinMode, latchPin, OUTPUT,
       Event::kTypePinMode, dataPin, OUTPUT,
       Event::kTypePinMode, clockPin, OUTPUT,

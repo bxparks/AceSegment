@@ -971,10 +971,7 @@ class DigitDriverSerialLedMatrixTest: public BaseHardwareTest {
 
 testF(DigitDriverSerialLedMatrixTest, configure) {
   mDriver->configure();
-  assertEvents(14,
-      Event::kTypeDigitalWrite, latchPin, LOW,
-      Event::kTypeDigitalWrite, dataPin, LOW,
-      Event::kTypeDigitalWrite, clockPin, LOW,
+  assertEvents(11,
       Event::kTypePinMode, latchPin, OUTPUT,
       Event::kTypePinMode, dataPin, OUTPUT,
       Event::kTypePinMode, clockPin, OUTPUT,
