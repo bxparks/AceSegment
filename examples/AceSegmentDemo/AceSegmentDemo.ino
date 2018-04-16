@@ -1,8 +1,54 @@
+#include <AceButton.h>
 #include <AceSegment.h>
 #include "FastDirectDriver.h"
 #include "FastSerialDriver.h"
 #include "FastSpiDriver.h"
 using namespace ace_segment;
+using namespace ace_button;
+
+//------------------------------------------------------------------
+// Configurations for AceButton
+//------------------------------------------------------------------
+
+const uint8_t LOOP_MODE_PAUSE = 0;
+const uint8_t LOOP_MODE_STEP = 1;
+const uint8_t LOOP_MODE_AUTO_RENDER = 2;
+uint8_t loopMode = LOOP_MODE_AUTO_RENDER;
+
+// Configuration for AceButton, to support Single-Step
+const uint8_t BUTTON_PIN = 2; // change this to the button pin
+AceButton button;
+
+void handleEvent(AceButton* button, uint8_t eventType, uint8_t buttonState) {
+  switch (eventType) {
+    case AceButton::kEventReleased:
+      if (loopMode == LOOP_MODE_AUTO_RENDER) {
+        loopMode = LOOP_MODE_PAUSE;
+        Serial.println(F("handleEvent(): paused"));
+      } else {
+        Serial.println(F("handleEvent(): stepping"));
+        loopMode = LOOP_MODE_STEP;
+      }
+      break;
+    case AceButton::kEventLongPressed:
+      Serial.println(F("handleEvent(): auto render"));
+      loopMode = LOOP_MODE_AUTO_RENDER;
+      break;
+  }
+}
+
+void setupAceButton() {
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  button.setEventHandler(handleEvent);
+  button.init(BUTTON_PIN);
+  ButtonConfig* config = button.getButtonConfig();
+  config->setFeature(ButtonConfig::kFeatureLongPress);
+  config->setFeature(ButtonConfig::kFeatureSuppressAfterLongPress);
+}
+
+//------------------------------------------------------------------
+// Configurations for AceSegment
+//------------------------------------------------------------------
 
 // Use polling or interrupt.
 #define USE_INTERRUPT 0
@@ -90,19 +136,6 @@ ISR(TIMER2_COMPA_vect) {
 
 #endif
 
-void setup() {
-  delay(1000); // Wait for stability on some boards, otherwise garage on Serial
-  Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
-  while (!Serial); // Wait until Serial is ready - Leonardo/Micro
-  Serial.println(F("setup(): begin"));
-
-#if DRIVER_MODE > DRIVER_MODE_NONE
-  setupAceSegment();
-#endif
-
-  Serial.println(F("setup(): end"));
-}
-
 #if DRIVER_MODE > DRIVER_MODE_NONE
 // Create the resources.
 void setupAceSegment() {
@@ -189,7 +222,41 @@ void setupAceSegment() {
 }
 #endif
 
+//------------------------------------------------------------------
+// Configurations for AceSegmentDemo
+//------------------------------------------------------------------
+
+void setup() {
+  delay(1000); // Wait for stability on some boards, otherwise garage on Serial
+  Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
+  while (!Serial); // Wait until Serial is ready - Leonardo/Micro
+  Serial.println(F("setup(): begin"));
+
+  setupAceButton();
+
+#if DRIVER_MODE > DRIVER_MODE_NONE
+  setupAceSegment();
+#endif
+
+  Serial.println(F("setup(): end"));
+}
+
 void loop() {
+  if (loopMode == LOOP_MODE_STEP) {
+    singleStep();
+    loopMode = LOOP_MODE_PAUSE;
+  } else if (loopMode == LOOP_MODE_AUTO_RENDER) {
+    autoRender();
+  }
+
+  button.check();
+}
+
+void singleStep() {
+  renderer->renderField();
+}
+
+void autoRender() {
   static unsigned long lastUpdateTime = millis();
   static unsigned long stopWatchStart = lastUpdateTime;
   static uint32_t loopCount = 0;
