@@ -217,6 +217,7 @@ void setup() {
       .setNumDigits(NUM_DIGITS)
       .setCommonCathode()
       .setResistorsOnSegments()
+      .useTransistorDrivers()
       .setDigitPins(digitPins)
       .setSegmentDirectPins(segmentPins)
       ...
@@ -359,6 +360,7 @@ The following methods are available in `DriverBuilder`:
 * `DriverBuilder& setCommonCathode()`
 * `DriverBuilder& setResistorsOnDigits()`
 * `DriverBuilder& setResistorsOnSegments()`
+* `DriverBuilder& useTransistorDrivers()`
 * `DriverBuilder& setDigitPins(const uint8_t* digitPins)`
 * `DriverBuilder& setSegmentDirectPins(const uint8_t* segmentPins)`
 * `DriverBuilder& setSegmentSerialPins(uint8_t latchPin, uint8_t dataPin,
@@ -371,17 +373,61 @@ The following methods are available in `DriverBuilder`:
 The best way to show how to use these methods is probably through
 examples.
 
+#### Resistors and Transistors
+
 In the following circuit diagrams, `R` represents the current limiting resistors
 and `T` represents the driving transistor. The resistor protects each LED
-sement, and the transistor prevents overloading the GPIO pin of the
-microcontroller. On an Arduino Nano for example, each GPIO pin can handle 40mA
-of current. But if all 8 segments are turned on at the same time, then 320mA of
-current would flow into the digit pin, which exceeds the maximum current
-significantly. If the value of `R` is high enough that each segment only drew
-only 5mA of current, the transistor could be omitted since 8 x 5mA is 40mA,
-which is within the limit of a single GPIO pin. The LED will probably be
-significantly dim, but this configuration may be good enough for testing
-purposes.
+segment, and the transistor prevents overloading the GPIO pin of the
+microcontroller.
+
+On an Arduino Nano for example, each GPIO pin can handle 40mA of current. If the
+value of `R` is high enough that each segment only drew only 5mA of current, the
+transistor could be omitted since 8 x 5mA is 40mA, which is within the limit of
+a single GPIO pin.
+
+If the `R` value is increased so that each LED segment is pushed to its rated
+current limit (probably 10-15mA), then 8 segments could potentially push
+80-120mA into the single digit pin of the Nano, which would exceed the maximum
+rating. A driver transistor would be needed on the digit pin to handle this
+current.
+
+If driver transistors are used on the digits, then it is likely that the logic
+levels need to be inverted software. In the examnple below, using common cathode
+display, with the resistors on the segments, an NPN transistor on the digit,
+the digit pin on the microcontroll (D12) needs to be HIGH to turn on the LED
+segement. In contrast, if the D12 pin was connected directly to the LED, the
+digit pin would need to be set LOW to turn on the LED.
+
+```
+MCU                     LED display
++-----+                  +------------------------+
+|  D04|------ R ---------|a -------.              |
+|  D05|------ R ---------|b -------|--------.     |
+|  D06|------ R ---------|c        |        |     |
+|  D07|------ R ---------|d      -----    -----   |
+|  D08|------ R ---------|e       \ /      \ /    |
+|  D09|------ R ---------|f      --v--    --v--   |
+|  D10|------ R ---------|g        |        |     |
+|  D11|------ R ---------|h        |        |     |
+|     |                  |         |        |     |
+|     |              +---|D1 ------+--------'     |
+|     |             /    |                        |
+|     |            /     +------------------------+
+|  D12|----- R ---| NPN
+|     |            \
++-----+             v
+                    |
+                   GND
+```
+
+The `useTransistorDrivers()` method on `DriverBuilder` tells the software
+that transistor drivers are being used, and that the logic levels should be
+inverted.
+
+If the LED display was using common anode, instead of common cathode as shown
+above, then a PNP transistor would be used, with the emitter tied to Vcc. Again,
+the logic level on the D12 pin will become inverted compared to wiring the digit
+pin directly to the microcontroller.
 
 #### Pins Wired Directly, Resistors on Segments, Common Cathode
 
@@ -413,6 +459,7 @@ Driver* driver = DriverBuilder(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonCathode()
     .setResistorsOnSegments()
+    .useTransistorDrivers()
     .setDigitPins(digitPins)
     .setSegmentDirectPins(segmentPins)
     .setDimmablePatterns(dimmablePatterns)
@@ -449,6 +496,7 @@ Driver* driver = DriverBuilder(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonAnode()
     .setResistorsOnSegments()
+    .useTransistorDrivers()
     .setDigitPins(digitPins)
     .setSegmentDirectPins(segmentPins)
     .setDimmablePatterns(dimmablePatterns)
@@ -485,6 +533,7 @@ Driver* driver = DriverBuilder(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonAnode()
     .setResistorsOnDigits()
+    .useTransistorDrivers()
     .setDigitPins(digitPins)
     .setSegmentDirectPins(segmentPins)
     .setDimmablePatterns(dimmablePatterns)
@@ -521,6 +570,7 @@ Driver* driver = DriverBuilder(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonAnode()
     .setResistorsOnDigits()
+    .useTransistorDrivers()
     .setDigitPins(digitPins)
     .setSegmentDirectPins(segmentPins)
     .setDimmablePatterns(dimmablePatterns)
@@ -564,6 +614,7 @@ Driver* driver = DriverBuilder(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonCathode()
     .setResistorsOnSegments()
+    .useTransistorDrivers()
     .setDigitPins(digitPins)
     .setSegmentDirectPins(segmentPins)
     .setDimmablePatterns(dimmablePatterns)
@@ -611,6 +662,7 @@ Driver* driver = DriverBuilder(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonCathode()
     .setResistorsOnSegments()
+    .useTransistorDrivers()
     .setDigitPins(digitPins)
     .setSegmentSerialPins(latchPin, dataPin, clockPin)
     .setDimmablePatterns(dimmablePatterns)
@@ -657,6 +709,7 @@ Driver* driver = DriverBuilder(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonCathode()
     .setResistorsOnSegments()
+    .useTransistorDrivers()
     .setDigitPins(digitPins)
     .setSegmentSpiPins(latchPin, dataPin, clockPin)
     .setDimmablePatterns(dimmablePatterns)
@@ -702,17 +755,17 @@ The "PWM" options are selected by:
 ```
 Resistors | Wiring | PWM | Available? |
 ----------+--------+-----+------------|
-Segments  | Direct | -   | y          |
+Segments  | Direct | Off | y          |
 Segments  | Direct | On  | y          |
-Segments  | Serial | -   | y          |
+Segments  | Serial | Off | y          |
 Segments  | Serial | On  | y          |
-Segments  | SPI    | -   | y          |
+Segments  | SPI    | Off | y          |
 Segments  | SPI    | On  | y          |
-Digits    | Direct | -   | y          |
+Digits    | Direct | Off | y          |
 Digits    | Direct | On  | -          |
-Digits    | Serial | -   | y          |
+Digits    | Serial | Off | y          |
 Digits    | Serial | On  | -          |
-Digits    | SPI    | -   | y          |
+Digits    | SPI    | Off | y          |
 Digits    | SPI    | On  | -          |
 ----------+--------+-----+------------|
 ```
