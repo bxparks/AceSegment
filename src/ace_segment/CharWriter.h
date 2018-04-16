@@ -26,7 +26,7 @@ SOFTWARE.
 #define ACE_SEGMENT_CHAR_WRITER_H
 
 #include <stdint.h>
-#include "StyledDigit.h"
+#include "StyledPattern.h"
 #include "Renderer.h"
 
 namespace ace_segment {
@@ -51,10 +51,10 @@ class CharWriter {
     void writeCharAt(uint8_t digit, char c);
 
     /** Write the character at the specified position. */
-    void writeCharAt(uint8_t digit, char c, StyledDigit::StyleType style);
+    void writeCharAt(uint8_t digit, char c, StyledPattern::StyleType style);
 
     /** Write the style for a given digit, leaving character unchanged. */
-    void writeStyleAt(uint8_t digit, StyledDigit::StyleType style) {
+    void writeStyleAt(uint8_t digit, StyledPattern::StyleType style) {
       if (digit >= getNumDigits()) return;
       mRenderer->writeStyleAt(digit, style);
     }

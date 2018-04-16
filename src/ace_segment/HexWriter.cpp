@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 #include <Arduino.h>
-#include "StyledDigit.h"
+#include "StyledPattern.h"
 #include "HexWriter.h"
 
 namespace ace_segment {
@@ -69,7 +69,7 @@ const uint8_t HexWriter::kNumCharacters =
     sizeof(kCharacterArray)/sizeof(kCharacterArray[0]);
 
 void HexWriter::writeHexAt(uint8_t digit, uint8_t c,
-    StyledDigit::StyleType style) {
+    StyledPattern::StyleType style) {
   if (digit >= getNumDigits()) return;
   uint8_t pattern = ((uint8_t) c < kNumCharacters)
       ? pgm_read_byte(&kCharacterArray[(uint8_t) c])

@@ -48,8 +48,8 @@ const uint8_t dataPin = 13;
 const uint8_t clockPin = 14;
 
 // create NUM_DIGITS+1 elements for doing array bound checking
-DimmingDigit dimmingDigits[NUM_DIGITS + 1];
-StyledDigit styledDigits[NUM_DIGITS + 1];
+DimmablePattern dimmablePatterns[NUM_DIGITS + 1];
+StyledPattern styledPatterns[NUM_DIGITS + 1];
 
 void setup() {
   delay(1000); // Wait for stability on some boards, otherwise garage on Serial
@@ -87,7 +87,7 @@ class DigitDriverTest: public BaseHardwareTest {
           .setResistorsOnSegments()
           .setDigitPins(digitPins)
           .setSegmentDirectPins(segmentPins)
-          .setDimmingDigits(dimmingDigits)
+          .setDimmablePatterns(dimmablePatterns)
           .build();
 
       mDriver->configure();
@@ -364,7 +364,7 @@ class SegmentDriverTest: public BaseHardwareTest {
           .setResistorsOnDigits()
           .setDigitPins(digitPins)
           .setSegmentDirectPins(segmentPins)
-          .setDimmingDigits(dimmingDigits)
+          .setDimmablePatterns(dimmablePatterns)
           .build();
       mDriver->configure();
       mHardware->clear();
@@ -544,7 +544,7 @@ class ModulatingDigitDriverTest: public BaseHardwareTest {
           .setResistorsOnSegments()
           .setDigitPins(digitPins)
           .setSegmentDirectPins(segmentPins)
-          .setDimmingDigits(dimmingDigits)
+          .setDimmablePatterns(dimmablePatterns)
           .useModulatingDriver(NUM_SUB_FIELDS)
           .build();
       mDriver->configure();
@@ -876,7 +876,7 @@ class EdgeCaseModulatingDigitDriverTest: public BaseHardwareTest {
           .setResistorsOnSegments()
           .setDigitPins(digitPins)
           .setSegmentDirectPins(segmentPins)
-          .setDimmingDigits(dimmingDigits)
+          .setDimmablePatterns(dimmablePatterns)
           .useModulatingDriver(1) // edge case of 1 subfield/field
           .build();
 
@@ -955,7 +955,7 @@ class DigitDriverSerialLedMatrixTest: public BaseHardwareTest {
           .setResistorsOnSegments()
           .setDigitPins(digitPins)
           .setSegmentSerialPins(latchPin, dataPin, clockPin)
-          .setDimmingDigits(dimmingDigits)
+          .setDimmablePatterns(dimmablePatterns)
           .build();
 
       mDriver->configure();

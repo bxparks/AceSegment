@@ -70,8 +70,8 @@ const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
 
 #if DRIVER_MODE > DRIVER_MODE_NONE
 // Set up the chain of resources and their dependencies.
-DimmingDigit dimmingDigits[NUM_DIGITS];
-StyledDigit styledDigits[NUM_DIGITS];
+DimmablePattern dimmingPattern[NUM_DIGITS];
+StyledPattern styledPatterns[NUM_DIGITS];
 
 // The chain of resources.
 Hardware* hardware;
@@ -128,7 +128,7 @@ void setupAceSegment() {
   #if DRIVER_MODE == DRIVER_MODE_MODULATING_DIGIT
       .useModulatingDriver(NUM_SUBFIELDS)
   #endif
-      .setDimmingDigits(dimmingDigits)
+      .setDimmablePatterns(dimmingPattern)
   #if USE_TRANSISTOR_DRIVERS == 1
       .useTransistorDrivers()
   #endif
@@ -140,22 +140,22 @@ void setupAceSegment() {
       .setResistorsOnDigits()
       .setDigitPins(digitPins)
       .setSegmentDirectPins(segmentPins)
-      .setDimmingDigits(dimmingDigits)
+      .setDimmablePatterns(dimmingPattern)
   #if USE_TRANSISTOR_DRIVERS == 1
       .useTransistorDrivers()
   #endif
       .build();
 #elif DRIVER_MODE == DRIVER_MODE_FAST_DIRECT
-  driver = new FastDirectDriver(dimmingDigits, NUM_DIGITS, NUM_SUBFIELDS);
+  driver = new FastDirectDriver(dimmingPattern, NUM_DIGITS, NUM_SUBFIELDS);
 #elif DRIVER_MODE == DRIVER_MODE_FAST_SERIAL
-  driver = new FastSerialDriver(dimmingDigits, NUM_DIGITS, NUM_SUBFIELDS);
+  driver = new FastSerialDriver(dimmingPattern, NUM_DIGITS, NUM_SUBFIELDS);
 #elif DRIVER_MODE == DRIVER_MODE_FAST_SPI
-  driver = new FastSpiDriver(dimmingDigits, NUM_DIGITS, NUM_SUBFIELDS);
+  driver = new FastSpiDriver(dimmingPattern, NUM_DIGITS, NUM_SUBFIELDS);
 #endif
   driver->configure();
 
   // Create the Renderer.
-  renderer = RendererBuilder(hardware, driver, styledDigits, NUM_DIGITS)
+  renderer = RendererBuilder(hardware, driver, styledPatterns, NUM_DIGITS)
       .setFramesPerSecond(FRAMES_PER_SECOND)
       .build();
   renderer->configure();
@@ -264,10 +264,10 @@ void writeHexes() {
   uint8_t buffer[3];
   buffer[0] = (c & 0xf0) >> 4;
   buffer[1] = (c & 0x0f);
-  hexWriter->writeHexAt(0, buffer[0], StyledDigit::kStylePulseFast);
-  hexWriter->writeHexAt(1, buffer[1], StyledDigit::kStylePulseSlow);
-  hexWriter->writeHexAt(2, HexWriter::kMinus, StyledDigit::kStyleBlinkFast);
-  hexWriter->writeHexAt(3, c, StyledDigit::kStyleBlinkSlow);
+  hexWriter->writeHexAt(0, buffer[0], StyledPattern::kStylePulseFast);
+  hexWriter->writeHexAt(1, buffer[1], StyledPattern::kStylePulseSlow);
+  hexWriter->writeHexAt(2, HexWriter::kMinus, StyledPattern::kStyleBlinkFast);
+  hexWriter->writeHexAt(3, c, StyledPattern::kStyleBlinkSlow);
 
   Util::incrementMod(c, HexWriter::kNumCharacters);
 }
@@ -280,10 +280,10 @@ void writeChars() {
   char buffer[3];
   buffer[0] = (c & 0xf0) >> 4;
   buffer[1] = (c & 0x0f);
-  charWriter->writeCharAt(0, buffer[0], StyledDigit::kStylePulseFast);
-  charWriter->writeCharAt(1, buffer[1], StyledDigit::kStylePulseSlow);
-  charWriter->writeCharAt(2, '-', StyledDigit::kStyleBlinkFast);
-  charWriter->writeCharAt(3, c, StyledDigit::kStyleBlinkSlow);
+  charWriter->writeCharAt(0, buffer[0], StyledPattern::kStylePulseFast);
+  charWriter->writeCharAt(1, buffer[1], StyledPattern::kStylePulseSlow);
+  charWriter->writeCharAt(2, '-', StyledPattern::kStyleBlinkFast);
+  charWriter->writeCharAt(3, c, StyledPattern::kStyleBlinkSlow);
 
   Util::incrementMod(c, CharWriter::kNumCharacters);
 }

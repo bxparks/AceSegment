@@ -115,8 +115,8 @@ class DriverBuilder {
       return *this;
     }
 
-    DriverBuilder& setDimmingDigits(DimmingDigit* dimmingDigits) {
-      mDimmingDigits = dimmingDigits;
+    DriverBuilder& setDimmablePatterns(DimmablePattern* dimmablePatterns) {
+      mDimmablePatterns = dimmablePatterns;
       return *this;
     }
 
@@ -156,7 +156,7 @@ class DriverBuilder {
     uint8_t mClockPin = 0;
 
     // parameters for Driver
-    DimmingDigit* mDimmingDigits = nullptr;
+    DimmablePattern* mDimmablePatterns = nullptr;
     bool mUseModulatingDriver = false;
     uint8_t mNumSubFields = 16;
 };

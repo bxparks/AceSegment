@@ -47,8 +47,9 @@ void FastSpiDriver::displayCurrentField() {
   if (mPreparedToSleep) return;
 
   bool isCurrentDigitOn;
-  ace_segment::DimmingDigit& dimmingDigit = mDimmingDigits[mCurrentDigit];
-  uint8_t brightness = dimmingDigit.brightness;
+  ace_segment::DimmablePattern& dimmablePattern =
+      mDimmablePatterns[mCurrentDigit];
+  uint8_t brightness = dimmablePattern.brightness;
   if (mCurrentDigit != mPrevDigit) {
     disableDigit(mPrevDigit);
     isCurrentDigitOn = false;
@@ -64,7 +65,7 @@ void FastSpiDriver::displayCurrentField() {
     }
   } else {
     if (!isCurrentDigitOn) {
-      SegmentPatternType segmentPattern = dimmingDigit.pattern;
+      SegmentPatternType segmentPattern = dimmablePattern.pattern;
       if (segmentPattern != mSegmentPattern) {
         drawSegments(segmentPattern);
         mSegmentPattern = segmentPattern;

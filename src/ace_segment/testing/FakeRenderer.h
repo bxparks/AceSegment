@@ -30,7 +30,7 @@ SOFTWARE.
 
 namespace ace_segment {
 
-class StyledDigit;
+class StyledPattern;
 
 namespace testing {
 
@@ -39,9 +39,9 @@ namespace testing {
  */
 class FakeRenderer: public Renderer {
   public:
-    FakeRenderer(StyledDigit* styledDigits, uint8_t numDigits):
+    FakeRenderer(StyledPattern* styledPatterns, uint8_t numDigits):
         Renderer(nullptr /* hardware */, nullptr /* driver */,
-            styledDigits, numDigits,
+            styledPatterns, numDigits,
             60 /* framesPerSecond */,
             1200 /* statsResetInterval */,
             600 /* blinkSlowDurationMillis */,

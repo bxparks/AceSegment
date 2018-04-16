@@ -16,10 +16,10 @@
 class FastSpiDriver: public ace_segment::ModulatingDigitDriver {
   public:
     // Constructor
-    FastSpiDriver(ace_segment::DimmingDigit* dimmingDigits,
+    FastSpiDriver(ace_segment::DimmablePattern* dimmablePatterns,
             uint8_t numDigits, uint8_t numSubFields):
         ace_segment::ModulatingDigitDriver(
-            nullptr /* ledMatrix */, dimmingDigits, numDigits, numSubFields)
+            nullptr /* ledMatrix */, dimmablePatterns, numDigits, numSubFields)
     {}
 
     // Destructor

@@ -39,8 +39,8 @@ const uint16_t FRAMES_PER_SECOND = 60;
 const int8_t NUM_SUB_FIELDS = 3;
 
 // create NUM_DIGITS+1 elements for doing array bound checking
-DimmingDigit dimmingDigits[NUM_DIGITS + 1];
-StyledDigit styledDigits[NUM_DIGITS + 1];
+DimmablePattern dimmablePatterns[NUM_DIGITS + 1];
+StyledPattern styledPatterns[NUM_DIGITS + 1];
 
 void setup() {
   delay(1000); // Wait for stability on some boards, otherwise garage on Serial
@@ -196,51 +196,51 @@ test(calcBrightness) {
   const uint8_t pulseFastFraction = 63; // fraction=63/256
   uint8_t brightness;
 
-  brightness = Renderer::calcBrightness(StyledDigit::kStyleNormal,
+  brightness = Renderer::calcBrightness(StyledPattern::kStyleNormal,
       overallBrightness, Renderer::kBlinkStateOff, Renderer::kBlinkStateOff,
       false, pulseSlowFraction, pulseFastFraction);
   assertEqual(199, brightness);
 
-  brightness = Renderer::calcBrightness(StyledDigit::kStyleBlinkSlow,
+  brightness = Renderer::calcBrightness(StyledPattern::kStyleBlinkSlow,
       overallBrightness, Renderer::kBlinkStateOff, Renderer::kBlinkStateOff,
       false, pulseSlowFraction, pulseFastFraction);
   assertEqual(0, brightness);
 
-  brightness = Renderer::calcBrightness(StyledDigit::kStyleBlinkSlow,
+  brightness = Renderer::calcBrightness(StyledPattern::kStyleBlinkSlow,
       overallBrightness, Renderer::kBlinkStateOn, Renderer::kBlinkStateOff,
       false, pulseSlowFraction, pulseFastFraction);
   assertEqual(199, brightness);
 
-  brightness = Renderer::calcBrightness(StyledDigit::kStyleBlinkFast,
+  brightness = Renderer::calcBrightness(StyledPattern::kStyleBlinkFast,
       overallBrightness, Renderer::kBlinkStateOff, Renderer::kBlinkStateOff,
       false, pulseSlowFraction, pulseFastFraction);
   assertEqual(0, brightness);
 
-  brightness = Renderer::calcBrightness(StyledDigit::kStyleBlinkFast,
+  brightness = Renderer::calcBrightness(StyledPattern::kStyleBlinkFast,
       overallBrightness, Renderer::kBlinkStateOff, Renderer::kBlinkStateOn,
       false, pulseSlowFraction, pulseFastFraction);
   assertEqual(199, brightness);
 
   // enablePulse is false, so should return the overallBrightness
-  brightness = Renderer::calcBrightness(StyledDigit::kStylePulseSlow,
+  brightness = Renderer::calcBrightness(StyledPattern::kStylePulseSlow,
       overallBrightness, Renderer::kBlinkStateOff, Renderer::kBlinkStateOff,
       false, pulseSlowFraction, pulseFastFraction);
   assertEqual(199, brightness);
 
   // enablePulse is false, so should return the overallBrightness
-  brightness = Renderer::calcBrightness(StyledDigit::kStylePulseFast,
+  brightness = Renderer::calcBrightness(StyledPattern::kStylePulseFast,
       overallBrightness, Renderer::kBlinkStateOff, Renderer::kBlinkStateOff,
       false, pulseSlowFraction, pulseFastFraction);
   assertEqual(199, brightness);
 
   // enablePulse is true, so should return a reduced brightness
-  brightness = Renderer::calcBrightness(StyledDigit::kStylePulseSlow,
+  brightness = Renderer::calcBrightness(StyledPattern::kStylePulseSlow,
       overallBrightness, Renderer::kBlinkStateOff, Renderer::kBlinkStateOff,
       true, pulseSlowFraction, pulseFastFraction);
   assertEqual(99, brightness);
 
   // enablePulse is false, so should return a reduced brightness
-  brightness = Renderer::calcBrightness(StyledDigit::kStylePulseFast,
+  brightness = Renderer::calcBrightness(StyledPattern::kStylePulseFast,
       overallBrightness, Renderer::kBlinkStateOff, Renderer::kBlinkStateOff,
       true, pulseSlowFraction, pulseFastFraction);
   assertEqual(48, brightness);
@@ -256,11 +256,11 @@ class RendererTest: public TestOnce {
       TestOnce::setup();
 
       hardware = new TestableHardware();
-      driver = new FakeDriver(dimmingDigits, NUM_DIGITS);
+      driver = new FakeDriver(dimmablePatterns, NUM_DIGITS);
       driver->setNumSubFields(NUM_SUB_FIELDS);
       driver->configure();
 
-      renderer = RendererBuilder(hardware, driver, styledDigits, NUM_DIGITS)
+      renderer = RendererBuilder(hardware, driver, styledPatterns, NUM_DIGITS)
           .setFramesPerSecond(FRAMES_PER_SECOND)
           .build();
       renderer->writeBrightness(255);
@@ -276,16 +276,16 @@ class RendererTest: public TestOnce {
       TestOnce::teardown();
     }
 
-    void assertDimmingDigitsEqual(int n, ...) {
+    void assertDimmablePatternsEqual(int n, ...) {
       assertEqual(NUM_DIGITS, n);
       va_list args;
       va_start(args, n);
       for (int i = 0; i < n; i++) {
         uint8_t pattern = va_arg(args, int);
         uint8_t brightness = va_arg(args, int);
-        const DimmingDigit& dimmingDigit = dimmingDigits[i];
-        assertEqual(pattern, dimmingDigit.pattern);
-        assertEqual(brightness, dimmingDigit.brightness);
+        const DimmablePattern& dimmablePattern = dimmablePatterns[i];
+        assertEqual(pattern, dimmablePattern.pattern);
+        assertEqual(brightness, dimmablePattern.brightness);
       }
       va_end(args);
     }
@@ -309,62 +309,62 @@ testF(RendererTest, frames_and_fields) {
 }
 
 testF(RendererTest, writePatternAt) {
-  StyledDigit& styledDigit = styledDigits[0];
+  StyledPattern& styledPattern = styledPatterns[0];
 
-  renderer->writePatternAt(0, 0x11, StyledDigit::kStyleNormal);
-  assertEqual(0x11, styledDigit.pattern);
-  assertEqual(0, styledDigit.style);
+  renderer->writePatternAt(0, 0x11, StyledPattern::kStyleNormal);
+  assertEqual(0x11, styledPattern.pattern);
+  assertEqual(0, styledPattern.style);
 
   renderer->writePatternAt(0, 0x22);
-  assertEqual(0x22, styledDigit.pattern);
-  assertEqual(0, styledDigit.style);
+  assertEqual(0x22, styledPattern.pattern);
+  assertEqual(0, styledPattern.style);
 
-  renderer->writeStyleAt(0, StyledDigit::kStyleBlinkFast);
-  assertEqual(0x22, styledDigit.pattern);
-  assertEqual(StyledDigit::kStyleBlinkFast, styledDigit.style);
+  renderer->writeStyleAt(0, StyledPattern::kStyleBlinkFast);
+  assertEqual(0x22, styledPattern.pattern);
+  assertEqual(StyledPattern::kStyleBlinkFast, styledPattern.style);
 }
 
 testF(RendererTest, writePatternAt_outOfBounds) {
-  StyledDigit& styledDigit = styledDigits[4];
-  styledDigit.pattern = 1;
-  styledDigit.style = StyledDigit::kStyleNormal;
+  StyledPattern& styledPattern = styledPatterns[4];
+  styledPattern.pattern = 1;
+  styledPattern.style = StyledPattern::kStyleNormal;
 
-  renderer->writePatternAt(4, 0x11, StyledDigit::kStyleBlinkSlow);
-  assertEqual(1, styledDigit.pattern);
-  assertEqual(StyledDigit::kStyleNormal, styledDigit.style);
+  renderer->writePatternAt(4, 0x11, StyledPattern::kStyleBlinkSlow);
+  assertEqual(1, styledPattern.pattern);
+  assertEqual(StyledPattern::kStyleNormal, styledPattern.style);
 
   renderer->writePatternAt(4, 0x11);
-  assertEqual(1, styledDigit.pattern);
-  assertEqual(StyledDigit::kStyleNormal, styledDigit.style);
+  assertEqual(1, styledPattern.pattern);
+  assertEqual(StyledPattern::kStyleNormal, styledPattern.style);
 
-  renderer->writeStyleAt(4, StyledDigit::kStyleBlinkFast);
-  assertEqual(1, styledDigit.pattern);
-  assertEqual(StyledDigit::kStyleNormal, styledDigit.style);
+  renderer->writeStyleAt(4, StyledPattern::kStyleBlinkFast);
+  assertEqual(1, styledPattern.pattern);
+  assertEqual(StyledPattern::kStyleNormal, styledPattern.style);
 }
 
 testF(RendererTest, writeDecimalPointAt) {
-  StyledDigit& styledDigit = styledDigits[0];
+  StyledPattern& styledPattern = styledPatterns[0];
 
-  renderer->writePatternAt(0, 0x11, StyledDigit::kStyleNormal);
-  assertEqual(0x11, styledDigit.pattern);
-  assertEqual(0, styledDigit.style);
+  renderer->writePatternAt(0, 0x11, StyledPattern::kStyleNormal);
+  assertEqual(0x11, styledPattern.pattern);
+  assertEqual(0, styledPattern.style);
 
   renderer->writeDecimalPointAt(0);
-  assertEqual(0x11 | 0x80, styledDigit.pattern);
-  assertEqual(0, styledDigit.style);
+  assertEqual(0x11 | 0x80, styledPattern.pattern);
+  assertEqual(0, styledPattern.style);
 
   renderer->writeDecimalPointAt(0, false);
-  assertEqual(0x11, styledDigit.pattern);
-  assertEqual(0, styledDigit.style);
+  assertEqual(0x11, styledPattern.pattern);
+  assertEqual(0, styledPattern.style);
 }
 
 testF(RendererTest, writeDecimalPointAt_outOfBounds) {
-  StyledDigit& styledDigit = styledDigits[4];
-  styledDigit.pattern = 1;
-  styledDigit.style = StyledDigit::kStyleNormal;
+  StyledPattern& styledPattern = styledPatterns[4];
+  styledPattern.pattern = 1;
+  styledPattern.style = StyledPattern::kStyleNormal;
 
   renderer->writeDecimalPointAt(4);
-  assertEqual(1, styledDigit.pattern);
+  assertEqual(1, styledPattern.pattern);
 }
 
 // Frame rates for various blinks and pulses at 60 fps, (4 * 3) fields/frame:
@@ -374,25 +374,25 @@ testF(RendererTest, writeDecimalPointAt_outOfBounds) {
 //  - pulse fast: 60 frames/cycle - 4*3*60 = 720 fields/cycle
 testF(RendererTest, displayCurrentField) {
   //enableVerbosity(Verbosity::kAssertionPassed);
-  renderer->writePatternAt(0, 0x11, StyledDigit::kStyleBlinkSlow);
-  renderer->writePatternAt(1, 0x22, StyledDigit::kStyleBlinkFast);
-  renderer->writePatternAt(2, 0x33, StyledDigit::kStylePulseSlow);
-  renderer->writePatternAt(3, 0x44, StyledDigit::kStylePulseFast);
+  renderer->writePatternAt(0, 0x11, StyledPattern::kStyleBlinkSlow);
+  renderer->writePatternAt(1, 0x22, StyledPattern::kStyleBlinkFast);
+  renderer->writePatternAt(2, 0x33, StyledPattern::kStylePulseSlow);
+  renderer->writePatternAt(3, 0x44, StyledPattern::kStylePulseFast);
 
   assertEqual((uint16_t) (FRAMES_PER_SECOND * 4 * 3),
       renderer->getFieldsPerSecond());
 
   renderer->renderField();
-  assertDimmingDigitsEqual(4, 0x11, 255, 0x22, 255, 0x33, 0, 0x44, 0);
+  assertDimmablePatternsEqual(4, 0x11, 255, 0x22, 255, 0x33, 0, 0x44, 0);
 
   fastForwardFields(156); // +13 frames = #13
-  assertDimmingDigitsEqual(4, 0x11, 255, 0x22, 0, 0x33, 35, 0x44, 109);
+  assertDimmablePatternsEqual(4, 0x11, 255, 0x22, 0, 0x33, 35, 0x44, 109);
 
   fastForwardFields(156); // +13 frames = #26
-  assertDimmingDigitsEqual(4, 0x11, 0, 0x22, 255, 0x33, 72, 0x44, 220);
+  assertDimmablePatternsEqual(4, 0x11, 0, 0x22, 255, 0x33, 72, 0x44, 220);
 
   fastForwardFields(708); // +59 frames = #85
-  assertDimmingDigitsEqual(4, 0x11, 0, 0x22, 0, 0x33, 240, 0x44, 212);
+  assertDimmablePatternsEqual(4, 0x11, 0, 0x22, 0, 0x33, 240, 0x44, 212);
 }
 
 // If the driver does not support subfields, then pulsing is disabled.
@@ -405,25 +405,25 @@ testF(RendererTest, displayCurrentField_noSubFieldDriver) {
   assertEqual(false, driver->isBrightnessSupported());
   renderer->configure();
 
-  renderer->writePatternAt(0, 0x11, StyledDigit::kStyleBlinkSlow);
-  renderer->writePatternAt(1, 0x22, StyledDigit::kStyleBlinkFast);
-  renderer->writePatternAt(2, 0x33, StyledDigit::kStylePulseSlow);
-  renderer->writePatternAt(3, 0x44, StyledDigit::kStylePulseFast);
+  renderer->writePatternAt(0, 0x11, StyledPattern::kStyleBlinkSlow);
+  renderer->writePatternAt(1, 0x22, StyledPattern::kStyleBlinkFast);
+  renderer->writePatternAt(2, 0x33, StyledPattern::kStylePulseSlow);
+  renderer->writePatternAt(3, 0x44, StyledPattern::kStylePulseFast);
 
   assertEqual((uint16_t) (FRAMES_PER_SECOND * 4 * 1),
       renderer->getFieldsPerSecond());
 
   renderer->renderField(); // #0
-  assertDimmingDigitsEqual(4, 0x11, 255, 0x22, 255, 0x33, 255, 0x44, 255);
+  assertDimmablePatternsEqual(4, 0x11, 255, 0x22, 255, 0x33, 255, 0x44, 255);
 
   fastForwardFields(52); // +13 frames = #13
-  assertDimmingDigitsEqual(4, 0x11, 255, 0x22, 0, 0x33, 255, 0x44, 255);
+  assertDimmablePatternsEqual(4, 0x11, 255, 0x22, 0, 0x33, 255, 0x44, 255);
 
   fastForwardFields(52); // +13 frames = #26
-  assertDimmingDigitsEqual(4, 0x11, 0, 0x22, 255, 0x33, 255, 0x44, 255);
+  assertDimmablePatternsEqual(4, 0x11, 0, 0x22, 255, 0x33, 255, 0x44, 255);
 
   fastForwardFields(236); // +59 frames = #85
-  assertDimmingDigitsEqual(4, 0x11, 0, 0x22, 0, 0x33, 255, 0x44, 255);
+  assertDimmablePatternsEqual(4, 0x11, 0, 0x22, 0, 0x33, 255, 0x44, 255);
 }
 
 testF(RendererTest, displayCurrentField_dimmedBrightness) {
@@ -432,10 +432,10 @@ testF(RendererTest, displayCurrentField_dimmedBrightness) {
   renderer->configure();
 
   renderer->writeBrightness(127);
-  renderer->writePatternAt(0, 0x11, StyledDigit::kStyleBlinkSlow);
-  renderer->writePatternAt(1, 0x22, StyledDigit::kStyleBlinkFast);
-  renderer->writePatternAt(2, 0x33, StyledDigit::kStylePulseSlow);
-  renderer->writePatternAt(3, 0x44, StyledDigit::kStylePulseFast);
+  renderer->writePatternAt(0, 0x11, StyledPattern::kStyleBlinkSlow);
+  renderer->writePatternAt(1, 0x22, StyledPattern::kStyleBlinkFast);
+  renderer->writePatternAt(2, 0x33, StyledPattern::kStylePulseSlow);
+  renderer->writePatternAt(3, 0x44, StyledPattern::kStylePulseFast);
 
   assertEqual((uint16_t) (FRAMES_PER_SECOND * 4 * 3),
       renderer->getFieldsPerSecond());
@@ -444,16 +444,16 @@ testF(RendererTest, displayCurrentField_dimmedBrightness) {
   // the testF(RendererTest, displayCurrentField) test case.
 
   renderer->renderField();
-  assertDimmingDigitsEqual(4, 0x11, 127, 0x22, 127, 0x33, 0, 0x44, 0);
+  assertDimmablePatternsEqual(4, 0x11, 127, 0x22, 127, 0x33, 0, 0x44, 0);
 
   fastForwardFields(156); // +13 frames = #13
-  assertDimmingDigitsEqual(4, 0x11, 127, 0x22, 0, 0x33, 17, 0x44, 54);
+  assertDimmablePatternsEqual(4, 0x11, 127, 0x22, 0, 0x33, 17, 0x44, 54);
 
   fastForwardFields(156); // +13 frames = #26
-  assertDimmingDigitsEqual(4, 0x11, 0, 0x22, 127, 0x33, 36, 0x44, 109);
+  assertDimmablePatternsEqual(4, 0x11, 0, 0x22, 127, 0x33, 36, 0x44, 109);
 
   fastForwardFields(708); // +59 frames = #85
-  assertDimmingDigitsEqual(4, 0x11, 0, 0x22, 0, 0x33, 119, 0x44, 105);
+  assertDimmablePatternsEqual(4, 0x11, 0, 0x22, 0, 0x33, 119, 0x44, 105);
 }
 
 

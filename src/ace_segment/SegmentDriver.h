@@ -30,7 +30,7 @@ SOFTWARE.
 
 namespace ace_segment {
 
-class DimmingDigit;
+class DimmablePattern;
 
 /**
  * A Driver that assumes that the resistors are on the digits so the
@@ -39,9 +39,10 @@ class DimmingDigit;
 class SegmentDriver: public Driver {
   public:
     /** Constructor. */
-    explicit SegmentDriver(LedMatrix* ledMatrix, DimmingDigit* dimmingDigits,
+    explicit SegmentDriver(LedMatrix* ledMatrix,
+            DimmablePattern* dimmablePatterns,
             uint8_t numDigits, bool ownsLedMatrix = false):
-        Driver(ledMatrix, dimmingDigits, numDigits, ownsLedMatrix)
+        Driver(ledMatrix, dimmablePatterns, numDigits, ownsLedMatrix)
     {}
 
     virtual void configure() override {

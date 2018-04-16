@@ -33,8 +33,8 @@ void ModulatingDigitDriver::displayCurrentField() {
   if (mPreparedToSleep) return;
 
   bool isCurrentDigitOn;
-  DimmingDigit& dimmingDigit = mDimmingDigits[mCurrentDigit];
-  uint8_t brightness = dimmingDigit.brightness;
+  DimmablePattern& dimmablePattern = mDimmablePatterns[mCurrentDigit];
+  uint8_t brightness = dimmablePattern.brightness;
   if (mCurrentDigit != mPrevDigit) {
     // NOTE: The following could be optimized away by wrapping it around an 'if
     // (mIsPrevDigitOn)' statement. But I think it's safer to issue a redundant
@@ -62,7 +62,7 @@ void ModulatingDigitDriver::displayCurrentField() {
   } else {
     // turn on the current digit
     if (!isCurrentDigitOn) {
-      SegmentPatternType segmentPattern = dimmingDigit.pattern;
+      SegmentPatternType segmentPattern = dimmablePattern.pattern;
       if (segmentPattern != mSegmentPattern) {
         mLedMatrix->drawElements(segmentPattern);
         mSegmentPattern = segmentPattern;

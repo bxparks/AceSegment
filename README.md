@@ -123,21 +123,21 @@ depend on the lower-level classes:
 
 * `Hardware`: A class that hold hardware dependent methods (such as
   `digitalWrite()`).
-* `DimmingDigit`: A class that represents one digit of the 7-segment display
+* `DimmablePattern`: A class that represents one digit of the 7-segment display
   and its brightness. An array of these will be created, one for each digit.
-* `Driver`: A class that knows how to display bit patterns of a `DimmingDigit`
-  to the seven segment leds. Different subclasses implement different types of
-  wiring, but the user does not need to aware of the various subclasses. That
-  complexity is managed by the `DriverBuilder` class.
+* `Driver`: A class that knows how to display bit patterns of a
+  `DimmablePattern` to the seven segment leds. Different subclasses implement
+  different types of wiring, but the user does not need to aware of the various
+  subclasses. That complexity is managed by the `DriverBuilder` class.
 * `DriverBuilder`: A class that knows how to select and configure the
   appropriate subclass of `Driver`.
-* `StyledDigit`: A class that represents one digit which can have certain style
-  attributes (e.g. blinking, or pulsing). A `StyledDigit` is converted into
-  a `DimmingDigit`.
-* `Renderer`: A class that knows how to convert a `StyledDigit` into the
-  `DimmingDigit` that a `Driver` knows how to diplay. A `Renderer` also
-  knows how to modulate the brightness of a `DimmingDigit` to achieve
-  the style indicated by `StyledDigit`.
+* `StyledPattern`: A class that represents the bit patterns digit which can have
+  certain style attributes (e.g. blinking, or pulsing). A `StyledPattern` is
+  converted into a `DimmablePattern` by the `Renderer`.
+* `Renderer`: A class that knows how to convert a `StyledPattern` into the
+  `DimmablePattern` that a `Driver` knows how to diplay. A `Renderer` also
+  knows how to modulate the brightness of a `DimmablePattern` to achieve
+  the style indicated by `StyledPattern`.
 * `HexWriter`: A class that print a hexadecimal numeral (0-F) to a bit pattern
   used by the `Renderer` class. Three additional characters are supported:
   `kSpace`, `kMinus` and `kPeriod`. (Note that decimal numerals are a subset of
@@ -191,8 +191,8 @@ const uint8_t NUM_DIGITS = 4;
 const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
 const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
 
-DimmingDigit dimmingDigits[NUM_DIGITS];
-StyledDigit styledDigits[NUM_DIGITS];
+DimmablePattern dimmablePatterns[NUM_DIGITS];
+StyledPattern styledPatterns[NUM_DIGITS];
 
 // The chain of resources.
 Hardware* hardware;
@@ -224,7 +224,7 @@ void setup() {
   driver->configure();
 
   // Create and configure the Renderer.
-  renderer = RendererBuilder(hardware, driver, styledDigits, NUM_DIGITS)
+  renderer = RendererBuilder(hardware, driver, styledPatterns, NUM_DIGITS)
       .setFramesPerSecond(FRAMES_PER_SECOND)
       ...
       .build();
@@ -267,8 +267,8 @@ const uint8_t NUM_DIGITS = 4;
 const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
 const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
 
-DimmingDigit dimmingDigits[NUM_DIGITS];
-StyledDigit styledDigits[NUM_DIGITS];
+DimmablePattern dimmablePatterns[NUM_DIGITS];
+StyledPattern styledPatterns[NUM_DIGITS];
 
 // The chain of resources.
 Hardware hardware;
@@ -281,7 +281,7 @@ Driver* driver = DriverBuilder(&hardware)
     ...
     .build();
 Renderer* renderer = RendererBuilder(
-        &hardware, driver, styledDigits, NUM_DIGITS)
+        &hardware, driver, styledPatterns, NUM_DIGITS)
     .setFramesPerSecond(FRAMES_PER_SECOND)
     ...
     .build();
@@ -365,7 +365,7 @@ The following methods are available in `DriverBuilder`:
    uint8_t clockPin)`
 * `DriverBuilder& setSegmentSpiPins(uint8_t latchPin, uint8_t dataPin,
    uint8_t clockPin)`
-* `DriverBuilder& setDimmingDigits(DimmingDigit* dimmingDigits)`
+* `DriverBuilder& setDimmablePatterns(DimmablePattern* dimmablePatterns)`
 * `DriverBuilder& useModulatingDriver(uint8_t numSubFields)`
 
 The best way to show how to use these methods is probably through
@@ -415,7 +415,7 @@ Driver* driver = DriverBuilder(hardware)
     .setResistorsOnSegments()
     .setDigitPins(digitPins)
     .setSegmentDirectPins(segmentPins)
-    .setDimmingDigits(dimmingDigits)
+    .setDimmablePatterns(dimmablePatterns)
     .build();
 ```
 
@@ -451,7 +451,7 @@ Driver* driver = DriverBuilder(hardware)
     .setResistorsOnSegments()
     .setDigitPins(digitPins)
     .setSegmentDirectPins(segmentPins)
-    .setDimmingDigits(dimmingDigits)
+    .setDimmablePatterns(dimmablePatterns)
     .build();
 ```
 
@@ -487,7 +487,7 @@ Driver* driver = DriverBuilder(hardware)
     .setResistorsOnDigits()
     .setDigitPins(digitPins)
     .setSegmentDirectPins(segmentPins)
-    .setDimmingDigits(dimmingDigits)
+    .setDimmablePatterns(dimmablePatterns)
     .build();
 ```
 
@@ -523,7 +523,7 @@ Driver* driver = DriverBuilder(hardware)
     .setResistorsOnDigits()
     .setDigitPins(digitPins)
     .setSegmentDirectPins(segmentPins)
-    .setDimmingDigits(dimmingDigits)
+    .setDimmablePatterns(dimmablePatterns)
     .build();
 ```
 
@@ -566,7 +566,7 @@ Driver* driver = DriverBuilder(hardware)
     .setResistorsOnSegments()
     .setDigitPins(digitPins)
     .setSegmentDirectPins(segmentPins)
-    .setDimmingDigits(dimmingDigits)
+    .setDimmablePatterns(dimmablePatterns)
     .useModulatingDriver(NUM_SUBFIELDS)
     .build();
 ```
@@ -613,7 +613,7 @@ Driver* driver = DriverBuilder(hardware)
     .setResistorsOnSegments()
     .setDigitPins(digitPins)
     .setSegmentSerialPins(latchPin, dataPin, clockPin)
-    .setDimmingDigits(dimmingDigits)
+    .setDimmablePatterns(dimmablePatterns)
     .build();
 ```
 
@@ -659,7 +659,7 @@ Driver* driver = DriverBuilder(hardware)
     .setResistorsOnSegments()
     .setDigitPins(digitPins)
     .setSegmentSpiPins(latchPin, dataPin, clockPin)
-    .setDimmingDigits(dimmingDigits)
+    .setDimmablePatterns(dimmablePatterns)
     .build();
 
 driver->configure();
@@ -723,7 +723,7 @@ The `Renderer` is dependent on the following resources, and these required
 parameters are given in the constructor of `RendererBuilder`:
 * `Hardware`
 * `Driver`
-* an array of `StyledDigit`
+* an array of `StyledPattern`
 
 The following optional parameters can be given to `RendererBuilder` to override
 the defaults. Each of these methods returns a reference to `*this` so they can
@@ -739,7 +739,7 @@ The `build()` method creates an instance of `Renderer` with the given
 parameters. An example of configuring the `Renderer` is:
 ```
 const uint8_t NUM_DIGITS = 4;
-StyledDigit styledDigits[NUM_DIGITS];
+StyledPattern styledPatterns[NUM_DIGITS];
 const int FRAMES_PER_SECOND = 90;
 const int BLINK_FAST_DURATION_MILLIS = 500;
 
@@ -749,7 +749,7 @@ void setup() {
   Driver* driver = ...;
 
   Renderer* renderer =
-      RendererBuilder(hardware, driver, styledDigits, NUM_DIGITS)
+      RendererBuilder(hardware, driver, styledPatterns, NUM_DIGITS)
       .setFramesPerSecond(FRAMES_PER_SECOND)
       .setBlinkFastDuration(BLINK_FAST_DURATION_MILLIS)
       .build();
@@ -769,11 +769,10 @@ the seven segment display:
 * `void writeStyleAt(uint8_t digit, uint8_t style)`
 * `void writeDecimalPointAt(uint8_t digit, bool state = true)`
 
-The `digit` is the index into the `StyledDigit` array, from `0` to
-`NUM_DIGITS-1`. The `pattern` is an 8-bit integer which maps the the
-seven-segment digit bit to the bit using following the usual convention for
-a seven segment LED ('a' is the least significant bit 0, decimal point 'dp'
-is the most seignificant bit 7):
+The `digit` is the index into the `StyledPattern` array, from `0` to
+`NUM_DIGITS-1`. The `pattern` is an 8-bit integer which maps to the LED segments
+using the usual convention for a seven-segment LED ('a' is the least significant
+bit 0, decimal point 'dp' is the most seignificant bit 7):
 ```
 7-segment map:
       aaa       000
@@ -789,7 +788,7 @@ Segment: dp g f e d c b a
 ```
 (Sometimes, the decimal point `dp` is labeled as an `h`).
 
-The `style` is a constant given by the constants in the `StyledDigit` class:
+The `style` is a constant given by the constants in the `StyledPattern` class:
 ```
 static const StyleType kStyleNormal = 0;
 static const StyleType kStyleBlinkSlow = 1;
@@ -877,11 +876,11 @@ how many fields there are in a frame and this information comes from the
 With the distinction between *frames* and *fields* explained, we can now explain
 how `Renderer::renderField()` works. The `Renderer` keeps an internal counter,
 and if the call occurs at a frame boundary, the `Renderer` calculates the
-`DimmingDigit` buffer in the `Driver` from the `StyledDigit` in the `Renderer`,
-and applies any changes to the digit bit patterns necessary to support the
-various digit styles (overall brightness, pulsing or blinking). Then the
-`Renderer` passes along the call to the `Driver` which will draw the resulting
-bit pattern on the LED display.
+`DimmablePattern` buffer in the `Driver` from the `StyledPattern` in the
+`Renderer`, and applies any changes to the digit bit patterns necessary to
+support the various digit styles (overall brightness, pulsing or blinking). Then
+the `Renderer` passes along the call to the `Driver` which will draw the
+resulting bit pattern on the LED display.
 
 If the call to `renderField()` occurs in the middle of a frame (i.e. in a
 field), then the `Renderer` simply passed along the call to the `Driver`, which
@@ -974,8 +973,8 @@ table is stored in flash memory to conserve static memory.
 
 The class supports the following methods:
 * `void writeHexAt(uint8_t digit, uint8_t c)`
-* `void writeHexAt(uint8_t digit, uint8_t c, StyledDigit::StyleType style)`
-* `void writeStyleAt(uint8_t digit, StyledDigit::StyleType style)`
+* `void writeHexAt(uint8_t digit, uint8_t c, StyledPattern::StyleType style)`
+* `void writeStyleAt(uint8_t digit, StyledPattern::StyleType style)`
 * `void writeDecimalPointAt(uint8_t digit, bool state = true)`
 
 In addition to the numerals 0-15 (or 0x0-0xF), the class also supports these
@@ -998,8 +997,8 @@ memory.
 
 The class supports the following methods:
 * `void writeCharAt(uint8_t digit, char c)`
-* `void writeCharAt(uint8_t digit, char c, StyledDigit::StyleType style)`
-* `void writeStyleAt(uint8_t digit, StyledDigit::StyleType style)`
+* `void writeCharAt(uint8_t digit, char c, StyledPattern::StyleType style)`
+* `void writeStyleAt(uint8_t digit, StyledPattern::StyleType style)`
 * `void writeDecimalPointAt(uint8_t digit, bool state = true)`
 
 A `CharWriter` consumes about 300 bytes of flash memory.
@@ -1035,13 +1034,13 @@ void scrollString(const char* s) {
 
 (TODO: Maybe move this code fragment into the StringWriter class. I'm not sure
 that we can push this down to the Renderer class because the Renderer not know
-how to translate a `char` into the bit patterns of `StyledDigit`. We could have
-the StringWriter present a complete array of translated `StyledDigit` to the
-Renderer, but that seems like a waste of memory, since we don't need to
+how to translate a `char` into the bit patterns of `StyledPattern`. We could
+have the StringWriter present a complete array of translated `StyledPattern` to
+the Renderer, but that seems like a waste of memory, since we don't need to
 precalcuate the bit pattern translation of the entire string. We only need to
 translate as many characters as will fit into the number of digits in the LED
 display. Also, it turns out the precalcuted strings won't really work, because
-the exact `StyledDigit` of the first digit depends on the scroll position. In
+the exact `StyledPattern` of the first digit depends on the scroll position. In
 other words, a period '.' character will occupy an entire digit on the first LED
 digit, but will be collapsed into the previous character at other positions.)
 
@@ -1080,7 +1079,7 @@ FastDirectDriver.cpp
 These generated classes will replace the class generated by `DriverBuilder`:
 ```
 Driver* driver = DriverBuilder(hardware)
-    .setDimmingDigits(dimmingDigits)
+    .setDimmablePatterns(dimmablePatterns)
     .setNumDigits(NUM_DIGITS)
     .useModulatingDriver(NUM_SUBFIELDS)
     ...
@@ -1088,7 +1087,8 @@ Driver* driver = DriverBuilder(hardware)
 ```
 with just
 ```
-Driver* driver = new FastDirectDriver(dimmingDigits, NUM_DIGITS, NUM_SUBFIELDS);
+Driver* driver = new FastDirectDriver(
+    dimmablePatterns, NUM_DIGITS, NUM_SUBFIELDS);
 ```
 
 The generated code has no dependency to `Hardware`, it writes directly to the

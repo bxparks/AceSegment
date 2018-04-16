@@ -27,10 +27,10 @@ class DriverGenerator:
 class {1}: public ace_segment::ModulatingDigitDriver {{
   public:
     // Constructor
-    {1}(ace_segment::DimmingDigit* dimmingDigits,
+    {1}(ace_segment::DimmablePattern* dimmablePatterns,
             uint8_t numDigits, uint8_t numSubFields):
         ace_segment::ModulatingDigitDriver(
-            nullptr /* ledMatrix */, dimmingDigits, numDigits, numSubFields)
+            nullptr /* ledMatrix */, dimmablePatterns, numDigits, numSubFields)
     {{}}
 
     // Destructor
@@ -130,8 +130,9 @@ void {1}::displayCurrentField() {{
   if (mPreparedToSleep) return;
 
   bool isCurrentDigitOn;
-  ace_segment::DimmingDigit& dimmingDigit = mDimmingDigits[mCurrentDigit];
-  uint8_t brightness = dimmingDigit.brightness;
+  ace_segment::DimmablePattern& dimmablePattern =
+      mDimmablePatterns[mCurrentDigit];
+  uint8_t brightness = dimmablePattern.brightness;
   if (mCurrentDigit != mPrevDigit) {{
     disableDigit(mPrevDigit);
     isCurrentDigitOn = false;
@@ -147,7 +148,7 @@ void {1}::displayCurrentField() {{
     }}
   }} else {{
     if (!isCurrentDigitOn) {{
-      SegmentPatternType segmentPattern = dimmingDigit.pattern;
+      SegmentPatternType segmentPattern = dimmablePattern.pattern;
       if (segmentPattern != mSegmentPattern) {{
         drawSegments(segmentPattern);
         mSegmentPattern = segmentPattern;

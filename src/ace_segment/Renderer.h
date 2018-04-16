@@ -31,7 +31,7 @@ SOFTWARE.
 
 namespace ace_segment {
 
-class StyledDigit;
+class StyledPattern;
 class Hardware;
 
 /**
@@ -52,7 +52,7 @@ class Renderer {
 
     /** Constructor. */
     explicit Renderer(Hardware* hardware, Driver* driver,
-            StyledDigit* styledDigits, uint8_t numDigits,
+            StyledPattern* styledPatterns, uint8_t numDigits,
             uint8_t framesPerSecond,
             uint16_t statsResetInterval,
             uint16_t blinkSlowDurationMillis,
@@ -61,7 +61,7 @@ class Renderer {
             uint16_t pulseFastDurationMillis):
         mHardware(hardware),
         mDriver(driver),
-        mStyledDigits(styledDigits),
+        mStyledPatterns(styledPatterns),
         mNumDigits(numDigits),
         mFramesPerSecond(framesPerSecond),
         mStatsResetInterval(statsResetInterval),
@@ -158,8 +158,8 @@ class Renderer {
     TimingStats getTimingStats();
 
     /** Return a reference the styled digit. VisibleForTesting. */
-    StyledDigit& getStyledDigit(uint8_t i) {
-      return mStyledDigits[i];
+    StyledPattern& getStyledPattern(uint8_t i) {
+      return mStyledPatterns[i];
     }
 
     /** Calculate the blink state. VisibleForTesting. */
@@ -209,12 +209,12 @@ class Renderer {
     /** Calculate the blink and pulse states for current frame. */
     void calcBlinkAndPulseForFrame();
 
-    /** Translate the StyledDigits to DimmingDigits for the Driver. */
-    void renderStyledDigits();
+    /** Translate the StyledPatterns to DimmablePatterns for the Driver. */
+    void renderStyledPatterns();
 
     Hardware* const mHardware;
     Driver* const mDriver;
-    StyledDigit* const mStyledDigits;
+    StyledPattern* const mStyledPatterns;
     const uint8_t mNumDigits;
     const uint8_t mFramesPerSecond;
 

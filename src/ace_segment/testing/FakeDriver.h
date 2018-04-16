@@ -37,8 +37,8 @@ namespace testing {
 class FakeDriver: public Driver {
   public:
     /** Constructor. */
-    explicit FakeDriver(DimmingDigit* dimmingDigits, uint8_t numDigits):
-        Driver(nullptr /* ledMatrix */, dimmingDigits, numDigits)
+    explicit FakeDriver(DimmablePattern* dimmablePatterns, uint8_t numDigits):
+        Driver(nullptr /* ledMatrix */, dimmablePatterns, numDigits)
     {}
 
     virtual void displayCurrentField() override {}

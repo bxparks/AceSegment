@@ -29,12 +29,12 @@ SOFTWARE.
 
 namespace ace_segment {
 
-class DimmingDigit {
+class DimmablePattern {
   public:
     static const uint8_t kOff = 0;
     static const uint8_t kOn = 255;
 
-    DimmingDigit():
+    DimmablePattern():
       pattern(0),
       brightness(kOn)
     {}
@@ -44,8 +44,8 @@ class DimmingDigit {
 
   private:
     // disable copy-constructor and assignment operator
-    DimmingDigit(const DimmingDigit&) = delete;
-    DimmingDigit& operator=(const DimmingDigit&) = delete;
+    DimmablePattern(const DimmablePattern&) = delete;
+    DimmablePattern& operator=(const DimmablePattern&) = delete;
 };
 
 }

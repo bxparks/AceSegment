@@ -94,14 +94,14 @@ Driver* DriverBuilder::build() {
 
   if (mResistorsOnSegments) {
     if (mUseModulatingDriver) {
-      return new ModulatingDigitDriver(ledMatrix, mDimmingDigits,
+      return new ModulatingDigitDriver(ledMatrix, mDimmablePatterns,
           mNumDigits, mNumSubFields, true /* ownsLedMatrix */);
     } else {
-      return new DigitDriver(ledMatrix, mDimmingDigits, mNumDigits,
+      return new DigitDriver(ledMatrix, mDimmablePatterns, mNumDigits,
           true /* ownsLedMatrix */);
     }
   } else {
-    return new SegmentDriver(ledMatrix, mDimmingDigits, mNumDigits,
+    return new SegmentDriver(ledMatrix, mDimmablePatterns, mNumDigits,
         true /* ownsLedMatrix */);
   }
 }

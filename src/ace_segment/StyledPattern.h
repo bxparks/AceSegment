@@ -33,7 +33,7 @@ namespace ace_segment {
  * Data structure that keeps track of the state of each digit (its segment bit
  * pattern and its style).
  */
-class StyledDigit {
+class StyledPattern {
   public:
     typedef uint8_t StyleType;
 
@@ -43,7 +43,7 @@ class StyledDigit {
     static const StyleType kStylePulseSlow = 3;
     static const StyleType kStylePulseFast = 4;
 
-    StyledDigit():
+    StyledPattern():
       pattern(0),
       style(kStyleNormal)
     {}
@@ -61,8 +61,8 @@ class StyledDigit {
 
   private:
     // disable copy-constructor and assignment operator
-    StyledDigit(const StyledDigit&) = delete;
-    StyledDigit& operator=(const StyledDigit&) = delete;
+    StyledPattern(const StyledPattern&) = delete;
+    StyledPattern& operator=(const StyledPattern&) = delete;
 
 };
 

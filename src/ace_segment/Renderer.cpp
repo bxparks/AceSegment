@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 #include <Arduino.h>
-#include "StyledDigit.h"
+#include "StyledPattern.h"
 #include "Hardware.h"
 #include "Renderer.h"
 #include "Util.h"
@@ -78,30 +78,30 @@ void Renderer::configure() {
 
 void Renderer::writePatternAt(uint8_t digit, uint8_t pattern, uint8_t style) {
   if (digit >= mNumDigits) return;
-  StyledDigit& styledDigit = mStyledDigits[digit];
-  styledDigit.pattern = pattern;
-  styledDigit.style = style;
+  StyledPattern& styledPattern = mStyledPatterns[digit];
+  styledPattern.pattern = pattern;
+  styledPattern.style = style;
 }
 
 void Renderer::writePatternAt(uint8_t digit, uint8_t pattern) {
   if (digit >= mNumDigits) return;
-  StyledDigit& styledDigit = mStyledDigits[digit];
-  styledDigit.pattern = pattern;
+  StyledPattern& styledPattern = mStyledPatterns[digit];
+  styledPattern.pattern = pattern;
 }
 
 void Renderer::writeStyleAt(uint8_t digit, uint8_t style) {
   if (digit >= mNumDigits) return;
-  StyledDigit& styledDigit = mStyledDigits[digit];
-  styledDigit.style = style;
+  StyledPattern& styledPattern = mStyledPatterns[digit];
+  styledPattern.style = style;
 }
 
 void Renderer::writeDecimalPointAt(uint8_t digit, bool state) {
   if (digit >= mNumDigits) return;
-  StyledDigit& styledDigit = mStyledDigits[digit];
+  StyledPattern& styledPattern = mStyledPatterns[digit];
   if (state) {
-    styledDigit.setDecimalPoint();
+    styledPattern.setDecimalPoint();
   } else {
-    styledDigit.clearDecimalPoint();
+    styledPattern.clearDecimalPoint();
   }
 }
 
@@ -128,7 +128,7 @@ void Renderer::renderField() {
 
 void Renderer::updateFrame() {
   calcBlinkAndPulseForFrame();
-  renderStyledDigits();
+  renderStyledPatterns();
   if (mStatsResetInterval > 0 &&
       mStats.getCount() >= mStatsResetInterval) {
     mStats.reset();
@@ -142,14 +142,14 @@ TimingStats Renderer::getTimingStats() {
   return stats;
 }
 
-void Renderer::renderStyledDigits() {
+void Renderer::renderStyledPatterns() {
   for (uint8_t digit = 0; digit < mNumDigits; digit++) {
-    StyledDigit& styledDigit = mStyledDigits[digit];
-    StyledDigit::StyleType style = styledDigit.style;
+    StyledPattern& styledPattern = mStyledPatterns[digit];
+    StyledPattern::StyleType style = styledPattern.style;
     uint8_t brightness = calcBrightness(style, mBrightness,
         mBlinkSlowState, mBlinkFastState, mIsPulseEnabled,
         mPulseSlowFraction, mPulseFastFraction);
-    mDriver->setPattern(digit, styledDigit.pattern, brightness);
+    mDriver->setPattern(digit, styledPattern.pattern, brightness);
   }
 }
 
@@ -158,19 +158,19 @@ uint8_t Renderer::calcBrightness(uint8_t style, uint8_t brightness,
     uint8_t pulseSlowFraction, uint8_t pulseFastFraction) {
 
   switch (style) {
-    case StyledDigit::kStyleNormal:
+    case StyledPattern::kStyleNormal:
       return brightness;
-    case StyledDigit::kStyleBlinkSlow:
+    case StyledPattern::kStyleBlinkSlow:
       return (blinkSlowState == kBlinkStateOff) ? 0 : brightness;
-    case StyledDigit::kStyleBlinkFast:
+    case StyledPattern::kStyleBlinkFast:
       return (blinkFastState == kBlinkStateOff) ? 0 : brightness;
-    case StyledDigit::kStylePulseSlow:
+    case StyledPattern::kStylePulseSlow:
       if (isPulseEnabled) {
         return ((uint16_t) pulseSlowFraction * brightness) / 256;
       } else {
         return brightness;
       }
-    case StyledDigit::kStylePulseFast:
+    case StyledPattern::kStylePulseFast:
       if (isPulseEnabled) {
         return ((uint16_t) pulseFastFraction * brightness) / 256;
       } else {

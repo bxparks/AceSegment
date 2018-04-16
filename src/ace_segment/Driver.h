@@ -26,7 +26,7 @@ SOFTWARE.
 #define ACE_SEGMENT_DRIVER_H
 
 #include <stdint.h>
-#include "DimmingDigit.h"
+#include "DimmablePattern.h"
 
 namespace ace_segment {
 
@@ -34,7 +34,7 @@ class LedMatrix;
 
 /**
  * Base class of drivers which knows how to transfer the bit patterns stored in
- * the array of DimmingDigit objects to the actual LED display. Different
+ * the array of DimmablePattern objects to the actual LED display. Different
  * wiring configuration will require different drivers.
  *
  * Each call to displayCurrentField() displays one field of a frame. The object
@@ -108,7 +108,7 @@ class Driver {
      *    1/256, set to 255 if not specified
      */
     void setPattern(uint8_t digit, SegmentPatternType pattern,
-        uint8_t brightness = DimmingDigit::kOn);
+        uint8_t brightness = DimmablePattern::kOn);
 
     /** Set the brightness of the given digit. */
     void setBrightness(uint8_t digit, uint8_t brightness);
@@ -131,24 +131,24 @@ class Driver {
      *
      * @param ledMatrix The ledMatrix can be null for a FakeDriver but normally
      * it is expected to be non-null.
-     * @param dimmingDigits An array of DimmingDigit objects that represents
-     * each digit.
+     * @param dimmablePatterns An array of DimmablePattern objects that
+     * represents each digit.
      * @param numDigits
      * @param ownsLedMatrix If true, the Driver object owns the ledMatrix and
      * will delete it in the destructor. Default is false, but set to true
      * by DriverBuidler.
      */
-    explicit Driver(LedMatrix* ledMatrix, DimmingDigit* dimmingDigits,
+    explicit Driver(LedMatrix* ledMatrix, DimmablePattern* dimmablePatterns,
             uint8_t numDigits, bool ownsLedMatrix = false):
         mLedMatrix(ledMatrix),
-        mDimmingDigits(dimmingDigits),
+        mDimmablePatterns(dimmablePatterns),
         mNumDigits(numDigits),
         mOwnsLedMatrix(ownsLedMatrix),
         mPreparedToSleep(false)
     {}
 
     LedMatrix* const mLedMatrix;
-    DimmingDigit* const mDimmingDigits;
+    DimmablePattern* const mDimmablePatterns;
     const uint8_t mNumDigits;
     const bool mOwnsLedMatrix;
 

@@ -30,7 +30,7 @@ SOFTWARE.
 
 namespace ace_segment {
 
-class StyledDigit;
+class StyledPattern;
 class Hardware;
 
 /**
@@ -42,10 +42,10 @@ class RendererBuilder {
   public:
     /** Constructor. */
     explicit RendererBuilder(Hardware* hardware, Driver* driver,
-            StyledDigit* styledDigits, uint8_t numDigits):
+            StyledPattern* styledPatterns, uint8_t numDigits):
         mHardware(hardware),
         mDriver(driver),
-        mStyledDigits(styledDigits),
+        mStyledPatterns(styledPatterns),
         mNumDigits(numDigits),
         mFramesPerSecond(kFramesPerSecondDefault),
         mStatsResetInterval(kStatsResetIntervalDefault),
@@ -113,7 +113,7 @@ class RendererBuilder {
      * parameters. The Renderer::init() method must be called before using it.
      */
     Renderer* build() {
-      return new Renderer(mHardware, mDriver, mStyledDigits, mNumDigits,
+      return new Renderer(mHardware, mDriver, mStyledPatterns, mNumDigits,
           mFramesPerSecond, mStatsResetInterval,
           mBlinkSlowDurationMillis, mBlinkFastDurationMillis,
           mPulseSlowDurationMillis, mPulseFastDurationMillis);
@@ -134,7 +134,7 @@ class RendererBuilder {
 
     Hardware* const mHardware;
     Driver* const mDriver;
-    StyledDigit* const mStyledDigits;
+    StyledPattern* const mStyledPatterns;
     uint8_t const mNumDigits;
     uint8_t mFramesPerSecond;
     uint16_t mStatsResetInterval;

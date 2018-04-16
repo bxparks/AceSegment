@@ -39,11 +39,11 @@ void DigitDriver::displayCurrentField() {
     mLedMatrix->disableGroup(mPrevDigit);
   }
 
-  DimmingDigit& dimmingDigit = mDimmingDigits[mCurrentDigit];
-  if (dimmingDigit.brightness == 0) {
+  DimmablePattern& dimmablePattern = mDimmablePatterns[mCurrentDigit];
+  if (dimmablePattern.brightness == 0) {
     mLedMatrix->disableGroup(mCurrentDigit);
   } else {
-    SegmentPatternType segmentPattern = dimmingDigit.pattern;
+    SegmentPatternType segmentPattern = dimmablePattern.pattern;
     if (segmentPattern != mSegmentPattern) {
       mLedMatrix->drawElements(segmentPattern);
       mSegmentPattern = segmentPattern;

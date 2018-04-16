@@ -26,7 +26,7 @@ SOFTWARE.
 #define ACE_SEGMENT_HEX_WRITER_H
 
 #include <stdint.h>
-#include "StyledDigit.h"
+#include "StyledPattern.h"
 #include "Renderer.h"
 
 namespace ace_segment {
@@ -55,10 +55,10 @@ class HexWriter {
     void writeHexAt(uint8_t digit, uint8_t c);
 
     /** Write the hex at the specified position. */
-    void writeHexAt(uint8_t digit, uint8_t c, StyledDigit::StyleType style);
+    void writeHexAt(uint8_t digit, uint8_t c, StyledPattern::StyleType style);
 
     /** Write the style for a given digit, leaving hex unchanged. */
-    void writeStyleAt(uint8_t digit, StyledDigit::StyleType style) {
+    void writeStyleAt(uint8_t digit, StyledPattern::StyleType style) {
       if (digit >= getNumDigits()) return;
       mRenderer->writeStyleAt(digit, style);
     }
