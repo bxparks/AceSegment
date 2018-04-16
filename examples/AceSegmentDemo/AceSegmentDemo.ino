@@ -28,14 +28,17 @@ using namespace ace_segment;
 // Define the Driver to use. Use DRIVER_MODE_NONE to get flash/static
 // consumption without any AceSegment code. Then set to the other modes to get
 // flash/static memory usage.
-#define DRIVER_MODE DRIVER_MODE_FAST_SERIAL
+#define DRIVER_MODE DRIVER_MODE_DIGIT
 
 // Applies only for DRIVER_MODE_DIGIT, DRIVER_MODE_MODULATING_DIGIT,
 // DRIVER_MODE_SEGMENT. Ignored for others.
-#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
+#define LED_MATRIX_MODE LED_MATRIX_MODE_SERIAL
 
 // Type of characters to write to the LED display
 #define WRITE_MODE WRITE_MODE_HEX
+
+// Transistor drivers on digits.
+#define USE_TRANSISTOR_DRIVERS 1
 
 const uint8_t FRAMES_PER_SECOND = 60;
 const uint8_t NUM_SUBFIELDS = 16;
@@ -126,6 +129,9 @@ void setupAceSegment() {
       .useModulatingDriver(NUM_SUBFIELDS)
   #endif
       .setDimmingDigits(dimmingDigits)
+  #if USE_TRANSISTOR_DRIVERS == 1
+      .useTransistorDrivers()
+  #endif
       .build();
 #elif DRIVER_MODE == DRIVER_MODE_SEGMENT
   driver = DriverBuilder(hardware)
@@ -135,6 +141,9 @@ void setupAceSegment() {
       .setDigitPins(digitPins)
       .setSegmentDirectPins(segmentPins)
       .setDimmingDigits(dimmingDigits)
+  #if USE_TRANSISTOR_DRIVERS == 1
+      .useTransistorDrivers()
+  #endif
       .build();
 #elif DRIVER_MODE == DRIVER_MODE_FAST_DIRECT
   driver = new FastDirectDriver(dimmingDigits, NUM_DIGITS, NUM_SUBFIELDS);

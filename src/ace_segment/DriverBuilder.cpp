@@ -37,6 +37,7 @@ namespace ace_segment {
 
 /** The LedMatrix object returned must have its configure() called. */
 LedMatrix* DriverBuilder::buildLedMatrix() {
+  LedMatrix* matrix;
   if (mLedMatrixType == kTypeLedMatrixDirect) {
     if (mResistorsOnSegments) {
       LedMatrixDirect* ledMatrix =
@@ -48,18 +49,21 @@ LedMatrix* DriverBuilder::buildLedMatrix() {
       } else {
         ledMatrix->setAnodeOnGroup();
       }
-      return ledMatrix;
+      matrix = ledMatrix;
     } else {
       LedMatrixDirect* ledMatrix =
           new LedMatrixDirect(mHardware, mNumSegments, mNumDigits);
       ledMatrix->setGroupPins(mSegmentPins);
       ledMatrix->setElementPins(mDigitPins);
+      // If the resistors are on the Digit pins, then the "anode" and "cathode"
+      // pins become flipped electrically, because we're scanning the LED
+      // matrix in the other direction.
       if (mCommonCathode) {
         ledMatrix->setAnodeOnGroup();
       } else {
         ledMatrix->setCathodeOnGroup();
       }
-      return ledMatrix;
+      matrix = ledMatrix;
     }
   } else {
     // We support only resistors on segments for SerialToParallel
@@ -76,8 +80,13 @@ LedMatrix* DriverBuilder::buildLedMatrix() {
     } else {
       ledMatrix->setAnodeOnGroup();
     }
-    return ledMatrix;
+    matrix = ledMatrix;
   }
+
+  if (mUseTransistorDrivers) {
+    matrix->invertGroupLevels();
+  }
+  return matrix;
 }
 
 Driver* DriverBuilder::build() {

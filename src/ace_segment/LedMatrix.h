@@ -27,6 +27,10 @@ SOFTWARE.
 
 #include <Arduino.h> // LOW and HIGH
 
+#if LOW != 0 || HIGH != 1
+  #error LOW is not 0 or HIGH is not 1
+#endif
+
 namespace ace_segment {
 
 class Hardware;
@@ -55,6 +59,12 @@ class LedMatrix {
       mGroupOff = LOW;
       mElementOn = LOW;
       mElementOff = HIGH;
+    }
+
+    /** If a transistor drives the group, invert the logic levels. */
+    void invertGroupLevels() {
+      mGroupOn = 1 - mGroupOn;
+      mGroupOff =  1 - mGroupOff;
     }
 
     virtual void configure() {}
