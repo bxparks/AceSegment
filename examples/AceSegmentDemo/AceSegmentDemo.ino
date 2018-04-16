@@ -84,7 +84,7 @@ void setupAceButton() {
 #define WRITE_MODE WRITE_MODE_HEX
 
 // Transistor drivers on digits.
-#define USE_TRANSISTOR_DRIVERS 1
+#define USE_TRANSISTORS 1
 
 const uint8_t FRAMES_PER_SECOND = 60;
 const uint8_t NUM_SUBFIELDS = 16;
@@ -162,8 +162,8 @@ void setupAceSegment() {
       .useModulatingDriver(NUM_SUBFIELDS)
   #endif
       .setDimmablePatterns(dimmingPattern)
-  #if USE_TRANSISTOR_DRIVERS == 1
-      .useTransistorDrivers()
+  #if USE_TRANSISTORS == 1
+      .useTransistors()
   #endif
       .build();
 #elif DRIVER_MODE == DRIVER_MODE_SEGMENT
@@ -174,8 +174,8 @@ void setupAceSegment() {
       .setDigitPins(digitPins)
       .setSegmentDirectPins(segmentPins)
       .setDimmablePatterns(dimmingPattern)
-  #if USE_TRANSISTOR_DRIVERS == 1
-      .useTransistorDrivers()
+  #if USE_TRANSISTORS == 1
+      .useTransistors()
   #endif
       .build();
 #elif DRIVER_MODE == DRIVER_MODE_FAST_DIRECT

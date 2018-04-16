@@ -83,7 +83,7 @@ LedMatrix* DriverBuilder::buildLedMatrix() {
     matrix = ledMatrix;
   }
 
-  if (mUseTransistorDrivers) {
+  if (mUseTransistors) {
     matrix->invertGroupLevels();
   }
   return matrix;

@@ -17,7 +17,7 @@ class Generator:
         self.segment_spi_pins = kwargs.get('segment_spi_pins')
         self.digit_pins = kwargs['digit_pins']
         self.common_cathode = kwargs['common_cathode']
-        self.use_transistor_drivers = kwargs['use_transistor_drivers']
+        self.use_transistors = kwargs['use_transistors']
         self.digital_write_fast = kwargs['digital_write_fast']
         self.output_header = kwargs['output_header']
         self.output_source = kwargs['output_source']
@@ -29,7 +29,7 @@ class Generator:
         logging.info("segment_spi_pins: %s", self.segment_spi_pins)
         logging.info("digit_pins: %s", self.digit_pins)
         logging.info("common_cathode: %s", self.common_cathode)
-        logging.info("use_transistor_drivers: %s", self.use_transistor_drivers)
+        logging.info("use_transistors: %s", self.use_transistors)
         logging.info("digital_write_fast: %s", self.digital_write_fast)
 
     def run(self):
@@ -139,7 +139,7 @@ class Generator:
             segment_on = 'LOW'
             segment_off = 'HIGH'
 
-        if self.use_transistor_drivers:
+        if self.use_transistors:
             digit_on, digit_off = digit_off, digit_on
 
         constants = []

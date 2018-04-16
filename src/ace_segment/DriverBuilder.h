@@ -61,8 +61,8 @@ class DriverBuilder {
       return *this;
     }
 
-    DriverBuilder& useTransistorDrivers() {
-      mUseTransistorDrivers = true;
+    DriverBuilder& useTransistors() {
+      mUseTransistors = true;
       return *this;
     }
 
@@ -147,7 +147,7 @@ class DriverBuilder {
     uint8_t mNumSegments = 8;
     bool mResistorsOnSegments = true;
     bool mCommonCathode = true;
-    bool mUseTransistorDrivers = false;
+    bool mUseTransistors = false;
     uint8_t mLedMatrixType = kTypeLedMatrixDirect;
     const uint8_t* mDigitPins = nullptr;
     const uint8_t* mSegmentPins = nullptr;

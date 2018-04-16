@@ -19,7 +19,7 @@ Usage: fast_driver.py [-h] [flags ...]
   --digit_pins {space-separate list of digit pins}
   --common_cathode
   --common_anode
-  --use_transistor_drivers
+  --use_transistors
   --output_header print {class_name}.h file on stdout
   --output_source print {class_name}.cpp file on stdout
   --output_files generate the {class_name}.h and {class_name}.cpp files
@@ -110,7 +110,7 @@ def main():
         dest='common_cathode',
         action="store_false")
     parser.add_argument(
-        '--use_transistor_drivers',
+        '--use_transistors',
         help='Transistors on digit pins invert their logic values',
         action="store_true")
     parser.add_argument(
@@ -153,7 +153,7 @@ def main():
             segment_direct_pins=args.segment_direct_pins,
             digit_pins=args.digit_pins,
             common_cathode=args.common_cathode,
-            use_transistor_drivers=args.use_transistor_drivers,
+            use_transistors=args.use_transistors,
             output_header=args.output_header,
             output_source=args.output_source,
             output_files=args.output_files,
@@ -165,7 +165,7 @@ def main():
             segment_serial_pins=args.segment_serial_pins,
             digit_pins=args.digit_pins,
             common_cathode=args.common_cathode,
-            use_transistor_drivers=args.use_transistor_drivers,
+            use_transistors=args.use_transistors,
             output_header=args.output_header,
             output_source=args.output_source,
             output_files=args.output_files,
@@ -177,7 +177,7 @@ def main():
             segment_spi_pins=args.segment_spi_pins,
             digit_pins=args.digit_pins,
             common_cathode=args.common_cathode,
-            use_transistor_drivers=args.use_transistor_drivers,
+            use_transistors=args.use_transistors,
             output_header=args.output_header,
             output_source=args.output_source,
             output_files=args.output_files,

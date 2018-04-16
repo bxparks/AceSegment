@@ -217,7 +217,7 @@ void setup() {
       .setNumDigits(NUM_DIGITS)
       .setCommonCathode()
       .setResistorsOnSegments()
-      .useTransistorDrivers()
+      .useTransistors()
       .setDigitPins(digitPins)
       .setSegmentDirectPins(segmentPins)
       ...
@@ -360,7 +360,7 @@ The following methods are available in `DriverBuilder`:
 * `DriverBuilder& setCommonCathode()`
 * `DriverBuilder& setResistorsOnDigits()`
 * `DriverBuilder& setResistorsOnSegments()`
-* `DriverBuilder& useTransistorDrivers()`
+* `DriverBuilder& useTransistors()`
 * `DriverBuilder& setDigitPins(const uint8_t* digitPins)`
 * `DriverBuilder& setSegmentDirectPins(const uint8_t* segmentPins)`
 * `DriverBuilder& setSegmentSerialPins(uint8_t latchPin, uint8_t dataPin,
@@ -420,7 +420,7 @@ MCU                     LED display
                    GND
 ```
 
-The `useTransistorDrivers()` method on `DriverBuilder` tells the software
+The `useTransistors()` method on `DriverBuilder` tells the software
 that transistor drivers are being used, and that the logic levels should be
 inverted.
 
@@ -459,7 +459,7 @@ Driver* driver = DriverBuilder(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonCathode()
     .setResistorsOnSegments()
-    .useTransistorDrivers()
+    .useTransistors()
     .setDigitPins(digitPins)
     .setSegmentDirectPins(segmentPins)
     .setDimmablePatterns(dimmablePatterns)
@@ -496,7 +496,7 @@ Driver* driver = DriverBuilder(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonAnode()
     .setResistorsOnSegments()
-    .useTransistorDrivers()
+    .useTransistors()
     .setDigitPins(digitPins)
     .setSegmentDirectPins(segmentPins)
     .setDimmablePatterns(dimmablePatterns)
@@ -533,7 +533,7 @@ Driver* driver = DriverBuilder(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonAnode()
     .setResistorsOnDigits()
-    .useTransistorDrivers()
+    .useTransistors()
     .setDigitPins(digitPins)
     .setSegmentDirectPins(segmentPins)
     .setDimmablePatterns(dimmablePatterns)
@@ -570,7 +570,7 @@ Driver* driver = DriverBuilder(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonAnode()
     .setResistorsOnDigits()
-    .useTransistorDrivers()
+    .useTransistors()
     .setDigitPins(digitPins)
     .setSegmentDirectPins(segmentPins)
     .setDimmablePatterns(dimmablePatterns)
@@ -614,7 +614,7 @@ Driver* driver = DriverBuilder(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonCathode()
     .setResistorsOnSegments()
-    .useTransistorDrivers()
+    .useTransistors()
     .setDigitPins(digitPins)
     .setSegmentDirectPins(segmentPins)
     .setDimmablePatterns(dimmablePatterns)
@@ -662,7 +662,7 @@ Driver* driver = DriverBuilder(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonCathode()
     .setResistorsOnSegments()
-    .useTransistorDrivers()
+    .useTransistors()
     .setDigitPins(digitPins)
     .setSegmentSerialPins(latchPin, dataPin, clockPin)
     .setDimmablePatterns(dimmablePatterns)
@@ -709,7 +709,7 @@ Driver* driver = DriverBuilder(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonCathode()
     .setResistorsOnSegments()
-    .useTransistorDrivers()
+    .useTransistors()
     .setDigitPins(digitPins)
     .setSegmentSpiPins(latchPin, dataPin, clockPin)
     .setDimmablePatterns(dimmablePatterns)
