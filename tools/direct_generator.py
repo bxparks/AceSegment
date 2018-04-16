@@ -183,13 +183,14 @@ void {class_name}::prepareToSleep() {{
 """
 
     def __init__(self, invocation, class_name, segment_pins, digit_pins,
-                 common_cathode, output_header, output_source, output_files,
-                 digital_write_fast):
+                 common_cathode, use_transistor_drivers, output_header,
+                 output_source, output_files, digital_write_fast):
         self.invocation = invocation
         self.class_name = class_name
         self.segment_pins = segment_pins
         self.digit_pins = digit_pins
         self.common_cathode = common_cathode
+        self.use_transistor_drivers = use_transistor_drivers
         self.output_header = output_header
         self.output_source = output_source
         self.output_files = output_files
@@ -199,6 +200,7 @@ void {class_name}::prepareToSleep() {{
         logging.info("segment_pins: %s", self.segment_pins)
         logging.info("digit_pins: %s", self.digit_pins)
         logging.info("common_cathode: %s", self.common_cathode)
+        logging.info("use_transistor_drivers: %s", self.use_transistor_drivers)
         logging.info("digital_write_fast: %s", self.digital_write_fast)
 
     def run(self):
@@ -297,15 +299,25 @@ void {class_name}::prepareToSleep() {{
         return '\n  '.join(entries)
 
     def get_on_off_constants(self):
-        constants = []
         if self.common_cathode:
-            constants.append('static const uint8_t kDigitOn = LOW;')
-            constants.append('static const uint8_t kDigitOff = HIGH;')
-            constants.append('static const uint8_t kSegmentOn = HIGH;')
-            constants.append('static const uint8_t kSegmentOff = LOW;')
+            digit_on = 'LOW'
+            digit_off = 'HIGH'
+            segment_on = 'HIGH'
+            segment_off = 'LOW'
         else:
-            constants.append('static const uint8_t kDigitOn = HIGH;')
-            constants.append('static const uint8_t kDigitOff = LOW;')
-            constants.append('static const uint8_t kSegmentOn = LOW;')
-            constants.append('static const uint8_t kSegmentOff = HIGH;')
+            digit_on = 'HIGH'
+            digit_off = 'LOW'
+            segment_on = 'LOW'
+            segment_off = 'HIGH'
+
+        if self.use_transistor_drivers:
+            digit_on, digit_off = digit_off, digit_on
+
+        constants = []
+        constants.append('static const uint8_t kDigitOn = %s;' % (digit_on))
+        constants.append('static const uint8_t kDigitOff = %s;' % (digit_off))
+        constants.append('static const uint8_t kSegmentOn = %s;' %
+                         (segment_on))
+        constants.append('static const uint8_t kSegmentOff = %s;' %
+                         (segment_off))
         return '\n    '.join(constants)
