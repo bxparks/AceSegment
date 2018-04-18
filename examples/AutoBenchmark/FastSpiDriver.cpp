@@ -3,6 +3,8 @@
 //
 // DO NOT EDIT
 
+#ifdef __AVR__
+
 #include <stdint.h>
 #include <Arduino.h>
 #include <SPI.h>
@@ -97,3 +99,5 @@ void FastSpiDriver::prepareToSleep() {
   Driver::prepareToSleep();
   disableDigit(mPrevDigit);
 }
+
+#endif

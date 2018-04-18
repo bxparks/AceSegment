@@ -18,6 +18,8 @@ class DriverGenerator(Generator):
 //
 // DO NOT EDIT
 
+#ifdef __AVR__
+
 #include <stdint.h>
 #include <digitalWriteFast.h>
 #include <ace_segment/ModulatingDigitDriver.h>
@@ -81,6 +83,8 @@ class {class_name}: public ace_segment::ModulatingDigitDriver {{
 }};
 
 #endif
+
+#endif
 """
 
     SOURCE_FILE = """\
@@ -88,6 +92,8 @@ class {class_name}: public ace_segment::ModulatingDigitDriver {{
 //   {invocation}
 //
 // DO NOT EDIT
+
+#ifdef __AVR__
 
 #include <stdint.h>
 #include <Arduino.h>
@@ -175,6 +181,8 @@ void {class_name}::prepareToSleep() {{
   Driver::prepareToSleep();
   disableDigit(mPrevDigit);
 }}
+
+#endif
 """
 
     def __init__(self, invocation, **kwargs):

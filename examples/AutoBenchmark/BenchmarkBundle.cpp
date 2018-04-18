@@ -23,9 +23,11 @@ SOFTWARE.
 */
 
 #include "BenchmarkBundle.h"
-#include "FastDirectDriver.h"
-#include "FastSerialDriver.h"
-#include "FastSpiDriver.h"
+#ifdef __AVR__
+  #include "FastDirectDriver.h"
+  #include "FastSerialDriver.h"
+  #include "FastSpiDriver.h"
+#endif
 
 const uint8_t BenchmarkBundle::kDigitPins[kNumDigits] = {4, 5, 6, 7};
 const uint8_t BenchmarkBundle::kSegmentDirectPins[8] =
@@ -38,6 +40,7 @@ BenchmarkBundle::BenchmarkBundle(const DriverConfig* driverConfig) {
 
   // Create the Driver.
   if (driverConfig->mFast) {
+#ifdef __AVR__
     if (driverConfig->mPinWiring == DriverConfig::DirectPins) {
       mDriver = new FastDirectDriver(
           mDimmingPatterns, kNumDigits, kNumSubFields);
@@ -48,6 +51,7 @@ BenchmarkBundle::BenchmarkBundle(const DriverConfig* driverConfig) {
       mDriver = new FastSpiDriver(
           mDimmingPatterns, kNumDigits, kNumSubFields);
     }
+#endif
   } else {
     DriverBuilder builder = DriverBuilder(mHardware)
           .setDimmablePatterns(mDimmingPatterns);

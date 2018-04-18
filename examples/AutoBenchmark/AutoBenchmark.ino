@@ -39,9 +39,11 @@ SOFTWARE.
 
 #include <stdio.h>
 #include <AceSegment.h>
-#include "FastDirectDriver.h"
-#include "FastSerialDriver.h"
-#include "FastSpiDriver.h"
+#ifdef __AVR__
+  #include "FastDirectDriver.h"
+  #include "FastSerialDriver.h"
+  #include "FastSpiDriver.h"
+#endif
 #include "DriverConfig.h"
 #include "BenchmarkBundle.h"
 

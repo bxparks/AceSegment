@@ -62,6 +62,7 @@ const DriverConfig DriverConfig::kDriverConfigs[] {
       ResistorsOnSegments, SpiPins, UseModulation, NoFastDriver,
       "segments    | spi       | modulation |      |"),
 
+#ifdef __AVR__
   DriverConfig(
       ResistorsOnSegments, DirectPins, UseModulation, UseFastDriver,
       "segments    | direct    | modulation | fast |"),
@@ -71,6 +72,7 @@ const DriverConfig DriverConfig::kDriverConfigs[] {
   DriverConfig(
       ResistorsOnSegments, SpiPins, UseModulation, UseFastDriver,
       "segments    | spi       | modulation | fast |"),
+#endif
 };
 
 const uint8_t DriverConfig::kNumDriverConfigs =

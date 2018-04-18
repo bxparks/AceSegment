@@ -1266,11 +1266,14 @@ This library was developed and tested using:
 
 I used MacOS 10.13.3 and Ubuntu Linux 17.10 for most of my development.
 
-The library has been verified to work on the following hardware:
+The library has been tested on the following hardware:
 
-* Arduino Nano clone (16 MHz ATmega328P)
-* Arduino Pro Mini clone (16 MHz ATmega328P, 5V)
-* Teensy LC (48 MHz ARM Cortex-M0+)
+* Arduino Nano clone (16 MHz ATmega328P) - fully tested
+* Arduino Pro Mini clone (16 MHz ATmega328P, 5V) - fully tested
+* Teensy LC (48 MHz ARM Cortex-M0+) - limited hardware testing
+* Arduino Pro Micro clone (16 MHz ATmega32U4, 5V) - limited software testing
+* Teensy 3.2 (48 MHz ARM Cortex-M0+) - verified compile
+* NodeMCU 1.0 clone (ESP-12E module, 80MHz ESP8266) - verified compile
 
 The unit tests require [AUnit](https://github.com/bxparks/AUnit)
 to be installed.
