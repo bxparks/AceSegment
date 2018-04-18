@@ -118,11 +118,19 @@ class Renderer {
     /** Write the decimal point for the digit. */
     void writeDecimalPointAt(uint8_t digit, bool state = true);
 
+    /** Clear all digits, preserving the styles at each digit. */
+    void clear();
+
     /**
      * Display one field of a frame when the time is right. This is a polling
      * method, so call this slightly more frequently than getFieldsPerSecond().
+     *
+     * @return Returns true if renderField() was called and the field was
+     * rendered. The flag can be used to optimize the polling of
+     * getTimingStats(). If the return value is false, there's no need to call
+     * getTimingStats() again, since it will not have changed.
      */
-    void renderFieldWhenReady();
+    bool renderFieldWhenReady();
 
     /**
      * Render the current field immediately. Designed to be called from a timer

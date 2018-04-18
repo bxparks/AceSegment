@@ -358,6 +358,18 @@ testF(RendererTest, writeDecimalPointAt) {
   assertEqual(0, styledPattern.style);
 }
 
+testF(RendererTest, clear) {
+  StyledPattern& styledPattern = styledPatterns[0];
+
+  renderer->writePatternAt(0, 0x11, StyledPattern::kStyleBlinkSlow);
+  assertEqual(0x11, styledPattern.pattern);
+  assertEqual(StyledPattern::kStyleBlinkSlow, styledPattern.style);
+
+  renderer->clear();
+  assertEqual(0, styledPattern.pattern);
+  assertEqual(StyledPattern::kStyleBlinkSlow, styledPattern.style);
+}
+
 testF(RendererTest, writeDecimalPointAt_outOfBounds) {
   StyledPattern& styledPattern = styledPatterns[4];
   styledPattern.pattern = 1;

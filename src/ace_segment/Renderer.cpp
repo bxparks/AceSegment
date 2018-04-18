@@ -104,13 +104,21 @@ void Renderer::writeDecimalPointAt(uint8_t digit, bool state) {
     styledPattern.clearDecimalPoint();
   }
 }
+void Renderer::clear() {
+  for (uint8_t i = 0; i < mNumDigits; i++) {
+    mStyledPatterns[i].pattern = 0;
+  }
+}
 
-void Renderer::renderFieldWhenReady() {
+bool Renderer::renderFieldWhenReady() {
   uint16_t now = mHardware->micros();
   uint16_t elapsedMicros = now - mLastRenderFieldMicros;
   if (elapsedMicros >= mMicrosPerField) {
     renderField();
     mLastRenderFieldMicros = now;
+    return true;
+  } else {
+    return false;
   }
 }
 
