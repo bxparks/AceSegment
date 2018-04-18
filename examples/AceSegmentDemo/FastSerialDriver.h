@@ -3,6 +3,8 @@
 //
 // DO NOT EDIT
 
+#ifdef __AVR__
+
 #include <stdint.h>
 #include <digitalWriteFast.h>
 #include <ace_segment/ModulatingDigitDriver.h>
@@ -74,5 +76,7 @@ class FastSerialDriver: public ace_segment::ModulatingDigitDriver {
     static void digitalWriteFastDigit03Low() { digitalWriteFast(7, LOW); }
     static void digitalWriteFastDigit03High() { digitalWriteFast(7, HIGH); }
 };
+
+#endif
 
 #endif

@@ -1,8 +1,11 @@
 #include <AceButton.h>
 #include <AceSegment.h>
-#include "FastDirectDriver.h"
-#include "FastSerialDriver.h"
-#include "FastSpiDriver.h"
+#ifdef __AVR__
+  #include "FastDirectDriver.h"
+  #include "FastSerialDriver.h"
+  #include "FastSpiDriver.h"
+#endif
+
 using namespace ace_segment;
 using namespace ace_button;
 
@@ -78,7 +81,7 @@ void setupAceButton() {
 
 // Applies only for DRIVER_MODE_DIGIT, DRIVER_MODE_MODULATING_DIGIT,
 // DRIVER_MODE_SEGMENT. Ignored for others.
-#define LED_MATRIX_MODE LED_MATRIX_MODE_SERIAL
+#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
 
 // Type of characters to write to the LED display
 #define WRITE_MODE WRITE_MODE_HEX
@@ -89,28 +92,25 @@ void setupAceButton() {
 const uint8_t FRAMES_PER_SECOND = 60;
 const uint8_t NUM_SUBFIELDS = 16;
 
-#if DRIVER_MODE == DRIVER_MODE_SEGMENT
-// 4 digits, resistors on digits
 const uint8_t NUM_DIGITS = 4;
-const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
-const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
+const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
+
+#if DRIVER_MODE == DRIVER_MODE_SEGMENT
+  // 4 digits, resistors on digits
+  const uint8_t segmentPins[8] = {8, 9, 10, 11, 12, 13, 14, 15};
 #else
   #if ((DRIVER_MODE == DRIVER_MODE_DIGIT \
       || DRIVER_MODE == DRIVER_MODE_MODULATING_DIGIT \
       || DRIVER_MODE == DRIVER_MODE_SEGMENT) \
         && LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT) \
       || DRIVER_MODE == DRIVER_MODE_FAST_DIRECT
-  // 4 digits, resistors on segments
-  const uint8_t NUM_DIGITS = 4;
-  const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
-  const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
+    // 4 digits, resistors on segments
+    const uint8_t segmentPins[8] = {8, 9, 10, 11, 12, 13, 14, 15};
   #else
-  // 4 digits, resistors on segments, serial-to-parallel converter on segments
-  const uint8_t NUM_DIGITS = 4;
-  const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
-  const uint8_t latchPin = 10; // ST_CP on 74HC595
-  const uint8_t dataPin = 11; // DS on 74HC595
-  const uint8_t clockPin = 13; // SH_CP on 74HC595
+    // 4 digits, resistors on segments, serial-to-parallel converter on segments
+    const uint8_t latchPin = SS; // ST_CP on 74HC595
+    const uint8_t dataPin = MOSI; // DS on 74HC595
+    const uint8_t clockPin = SCK; // SH_CP on 74HC595
   #endif
 #endif
 
@@ -178,12 +178,16 @@ void setupAceSegment() {
       .useTransistors()
   #endif
       .build();
-#elif DRIVER_MODE == DRIVER_MODE_FAST_DIRECT
-  driver = new FastDirectDriver(dimmingPattern, NUM_DIGITS, NUM_SUBFIELDS);
-#elif DRIVER_MODE == DRIVER_MODE_FAST_SERIAL
-  driver = new FastSerialDriver(dimmingPattern, NUM_DIGITS, NUM_SUBFIELDS);
-#elif DRIVER_MODE == DRIVER_MODE_FAST_SPI
-  driver = new FastSpiDriver(dimmingPattern, NUM_DIGITS, NUM_SUBFIELDS);
+#else
+  #ifdef __AVR__
+    #if DRIVER_MODE == DRIVER_MODE_FAST_DIRECT
+      driver = new FastDirectDriver(dimmingPattern, NUM_DIGITS, NUM_SUBFIELDS);
+    #elif DRIVER_MODE == DRIVER_MODE_FAST_SERIAL
+      driver = new FastSerialDriver(dimmingPattern, NUM_DIGITS, NUM_SUBFIELDS);
+    #elif DRIVER_MODE == DRIVER_MODE_FAST_SPI
+      driver = new FastSpiDriver(dimmingPattern, NUM_DIGITS, NUM_SUBFIELDS);
+    #endif
+  #endif
 #endif
   driver->configure();
 

@@ -3,6 +3,8 @@
 //
 // DO NOT EDIT
 
+#ifdef __AVR__
+
 #include <stdint.h>
 #include <Arduino.h>
 #include <SPI.h>
@@ -69,5 +71,7 @@ class FastSpiDriver: public ace_segment::ModulatingDigitDriver {
     static void digitalWriteFastDigit03Low() { digitalWriteFast(7, LOW); }
     static void digitalWriteFastDigit03High() { digitalWriteFast(7, HIGH); }
 };
+
+#endif
 
 #endif

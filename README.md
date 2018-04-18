@@ -188,8 +188,8 @@ A typical resource creation code looks like this:
 ```
 const uint16_t FRAMES_PER_SECOND = 60;
 const uint8_t NUM_DIGITS = 4;
-const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
-const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
+const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
+const uint8_t segmentPins[8] = {8, 9, 10, 11, 12, 13, 14, 15};
 
 DimmablePattern dimmablePatterns[NUM_DIGITS];
 StyledPattern styledPatterns[NUM_DIGITS];
@@ -265,8 +265,8 @@ like this:
 ```
 const uint16_t FRAMES_PER_SECOND = 60;
 const uint8_t NUM_DIGITS = 4;
-const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
-const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
+const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
+const uint8_t segmentPins[8] = {8, 9, 10, 11, 12, 13, 14, 15};
 
 DimmablePattern dimmablePatterns[NUM_DIGITS];
 StyledPattern styledPatterns[NUM_DIGITS];
@@ -401,19 +401,19 @@ digit pin would need to be set LOW to turn on the LED.
 ```
 MCU                     LED display
 +-----+                  +------------------------+
-|  D04|------ R ---------|a -------.              |
-|  D05|------ R ---------|b -------|--------.     |
-|  D06|------ R ---------|c        |        |     |
-|  D07|------ R ---------|d      -----    -----   |
-|  D08|------ R ---------|e       \ /      \ /    |
-|  D09|------ R ---------|f      --v--    --v--   |
-|  D10|------ R ---------|g        |        |     |
-|  D11|------ R ---------|h        |        |     |
+|  D08|------ R ---------|a -------.              |
+|  D09|------ R ---------|b -------|--------.     |
+|  D10|------ R ---------|c        |        |     |
+|  D11|------ R ---------|d      -----    -----   |
+|  D12|------ R ---------|e       \ /      \ /    |
+|  D13|------ R ---------|f      --v--    --v--   |
+|  D14|------ R ---------|g        |        |     |
+|  D15|------ R ---------|h        |        |     |
 |     |                  |         |        |     |
 |     |              +---|D1 ------+--------'     |
 |     |             /    |                        |
 |     |            /     +------------------------+
-|  D12|----- R ---| NPN
+|  D04|----- R ---| NPN
 |     |            \
 +-----+             v
                     |
@@ -435,26 +435,26 @@ The wiring for this configuration looks like this:
 ```
 MCU                     LED display
 +-----+                  +------------------------+
-|  D04|------ R ---------|a -------.              |
-|  D05|------ R ---------|b -------|--------.     |
-|  D06|------ R ---------|c        |        |     |
-|  D07|------ R ---------|d      -----    -----   |
-|  D08|------ R ---------|e       \ /      \ /    |
-|  D09|------ R ---------|f      --v--    --v--   |
-|  D10|------ R ---------|g        |        |     |
-|  D11|------ R ---------|h        |        |     |
+|  D08|------ R ---------|a -------.              |
+|  D09|------ R ---------|b -------|--------.     |
+|  D10|------ R ---------|c        |        |     |
+|  D11|------ R ---------|d      -----    -----   |
+|  D12|------ R ---------|e       \ /      \ /    |
+|  D13|------ R ---------|f      --v--    --v--   |
+|  D14|------ R ---------|g        |        |     |
+|  D15|------ R ---------|h        |        |     |
 |     |                  |         |        |     |
-|  D12|------ T ---------|D1 ------'--------'     |
-|  D14|------ T ---------|D2                      |
-|  D15|------ T ---------|D3                      |
-|  D16|------ T ---------|D4                      |
+|  D04|------ T ---------|D1 ------'--------'     |
+|  D05|------ T ---------|D2                      |
+|  D06|------ T ---------|D3                      |
+|  D07|------ T ---------|D4                      |
 +-----+                  +------------------------+
 ```
 
 The `DriverBuilder` configuration is:
 ```
-const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
-const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
+const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
+const uint8_t segmentPins[8] = {8, 9, 10, 11, 12, 13, 14, 15};
 Driver* driver = DriverBuilder(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonCathode()
@@ -472,26 +472,26 @@ The wiring for this configuration looks like this:
 ```
 MCU                    LED display
 +-----+                  +------------------------+
-|  D04|------ R ---------|a -------.              |
-|  D05|------ R ---------|b -------|--------.     |
-|  D06|------ R ---------|c        |        |     |
-|  D07|------ R ---------|d      --^--    --^--   |
-|  D08|------ R ---------|e       / \      / \    |
-|  D09|------ R ---------|f      -----    -----   |
-|  D10|------ R ---------|g        |        |     |
-|  D11|------ R ---------|h        |        |     |
+|  D08|------ R ---------|a -------.              |
+|  D09|------ R ---------|b -------|--------.     |
+|  D10|------ R ---------|c        |        |     |
+|  D11|------ R ---------|d      --^--    --^--   |
+|  D12|------ R ---------|e       / \      / \    |
+|  D13|------ R ---------|f      -----    -----   |
+|  D14|------ R ---------|g        |        |     |
+|  D15|------ R ---------|h        |        |     |
 |     |                  |         |        |     |
-|  D12|------ T ---------|D1 ------'--------'     |
-|  D14|------ T ---------|D2                      |
-|  D15|------ T ---------|D3                      |
-|  D16|------ T ---------|D4                      |
+|  D04|------ T ---------|D1 ------'--------'     |
+|  D05|------ T ---------|D2                      |
+|  D06|------ T ---------|D3                      |
+|  D07|------ T ---------|D4                      |
 +-----+                  +------------------------+
 ```
 
 The `DriverBuilder` configuration is:
 ```
-const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
-const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
+const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
+const uint8_t segmentPins[8] = {8, 9, 10, 11, 12, 13, 14, 15};
 Driver* driver = DriverBuilder(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonAnode()
@@ -509,26 +509,26 @@ The wiring for this configuration looks like this:
 ```
 MCU                     LED display
 +-----+                  +------------------------+
-|  D04|------ T ---------|a -------.              |
-|  D05|------ T ---------|b -------|--------.     |
-|  D06|------ T ---------|c        |        |     |
-|  D07|------ T ---------|d      -----    -----   |
-|  D08|------ T ---------|e       \ /      \ /    |
-|  D09|------ T ---------|f      --v--    --v--   |
-|  D10|------ T ---------|g        |        |     |
-|  D11|------ T ---------|h        |        |     |
+|  D08|------ T ---------|a -------.              |
+|  D09|------ T ---------|b -------|--------.     |
+|  D10|------ T ---------|c        |        |     |
+|  D11|------ T ---------|d      -----    -----   |
+|  D12|------ T ---------|e       \ /      \ /    |
+|  D13|------ T ---------|f      --v--    --v--   |
+|  D14|------ T ---------|g        |        |     |
+|  D15|------ T ---------|h        |        |     |
 |     |                  |         |        |     |
-|  D12|------ R ---------|D1 ------'--------'     |
-|  D14|------ R ---------|D2                      |
-|  D15|------ R ---------|D3                      |
-|  D16|------ R ---------|D4                      |
+|  D04|------ R ---------|D1 ------'--------'     |
+|  D05|------ R ---------|D2                      |
+|  D06|------ R ---------|D3                      |
+|  D07|------ R ---------|D4                      |
 +-----+                  +------------------------+
 ```
 
 The `DriverBuilder` configuration is:
 ```
-const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
-const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
+const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
+const uint8_t segmentPins[8] = {8, 9, 10, 11, 12, 13, 14, 15};
 Driver* driver = DriverBuilder(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonAnode()
@@ -546,26 +546,26 @@ The wiring for this configuration looks like this:
 ```
 MCU                     LED display
 +-----+                  +------------------------+
-|  D04|------- T --------|a -------.              |
-|  D05|------- T --------|b -------|--------.     |
-|  D06|------- T --------|c        |        |     |
-|  D07|------- T --------|d      --^--    --^--   |
-|  D08|------- T --------|e       / \      / \    |
-|  D09|------- T --------|f      -----    -----   |
-|  D10|------- T --------|g        |        |     |
-|  D11|------- T --------|h        |        |     |
+|  D08|------- T --------|a -------.              |
+|  D09|------- T --------|b -------|--------.     |
+|  D10|------- T --------|c        |        |     |
+|  D11|------- T --------|d      --^--    --^--   |
+|  D12|------- T --------|e       / \      / \    |
+|  D13|------- T --------|f      -----    -----   |
+|  D14|------- T --------|g        |        |     |
+|  D15|------- T --------|h        |        |     |
 |     |                  |         |        |     |
-|  D12|------- R --------|D1 ------'--------'     |
-|  D14|------- R --------|D2                      |
-|  D15|------- R --------|D3                      |
-|  D16|------- R --------|D4                      |
+|  D04|------- R --------|D1 ------'--------'     |
+|  D05|------- R --------|D2                      |
+|  D06|------- R --------|D3                      |
+|  D07|------- R --------|D4                      |
 +-----+                  +----------------------- +
 ```
 
 The `DriverBuilder` configuration is:
 ```
-const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
-const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
+const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
+const uint8_t segmentPins[8] = {8, 9, 10, 11, 12, 13, 14, 15};
 Driver* driver = DriverBuilder(hardware)
     .setNumDigits(NUM_DIGITS)
     .setCommonAnode()
@@ -586,29 +586,29 @@ and pulsing of digits. The wiring for this configuration looks like before:
 ```
 MCU                     LED display
 +-----+                  +------------------------+
-|  D04|------ R ---------|a -------.              |
-|  D05|------ R ---------|b -------|--------.     |
-|  D06|------ R ---------|c        |        |     |
-|  D07|------ R ---------|d      -----    -----   |
-|  D08|------ R ---------|e       \ /      \ /    |
-|  D09|------ R ---------|f      --v--    --v--   |
-|  D10|------ R ---------|g        |        |     |
-|  D11|------ R ---------|h        |        |     |
+|  D08|------ R ---------|a -------.              |
+|  D09|------ R ---------|b -------|--------.     |
+|  D10|------ R ---------|c        |        |     |
+|  D11|------ R ---------|d      -----    -----   |
+|  D12|------ R ---------|e       \ /      \ /    |
+|  D13|------ R ---------|f      --v--    --v--   |
+|  D14|------ R ---------|g        |        |     |
+|  D15|------ R ---------|h        |        |     |
 |     |                  |         |        |     |
-|  D12|------ T ---------|D1 ------'--------'     |
-|  D14|------ T ---------|D2                      |
-|  D15|------ T ---------|D3                      |
-|  D16|------ T ---------|D4                      |
+|  D04|------ T ---------|D1 ------'--------'     |
+|  D05|------ T ---------|D2                      |
+|  D06|------ T ---------|D3                      |
+|  D07|------ T ---------|D4                      |
 +-----+                  +------------------------+
 ```
 
 The `DriverBuilder` configuration is similar to before but we add
 a `useModulatingDriver()` option along with the number of
 subfields to use:
-```
+``` 
 const uint8_t NUM_SUBFIELDS = 16;
-const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
-const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
+const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
+const uint8_t segmentPins[8] = {8, 9, 10, 11, 12, 13, 14, 15};
 
 Driver* driver = DriverBuilder(hardware)
     .setNumDigits(NUM_DIGITS)
@@ -697,13 +697,14 @@ MCU          74HC595             LED display
 ```
 
 The `DriverBuilder` configuration is similar to before but we use the
-`setSegmentSpiPins()` method instead:
+`setSegmentSpiPins()` method instead. The `Arduino.h` header file conveniently
+defines the `SS`, `MOSI` and `SCK` symbols for various platforms.
 
 ```
 const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
-const uint8_t latchPin = 10; // ST_CP on 74HC595
-const uint8_t dataPin = 11; // DS on 74HC595
-const uint8_t clockPin = 13; // SH_CP on 74HC595
+const uint8_t latchPin = SS; // ST_CP on 74HC595
+const uint8_t dataPin = MOSI; // DS on 74HC595
+const uint8_t clockPin = SCK; // SH_CP on 74HC595
 
 Driver* driver = DriverBuilder(hardware)
     .setNumDigits(NUM_DIGITS)
@@ -753,21 +754,21 @@ The "PWM" options are selected by:
 * `useModulatingDriver(NUM_SUBFIELDS)`
 
 ```
-Resistors | Wiring | PWM | Available? |
-----------+--------+-----+------------|
-Segments  | Direct | Off | y          |
-Segments  | Direct | On  | y          |
-Segments  | Serial | Off | y          |
-Segments  | Serial | On  | y          |
-Segments  | SPI    | Off | y          |
-Segments  | SPI    | On  | y          |
-Digits    | Direct | Off | y          |
-Digits    | Direct | On  | -          |
-Digits    | Serial | Off | y          |
-Digits    | Serial | On  | -          |
-Digits    | SPI    | Off | y          |
-Digits    | SPI    | On  | -          |
-----------+--------+-----+------------|
+ResistorsOn | Wiring | Modulation | Available? |
+------------+--------+------------+------------|
+Segments    | Direct |            | y          |
+Segments    | Direct | Modulation | y          |
+Segments    | Serial |            | y          |
+Segments    | Serial | Modulation | y          |
+Segments    | SPI    |            | y          |
+Segments    | SPI    | Modulation | y          |
+Digits      | Direct |            | y          |
+Digits      | Direct | Modulation | -          |
+Digits      | Serial |            | y          |
+Digits      | Serial | Modulation | -          |
+Digits      | SPI    |            | y          |
+Digits      | SPI    | Modulation | -          |
+------------+--------+------------+------------|
 ```
 
 ### Configuring the Renderer

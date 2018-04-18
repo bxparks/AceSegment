@@ -3,6 +3,8 @@
 //
 // DO NOT EDIT
 
+#ifdef __AVR__
+
 #include <stdint.h>
 #include <Arduino.h>
 #include <digitalWriteFast.h>
@@ -126,3 +128,5 @@ void FastDirectDriver::prepareToSleep() {
   Driver::prepareToSleep();
   disableDigit(mPrevDigit);
 }
+
+#endif
