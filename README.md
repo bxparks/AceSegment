@@ -1218,42 +1218,45 @@ created by `DriverBuilder` and `RendererBuilder`).
 
 ### CPU Cycles
 
-The `Renderer` has a number of statistics variables which track the minimum,
-average, and maximum amount of time taken by a single call to `renderField()`
-method, over the last 300 frames (default which is adjustable). Here are the
-numbers for a 16MHz ATmega328P, using a frame rate of 60Hz, with 16 subfields
-per field for the `useModulatingDriver()` option:
+The `Renderer` contains a `TimingStats` object which tracks the minimum,
+average, and maximum amount of time taken by a call to `renderField()` method.
+The stats object reset periodically, by default every 1200 calls to
+`renderField()` but can be changed.
 
-* DigitDriver w/ LedMatrixDirect
-    * min: 16us; avg: 80us; max: 108us
-* DigitDriver w/ LedMatrixSerial
-    * min: 16us; avg: 84-139us; max: 204us
-* DigitDriver w/ LedMatrixSpi
-    * min: 16us; avg: 30-55us; max: 80us
-* ModulatingDigitDriver w/ LedMatrixDirect
-    * min: 8us; avg: 12-20us; max: 140us
-* ModulatingDigitDriver w/ LedMatrixSerial
-    * min: 8us; avg: 12-20us; max: 212us
-* ModulatingDigitDriver w/ LedMatrixSpi
-    * min: 8us; avg: 12-20us; max: 100us
-* SegmentDriver w/ LedMatrixDirect
-    * min: 28us; avg: 36-76; max: 96us
-* FastDirectDriver (fast_driver.py w/ segment_direct_pins)
-    * min: 8us; avg: 13us; max: 84us
-* FastSerialDriver (fast_driver.py, segment_serial_pins)
-    * min: 8us; avg: 13us; max: 80us
-* FastSpiDriver (fast_driver.py, segment_spi_pins)
-    * min: 8us; avg: 13us; max: 76us
+Here is the output of the `examples/AutoBenchmark/` sketch which iterates
+through every supported variation of `Driver`, calls `renderField()` about a
+1000 times, then reports the min/avg/max CPU time (in microseconds) collected by
+the `TimingStats` object in the `Renderer`. The sketch was run on an Arduino
+Nano clone (16MHz ATmega328P), using a frame rate of 60Hz, with 16 subfields per
+field for the `useModulatingDriver()` option:
+
+```
+------------+-----------+------------+------+-------------+
+resistorsOn | pinWiring | modulation | fast | min/avg/max |
+------------|-----------|------------|------|-------------|
+digits      | direct    |            |      |  60/ 67/100 |
+digits      | serial    |            |      |  60/ 67/100 |
+digits      | spi       |            |      |  60/ 67/100 |
+segments    | direct    |            |      |  80/ 88/116 |
+segments    | serial    |            |      | 152/163/192 |
+segments    | spi       |            |      |  44/ 53/ 84 |
+segments    | direct    | modulation |      |  12/ 18/140 |
+segments    | serial    | modulation |      |  12/ 23/220 |
+segments    | spi       | modulation |      |  12/ 16/104 |
+segments    | direct    | modulation | fast |  12/ 15/ 88 |
+segments    | serial    | modulation | fast |  12/ 14/ 80 |
+segments    | spi       | modulation | fast |  12/ 14/ 76 |
+------------+-----------+------------+------+-------------+
+```
 
 If we want to drive a 4 digit LED display at 60 frames per second, using a
 subfield modulation of 16 subfields per field, we get a field rate of 3.84 kHz,
 or 260 microseconds per field. All of the options had a maximum time
 of less than 260 microseconds.
 
-The `fast_driver.py` generates code that is fast enough to drive a 4-digit LED
-display on an 8MHz ATmega328P microcontroller at a frame rate of 60Hz, with 16
-subfields per field for pulse width modulation.
-
+The `fast_driver.py` script generates C++ code (indicated by `fast` above) that
+is fast enough to allow pulse width modulation even on an 8MHz ATmega328P
+microcontroller.
 
 ## System Requirements
 
