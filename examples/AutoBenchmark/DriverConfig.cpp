@@ -22,56 +22,78 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include "Flash.h"
 #include "DriverConfig.h"
 
-// The c-strings below consume 47 x 12 = 564 bytes of static memory. They could
-// be moved into flash memory. But the F() macro doesn't work outside of a
-// function context, so it's a bit more effort to move them into PROGMEM. Since
-// this is just a diagnostic sketch that still fits inside 2kB, it doesn't seem
-// to be worthwhile to do this work. However, if we start running out of static
-// memory, this would be the first place to save memory.
+static const char kLabelDigitsDirect[] PROGMEM =
+  //"------------+--------+------------+------+-------------+"
+    "digits      | direct |            |      |";
+static const char kLabelDigitsSerial[] PROGMEM =
+    "digits      | serial |            |      |";
+static const char kLabelDigitsSpi[] PROGMEM =
+    "digits      | spi    |            |      |";
+static const char kLabelSegmentsDirect[] PROGMEM =
+    "segments    | direct |            |      |";
+static const char kLabelSegmentsSerial[] PROGMEM =
+    "segments    | serial |            |      |";
+static const char kLabelSegmentsSpi[] PROGMEM =
+    "segments    | spi    |            |      |";
+static const char kLabelSegmentsDirectModulation[] PROGMEM =
+    "segments    | direct | modulation |      |";
+static const char kLabelSegmentsSerialModulation[] PROGMEM =
+    "segments    | serial | modulation |      |";
+static const char kLabelSegmentsSpiModulation[] PROGMEM =
+    "segments    | spi    | modulation |      |";
+static const char kLabelSegmentsDirectModulationFast[] PROGMEM =
+    "segments    | direct | modulation | fast |";
+static const char kLabelSegmentsSerialModulationFast[] PROGMEM =
+    "segments    | serial | modulation | fast |";
+static const char kLabelSegmentsSpiModulationFast[] PROGMEM =
+    "segments    | spi    | modulation | fast |";
+
+// The strings below would consume 47 x 12 = 564 bytes of static memory if they
+// were not placed in PROGMEM.
 const DriverConfig DriverConfig::kDriverConfigs[] {
-  //F("------------+-----------+------------+------+-------------+"));
   DriverConfig(
       ResistorsOnDigits, DirectPins, NoModulation, NoFastDriver,
-      "digits      | direct    |            |      |"),
+      FPSTR(kLabelDigitsDirect)),
   DriverConfig(
       ResistorsOnDigits, SerialPins, NoModulation, NoFastDriver,
-      "digits      | serial    |            |      |"),
+      FPSTR(kLabelDigitsSerial)),
   DriverConfig(
       ResistorsOnDigits, SpiPins, NoModulation, NoFastDriver,
-      "digits      | spi       |            |      |"),
+      FPSTR(kLabelDigitsSpi)),
 
   DriverConfig(
       ResistorsOnSegments, DirectPins, NoModulation, NoFastDriver,
-      "segments    | direct    |            |      |"),
+      FPSTR(kLabelSegmentsDirect)),
   DriverConfig(
       ResistorsOnSegments, SerialPins, NoModulation, NoFastDriver,
-      "segments    | serial    |            |      |"),
+      FPSTR(kLabelSegmentsSerial)),
   DriverConfig(
       ResistorsOnSegments, SpiPins, NoModulation, NoFastDriver,
-      "segments    | spi       |            |      |"),
+      FPSTR(kLabelSegmentsSpi)),
 
   DriverConfig(
       ResistorsOnSegments, DirectPins, UseModulation, NoFastDriver,
-      "segments    | direct    | modulation |      |"),
+      FPSTR(kLabelSegmentsDirectModulation)),
   DriverConfig(
       ResistorsOnSegments, SerialPins, UseModulation, NoFastDriver,
-      "segments    | serial    | modulation |      |"),
+      FPSTR(kLabelSegmentsSerialModulation)),
   DriverConfig(
       ResistorsOnSegments, SpiPins, UseModulation, NoFastDriver,
-      "segments    | spi       | modulation |      |"),
+      FPSTR(kLabelSegmentsSpiModulation)),
 
 #ifdef __AVR__
   DriverConfig(
       ResistorsOnSegments, DirectPins, UseModulation, UseFastDriver,
-      "segments    | direct    | modulation | fast |"),
+      FPSTR(kLabelSegmentsDirectModulationFast)),
   DriverConfig(
       ResistorsOnSegments, SerialPins, UseModulation, UseFastDriver,
-      "segments    | serial    | modulation | fast |"),
+      FPSTR(kLabelSegmentsSerialModulationFast)),
   DriverConfig(
       ResistorsOnSegments, SpiPins, UseModulation, UseFastDriver,
-      "segments    | spi       | modulation | fast |"),
+      FPSTR(kLabelSegmentsSpiModulationFast)),
 #endif
 };
 

@@ -22,53 +22,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef DRIVER_CONFIG_H
-#define DRIVER_CONFIG_H
+#ifndef FLASH_H
 
-#include <stdint.h>
+#ifdef ESP8266
+  #include <pgmspace.h>
+#else
+  #include <avr/pgmspace.h>
+#endif
 
 class __FlashStringHelper;
 
-struct DriverConfig {
-  enum ResistorWiring {
-    ResistorsOnDigits,
-    ResistorsOnSegments
-  };
-  
-  enum PinWiring {
-    DirectPins,
-    SerialPins,
-    SpiPins
-  };
-
-  enum Modulation {
-    NoModulation,
-    UseModulation
-  };
-
-  enum Fast {
-    NoFastDriver,
-    UseFastDriver
-  };
-
-  DriverConfig(
-      ResistorWiring resistorWiring, PinWiring pinWiring,
-      Modulation modulation, Fast fast, const __FlashStringHelper* label):
-    mResistorWiring(resistorWiring),
-    mPinWiring(pinWiring),
-    mModulation(modulation),
-    mFast(fast),
-    mLabel(label)
-  {}
-
-  const ResistorWiring mResistorWiring;
-  const PinWiring mPinWiring;
-  const Modulation mModulation;
-  const Fast mFast;
-  const __FlashStringHelper* const mLabel;
-
-  static const DriverConfig kDriverConfigs[];
-  static const uint8_t kNumDriverConfigs;
-};
+// Defined in ESP8266, not defined in AVR or Teensy
+#ifndef FPSTR
+  #define FPSTR(pstr_pointer) \
+      (reinterpret_cast<const __FlashStringHelper *>(pstr_pointer))
+#endif
 
 #endif
