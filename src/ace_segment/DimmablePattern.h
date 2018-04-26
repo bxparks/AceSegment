@@ -41,11 +41,6 @@ class DimmablePattern {
 
     uint8_t pattern; // segment bit pattern of the digit
     uint8_t brightness; // units of 1/256
-
-  private:
-    // disable copy-constructor and assignment operator
-    DimmablePattern(const DimmablePattern&) = delete;
-    DimmablePattern& operator=(const DimmablePattern&) = delete;
 };
 
 }

@@ -77,7 +77,7 @@ void setupAceButton() {
 // Define the Driver to use. Use DRIVER_MODE_NONE to get flash/static
 // consumption without any AceSegment code. Then set to the other modes to get
 // flash/static memory usage.
-#define DRIVER_MODE DRIVER_MODE_DIGIT
+#define DRIVER_MODE DRIVER_MODE_MODULATING_DIGIT
 
 // Applies only for DRIVER_MODE_DIGIT, DRIVER_MODE_MODULATING_DIGIT,
 // DRIVER_MODE_SEGMENT. Ignored for others.
@@ -92,12 +92,15 @@ void setupAceButton() {
 const uint8_t FRAMES_PER_SECOND = 60;
 const uint8_t NUM_SUBFIELDS = 16;
 
+const uint8_t BLINK_STYLE = 1;
+const uint8_t PULSE_STYLE = 2;
+
 const uint8_t NUM_DIGITS = 4;
 const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
 
 #if DRIVER_MODE == DRIVER_MODE_SEGMENT
   // 4 digits, resistors on digits
-  const uint8_t segmentPins[8] = {8, 9, 10, 11, 12, 13, 14, 15};
+  const uint8_t segmentPins[8] = {8, 9, 10, 11, 12, 14, 15, 16};
 #else
   #if ((DRIVER_MODE == DRIVER_MODE_DIGIT \
       || DRIVER_MODE == DRIVER_MODE_MODULATING_DIGIT \
@@ -105,7 +108,7 @@ const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
         && LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT) \
       || DRIVER_MODE == DRIVER_MODE_FAST_DIRECT
     // 4 digits, resistors on segments
-    const uint8_t segmentPins[8] = {8, 9, 10, 11, 12, 13, 14, 15};
+    const uint8_t segmentPins[8] = {8, 9, 10, 11, 12, 14, 15, 16};
   #else
     // 4 digits, resistors on segments, serial-to-parallel converter on segments
     const uint8_t latchPin = SS; // ST_CP on 74HC595
@@ -122,6 +125,8 @@ StyledPattern styledPatterns[NUM_DIGITS];
 // The chain of resources.
 Hardware* hardware;
 Driver* driver;
+PulseStyler* pulseStyler;
+BlinkStyler* blinkStyler;
 Renderer* renderer;
 CharWriter* charWriter;
 HexWriter* hexWriter;
@@ -192,8 +197,12 @@ void setupAceSegment() {
   driver->configure();
 
   // Create the Renderer.
+  pulseStyler = new PulseStyler(FRAMES_PER_SECOND, 2000);
+  blinkStyler = new BlinkStyler(FRAMES_PER_SECOND, 800);
   renderer = RendererBuilder(hardware, driver, styledPatterns, NUM_DIGITS)
       .setFramesPerSecond(FRAMES_PER_SECOND)
+      .setStyler(BLINK_STYLE, blinkStyler)
+      .setStyler(PULSE_STYLE, pulseStyler)
       .build();
   renderer->configure();
 
@@ -335,10 +344,10 @@ void writeHexes() {
   uint8_t buffer[3];
   buffer[0] = (c & 0xf0) >> 4;
   buffer[1] = (c & 0x0f);
-  hexWriter->writeHexAt(0, buffer[0], StyledPattern::kStylePulseFast);
-  hexWriter->writeHexAt(1, buffer[1], StyledPattern::kStylePulseSlow);
-  hexWriter->writeHexAt(2, HexWriter::kMinus, StyledPattern::kStyleBlinkFast);
-  hexWriter->writeHexAt(3, c, StyledPattern::kStyleBlinkSlow);
+  hexWriter->writeHexAt(0, buffer[0], StyledPattern::kStyleNormal);
+  hexWriter->writeHexAt(1, buffer[1], PULSE_STYLE);
+  hexWriter->writeHexAt(2, HexWriter::kMinus, StyledPattern::kStyleNormal);
+  hexWriter->writeHexAt(3, c, BLINK_STYLE);
 
   Util::incrementMod(c, HexWriter::kNumCharacters);
 }
@@ -351,10 +360,10 @@ void writeChars() {
   char buffer[3];
   buffer[0] = (c & 0xf0) >> 4;
   buffer[1] = (c & 0x0f);
-  charWriter->writeCharAt(0, buffer[0], StyledPattern::kStylePulseFast);
-  charWriter->writeCharAt(1, buffer[1], StyledPattern::kStylePulseSlow);
-  charWriter->writeCharAt(2, '-', StyledPattern::kStyleBlinkFast);
-  charWriter->writeCharAt(3, c, StyledPattern::kStyleBlinkSlow);
+  charWriter->writeCharAt(0, buffer[0], StyledPattern::kStyleNormal);
+  charWriter->writeCharAt(1, buffer[1], PULSE_STYLE);
+  charWriter->writeCharAt(2, '-', StyledPattern::kStyleNormal);
+  charWriter->writeCharAt(3, c, BLINK_STYLE);
 
   Util::incrementMod(c, CharWriter::kNumCharacters);
 }

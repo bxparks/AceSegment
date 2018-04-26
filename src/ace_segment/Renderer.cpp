@@ -23,10 +23,11 @@ SOFTWARE.
 */
 
 #include <Arduino.h>
+#include "Util.h"
 #include "StyledPattern.h"
 #include "Hardware.h"
+#include "Styler.h"
 #include "Renderer.h"
-#include "Util.h"
 
 // Set to 1 to use the reciprocal of pulse frames to avoid a long division
 // calculation every frame.
@@ -38,7 +39,7 @@ void Renderer::configure() {
   uint16_t nowMicros = mHardware->micros();
 
   // Extract driver specific info.
-  mIsPulseEnabled = mDriver->isBrightnessSupported();
+  mIsBrightnessEnabled = mDriver->isBrightnessSupported();
   mFieldsPerFrame = mDriver->getFieldsPerFrame();
 
   // Counters for frames and fields.
@@ -50,37 +51,13 @@ void Renderer::configure() {
 
   // Reset statistics
   mStats.reset();
-
-  // Set up for blinking slow.
-  mFramesPerBlinkSlow = (uint32_t) mFramesPerSecond
-      * mBlinkSlowDurationMillis / 1000;
-  mCurrentBlinkSlowFrame = 0;
-
-  // Set up for blinking fast.
-  mFramesPerBlinkFast = (uint32_t) mFramesPerSecond
-      * mBlinkFastDurationMillis / 1000;
-  mCurrentBlinkFastFrame = 0;
-
-  // Set up for pulsing slow.
-  mFramesPerPulseSlow = (uint32_t) mFramesPerSecond
-      * mPulseSlowDurationMillis / 1000;
-  mFramesPerPulseSlowInverse = (uint32_t) 65536 * 1000
-      / mFramesPerSecond / mPulseSlowDurationMillis;
-  mCurrentPulseSlowFrame = 0;
-
-  // Set up for pulsing fast.
-  mFramesPerPulseFast = (uint32_t) mFramesPerSecond
-      * mPulseFastDurationMillis / 1000;
-  mFramesPerPulseFastInverse = (uint32_t) 65536 * 1000
-      / mFramesPerSecond / mPulseFastDurationMillis;
-  mCurrentPulseFastFrame = 0;
 }
 
 void Renderer::writePatternAt(uint8_t digit, uint8_t pattern, uint8_t style) {
   if (digit >= mNumDigits) return;
   StyledPattern& styledPattern = mStyledPatterns[digit];
   styledPattern.pattern = pattern;
-  styledPattern.style = style;
+  styledPattern.style = (style < kNumStyles) ? style : 0;
 }
 
 void Renderer::writePatternAt(uint8_t digit, uint8_t pattern) {
@@ -92,7 +69,7 @@ void Renderer::writePatternAt(uint8_t digit, uint8_t pattern) {
 void Renderer::writeStyleAt(uint8_t digit, uint8_t style) {
   if (digit >= mNumDigits) return;
   StyledPattern& styledPattern = mStyledPatterns[digit];
-  styledPattern.style = style;
+  styledPattern.style = (style < kNumStyles) ? style : 0;
 }
 
 void Renderer::writeDecimalPointAt(uint8_t digit, bool state) {
@@ -135,12 +112,42 @@ void Renderer::renderField() {
 }
 
 void Renderer::updateFrame() {
-  calcBlinkAndPulseForFrame();
+  updateStylers();
   renderStyledPatterns();
   if (mStatsResetInterval > 0 &&
       mStats.getCount() >= mStatsResetInterval) {
     mStats.reset();
   }
+}
+
+void Renderer::updateStylers() {
+  // Determine the active styles.
+  bool activeStylers[kNumStyles];
+  for (uint8_t i = 0 ; i < kNumStyles; i++) {
+    activeStylers[i] = false;
+  }
+  for (uint8_t digit = 0 ; digit < mNumDigits; digit++) {
+    uint8_t style = mStyledPatterns[digit].style;
+    if (0 < style && style < kNumStyles) {
+      activeStylers[style] = true;
+    }
+  }
+
+  // Update the active Stylers.
+  for (uint8_t i = 1; i < kNumStyles; i++) {
+    if (activeStylers[i]) {
+      Styler* styler = mStylers[i];
+      if (isStylerSupported(styler)) {
+        styler->calcForFrame();
+      }
+    }
+  }
+}
+
+bool Renderer::isStylerSupported(Styler* styler) {
+  if (styler == nullptr) return false;
+  if (!styler->requiresBrightness()) return true;
+  return mIsBrightnessEnabled;
 }
 
 TimingStats Renderer::getTimingStats() {
@@ -153,109 +160,19 @@ TimingStats Renderer::getTimingStats() {
 void Renderer::renderStyledPatterns() {
   for (uint8_t digit = 0; digit < mNumDigits; digit++) {
     StyledPattern& styledPattern = mStyledPatterns[digit];
-    StyledPattern::StyleType style = styledPattern.style;
-    uint8_t brightness = calcBrightness(style, mBrightness,
-        mBlinkSlowState, mBlinkFastState, mIsPulseEnabled,
-        mPulseSlowFraction, mPulseFastFraction);
-    mDriver->setPattern(digit, styledPattern.pattern, brightness);
-  }
-}
 
-uint8_t Renderer::calcBrightness(uint8_t style, uint8_t brightness,
-    uint8_t blinkSlowState, uint8_t blinkFastState, bool isPulseEnabled,
-    uint8_t pulseSlowFraction, uint8_t pulseFastFraction) {
+    uint8_t brightness = mBrightness;
+    uint8_t pattern = styledPattern.pattern;
 
-  switch (style) {
-    case StyledPattern::kStyleNormal:
-      return brightness;
-    case StyledPattern::kStyleBlinkSlow:
-      return (blinkSlowState == kBlinkStateOff) ? 0 : brightness;
-    case StyledPattern::kStyleBlinkFast:
-      return (blinkFastState == kBlinkStateOff) ? 0 : brightness;
-    case StyledPattern::kStylePulseSlow:
-      if (isPulseEnabled) {
-        return ((uint16_t) pulseSlowFraction * brightness) / 256;
-      } else {
-        return brightness;
+    uint8_t style = styledPattern.style;
+    if (0 < style && style < kNumStyles) {
+      Styler* styler = mStylers[style];
+      if (isStylerSupported(styler)) {
+        styler->apply(&pattern, &brightness);
       }
-    case StyledPattern::kStylePulseFast:
-      if (isPulseEnabled) {
-        return ((uint16_t) pulseFastFraction * brightness) / 256;
-      } else {
-        return brightness;
-      }
-    default:
-      return brightness;
+    }
+    mDriver->setPattern(digit, pattern, brightness);
   }
-}
-
-void Renderer::calcBlinkAndPulseForFrame() {
-  calcBlinkStateForFrame(mFramesPerBlinkSlow, mCurrentBlinkSlowFrame,
-      mBlinkSlowState);
-  calcBlinkStateForFrame(mFramesPerBlinkFast, mCurrentBlinkFastFrame,
-      mBlinkFastState);
-
-  if (mIsPulseEnabled) {
-#if ACE_SEGMENT_USE_INVERSE_PULSE_FRAMES == 1
-    calcPulseFractionForFrameUsingInverse(mFramesPerPulseSlowInverse,
-        mFramesPerPulseSlow, mCurrentPulseSlowFrame, mPulseSlowFraction);
-    calcPulseFractionForFrameUsingInverse(mFramesPerPulseFastInverse,
-        mFramesPerPulseFast, mCurrentPulseFastFrame, mPulseFastFraction);
-#else
-    calcPulseFractionForFrame(mFramesPerPulseSlow, mCurrentPulseSlowFrame,
-        mPulseSlowFraction);
-    calcPulseFractionForFrame(mFramesPerPulseFast, mCurrentPulseFastFrame,
-        mPulseFastFraction);
-#endif
-  }
-}
-
-void Renderer::calcBlinkStateForFrame(uint16_t framesPerBlink,
-    uint16_t& currentFrame, uint8_t& blinkState) {
-  uint16_t middleOfBlink = framesPerBlink / 2;
-  if (currentFrame < middleOfBlink) {
-    blinkState = kBlinkStateOn;
-  } else {
-    blinkState = kBlinkStateOff;
-  }
-  Util::incrementMod(currentFrame, framesPerBlink);
-}
-
-void Renderer::calcPulseFractionForFrame(uint16_t framesPerPulse,
-    uint16_t& currentFrame, uint8_t& pulseFraction) {
-  uint16_t middleOfPulse = framesPerPulse / 2;
-  uint16_t fraction;
-  if (currentFrame < middleOfPulse) {
-    // TODO: rewrite to avoid expensive division operation
-    fraction = 256 * (uint32_t) currentFrame / middleOfPulse;
-  } else if (currentFrame < framesPerPulse) {
-    uint16_t reverse = (framesPerPulse - currentFrame - 1);
-    // TODO: rewrite to avoid expensive division operation
-    fraction = 256 * (uint32_t) reverse / middleOfPulse;
-  } else {
-    fraction = 0;
-  }
-  if (fraction > 255) fraction = 255;
-  pulseFraction = fraction;
-  Util::incrementMod(currentFrame, framesPerPulse);
-}
-
-void Renderer::calcPulseFractionForFrameUsingInverse(
-    uint16_t framesPerPulseInverse, uint16_t framesPerPulse,
-    uint16_t& currentFrame, uint8_t& pulseFraction) {
-  uint16_t middleOfPulse = framesPerPulse / 2;
-  uint16_t fraction;
-  if (currentFrame < middleOfPulse) {
-    fraction = (uint32_t) framesPerPulseInverse * currentFrame / (256/2);
-  } else if (currentFrame < framesPerPulse) {
-    uint16_t reverse = (framesPerPulse - currentFrame - 1);
-    fraction = (uint32_t) framesPerPulseInverse * reverse / (256/2);
-  } else {
-    fraction = 0;
-  }
-  if (fraction > 255) fraction = 255;
-  pulseFraction = fraction;
-  Util::incrementMod(currentFrame, framesPerPulse);
 }
 
 }

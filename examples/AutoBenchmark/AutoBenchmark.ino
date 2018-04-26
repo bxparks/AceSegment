@@ -82,7 +82,11 @@ void setupBenchmark(const DriverConfig* driverConfig) {
 
   benchmarkBundle = new BenchmarkBundle(driverConfig);
   benchmarkBundle->configure();
-  benchmarkBundle->mStringWriter->writeStringAt(0, "1234");
+  CharWriter* writer = benchmarkBundle->mCharWriter;
+  writer->writeCharAt(0, '1', BenchmarkBundle::kBlinkStyle);
+  writer->writeCharAt(1, '2', BenchmarkBundle::kPulseStyle);
+  writer->writeCharAt(2, '3', BenchmarkBundle::kBlinkStyle);
+  writer->writeCharAt(3, '4', BenchmarkBundle::kPulseStyle);
 }
 
 //------------------------------------------------------------------

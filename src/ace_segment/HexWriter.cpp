@@ -68,8 +68,7 @@ const uint8_t HexWriter::kCharacterArray[] PROGMEM = {
 const uint8_t HexWriter::kNumCharacters =
     sizeof(kCharacterArray)/sizeof(kCharacterArray[0]);
 
-void HexWriter::writeHexAt(uint8_t digit, uint8_t c,
-    StyledPattern::StyleType style) {
+void HexWriter::writeHexAt(uint8_t digit, uint8_t c, uint8_t style) {
   if (digit >= getNumDigits()) return;
   uint8_t pattern = ((uint8_t) c < kNumCharacters)
       ? pgm_read_byte(&kCharacterArray[(uint8_t) c])

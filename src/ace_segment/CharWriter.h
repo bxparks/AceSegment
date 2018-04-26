@@ -51,10 +51,10 @@ class CharWriter {
     void writeCharAt(uint8_t digit, char c);
 
     /** Write the character at the specified position. */
-    void writeCharAt(uint8_t digit, char c, StyledPattern::StyleType style);
+    void writeCharAt(uint8_t digit, char c, uint8_t style);
 
     /** Write the style for a given digit, leaving character unchanged. */
-    void writeStyleAt(uint8_t digit, StyledPattern::StyleType style) {
+    void writeStyleAt(uint8_t digit, uint8_t style) {
       if (digit >= getNumDigits()) return;
       mRenderer->writeStyleAt(digit, style);
     }
