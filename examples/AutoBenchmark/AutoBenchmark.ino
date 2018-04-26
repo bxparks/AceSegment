@@ -95,11 +95,11 @@ void setupBenchmark(const DriverConfig* driverConfig) {
 //------------------------------------------------------------------
 
 static const char kBoundary[] PROGMEM =
-    "------------+--------+------------+------+-------------+";
+    "------------+--------+------------+------+--------+-------------+";
 static const char kHeader[] PROGMEM =
-    "resistorsOn | wiring | modulation | fast | min/avg/max |";
+    "resistorsOn | wiring | modulation | fast | styles | min/avg/max |";
 static const char kDivider[] PROGMEM =
-    "------------|--------|------------|------|-------------|";
+    "------------|--------|------------|------|--------|-------------|";
 
 void loop() {
   if (loopMode == LOOP_MODE_BEGIN) {

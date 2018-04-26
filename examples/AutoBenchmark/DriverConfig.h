@@ -34,7 +34,7 @@ struct DriverConfig {
     ResistorsOnDigits,
     ResistorsOnSegments
   };
-  
+
   enum PinWiring {
     DirectPins,
     SerialPins,
@@ -51,13 +51,20 @@ struct DriverConfig {
     UseFastDriver
   };
 
+  enum Style {
+    NoStyles,
+    UseStyles
+  };
+
   DriverConfig(
       ResistorWiring resistorWiring, PinWiring pinWiring,
-      Modulation modulation, Fast fast, const __FlashStringHelper* label):
+      Modulation modulation, Fast fast, Style style,
+      const __FlashStringHelper* label):
     mResistorWiring(resistorWiring),
     mPinWiring(pinWiring),
     mModulation(modulation),
     mFast(fast),
+    mStyle(style),
     mLabel(label)
   {}
 
@@ -65,6 +72,7 @@ struct DriverConfig {
   const PinWiring mPinWiring;
   const Modulation mModulation;
   const Fast mFast;
+  const Style mStyle;
   const __FlashStringHelper* const mLabel;
 
   static const DriverConfig kDriverConfigs[];
