@@ -29,10 +29,6 @@ SOFTWARE.
 #include "Styler.h"
 #include "Renderer.h"
 
-// Set to 1 to use the reciprocal of pulse frames to avoid a long division
-// calculation every frame.
-#define ACE_SEGMENT_USE_INVERSE_PULSE_FRAMES 1
-
 namespace ace_segment {
 
 void Renderer::configure() {
@@ -60,6 +56,8 @@ void Renderer::configure() {
 void Renderer::writePatternAt(uint8_t digit, uint8_t pattern, uint8_t style) {
   if (digit >= mNumDigits) return;
   if (style >= kNumStyles) return;
+  // style 0 is always allowed
+  if (style > 0 && mStylers[style] == nullptr) return;
 
   StyledPattern& styledPattern = mStyledPatterns[digit];
   styledPattern.pattern = pattern;
@@ -78,6 +76,8 @@ void Renderer::writePatternAt(uint8_t digit, uint8_t pattern) {
 void Renderer::writeStyleAt(uint8_t digit, uint8_t style) {
   if (digit >= mNumDigits) return;
   if (style >= kNumStyles) return;
+  // style 0 is always allowed
+  if (style > 0 && mStylers[style] == nullptr) return;
 
   StyledPattern& styledPattern = mStyledPatterns[digit];
 
@@ -136,6 +136,7 @@ void Renderer::updateFrame() {
 
 void Renderer::updateStylers() {
   // Update the active Stylers.
+  // Style 0 is the no-op style that does nothing.
   for (uint8_t style = 1; style < kNumStyles; style++) {
     if (mActiveStyles[style] > 0) {
       Styler* styler = mStylers[style];

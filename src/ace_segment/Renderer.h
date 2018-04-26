@@ -47,22 +47,24 @@ class Styler;
  */
 class Renderer {
   public:
-    /** Maximum number of styles. Valid style indexes are [0, kNumStyles-1]. */
-    static const uint8_t kNumStyles = 5;
+    /**
+     * Maximum number of styles. Valid style indexes are [0, kNumStyles-1].
+     * Style 0 is reserved for "no-style" and cannot be changed by the user, so
+     * the number of user-accessible styles is (kNumStyles - 1).
+     */
+    static const uint8_t kNumStyles = 6;
 
     /** Constructor. */
     explicit Renderer(Hardware* hardware, Driver* driver,
             StyledPattern* styledPatterns, uint8_t numDigits,
-            uint8_t framesPerSecond,
-            uint16_t statsResetInterval, Styler** stylers):
+            uint8_t framesPerSecond, uint16_t statsResetInterval,
+            Styler** stylers):
         mHardware(hardware),
         mDriver(driver),
         mStyledPatterns(styledPatterns),
         mNumDigits(numDigits),
         mFramesPerSecond(framesPerSecond),
-        mStatsResetInterval(statsResetInterval),
-        mBrightness(255),
-        mIsBrightnessEnabled(false)
+        mStatsResetInterval(statsResetInterval)
     {
       for (uint8_t i = 0; i < kNumStyles; i++) {
         mStylers[i] = stylers[i];
@@ -73,8 +75,10 @@ class Renderer {
     virtual ~Renderer() {}
 
     /**
-     * Configure the driver with the parameters given by the various setXxx()
-     * methods.
+     * Configure the driver with the parameters given by in the constructor.
+     * Normally, this should be called only once after construction. Unit tests
+     * will sometimes change a parameter of FakeDriver and call this a second
+     * time.
      */
     virtual void configure();
 
@@ -100,13 +104,23 @@ class Renderer {
       mBrightness = brightness;
     }
 
-    /** Write the pattern and style for a given digit. */
+    /**
+     * Write the pattern and style for a given digit.
+     * If the digit is out of bounds, the method does nothing.
+     * If the style is out of bounds or not registered, the method does nothing.
+     */
     void writePatternAt(uint8_t digit, uint8_t pattern, uint8_t style);
 
-    /** Write the pattern for a given digit, leaving style unchanged. */
+    /**
+     * Write the pattern for a given digit, leaving style unchanged.
+     * If the digit is out of bounds, the method does nothing.
+     */
     void writePatternAt(uint8_t digit, uint8_t pattern);
 
-    /** Write the style for a given digit, leaving pattern unchanged. */
+    /**
+     * Write the style for a given digit, leaving pattern unchanged.
+     * If the style is out of bounds or not registered, the method does nothing.
+     */
     void writeStyleAt(uint8_t digit, uint8_t style);
 
     /** Write the decimal point for the digit. */
@@ -161,7 +175,7 @@ class Renderer {
     /** Perform things that need to be done each frame. */
     void updateFrame();
 
-    /** Update the stylers currently used by the mStyledDigits. */
+    /** Update the stylers active stylers indicated by mActiveStyles. */
     void updateStylers();
 
     /** Translate the StyledPatterns to DimmablePatterns for the Driver. */
@@ -177,8 +191,8 @@ class Renderer {
     const uint16_t mStatsResetInterval;
     TimingStats mStats;
 
-    // Array of Stylers. Index 0 is reserved and cannot be set by the the
-    // client code.
+    // Array of Stylers. Index 0 is reserved and represents the "no-style"
+    // setting which does nothing. It cannot be set by the the client code.
     Styler* mStylers[kNumStyles];
 
     // Count of the number of times the given style index is used in the
@@ -188,10 +202,10 @@ class Renderer {
     uint8_t mActiveStyles[kNumStyles];
 
     // global brightness, can be changed during runtime
-    uint8_t mBrightness;
+    uint8_t mBrightness = 255;
 
     // does the Driver support brightness?
-    bool mIsBrightnessEnabled;
+    bool mIsBrightnessEnabled = false;
 
     // variables to support renderFieldWhenReady()
     uint16_t mMicrosPerField;

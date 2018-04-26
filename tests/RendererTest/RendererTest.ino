@@ -48,6 +48,9 @@ void setup() {
   while (!Serial); // Wait until Serial is ready - Leonardo/Micro
   Serial.println(F("setup(): start"));
 
+  //TestRunner::exclude("*");
+  //TestRunner::include("RendererTest", "activeStyles");
+
   Serial.println(F("setup(): end"));
 }
 
@@ -121,7 +124,6 @@ class PulseStylerTest: public TestOnce {
 };
 
 testF(PulseStylerTest, test) {
-  //enableVerbosity(Verbosity::kAssertionPassed);
   uint8_t pattern = 0x5C;
   uint8_t brightness = 128;
 
@@ -328,17 +330,25 @@ testF(RendererTest, activeStyles) {
   renderer->writeStyleAt(3, StyledPattern::kStyleNormal);
   assertActiveStyles(5, 1, 1, 1, 1, 0);
 
-  // verify that write to out of bounds digit does nothing
-  renderer->writeStyleAt(20, kStyleBlinkSlow);
-  assertActiveStyles(5, 1, 1, 1, 1, 0);
-
-  // verify that write to out of bounds digit does nothing
+  // verify that write pattern to out of bounds digit does nothing
   renderer->writePatternAt(21, 0x55, kStyleBlinkSlow);
   assertActiveStyles(5, 1, 1, 1, 1, 0);
 
-  // verify that writing an unsupported style does nothing
-  renderer->writeStyleAt(0, 10);
+  // verify that write style to out of bounds digit does nothing
+  renderer->writeStyleAt(20, kStyleBlinkSlow);
   assertActiveStyles(5, 1, 1, 1, 1, 0);
+
+  // verify that writing an invalid style does nothing
+  renderer->writeStyleAt(0, Renderer::kNumStyles);
+  assertActiveStyles(5, 1, 1, 1, 1, 0);
+
+  // verify that write pattern with an unregistered style does nothing
+  renderer->writePatternAt(0, 0x55, 5);
+  assertActiveStyles(6, 1, 1, 1, 1, 0, 0);
+
+  // verify that writing an unregsitered style does nothing
+  renderer->writeStyleAt(0, 5);
+  assertActiveStyles(6, 1, 1, 1, 1, 0, 0);
 }
 
 testF(RendererTest, isStylerSupported_driverWithoutBrightness) {
@@ -369,7 +379,6 @@ testF(RendererTest, isStylerSupported_driverWithBrightness) {
 //  - pulse slow: 180 frames/cycle = 4*3*180 = 2160 fields/cycle
 //  - pulse fast: 60 frames/cycle - 4*3*60 = 720 fields/cycle
 testF(RendererTest, renderField) {
-  //enableVerbosity(Verbosity::kAssertionPassed);
   assertActiveStyles(5, 4, 0, 0, 0, 0);
 
   renderer->writePatternAt(0, 0x11, kStyleBlinkSlow);
