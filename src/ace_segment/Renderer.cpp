@@ -123,9 +123,7 @@ void Renderer::updateFrame() {
 void Renderer::updateStylers() {
   // Determine the active styles.
   bool activeStylers[kNumStyles];
-  for (uint8_t i = 0 ; i < kNumStyles; i++) {
-    activeStylers[i] = false;
-  }
+  memset(activeStylers, 0, kNumStyles * sizeof(bool));
   for (uint8_t digit = 0 ; digit < mNumDigits; digit++) {
     uint8_t style = mStyledPatterns[digit].style;
     if (0 < style && style < kNumStyles) {

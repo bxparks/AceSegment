@@ -48,7 +48,7 @@ class Styler;
 class Renderer {
   public:
     /** Maximum number of styles. */
-    static const uint8_t kNumStyles = 8;
+    static const uint8_t kNumStyles = 4;
 
     /** Constructor. */
     explicit Renderer(Hardware* hardware, Driver* driver,
