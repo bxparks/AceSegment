@@ -83,6 +83,7 @@ BenchmarkBundle::BenchmarkBundle(const DriverConfig* driverConfig) {
   }
 
   // Create the Renderer.
+  memset(mStyledPatterns, 0, kNumDigits * sizeof(StyledPattern));
   mBlinkStyler = new BlinkStyler(kFramePerSecond, kBlinkDuration);
   mPulseStyler = new PulseStyler(kFramePerSecond, kPulseDuration);
   mRenderer = RendererBuilder(mHardware, mDriver, mStyledPatterns, kNumDigits)
