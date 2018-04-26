@@ -47,8 +47,8 @@ class Styler;
  */
 class Renderer {
   public:
-    /** Maximum number of styles. */
-    static const uint8_t kNumStyles = 4;
+    /** Maximum number of styles. Valid style indexes are [0, kNumStyles-1]. */
+    static const uint8_t kNumStyles = 5;
 
     /** Constructor. */
     explicit Renderer(Hardware* hardware, Driver* driver,
@@ -150,6 +150,9 @@ class Renderer {
      */
     bool isStylerSupported(Styler* styler);
 
+    /** Retrieve the array of active styles. VisibleForTesting. */
+    uint8_t* getActiveStyles() { return mActiveStyles; }
+
   private:
     // disable copy-constructor and assignment operator
     Renderer(const Renderer&) = delete;
@@ -177,6 +180,12 @@ class Renderer {
     // Array of Stylers. Index 0 is reserved and cannot be set by the the
     // client code.
     Styler* mStylers[kNumStyles];
+
+    // Count of the number of times the given style index is used in the
+    // mStyledPatterns array. We update this map during writePatternAt() and
+    // writeStyleAt() to avoid calculating this in renderField() which saves
+    // CPU cycles.
+    uint8_t mActiveStyles[kNumStyles];
 
     // global brightness, can be changed during runtime
     uint8_t mBrightness;

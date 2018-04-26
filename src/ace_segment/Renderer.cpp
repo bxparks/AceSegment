@@ -51,13 +51,22 @@ void Renderer::configure() {
 
   // Reset statistics
   mStats.reset();
+
+  // Reset the active styles.
+  memset(mActiveStyles, 0, kNumStyles * sizeof(uint8_t));
+  mActiveStyles[0] = mNumDigits;
 }
 
 void Renderer::writePatternAt(uint8_t digit, uint8_t pattern, uint8_t style) {
   if (digit >= mNumDigits) return;
+  if (style >= kNumStyles) return;
+
   StyledPattern& styledPattern = mStyledPatterns[digit];
   styledPattern.pattern = pattern;
-  styledPattern.style = (style < kNumStyles) ? style : 0;
+
+  mActiveStyles[styledPattern.style]--;
+  mActiveStyles[style]++;
+  styledPattern.style = style;
 }
 
 void Renderer::writePatternAt(uint8_t digit, uint8_t pattern) {
@@ -68,8 +77,13 @@ void Renderer::writePatternAt(uint8_t digit, uint8_t pattern) {
 
 void Renderer::writeStyleAt(uint8_t digit, uint8_t style) {
   if (digit >= mNumDigits) return;
+  if (style >= kNumStyles) return;
+
   StyledPattern& styledPattern = mStyledPatterns[digit];
-  styledPattern.style = (style < kNumStyles) ? style : 0;
+
+  mActiveStyles[styledPattern.style]--;
+  mActiveStyles[style]++;
+  styledPattern.style = style;
 }
 
 void Renderer::writeDecimalPointAt(uint8_t digit, bool state) {
@@ -121,20 +135,10 @@ void Renderer::updateFrame() {
 }
 
 void Renderer::updateStylers() {
-  // Determine the active styles.
-  bool activeStylers[kNumStyles];
-  memset(activeStylers, 0, kNumStyles * sizeof(bool));
-  for (uint8_t digit = 0 ; digit < mNumDigits; digit++) {
-    uint8_t style = mStyledPatterns[digit].style;
-    if (0 < style && style < kNumStyles) {
-      activeStylers[style] = true;
-    }
-  }
-
   // Update the active Stylers.
-  for (uint8_t i = 1; i < kNumStyles; i++) {
-    if (activeStylers[i]) {
-      Styler* styler = mStylers[i];
+  for (uint8_t style = 1; style < kNumStyles; style++) {
+    if (mActiveStyles[style] > 0) {
+      Styler* styler = mStylers[style];
       if (isStylerSupported(styler)) {
         styler->calcForFrame();
       }
@@ -159,8 +163,8 @@ void Renderer::renderStyledPatterns() {
   for (uint8_t digit = 0; digit < mNumDigits; digit++) {
     StyledPattern& styledPattern = mStyledPatterns[digit];
 
-    uint8_t brightness = mBrightness;
     uint8_t pattern = styledPattern.pattern;
+    uint8_t brightness = mBrightness;
 
     uint8_t style = styledPattern.style;
     if (0 < style && style < kNumStyles) {

@@ -152,6 +152,9 @@ class RendererTest: public TestOnce {
     virtual void setup() override {
       TestOnce::setup();
 
+      memset(dimmablePatterns, 0, (NUM_DIGITS+1) * sizeof(DimmablePattern));
+      memset(styledPatterns, 0, (NUM_DIGITS+1) * sizeof(StyledPattern));
+
       hardware = new TestableHardware();
       driver = new FakeDriver(dimmablePatterns, NUM_DIGITS);
       driver->setNumSubFields(NUM_SUB_FIELDS);
@@ -204,6 +207,17 @@ class RendererTest: public TestOnce {
       while (n--) {
         renderer->renderField();
       }
+    }
+
+    void assertActiveStyles(int n, ...) {
+      va_list args;
+      va_start(args, n);
+      uint8_t* activeStyles = renderer->getActiveStyles();
+      for (int style = 0; style < n; style++) {
+        uint8_t styleCount = va_arg(args, int);
+        assertEqual(styleCount, activeStyles[style]);
+      }
+      va_end(args);
     }
 
     TestableHardware* hardware;
@@ -293,9 +307,43 @@ testF(RendererTest, writeDecimalPointAt_outOfBounds) {
   assertEqual(1, styledPattern.pattern);
 }
 
+testF(RendererTest, activeStyles) {
+  assertActiveStyles(5, 4, 0, 0, 0, 0);
+
+  renderer->writePatternAt(0, 0x11, StyledPattern::kStyleNormal);
+  assertActiveStyles(5, 4, 0, 0, 0, 0);
+
+  renderer->writePatternAt(0, 0x11, kStyleBlinkSlow);
+  assertActiveStyles(5, 3, 1, 0, 0, 0);
+
+  renderer->writePatternAt(1, 0x11, kStyleBlinkFast);
+  assertActiveStyles(5, 2, 1, 1, 0, 0);
+
+  renderer->writePatternAt(2, 0x11, kStylePulseSlow);
+  assertActiveStyles(5, 1, 1, 1, 1, 0);
+
+  renderer->writePatternAt(3, 0x11, kStylePulseFast);
+  assertActiveStyles(5, 0, 1, 1, 1, 1);
+
+  renderer->writeStyleAt(3, StyledPattern::kStyleNormal);
+  assertActiveStyles(5, 1, 1, 1, 1, 0);
+
+  // verify that write to out of bounds digit does nothing
+  renderer->writeStyleAt(20, kStyleBlinkSlow);
+  assertActiveStyles(5, 1, 1, 1, 1, 0);
+
+  // verify that write to out of bounds digit does nothing
+  renderer->writePatternAt(21, 0x55, kStyleBlinkSlow);
+  assertActiveStyles(5, 1, 1, 1, 1, 0);
+
+  // verify that writing an unsupported style does nothing
+  renderer->writeStyleAt(0, 10);
+  assertActiveStyles(5, 1, 1, 1, 1, 0);
+}
+
 testF(RendererTest, isStylerSupported_driverWithoutBrightness) {
   driver->setNumSubFields(1);
-  assertEqual(false, driver->isBrightnessSupported());
+  assertFalse(driver->isBrightnessSupported());
   renderer->configure();
 
   assertTrue(renderer->isStylerSupported(blinkSlow));
@@ -306,7 +354,7 @@ testF(RendererTest, isStylerSupported_driverWithoutBrightness) {
 
 testF(RendererTest, isStylerSupported_driverWithBrightness) {
   driver->setNumSubFields(3);
-  assertEqual(true, driver->isBrightnessSupported());
+  assertTrue(driver->isBrightnessSupported());
   renderer->configure();
 
   assertTrue(renderer->isStylerSupported(blinkSlow));
@@ -320,12 +368,16 @@ testF(RendererTest, isStylerSupported_driverWithBrightness) {
 //  - blink fast: 24 frames/cycle = 4*3*24 = 288 fields/cycle
 //  - pulse slow: 180 frames/cycle = 4*3*180 = 2160 fields/cycle
 //  - pulse fast: 60 frames/cycle - 4*3*60 = 720 fields/cycle
-testF(RendererTest, displayCurrentField) {
+testF(RendererTest, renderField) {
   //enableVerbosity(Verbosity::kAssertionPassed);
+  assertActiveStyles(5, 4, 0, 0, 0, 0);
+
   renderer->writePatternAt(0, 0x11, kStyleBlinkSlow);
   renderer->writePatternAt(1, 0x22, kStyleBlinkFast);
   renderer->writePatternAt(2, 0x33, kStylePulseSlow);
   renderer->writePatternAt(3, 0x44, kStylePulseFast);
+
+  assertActiveStyles(5, 0, 1, 1, 1, 1);
 
   assertEqual((uint16_t) (FRAMES_PER_SECOND * 4 * 3),
       renderer->getFieldsPerSecond());
@@ -348,9 +400,9 @@ testF(RendererTest, displayCurrentField) {
 //  - blink fast: 24 frames/cycle = 4*24 = 96 fields/cycle
 //  - pulse slow: 180 frames/cycle = 4*180 = 720 fields/cycle
 //  - pulse fast: 60 frames/cycle - 4*60 = 240 fields/cycle
-testF(RendererTest, displayCurrentField_noSubFieldDriver) {
+testF(RendererTest, renderField_noSubFieldDriver) {
   driver->setNumSubFields(1);
-  assertEqual(false, driver->isBrightnessSupported());
+  assertFalse(driver->isBrightnessSupported());
   renderer->configure();
 
   renderer->writePatternAt(0, 0x11, kStyleBlinkSlow);
@@ -375,9 +427,9 @@ testF(RendererTest, displayCurrentField_noSubFieldDriver) {
 }
 
 // If the driver supports subfields, then pulsing is enabled.
-testF(RendererTest, displayCurrentField_dimmedBrightness) {
+testF(RendererTest, renderField_dimmedBrightness) {
   driver->setNumSubFields(3);
-  assertEqual(true, driver->isBrightnessSupported());
+  assertTrue(driver->isBrightnessSupported());
   renderer->configure();
 
   renderer->writeBrightness(127);
@@ -390,7 +442,7 @@ testF(RendererTest, displayCurrentField_dimmedBrightness) {
       renderer->getFieldsPerSecond());
 
   // Verify that the digit brightness is about 1/2 the value of
-  // the testF(RendererTest, displayCurrentField) test case.
+  // the testF(RendererTest, renderField) test case.
 
   renderer->renderField();
   assertDimmablePatternsEqual(4, 0x11, 127, 0x22, 127, 0x33, 0, 0x44, 0);
