@@ -41,6 +41,7 @@ class {class_name}: public ace_segment::ModulatingDigitDriver {{
     virtual ~{class_name}() override {{}}
 
     virtual void configure() override;
+    virtual void finish() override;
     virtual void displayCurrentField() override;
     virtual void prepareToSleep() override;
 
@@ -120,6 +121,19 @@ void {class_name}::configure() {{
   pinMode(kClockPin, OUTPUT);
 
   ace_segment::ModulatingDigitDriver::configure();
+}}
+
+void {class_name}::finish() {{
+  ace_segment::ModulatingDigitDriver::finish();
+
+  for (uint8_t digit = 0; digit < mNumDigits; digit++) {{
+    uint8_t groupPin = kDigitPins[digit];
+    pinMode(groupPin, INPUT);
+  }}
+
+  pinMode(kLatchPin, INPUT);
+  pinMode(kDataPin, INPUT);
+  pinMode(kClockPin, INPUT);
 }}
 
 void {class_name}::displayCurrentField() {{

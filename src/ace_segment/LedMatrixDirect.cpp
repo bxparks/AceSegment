@@ -54,6 +54,17 @@ void LedMatrixDirect::configure() {
   }
 }
 
+void LedMatrixDirect::finish() {
+  for (uint8_t group = 0; group < mNumGroups; group++) {
+    uint8_t digitalPin = mGroupPins[group];
+    mHardware->pinMode(digitalPin, INPUT);
+  }
+  for (uint8_t element = 0; element < mNumElements; element++) {
+    uint8_t elementPin = mElementPins[element];
+    mHardware->pinMode(elementPin, INPUT);
+  }
+}
+
 void LedMatrixDirect::enableGroup(uint8_t group) {
   writeGroupPin(group, mGroupOn);
 }

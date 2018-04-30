@@ -65,6 +65,8 @@ void BaseHardwareTest::assertEvents(int8_t n, ...) {
         break;
       case Event::kTypeSpiBegin:
         break;
+      case Event::kTypeSpiEnd:
+        break;
       case Event::kTypeSpiTransfer: {
           uint8_t value = va_arg(args, int);
           assertEqual(value, event.arg1);

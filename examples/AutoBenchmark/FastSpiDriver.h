@@ -28,6 +28,7 @@ class FastSpiDriver: public ace_segment::ModulatingDigitDriver {
     virtual ~FastSpiDriver() override {}
 
     virtual void configure() override;
+    virtual void finish() override;
     virtual void displayCurrentField() override;
     virtual void prepareToSleep() override;
 

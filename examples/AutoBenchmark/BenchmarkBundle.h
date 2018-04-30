@@ -65,6 +65,10 @@ struct BenchmarkBundle {
     mRenderer->configure();
   }
 
+  void finish() {
+    mDriver->finish();
+  }
+
   Hardware* mHardware;
   DimmablePattern mDimmingPatterns[kNumDigits];
   Driver* mDriver;

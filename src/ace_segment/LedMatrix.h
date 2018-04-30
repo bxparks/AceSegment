@@ -35,6 +35,17 @@ namespace ace_segment {
 
 class Hardware;
 
+/**
+ * Class that represents the abstraction of a particular LED display wiring.
+ * If the resistors are on the segments, then the segments become the
+ * Elements and the digits become the Groups.
+ * If the resistors are on the digits, then the digits become the Elements
+ * and the segments become the Groups.
+ * The setCathodeOnGroup() and setAnnodeOnGroup() methods determine the
+ * polarity of the LED with respect to the Group line.
+ * The invertGroupLevels() should be called when transistors are used
+ * on the Group lines to handle higher currents.
+ */
 class LedMatrix {
   public:
     LedMatrix(Hardware* hardware, uint8_t numGroups, uint8_t numElements):
@@ -67,7 +78,11 @@ class LedMatrix {
       mGroupOff =  1 - mGroupOff;
     }
 
+    /** Configure the pins for the given LED wiring. */
     virtual void configure() {}
+
+    /** Turn off the pins by doing the opposite of configure(). */
+    virtual void finish() {}
 
     virtual void enableGroup(uint8_t group) = 0;
 

@@ -43,6 +43,17 @@ void LedMatrixSerial::configure() {
   }
 }
 
+void LedMatrixSerial::finish() {
+  mHardware->pinMode(mLatchPin, INPUT);
+  mHardware->pinMode(mDataPin, INPUT);
+  mHardware->pinMode(mClockPin, INPUT);
+
+  for (uint8_t group = 0; group < mNumGroups; group++) {
+    uint8_t pin = mGroupPins[group];
+    mHardware->pinMode(pin, INPUT);
+  }
+}
+
 void LedMatrixSerial::enableGroup(uint8_t group) {
   writeGroupPin(group, mGroupOn);
 }

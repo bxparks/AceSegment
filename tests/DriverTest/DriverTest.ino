@@ -130,6 +130,22 @@ testF(DigitDriverTest, configure) {
       Event::kTypePinMode, 11, OUTPUT,
       Event::kTypeDigitalWrite, 11, LOW);
   assertEqual((uint16_t)4, mDriver->getFieldsPerFrame());
+
+  mHardware->clear();
+  mDriver->finish();
+  assertEvents(12,
+      Event::kTypePinMode, 0, INPUT,
+      Event::kTypePinMode, 1, INPUT,
+      Event::kTypePinMode, 2, INPUT,
+      Event::kTypePinMode, 3, INPUT,
+      Event::kTypePinMode, 4, INPUT,
+      Event::kTypePinMode, 5, INPUT,
+      Event::kTypePinMode, 6, INPUT,
+      Event::kTypePinMode, 7, INPUT,
+      Event::kTypePinMode, 8, INPUT,
+      Event::kTypePinMode, 9, INPUT,
+      Event::kTypePinMode, 10, INPUT,
+      Event::kTypePinMode, 11, INPUT);
 }
 
 testF(DigitDriverTest, displayCurrentField_one_dark) {
@@ -380,7 +396,48 @@ class SegmentDriverTest: public BaseHardwareTest {
 
 testF(SegmentDriverTest, configure) {
   mDriver->configure();
+  assertEvents(24,
+      Event::kTypePinMode, 4, OUTPUT,
+      Event::kTypeDigitalWrite, 4, LOW,
+      Event::kTypePinMode, 5, OUTPUT,
+      Event::kTypeDigitalWrite, 5, LOW,
+      Event::kTypePinMode, 6, OUTPUT,
+      Event::kTypeDigitalWrite, 6, LOW,
+      Event::kTypePinMode, 7, OUTPUT,
+      Event::kTypeDigitalWrite, 7, LOW,
+      Event::kTypePinMode, 8, OUTPUT,
+      Event::kTypeDigitalWrite, 8, LOW,
+      Event::kTypePinMode, 9, OUTPUT,
+      Event::kTypeDigitalWrite, 9, LOW,
+      Event::kTypePinMode, 10, OUTPUT,
+      Event::kTypeDigitalWrite, 10, LOW,
+      Event::kTypePinMode, 11, OUTPUT,
+      Event::kTypeDigitalWrite, 11, LOW,
+      Event::kTypePinMode, 0, OUTPUT,
+      Event::kTypeDigitalWrite, 0, HIGH,
+      Event::kTypePinMode, 1, OUTPUT,
+      Event::kTypeDigitalWrite, 1, HIGH,
+      Event::kTypePinMode, 2, OUTPUT,
+      Event::kTypeDigitalWrite, 2, HIGH,
+      Event::kTypePinMode, 3, OUTPUT,
+      Event::kTypeDigitalWrite, 3, HIGH);
   assertEqual((uint16_t)(8), mDriver->getFieldsPerFrame());
+
+  mHardware->clear();
+  mDriver->finish();
+  assertEvents(12,
+      Event::kTypePinMode, 4, INPUT,
+      Event::kTypePinMode, 5, INPUT,
+      Event::kTypePinMode, 6, INPUT,
+      Event::kTypePinMode, 7, INPUT,
+      Event::kTypePinMode, 8, INPUT,
+      Event::kTypePinMode, 9, INPUT,
+      Event::kTypePinMode, 10, INPUT,
+      Event::kTypePinMode, 11, INPUT,
+      Event::kTypePinMode, 0, INPUT,
+      Event::kTypePinMode, 1, INPUT,
+      Event::kTypePinMode, 2, INPUT,
+      Event::kTypePinMode, 3, INPUT);
 }
 
 testF(SegmentDriverTest, displayCurrentField_one_dark) {
@@ -561,7 +618,48 @@ class ModulatingDigitDriverTest: public BaseHardwareTest {
 
 testF(ModulatingDigitDriverTest, configure) {
   mDriver->configure();
+  assertEvents(24,
+      Event::kTypePinMode, 0, OUTPUT,
+      Event::kTypeDigitalWrite, 0, HIGH,
+      Event::kTypePinMode, 1, OUTPUT,
+      Event::kTypeDigitalWrite, 1, HIGH,
+      Event::kTypePinMode, 2, OUTPUT,
+      Event::kTypeDigitalWrite, 2, HIGH,
+      Event::kTypePinMode, 3, OUTPUT,
+      Event::kTypeDigitalWrite, 3, HIGH,
+      Event::kTypePinMode, 4, OUTPUT,
+      Event::kTypeDigitalWrite, 4, LOW,
+      Event::kTypePinMode, 5, OUTPUT,
+      Event::kTypeDigitalWrite, 5, LOW,
+      Event::kTypePinMode, 6, OUTPUT,
+      Event::kTypeDigitalWrite, 6, LOW,
+      Event::kTypePinMode, 7, OUTPUT,
+      Event::kTypeDigitalWrite, 7, LOW,
+      Event::kTypePinMode, 8, OUTPUT,
+      Event::kTypeDigitalWrite, 8, LOW,
+      Event::kTypePinMode, 9, OUTPUT,
+      Event::kTypeDigitalWrite, 9, LOW,
+      Event::kTypePinMode, 10, OUTPUT,
+      Event::kTypeDigitalWrite, 10, LOW,
+      Event::kTypePinMode, 11, OUTPUT,
+      Event::kTypeDigitalWrite, 11, LOW);
   assertEqual((uint16_t)(3 * 4), mDriver->getFieldsPerFrame());
+
+  mHardware->clear();
+  mDriver->finish();
+  assertEvents(12,
+      Event::kTypePinMode, 0, INPUT,
+      Event::kTypePinMode, 1, INPUT,
+      Event::kTypePinMode, 2, INPUT,
+      Event::kTypePinMode, 3, INPUT,
+      Event::kTypePinMode, 4, INPUT,
+      Event::kTypePinMode, 5, INPUT,
+      Event::kTypePinMode, 6, INPUT,
+      Event::kTypePinMode, 7, INPUT,
+      Event::kTypePinMode, 8, INPUT,
+      Event::kTypePinMode, 9, INPUT,
+      Event::kTypePinMode, 10, INPUT,
+      Event::kTypePinMode, 11, INPUT);
 }
 
 testF(ModulatingDigitDriverTest, displayCurrentField_one_dark) {
@@ -984,6 +1082,17 @@ testF(DigitDriverSerialLedMatrixTest, configure) {
       Event::kTypePinMode, 3, OUTPUT,
       Event::kTypeDigitalWrite, 3, HIGH);
   assertEqual((uint16_t)(4), mDriver->getFieldsPerFrame());
+
+  mHardware->clear();
+  mDriver->finish();
+  assertEvents(7,
+      Event::kTypePinMode, latchPin, INPUT,
+      Event::kTypePinMode, dataPin, INPUT,
+      Event::kTypePinMode, clockPin, INPUT,
+      Event::kTypePinMode, 0, INPUT,
+      Event::kTypePinMode, 1, INPUT,
+      Event::kTypePinMode, 2, INPUT,
+      Event::kTypePinMode, 3, INPUT);
 }
 
 testF(DigitDriverSerialLedMatrixTest, displayCurrentField) {

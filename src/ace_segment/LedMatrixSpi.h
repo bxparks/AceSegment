@@ -43,6 +43,8 @@ class LedMatrixSpi: public LedMatrixSerial {
 
     virtual void configure() override;
 
+    virtual void finish() override;
+
     virtual void drawElements(uint8_t pattern) override;
 };
 

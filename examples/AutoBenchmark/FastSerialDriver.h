@@ -26,6 +26,7 @@ class FastSerialDriver: public ace_segment::ModulatingDigitDriver {
     virtual ~FastSerialDriver() override {}
 
     virtual void configure() override;
+    virtual void finish() override;
     virtual void displayCurrentField() override;
     virtual void prepareToSleep() override;
 

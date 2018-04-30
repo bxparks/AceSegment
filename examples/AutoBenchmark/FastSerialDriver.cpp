@@ -42,6 +42,19 @@ void FastSerialDriver::configure() {
   ace_segment::ModulatingDigitDriver::configure();
 }
 
+void FastSerialDriver::finish() {
+  ace_segment::ModulatingDigitDriver::finish();
+
+  for (uint8_t digit = 0; digit < mNumDigits; digit++) {
+    uint8_t groupPin = kDigitPins[digit];
+    pinMode(groupPin, INPUT);
+  }
+
+  pinMode(kLatchPin, INPUT);
+  pinMode(kDataPin, INPUT);
+  pinMode(kClockPin, INPUT);
+}
+
 void FastSerialDriver::displayCurrentField() {
   if (mPreparedToSleep) return;
 

@@ -65,7 +65,14 @@ class Driver {
      */
     virtual ~Driver();
 
+    /**
+     * Configure the driver. Usually called only once in a program.
+     * Sometimes unit tests may call it twice.
+     */
     virtual void configure();
+
+    /** Turn off the LEDs by doing the opposite of configure(). */
+    virtual void finish();
 
     /**
      * Display the current field of the frame. Automatically advances to the

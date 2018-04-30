@@ -57,6 +57,8 @@ class LedMatrixSerial: public LedMatrix {
 
     virtual void configure() override;
 
+    virtual void finish() override;
+
     virtual void enableGroup(uint8_t group) override;
 
     virtual void disableGroup(uint8_t group) override;

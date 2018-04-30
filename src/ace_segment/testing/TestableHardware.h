@@ -38,6 +38,7 @@ class Event {
     static const uint8_t kTypeShiftOut = 2;
     static const uint8_t kTypeSpiBegin = 3;
     static const uint8_t kTypeSpiTransfer = 4;
+    static const uint8_t kTypeSpiEnd = 5;
 
     uint8_t type; // arg0
     uint8_t arg1;
@@ -95,6 +96,14 @@ class TestableHardware: public Hardware {
       if (mNumRecords < kMaxRecords) {
         Event& event = mEvents[mNumRecords];
         event.type = Event::kTypeSpiBegin;
+        mNumRecords++;
+      }
+    }
+
+    virtual void spiEnd() override {
+      if (mNumRecords < kMaxRecords) {
+        Event& event = mEvents[mNumRecords];
+        event.type = Event::kTypeSpiEnd;
         mNumRecords++;
       }
     }

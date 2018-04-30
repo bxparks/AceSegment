@@ -30,8 +30,12 @@ namespace ace_segment {
 
 void LedMatrixSpi::configure() {
   LedMatrixSerial::configure();
-
   mHardware->spiBegin();
+}
+
+void LedMatrixSpi::finish() {
+  mHardware->spiEnd();
+  LedMatrixSerial::finish();
 }
 
 void LedMatrixSpi::drawElements(uint8_t pattern) {

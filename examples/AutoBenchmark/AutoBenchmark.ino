@@ -51,6 +51,8 @@ SOFTWARE.
 using namespace ace_segment;
 
 void writeChars();
+void finishBenchmark();
+void setupBenchmark();
 void nextBenchmark();
 
 //------------------------------------------------------------------
@@ -78,9 +80,15 @@ void setup() {
   Serial.println(F("setup(): end"));
 }
 
-void setupBenchmark(const DriverConfig* driverConfig) {
-  if (benchmarkBundle != nullptr) delete benchmarkBundle;
+void finishBenchmark() {
+  if (benchmarkBundle == nullptr) return;
 
+  benchmarkBundle->finish();
+  delete benchmarkBundle;
+  benchmarkBundle = nullptr;
+}
+
+void setupBenchmark(const DriverConfig* driverConfig) {
   benchmarkBundle = new BenchmarkBundle(driverConfig);
   benchmarkBundle->configure();
   CharWriter* writer = benchmarkBundle->mCharWriter;
@@ -110,6 +118,7 @@ void loop() {
   } else if (loopMode == LOOP_MODE_RENDER) {
     render();
   } else if (loopMode == LOOP_MODE_NEXT_DRIVER) {
+    finishBenchmark();
     nextBenchmark();
   } else if (loopMode == LOOP_MODE_FOOTER) {
     Serial.println(FPSTR(kBoundary));

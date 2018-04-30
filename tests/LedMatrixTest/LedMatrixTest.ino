@@ -115,6 +115,22 @@ testF(LedMatrixDirectTest, configure) {
       Event::kTypeDigitalWrite, 10, LOW,
       Event::kTypePinMode, 11, OUTPUT,
       Event::kTypeDigitalWrite, 11, LOW);
+
+  mHardware->clear();
+  mLedMatrix->finish();
+  assertEvents(12,
+      Event::kTypePinMode, 0, INPUT,
+      Event::kTypePinMode, 1, INPUT,
+      Event::kTypePinMode, 2, INPUT,
+      Event::kTypePinMode, 3, INPUT,
+      Event::kTypePinMode, 4, INPUT,
+      Event::kTypePinMode, 5, INPUT,
+      Event::kTypePinMode, 6, INPUT,
+      Event::kTypePinMode, 7, INPUT,
+      Event::kTypePinMode, 8, INPUT,
+      Event::kTypePinMode, 9, INPUT,
+      Event::kTypePinMode, 10, INPUT,
+      Event::kTypePinMode, 11, INPUT);
 }
 
 testF(LedMatrixDirectTest, enableGroup) {
@@ -184,6 +200,18 @@ testF(LedMatrixSerialTest, configure) {
       Event::kTypeDigitalWrite, 2, HIGH,
       Event::kTypePinMode, 3, OUTPUT,
       Event::kTypeDigitalWrite, 3, HIGH);
+
+  mHardware->clear();
+  mLedMatrix->finish();
+  assertEvents(7,
+      Event::kTypePinMode, latchPin, INPUT,
+      Event::kTypePinMode, dataPin, INPUT,
+      Event::kTypePinMode, clockPin, INPUT,
+      Event::kTypePinMode, 0, INPUT,
+      Event::kTypePinMode, 1, INPUT,
+      Event::kTypePinMode, 2, INPUT,
+      Event::kTypePinMode, 3, INPUT);
+
 }
 
 testF(LedMatrixSerialTest, enableGroup) {
@@ -239,7 +267,6 @@ testF(LedMatrixSpiTest, configure) {
       Event::kTypePinMode, latchPin, OUTPUT,
       Event::kTypePinMode, dataPin, OUTPUT,
       Event::kTypePinMode, clockPin, OUTPUT,
-
       Event::kTypePinMode, 0, OUTPUT,
       Event::kTypeDigitalWrite, 0, HIGH,
       Event::kTypePinMode, 1, OUTPUT,
@@ -248,9 +275,19 @@ testF(LedMatrixSpiTest, configure) {
       Event::kTypeDigitalWrite, 2, HIGH,
       Event::kTypePinMode, 3, OUTPUT,
       Event::kTypeDigitalWrite, 3, HIGH,
+      Event::kTypeSpiBegin);
 
-      Event::kTypeSpiBegin
-  );
+  mHardware->clear();
+  mLedMatrix->finish();
+  assertEvents(8,
+      Event::kTypeSpiEnd,
+      Event::kTypePinMode, latchPin, INPUT,
+      Event::kTypePinMode, dataPin, INPUT,
+      Event::kTypePinMode, clockPin, INPUT,
+      Event::kTypePinMode, 0, INPUT,
+      Event::kTypePinMode, 1, INPUT,
+      Event::kTypePinMode, 2, INPUT,
+      Event::kTypePinMode, 3, INPUT);
 }
 
 testF(LedMatrixSpiTest, enableGroup) {

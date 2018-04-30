@@ -40,6 +40,12 @@ void Driver::configure() {
   }
 }
 
+void Driver::finish() {
+  if (mLedMatrix) {
+    mLedMatrix->finish();
+  }
+}
+
 void Driver::setPattern(uint8_t digit, SegmentPatternType pattern,
     uint8_t brightness) {
   if (digit >= mNumDigits) return;

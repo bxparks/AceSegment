@@ -40,6 +40,7 @@ class {class_name}: public ace_segment::ModulatingDigitDriver {{
     virtual ~{class_name}() override {{}}
 
     virtual void configure() override;
+    virtual void finish() override;
     virtual void displayCurrentField() override;
     virtual void prepareToSleep() override;
 
@@ -131,6 +132,20 @@ void {class_name}::configure() {{
   }}
 
   ace_segment::ModulatingDigitDriver::configure();
+}}
+
+void {class_name}::finish() {{
+  ace_segment::ModulatingDigitDriver::finish();
+
+  for (uint8_t digit = 0; digit < mNumDigits; digit++) {{
+    uint8_t groupPin = kDigitPins[digit];
+    pinMode(groupPin, INPUT);
+  }}
+
+  for (uint8_t segment = 0; segment < kNumSegments; segment++) {{
+    uint8_t elementPin = kSegmentPins[segment];
+    pinMode(elementPin, INPUT);
+  }}
 }}
 
 void {class_name}::displayCurrentField() {{
