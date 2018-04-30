@@ -35,13 +35,7 @@ namespace ace_segment {
  */
 class StyledPattern {
   public:
-    typedef uint8_t StyleType;
-
-    static const StyleType kStyleNormal = 0;
-    static const StyleType kStyleBlinkSlow = 1;
-    static const StyleType kStyleBlinkFast = 2;
-    static const StyleType kStylePulseSlow = 3;
-    static const StyleType kStylePulseFast = 4;
+    static const uint8_t kStyleNormal = 0;
 
     StyledPattern():
       pattern(0),
@@ -58,12 +52,6 @@ class StyledPattern {
 
     uint8_t pattern;
     uint8_t style;
-
-  private:
-    // disable copy-constructor and assignment operator
-    StyledPattern(const StyledPattern&) = delete;
-    StyledPattern& operator=(const StyledPattern&) = delete;
-
 };
 
 }

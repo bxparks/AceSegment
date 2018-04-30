@@ -33,6 +33,7 @@ namespace ace_segment {
 
 class StyledPattern;
 class Hardware;
+class Styler;
 
 /**
  * A class that knows how to translate an array of led segement bit patterns
@@ -46,41 +47,38 @@ class Hardware;
  */
 class Renderer {
   public:
-    // VisibleForTesting.
-    static const uint8_t kBlinkStateOff = 0;
-    static const uint8_t kBlinkStateOn = 1;
+    /**
+     * Maximum number of styles. Valid style indexes are [0, kNumStyles-1].
+     * Style 0 is reserved for "no-style" and cannot be changed by the user, so
+     * the number of user-accessible styles is (kNumStyles - 1).
+     */
+    static const uint8_t kNumStyles = 6;
 
     /** Constructor. */
     explicit Renderer(Hardware* hardware, Driver* driver,
             StyledPattern* styledPatterns, uint8_t numDigits,
-            uint8_t framesPerSecond,
-            uint16_t statsResetInterval,
-            uint16_t blinkSlowDurationMillis,
-            uint16_t blinkFastDurationMillis,
-            uint16_t pulseSlowDurationMillis,
-            uint16_t pulseFastDurationMillis):
+            uint8_t framesPerSecond, uint16_t statsResetInterval,
+            Styler** stylers):
         mHardware(hardware),
         mDriver(driver),
         mStyledPatterns(styledPatterns),
         mNumDigits(numDigits),
         mFramesPerSecond(framesPerSecond),
-        mStatsResetInterval(statsResetInterval),
-        mBlinkSlowDurationMillis(blinkSlowDurationMillis),
-        mBlinkFastDurationMillis(blinkFastDurationMillis),
-        mPulseSlowDurationMillis(pulseSlowDurationMillis),
-        mPulseFastDurationMillis(pulseFastDurationMillis),
-        mBrightness(255),
-        mIsPulseEnabled(false),
-        mBlinkSlowState(kBlinkStateOn),
-        mBlinkFastState(kBlinkStateOn)
-    {}
+        mStatsResetInterval(statsResetInterval)
+    {
+      for (uint8_t i = 0; i < kNumStyles; i++) {
+        mStylers[i] = stylers[i];
+      }
+    }
 
     /** Destructor. */
     virtual ~Renderer() {}
 
     /**
-     * Configure the driver with the parameters given by the various setXxx()
-     * methods.
+     * Configure the driver with the parameters given by in the constructor.
+     * Normally, this should be called only once after construction. Unit tests
+     * will sometimes change a parameter of FakeDriver and call this a second
+     * time.
      */
     virtual void configure();
 
@@ -106,13 +104,23 @@ class Renderer {
       mBrightness = brightness;
     }
 
-    /** Write the pattern and style for a given digit. */
+    /**
+     * Write the pattern and style for a given digit.
+     * If the digit is out of bounds, the method does nothing.
+     * If the style is out of bounds or not registered, the method does nothing.
+     */
     void writePatternAt(uint8_t digit, uint8_t pattern, uint8_t style);
 
-    /** Write the pattern for a given digit, leaving style unchanged. */
+    /**
+     * Write the pattern for a given digit, leaving style unchanged.
+     * If the digit is out of bounds, the method does nothing.
+     */
     void writePatternAt(uint8_t digit, uint8_t pattern);
 
-    /** Write the style for a given digit, leaving pattern unchanged. */
+    /**
+     * Write the style for a given digit, leaving pattern unchanged.
+     * If the style is out of bounds or not registered, the method does nothing.
+     */
     void writeStyleAt(uint8_t digit, uint8_t style);
 
     /** Write the decimal point for the digit. */
@@ -134,27 +142,7 @@ class Renderer {
 
     /**
      * Render the current field immediately. Designed to be called from a timer
-     * interrupt handler. The statistics variables give us the following
-     * benchmar on a 16MHz ATmega328P using a 4-digit LED display, at 60 fps,
-     * using 8 sub-fields per frame, with 2 digits pulsing, and 2 digits
-     * blinking:
-     *
-     * DigitDriver w/ LedMatrixDirect
-     *    min: 16us; avg: 73; max: 120us
-     * DigitDriver w/ LedMatrixSerial
-     *    min: 16us; avg: 128us; max: 200us
-     * DigitDriver w/ LedMatrixSpi
-     *    min: 16us; avg: 30-55us; max: 80us
-     * ModulatingDigitDriver w/ LedMatrixDirect
-     *    min: 8us; avg: 16us; max: 140us
-     * ModulatingDigitDriver w/ LedMatrixDirect w/ calcPulseFractionForFrame():
-     *    min: 8us; avg: 12-20us; max: 192us
-     * ModulatingDigitDriver w/ LedMatrixSerial
-     *    min: 8us; avg: 19us; max: 212us
-     * ModulatingDigitDriver w/ LedMatrixSpi
-     *    min: 8us; avg: 14us; max: 104us
-     * SegmentDriver w/ LedMatrixDirect
-     *    min: 32us; avg: 57us; max: 96us
+     * interrupt handler.
      */
     void renderField();
 
@@ -170,43 +158,16 @@ class Renderer {
       return mStyledPatterns[i];
     }
 
-    /** Calculate the blink state. VisibleForTesting. */
-    static void calcBlinkStateForFrame(uint16_t framesPerBlink,
-        uint16_t& currentFrame, uint8_t& blinkState);
-
-    /** Calculate the pulse fraction. VisibleForTesting. */
-    static void calcPulseFractionForFrame(uint16_t framesPerPulse,
-        uint16_t& currentFrame, uint8_t& pulseFraction);
-
     /**
-     * Calculate the pulse fraction using the reciprocal of the framesPerPulse,
-     * which avoid a long division, which is very slow in 8-bit processors.
+     * Return true if the given Styler is supported by the current Driver.
      * VisibleForTesting.
      */
-    static void calcPulseFractionForFrameUsingInverse(
-        uint16_t framesPerPulseInverse, uint16_t framesPerPulse,
-        uint16_t& currentFrame, uint8_t& pulseFraction);
+    bool isStylerSupported(Styler* styler);
 
-    /**
-     * Calculate the effective brightness of a digit with the given style.
-     * VisibleForTesting.
-     *
-     * @param brightness global brightness
-     * @param style the style of the digit
-     * @param blinkSlowState state of the blinkSlow cycle (on or off)
-     * @param blinkFastState state of the blinkFast cycle (on or off)
-     * @param isPulseEnabled true if the driver supports greyscale brightness,
-     *    probably using PWM
-     * @param pulseSlowFraction current brightness of the pulseSlow cycle
-     * @param pulseFastFraction current brightness of the pulseSlow cycle
-     *
-     * @return the effective brightness of a digit with the given style
-     */
-    static uint8_t calcBrightness(uint8_t style, uint8_t brightness,
-        uint8_t blinkSlowState, uint8_t blinkFastState, bool isPulseEnabled,
-        uint8_t pulseSlowFraction, uint8_t pulseFastFraction);
+    /** Retrieve the array of active styles. VisibleForTesting. */
+    uint8_t* getActiveStyles() { return mActiveStyles; }
 
-  protected:
+  private:
     // disable copy-constructor and assignment operator
     Renderer(const Renderer&) = delete;
     Renderer& operator=(const Renderer&) = delete;
@@ -214,8 +175,8 @@ class Renderer {
     /** Perform things that need to be done each frame. */
     void updateFrame();
 
-    /** Calculate the blink and pulse states for current frame. */
-    void calcBlinkAndPulseForFrame();
+    /** Update the stylers active stylers indicated by mActiveStyles. */
+    void updateStylers();
 
     /** Translate the StyledPatterns to DimmablePatterns for the Driver. */
     void renderStyledPatterns();
@@ -230,17 +191,21 @@ class Renderer {
     const uint16_t mStatsResetInterval;
     TimingStats mStats;
 
-    // digit style attributes
-    const uint16_t mBlinkSlowDurationMillis;
-    const uint16_t mBlinkFastDurationMillis;
-    const uint16_t mPulseSlowDurationMillis;
-    const uint16_t mPulseFastDurationMillis;
+    // Array of Stylers. Index 0 is reserved and represents the "no-style"
+    // setting which does nothing. It cannot be set by the the client code.
+    Styler* mStylers[kNumStyles];
+
+    // Count of the number of times the given style index is used in the
+    // mStyledPatterns array. We update this map during writePatternAt() and
+    // writeStyleAt() to avoid calculating this in renderField() which saves
+    // CPU cycles.
+    uint8_t mActiveStyles[kNumStyles];
 
     // global brightness, can be changed during runtime
-    uint8_t mBrightness;
+    uint8_t mBrightness = 255;
 
-    // depends on the Driver
-    bool mIsPulseEnabled;
+    // does the Driver support brightness?
+    bool mIsBrightnessEnabled = false;
 
     // variables to support renderFieldWhenReady()
     uint16_t mMicrosPerField;
@@ -250,27 +215,6 @@ class Renderer {
     // fieldsPerFrame, so certain calculations can be performed once per frame
     uint16_t mFieldsPerFrame;
     uint16_t mCurrentField;
-
-    // TODO: Maybe generalize the following into an array of styles, because the
-    // calculations seem so similar.
-
-    uint16_t mFramesPerBlinkSlow;
-    uint16_t mCurrentBlinkSlowFrame;
-    uint8_t mBlinkSlowState;
-
-    uint16_t mFramesPerBlinkFast;
-    uint16_t mCurrentBlinkFastFrame;
-    uint8_t mBlinkFastState;
-
-    uint16_t mFramesPerPulseSlow;
-    uint16_t mFramesPerPulseSlowInverse; // 65536/mFramesPerPulseSlow
-    uint16_t mCurrentPulseSlowFrame;
-    uint8_t mPulseSlowFraction;
-
-    uint16_t mFramesPerPulseFast;
-    uint16_t mFramesPerPulseFastInverse; // 65536/mFramesPerPulseFast
-    uint16_t mCurrentPulseFastFrame;
-    uint8_t mPulseFastFraction;
 };
 
 }

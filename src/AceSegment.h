@@ -38,6 +38,8 @@ SOFTWARE.
 #include "ace_segment/Driver.h"
 #include "ace_segment/DriverBuilder.h"
 #include "ace_segment/StyledPattern.h"
+#include "ace_segment/BlinkStyler.h"
+#include "ace_segment/PulseStyler.h"
 #include "ace_segment/Renderer.h"
 #include "ace_segment/RendererBuilder.h"
 #include "ace_segment/CharWriter.h"

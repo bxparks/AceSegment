@@ -39,6 +39,7 @@ SOFTWARE.
 
 #include <stdio.h>
 #include <AceSegment.h>
+#include "Flash.h"
 #ifdef __AVR__
   #include "FastDirectDriver.h"
   #include "FastSerialDriver.h"
@@ -82,29 +83,36 @@ void setupBenchmark(const DriverConfig* driverConfig) {
 
   benchmarkBundle = new BenchmarkBundle(driverConfig);
   benchmarkBundle->configure();
-  benchmarkBundle->mStringWriter->writeStringAt(0, "1234");
+  CharWriter* writer = benchmarkBundle->mCharWriter;
+  writer->writeCharAt(0, '1', BenchmarkBundle::kBlinkStyle);
+  writer->writeCharAt(1, '2', BenchmarkBundle::kPulseStyle);
+  writer->writeCharAt(2, '3', BenchmarkBundle::kBlinkStyle);
+  writer->writeCharAt(3, '4', BenchmarkBundle::kPulseStyle);
 }
 
 //------------------------------------------------------------------
 // Loop for AutoBenchmark
 //------------------------------------------------------------------
 
+static const char kBoundary[] PROGMEM =
+    "------------+--------+------------+------+--------+-------------+";
+static const char kHeader[] PROGMEM =
+    "resistorsOn | wiring | modulation | fast | styles | min/avg/max |";
+static const char kDivider[] PROGMEM =
+    "------------|--------|------------|------|--------|-------------|";
+
 void loop() {
   if (loopMode == LOOP_MODE_BEGIN) {
-    Serial.println(
-        F("------------+-----------+------------+------+-------------+"));
-    Serial.println(
-        F("resistorsOn | pinWiring | modulation | fast | min/avg/max |"));
-    Serial.println(
-        F("------------|-----------|------------|------|-------------|"));
+    Serial.println(FPSTR(kBoundary));
+    Serial.println(FPSTR(kHeader));
+    Serial.println(FPSTR(kDivider));
     loopMode = LOOP_MODE_RENDER;
   } else if (loopMode == LOOP_MODE_RENDER) {
     render();
   } else if (loopMode == LOOP_MODE_NEXT_DRIVER) {
     nextBenchmark();
   } else if (loopMode == LOOP_MODE_FOOTER) {
-    Serial.println(
-        F("------------+-----------+------------+------+-------------+"));
+    Serial.println(FPSTR(kBoundary));
     loopMode = LOOP_MODE_DONE;
   }
 }
@@ -121,7 +129,7 @@ void render() {
   bool isRendered = benchmarkBundle->mRenderer->renderFieldWhenReady();
 
   if (isRendered) {
-    uint16_t elapsedCount = benchmarkBundle->mCurrentStatsCounter - 
+    uint16_t elapsedCount = benchmarkBundle->mCurrentStatsCounter -
         benchmarkBundle->mLastStatsCounter;
     if (elapsedCount >= NUM_FIELD_SAMPLES) {
       TimingStats stats = benchmarkBundle->mRenderer->getTimingStats();
@@ -149,7 +157,7 @@ void printTimingStats(const DriverConfig* driverConfig,
   Serial.print(driverConfig->mLabel);
 
   char buf[15]; // 12 should be enough, but give 3 more just in case
-  sprintf(buf, " %3d/%3d/%3d |", stats.getMin(), stats.getAvg(), 
+  sprintf(buf, " %3d/%3d/%3d |", stats.getMin(), stats.getAvg(),
       stats.getMax());
   Serial.println(buf);
 }

@@ -42,14 +42,20 @@ struct BenchmarkBundle {
   static const uint8_t kDataPin = MOSI; // DS on 74HC595
   static const uint8_t kClockPin = SCK; // SH_CP on 74HC595
 
+  static const uint16_t kBlinkDuration = 800;
+  static const uint8_t kBlinkStyle = 1;
+  static const uint16_t kPulseDuration = 1600;
+  static const uint8_t kPulseStyle = 2;
+
   /** Constructor. */
   BenchmarkBundle(const DriverConfig* driverConfig);
 
   /** Destructor. */
   ~BenchmarkBundle() {
-    delete mStringWriter;
     delete mCharWriter;
     delete mRenderer;
+    delete mPulseStyler;
+    delete mBlinkStyler;
     delete mDriver;
     delete mHardware;
   }
@@ -64,10 +70,11 @@ struct BenchmarkBundle {
   Driver* mDriver;
 
   StyledPattern mStyledPatterns[kNumDigits];
+  BlinkStyler* mBlinkStyler;
+  PulseStyler* mPulseStyler;
   Renderer* mRenderer;
 
   CharWriter* mCharWriter;
-  StringWriter* mStringWriter;
 
   uint16_t mLastStatsCounter = 0;
   uint16_t mCurrentStatsCounter = 0;

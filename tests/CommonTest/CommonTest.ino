@@ -51,6 +51,8 @@ void setup() {
   while (!Serial); // Wait until Serial is ready - Leonardo/Micro
   Serial.println(F("setup(): start"));
 
+  Serial.print(F("sizeof(TimingStats): "));
+  Serial.println(sizeof(TimingStats));
   Serial.print(F("sizeof(Hardware): "));
   Serial.println(sizeof(Hardware));
   Serial.print(F("sizeof(LedMatrixDirect): "));
@@ -69,6 +71,10 @@ void setup() {
   Serial.println(sizeof(ModulatingDigitDriver));
   Serial.print(F("sizeof(DriverBuilder): "));
   Serial.println(sizeof(DriverBuilder));
+  Serial.print(F("sizeof(BlinkStyler): "));
+  Serial.println(sizeof(BlinkStyler));
+  Serial.print(F("sizeof(PulseStyler): "));
+  Serial.println(sizeof(PulseStyler));
   Serial.print(F("sizeof(Renderer): "));
   Serial.println(sizeof(Renderer));
   Serial.print(F("sizeof(RendererBuilder): "));

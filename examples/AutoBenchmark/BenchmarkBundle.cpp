@@ -31,7 +31,7 @@ SOFTWARE.
 
 const uint8_t BenchmarkBundle::kDigitPins[kNumDigits] = {4, 5, 6, 7};
 const uint8_t BenchmarkBundle::kSegmentDirectPins[8] =
-    {8, 9, 10, 11, 12, 13, 14, 15};
+    {8, 9, 10, 11, 12, 14, 15, 16};
 
 // Normally it's not a good idea to do so much in a constructor but this is
 // just a diagnostic program.
@@ -83,11 +83,18 @@ BenchmarkBundle::BenchmarkBundle(const DriverConfig* driverConfig) {
   }
 
   // Create the Renderer.
-  mRenderer = RendererBuilder(mHardware, mDriver, mStyledPatterns, kNumDigits)
+  memset(mStyledPatterns, 0, kNumDigits * sizeof(StyledPattern));
+  mBlinkStyler = new BlinkStyler(kFramePerSecond, kBlinkDuration);
+  mPulseStyler = new PulseStyler(kFramePerSecond, kPulseDuration);
+  RendererBuilder rendererBuilder =
+      RendererBuilder(mHardware, mDriver, mStyledPatterns, kNumDigits)
       .setFramesPerSecond(kFramePerSecond)
-      .setStatsResetInterval(0)
-      .build();
-
+      .setStatsResetInterval(0);
+  if (driverConfig->mStyle == DriverConfig::UseStyles) {
+      rendererBuilder
+          .setStyler(kBlinkStyle, mBlinkStyler)
+          .setStyler(kPulseStyle, mPulseStyler);
+  }
+  mRenderer = rendererBuilder.build();
   mCharWriter = new CharWriter(mRenderer);
-  mStringWriter = new StringWriter(mCharWriter);
 }

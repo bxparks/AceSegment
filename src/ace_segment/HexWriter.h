@@ -55,10 +55,10 @@ class HexWriter {
     void writeHexAt(uint8_t digit, uint8_t c);
 
     /** Write the hex at the specified position. */
-    void writeHexAt(uint8_t digit, uint8_t c, StyledPattern::StyleType style);
+    void writeHexAt(uint8_t digit, uint8_t c, uint8_t style);
 
     /** Write the style for a given digit, leaving hex unchanged. */
-    void writeStyleAt(uint8_t digit, StyledPattern::StyleType style) {
+    void writeStyleAt(uint8_t digit, uint8_t style) {
       if (digit >= getNumDigits()) return;
       mRenderer->writeStyleAt(digit, style);
     }

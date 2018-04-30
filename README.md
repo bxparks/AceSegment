@@ -2,7 +2,7 @@
 An adjustable, configurable, and extensible framework for rendering seven
 segment LED displays on Arduino platforms
 
-Version: 0.2.0 (2018-04-12)
+Version: 0.3.0 (2018-04-30)
 
 ## Summary
 
@@ -14,22 +14,41 @@ It is called AceSegment because:
   **Configurable** at compile-time by choosing the appropriate classes
 * the framework is **Extensible** by writing new versions of the `Driver` class
 
+The framework is intended to be used with LED displays which are more-or-less
+directly connected to the microcontroller through the GPIO pins,
+instead of through a specialized LED display driver chip, like
+the [MAX7219](https://www.maximintegrated.com/en/datasheet/index.mvp/id/1339)
+or the
+[MC14489B](http://cache.freescale.com/files/timing_interconnect_access/doc/inactive/MC14489B.pdf).
+The framework does support the 74HC595 serial-to-parallel chip which is a
+general purpose chip that helps reduce the GPIO pin usage.
+
+Here are the features supported by this framework:
+* multiplexing of segments at a selectable frame rate
+* common cathode or common anode configurations
+* resistors on segments or resistors on digits
+* LED display directly connected to the GPIO pins
+* LED display connected through a serial-to-parallel chip (74HC595)
+* communication with the 74HC595 through
+    * `shiftOut()`
+    * hardware SPI
+* transistors drivers to handle high currents
+* configurable and extensible bit pattern styles (e.g. blinking and pulsing)
+
 The framework splits the responsibility of displaying LED digits into two
 main parts:
 * The `Renderer` is the higher-level class that allows bit patterns of an LED
-  digit to be associated with a number of predefined styles (e.g. blinking or
-  pulsing). The parameters for these styles can be modified by the end-user.
+  digit to be associated with a particular style (e.g. blinking or pulsing).
+    * The user can choose to use pre-defined styles, or
+    * the user can provide custom styles.
 * The `Driver` knows how to display the bit patterns to a specific
   physical wiring of an LED display. Different versions of the `Driver`
   are provided to cover some of the basic wiring configurations:
-    * Resistors on segments
-    * Resistors on digits
-    * Resistors on digits, with pulse width modulation
-
-Because of power and pin number limitations, the LED display will be multiplexed
-to activate only a small part of the LED display. If the multiplexing is
-performed quickly enough, the human eye will perceive that the entire LED
-display is turned on.
+    * resistors on segments
+    * resistors on digits
+    * resistors on digits, with pulse width modulation
+    * transistors on digits or segments
+    * using 74HC595 with `shiftOut()` or hardware SPI
 
 The rendering of an array of bit patterns is split into 2 parts:
 * a *frame* is one complete rendering of the LED display
@@ -46,19 +65,8 @@ requirement because the most complex driver option (`useModulatingDriver()`) is
 able to render a single field with a maximum CPU time of 124 microseconds on a
 16MHz ATmega328P microcontroller (Arduino UNO, Nano, Mini, etc).
 
-When the `useModulatingDriver()` option is enabled, the following features
-become enabled on a single digit, independently of the other digits:
-* blinking slow
-* blinking fast
-* pulsing slow
-* pulsing fast
-* a user-selectable global brightness
-
-The framework supports an LED display which is either directly connected to the
-GPIO pins or through a serial-to-parallel chip like the 74HC595.
-
-A Python script in the `./tools` directory extends the framework to implement
-C++ code generation to create subclasses of `Driver` that uses
+For the fastest rendering time, a Python script in the `./tools` directory
+uses code generation to create subclasses of `Driver` that uses
 [digitalWriteFast()](https://github.com/NicksonYap/digitalWriteFast) routines
 which are 10-20X faster than the default `digitalWrite()` methods in Arduino.
 The generated code makes `Driver::renderField()` consume 25% to 65% fewer CPU
@@ -102,7 +110,20 @@ resistors on the segments, all the segments on one digit can be activated at the
 same time, and we can use pulse width modulation on the digit line to control
 the brightness of a single digit.
 
+Multiple LED segments will be connected to a single GPIO pin. If the total
+current on the pin exceeds the rated limit, then a transistor will need to be
+added to handle the current. The framework can be configured to support these
+transistors.
+
 ## Usage
+
+### Examples
+
+There are 2 example sketches provided:
+* `examples/AceSegmentDemo/`: a demo program that exercises a large fraction
+  of the feature of the framework
+* `examples/AutoBenchmark/`: a program that performs CPU benchmarking of
+  most (if not all) of the various configurations of the framework
 
 ### Include Header and Namespace
 
@@ -129,8 +150,6 @@ depend on the lower-level classes:
   `DimmablePattern` to the seven segment leds. Different subclasses implement
   different types of wiring, but the user does not need to aware of the various
   subclasses. That complexity is managed by the `DriverBuilder` class.
-* `DriverBuilder`: A class that knows how to select and configure the
-  appropriate subclass of `Driver`.
 * `StyledPattern`: A class that represents the bit patterns digit which can have
   certain style attributes (e.g. blinking, or pulsing). A `StyledPattern` is
   converted into a `DimmablePattern` by the `Renderer`.
@@ -153,6 +172,20 @@ depend on the lower-level classes:
 Not all `Driver`s and not all wiring configurations will support the brightness.
 See the *Modulating Driver* section for details on which configuration supports
 this feature.
+
+#### Builders
+
+The `Driver` and `Renderer` classes can be complex to configure because the
+corresponding wiring circuits can be varied and complex. Two builder classes are
+provided to translate the physical wiring into a properly configured instance of
+these classes.
+
+* `RendererBuilder`: A class that knows how to configure and create a
+  `Renderer`.
+* `DriverBuilder`: A class that knows how to select and configure the
+  appropriate subclass of `Driver`.
+
+#### Doxygen Docs
 
 The [Doxygen docs for these classes](https://bxparks.github.io/AceSegment/html)
 are published through GitHub Pages.
@@ -247,75 +280,18 @@ void setup() {
 
 Usually in embedded environments, resources (objects) are created statically
 instead of the heap. That's usually because resources are created once and
-never deleted for the life of the application. In the `Driver` and `Renderer`
-objects, I chose to create them on the heap through the `DriverBuilder` and
-`RendererBuilder` objects (respectively). For `DriverBuilder`, it was a
-necessity since it creates different versions (subclasses) of `Driver` and an
-internal class called `LedMatrix`, and it's not possible to statically create
-those subclasses. Then for consistency, I chose to do the same for
-`RendererBuilder` even though that was not strictly necessary.
+never deleted for the life of the application.
 
-In the example shown above, I chose to use the heap for all resources for
-consistency of style. In a normal program, all of those heap objects are created
-once and never deleted, so the static memory usage will be about the same as if
-they were created statically.
+Although it is possible (with some effort) to create all the required objects
+needed by this framework statically, I choose to document the usage using heap
+objects because it is a lot easier, and because the heap objects are created
+only once during `setup()` and never deleted, so it's basically equivalent to
+creating them statically.
 
-If the user prefer, it *is* possible to create most of these objects statically,
-like this:
-```
-const uint16_t FRAMES_PER_SECOND = 60;
-const uint8_t NUM_DIGITS = 4;
-const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
-const uint8_t segmentPins[8] = {8, 9, 10, 11, 12, 13, 14, 15};
-
-DimmablePattern dimmablePatterns[NUM_DIGITS];
-StyledPattern styledPatterns[NUM_DIGITS];
-
-// The chain of resources.
-Hardware hardware;
-Driver* driver = DriverBuilder(&hardware)
-    .setNumDigits(NUM_DIGITS)
-    .setCommonCathode()
-    .setResistorsOnSegments()
-    .setDigitPins(digitPins)
-    .setSegmentDirectPins(segmentPins)
-    ...
-    .build();
-Renderer* renderer = RendererBuilder(
-        &hardware, driver, styledPatterns, NUM_DIGITS)
-    .setFramesPerSecond(FRAMES_PER_SECOND)
-    ...
-    .build();
-CharWriter charWriter(renderer);
-StringWriter stringWriter(&charWriter);
-...
-
-void setup() {
-  delay(1000); // Wait for stability on some boards, otherwise garage on Serial
-  Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
-  while (!Serial); // Wait until Serial is ready - Leonardo/Micro
-  Serial.println(F("setup(): begin"));
-
-  driver->configure();
-  renderer->configure();
-  ...
-
-  Serial.println(F("setup(): end"));
-
-```
-
-The disadvantages are:
-* there is mixing style, using objects by value and some objects by pointer
-* debugging the `DriverBuilder::build()` and `RendererBuilder::build()` is
-  more difficult because we cannot insert a `Serial.print()` statement in there,
-  `Serial` cannot be used until it is configured in the `setup()` method
-
-In unit tests, multiple test objects are created and deleted with various
-configuration parameters, so creating these objects on the heap makes the test
-code cleaner and more robust. Once I got used to creating them on the heap, then
-it seemed easier sense to use the same style within an application. As I point
-out above, these heap objects are created just once in an application, so
-there's little difference in the overall static memory usage.
+Creating the objects on the heap becomes especially useful in unit tests where
+we can create multiple test cases with different configurations of the various
+objects, run a particular test case, then tear down the test fixtures and start
+for the next test case.
 
 The biggest disadvantage of using the `DriverBuilder` helper object is not the
 static memory consumption, but *flash* memory consumption. The `DriverBuilder`
@@ -325,15 +301,11 @@ configuration options are known at compile-time, the code for creating all the
 other configuration options are loaded into flash and *not removed*, even after
 the `DriverBuilder` instance is created, used, and destroyed.
 
-Therefore, I've made it possible to bypass the `DriverBuilder` and
-`RendererBuilder` and create *all* resources statically. You just need to follow
-the logic of `DriverBuilder` and `RendererBuilder`, create the intermediary
-`LedMatrix` object, and call the constructors of the various subclasses of
-`Driver` and the constructor of `Renderer` manually. Send me an email if you
-need help with this. (If there is sufficient demand, I will write up more
-detailed instructions.)
+It is possible to bypass the `DriverBuilder` and `RendererBuilder` and create
+*all* resources statically. I can write instructions for doing that if there is
+sufficient demand.
 
-However, I suspect that if flash memory consumption is an issue, then you will
+I suspect that if flash memory consumption is an issue, then you will
 probably also be concerned about CPU cycles, and there's an even better way to
 reduce both. See the section __Code Generation to Use DigitalWriteFast__ section
 below.
@@ -354,21 +326,22 @@ a reference to `*this`, so they can be chained together in one statement.
 
 The following methods are available in `DriverBuilder`:
 
-* `DriverBuilder& setNumDigits(uint8_t numDigits)`
-* `DriverBuilder& setNumSegments(uint8_t numSegments)`
-* `DriverBuilder& setCommonAnode()`
-* `DriverBuilder& setCommonCathode()`
-* `DriverBuilder& setResistorsOnDigits()`
-* `DriverBuilder& setResistorsOnSegments()`
-* `DriverBuilder& useTransistors()`
-* `DriverBuilder& setDigitPins(const uint8_t* digitPins)`
-* `DriverBuilder& setSegmentDirectPins(const uint8_t* segmentPins)`
+* `DriverBuilder& setNumDigits(uint8_t numDigits)`: required
+* `DriverBuilder& setNumSegments(uint8_t numSegments)`: required
+* `DriverBuilder& setCommonAnode()`: optional
+* `DriverBuilder& setCommonCathode()`: optional
+* `DriverBuilder& setResistorsOnDigits()`: optional
+* `DriverBuilder& setResistorsOnSegments()`: optional
+* `DriverBuilder& useTransistors()`: optional
+* `DriverBuilder& setDigitPins(const uint8_t* digitPins)`: required
+* `DriverBuilder& setSegmentDirectPins(const uint8_t* segmentPins)`: optional
 * `DriverBuilder& setSegmentSerialPins(uint8_t latchPin, uint8_t dataPin,
-   uint8_t clockPin)`
+   uint8_t clockPin)`: optional
 * `DriverBuilder& setSegmentSpiPins(uint8_t latchPin, uint8_t dataPin,
-   uint8_t clockPin)`
-* `DriverBuilder& setDimmablePatterns(DimmablePattern* dimmablePatterns)`
-* `DriverBuilder& useModulatingDriver(uint8_t numSubFields)`
+   uint8_t clockPin)`: optional
+* `DriverBuilder& setDimmablePatterns(DimmablePattern* dimmablePatterns)`:
+  required
+* `DriverBuilder& useModulatingDriver(uint8_t numSubFields)`: optional
 
 The best way to show how to use these methods is probably through
 examples.
@@ -771,6 +744,32 @@ Digits      | SPI    | Modulation | -          |
 ------------+--------+------------+------------|
 ```
 
+### Styles
+
+The `Renderer` is responsible for translating the bit `pattern` and a
+`style` code into a bit `pattern` and a `brightness`. An example of a
+`style` is a "blinking" style. If the blinking style is configured to blink
+every 800 milliseconds, the `Renderer` is responsible for turning on the bit
+patterns for 400 milliseconds, then turning off the bit patterns for 400
+millliseconds for a total blink duration of 800 milliseconds.
+
+The framework provides 2 pre-defined styles (blinking and pulsing), but the
+number of styles is limited only by imagination, so the `Renderer` allows
+end-users create custom style effects. The classes that implement styles are:
+* `Styler`: an interface class
+* `BlinkStyler`: implements the blinking style
+* `PulseStyler`: implements the pulsing style
+
+User-defined custom styles would subclass the `Styler` interface class.
+
+The `Renderer` contains a lookup table that associates a particular style code
+to an instance of a `Styler`.  The style code of `0` is reserved and means "no
+style". The maximum number of styles is defined by `Renderer::kNumStyles` and is
+currently `6`, which means five additional style codes (`1` to `5`) can be
+associated with any implementation of the `Styler` class. The association
+between a style code and a `Styler` is configurable by the end-user. The library
+does not pre-determine a particular style code, except for `style 0`.
+
 ### Configuring the Renderer
 
 The `Renderer` is dependent on the following resources, and these required
@@ -783,29 +782,38 @@ The following optional parameters can be given to `RendererBuilder` to override
 the defaults. Each of these methods returns a reference to `*this` so they can
 be chained (see below):
 * `setFramesPerSecond(uint8_t framesPerSecond)` (default: 60)
-* `setStatsResetInterval(uint16_t framesPerStatsReset)` (default: 120)
-* `setBlinkSlowDuration(uint16_t durationMillis)` (default: 800)
-* `setBlinkFastDuration(uint16_t durationMillis)` (default: 400)
-* `setPulseSlowDuration(uint16_t durationMillis)` (default: 3000)
-* `setPulseFastDuration(uint16_t durationMillis)` (default: 1000)
+* `setStatsResetInterval(uint16_t fieldsPerStatsReset)` (default: 120)
+* `setStyle(uint8_t code, Styler* styler)`: call as many times as necessary
 
 The `build()` method creates an instance of `Renderer` with the given
 parameters. An example of configuring the `Renderer` is:
 ```
 const uint8_t NUM_DIGITS = 4;
 StyledPattern styledPatterns[NUM_DIGITS];
-const int FRAMES_PER_SECOND = 90;
-const int BLINK_FAST_DURATION_MILLIS = 500;
+
+const uint8_t FRAMES_PER_SECOND = 90;
+
+const uint16_t BLINK_DURATION_MILLIS = 800;
+const uint16_t PULSE_DURATION_MILLIS = 2000;
+const uint8_t BLINK_STYLE = 1;
+const uint8_t PULSE_STYLE = 2;
+
+PulseStyler* pulseStyler;
+BlinkStyler* blinkStyler;
+Renderer* renderer;
 
 void setup() {
   ...
   Hardware* hardware = ...;
   Driver* driver = ...;
 
-  Renderer* renderer =
+  blinkStyler = new BlinkStyler(FRAMES_PER_SECOND, BLINK_DURATION_MILLIS);
+  pulseStyler = new PulseStyler(FRAMES_PER_SECOND, PULSE_DURATION_MILLIS);
+  renderer =
       RendererBuilder(hardware, driver, styledPatterns, NUM_DIGITS)
       .setFramesPerSecond(FRAMES_PER_SECOND)
-      .setBlinkFastDuration(BLINK_FAST_DURATION_MILLIS)
+      .setStyler(BLINK_STYLE, blinkStyler)
+      .setStyler(PULSE_STYLE, pulseStyler)
       .build();
   renderer->configure();
   ...
@@ -842,38 +850,19 @@ Segment: dp g f e d c b a
 ```
 (Sometimes, the decimal point `dp` is labeled as an `h`).
 
-The `style` is a constant given by the constants in the `StyledPattern` class:
-```
-static const StyleType kStyleNormal = 0;
-static const StyleType kStyleBlinkSlow = 1;
-static const StyleType kStyleBlinkFast = 2;
-static const StyleType kStylePulseSlow = 3;
-static const StyleType kStylePulseFast = 4;
-```
+The `style` is an integer constant (0-5) associated with an instance of
+`Styler`. Style code `0` means "no style". The other codes can be assigned in
+the `RendererBuidler`.
 
 The `writeDecimalPointAt()` is a special method that sets the bit corresponding
 to the decimal point ('h', bit 7), no matter what previous pattern was there in
 initially. The `state` variable controls whether the decimal point should
 be turned on (default) or off (false).
 
-As indicated above, each digit of the LED display can be assigned a
-specific style:
-* `kStyleNormal`: plain
-* `kStyleBlinkSlow`: blinks a slow rate of 800 milliseconds per blink which can
-  be changed by `Renderer::setBlinkSlowDuration()`
-* `kStyleBlinkFast`: blinks a slow rate of 400 milliseconds per blink which can
-  be changed by `Renderer::setBlinkFastDuration()`
-* `kStylePulseSlow`: pulses (dims and brightens) at a slow rate of 3000
-  milliseconds per cycle which can be changed by
-  `Renderer::setPulseSlowDuration()`
-* `kStylePulseFast`: pulses (dims and brightens) at a fast rate of 1000
-  milliseconds per cycle which can be changed by
-  `Renderer::setPulseFastDuration()`
-
-The `useModulatingDriver()` option is required for the two pulsing modes,
-because the driver needs to be able to support intermediate brightness of the
-LED digits, which can currently be achieved using pulse width modulation.
-
+Some `Styler` classes need a `Driver` whose `Driver::isBrightnessSupported()`
+returns `true` to indicate that the driver supports brightness. If the `Driver`
+does not support brightness, the `Styler` should be written so that it does
+something reasonable, even if it means doing nothing.
 
 #### Global Brightness
 
@@ -1027,8 +1016,8 @@ table is stored in flash memory to conserve static memory.
 
 The class supports the following methods:
 * `void writeHexAt(uint8_t digit, uint8_t c)`
-* `void writeHexAt(uint8_t digit, uint8_t c, StyledPattern::StyleType style)`
-* `void writeStyleAt(uint8_t digit, StyledPattern::StyleType style)`
+* `void writeHexAt(uint8_t digit, uint8_t c, uint8_t style)`
+* `void writeStyleAt(uint8_t digit, uint8_t style)`
 * `void writeDecimalPointAt(uint8_t digit, bool state = true)`
 
 In addition to the numerals 0-15 (or 0x0-0xF), the class also supports these
@@ -1051,8 +1040,8 @@ memory.
 
 The class supports the following methods:
 * `void writeCharAt(uint8_t digit, char c)`
-* `void writeCharAt(uint8_t digit, char c, StyledPattern::StyleType style)`
-* `void writeStyleAt(uint8_t digit, StyledPattern::StyleType style)`
+* `void writeCharAt(uint8_t digit, char c, uint8_t style)`
+* `void writeStyleAt(uint8_t digit, uint8_t style)`
 * `void writeDecimalPointAt(uint8_t digit, bool state = true)`
 
 A `CharWriter` consumes about 300 bytes of flash memory.
@@ -1162,20 +1151,30 @@ for more details.
 Here are the sizes of the various classes on the 8-bit AVR microcontrollers
 (Arduino Uno, Nano, etc):
 
+* sizeof(TimingStats): 14
 * sizeof(Hardware): 2
 * sizeof(LedMatrixDirect): 14
 * sizeof(LedMatrixSerial): 15
 * sizeof(LedMatrixSpi): 15
-* sizeof(Driver): 7
-* sizeof(SegmentDriver): 10
-* sizeof(DigitDriver): 11
+* sizeof(Driver): 9
+* sizeof(SegmentDriver): 12
+* sizeof(DigitDriver): 12
+* sizeof(DriverBuilder): 19
 * sizeof(ModulatingDigitDriver): 14
-* sizeof(Renderer): 62
+* sizeof(BlinkStyler): 7
+* sizeof(PulseStyler): 9
+* sizeof(Renderer): 54
+* sizeof(RendererBuilder): 22
 * sizeof(HexWriter): 2
 * sizeof(CharWriter): 2
 * sizeof(StringWriter): 2
 
 ### Flash Memory
+
+For the most part, the user pays only for the feature that is being used. For
+example, if the `CharWriter` (which consumes 312 bytes of flash) is not used, it
+is not loaded into the program. Similarly, if the `BlinkStyler` is not used by
+the `Renderer`, that class is not loaded into the flash memory.
 
 Here are the flash and static memory consumptions for various options.
 Tested on `examples/AceSegmentDemo`:
@@ -1232,22 +1231,34 @@ Nano clone (16MHz ATmega328P), using a frame rate of 60Hz, with 16 subfields per
 field for the `useModulatingDriver()` option:
 
 ```
-------------+-----------+------------+------+-------------+
-resistorsOn | pinWiring | modulation | fast | min/avg/max |
-------------|-----------|------------|------|-------------|
-digits      | direct    |            |      |  60/ 67/100 |
-digits      | serial    |            |      |  60/ 67/100 |
-digits      | spi       |            |      |  60/ 67/100 |
-segments    | direct    |            |      |  80/ 88/116 |
-segments    | serial    |            |      | 152/163/192 |
-segments    | spi       |            |      |  44/ 53/ 84 |
-segments    | direct    | modulation |      |  12/ 18/140 |
-segments    | serial    | modulation |      |  12/ 23/220 |
-segments    | spi       | modulation |      |  12/ 16/104 |
-segments    | direct    | modulation | fast |  12/ 15/ 88 |
-segments    | serial    | modulation | fast |  12/ 14/ 80 |
-segments    | spi       | modulation | fast |  12/ 14/ 76 |
-------------+-----------+------------+------+-------------+
+------------+--------+------------+------+--------+-------------+
+resistorsOn | wiring | modulation | fast | styles | min/avg/max |
+------------|--------|------------|------|--------|-------------|
+digits      | direct |            |      |        |  32/ 37/ 64 |
+digits      | direct |            |      | styles |  32/ 67/112 |
+digits      | serial |            |      |        |  32/ 37/ 60 |
+digits      | serial |            |      | styles |  32/ 67/112 |
+digits      | spi    |            |      |        |  32/ 37/ 64 |
+digits      | spi    |            |      | styles |  32/ 67/112 |
+segments    | direct |            |      |        |  24/ 33/ 56 |
+segments    | direct |            |      | styles |  24/ 78/140 |
+segments    | serial |            |      |        |  24/ 33/ 56 |
+segments    | serial |            |      | styles |  24/135/224 |
+segments    | spi    |            |      |        |  24/ 33/ 56 |
+segments    | spi    |            |      | styles |  24/ 51/ 96 |
+segments    | direct | modulation |      |        |  12/ 14/ 60 |
+segments    | direct | modulation |      | styles |  12/ 18/152 |
+segments    | serial | modulation |      |        |  12/ 14/ 60 |
+segments    | serial | modulation |      | styles |  12/ 22/236 |
+segments    | spi    | modulation |      |        |  12/ 14/ 60 |
+segments    | spi    | modulation |      | styles |  12/ 16/116 |
+segments    | direct | modulation | fast |        |  12/ 14/ 52 |
+segments    | direct | modulation | fast | styles |  12/ 16/ 96 |
+segments    | serial | modulation | fast |        |  12/ 14/ 48 |
+segments    | serial | modulation | fast | styles |  12/ 15/ 92 |
+segments    | spi    | modulation | fast |        |  12/ 14/ 48 |
+segments    | spi    | modulation | fast | styles |  12/ 15/ 84 |
+------------+--------+------------+------+--------+-------------+
 ```
 
 If we want to drive a 4 digit LED display at 60 frames per second, using a
