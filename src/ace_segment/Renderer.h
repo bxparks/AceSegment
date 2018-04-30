@@ -67,7 +67,7 @@ class Renderer {
         mStatsResetInterval(statsResetInterval)
     {
       for (uint8_t i = 0; i < kNumStyles; i++) {
-        mStylers[i] = stylers[i];
+        mStylers[i] = (stylers != nullptr) ? stylers[i] : nullptr;
       }
     }
 

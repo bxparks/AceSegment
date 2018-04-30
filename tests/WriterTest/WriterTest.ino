@@ -28,22 +28,35 @@ SOFTWARE.
 #include <AUnit.h>
 #include <AceSegment.h>
 #include <ace_segment/testing/FakeRenderer.h>
+#include <ace_segment/testing/StubStyler.h>
 
 using namespace aunit;
 using namespace ace_segment;
 using namespace ace_segment::testing;
 
-const int8_t NUM_DIGITS = 4;
+const uint8_t NUM_DIGITS = 4;
 
 // create NUM_DIGITS+1 elements for doing array bound checking
 DimmablePattern dimmablePatterns[NUM_DIGITS + 1];
 StyledPattern styledPatterns[NUM_DIGITS + 1];
+
+const uint8_t STYLE_BLINK = 1;
+const uint8_t STYLE_PULSE = 2;
+
+Styler* blinkStyler = new StubStyler();
+Styler* pulseStyler = new StubStyler();
+
+Styler* stylers[Renderer::kNumStyles];
 
 void setup() {
   delay(1000); // Wait for stability on some boards, otherwise garage on Serial
   Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
   while (!Serial); // Wait until Serial is ready - Leonardo/Micro
   Serial.println(F("setup(): start"));
+
+  memset(stylers, 0, Renderer::kNumStyles * sizeof(Styler*));
+  stylers[STYLE_BLINK] = blinkStyler;
+  stylers[STYLE_PULSE] = pulseStyler;
 
   Serial.println(F("setup(): end"));
 }
@@ -68,7 +81,7 @@ class CharWriterTest: public TestOnce {
     virtual void setup() override {
       TestOnce::setup();
 
-      mRenderer = new FakeRenderer(styledPatterns, NUM_DIGITS);
+      mRenderer = new FakeRenderer(styledPatterns, NUM_DIGITS, stylers);
       mRenderer->configure();
       mCharWriter = new CharWriter(mRenderer);
       clearStyledPatterns();
@@ -94,12 +107,12 @@ testF(CharWriterTest, writeAt) {
   assertEqual(0b00111111, styledPatterns[0].pattern);
   assertEqual(StyledPattern::kStyleNormal, styledPatterns[0].style);
 
-  mCharWriter->writeCharAt(1, '0', StyledPattern::kStyleBlinkSlow);
+  mCharWriter->writeCharAt(1, '0', STYLE_BLINK);
   assertEqual(0b00111111, styledPatterns[1].pattern);
-  assertEqual(StyledPattern::kStyleBlinkSlow, styledPatterns[1].style);
+  assertEqual(STYLE_BLINK, styledPatterns[1].style);
 
-  mCharWriter->writeStyleAt(1, StyledPattern::kStyleBlinkFast);
-  assertEqual(StyledPattern::kStyleBlinkFast, styledPatterns[1].style);
+  mCharWriter->writeStyleAt(1, STYLE_PULSE);
+  assertEqual(STYLE_PULSE, styledPatterns[1].style);
 
   mCharWriter->writeDecimalPointAt(1);
   assertEqual(0b00111111 | 0x80, styledPatterns[1].pattern);
@@ -111,7 +124,7 @@ testF(CharWriterTest, writeAt) {
 testF(CharWriterTest, writeAt_outOfBounds) {
   styledPatterns[4].pattern = 0;
   styledPatterns[4].style = StyledPattern::kStyleNormal;
-  mCharWriter->writeCharAt(4, 'a', StyledPattern::kStyleBlinkSlow);
+  mCharWriter->writeCharAt(4, 'a', STYLE_BLINK);
   mCharWriter->writeDecimalPointAt(4);
   assertEqual(0, styledPatterns[4].pattern);
   assertEqual(StyledPattern::kStyleNormal, styledPatterns[4].style);
@@ -126,7 +139,7 @@ class StringWriterTest: public TestOnce {
     virtual void setup() override {
       TestOnce::setup();
 
-      mRenderer = new FakeRenderer(styledPatterns, NUM_DIGITS);
+      mRenderer = new FakeRenderer(styledPatterns, NUM_DIGITS, stylers);
       mRenderer->configure();
       mCharWriter = new CharWriter(mRenderer);
       mStringWriter = new StringWriter(mCharWriter);
@@ -179,7 +192,7 @@ class HexWriterTest: public TestOnce {
     virtual void setup() override {
       TestOnce::setup();
 
-      mRenderer = new FakeRenderer(styledPatterns, NUM_DIGITS);
+      mRenderer = new FakeRenderer(styledPatterns, NUM_DIGITS, stylers);
       mRenderer->configure();
       mHexWriter = new HexWriter(mRenderer);
       clearStyledPatterns();
@@ -205,12 +218,12 @@ testF(HexWriterTest, writeAt) {
   assertEqual(0b00111111, styledPatterns[0].pattern);
   assertEqual(StyledPattern::kStyleNormal, styledPatterns[0].style);
 
-  mHexWriter->writeHexAt(1, 0, StyledPattern::kStyleBlinkSlow);
+  mHexWriter->writeHexAt(1, 0, STYLE_BLINK);
   assertEqual(0b00111111, styledPatterns[1].pattern);
-  assertEqual(StyledPattern::kStyleBlinkSlow, styledPatterns[1].style);
+  assertEqual(STYLE_BLINK, styledPatterns[1].style);
 
-  mHexWriter->writeStyleAt(1, StyledPattern::kStyleBlinkFast);
-  assertEqual(StyledPattern::kStyleBlinkFast, styledPatterns[1].style);
+  mHexWriter->writeStyleAt(1, STYLE_PULSE);
+  assertEqual(STYLE_PULSE, styledPatterns[1].style);
 
   mHexWriter->writeDecimalPointAt(1);
   assertEqual(0b00111111 | 0x80, styledPatterns[1].pattern);
@@ -222,7 +235,7 @@ testF(HexWriterTest, writeAt) {
 testF(HexWriterTest, writeAt_outOfBounds) {
   styledPatterns[4].pattern = 0;
   styledPatterns[4].style = StyledPattern::kStyleNormal;
-  mHexWriter->writeHexAt(4, HexWriter::kMinus, StyledPattern::kStyleBlinkSlow);
+  mHexWriter->writeHexAt(4, HexWriter::kMinus, STYLE_BLINK);
   mHexWriter->writeDecimalPointAt(4);
   assertEqual(0, styledPatterns[4].pattern);
   assertEqual(StyledPattern::kStyleNormal, styledPatterns[4].style);
