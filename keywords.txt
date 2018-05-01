@@ -6,18 +6,21 @@
 # Datatypes (KEYWORD1)
 #######################################
 
+TimingStats	KEYWORD1
 Hardware	KEYWORD1
 LedMatrix	KEYWORD1
+DimmablePattern	KEYWORD1
 Driver	KEYWORD1
 DriverBuilder	KEYWORD1
+Styler	KEYWORD1
+BlinkStyler	KEYWORD1
+PulseStyler	KEYWORD1
+StyledPattern	KEYWORD1
 Renderer	KEYWORD1
 RendererBuilder	KEYWORD1
-StyledDigit	KEYWORD1
-DimmingDigit	KEYWORD1
 HexWriter	KEYWORD1
 CharWriter	KEYWORD1
 StringWriter	KEYWORD1
-TimingStats	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
@@ -40,11 +43,15 @@ shiftOut	KEYWORD2
 micros	KEYWORD2
 millis	KEYWORD2
 spiBegin	KEYWORD2
+spiEnd	KEYWORD2
 spiTransfer	KEYWORD2
 
 # LedMatrix.h
+configure	KEYWORD2
+finish	KEYWORD2
 setCathodeOnGroup	KEYWORD2
 setAnodeOnGroup	KEYWORD2
+invertGroupLevels	KEYWORD2
 configure	KEYWORD2
 enableGroup	KEYWORD2
 disableGroup	KEYWORD2
@@ -52,10 +59,16 @@ drawElements	KEYWORD2
 
 # Driver.h
 configure	KEYWORD2
+finish	KEYWORD2
 displayCurrentField	KEYWORD2
 isBrightnessSupported	KEYWORD2
 setPattern	KEYWORD2
 setBrightness	KEYWORD2
+
+# Styler.h
+configure	KEYWORD2
+apply	KEYWORD2
+requiresBrightness	KEYWORD2
 
 # Renderer.h
 configure	KEYWORD2
@@ -102,17 +115,14 @@ setDigitPins	KEYWORD2
 setSegmentDirectPins	KEYWORD2
 setSegmentSerialPins	KEYWORD2
 setSegmentSpiPins	KEYWORD2
-setDimmingDigits	KEYWORD2
+setDimmablePatterns	KEYWORD2
 useModulatingDriver	KEYWORD2
 build	KEYWORD2
 
 # RendererBuilder.h
 setFramesPerSecond	KEYWORD2
 setStatsResetInterval	KEYWORD2
-setBlinkSlowDuration	KEYWORD2
-setBlinkFastDuration	KEYWORD2
-setPulseSlowDuration	KEYWORD2
-setPulseFastDuration	KEYWORD2
+setStyler	KEYWORD2
 build	KEYWORD2
 
 #######################################
@@ -122,6 +132,16 @@ build	KEYWORD2
 #######################################
 # Constants (LITERAL1)
 #######################################
+
+# DimmablePattern.h
+kOff	LITERAL1
+kOn	LITERAL1
+
+# StyledPattern.h
+kStyleNormal	LITERAL1
+
+# Renderer.h
+kNumStyles	LITERAL1
 
 # HexWriter.h
 kNumCharacters	LITERAL1
