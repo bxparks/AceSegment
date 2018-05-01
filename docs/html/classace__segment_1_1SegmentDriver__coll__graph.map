@@ -1,6 +1,6 @@
 <map id="ace_segment::SegmentDriver" name="ace_segment::SegmentDriver">
-<area shape="rect" id="node2" href="$classace__segment_1_1Driver.html" title="Base class of drivers which knows how to transfer the bit patterns stored in the array of DimmingDigi..." alt="" coords="110,184,253,211"/>
-<area shape="rect" id="node3" href="$classace__segment_1_1DimmingDigit.html" title="ace_segment::DimmingDigit" alt="" coords="5,95,192,121"/>
-<area shape="rect" id="node4" href="$classace__segment_1_1LedMatrix.html" title="ace_segment::LedMatrix" alt="" coords="216,95,381,121"/>
-<area shape="rect" id="node5" href="$classace__segment_1_1Hardware.html" title="ace_segment::Hardware" alt="" coords="217,5,381,32"/>
+<area shape="rect" id="node2" href="$classace__segment_1_1Driver.html" title="Base class of drivers which knows how to transfer the bit patterns stored in the array of DimmablePat..." alt="" coords="129,184,272,211"/>
+<area shape="rect" id="node3" href="$classace__segment_1_1DimmablePattern.html" title="ace_segment::DimmablePattern" alt="" coords="5,95,215,121"/>
+<area shape="rect" id="node4" href="$classace__segment_1_1LedMatrix.html" title="Class that represents the abstraction of a particular LED display wiring. " alt="" coords="239,95,405,121"/>
+<area shape="rect" id="node5" href="$classace__segment_1_1Hardware.html" title="ace_segment::Hardware" alt="" coords="240,5,404,32"/>
 </map>

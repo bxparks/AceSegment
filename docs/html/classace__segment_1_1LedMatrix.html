@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.2.0</span>
+   &#160;<span id="projectnumber">0.3.0</span>
    </div>
    <div id="projectbrief">An adjustable, configurable, and extensible framework for rendering seven segment LED displays.</div>
   </td>
@@ -72,6 +72,11 @@ $(function() {
 <div class="title">ace_segment::LedMatrix Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>Class that represents the abstraction of a particular LED display wiring.  
+ <a href="classace__segment_1_1LedMatrix.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="LedMatrix_8h_source.html">LedMatrix.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for ace_segment::LedMatrix:</div>
 <div class="dyncontent">
@@ -79,7 +84,7 @@ Inheritance diagram for ace_segment::LedMatrix:</div>
 <map name="ace__segment_1_1LedMatrix_inherit__map" id="ace__segment_1_1LedMatrix_inherit__map">
 <area shape="rect" id="node2" href="classace__segment_1_1LedMatrixDirect.html" title="ace_segment::LedMatrixDirect" alt="" coords="5,80,205,107"/>
 <area shape="rect" id="node3" href="classace__segment_1_1LedMatrixSerial.html" title="An LedMatrix with an 74HC595 Serial&#45;To&#45;Parallel converter chip on the segment pins. " alt="" coords="229,80,427,107"/>
-<area shape="rect" id="node4" href="classace__segment_1_1LedMatrixSpi.html" title="Similar to LedMatrixSerial accept that it uses SPI to talk to the 74HC595 chip instead of the shiftOu..." alt="" coords="236,155,420,181"/>
+<area shape="rect" id="node4" href="classace__segment_1_1LedMatrixSpi.html" title="Similar to LedMatrixSerial but uses SPI to talk to the 74HC595 chip instead of the shiftOut() method..." alt="" coords="236,155,420,181"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <div class="dynheader">
@@ -102,9 +107,15 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a562150f95e1397ddc8bafe54ac5f2a71"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedMatrix.html#a562150f95e1397ddc8bafe54ac5f2a71">setAnodeOnGroup</a> ()</td></tr>
 <tr class="memdesc:a562150f95e1397ddc8bafe54ac5f2a71"><td class="mdescLeft">&#160;</td><td class="mdescRight">LED positive terminals are on the group line.  <a href="#a562150f95e1397ddc8bafe54ac5f2a71">More...</a><br /></td></tr>
 <tr class="separator:a562150f95e1397ddc8bafe54ac5f2a71"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3ff3807a3370409a7d16128dd05433c4"><td class="memItemLeft" align="right" valign="top"><a id="a3ff3807a3370409a7d16128dd05433c4"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>configure</b> ()</td></tr>
+<tr class="memitem:a1fd06061235eb57c06ecc4e40bd2b80b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedMatrix.html#a1fd06061235eb57c06ecc4e40bd2b80b">invertGroupLevels</a> ()</td></tr>
+<tr class="memdesc:a1fd06061235eb57c06ecc4e40bd2b80b"><td class="mdescLeft">&#160;</td><td class="mdescRight">If a transistor drives the group, invert the logic levels.  <a href="#a1fd06061235eb57c06ecc4e40bd2b80b">More...</a><br /></td></tr>
+<tr class="separator:a1fd06061235eb57c06ecc4e40bd2b80b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ff3807a3370409a7d16128dd05433c4"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedMatrix.html#a3ff3807a3370409a7d16128dd05433c4">configure</a> ()</td></tr>
+<tr class="memdesc:a3ff3807a3370409a7d16128dd05433c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configure the pins for the given LED wiring.  <a href="#a3ff3807a3370409a7d16128dd05433c4">More...</a><br /></td></tr>
 <tr class="separator:a3ff3807a3370409a7d16128dd05433c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3f975ba8b22e88857b89984ba08675f4"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedMatrix.html#a3f975ba8b22e88857b89984ba08675f4">finish</a> ()</td></tr>
+<tr class="memdesc:a3f975ba8b22e88857b89984ba08675f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Turn off the pins by doing the opposite of <a class="el" href="classace__segment_1_1LedMatrix.html#a3ff3807a3370409a7d16128dd05433c4" title="Configure the pins for the given LED wiring. ">configure()</a>.  <a href="#a3f975ba8b22e88857b89984ba08675f4">More...</a><br /></td></tr>
+<tr class="separator:a3f975ba8b22e88857b89984ba08675f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab51a50e1e948fe06a8d607d7b4083cd3"><td class="memItemLeft" align="right" valign="top"><a id="ab51a50e1e948fe06a8d607d7b4083cd3"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>enableGroup</b> (uint8_t group)=0</td></tr>
 <tr class="separator:ab51a50e1e948fe06a8d607d7b4083cd3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -140,9 +151,102 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>mElementOff</b></t
 <tr class="separator:afca2c5ac1344c85cdadab8ac7877ada1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock">
-<p class="definition">Definition at line <a class="el" href="LedMatrix_8h_source.html#l00034">34</a> of file <a class="el" href="LedMatrix_8h_source.html">LedMatrix.h</a>.</p>
+<div class="textblock"><p>Class that represents the abstraction of a particular LED display wiring. </p>
+<p>If the resistors are on the segments, then the segments become the Elements and the digits become the Groups. If the resistors are on the digits, then the digits become the Elements and the segments become the Groups. The <a class="el" href="classace__segment_1_1LedMatrix.html#a0dc49954ce07d860d297bbdd1d4aacb7" title="LED negative terminals are on the group line. ">setCathodeOnGroup()</a> and setAnnodeOnGroup() methods determine the polarity of the LED with respect to the Group line. The <a class="el" href="classace__segment_1_1LedMatrix.html#a1fd06061235eb57c06ecc4e40bd2b80b" title="If a transistor drives the group, invert the logic levels. ">invertGroupLevels()</a> should be called when transistors are used on the Group lines to handle higher currents. </p>
+
+<p class="definition">Definition at line <a class="el" href="LedMatrix_8h_source.html#l00049">49</a> of file <a class="el" href="LedMatrix_8h_source.html">LedMatrix.h</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="a3ff3807a3370409a7d16128dd05433c4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3ff3807a3370409a7d16128dd05433c4">&#9670;&nbsp;</a></span>configure()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void ace_segment::LedMatrix::configure </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Configure the pins for the given LED wiring. </p>
+
+<p>Reimplemented in <a class="el" href="classace__segment_1_1LedMatrixSerial.html#a7eb1d1dfa27eb4866a20ebec80caae0d">ace_segment::LedMatrixSerial</a>, <a class="el" href="classace__segment_1_1LedMatrixSpi.html#affd79413e97098648ee5fd11ce3868b6">ace_segment::LedMatrixSpi</a>, and <a class="el" href="classace__segment_1_1LedMatrixDirect.html#a576eb5577c0352a644d468abc87b4f96">ace_segment::LedMatrixDirect</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="LedMatrix_8h_source.html#l00082">82</a> of file <a class="el" href="LedMatrix_8h_source.html">LedMatrix.h</a>.</p>
+
+</div>
+</div>
+<a id="a3f975ba8b22e88857b89984ba08675f4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3f975ba8b22e88857b89984ba08675f4">&#9670;&nbsp;</a></span>finish()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void ace_segment::LedMatrix::finish </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Turn off the pins by doing the opposite of <a class="el" href="classace__segment_1_1LedMatrix.html#a3ff3807a3370409a7d16128dd05433c4" title="Configure the pins for the given LED wiring. ">configure()</a>. </p>
+
+<p>Reimplemented in <a class="el" href="classace__segment_1_1LedMatrixSerial.html#a3fda7bf3225f8b174cbff1789e91c613">ace_segment::LedMatrixSerial</a>, <a class="el" href="classace__segment_1_1LedMatrixSpi.html#aad716cd26d076f817dfcb415f702d3d7">ace_segment::LedMatrixSpi</a>, and <a class="el" href="classace__segment_1_1LedMatrixDirect.html#a847eb3598badb44ab6c25fc210ea4f24">ace_segment::LedMatrixDirect</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="LedMatrix_8h_source.html#l00085">85</a> of file <a class="el" href="LedMatrix_8h_source.html">LedMatrix.h</a>.</p>
+
+</div>
+</div>
+<a id="a1fd06061235eb57c06ecc4e40bd2b80b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1fd06061235eb57c06ecc4e40bd2b80b">&#9670;&nbsp;</a></span>invertGroupLevels()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ace_segment::LedMatrix::invertGroupLevels </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>If a transistor drives the group, invert the logic levels. </p>
+
+<p class="definition">Definition at line <a class="el" href="LedMatrix_8h_source.html#l00076">76</a> of file <a class="el" href="LedMatrix_8h_source.html">LedMatrix.h</a>.</p>
+
+</div>
+</div>
 <a id="a562150f95e1397ddc8bafe54ac5f2a71"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a562150f95e1397ddc8bafe54ac5f2a71">&#9670;&nbsp;</a></span>setAnodeOnGroup()</h2>
 
@@ -169,7 +273,7 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>mElementOff</b></t
 <p>LED positive terminals are on the group line. </p>
 <p>Required. </p>
 
-<p class="definition">Definition at line <a class="el" href="LedMatrix_8h_source.html#l00053">53</a> of file <a class="el" href="LedMatrix_8h_source.html">LedMatrix.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LedMatrix_8h_source.html#l00068">68</a> of file <a class="el" href="LedMatrix_8h_source.html">LedMatrix.h</a>.</p>
 
 </div>
 </div>
@@ -199,7 +303,7 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>mElementOff</b></t
 <p>LED negative terminals are on the group line. </p>
 <p>Required. </p>
 
-<p class="definition">Definition at line <a class="el" href="LedMatrix_8h_source.html#l00045">45</a> of file <a class="el" href="LedMatrix_8h_source.html">LedMatrix.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LedMatrix_8h_source.html#l00060">60</a> of file <a class="el" href="LedMatrix_8h_source.html">LedMatrix.h</a>.</p>
 
 </div>
 </div>

@@ -1,8 +1,6 @@
 var searchData=
 [
-  ['renderer',['Renderer',['../classace__segment_1_1Renderer.html#afede3eac874ddd060baff4082ee63eef',1,'ace_segment::Renderer']]],
-  ['rendererbuilder',['RendererBuilder',['../classace__segment_1_1RendererBuilder.html#ab6fe210b3e363882fcf45c5ebcd14625',1,'ace_segment::RendererBuilder']]],
-  ['renderfield',['renderField',['../classace__segment_1_1Renderer.html#af86c917c7b7e64f788289b7c679c3285',1,'ace_segment::Renderer']]],
-  ['renderfieldwhenready',['renderFieldWhenReady',['../classace__segment_1_1Renderer.html#a20ef51b7c77f3ae9ce0d145eaa0dc743',1,'ace_segment::Renderer']]],
-  ['renderstyleddigits',['renderStyledDigits',['../classace__segment_1_1Renderer.html#aa049ec64493c1bfbf39659ffe0c19fb4',1,'ace_segment::Renderer']]]
+  ['micros',['micros',['../classace__segment_1_1Hardware.html#a577bbefb50970431da768e99e8765798',1,'ace_segment::Hardware']]],
+  ['millis',['millis',['../classace__segment_1_1Hardware.html#a967adfe2fb7acb7eecca011e34a4a690',1,'ace_segment::Hardware']]],
+  ['modulatingdigitdriver',['ModulatingDigitDriver',['../classace__segment_1_1ModulatingDigitDriver.html#a72a575e2a9eba38e1e05d43a1d957704',1,'ace_segment::ModulatingDigitDriver']]]
 ];

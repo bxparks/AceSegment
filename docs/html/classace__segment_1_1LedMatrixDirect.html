@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.2.0</span>
+   &#160;<span id="projectnumber">0.3.0</span>
    </div>
    <div id="projectbrief">An adjustable, configurable, and extensible framework for rendering seven segment LED displays.</div>
   </td>
@@ -76,7 +76,7 @@ Inheritance diagram for ace_segment::LedMatrixDirect:</div>
 <div class="dyncontent">
 <div class="center"><img src="classace__segment_1_1LedMatrixDirect__inherit__graph.png" border="0" usemap="#ace__segment_1_1LedMatrixDirect_inherit__map" alt="Inheritance graph"/></div>
 <map name="ace__segment_1_1LedMatrixDirect_inherit__map" id="ace__segment_1_1LedMatrixDirect_inherit__map">
-<area shape="rect" id="node2" href="classace__segment_1_1LedMatrix.html" title="ace_segment::LedMatrix" alt="" coords="23,5,188,32"/>
+<area shape="rect" id="node2" href="classace__segment_1_1LedMatrix.html" title="Class that represents the abstraction of a particular LED display wiring. " alt="" coords="23,5,188,32"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <div class="dynheader">
@@ -84,7 +84,7 @@ Collaboration diagram for ace_segment::LedMatrixDirect:</div>
 <div class="dyncontent">
 <div class="center"><img src="classace__segment_1_1LedMatrixDirect__coll__graph.png" border="0" usemap="#ace__segment_1_1LedMatrixDirect_coll__map" alt="Collaboration graph"/></div>
 <map name="ace__segment_1_1LedMatrixDirect_coll__map" id="ace__segment_1_1LedMatrixDirect_coll__map">
-<area shape="rect" id="node2" href="classace__segment_1_1LedMatrix.html" title="ace_segment::LedMatrix" alt="" coords="23,95,188,121"/>
+<area shape="rect" id="node2" href="classace__segment_1_1LedMatrix.html" title="Class that represents the abstraction of a particular LED display wiring. " alt="" coords="23,95,188,121"/>
 <area shape="rect" id="node3" href="classace__segment_1_1Hardware.html" title="ace_segment::Hardware" alt="" coords="23,5,187,32"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
@@ -100,9 +100,12 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>setGroupPins</b> (con
 <tr class="memitem:a279ce5f89c709e24224bce61a6b85165"><td class="memItemLeft" align="right" valign="top"><a id="a279ce5f89c709e24224bce61a6b85165"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setElementPins</b> (const uint8_t *elementPins)</td></tr>
 <tr class="separator:a279ce5f89c709e24224bce61a6b85165"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a576eb5577c0352a644d468abc87b4f96"><td class="memItemLeft" align="right" valign="top"><a id="a576eb5577c0352a644d468abc87b4f96"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>configure</b> () override</td></tr>
+<tr class="memitem:a576eb5577c0352a644d468abc87b4f96"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedMatrixDirect.html#a576eb5577c0352a644d468abc87b4f96">configure</a> () override</td></tr>
+<tr class="memdesc:a576eb5577c0352a644d468abc87b4f96"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configure the pins for the given LED wiring.  <a href="#a576eb5577c0352a644d468abc87b4f96">More...</a><br /></td></tr>
 <tr class="separator:a576eb5577c0352a644d468abc87b4f96"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a847eb3598badb44ab6c25fc210ea4f24"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedMatrixDirect.html#a847eb3598badb44ab6c25fc210ea4f24">finish</a> () override</td></tr>
+<tr class="memdesc:a847eb3598badb44ab6c25fc210ea4f24"><td class="mdescLeft">&#160;</td><td class="mdescRight">Turn off the pins by doing the opposite of <a class="el" href="classace__segment_1_1LedMatrixDirect.html#a576eb5577c0352a644d468abc87b4f96" title="Configure the pins for the given LED wiring. ">configure()</a>.  <a href="#a847eb3598badb44ab6c25fc210ea4f24">More...</a><br /></td></tr>
+<tr class="separator:a847eb3598badb44ab6c25fc210ea4f24"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a73bdef06d164638426c77546342eac09"><td class="memItemLeft" align="right" valign="top"><a id="a73bdef06d164638426c77546342eac09"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>enableGroup</b> (uint8_t group) override</td></tr>
 <tr class="separator:a73bdef06d164638426c77546342eac09"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -122,6 +125,9 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>drawElements<
 <tr class="memitem:a562150f95e1397ddc8bafe54ac5f2a71 inherit pub_methods_classace__segment_1_1LedMatrix"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedMatrix.html#a562150f95e1397ddc8bafe54ac5f2a71">setAnodeOnGroup</a> ()</td></tr>
 <tr class="memdesc:a562150f95e1397ddc8bafe54ac5f2a71 inherit pub_methods_classace__segment_1_1LedMatrix"><td class="mdescLeft">&#160;</td><td class="mdescRight">LED positive terminals are on the group line.  <a href="classace__segment_1_1LedMatrix.html#a562150f95e1397ddc8bafe54ac5f2a71">More...</a><br /></td></tr>
 <tr class="separator:a562150f95e1397ddc8bafe54ac5f2a71 inherit pub_methods_classace__segment_1_1LedMatrix"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1fd06061235eb57c06ecc4e40bd2b80b inherit pub_methods_classace__segment_1_1LedMatrix"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedMatrix.html#a1fd06061235eb57c06ecc4e40bd2b80b">invertGroupLevels</a> ()</td></tr>
+<tr class="memdesc:a1fd06061235eb57c06ecc4e40bd2b80b inherit pub_methods_classace__segment_1_1LedMatrix"><td class="mdescLeft">&#160;</td><td class="mdescRight">If a transistor drives the group, invert the logic levels.  <a href="classace__segment_1_1LedMatrix.html#a1fd06061235eb57c06ecc4e40bd2b80b">More...</a><br /></td></tr>
+<tr class="separator:a1fd06061235eb57c06ecc4e40bd2b80b inherit pub_methods_classace__segment_1_1LedMatrix"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
@@ -150,8 +156,71 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>mElementOff</b></t
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock">
-<p class="definition">Definition at line <a class="el" href="LedMatrixDirect_8h_source.html#l00033">33</a> of file <a class="el" href="LedMatrixDirect_8h_source.html">LedMatrixDirect.h</a>.</p>
-</div><hr/>The documentation for this class was generated from the following files:<ul>
+<p class="definition">Definition at line <a class="el" href="LedMatrixDirect_8h_source.html#l00032">32</a> of file <a class="el" href="LedMatrixDirect_8h_source.html">LedMatrixDirect.h</a>.</p>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="a576eb5577c0352a644d468abc87b4f96"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a576eb5577c0352a644d468abc87b4f96">&#9670;&nbsp;</a></span>configure()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ace_segment::LedMatrixDirect::configure </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Configure the pins for the given LED wiring. </p>
+
+<p>Reimplemented from <a class="el" href="classace__segment_1_1LedMatrix.html#a3ff3807a3370409a7d16128dd05433c4">ace_segment::LedMatrix</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="LedMatrixDirect_8cpp_source.html#l00042">42</a> of file <a class="el" href="LedMatrixDirect_8cpp_source.html">LedMatrixDirect.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a847eb3598badb44ab6c25fc210ea4f24"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a847eb3598badb44ab6c25fc210ea4f24">&#9670;&nbsp;</a></span>finish()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ace_segment::LedMatrixDirect::finish </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Turn off the pins by doing the opposite of <a class="el" href="classace__segment_1_1LedMatrixDirect.html#a576eb5577c0352a644d468abc87b4f96" title="Configure the pins for the given LED wiring. ">configure()</a>. </p>
+
+<p>Reimplemented from <a class="el" href="classace__segment_1_1LedMatrix.html#a3f975ba8b22e88857b89984ba08675f4">ace_segment::LedMatrix</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="LedMatrixDirect_8cpp_source.html#l00057">57</a> of file <a class="el" href="LedMatrixDirect_8cpp_source.html">LedMatrixDirect.cpp</a>.</p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following files:<ul>
 <li>/home/brian/dev/AceSegment/src/ace_segment/<a class="el" href="LedMatrixDirect_8h_source.html">LedMatrixDirect.h</a></li>
 <li>/home/brian/dev/AceSegment/src/ace_segment/<a class="el" href="LedMatrixDirect_8cpp_source.html">LedMatrixDirect.cpp</a></li>
 </ul>

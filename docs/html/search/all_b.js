@@ -1,8 +1,6 @@
 var searchData=
 [
-  ['renderer',['Renderer',['../classace__segment_1_1Renderer.html',1,'ace_segment::Renderer'],['../classace__segment_1_1Renderer.html#afede3eac874ddd060baff4082ee63eef',1,'ace_segment::Renderer::Renderer()']]],
-  ['rendererbuilder',['RendererBuilder',['../classace__segment_1_1RendererBuilder.html',1,'ace_segment::RendererBuilder'],['../classace__segment_1_1RendererBuilder.html#ab6fe210b3e363882fcf45c5ebcd14625',1,'ace_segment::RendererBuilder::RendererBuilder()']]],
-  ['renderfield',['renderField',['../classace__segment_1_1Renderer.html#af86c917c7b7e64f788289b7c679c3285',1,'ace_segment::Renderer']]],
-  ['renderfieldwhenready',['renderFieldWhenReady',['../classace__segment_1_1Renderer.html#a20ef51b7c77f3ae9ce0d145eaa0dc743',1,'ace_segment::Renderer']]],
-  ['renderstyleddigits',['renderStyledDigits',['../classace__segment_1_1Renderer.html#aa049ec64493c1bfbf39659ffe0c19fb4',1,'ace_segment::Renderer']]]
+  ['pinmode',['pinMode',['../classace__segment_1_1Hardware.html#a280e081f961d73bfcdbbd2e73d7af1a6',1,'ace_segment::Hardware']]],
+  ['preparetosleep',['prepareToSleep',['../classace__segment_1_1DigitDriver.html#a9d307e52427ca56995a033549e0457d4',1,'ace_segment::DigitDriver::prepareToSleep()'],['../classace__segment_1_1Driver.html#ac8da600f5f1a0337b4e4cff950dae6f0',1,'ace_segment::Driver::prepareToSleep()'],['../classace__segment_1_1SegmentDriver.html#ac6abe45832780b9a068789998a92b8ba',1,'ace_segment::SegmentDriver::prepareToSleep()']]],
+  ['pulsestyler',['PulseStyler',['../classace__segment_1_1PulseStyler.html',1,'ace_segment']]]
 ];

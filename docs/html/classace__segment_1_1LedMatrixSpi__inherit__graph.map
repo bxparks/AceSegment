@@ -1,4 +1,4 @@
 <map id="ace_segment::LedMatrixSpi" name="ace_segment::LedMatrixSpi">
 <area shape="rect" id="node2" href="$classace__segment_1_1LedMatrixSerial.html" title="An LedMatrix with an 74HC595 Serial&#45;To&#45;Parallel converter chip on the segment pins. " alt="" coords="5,80,204,107"/>
-<area shape="rect" id="node3" href="$classace__segment_1_1LedMatrix.html" title="ace_segment::LedMatrix" alt="" coords="22,5,187,32"/>
+<area shape="rect" id="node3" href="$classace__segment_1_1LedMatrix.html" title="Class that represents the abstraction of a particular LED display wiring. " alt="" coords="22,5,187,32"/>
 </map>

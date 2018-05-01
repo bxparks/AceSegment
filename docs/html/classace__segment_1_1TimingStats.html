@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.2.0</span>
+   &#160;<span id="projectnumber">0.3.0</span>
    </div>
    <div id="projectbrief">An adjustable, configurable, and extensible framework for rendering seven segment LED displays.</div>
   </td>
@@ -80,24 +80,24 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a4fc9d52e45fef4df76449c45c5d62a02"><td class="memItemLeft" align="right" valign="top"><a id="a4fc9d52e45fef4df76449c45c5d62a02"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>reset</b> ()</td></tr>
 <tr class="separator:a4fc9d52e45fef4df76449c45c5d62a02"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad46a7e2687136e5bc95fdc6cd03a2d87"><td class="memItemLeft" align="right" valign="top"><a id="ad46a7e2687136e5bc95fdc6cd03a2d87"></a>
-uint16_t&#160;</td><td class="memItemRight" valign="bottom"><b>getMax</b> ()</td></tr>
-<tr class="separator:ad46a7e2687136e5bc95fdc6cd03a2d87"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4beae2486fe670a6033782e6237b1bae"><td class="memItemLeft" align="right" valign="top"><a id="a4beae2486fe670a6033782e6237b1bae"></a>
-uint16_t&#160;</td><td class="memItemRight" valign="bottom"><b>getMin</b> ()</td></tr>
-<tr class="separator:a4beae2486fe670a6033782e6237b1bae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac54d55e6c9859084ab34052131ac26c5"><td class="memItemLeft" align="right" valign="top"><a id="ac54d55e6c9859084ab34052131ac26c5"></a>
-uint16_t&#160;</td><td class="memItemRight" valign="bottom"><b>getAvg</b> ()</td></tr>
-<tr class="separator:ac54d55e6c9859084ab34052131ac26c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2f21dc61d6cce8938050c216f0668391"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1TimingStats.html#a2f21dc61d6cce8938050c216f0668391">getExpDecayAvg</a> ()</td></tr>
-<tr class="memdesc:a2f21dc61d6cce8938050c216f0668391"><td class="mdescLeft">&#160;</td><td class="mdescRight">An exponential decay average.  <a href="#a2f21dc61d6cce8938050c216f0668391">More...</a><br /></td></tr>
-<tr class="separator:a2f21dc61d6cce8938050c216f0668391"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4bf5ffa2e82710786db742460dbcb825"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1TimingStats.html#a4bf5ffa2e82710786db742460dbcb825">getCount</a> ()</td></tr>
-<tr class="memdesc:a4bf5ffa2e82710786db742460dbcb825"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of times update() was called since last reset.  <a href="#a4bf5ffa2e82710786db742460dbcb825">More...</a><br /></td></tr>
-<tr class="separator:a4bf5ffa2e82710786db742460dbcb825"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a46eaca310c9fa05cc8695cfca3b274d2"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1TimingStats.html#a46eaca310c9fa05cc8695cfca3b274d2">getCounter</a> ()</td></tr>
-<tr class="memdesc:a46eaca310c9fa05cc8695cfca3b274d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of times update() was called from the beginning of time.  <a href="#a46eaca310c9fa05cc8695cfca3b274d2">More...</a><br /></td></tr>
-<tr class="separator:a46eaca310c9fa05cc8695cfca3b274d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3716173e13fb9cbc60d769e8333bb75b"><td class="memItemLeft" align="right" valign="top"><a id="a3716173e13fb9cbc60d769e8333bb75b"></a>
+uint16_t&#160;</td><td class="memItemRight" valign="bottom"><b>getMax</b> () const</td></tr>
+<tr class="separator:a3716173e13fb9cbc60d769e8333bb75b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab88bb657cdcb341314635e89ca50fbaf"><td class="memItemLeft" align="right" valign="top"><a id="ab88bb657cdcb341314635e89ca50fbaf"></a>
+uint16_t&#160;</td><td class="memItemRight" valign="bottom"><b>getMin</b> () const</td></tr>
+<tr class="separator:ab88bb657cdcb341314635e89ca50fbaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7dd669e0c4ae77952c7be734d67954fa"><td class="memItemLeft" align="right" valign="top"><a id="a7dd669e0c4ae77952c7be734d67954fa"></a>
+uint16_t&#160;</td><td class="memItemRight" valign="bottom"><b>getAvg</b> () const</td></tr>
+<tr class="separator:a7dd669e0c4ae77952c7be734d67954fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a83d8a0932871fefc2f20994ea09290c3"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1TimingStats.html#a83d8a0932871fefc2f20994ea09290c3">getExpDecayAvg</a> () const</td></tr>
+<tr class="memdesc:a83d8a0932871fefc2f20994ea09290c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">An exponential decay average.  <a href="#a83d8a0932871fefc2f20994ea09290c3">More...</a><br /></td></tr>
+<tr class="separator:a83d8a0932871fefc2f20994ea09290c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a29cb0f6614fee98d2cfe22a5f9dcaf08"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1TimingStats.html#a29cb0f6614fee98d2cfe22a5f9dcaf08">getCount</a> () const</td></tr>
+<tr class="memdesc:a29cb0f6614fee98d2cfe22a5f9dcaf08"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of times update() was called since last reset.  <a href="#a29cb0f6614fee98d2cfe22a5f9dcaf08">More...</a><br /></td></tr>
+<tr class="separator:a29cb0f6614fee98d2cfe22a5f9dcaf08"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8bd4cf9589e8c1532beca93854695416"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1TimingStats.html#a8bd4cf9589e8c1532beca93854695416">getCounter</a> () const</td></tr>
+<tr class="memdesc:a8bd4cf9589e8c1532beca93854695416"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of times update() was called from the beginning of time.  <a href="#a8bd4cf9589e8c1532beca93854695416">More...</a><br /></td></tr>
+<tr class="separator:a8bd4cf9589e8c1532beca93854695416"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a737a6e01239c4212c8edd2f1396e17a2"><td class="memItemLeft" align="right" valign="top"><a id="a737a6e01239c4212c8edd2f1396e17a2"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>update</b> (uint16_t duration)</td></tr>
 <tr class="separator:a737a6e01239c4212c8edd2f1396e17a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -137,8 +137,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>update</b> (uint16_t 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a4bf5ffa2e82710786db742460dbcb825"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4bf5ffa2e82710786db742460dbcb825">&#9670;&nbsp;</a></span>getCount()</h2>
+<a id="a29cb0f6614fee98d2cfe22a5f9dcaf08"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a29cb0f6614fee98d2cfe22a5f9dcaf08">&#9670;&nbsp;</a></span>getCount()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -150,7 +150,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>update</b> (uint16_t 
           <td class="memname">uint16_t ace_segment::TimingStats::getCount </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
   </td>
@@ -166,8 +166,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>update</b> (uint16_t 
 
 </div>
 </div>
-<a id="a46eaca310c9fa05cc8695cfca3b274d2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a46eaca310c9fa05cc8695cfca3b274d2">&#9670;&nbsp;</a></span>getCounter()</h2>
+<a id="a8bd4cf9589e8c1532beca93854695416"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8bd4cf9589e8c1532beca93854695416">&#9670;&nbsp;</a></span>getCounter()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -179,7 +179,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>update</b> (uint16_t 
           <td class="memname">uint16_t ace_segment::TimingStats::getCounter </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
   </td>
@@ -196,8 +196,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>update</b> (uint16_t 
 
 </div>
 </div>
-<a id="a2f21dc61d6cce8938050c216f0668391"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2f21dc61d6cce8938050c216f0668391">&#9670;&nbsp;</a></span>getExpDecayAvg()</h2>
+<a id="a83d8a0932871fefc2f20994ea09290c3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a83d8a0932871fefc2f20994ea09290c3">&#9670;&nbsp;</a></span>getExpDecayAvg()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -209,7 +209,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>update</b> (uint16_t 
           <td class="memname">uint16_t ace_segment::TimingStats::getExpDecayAvg </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
   </td>

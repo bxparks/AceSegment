@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.2.0</span>
+   &#160;<span id="projectnumber">0.3.0</span>
    </div>
    <div id="projectbrief">An adjustable, configurable, and extensible framework for rendering seven segment LED displays.</div>
   </td>
@@ -72,7 +72,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>Similar to <a class="el" href="classace__segment_1_1LedMatrixSerial.html" title="An LedMatrix with an 74HC595 Serial-To-Parallel converter chip on the segment pins. ">LedMatrixSerial</a> accept that it uses SPI to talk to the 74HC595 chip instead of the shiftOut() method.  
+<p>Similar to <a class="el" href="classace__segment_1_1LedMatrixSerial.html" title="An LedMatrix with an 74HC595 Serial-To-Parallel converter chip on the segment pins. ">LedMatrixSerial</a> but uses SPI to talk to the 74HC595 chip instead of the shiftOut() method.  
  <a href="classace__segment_1_1LedMatrixSpi.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="LedMatrixSpi_8h_source.html">LedMatrixSpi.h</a>&gt;</code></p>
@@ -82,7 +82,7 @@ Inheritance diagram for ace_segment::LedMatrixSpi:</div>
 <div class="center"><img src="classace__segment_1_1LedMatrixSpi__inherit__graph.png" border="0" usemap="#ace__segment_1_1LedMatrixSpi_inherit__map" alt="Inheritance graph"/></div>
 <map name="ace__segment_1_1LedMatrixSpi_inherit__map" id="ace__segment_1_1LedMatrixSpi_inherit__map">
 <area shape="rect" id="node2" href="classace__segment_1_1LedMatrixSerial.html" title="An LedMatrix with an 74HC595 Serial&#45;To&#45;Parallel converter chip on the segment pins. " alt="" coords="5,80,204,107"/>
-<area shape="rect" id="node3" href="classace__segment_1_1LedMatrix.html" title="ace_segment::LedMatrix" alt="" coords="22,5,187,32"/>
+<area shape="rect" id="node3" href="classace__segment_1_1LedMatrix.html" title="Class that represents the abstraction of a particular LED display wiring. " alt="" coords="22,5,187,32"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <div class="dynheader">
@@ -91,7 +91,7 @@ Collaboration diagram for ace_segment::LedMatrixSpi:</div>
 <div class="center"><img src="classace__segment_1_1LedMatrixSpi__coll__graph.png" border="0" usemap="#ace__segment_1_1LedMatrixSpi_coll__map" alt="Collaboration graph"/></div>
 <map name="ace__segment_1_1LedMatrixSpi_coll__map" id="ace__segment_1_1LedMatrixSpi_coll__map">
 <area shape="rect" id="node2" href="classace__segment_1_1LedMatrixSerial.html" title="An LedMatrix with an 74HC595 Serial&#45;To&#45;Parallel converter chip on the segment pins. " alt="" coords="5,171,204,197"/>
-<area shape="rect" id="node3" href="classace__segment_1_1LedMatrix.html" title="ace_segment::LedMatrix" alt="" coords="22,95,187,121"/>
+<area shape="rect" id="node3" href="classace__segment_1_1LedMatrix.html" title="Class that represents the abstraction of a particular LED display wiring. " alt="" coords="22,95,187,121"/>
 <area shape="rect" id="node4" href="classace__segment_1_1Hardware.html" title="ace_segment::Hardware" alt="" coords="23,5,187,32"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
@@ -101,9 +101,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:acf91b747d2527e0ae370a7fc52408b30"><td class="memItemLeft" align="right" valign="top"><a id="acf91b747d2527e0ae370a7fc52408b30"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>LedMatrixSpi</b> (<a class="el" href="classace__segment_1_1Hardware.html">Hardware</a> *hardware, uint8_t numGroups, uint8_t numElements)</td></tr>
 <tr class="separator:acf91b747d2527e0ae370a7fc52408b30"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:affd79413e97098648ee5fd11ce3868b6"><td class="memItemLeft" align="right" valign="top"><a id="affd79413e97098648ee5fd11ce3868b6"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>configure</b> () override</td></tr>
+<tr class="memitem:affd79413e97098648ee5fd11ce3868b6"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedMatrixSpi.html#affd79413e97098648ee5fd11ce3868b6">configure</a> () override</td></tr>
+<tr class="memdesc:affd79413e97098648ee5fd11ce3868b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configure the pins for the given LED wiring.  <a href="#affd79413e97098648ee5fd11ce3868b6">More...</a><br /></td></tr>
 <tr class="separator:affd79413e97098648ee5fd11ce3868b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aad716cd26d076f817dfcb415f702d3d7"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedMatrixSpi.html#aad716cd26d076f817dfcb415f702d3d7">finish</a> () override</td></tr>
+<tr class="memdesc:aad716cd26d076f817dfcb415f702d3d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Turn off the pins by doing the opposite of <a class="el" href="classace__segment_1_1LedMatrixSpi.html#affd79413e97098648ee5fd11ce3868b6" title="Configure the pins for the given LED wiring. ">configure()</a>.  <a href="#aad716cd26d076f817dfcb415f702d3d7">More...</a><br /></td></tr>
+<tr class="separator:aad716cd26d076f817dfcb415f702d3d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a35553c5d544e470223c8654867c611a4"><td class="memItemLeft" align="right" valign="top"><a id="a35553c5d544e470223c8654867c611a4"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>drawElements</b> (uint8_t pattern) override</td></tr>
 <tr class="separator:a35553c5d544e470223c8654867c611a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -133,6 +136,9 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>disableGroup<
 <tr class="memitem:a562150f95e1397ddc8bafe54ac5f2a71 inherit pub_methods_classace__segment_1_1LedMatrix"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedMatrix.html#a562150f95e1397ddc8bafe54ac5f2a71">setAnodeOnGroup</a> ()</td></tr>
 <tr class="memdesc:a562150f95e1397ddc8bafe54ac5f2a71 inherit pub_methods_classace__segment_1_1LedMatrix"><td class="mdescLeft">&#160;</td><td class="mdescRight">LED positive terminals are on the group line.  <a href="classace__segment_1_1LedMatrix.html#a562150f95e1397ddc8bafe54ac5f2a71">More...</a><br /></td></tr>
 <tr class="separator:a562150f95e1397ddc8bafe54ac5f2a71 inherit pub_methods_classace__segment_1_1LedMatrix"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1fd06061235eb57c06ecc4e40bd2b80b inherit pub_methods_classace__segment_1_1LedMatrix"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedMatrix.html#a1fd06061235eb57c06ecc4e40bd2b80b">invertGroupLevels</a> ()</td></tr>
+<tr class="memdesc:a1fd06061235eb57c06ecc4e40bd2b80b inherit pub_methods_classace__segment_1_1LedMatrix"><td class="mdescLeft">&#160;</td><td class="mdescRight">If a transistor drives the group, invert the logic levels.  <a href="classace__segment_1_1LedMatrix.html#a1fd06061235eb57c06ecc4e40bd2b80b">More...</a><br /></td></tr>
+<tr class="separator:a1fd06061235eb57c06ecc4e40bd2b80b inherit pub_methods_classace__segment_1_1LedMatrix"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
@@ -177,10 +183,73 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>mElementOff</b></t
 <tr class="separator:afca2c5ac1344c85cdadab8ac7877ada1 inherit pro_attribs_classace__segment_1_1LedMatrix"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Similar to <a class="el" href="classace__segment_1_1LedMatrixSerial.html" title="An LedMatrix with an 74HC595 Serial-To-Parallel converter chip on the segment pins. ">LedMatrixSerial</a> accept that it uses SPI to talk to the 74HC595 chip instead of the shiftOut() method. </p>
+<div class="textblock"><p>Similar to <a class="el" href="classace__segment_1_1LedMatrixSerial.html" title="An LedMatrix with an 74HC595 Serial-To-Parallel converter chip on the segment pins. ">LedMatrixSerial</a> but uses SPI to talk to the 74HC595 chip instead of the shiftOut() method. </p>
 
 <p class="definition">Definition at line <a class="el" href="LedMatrixSpi_8h_source.html#l00038">38</a> of file <a class="el" href="LedMatrixSpi_8h_source.html">LedMatrixSpi.h</a>.</p>
-</div><hr/>The documentation for this class was generated from the following files:<ul>
+</div><h2 class="groupheader">Member Function Documentation</h2>
+<a id="affd79413e97098648ee5fd11ce3868b6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#affd79413e97098648ee5fd11ce3868b6">&#9670;&nbsp;</a></span>configure()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ace_segment::LedMatrixSpi::configure </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Configure the pins for the given LED wiring. </p>
+
+<p>Reimplemented from <a class="el" href="classace__segment_1_1LedMatrixSerial.html#a7eb1d1dfa27eb4866a20ebec80caae0d">ace_segment::LedMatrixSerial</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="LedMatrixSpi_8cpp_source.html#l00031">31</a> of file <a class="el" href="LedMatrixSpi_8cpp_source.html">LedMatrixSpi.cpp</a>.</p>
+
+</div>
+</div>
+<a id="aad716cd26d076f817dfcb415f702d3d7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aad716cd26d076f817dfcb415f702d3d7">&#9670;&nbsp;</a></span>finish()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ace_segment::LedMatrixSpi::finish </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Turn off the pins by doing the opposite of <a class="el" href="classace__segment_1_1LedMatrixSpi.html#affd79413e97098648ee5fd11ce3868b6" title="Configure the pins for the given LED wiring. ">configure()</a>. </p>
+
+<p>Reimplemented from <a class="el" href="classace__segment_1_1LedMatrixSerial.html#a3fda7bf3225f8b174cbff1789e91c613">ace_segment::LedMatrixSerial</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="LedMatrixSpi_8cpp_source.html#l00036">36</a> of file <a class="el" href="LedMatrixSpi_8cpp_source.html">LedMatrixSpi.cpp</a>.</p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following files:<ul>
 <li>/home/brian/dev/AceSegment/src/ace_segment/<a class="el" href="LedMatrixSpi_8h_source.html">LedMatrixSpi.h</a></li>
 <li>/home/brian/dev/AceSegment/src/ace_segment/<a class="el" href="LedMatrixSpi_8cpp_source.html">LedMatrixSpi.cpp</a></li>
 </ul>

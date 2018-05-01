@@ -1,6 +1,6 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classace__segment_1_1Driver.html" title="Base class of drivers which knows how to transfer the bit patterns stored in the array of DimmingDigi..." alt="" coords="5,38,148,65"/>
-<area shape="rect" id="node2" href="$classace__segment_1_1DigitDriver.html" title="ace_segment::DigitDriver" alt="" coords="208,13,379,39"/>
-<area shape="rect" id="node4" href="$classace__segment_1_1SegmentDriver.html" title="ace_segment::SegmentDriver" alt="" coords="196,63,391,90"/>
+<area shape="rect" id="node1" href="$classace__segment_1_1Driver.html" title="Base class of drivers which knows how to transfer the bit patterns stored in the array of DimmablePat..." alt="" coords="5,38,148,65"/>
+<area shape="rect" id="node2" href="$classace__segment_1_1DigitDriver.html" title="A Driver that assumes that the resistors are on the segments so the multiplexing occurs by scanning t..." alt="" coords="208,13,379,39"/>
+<area shape="rect" id="node4" href="$classace__segment_1_1SegmentDriver.html" title="A Driver that assumes that the resistors are on the digits so the multiplexing occurs by scanning thr..." alt="" coords="196,63,391,90"/>
 <area shape="rect" id="node3" href="$classace__segment_1_1ModulatingDigitDriver.html" title="ace_segment::ModulatingDigit\lDriver" alt="" coords="439,5,637,47"/>
 </map>

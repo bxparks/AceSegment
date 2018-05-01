@@ -1,7 +1,5 @@
 var searchData=
 [
-  ['ledmatrix',['LedMatrix',['../classace__segment_1_1LedMatrix.html',1,'ace_segment']]],
-  ['ledmatrixdirect',['LedMatrixDirect',['../classace__segment_1_1LedMatrixDirect.html',1,'ace_segment']]],
-  ['ledmatrixserial',['LedMatrixSerial',['../classace__segment_1_1LedMatrixSerial.html',1,'ace_segment']]],
-  ['ledmatrixspi',['LedMatrixSpi',['../classace__segment_1_1LedMatrixSpi.html',1,'ace_segment']]]
+  ['knumsegments',['kNumSegments',['../classace__segment_1_1Driver.html#a0e1728dfa38f3e32d9e0fa1e716c66d4',1,'ace_segment::Driver']]],
+  ['knumstyles',['kNumStyles',['../classace__segment_1_1Renderer.html#afed3377a01b8e7147cefbf54d8ec79f4',1,'ace_segment::Renderer']]]
 ];
