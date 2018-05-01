@@ -74,7 +74,7 @@ void BaseHardwareTest::assertEvents(uint8_t n, ...) {
         break;
       default:
         // Unknown event type
-        fail();
+        failNow();
     }
   }
   va_end(args);
