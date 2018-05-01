@@ -30,15 +30,15 @@ SOFTWARE.
 
 namespace ace_segment {
 
-class DimmingDigit;
+class DimmablePattern;
 
 class ModulatingDigitDriver: public DigitDriver {
   public:
     /** Constructor. */
     explicit ModulatingDigitDriver(LedMatrix* ledMatrix,
-            DimmingDigit* dimmingDigits, uint8_t numDigits,
+            DimmablePattern* dimmablePatterns, uint8_t numDigits,
             uint8_t numSubFields, bool ownsLedMatrix = false):
-        DigitDriver(ledMatrix, dimmingDigits, numDigits, ownsLedMatrix),
+        DigitDriver(ledMatrix, dimmablePatterns, numDigits, ownsLedMatrix),
         mNumSubFields(numSubFields)
     {}
 
@@ -46,6 +46,7 @@ class ModulatingDigitDriver: public DigitDriver {
       DigitDriver::configure();
       mCurrentSubField = 0;
       mCurrentSubFieldMax = 0;
+      mIsPrevDigitOn = true; // setting true forces it off on next interation
     }
 
     virtual uint16_t getFieldsPerFrame() override {
@@ -60,6 +61,9 @@ class ModulatingDigitDriver: public DigitDriver {
     uint8_t const mNumSubFields;
     uint8_t mCurrentSubField;
     uint8_t mCurrentSubFieldMax;
+
+    /** Whether the previous digit was turned on or off. */
+    bool mIsPrevDigitOn;
 
   private:
     // disable copy-constructor and assignment operator

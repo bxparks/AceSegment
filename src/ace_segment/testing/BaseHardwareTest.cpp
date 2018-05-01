@@ -1,3 +1,5 @@
+#line 2 "BaseHardwareTest.cpp"
+
 /*
 MIT License
 
@@ -27,11 +29,11 @@ SOFTWARE.
 namespace ace_segment {
 namespace testing {
 
-void BaseHardwareTest::assertEvents(int8_t n, ...) {
+void BaseHardwareTest::assertEvents(uint8_t n, ...) {
   assertEqual(n, mHardware->getNumRecords());
   va_list args;
   va_start(args, n);
-  for (int i = 0; i < n; i++) {
+  for (uint8_t i = 0; i < n; i++) {
     uint8_t type = va_arg(args, int);
     Event& event = mHardware->getEvent(i);
     assertEqual(type, event.type);
@@ -62,6 +64,8 @@ void BaseHardwareTest::assertEvents(int8_t n, ...) {
         }
         break;
       case Event::kTypeSpiBegin:
+        break;
+      case Event::kTypeSpiEnd:
         break;
       case Event::kTypeSpiTransfer: {
           uint8_t value = va_arg(args, int);

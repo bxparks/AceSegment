@@ -40,17 +40,23 @@ void Driver::configure() {
   }
 }
 
+void Driver::finish() {
+  if (mLedMatrix) {
+    mLedMatrix->finish();
+  }
+}
+
 void Driver::setPattern(uint8_t digit, SegmentPatternType pattern,
     uint8_t brightness) {
   if (digit >= mNumDigits) return;
-  DimmingDigit& dimmingDigit = mDimmingDigits[digit];
-  dimmingDigit.pattern = pattern;
-  dimmingDigit.brightness = brightness;
+  DimmablePattern& dimmablePattern = mDimmablePatterns[digit];
+  dimmablePattern.pattern = pattern;
+  dimmablePattern.brightness = brightness;
 }
 
 void Driver::setBrightness(uint8_t digit, uint8_t brightness) {
   if (digit >= mNumDigits) return;
-  mDimmingDigits[digit].brightness = brightness;
+  mDimmablePatterns[digit].brightness = brightness;
 }
 
 }

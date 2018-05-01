@@ -1,4 +1,4 @@
 <map id="ace_segment::DigitDriver" name="ace_segment::DigitDriver">
 <area shape="rect" id="node3" href="$classace__segment_1_1ModulatingDigitDriver.html" title="ace_segment::ModulatingDigit\lDriver" alt="" coords="5,155,204,196"/>
-<area shape="rect" id="node2" href="$classace__segment_1_1Driver.html" title="Base class of drivers which knows how to transfer the bit patterns stored in the array of DimmingDigi..." alt="" coords="33,5,176,32"/>
+<area shape="rect" id="node2" href="$classace__segment_1_1Driver.html" title="Base class of drivers which knows how to transfer the bit patterns stored in the array of DimmablePat..." alt="" coords="33,5,176,32"/>
 </map>

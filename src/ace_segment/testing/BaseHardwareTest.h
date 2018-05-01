@@ -1,3 +1,5 @@
+#line 2 "BaseHardwareTest.h"
+
 /*
 MIT License
 
@@ -54,7 +56,7 @@ class BaseHardwareTest: public TestOnce {
      *    ...
      *    type, arg1, arg2[, ...]);
      */
-    void assertEvents(int8_t n, ...);
+    void assertEvents(uint8_t n, ...);
 
     TestableHardware* mHardware;
 };

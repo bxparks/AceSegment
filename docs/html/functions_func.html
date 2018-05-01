@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.2.0</span>
+   &#160;<span id="projectnumber">0.3.0</span>
    </div>
    <div id="projectbrief">An adjustable, configurable, and extensible framework for rendering seven segment LED displays.</div>
   </td>
@@ -62,6 +62,15 @@ $(function() {
 <div class="contents">
 &#160;
 
+<h3><a id="index_a"></a>- a -</h3><ul>
+<li>apply()
+: <a class="el" href="classace__segment_1_1BlinkStyler.html#a0b984b965960ce90770927d538118288">ace_segment::BlinkStyler</a>
+, <a class="el" href="classace__segment_1_1PulseStyler.html#a9a6fb356545f600d1dbe7447fea6b570">ace_segment::PulseStyler</a>
+, <a class="el" href="classace__segment_1_1Styler.html#aac2fb2329d0a3abe0221ae9845df9db1">ace_segment::Styler</a>
+</li>
+</ul>
+
+
 <h3><a id="index_b"></a>- b -</h3><ul>
 <li>build()
 : <a class="el" href="classace__segment_1_1RendererBuilder.html#acc76950294a29bac11b29ce5a8ad9a28">ace_segment::RendererBuilder</a>
@@ -70,26 +79,27 @@ $(function() {
 
 
 <h3><a id="index_c"></a>- c -</h3><ul>
-<li>calcBlinkAndPulseForFrame()
-: <a class="el" href="classace__segment_1_1Renderer.html#a382f42b097b497064402b8e663260d6c">ace_segment::Renderer</a>
-</li>
-<li>calcBlinkStateForFrame()
-: <a class="el" href="classace__segment_1_1Renderer.html#a2a1843bc7ea3da1fe85daa2b76e70866">ace_segment::Renderer</a>
-</li>
-<li>calcBrightness()
-: <a class="el" href="classace__segment_1_1Renderer.html#a8632c6c1315d437cf1923504a5bc910a">ace_segment::Renderer</a>
-</li>
-<li>calcPulseFractionForFrame()
-: <a class="el" href="classace__segment_1_1Renderer.html#a736e1db1b5373de23720d87bf9db9dae">ace_segment::Renderer</a>
-</li>
-<li>calcPulseFractionForFrameUsingInverse()
-: <a class="el" href="classace__segment_1_1Renderer.html#afe6d7db305ff361fd0b5c4ae2cf604f2">ace_segment::Renderer</a>
+<li>calcForFrame()
+: <a class="el" href="classace__segment_1_1BlinkStyler.html#af88ed3fade40e293e28b2c102123daea">ace_segment::BlinkStyler</a>
+, <a class="el" href="classace__segment_1_1PulseStyler.html#a7bc0580b8d413209b2bef3c60e0a7e5c">ace_segment::PulseStyler</a>
+, <a class="el" href="classace__segment_1_1Styler.html#a76fca1141a4b8fbf6224c6862e9367ad">ace_segment::Styler</a>
 </li>
 <li>CharWriter()
 : <a class="el" href="classace__segment_1_1CharWriter.html#a05b2481057932248f9e02c3df1f71456">ace_segment::CharWriter</a>
 </li>
+<li>clear()
+: <a class="el" href="classace__segment_1_1Renderer.html#af1a7600d49ccf169a7d0e88b2164cd02">ace_segment::Renderer</a>
+</li>
 <li>configure()
-: <a class="el" href="classace__segment_1_1Renderer.html#a0c9b8944386f7f674fdeba427037d8fd">ace_segment::Renderer</a>
+: <a class="el" href="classace__segment_1_1DigitDriver.html#ac3f74001c83eda2f4a88794b4b1a2a97">ace_segment::DigitDriver</a>
+, <a class="el" href="classace__segment_1_1Driver.html#a25f0afecc44250637ade35629636d59a">ace_segment::Driver</a>
+, <a class="el" href="classace__segment_1_1LedMatrix.html#a3ff3807a3370409a7d16128dd05433c4">ace_segment::LedMatrix</a>
+, <a class="el" href="classace__segment_1_1LedMatrixDirect.html#a576eb5577c0352a644d468abc87b4f96">ace_segment::LedMatrixDirect</a>
+, <a class="el" href="classace__segment_1_1LedMatrixSerial.html#a7eb1d1dfa27eb4866a20ebec80caae0d">ace_segment::LedMatrixSerial</a>
+, <a class="el" href="classace__segment_1_1LedMatrixSpi.html#affd79413e97098648ee5fd11ce3868b6">ace_segment::LedMatrixSpi</a>
+, <a class="el" href="classace__segment_1_1ModulatingDigitDriver.html#a577c2c5227980a3a79ada6e182bdab32">ace_segment::ModulatingDigitDriver</a>
+, <a class="el" href="classace__segment_1_1Renderer.html#a0c9b8944386f7f674fdeba427037d8fd">ace_segment::Renderer</a>
+, <a class="el" href="classace__segment_1_1SegmentDriver.html#a1447ff6f4360bafe634f675e5754b8cc">ace_segment::SegmentDriver</a>
 </li>
 </ul>
 
@@ -99,7 +109,7 @@ $(function() {
 : <a class="el" href="classace__segment_1_1Hardware.html#a6a0afa1ca729e820ef2d822bfeb64d02">ace_segment::Hardware</a>
 </li>
 <li>DigitDriver()
-: <a class="el" href="classace__segment_1_1DigitDriver.html#ab69a30528c066738598f4c8bd7fe1c70">ace_segment::DigitDriver</a>
+: <a class="el" href="classace__segment_1_1DigitDriver.html#afec2d0670889cc44b3d9eeb9e583dbad">ace_segment::DigitDriver</a>
 </li>
 <li>displayCurrentField()
 : <a class="el" href="classace__segment_1_1DigitDriver.html#a6afa0a1a4f60cbe770d80e89bb80718e">ace_segment::DigitDriver</a>
@@ -108,20 +118,34 @@ $(function() {
 , <a class="el" href="classace__segment_1_1SegmentDriver.html#abe0415978d1d5d6f70f53a9087fc6f03">ace_segment::SegmentDriver</a>
 </li>
 <li>Driver()
-: <a class="el" href="classace__segment_1_1Driver.html#a253f84d975df329275a4d591e1eb6de8">ace_segment::Driver</a>
+: <a class="el" href="classace__segment_1_1Driver.html#a74ef7c76a7cf7476dd549c911161dbff">ace_segment::Driver</a>
+</li>
+</ul>
+
+
+<h3><a id="index_f"></a>- f -</h3><ul>
+<li>finish()
+: <a class="el" href="classace__segment_1_1Driver.html#ae690798a1ee25ad0a50e5d1285e48813">ace_segment::Driver</a>
+, <a class="el" href="classace__segment_1_1LedMatrix.html#a3f975ba8b22e88857b89984ba08675f4">ace_segment::LedMatrix</a>
+, <a class="el" href="classace__segment_1_1LedMatrixDirect.html#a847eb3598badb44ab6c25fc210ea4f24">ace_segment::LedMatrixDirect</a>
+, <a class="el" href="classace__segment_1_1LedMatrixSerial.html#a3fda7bf3225f8b174cbff1789e91c613">ace_segment::LedMatrixSerial</a>
+, <a class="el" href="classace__segment_1_1LedMatrixSpi.html#aad716cd26d076f817dfcb415f702d3d7">ace_segment::LedMatrixSpi</a>
 </li>
 </ul>
 
 
 <h3><a id="index_g"></a>- g -</h3><ul>
+<li>getActiveStyles()
+: <a class="el" href="classace__segment_1_1Renderer.html#a882e3e321a07e75f69744cbec8151a28">ace_segment::Renderer</a>
+</li>
 <li>getCount()
-: <a class="el" href="classace__segment_1_1TimingStats.html#a4bf5ffa2e82710786db742460dbcb825">ace_segment::TimingStats</a>
+: <a class="el" href="classace__segment_1_1TimingStats.html#a29cb0f6614fee98d2cfe22a5f9dcaf08">ace_segment::TimingStats</a>
 </li>
 <li>getCounter()
-: <a class="el" href="classace__segment_1_1TimingStats.html#a46eaca310c9fa05cc8695cfca3b274d2">ace_segment::TimingStats</a>
+: <a class="el" href="classace__segment_1_1TimingStats.html#a8bd4cf9589e8c1532beca93854695416">ace_segment::TimingStats</a>
 </li>
 <li>getExpDecayAvg()
-: <a class="el" href="classace__segment_1_1TimingStats.html#a2f21dc61d6cce8938050c216f0668391">ace_segment::TimingStats</a>
+: <a class="el" href="classace__segment_1_1TimingStats.html#a83d8a0932871fefc2f20994ea09290c3">ace_segment::TimingStats</a>
 </li>
 <li>getFieldsPerFrame()
 : <a class="el" href="classace__segment_1_1DigitDriver.html#a475d2b9adfbd9a4f1ff462aaf948945f">ace_segment::DigitDriver</a>
@@ -140,8 +164,8 @@ $(function() {
 , <a class="el" href="classace__segment_1_1HexWriter.html#a87a5795c996d66dd3c323c9095508da8">ace_segment::HexWriter</a>
 , <a class="el" href="classace__segment_1_1Renderer.html#a5be6cf55a88ba5c241528ecab7977059">ace_segment::Renderer</a>
 </li>
-<li>getStyledDigit()
-: <a class="el" href="classace__segment_1_1Renderer.html#a42a5dd2741cc2a2fdcef3a383ce5860a">ace_segment::Renderer</a>
+<li>getStyledPattern()
+: <a class="el" href="classace__segment_1_1Renderer.html#a30b9b03d09ff499f5f854d66b4e62798">ace_segment::Renderer</a>
 </li>
 <li>getTimingStats()
 : <a class="el" href="classace__segment_1_1Renderer.html#a563510be35bb82797f6402c0d384d9a0">ace_segment::Renderer</a>
@@ -163,11 +187,17 @@ $(function() {
 <li>incrementMod()
 : <a class="el" href="classace__segment_1_1Util.html#aa1887a79364cd58a479092a2bc06e57d">ace_segment::Util</a>
 </li>
+<li>invertGroupLevels()
+: <a class="el" href="classace__segment_1_1LedMatrix.html#a1fd06061235eb57c06ecc4e40bd2b80b">ace_segment::LedMatrix</a>
+</li>
 <li>isBrightnessSupported()
 : <a class="el" href="classace__segment_1_1DigitDriver.html#a7f81c686645df5871b2b1800daa887b4">ace_segment::DigitDriver</a>
 , <a class="el" href="classace__segment_1_1Driver.html#a1189dc2a4bf3f14d9c79299577ba9528">ace_segment::Driver</a>
 , <a class="el" href="classace__segment_1_1ModulatingDigitDriver.html#a73f4300dc87e7cb4c808e6fddc5e7df4">ace_segment::ModulatingDigitDriver</a>
 , <a class="el" href="classace__segment_1_1SegmentDriver.html#ab3945682d0e26bb59dcacb66a81caeec">ace_segment::SegmentDriver</a>
+</li>
+<li>isStylerSupported()
+: <a class="el" href="classace__segment_1_1Renderer.html#a9f8f8d91fef7a0168bf7f60463638014">ace_segment::Renderer</a>
 </li>
 </ul>
 
@@ -180,7 +210,7 @@ $(function() {
 : <a class="el" href="classace__segment_1_1Hardware.html#a967adfe2fb7acb7eecca011e34a4a690">ace_segment::Hardware</a>
 </li>
 <li>ModulatingDigitDriver()
-: <a class="el" href="classace__segment_1_1ModulatingDigitDriver.html#acb7ea555663d194616f47d9605956c8d">ace_segment::ModulatingDigitDriver</a>
+: <a class="el" href="classace__segment_1_1ModulatingDigitDriver.html#a72a575e2a9eba38e1e05d43a1d957704">ace_segment::ModulatingDigitDriver</a>
 </li>
 </ul>
 
@@ -189,40 +219,41 @@ $(function() {
 <li>pinMode()
 : <a class="el" href="classace__segment_1_1Hardware.html#a280e081f961d73bfcdbbd2e73d7af1a6">ace_segment::Hardware</a>
 </li>
+<li>prepareToSleep()
+: <a class="el" href="classace__segment_1_1DigitDriver.html#a9d307e52427ca56995a033549e0457d4">ace_segment::DigitDriver</a>
+, <a class="el" href="classace__segment_1_1Driver.html#ac8da600f5f1a0337b4e4cff950dae6f0">ace_segment::Driver</a>
+, <a class="el" href="classace__segment_1_1SegmentDriver.html#ac6abe45832780b9a068789998a92b8ba">ace_segment::SegmentDriver</a>
+</li>
 </ul>
 
 
 <h3><a id="index_r"></a>- r -</h3><ul>
 <li>Renderer()
-: <a class="el" href="classace__segment_1_1Renderer.html#afede3eac874ddd060baff4082ee63eef">ace_segment::Renderer</a>
+: <a class="el" href="classace__segment_1_1Renderer.html#aa24085df1e1dd25aa2ebbfc7cc3799a4">ace_segment::Renderer</a>
 </li>
 <li>RendererBuilder()
-: <a class="el" href="classace__segment_1_1RendererBuilder.html#ab6fe210b3e363882fcf45c5ebcd14625">ace_segment::RendererBuilder</a>
+: <a class="el" href="classace__segment_1_1RendererBuilder.html#a1291df29962387e2b83a41c68647d267">ace_segment::RendererBuilder</a>
 </li>
 <li>renderField()
 : <a class="el" href="classace__segment_1_1Renderer.html#af86c917c7b7e64f788289b7c679c3285">ace_segment::Renderer</a>
 </li>
 <li>renderFieldWhenReady()
-: <a class="el" href="classace__segment_1_1Renderer.html#a20ef51b7c77f3ae9ce0d145eaa0dc743">ace_segment::Renderer</a>
+: <a class="el" href="classace__segment_1_1Renderer.html#a3388f24dfb5049c3a511b31aa0805a63">ace_segment::Renderer</a>
 </li>
-<li>renderStyledDigits()
-: <a class="el" href="classace__segment_1_1Renderer.html#aa049ec64493c1bfbf39659ffe0c19fb4">ace_segment::Renderer</a>
+<li>requiresBrightness()
+: <a class="el" href="classace__segment_1_1BlinkStyler.html#a0e70719b3aeff9f3ad52995877abe319">ace_segment::BlinkStyler</a>
+, <a class="el" href="classace__segment_1_1PulseStyler.html#a2cd90d3251ec31b19d0180068560c9c5">ace_segment::PulseStyler</a>
+, <a class="el" href="classace__segment_1_1Styler.html#ac6af18ad88071ddea5bf18d1232106d9">ace_segment::Styler</a>
 </li>
 </ul>
 
 
 <h3><a id="index_s"></a>- s -</h3><ul>
 <li>SegmentDriver()
-: <a class="el" href="classace__segment_1_1SegmentDriver.html#ab34b3e012f551568b94e6d573eff4659">ace_segment::SegmentDriver</a>
+: <a class="el" href="classace__segment_1_1SegmentDriver.html#a47a427e77130194d229171c2819724de">ace_segment::SegmentDriver</a>
 </li>
 <li>setAnodeOnGroup()
 : <a class="el" href="classace__segment_1_1LedMatrix.html#a562150f95e1397ddc8bafe54ac5f2a71">ace_segment::LedMatrix</a>
-</li>
-<li>setBlinkFastDuration()
-: <a class="el" href="classace__segment_1_1RendererBuilder.html#a164c3a5bbfe35f59b310abd8d3704880">ace_segment::RendererBuilder</a>
-</li>
-<li>setBlinkSlowDuration()
-: <a class="el" href="classace__segment_1_1RendererBuilder.html#a64bd94fa3a12d7c3e30529353cf5c529">ace_segment::RendererBuilder</a>
 </li>
 <li>setBrightness()
 : <a class="el" href="classace__segment_1_1Driver.html#aba1b47db2304b6244f4759a959125a9f">ace_segment::Driver</a>
@@ -234,16 +265,13 @@ $(function() {
 : <a class="el" href="classace__segment_1_1RendererBuilder.html#af0c9855f22aab430b469c16779b8253b">ace_segment::RendererBuilder</a>
 </li>
 <li>setPattern()
-: <a class="el" href="classace__segment_1_1Driver.html#a84f21c38b72a4c576a44e2d370356520">ace_segment::Driver</a>
-</li>
-<li>setPulseFastDuration()
-: <a class="el" href="classace__segment_1_1RendererBuilder.html#a0e6113e40832ebd4eb5572e00712ea9a">ace_segment::RendererBuilder</a>
-</li>
-<li>setPulseSlowDuration()
-: <a class="el" href="classace__segment_1_1RendererBuilder.html#a5cc5bb2635f8a7837f34a3a12aa46ded">ace_segment::RendererBuilder</a>
+: <a class="el" href="classace__segment_1_1Driver.html#a41265e34f99889668d8804cf290f5634">ace_segment::Driver</a>
 </li>
 <li>setStatsResetInterval()
 : <a class="el" href="classace__segment_1_1RendererBuilder.html#aee86f3f4bc0481f7a2204b17611235f1">ace_segment::RendererBuilder</a>
+</li>
+<li>setStyler()
+: <a class="el" href="classace__segment_1_1RendererBuilder.html#af4e793bbf8238589ab193998127d045a">ace_segment::RendererBuilder</a>
 </li>
 <li>shiftOut()
 : <a class="el" href="classace__segment_1_1Hardware.html#a15ffcc32a90c67cd23934be4175305c4">ace_segment::Hardware</a>
@@ -251,11 +279,17 @@ $(function() {
 <li>spiBegin()
 : <a class="el" href="classace__segment_1_1Hardware.html#a82220f9ae7eac84d6469eac1ec76200a">ace_segment::Hardware</a>
 </li>
+<li>spiEnd()
+: <a class="el" href="classace__segment_1_1Hardware.html#a617c8b05443f2ef3d748a79cd6d8d5ec">ace_segment::Hardware</a>
+</li>
 <li>spiTransfer()
 : <a class="el" href="classace__segment_1_1Hardware.html#a895de961d935c92011b078b104c76d57">ace_segment::Hardware</a>
 </li>
 <li>StringWriter()
 : <a class="el" href="classace__segment_1_1StringWriter.html#aba6bfaf9f459b0cc4a2a3dc59a05aa2e">ace_segment::StringWriter</a>
+</li>
+<li>Styler()
+: <a class="el" href="classace__segment_1_1Styler.html#a344f63b12711419d7416fc8c16426916">ace_segment::Styler</a>
 </li>
 </ul>
 
@@ -268,9 +302,6 @@ $(function() {
 
 
 <h3><a id="index_u"></a>- u -</h3><ul>
-<li>updateFrame()
-: <a class="el" href="classace__segment_1_1Renderer.html#aa0151565ff7b9f4fbd41f799b6e85186">ace_segment::Renderer</a>
-</li>
 <li>useModulatingDriver()
 : <a class="el" href="classace__segment_1_1DriverBuilder.html#a8303f5066da98e26189047d5623ce64b">ace_segment::DriverBuilder</a>
 </li>
@@ -278,6 +309,9 @@ $(function() {
 
 
 <h3><a id="index_w"></a>- w -</h3><ul>
+<li>wakeFromSleep()
+: <a class="el" href="classace__segment_1_1Driver.html#a8c505dd2a3617d3dc15085c2a7b0825d">ace_segment::Driver</a>
+</li>
 <li>writeBrightness()
 : <a class="el" href="classace__segment_1_1Renderer.html#acc623f6e203edfc74c1ac641784f93f6">ace_segment::Renderer</a>
 </li>
@@ -302,8 +336,8 @@ $(function() {
 : <a class="el" href="classace__segment_1_1StringWriter.html#a98276cf0a19743b379ad29cd8d863ac4">ace_segment::StringWriter</a>
 </li>
 <li>writeStyleAt()
-: <a class="el" href="classace__segment_1_1CharWriter.html#adac718eaa427c6ab4046674b8fad504b">ace_segment::CharWriter</a>
-, <a class="el" href="classace__segment_1_1HexWriter.html#a1663bd6c3307b0bf0f90394f96126e78">ace_segment::HexWriter</a>
+: <a class="el" href="classace__segment_1_1CharWriter.html#a2c20f76ce49799dcca898e9c24ca5324">ace_segment::CharWriter</a>
+, <a class="el" href="classace__segment_1_1HexWriter.html#a7dab07627170a871287849bd77de4c42">ace_segment::HexWriter</a>
 , <a class="el" href="classace__segment_1_1Renderer.html#a0d5c3d6c38a134552ddef550173055eb">ace_segment::Renderer</a>
 </li>
 </ul>
@@ -318,6 +352,9 @@ $(function() {
 </li>
 <li>~Renderer()
 : <a class="el" href="classace__segment_1_1Renderer.html#aa5863529c4779b50ecfb5e922ba8ac52">ace_segment::Renderer</a>
+</li>
+<li>~Styler()
+: <a class="el" href="classace__segment_1_1Styler.html#a5b0be691192974a84a686426b9eb0171">ace_segment::Styler</a>
 </li>
 </ul>
 </div><!-- contents -->

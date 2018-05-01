@@ -43,7 +43,7 @@ using namespace ace_segment::testing;
 const int8_t NUM_DIGITS = 4;
 
 // create NUM_DIGITS+1 elements for doing array bound checking
-DimmingDigit dimmingDigits[NUM_DIGITS + 1];
+DimmablePattern dimmablePatterns[NUM_DIGITS + 1];
 
 void setup() {
   delay(1000); // Wait for stability on some boards, otherwise garage on Serial
@@ -51,6 +51,8 @@ void setup() {
   while (!Serial); // Wait until Serial is ready - Leonardo/Micro
   Serial.println(F("setup(): start"));
 
+  Serial.print(F("sizeof(TimingStats): "));
+  Serial.println(sizeof(TimingStats));
   Serial.print(F("sizeof(Hardware): "));
   Serial.println(sizeof(Hardware));
   Serial.print(F("sizeof(LedMatrixDirect): "));
@@ -69,6 +71,10 @@ void setup() {
   Serial.println(sizeof(ModulatingDigitDriver));
   Serial.print(F("sizeof(DriverBuilder): "));
   Serial.println(sizeof(DriverBuilder));
+  Serial.print(F("sizeof(BlinkStyler): "));
+  Serial.println(sizeof(BlinkStyler));
+  Serial.print(F("sizeof(PulseStyler): "));
+  Serial.println(sizeof(PulseStyler));
   Serial.print(F("sizeof(Renderer): "));
   Serial.println(sizeof(Renderer));
   Serial.print(F("sizeof(RendererBuilder): "));
@@ -155,7 +161,7 @@ class FakeDriverTest: public TestOnce {
   protected:
     virtual void setup() override {
       TestOnce::setup();
-      mDriver = new FakeDriver(dimmingDigits, NUM_DIGITS);
+      mDriver = new FakeDriver(dimmablePatterns, NUM_DIGITS);
       mDriver->configure();
     }
 
@@ -168,20 +174,20 @@ class FakeDriverTest: public TestOnce {
 };
 
 testF(FakeDriverTest, setPattern) {
-  const DimmingDigit& dimmingDigit = dimmingDigits[0];
+  const DimmablePattern& dimmablePattern = dimmablePatterns[0];
 
   mDriver->setPattern(0, 0x11);
-  assertEqual(0x11, dimmingDigit.pattern);
-  assertEqual(255, dimmingDigit.brightness);
+  assertEqual(0x11, dimmablePattern.pattern);
+  assertEqual(255, dimmablePattern.brightness);
 
   mDriver->setPattern(0, 0x11, 10);
-  assertEqual(0x11, dimmingDigit.pattern);
-  assertEqual(10, dimmingDigit.brightness);
+  assertEqual(0x11, dimmablePattern.pattern);
+  assertEqual(10, dimmablePattern.brightness);
 }
 
 // Setting a digit that's out of bounds (>= NUM_DIGITS) does nothing
 testF(FakeDriverTest, setPattern_outOfBounds) {
-  DimmingDigit& digitOutOfBounds = dimmingDigits[4];
+  DimmablePattern& digitOutOfBounds = dimmablePatterns[4];
   digitOutOfBounds.pattern = 1;
   digitOutOfBounds.brightness = 2;
   mDriver->setPattern(5, 0x11, 10);
@@ -190,20 +196,20 @@ testF(FakeDriverTest, setPattern_outOfBounds) {
 }
 
 testF(FakeDriverTest, setBrightness) {
-  const DimmingDigit& dimmingDigit = dimmingDigits[0];
+  const DimmablePattern& dimmablePattern = dimmablePatterns[0];
 
   mDriver->setPattern(0, 0x11);
-  assertEqual(0x11, dimmingDigit.pattern);
-  assertEqual(255, dimmingDigit.brightness);
+  assertEqual(0x11, dimmablePattern.pattern);
+  assertEqual(255, dimmablePattern.brightness);
 
   mDriver->setBrightness(0, 20);
-  assertEqual(0x11, dimmingDigit.pattern);
-  assertEqual(20, dimmingDigit.brightness);
+  assertEqual(0x11, dimmablePattern.pattern);
+  assertEqual(20, dimmablePattern.brightness);
 }
 
 // Setting a digit that's out of bounds (>= NUM_DIGITS) does nothing
 testF(FakeDriverTest, setBrightness_outOfBounds) {
-  DimmingDigit& digitOutOfBounds = dimmingDigits[4];
+  DimmablePattern& digitOutOfBounds = dimmablePatterns[4];
   digitOutOfBounds.pattern = 1;
   digitOutOfBounds.brightness = 2;
   mDriver->setBrightness(4, 96);

@@ -70,6 +70,11 @@ class Hardware {
       SPI.begin();
     }
 
+    /** End SPI. */
+    virtual void spiEnd() {
+      SPI.end();
+    }
+
     /** Send byte through SPI. */
     virtual void spiTransfer(uint8_t value) {
       SPI.beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));

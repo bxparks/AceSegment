@@ -1,8 +1,0 @@
-<map id="ace_segment::Renderer" name="ace_segment::Renderer">
-<area shape="rect" id="node2" href="$classace__segment_1_1TimingStats.html" title="ace_segment::TimingStats" alt="" coords="625,5,804,32"/>
-<area shape="rect" id="node3" href="$classace__segment_1_1Driver.html" title="Base class of drivers which knows how to transfer the bit patterns stored in the array of DimmingDigi..." alt="" coords="643,56,786,83"/>
-<area shape="rect" id="node4" href="$classace__segment_1_1DimmingDigit.html" title="ace_segment::DimmingDigit" alt="" coords="289,56,476,83"/>
-<area shape="rect" id="node5" href="$classace__segment_1_1LedMatrix.html" title="ace_segment::LedMatrix" alt="" coords="300,5,465,32"/>
-<area shape="rect" id="node6" href="$classace__segment_1_1Hardware.html" title="ace_segment::Hardware" alt="" coords="5,71,169,97"/>
-<area shape="rect" id="node7" href="$classace__segment_1_1StyledDigit.html" title="Data structure that keeps track of the state of each digit (its segment bit pattern and its style)..." alt="" coords="629,157,801,184"/>
-</map>

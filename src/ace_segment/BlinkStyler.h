@@ -22,48 +22,41 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_STYLED_DIGIT_H
-#define ACE_SEGMENT_STYLED_DIGIT_H
+#ifndef ACE_SEGMENT_BLINK_STYLER_H
+#define ACE_SEGMENT_BLINK_STYLER_H
 
 #include <stdint.h>
+#include "Styler.h"
 
 namespace ace_segment {
 
-/**
- * Data structure that keeps track of the state of each digit (its segment bit
- * pattern and its style).
- */
-class StyledDigit {
+class BlinkStyler: public Styler{
   public:
-    typedef uint8_t StyleType;
-
-    static const StyleType kStyleNormal = 0;
-    static const StyleType kStyleBlinkSlow = 1;
-    static const StyleType kStyleBlinkFast = 2;
-    static const StyleType kStylePulseSlow = 3;
-    static const StyleType kStylePulseFast = 4;
-
-    StyledDigit():
-      pattern(0),
-      style(kStyleNormal)
+    BlinkStyler(uint8_t framesPerSecond, uint16_t durationMillis):
+      mFramesPerBlink((uint32_t) framesPerSecond * durationMillis / 1000)
     {}
 
-    void setDecimalPoint() {
-      pattern |= 0x80;
+    virtual void calcForFrame() override {
+      uint16_t middleOfBlink = mFramesPerBlink / 2;
+      mBlinkState = (mCurrentFrame < middleOfBlink) ? kOn : kOff;
+      Util::incrementMod(mCurrentFrame, mFramesPerBlink);
     }
 
-    void clearDecimalPoint() {
-      pattern &= ~0x80;
+    virtual void apply(uint8_t* pattern, uint8_t* brightness) override {
+      if (mBlinkState == kOff) {
+        *brightness = 0;
+      }
     }
 
-    uint8_t pattern;
-    uint8_t style;
+    virtual bool requiresBrightness() override { return false; }
 
   private:
-    // disable copy-constructor and assignment operator
-    StyledDigit(const StyledDigit&) = delete;
-    StyledDigit& operator=(const StyledDigit&) = delete;
+    static const uint8_t kOff = 0;
+    static const uint8_t kOn = 1;
 
+    const uint16_t mFramesPerBlink;
+    uint16_t mCurrentFrame = 0;
+    uint8_t mBlinkState;
 };
 
 }

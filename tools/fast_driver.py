@@ -15,10 +15,11 @@ The resulting class can be used where a 'Driver' object created by
 Usage: fast_driver.py [-h] [flags ...]
 
   --class_name name of class
-  --segment_direct_pins space-separated list of segment pins
-  --digit_pins space-separate list of digit pins
+  --segment_direct_pins {space-separated list of segment pins}
+  --digit_pins {space-separate list of digit pins}
   --common_cathode
   --common_anode
+  --use_transistors
   --output_header print {class_name}.h file on stdout
   --output_source print {class_name}.cpp file on stdout
   --output_files generate the {class_name}.h and {class_name}.cpp files
@@ -109,6 +110,10 @@ def main():
         dest='common_cathode',
         action="store_false")
     parser.add_argument(
+        '--use_transistors',
+        help='Transistors on digit pins invert their logic values',
+        action="store_true")
+    parser.add_argument(
         '--output_header',
         help='Output the *.h header file for debugging (default: False)',
         action="store_true")
@@ -143,19 +148,40 @@ def main():
     # Get the DriverGenerator for the given segment_pin configuration.
     if args.segment_direct_pins:
         generator = direct_generator.DriverGenerator(
-            invocation, args.class_name, args.segment_direct_pins,
-            args.digit_pins, args.common_cathode, args.output_header,
-            args.output_source, args.output_files, args.digital_write_fast)
+            invocation,
+            class_name=args.class_name,
+            segment_direct_pins=args.segment_direct_pins,
+            digit_pins=args.digit_pins,
+            common_cathode=args.common_cathode,
+            use_transistors=args.use_transistors,
+            output_header=args.output_header,
+            output_source=args.output_source,
+            output_files=args.output_files,
+            digital_write_fast=args.digital_write_fast)
     elif args.segment_serial_pins:
         generator = serial_generator.DriverGenerator(
-            invocation, args.class_name, args.segment_serial_pins,
-            args.digit_pins, args.common_cathode, args.output_header,
-            args.output_source, args.output_files, args.digital_write_fast)
+            invocation,
+            class_name=args.class_name,
+            segment_serial_pins=args.segment_serial_pins,
+            digit_pins=args.digit_pins,
+            common_cathode=args.common_cathode,
+            use_transistors=args.use_transistors,
+            output_header=args.output_header,
+            output_source=args.output_source,
+            output_files=args.output_files,
+            digital_write_fast=args.digital_write_fast)
     elif args.segment_spi_pins:
         generator = spi_generator.DriverGenerator(
-            invocation, args.class_name, args.segment_spi_pins,
-            args.digit_pins, args.common_cathode, args.output_header,
-            args.output_source, args.output_files, args.digital_write_fast)
+            invocation,
+            class_name=args.class_name,
+            segment_spi_pins=args.segment_spi_pins,
+            digit_pins=args.digit_pins,
+            common_cathode=args.common_cathode,
+            use_transistors=args.use_transistors,
+            output_header=args.output_header,
+            output_source=args.output_source,
+            output_files=args.output_files,
+            digital_write_fast=args.digital_write_fast)
     else:
         logging.error("Must provide one of " +
                       "(--segment_direct_pins, --segment_serial_pins, " +

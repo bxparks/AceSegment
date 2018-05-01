@@ -38,15 +38,7 @@ class Driver;
 class DriverBuilder {
   public:
     DriverBuilder(Hardware* hardware):
-      mHardware(hardware),
-      mNumSegments(8),
-      mResistorsOnSegments(true),
-      mCommonCathode(true),
-      mLedMatrixType(kTypeLedMatrixDirect),
-      mDigitPins(nullptr),
-      mSegmentPins(nullptr),
-      mUseModulatingDriver(false),
-      mNumSubFields(1)
+      mHardware(hardware)
     {}
 
     DriverBuilder& setNumDigits(uint8_t numDigits) {
@@ -66,6 +58,11 @@ class DriverBuilder {
 
     DriverBuilder& setCommonCathode() {
       mCommonCathode = true;
+      return *this;
+    }
+
+    DriverBuilder& useTransistors() {
+      mUseTransistors = true;
       return *this;
     }
 
@@ -118,8 +115,8 @@ class DriverBuilder {
       return *this;
     }
 
-    DriverBuilder& setDimmingDigits(DimmingDigit* dimmingDigits) {
-      mDimmingDigits = dimmingDigits;
+    DriverBuilder& setDimmablePatterns(DimmablePattern* dimmablePatterns) {
+      mDimmablePatterns = dimmablePatterns;
       return *this;
     }
 
@@ -146,21 +143,22 @@ class DriverBuilder {
 
     // parameters for LedMatrix
     Hardware* const mHardware;
-    uint8_t mNumDigits;
-    uint8_t mNumSegments;
-    bool mResistorsOnSegments;
-    bool mCommonCathode;
-    uint8_t mLedMatrixType;
-    const uint8_t* mDigitPins;
-    const uint8_t* mSegmentPins;
-    uint8_t mLatchPin;
-    uint8_t mDataPin;
-    uint8_t mClockPin;
+    uint8_t mNumDigits = 2;
+    uint8_t mNumSegments = 8;
+    bool mResistorsOnSegments = true;
+    bool mCommonCathode = true;
+    bool mUseTransistors = false;
+    uint8_t mLedMatrixType = kTypeLedMatrixDirect;
+    const uint8_t* mDigitPins = nullptr;
+    const uint8_t* mSegmentPins = nullptr;
+    uint8_t mLatchPin = 0;
+    uint8_t mDataPin = 0;
+    uint8_t mClockPin = 0;
 
     // parameters for Driver
-    DimmingDigit* mDimmingDigits;
-    bool mUseModulatingDriver;
-    uint8_t mNumSubFields;
+    DimmablePattern* mDimmablePatterns = nullptr;
+    bool mUseModulatingDriver = false;
+    uint8_t mNumSubFields = 16;
 };
 
 }

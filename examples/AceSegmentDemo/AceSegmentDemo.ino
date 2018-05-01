@@ -1,8 +1,57 @@
+#include <AceButton.h>
 #include <AceSegment.h>
-#include "FastDirectDriver.h"
-#include "FastSerialDriver.h"
-#include "FastSpiDriver.h"
+#ifdef __AVR__
+  #include "FastDirectDriver.h"
+  #include "FastSerialDriver.h"
+  #include "FastSpiDriver.h"
+#endif
+
 using namespace ace_segment;
+using namespace ace_button;
+
+//------------------------------------------------------------------
+// Configurations for AceButton
+//------------------------------------------------------------------
+
+const uint8_t LOOP_MODE_PAUSE = 0;
+const uint8_t LOOP_MODE_STEP = 1;
+const uint8_t LOOP_MODE_AUTO_RENDER = 2;
+uint8_t loopMode = LOOP_MODE_AUTO_RENDER;
+
+// Configuration for AceButton, to support Single-Step
+const uint8_t BUTTON_PIN = 2; // change this to the button pin
+AceButton button;
+
+void handleEvent(AceButton* button, uint8_t eventType, uint8_t buttonState) {
+  switch (eventType) {
+    case AceButton::kEventReleased:
+      if (loopMode == LOOP_MODE_AUTO_RENDER) {
+        loopMode = LOOP_MODE_PAUSE;
+        Serial.println(F("handleEvent(): paused"));
+      } else {
+        Serial.println(F("handleEvent(): stepping"));
+        loopMode = LOOP_MODE_STEP;
+      }
+      break;
+    case AceButton::kEventLongPressed:
+      Serial.println(F("handleEvent(): auto render"));
+      loopMode = LOOP_MODE_AUTO_RENDER;
+      break;
+  }
+}
+
+void setupAceButton() {
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  button.setEventHandler(handleEvent);
+  button.init(BUTTON_PIN);
+  ButtonConfig* config = button.getButtonConfig();
+  config->setFeature(ButtonConfig::kFeatureLongPress);
+  config->setFeature(ButtonConfig::kFeatureSuppressAfterLongPress);
+}
+
+//------------------------------------------------------------------
+// Configurations for AceSegment
+//------------------------------------------------------------------
 
 // Use polling or interrupt.
 #define USE_INTERRUPT 0
@@ -35,44 +84,49 @@ using namespace ace_segment;
 #define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
 
 // Type of characters to write to the LED display
-#define WRITE_MODE WRITE_MODE_STRING
+#define WRITE_MODE WRITE_MODE_HEX
+
+// Transistor drivers on digits.
+#define USE_TRANSISTORS 1
 
 const uint8_t FRAMES_PER_SECOND = 60;
 const uint8_t NUM_SUBFIELDS = 16;
 
-#if DRIVER_MODE == DRIVER_MODE_SEGMENT
-// 4 digits, resistors on digits
+const uint8_t BLINK_STYLE = 1;
+const uint8_t PULSE_STYLE = 2;
+
 const uint8_t NUM_DIGITS = 4;
-const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
-const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
+const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
+
+#if DRIVER_MODE == DRIVER_MODE_SEGMENT
+  // 4 digits, resistors on digits
+  const uint8_t segmentPins[8] = {8, 9, 10, 11, 12, 14, 15, 16};
 #else
   #if ((DRIVER_MODE == DRIVER_MODE_DIGIT \
       || DRIVER_MODE == DRIVER_MODE_MODULATING_DIGIT \
       || DRIVER_MODE == DRIVER_MODE_SEGMENT) \
         && LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT) \
       || DRIVER_MODE == DRIVER_MODE_FAST_DIRECT
-  // 4 digits, resistors on segments
-  const uint8_t NUM_DIGITS = 4;
-  const uint8_t digitPins[NUM_DIGITS] = {12, 14, 15, 16};
-  const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
+    // 4 digits, resistors on segments
+    const uint8_t segmentPins[8] = {8, 9, 10, 11, 12, 14, 15, 16};
   #else
-  // 4 digits, resistors on segments, serial-to-parallel converter on segments
-  const uint8_t NUM_DIGITS = 4;
-  const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
-  const uint8_t latchPin = 10; // ST_CP on 74HC595
-  const uint8_t dataPin = 11; // DS on 74HC595
-  const uint8_t clockPin = 13; // SH_CP on 74HC595
+    // 4 digits, resistors on segments, serial-to-parallel converter on segments
+    const uint8_t latchPin = SS; // ST_CP on 74HC595
+    const uint8_t dataPin = MOSI; // DS on 74HC595
+    const uint8_t clockPin = SCK; // SH_CP on 74HC595
   #endif
 #endif
 
 #if DRIVER_MODE > DRIVER_MODE_NONE
 // Set up the chain of resources and their dependencies.
-DimmingDigit dimmingDigits[NUM_DIGITS];
-StyledDigit styledDigits[NUM_DIGITS];
+DimmablePattern dimmingPattern[NUM_DIGITS];
+StyledPattern styledPatterns[NUM_DIGITS];
 
 // The chain of resources.
 Hardware* hardware;
 Driver* driver;
+PulseStyler* pulseStyler;
+BlinkStyler* blinkStyler;
 Renderer* renderer;
 CharWriter* charWriter;
 HexWriter* hexWriter;
@@ -86,19 +140,6 @@ ISR(TIMER2_COMPA_vect) {
 #endif
 
 #endif
-
-void setup() {
-  delay(1000); // Wait for stability on some boards, otherwise garage on Serial
-  Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
-  while (!Serial); // Wait until Serial is ready - Leonardo/Micro
-  Serial.println(F("setup(): begin"));
-
-#if DRIVER_MODE > DRIVER_MODE_NONE
-  setupAceSegment();
-#endif
-
-  Serial.println(F("setup(): end"));
-}
 
 #if DRIVER_MODE > DRIVER_MODE_NONE
 // Create the resources.
@@ -125,7 +166,10 @@ void setupAceSegment() {
   #if DRIVER_MODE == DRIVER_MODE_MODULATING_DIGIT
       .useModulatingDriver(NUM_SUBFIELDS)
   #endif
-      .setDimmingDigits(dimmingDigits)
+      .setDimmablePatterns(dimmingPattern)
+  #if USE_TRANSISTORS == 1
+      .useTransistors()
+  #endif
       .build();
 #elif DRIVER_MODE == DRIVER_MODE_SEGMENT
   driver = DriverBuilder(hardware)
@@ -134,20 +178,31 @@ void setupAceSegment() {
       .setResistorsOnDigits()
       .setDigitPins(digitPins)
       .setSegmentDirectPins(segmentPins)
-      .setDimmingDigits(dimmingDigits)
+      .setDimmablePatterns(dimmingPattern)
+  #if USE_TRANSISTORS == 1
+      .useTransistors()
+  #endif
       .build();
-#elif DRIVER_MODE == DRIVER_MODE_FAST_DIRECT
-  driver = new FastDirectDriver(dimmingDigits, NUM_DIGITS, NUM_SUBFIELDS);
-#elif DRIVER_MODE == DRIVER_MODE_FAST_SERIAL
-  driver = new FastSerialDriver(dimmingDigits, NUM_DIGITS, NUM_SUBFIELDS);
-#elif DRIVER_MODE == DRIVER_MODE_FAST_SPI
-  driver = new FastSpiDriver(dimmingDigits, NUM_DIGITS, NUM_SUBFIELDS);
+#else
+  #ifdef __AVR__
+    #if DRIVER_MODE == DRIVER_MODE_FAST_DIRECT
+      driver = new FastDirectDriver(dimmingPattern, NUM_DIGITS, NUM_SUBFIELDS);
+    #elif DRIVER_MODE == DRIVER_MODE_FAST_SERIAL
+      driver = new FastSerialDriver(dimmingPattern, NUM_DIGITS, NUM_SUBFIELDS);
+    #elif DRIVER_MODE == DRIVER_MODE_FAST_SPI
+      driver = new FastSpiDriver(dimmingPattern, NUM_DIGITS, NUM_SUBFIELDS);
+    #endif
+  #endif
 #endif
   driver->configure();
 
   // Create the Renderer.
-  renderer = RendererBuilder(hardware, driver, styledDigits, NUM_DIGITS)
+  pulseStyler = new PulseStyler(FRAMES_PER_SECOND, 2000);
+  blinkStyler = new BlinkStyler(FRAMES_PER_SECOND, 800);
+  renderer = RendererBuilder(hardware, driver, styledPatterns, NUM_DIGITS)
       .setFramesPerSecond(FRAMES_PER_SECOND)
+      .setStyler(BLINK_STYLE, blinkStyler)
+      .setStyler(PULSE_STYLE, pulseStyler)
       .build();
   renderer->configure();
 
@@ -180,7 +235,41 @@ void setupAceSegment() {
 }
 #endif
 
+//------------------------------------------------------------------
+// Configurations for AceSegmentDemo
+//------------------------------------------------------------------
+
+void setup() {
+  delay(1000); // Wait for stability on some boards, otherwise garage on Serial
+  Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
+  while (!Serial); // Wait until Serial is ready - Leonardo/Micro
+  Serial.println(F("setup(): begin"));
+
+  setupAceButton();
+
+#if DRIVER_MODE > DRIVER_MODE_NONE
+  setupAceSegment();
+#endif
+
+  Serial.println(F("setup(): end"));
+}
+
 void loop() {
+  if (loopMode == LOOP_MODE_STEP) {
+    singleStep();
+    loopMode = LOOP_MODE_PAUSE;
+  } else if (loopMode == LOOP_MODE_AUTO_RENDER) {
+    autoRender();
+  }
+
+  button.check();
+}
+
+void singleStep() {
+  renderer->renderField();
+}
+
+void autoRender() {
   static unsigned long lastUpdateTime = millis();
   static unsigned long stopWatchStart = lastUpdateTime;
   static uint32_t loopCount = 0;
@@ -255,10 +344,10 @@ void writeHexes() {
   uint8_t buffer[3];
   buffer[0] = (c & 0xf0) >> 4;
   buffer[1] = (c & 0x0f);
-  hexWriter->writeHexAt(0, buffer[0], StyledDigit::kStylePulseFast);
-  hexWriter->writeHexAt(1, buffer[1], StyledDigit::kStylePulseSlow);
-  hexWriter->writeHexAt(2, HexWriter::kMinus, StyledDigit::kStyleBlinkFast);
-  hexWriter->writeHexAt(3, c, StyledDigit::kStyleBlinkSlow);
+  hexWriter->writeHexAt(0, buffer[0], StyledPattern::kStyleNormal);
+  hexWriter->writeHexAt(1, buffer[1], PULSE_STYLE);
+  hexWriter->writeHexAt(2, HexWriter::kMinus, StyledPattern::kStyleNormal);
+  hexWriter->writeHexAt(3, c, BLINK_STYLE);
 
   Util::incrementMod(c, HexWriter::kNumCharacters);
 }
@@ -271,10 +360,10 @@ void writeChars() {
   char buffer[3];
   buffer[0] = (c & 0xf0) >> 4;
   buffer[1] = (c & 0x0f);
-  charWriter->writeCharAt(0, buffer[0], StyledDigit::kStylePulseFast);
-  charWriter->writeCharAt(1, buffer[1], StyledDigit::kStylePulseSlow);
-  charWriter->writeCharAt(2, '-', StyledDigit::kStyleBlinkFast);
-  charWriter->writeCharAt(3, c, StyledDigit::kStyleBlinkSlow);
+  charWriter->writeCharAt(0, buffer[0], StyledPattern::kStyleNormal);
+  charWriter->writeCharAt(1, buffer[1], PULSE_STYLE);
+  charWriter->writeCharAt(2, '-', StyledPattern::kStyleNormal);
+  charWriter->writeCharAt(3, c, BLINK_STYLE);
 
   Util::incrementMod(c, CharWriter::kNumCharacters);
 }

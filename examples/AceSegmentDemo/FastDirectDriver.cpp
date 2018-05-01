@@ -3,6 +3,8 @@
 //
 // DO NOT EDIT
 
+#ifdef __AVR__
+
 #include <stdint.h>
 #include <Arduino.h>
 #include <digitalWriteFast.h>
@@ -73,35 +75,58 @@ void FastDirectDriver::configure() {
 }
 
 void FastDirectDriver::displayCurrentField() {
-  ace_segment::DimmingDigit& dimmingDigit = mDimmingDigits[mCurrentDigit];
-  uint8_t brightness = dimmingDigit.brightness;
+  if (mPreparedToSleep) return;
+
+  bool isCurrentDigitOn;
+  ace_segment::DimmablePattern& dimmablePattern =
+      mDimmablePatterns[mCurrentDigit];
+  uint8_t brightness = dimmablePattern.brightness;
   if (mCurrentDigit != mPrevDigit) {
     disableDigit(mPrevDigit);
-    mIsCurrentDigitOn = false;
+    isCurrentDigitOn = false;
     mCurrentSubFieldMax = ((uint16_t) mNumSubFields * brightness) / 256;
+  } else {
+    isCurrentDigitOn = mIsPrevDigitOn;
   }
 
   if (brightness < 255 && mCurrentSubField >= mCurrentSubFieldMax) {
-    if (mIsCurrentDigitOn) {
+    if (isCurrentDigitOn) {
       disableDigit(mCurrentDigit);
-      mIsCurrentDigitOn = false;
+      isCurrentDigitOn = false;
     }
   } else {
-    if (!mIsCurrentDigitOn) {
-      SegmentPatternType segmentPattern = dimmingDigit.pattern;
+    if (!isCurrentDigitOn) {
+      SegmentPatternType segmentPattern = dimmablePattern.pattern;
       if (segmentPattern != mSegmentPattern) {
         drawSegments(segmentPattern);
         mSegmentPattern = segmentPattern;
       }
       enableDigit(mCurrentDigit);
-      mIsCurrentDigitOn = true;
+      isCurrentDigitOn = true;
     }
   }
 
   mCurrentSubField++;
   mPrevDigit = mCurrentDigit;
+  mIsPrevDigitOn = isCurrentDigitOn;
   if (mCurrentSubField >= mNumSubFields) {
     ace_segment::Util::incrementMod(mCurrentDigit, mNumDigits);
     mCurrentSubField = 0;
   }
 }
+
+void FastDirectDriver::drawSegments(uint8_t pattern) {
+  uint8_t elementMask = 0x1;
+  for (uint8_t segment = 0; segment < kNumSegments; segment++) {
+    uint8_t output = (pattern & elementMask) ? kSegmentOn : kSegmentOff;
+    writeSegment(segment, output);
+    elementMask <<= 1;
+  }
+}
+
+void FastDirectDriver::prepareToSleep() {
+  Driver::prepareToSleep();
+  disableDigit(mPrevDigit);
+}
+
+#endif

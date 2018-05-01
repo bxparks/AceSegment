@@ -22,32 +22,61 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_DIMMING_DIGIT_H
-#define ACE_SEGMENT_DIMMING_DIGIT_H
+#ifndef DRIVER_CONFIG_H
+#define DRIVER_CONFIG_H
 
 #include <stdint.h>
 
-namespace ace_segment {
+class __FlashStringHelper;
 
-class DimmingDigit {
-  public:
-    static const uint8_t kOff = 0;
-    static const uint8_t kOn = 255;
+struct DriverConfig {
+  enum ResistorWiring {
+    ResistorsOnDigits,
+    ResistorsOnSegments
+  };
 
-    DimmingDigit():
-      pattern(0),
-      brightness(kOn)
-    {}
+  enum PinWiring {
+    DirectPins,
+    SerialPins,
+    SpiPins
+  };
 
-    uint8_t pattern; // segment bit pattern of the digit
-    uint8_t brightness; // units of 1/256
+  enum Modulation {
+    NoModulation,
+    UseModulation
+  };
 
-  private:
-    // disable copy-constructor and assignment operator
-    DimmingDigit(const DimmingDigit&) = delete;
-    DimmingDigit& operator=(const DimmingDigit&) = delete;
+  enum Fast {
+    NoFastDriver,
+    UseFastDriver
+  };
+
+  enum Style {
+    NoStyles,
+    UseStyles
+  };
+
+  DriverConfig(
+      ResistorWiring resistorWiring, PinWiring pinWiring,
+      Modulation modulation, Fast fast, Style style,
+      const __FlashStringHelper* label):
+    mResistorWiring(resistorWiring),
+    mPinWiring(pinWiring),
+    mModulation(modulation),
+    mFast(fast),
+    mStyle(style),
+    mLabel(label)
+  {}
+
+  const ResistorWiring mResistorWiring;
+  const PinWiring mPinWiring;
+  const Modulation mModulation;
+  const Fast mFast;
+  const Style mStyle;
+  const __FlashStringHelper* const mLabel;
+
+  static const DriverConfig kDriverConfigs[];
+  static const uint8_t kNumDriverConfigs;
 };
-
-}
 
 #endif

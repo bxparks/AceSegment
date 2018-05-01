@@ -30,7 +30,7 @@ SOFTWARE.
 
 namespace ace_segment {
 
-class StyledDigit;
+class StyledPattern;
 class Hardware;
 
 /**
@@ -42,18 +42,18 @@ class RendererBuilder {
   public:
     /** Constructor. */
     explicit RendererBuilder(Hardware* hardware, Driver* driver,
-            StyledDigit* styledDigits, uint8_t numDigits):
+            StyledPattern* styledPatterns, uint8_t numDigits):
         mHardware(hardware),
         mDriver(driver),
-        mStyledDigits(styledDigits),
+        mStyledPatterns(styledPatterns),
         mNumDigits(numDigits),
         mFramesPerSecond(kFramesPerSecondDefault),
-        mStatsResetInterval(kStatsResetIntervalDefault),
-        mBlinkSlowDurationMillis(kBlinkSlowDurationMillisDefault),
-        mBlinkFastDurationMillis(kBlinkFastDurationMillisDefault),
-        mPulseSlowDurationMillis(kPulseSlowDurationMillisDefault),
-        mPulseFastDurationMillis(kPulseFastDurationMillisDefault)
-    {}
+        mStatsResetInterval(kStatsResetIntervalDefault)
+    {
+      for (uint8_t i = 0; i < Renderer::kNumStyles; i++) {
+        mStylers[i] = nullptr;
+      }
+    }
 
     /**
      * Set the desired frame rate. Default is 60.
@@ -84,27 +84,14 @@ class RendererBuilder {
       return *this;
     }
 
-    /** Set blink slow duration millis. Default 800 millis. */
-    RendererBuilder& setBlinkSlowDuration(uint16_t durationMillis) {
-      mBlinkSlowDurationMillis = durationMillis;
-      return *this;
-    }
-
-    /** Set blink fast duration millis. Default 400 millis. */
-    RendererBuilder& setBlinkFastDuration(uint16_t durationMillis) {
-      mBlinkFastDurationMillis = durationMillis;
-      return *this;
-    }
-
-    /** Set pulse slow duration millis. Default 3000 millis. */
-    RendererBuilder& setPulseSlowDuration(uint16_t durationMillis) {
-      mPulseSlowDurationMillis = durationMillis;
-      return *this;
-    }
-
-    /** Set pulse fast duration millis. Default 1000 millis. */
-    RendererBuilder& setPulseFastDuration(uint16_t durationMillis) {
-      mPulseFastDurationMillis = durationMillis;
+    /**
+     * Set the Styler for the given styleIndex. Currently supports maximum of
+     * kNumStyles which is 4.
+     */
+    RendererBuilder& setStyler(uint8_t styleIndex, Styler* styler) {
+      if (styleIndex > 0 && styleIndex < Renderer::kNumStyles) {
+        mStylers[styleIndex] = styler;
+      }
       return *this;
     }
 
@@ -113,35 +100,22 @@ class RendererBuilder {
      * parameters. The Renderer::init() method must be called before using it.
      */
     Renderer* build() {
-      return new Renderer(mHardware, mDriver, mStyledDigits, mNumDigits,
-          mFramesPerSecond, mStatsResetInterval,
-          mBlinkSlowDurationMillis, mBlinkFastDurationMillis,
-          mPulseSlowDurationMillis, mPulseFastDurationMillis);
+      return new Renderer(mHardware, mDriver, mStyledPatterns, mNumDigits,
+          mFramesPerSecond, mStatsResetInterval, mStylers);
     }
 
   private:
     static const uint8_t kFramesPerSecondDefault = 60;
-
     static const uint16_t kStatsResetIntervalDefault = 1200;
-
-    static const uint16_t kBlinkSlowDurationMillisDefault = 800;
-
-    static const uint16_t kBlinkFastDurationMillisDefault = 400;
-
-    static const uint16_t kPulseSlowDurationMillisDefault = 3000;
-
-    static const uint16_t kPulseFastDurationMillisDefault = 1000;
 
     Hardware* const mHardware;
     Driver* const mDriver;
-    StyledDigit* const mStyledDigits;
+    StyledPattern* const mStyledPatterns;
     uint8_t const mNumDigits;
     uint8_t mFramesPerSecond;
     uint16_t mStatsResetInterval;
-    uint16_t mBlinkSlowDurationMillis;
-    uint16_t mBlinkFastDurationMillis;
-    uint16_t mPulseSlowDurationMillis;
-    uint16_t mPulseFastDurationMillis;
+    Styler* mStylers[Renderer::kNumStyles];
+
 };
 
 }

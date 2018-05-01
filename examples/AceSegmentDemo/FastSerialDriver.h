@@ -3,6 +3,8 @@
 //
 // DO NOT EDIT
 
+#ifdef __AVR__
+
 #include <stdint.h>
 #include <digitalWriteFast.h>
 #include <ace_segment/ModulatingDigitDriver.h>
@@ -14,10 +16,10 @@
 class FastSerialDriver: public ace_segment::ModulatingDigitDriver {
   public:
     // Constructor
-    FastSerialDriver(ace_segment::DimmingDigit* dimmingDigits,
+    FastSerialDriver(ace_segment::DimmablePattern* dimmablePatterns,
             uint8_t numDigits, uint8_t numSubFields):
         ace_segment::ModulatingDigitDriver(
-            nullptr /* ledMatrix */, dimmingDigits, numDigits, numSubFields)
+            nullptr /* ledMatrix */, dimmablePatterns, numDigits, numSubFields)
     {}
 
     // Destructor
@@ -25,6 +27,7 @@ class FastSerialDriver: public ace_segment::ModulatingDigitDriver {
 
     virtual void configure() override;
     virtual void displayCurrentField() override;
+    virtual void prepareToSleep() override;
 
   private:
     typedef void (*DigitalWriter)(void);
@@ -61,19 +64,7 @@ class FastSerialDriver: public ace_segment::ModulatingDigitDriver {
       digitalWriteFast(kLatchPin, HIGH);
     }
 
-    static void shiftOutFast(uint8_t pattern) {
-      uint8_t mask = 0x80;
-      for (uint8_t i = 0; i < 8; i++)  {
-        if (pattern & mask) {
-          digitalWriteFast(kDataPin, HIGH);
-        } else {
-          digitalWriteFast(kDataPin, LOW);
-        }
-        digitalWriteFast(kClockPin, HIGH);
-        digitalWriteFast(kClockPin, LOW);            
-        mask >>= 1;
-      }
-    }
+    static void shiftOutFast(uint8_t pattern);
 
     // DigitalWriter functions for writing digit pins.
     static void digitalWriteFastDigit00Low() { digitalWriteFast(4, LOW); }
@@ -85,5 +76,7 @@ class FastSerialDriver: public ace_segment::ModulatingDigitDriver {
     static void digitalWriteFastDigit03Low() { digitalWriteFast(7, LOW); }
     static void digitalWriteFastDigit03High() { digitalWriteFast(7, HIGH); }
 };
+
+#endif
 
 #endif

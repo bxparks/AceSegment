@@ -34,10 +34,12 @@ SOFTWARE.
 
 #include "ace_segment/Util.h"
 #include "ace_segment/Hardware.h"
-#include "ace_segment/DimmingDigit.h"
+#include "ace_segment/DimmablePattern.h"
 #include "ace_segment/Driver.h"
 #include "ace_segment/DriverBuilder.h"
-#include "ace_segment/StyledDigit.h"
+#include "ace_segment/StyledPattern.h"
+#include "ace_segment/BlinkStyler.h"
+#include "ace_segment/PulseStyler.h"
 #include "ace_segment/Renderer.h"
 #include "ace_segment/RendererBuilder.h"
 #include "ace_segment/CharWriter.h"
@@ -45,6 +47,6 @@ SOFTWARE.
 #include "ace_segment/StringWriter.h"
 
 // Version format: xxyyzz == "xx.yy.zz"
-#define ACE_SEGMENT_VERSION 000200
+#define ACE_SEGMENT_VERSION 000300
 
 #endif

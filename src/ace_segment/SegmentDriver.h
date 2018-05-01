@@ -30,14 +30,19 @@ SOFTWARE.
 
 namespace ace_segment {
 
-class DimmingDigit;
+class DimmablePattern;
 
+/**
+ * A Driver that assumes that the resistors are on the digits so the
+ * multiplexing occurs by scanning through the segments.
+ */
 class SegmentDriver: public Driver {
   public:
     /** Constructor. */
-    explicit SegmentDriver(LedMatrix* ledMatrix, DimmingDigit* dimmingDigits,
+    explicit SegmentDriver(LedMatrix* ledMatrix,
+            DimmablePattern* dimmablePatterns,
             uint8_t numDigits, bool ownsLedMatrix = false):
-        Driver(ledMatrix, dimmingDigits, numDigits, ownsLedMatrix)
+        Driver(ledMatrix, dimmablePatterns, numDigits, ownsLedMatrix)
     {}
 
     virtual void configure() override {
@@ -53,6 +58,8 @@ class SegmentDriver: public Driver {
 
     virtual void displayCurrentField() override;
 
+    virtual void prepareToSleep() override;
+
   private:
     // disable copy-constructor and assignment operator
     SegmentDriver(const SegmentDriver&) = delete;
@@ -61,9 +68,21 @@ class SegmentDriver: public Driver {
     /** Get the digit bit pattern for the given segment. */
     DigitPatternType getDigitBitPattern(uint8_t segment);
 
+    /**
+     * Within the displayCurrentField() method, mCurrentSegment is the current
+     * segment that is being drawn. It is incremented to the next segment just
+     * before returning from that method.
+     */
     uint8_t mCurrentSegment;
+
+    /**
+     * Within the displayCurrentField() method, the mPrevSegment is the segment
+     * that was displayed on the previous call to displayCurrentField(). It is
+     * set to the segment that was just displayed before returning.
+     */
     uint8_t mPrevSegment;
-    uint8_t mDigitPattern;
+
+    DigitPatternType mDigitPattern;
 };
 
 }

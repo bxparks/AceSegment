@@ -45,24 +45,24 @@ class TimingStats {
       mCount = 0;
     }
 
-    uint16_t getMax() { return mMax; }
+    uint16_t getMax() const { return mMax; }
 
-    uint16_t getMin() { return mMin; }
+    uint16_t getMin() const { return mMin; }
 
-    uint16_t getAvg() { return (mCount > 0) ? mSum / mCount : 0; }
+    uint16_t getAvg() const { return (mCount > 0) ? mSum / mCount : 0; }
 
     /** An exponential decay average. */
-    uint16_t getExpDecayAvg() { return mExpDecayAvg; }
+    uint16_t getExpDecayAvg() const { return mExpDecayAvg; }
 
     /** Number of times update() was called since last reset. */
-    uint16_t getCount() { return mCount; }
+    uint16_t getCount() const { return mCount; }
 
     /**
      * Number of times update() was called from the beginning of time. Never
      * reset. This is useful to determining how many times update() was called
      * since it was last checked from the client code.
      */
-    uint16_t getCounter() { return mCounter; }
+    uint16_t getCounter() const { return mCounter; }
 
     void update(uint16_t duration) {
       mCount++;

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.2.0</span>
+   &#160;<span id="projectnumber">0.3.0</span>
    </div>
    <div id="projectbrief">An adjustable, configurable, and extensible framework for rendering seven segment LED displays.</div>
   </td>
@@ -66,20 +66,24 @@ $(function() {
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classace__segment_1_1DigitDriver-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">ace_segment::DigitDriver Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
+
+<p>A <a class="el" href="classace__segment_1_1Driver.html" title="Base class of drivers which knows how to transfer the bit patterns stored in the array of DimmablePat...">Driver</a> that assumes that the resistors are on the segments so the multiplexing occurs by scanning through the digits.  
+ <a href="classace__segment_1_1DigitDriver.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="DigitDriver_8h_source.html">DigitDriver.h</a>&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for ace_segment::DigitDriver:</div>
 <div class="dyncontent">
 <div class="center"><img src="classace__segment_1_1DigitDriver__inherit__graph.png" border="0" usemap="#ace__segment_1_1DigitDriver_inherit__map" alt="Inheritance graph"/></div>
 <map name="ace__segment_1_1DigitDriver_inherit__map" id="ace__segment_1_1DigitDriver_inherit__map">
 <area shape="rect" id="node3" href="classace__segment_1_1ModulatingDigitDriver.html" title="ace_segment::ModulatingDigit\lDriver" alt="" coords="5,155,204,196"/>
-<area shape="rect" id="node2" href="classace__segment_1_1Driver.html" title="Base class of drivers which knows how to transfer the bit patterns stored in the array of DimmingDigi..." alt="" coords="33,5,176,32"/>
+<area shape="rect" id="node2" href="classace__segment_1_1Driver.html" title="Base class of drivers which knows how to transfer the bit patterns stored in the array of DimmablePat..." alt="" coords="33,5,176,32"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <div class="dynheader">
@@ -87,20 +91,20 @@ Collaboration diagram for ace_segment::DigitDriver:</div>
 <div class="dyncontent">
 <div class="center"><img src="classace__segment_1_1DigitDriver__coll__graph.png" border="0" usemap="#ace__segment_1_1DigitDriver_coll__map" alt="Collaboration graph"/></div>
 <map name="ace__segment_1_1DigitDriver_coll__map" id="ace__segment_1_1DigitDriver_coll__map">
-<area shape="rect" id="node2" href="classace__segment_1_1Driver.html" title="Base class of drivers which knows how to transfer the bit patterns stored in the array of DimmingDigi..." alt="" coords="110,184,253,211"/>
-<area shape="rect" id="node3" href="classace__segment_1_1DimmingDigit.html" title="ace_segment::DimmingDigit" alt="" coords="5,95,192,121"/>
-<area shape="rect" id="node4" href="classace__segment_1_1LedMatrix.html" title="ace_segment::LedMatrix" alt="" coords="216,95,381,121"/>
-<area shape="rect" id="node5" href="classace__segment_1_1Hardware.html" title="ace_segment::Hardware" alt="" coords="217,5,381,32"/>
+<area shape="rect" id="node2" href="classace__segment_1_1Driver.html" title="Base class of drivers which knows how to transfer the bit patterns stored in the array of DimmablePat..." alt="" coords="129,184,272,211"/>
+<area shape="rect" id="node3" href="classace__segment_1_1DimmablePattern.html" title="ace_segment::DimmablePattern" alt="" coords="5,95,215,121"/>
+<area shape="rect" id="node4" href="classace__segment_1_1LedMatrix.html" title="Class that represents the abstraction of a particular LED display wiring. " alt="" coords="239,95,405,121"/>
+<area shape="rect" id="node5" href="classace__segment_1_1Hardware.html" title="ace_segment::Hardware" alt="" coords="240,5,404,32"/>
 </map>
 <center><span class="legend">[<a href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ab69a30528c066738598f4c8bd7fe1c70"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1DigitDriver.html#ab69a30528c066738598f4c8bd7fe1c70">DigitDriver</a> (<a class="el" href="classace__segment_1_1LedMatrix.html">LedMatrix</a> *ledMatrix, <a class="el" href="classace__segment_1_1DimmingDigit.html">DimmingDigit</a> *dimmingDigits, uint8_t numDigits, bool ownsLedMatrix=false)</td></tr>
-<tr class="memdesc:ab69a30528c066738598f4c8bd7fe1c70"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#ab69a30528c066738598f4c8bd7fe1c70">More...</a><br /></td></tr>
-<tr class="separator:ab69a30528c066738598f4c8bd7fe1c70"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac3f74001c83eda2f4a88794b4b1a2a97"><td class="memItemLeft" align="right" valign="top"><a id="ac3f74001c83eda2f4a88794b4b1a2a97"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>configure</b> () override</td></tr>
+<tr class="memitem:afec2d0670889cc44b3d9eeb9e583dbad"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1DigitDriver.html#afec2d0670889cc44b3d9eeb9e583dbad">DigitDriver</a> (<a class="el" href="classace__segment_1_1LedMatrix.html">LedMatrix</a> *ledMatrix, <a class="el" href="classace__segment_1_1DimmablePattern.html">DimmablePattern</a> *dimmablePatterns, uint8_t numDigits, bool ownsLedMatrix=false)</td></tr>
+<tr class="memdesc:afec2d0670889cc44b3d9eeb9e583dbad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="#afec2d0670889cc44b3d9eeb9e583dbad">More...</a><br /></td></tr>
+<tr class="separator:afec2d0670889cc44b3d9eeb9e583dbad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac3f74001c83eda2f4a88794b4b1a2a97"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1DigitDriver.html#ac3f74001c83eda2f4a88794b4b1a2a97">configure</a> () override</td></tr>
+<tr class="memdesc:ac3f74001c83eda2f4a88794b4b1a2a97"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configure the driver.  <a href="#ac3f74001c83eda2f4a88794b4b1a2a97">More...</a><br /></td></tr>
 <tr class="separator:ac3f74001c83eda2f4a88794b4b1a2a97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a475d2b9adfbd9a4f1ff462aaf948945f"><td class="memItemLeft" align="right" valign="top">virtual uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1DigitDriver.html#a475d2b9adfbd9a4f1ff462aaf948945f">getFieldsPerFrame</a> () override</td></tr>
 <tr class="memdesc:a475d2b9adfbd9a4f1ff462aaf948945f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return number of fields per frame.  <a href="#a475d2b9adfbd9a4f1ff462aaf948945f">More...</a><br /></td></tr>
@@ -111,47 +115,35 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>configure</b>
 <tr class="memitem:a6afa0a1a4f60cbe770d80e89bb80718e"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1DigitDriver.html#a6afa0a1a4f60cbe770d80e89bb80718e">displayCurrentField</a> () override</td></tr>
 <tr class="memdesc:a6afa0a1a4f60cbe770d80e89bb80718e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Display the current field of the frame.  <a href="#a6afa0a1a4f60cbe770d80e89bb80718e">More...</a><br /></td></tr>
 <tr class="separator:a6afa0a1a4f60cbe770d80e89bb80718e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d307e52427ca56995a033549e0457d4"><td class="memItemLeft" align="right" valign="top"><a id="a9d307e52427ca56995a033549e0457d4"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1DigitDriver.html#a9d307e52427ca56995a033549e0457d4">prepareToSleep</a> () override</td></tr>
+<tr class="memdesc:a9d307e52427ca56995a033549e0457d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prepare to go to sleep by clearing the frame, and setting a flag so that it doesn't turn itself back on through an interrupt. <br /></td></tr>
+<tr class="separator:a9d307e52427ca56995a033549e0457d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classace__segment_1_1Driver"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classace__segment_1_1Driver')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classace__segment_1_1Driver.html">ace_segment::Driver</a></td></tr>
 <tr class="memitem:a58962e8c09943bc7d5486bea97c5667d inherit pub_methods_classace__segment_1_1Driver"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1Driver.html#a58962e8c09943bc7d5486bea97c5667d">~Driver</a> ()</td></tr>
-<tr class="memdesc:a58962e8c09943bc7d5486bea97c5667d inherit pub_methods_classace__segment_1_1Driver"><td class="mdescLeft">&#160;</td><td class="mdescRight">Virtual destructor needed to clean up <a class="el" href="classace__segment_1_1LedMatrix.html">LedMatrix</a> that was created on the heap by <a class="el" href="classace__segment_1_1DriverBuilder.html">DriverBuilder</a>.  <a href="classace__segment_1_1Driver.html#a58962e8c09943bc7d5486bea97c5667d">More...</a><br /></td></tr>
+<tr class="memdesc:a58962e8c09943bc7d5486bea97c5667d inherit pub_methods_classace__segment_1_1Driver"><td class="mdescLeft">&#160;</td><td class="mdescRight">Virtual destructor needed to clean up <a class="el" href="classace__segment_1_1LedMatrix.html" title="Class that represents the abstraction of a particular LED display wiring. ">LedMatrix</a> that was created on the heap by <a class="el" href="classace__segment_1_1DriverBuilder.html">DriverBuilder</a>.  <a href="classace__segment_1_1Driver.html#a58962e8c09943bc7d5486bea97c5667d">More...</a><br /></td></tr>
 <tr class="separator:a58962e8c09943bc7d5486bea97c5667d inherit pub_methods_classace__segment_1_1Driver"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a84f21c38b72a4c576a44e2d370356520 inherit pub_methods_classace__segment_1_1Driver"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1Driver.html#a84f21c38b72a4c576a44e2d370356520">setPattern</a> (uint8_t digit, <a class="el" href="classace__segment_1_1Driver.html#a851393f9d1f557871e259b295e733920">SegmentPatternType</a> pattern, uint8_t brightness=DimmingDigit::kOn)</td></tr>
-<tr class="memdesc:a84f21c38b72a4c576a44e2d370356520 inherit pub_methods_classace__segment_1_1Driver"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the pattern for a given digit.  <a href="classace__segment_1_1Driver.html#a84f21c38b72a4c576a44e2d370356520">More...</a><br /></td></tr>
-<tr class="separator:a84f21c38b72a4c576a44e2d370356520 inherit pub_methods_classace__segment_1_1Driver"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae690798a1ee25ad0a50e5d1285e48813 inherit pub_methods_classace__segment_1_1Driver"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1Driver.html#ae690798a1ee25ad0a50e5d1285e48813">finish</a> ()</td></tr>
+<tr class="memdesc:ae690798a1ee25ad0a50e5d1285e48813 inherit pub_methods_classace__segment_1_1Driver"><td class="mdescLeft">&#160;</td><td class="mdescRight">Turn off the LEDs by doing the opposite of <a class="el" href="classace__segment_1_1Driver.html#a25f0afecc44250637ade35629636d59a" title="Configure the driver. ">configure()</a>.  <a href="classace__segment_1_1Driver.html#ae690798a1ee25ad0a50e5d1285e48813">More...</a><br /></td></tr>
+<tr class="separator:ae690798a1ee25ad0a50e5d1285e48813 inherit pub_methods_classace__segment_1_1Driver"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c505dd2a3617d3dc15085c2a7b0825d inherit pub_methods_classace__segment_1_1Driver"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1Driver.html#a8c505dd2a3617d3dc15085c2a7b0825d">wakeFromSleep</a> ()</td></tr>
+<tr class="memdesc:a8c505dd2a3617d3dc15085c2a7b0825d inherit pub_methods_classace__segment_1_1Driver"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wake up from sleep.  <a href="classace__segment_1_1Driver.html#a8c505dd2a3617d3dc15085c2a7b0825d">More...</a><br /></td></tr>
+<tr class="separator:a8c505dd2a3617d3dc15085c2a7b0825d inherit pub_methods_classace__segment_1_1Driver"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a41265e34f99889668d8804cf290f5634 inherit pub_methods_classace__segment_1_1Driver"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1Driver.html#a41265e34f99889668d8804cf290f5634">setPattern</a> (uint8_t digit, <a class="el" href="classace__segment_1_1Driver.html#a851393f9d1f557871e259b295e733920">SegmentPatternType</a> pattern, uint8_t brightness=DimmablePattern::kOn)</td></tr>
+<tr class="memdesc:a41265e34f99889668d8804cf290f5634 inherit pub_methods_classace__segment_1_1Driver"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the pattern for a given digit.  <a href="classace__segment_1_1Driver.html#a41265e34f99889668d8804cf290f5634">More...</a><br /></td></tr>
+<tr class="separator:a41265e34f99889668d8804cf290f5634 inherit pub_methods_classace__segment_1_1Driver"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aba1b47db2304b6244f4759a959125a9f inherit pub_methods_classace__segment_1_1Driver"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1Driver.html#aba1b47db2304b6244f4759a959125a9f">setBrightness</a> (uint8_t digit, uint8_t brightness)</td></tr>
 <tr class="memdesc:aba1b47db2304b6244f4759a959125a9f inherit pub_methods_classace__segment_1_1Driver"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the brightness of the given digit.  <a href="classace__segment_1_1Driver.html#aba1b47db2304b6244f4759a959125a9f">More...</a><br /></td></tr>
 <tr class="separator:aba1b47db2304b6244f4759a959125a9f inherit pub_methods_classace__segment_1_1Driver"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
-Protected Member Functions</h2></td></tr>
-<tr class="memitem:a5dbd3efacc4065aef9833077d9e32a0b"><td class="memItemLeft" align="right" valign="top"><a id="a5dbd3efacc4065aef9833077d9e32a0b"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>DigitDriver</b> (const <a class="el" href="classace__segment_1_1DigitDriver.html">DigitDriver</a> &amp;)=delete</td></tr>
-<tr class="separator:a5dbd3efacc4065aef9833077d9e32a0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a10b88611b554569c9e10f9415a0b4ed2"><td class="memItemLeft" align="right" valign="top"><a id="a10b88611b554569c9e10f9415a0b4ed2"></a>
-<a class="el" href="classace__segment_1_1DigitDriver.html">DigitDriver</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="classace__segment_1_1DigitDriver.html">DigitDriver</a> &amp;)=delete</td></tr>
-<tr class="separator:a10b88611b554569c9e10f9415a0b4ed2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="inherit_header pro_methods_classace__segment_1_1Driver"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classace__segment_1_1Driver')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classace__segment_1_1Driver.html">ace_segment::Driver</a></td></tr>
-<tr class="memitem:ac90ad7f3c9cd0e572afba003eaaa30d0 inherit pro_methods_classace__segment_1_1Driver"><td class="memItemLeft" align="right" valign="top"><a id="ac90ad7f3c9cd0e572afba003eaaa30d0"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>Driver</b> (const <a class="el" href="classace__segment_1_1Driver.html">Driver</a> &amp;)=delete</td></tr>
-<tr class="separator:ac90ad7f3c9cd0e572afba003eaaa30d0 inherit pro_methods_classace__segment_1_1Driver"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a43636cdee825f13660f1fd7ad2cc3c48 inherit pro_methods_classace__segment_1_1Driver"><td class="memItemLeft" align="right" valign="top"><a id="a43636cdee825f13660f1fd7ad2cc3c48"></a>
-<a class="el" href="classace__segment_1_1Driver.html">Driver</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="classace__segment_1_1Driver.html">Driver</a> &amp;)=delete</td></tr>
-<tr class="separator:a43636cdee825f13660f1fd7ad2cc3c48 inherit pro_methods_classace__segment_1_1Driver"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a253f84d975df329275a4d591e1eb6de8 inherit pro_methods_classace__segment_1_1Driver"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1Driver.html#a253f84d975df329275a4d591e1eb6de8">Driver</a> (<a class="el" href="classace__segment_1_1LedMatrix.html">LedMatrix</a> *ledMatrix, <a class="el" href="classace__segment_1_1DimmingDigit.html">DimmingDigit</a> *dimmingDigits, uint8_t numDigits, bool ownsLedMatrix=false)</td></tr>
-<tr class="memdesc:a253f84d975df329275a4d591e1eb6de8 inherit pro_methods_classace__segment_1_1Driver"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="classace__segment_1_1Driver.html#a253f84d975df329275a4d591e1eb6de8">More...</a><br /></td></tr>
-<tr class="separator:a253f84d975df329275a4d591e1eb6de8 inherit pro_methods_classace__segment_1_1Driver"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr class="memitem:a5324dd041c4fe5f9eade0712659e4617"><td class="memItemLeft" align="right" valign="top"><a id="a5324dd041c4fe5f9eade0712659e4617"></a>
-uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>mCurrentDigit</b></td></tr>
+<tr class="memitem:a5324dd041c4fe5f9eade0712659e4617"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1DigitDriver.html#a5324dd041c4fe5f9eade0712659e4617">mCurrentDigit</a></td></tr>
+<tr class="memdesc:a5324dd041c4fe5f9eade0712659e4617"><td class="mdescLeft">&#160;</td><td class="mdescRight">Within the <a class="el" href="classace__segment_1_1DigitDriver.html#a6afa0a1a4f60cbe770d80e89bb80718e" title="Display the current field of the frame. ">displayCurrentField()</a> method, mCurrentDigit is the current digit that is being drawn.  <a href="#a5324dd041c4fe5f9eade0712659e4617">More...</a><br /></td></tr>
 <tr class="separator:a5324dd041c4fe5f9eade0712659e4617"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1b1842acdaf81293c8b84d53d5bd91a3"><td class="memItemLeft" align="right" valign="top"><a id="a1b1842acdaf81293c8b84d53d5bd91a3"></a>
-uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>mPrevDigit</b></td></tr>
+<tr class="memitem:a1b1842acdaf81293c8b84d53d5bd91a3"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1DigitDriver.html#a1b1842acdaf81293c8b84d53d5bd91a3">mPrevDigit</a></td></tr>
+<tr class="memdesc:a1b1842acdaf81293c8b84d53d5bd91a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Within the <a class="el" href="classace__segment_1_1DigitDriver.html#a6afa0a1a4f60cbe770d80e89bb80718e" title="Display the current field of the frame. ">displayCurrentField()</a> method, the mPrevDigit is the digit that was displayed on the previous call to <a class="el" href="classace__segment_1_1DigitDriver.html#a6afa0a1a4f60cbe770d80e89bb80718e" title="Display the current field of the frame. ">displayCurrentField()</a>.  <a href="#a1b1842acdaf81293c8b84d53d5bd91a3">More...</a><br /></td></tr>
 <tr class="separator:a1b1842acdaf81293c8b84d53d5bd91a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afa1a3cb57acf35565e8457680124e215"><td class="memItemLeft" align="right" valign="top"><a id="afa1a3cb57acf35565e8457680124e215"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>mIsCurrentDigitOn</b></td></tr>
-<tr class="separator:afa1a3cb57acf35565e8457680124e215"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6a7f72fa39595c250af6dfa9f9e9da01"><td class="memItemLeft" align="right" valign="top"><a id="a6a7f72fa39595c250af6dfa9f9e9da01"></a>
 <a class="el" href="classace__segment_1_1Driver.html#a851393f9d1f557871e259b295e733920">SegmentPatternType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>mSegmentPattern</b></td></tr>
 <tr class="separator:a6a7f72fa39595c250af6dfa9f9e9da01"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -159,15 +151,18 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>mIsCurrentDigitOn</b>
 <tr class="memitem:a83726b5353b607e219ed2a8b0721b0d4 inherit pro_attribs_classace__segment_1_1Driver"><td class="memItemLeft" align="right" valign="top"><a id="a83726b5353b607e219ed2a8b0721b0d4"></a>
 <a class="el" href="classace__segment_1_1LedMatrix.html">LedMatrix</a> *const&#160;</td><td class="memItemRight" valign="bottom"><b>mLedMatrix</b></td></tr>
 <tr class="separator:a83726b5353b607e219ed2a8b0721b0d4 inherit pro_attribs_classace__segment_1_1Driver"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a78f8153d53887f456126c53bcaa9cb73 inherit pro_attribs_classace__segment_1_1Driver"><td class="memItemLeft" align="right" valign="top"><a id="a78f8153d53887f456126c53bcaa9cb73"></a>
-<a class="el" href="classace__segment_1_1DimmingDigit.html">DimmingDigit</a> *const&#160;</td><td class="memItemRight" valign="bottom"><b>mDimmingDigits</b></td></tr>
-<tr class="separator:a78f8153d53887f456126c53bcaa9cb73 inherit pro_attribs_classace__segment_1_1Driver"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a027ff43f4b6f8af3062b1c0008f52ee0 inherit pro_attribs_classace__segment_1_1Driver"><td class="memItemLeft" align="right" valign="top"><a id="a027ff43f4b6f8af3062b1c0008f52ee0"></a>
+<a class="el" href="classace__segment_1_1DimmablePattern.html">DimmablePattern</a> *const&#160;</td><td class="memItemRight" valign="bottom"><b>mDimmablePatterns</b></td></tr>
+<tr class="separator:a027ff43f4b6f8af3062b1c0008f52ee0 inherit pro_attribs_classace__segment_1_1Driver"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a11ce2ce3405d65736fbc13dd9aae878a inherit pro_attribs_classace__segment_1_1Driver"><td class="memItemLeft" align="right" valign="top"><a id="a11ce2ce3405d65736fbc13dd9aae878a"></a>
 const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>mNumDigits</b></td></tr>
 <tr class="separator:a11ce2ce3405d65736fbc13dd9aae878a inherit pro_attribs_classace__segment_1_1Driver"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a67b1c4978e97f002ea467c5ab2b76809 inherit pro_attribs_classace__segment_1_1Driver"><td class="memItemLeft" align="right" valign="top"><a id="a67b1c4978e97f002ea467c5ab2b76809"></a>
 const bool&#160;</td><td class="memItemRight" valign="bottom"><b>mOwnsLedMatrix</b></td></tr>
 <tr class="separator:a67b1c4978e97f002ea467c5ab2b76809 inherit pro_attribs_classace__segment_1_1Driver"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1147b4783f3614b42fdcafdbd5f9aa2e inherit pro_attribs_classace__segment_1_1Driver"><td class="memItemLeft" align="right" valign="top"><a id="a1147b4783f3614b42fdcafdbd5f9aa2e"></a>
+volatile bool&#160;</td><td class="memItemRight" valign="bottom"><b>mPreparedToSleep</b></td></tr>
+<tr class="separator:a1147b4783f3614b42fdcafdbd5f9aa2e inherit pro_attribs_classace__segment_1_1Driver"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
@@ -178,17 +173,28 @@ Additional Inherited Members</h2></td></tr>
 <tr class="memitem:a116d1569c86b24020e1ed5462d270eef inherit pub_types_classace__segment_1_1Driver"><td class="memItemLeft" align="right" valign="top">typedef uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1Driver.html#a116d1569c86b24020e1ed5462d270eef">DigitPatternType</a></td></tr>
 <tr class="memdesc:a116d1569c86b24020e1ed5462d270eef inherit pub_types_classace__segment_1_1Driver"><td class="mdescLeft">&#160;</td><td class="mdescRight">Integer type used to store the digit bit patterns of a single segment.  <a href="classace__segment_1_1Driver.html#a116d1569c86b24020e1ed5462d270eef">More...</a><br /></td></tr>
 <tr class="separator:a116d1569c86b24020e1ed5462d270eef inherit pub_types_classace__segment_1_1Driver"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_methods_classace__segment_1_1Driver"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classace__segment_1_1Driver')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classace__segment_1_1Driver.html">ace_segment::Driver</a></td></tr>
+<tr class="memitem:ac90ad7f3c9cd0e572afba003eaaa30d0 inherit pro_methods_classace__segment_1_1Driver"><td class="memItemLeft" align="right" valign="top"><a id="ac90ad7f3c9cd0e572afba003eaaa30d0"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Driver</b> (const <a class="el" href="classace__segment_1_1Driver.html">Driver</a> &amp;)=delete</td></tr>
+<tr class="separator:ac90ad7f3c9cd0e572afba003eaaa30d0 inherit pro_methods_classace__segment_1_1Driver"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a43636cdee825f13660f1fd7ad2cc3c48 inherit pro_methods_classace__segment_1_1Driver"><td class="memItemLeft" align="right" valign="top"><a id="a43636cdee825f13660f1fd7ad2cc3c48"></a>
+<a class="el" href="classace__segment_1_1Driver.html">Driver</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="classace__segment_1_1Driver.html">Driver</a> &amp;)=delete</td></tr>
+<tr class="separator:a43636cdee825f13660f1fd7ad2cc3c48 inherit pro_methods_classace__segment_1_1Driver"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a74ef7c76a7cf7476dd549c911161dbff inherit pro_methods_classace__segment_1_1Driver"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1Driver.html#a74ef7c76a7cf7476dd549c911161dbff">Driver</a> (<a class="el" href="classace__segment_1_1LedMatrix.html">LedMatrix</a> *ledMatrix, <a class="el" href="classace__segment_1_1DimmablePattern.html">DimmablePattern</a> *dimmablePatterns, uint8_t numDigits, bool ownsLedMatrix=false)</td></tr>
+<tr class="memdesc:a74ef7c76a7cf7476dd549c911161dbff inherit pro_methods_classace__segment_1_1Driver"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="classace__segment_1_1Driver.html#a74ef7c76a7cf7476dd549c911161dbff">More...</a><br /></td></tr>
+<tr class="separator:a74ef7c76a7cf7476dd549c911161dbff inherit pro_methods_classace__segment_1_1Driver"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_static_attribs_classace__segment_1_1Driver"><td colspan="2" onclick="javascript:toggleInherit('pro_static_attribs_classace__segment_1_1Driver')"><img src="closed.png" alt="-"/>&#160;Static Protected Attributes inherited from <a class="el" href="classace__segment_1_1Driver.html">ace_segment::Driver</a></td></tr>
 <tr class="memitem:a0e1728dfa38f3e32d9e0fa1e716c66d4 inherit pro_static_attribs_classace__segment_1_1Driver"><td class="memItemLeft" align="right" valign="top">static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1Driver.html#a0e1728dfa38f3e32d9e0fa1e716c66d4">kNumSegments</a> = 8</td></tr>
 <tr class="memdesc:a0e1728dfa38f3e32d9e0fa1e716c66d4 inherit pro_static_attribs_classace__segment_1_1Driver"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of segments on a single digit.  <a href="classace__segment_1_1Driver.html#a0e1728dfa38f3e32d9e0fa1e716c66d4">More...</a><br /></td></tr>
 <tr class="separator:a0e1728dfa38f3e32d9e0fa1e716c66d4 inherit pro_static_attribs_classace__segment_1_1Driver"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock">
-<p class="definition">Definition at line <a class="el" href="DigitDriver_8h_source.html#l00035">35</a> of file <a class="el" href="DigitDriver_8h_source.html">DigitDriver.h</a>.</p>
+<div class="textblock"><p>A <a class="el" href="classace__segment_1_1Driver.html" title="Base class of drivers which knows how to transfer the bit patterns stored in the array of DimmablePat...">Driver</a> that assumes that the resistors are on the segments so the multiplexing occurs by scanning through the digits. </p>
+
+<p class="definition">Definition at line <a class="el" href="DigitDriver_8h_source.html#l00039">39</a> of file <a class="el" href="DigitDriver_8h_source.html">DigitDriver.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="ab69a30528c066738598f4c8bd7fe1c70"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab69a30528c066738598f4c8bd7fe1c70">&#9670;&nbsp;</a></span>DigitDriver()</h2>
+<a id="afec2d0670889cc44b3d9eeb9e583dbad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afec2d0670889cc44b3d9eeb9e583dbad">&#9670;&nbsp;</a></span>DigitDriver()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -205,8 +211,8 @@ Additional Inherited Members</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="classace__segment_1_1DimmingDigit.html">DimmingDigit</a> *&#160;</td>
-          <td class="paramname"><em>dimmingDigits</em>, </td>
+          <td class="paramtype"><a class="el" href="classace__segment_1_1DimmablePattern.html">DimmablePattern</a> *&#160;</td>
+          <td class="paramname"><em>dimmablePatterns</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -235,11 +241,45 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Constructor. </p>
 
-<p class="definition">Definition at line <a class="el" href="DigitDriver_8h_source.html#l00038">38</a> of file <a class="el" href="DigitDriver_8h_source.html">DigitDriver.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="DigitDriver_8h_source.html#l00042">42</a> of file <a class="el" href="DigitDriver_8h_source.html">DigitDriver.h</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="ac3f74001c83eda2f4a88794b4b1a2a97"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac3f74001c83eda2f4a88794b4b1a2a97">&#9670;&nbsp;</a></span>configure()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void ace_segment::DigitDriver::configure </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Configure the driver. </p>
+<p>Usually called only once in a program. Sometimes unit tests may call it twice. </p>
+
+<p>Reimplemented from <a class="el" href="classace__segment_1_1Driver.html#a25f0afecc44250637ade35629636d59a">ace_segment::Driver</a>.</p>
+
+<p>Reimplemented in <a class="el" href="classace__segment_1_1ModulatingDigitDriver.html#a577c2c5227980a3a79ada6e182bdab32">ace_segment::ModulatingDigitDriver</a>.</p>
+
+<p class="definition">Definition at line <a class="el" href="DigitDriver_8h_source.html#l00048">48</a> of file <a class="el" href="DigitDriver_8h_source.html">DigitDriver.h</a>.</p>
+
+</div>
+</div>
 <a id="a6afa0a1a4f60cbe770d80e89bb80718e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6afa0a1a4f60cbe770d80e89bb80718e">&#9670;&nbsp;</a></span>displayCurrentField()</h2>
 
@@ -303,7 +343,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classace__segment_1_1ModulatingDigitDriver.html#a0c0c750944b251a16ac73ee431889ded">ace_segment::ModulatingDigitDriver</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="DigitDriver_8h_source.html#l00050">50</a> of file <a class="el" href="DigitDriver_8h_source.html">DigitDriver.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="DigitDriver_8h_source.html#l00055">55</a> of file <a class="el" href="DigitDriver_8h_source.html">DigitDriver.h</a>.</p>
 
 </div>
 </div>
@@ -337,7 +377,62 @@ Additional Inherited Members</h2></td></tr>
 
 <p>Reimplemented in <a class="el" href="classace__segment_1_1ModulatingDigitDriver.html#a73f4300dc87e7cb4c808e6fddc5e7df4">ace_segment::ModulatingDigitDriver</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="DigitDriver_8h_source.html#l00052">52</a> of file <a class="el" href="DigitDriver_8h_source.html">DigitDriver.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="DigitDriver_8h_source.html#l00057">57</a> of file <a class="el" href="DigitDriver_8h_source.html">DigitDriver.h</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="a5324dd041c4fe5f9eade0712659e4617"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5324dd041c4fe5f9eade0712659e4617">&#9670;&nbsp;</a></span>mCurrentDigit</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t ace_segment::DigitDriver::mCurrentDigit</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Within the <a class="el" href="classace__segment_1_1DigitDriver.html#a6afa0a1a4f60cbe770d80e89bb80718e" title="Display the current field of the frame. ">displayCurrentField()</a> method, mCurrentDigit is the current digit that is being drawn. </p>
+<p>It is incremented to the next digit just before returning from that method. </p>
+
+<p class="definition">Definition at line <a class="el" href="DigitDriver_8h_source.html#l00069">69</a> of file <a class="el" href="DigitDriver_8h_source.html">DigitDriver.h</a>.</p>
+
+</div>
+</div>
+<a id="a1b1842acdaf81293c8b84d53d5bd91a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1b1842acdaf81293c8b84d53d5bd91a3">&#9670;&nbsp;</a></span>mPrevDigit</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t ace_segment::DigitDriver::mPrevDigit</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Within the <a class="el" href="classace__segment_1_1DigitDriver.html#a6afa0a1a4f60cbe770d80e89bb80718e" title="Display the current field of the frame. ">displayCurrentField()</a> method, the mPrevDigit is the digit that was displayed on the previous call to <a class="el" href="classace__segment_1_1DigitDriver.html#a6afa0a1a4f60cbe770d80e89bb80718e" title="Display the current field of the frame. ">displayCurrentField()</a>. </p>
+<p>It is set to the digit that was just displayed before returning. </p>
+
+<p class="definition">Definition at line <a class="el" href="DigitDriver_8h_source.html#l00076">76</a> of file <a class="el" href="DigitDriver_8h_source.html">DigitDriver.h</a>.</p>
 
 </div>
 </div>

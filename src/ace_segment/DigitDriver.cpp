@@ -30,31 +30,34 @@ SOFTWARE.
 namespace ace_segment {
 
 void DigitDriver::displayCurrentField() {
+  if (mPreparedToSleep) return;
+
   if (mCurrentDigit != mPrevDigit) {
+    // NOTE: If we kept a flag (e.g. mIsPrevDigitOn) that preserved whether the
+    // previous iteration turned this digit on or off, we could bypass this
+    // disableGroup(). But the CPU savings doesn't seem worth it.
     mLedMatrix->disableGroup(mPrevDigit);
-    mIsCurrentDigitOn = false;
   }
 
-  DimmingDigit& dimmingDigit = mDimmingDigits[mCurrentDigit];
-  if (dimmingDigit.brightness == 0) {
-    if (mIsCurrentDigitOn) {
-      mLedMatrix->disableGroup(mCurrentDigit);
-      mIsCurrentDigitOn = false;
-    }
+  DimmablePattern& dimmablePattern = mDimmablePatterns[mCurrentDigit];
+  if (dimmablePattern.brightness == 0) {
+    mLedMatrix->disableGroup(mCurrentDigit);
   } else {
-    if (!mIsCurrentDigitOn) {
-      SegmentPatternType segmentPattern = dimmingDigit.pattern;
-      if (segmentPattern != mSegmentPattern) {
-        mLedMatrix->drawElements(segmentPattern);
-        mSegmentPattern = segmentPattern;
-      }
-      mLedMatrix->enableGroup(mCurrentDigit);
-      mIsCurrentDigitOn = true;
+    SegmentPatternType segmentPattern = dimmablePattern.pattern;
+    if (segmentPattern != mSegmentPattern) {
+      mLedMatrix->drawElements(segmentPattern);
+      mSegmentPattern = segmentPattern;
     }
+    mLedMatrix->enableGroup(mCurrentDigit);
   }
 
   mPrevDigit = mCurrentDigit;
   Util::incrementMod(mCurrentDigit, mNumDigits);
+}
+
+void DigitDriver::prepareToSleep() {
+  Driver::prepareToSleep();
+  mLedMatrix->disableGroup(mPrevDigit);
 }
 
 }

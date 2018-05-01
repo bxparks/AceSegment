@@ -3,6 +3,8 @@
 //
 // DO NOT EDIT
 
+#ifdef __AVR__
+
 #include <stdint.h>
 #include <digitalWriteFast.h>
 #include <ace_segment/ModulatingDigitDriver.h>
@@ -14,10 +16,10 @@
 class FastDirectDriver: public ace_segment::ModulatingDigitDriver {
   public:
     // Constructor
-    FastDirectDriver(ace_segment::DimmingDigit* dimmingDigits,
+    FastDirectDriver(ace_segment::DimmablePattern* dimmablePatterns,
             uint8_t numDigits, uint8_t numSubFields):
         ace_segment::ModulatingDigitDriver(
-            nullptr /* ledMatrix */, dimmingDigits, numDigits, numSubFields)
+            nullptr /* ledMatrix */, dimmablePatterns, numDigits, numSubFields)
     {}
 
     // Destructor
@@ -25,6 +27,7 @@ class FastDirectDriver: public ace_segment::ModulatingDigitDriver {
 
     virtual void configure() override;
     virtual void displayCurrentField() override;
+    virtual void prepareToSleep() override;
 
   private:
     typedef void (*DigitalWriter)(void);
@@ -60,14 +63,7 @@ class FastDirectDriver: public ace_segment::ModulatingDigitDriver {
       writer();
     }
 
-    static void drawSegments(uint8_t pattern) {
-      uint8_t elementMask = 0x1;
-      for (uint8_t segment = 0; segment < kNumSegments; segment++) {
-        uint8_t output = (pattern & elementMask) ? kSegmentOn : kSegmentOff;
-        writeSegment(segment, output);
-        elementMask <<= 1;
-      }
-    }
+    static void drawSegments(uint8_t pattern);
 
     // DigitalWriter functions for writing segment pins.
     static void digitalWriteFastSegment00Low() { digitalWriteFast(4, LOW); }
@@ -97,5 +93,7 @@ class FastDirectDriver: public ace_segment::ModulatingDigitDriver {
     static void digitalWriteFastDigit03Low() { digitalWriteFast(16, LOW); }
     static void digitalWriteFastDigit03High() { digitalWriteFast(16, HIGH); }
 };
+
+#endif
 
 #endif

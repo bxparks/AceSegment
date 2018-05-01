@@ -3,6 +3,8 @@
 //
 // DO NOT EDIT
 
+#ifdef __AVR__
+
 #include <stdint.h>
 #include <Arduino.h>
 #include <SPI.h>
@@ -16,10 +18,10 @@
 class FastSpiDriver: public ace_segment::ModulatingDigitDriver {
   public:
     // Constructor
-    FastSpiDriver(ace_segment::DimmingDigit* dimmingDigits,
+    FastSpiDriver(ace_segment::DimmablePattern* dimmablePatterns,
             uint8_t numDigits, uint8_t numSubFields):
         ace_segment::ModulatingDigitDriver(
-            nullptr /* ledMatrix */, dimmingDigits, numDigits, numSubFields)
+            nullptr /* ledMatrix */, dimmablePatterns, numDigits, numSubFields)
     {}
 
     // Destructor
@@ -27,6 +29,7 @@ class FastSpiDriver: public ace_segment::ModulatingDigitDriver {
 
     virtual void configure() override;
     virtual void displayCurrentField() override;
+    virtual void prepareToSleep() override;
 
   private:
     typedef void (*DigitalWriter)(void);
@@ -56,14 +59,7 @@ class FastSpiDriver: public ace_segment::ModulatingDigitDriver {
       writer();
     }
 
-    static void drawSegments(uint8_t pattern) {
-      digitalWriteFast(kLatchPin, LOW);
-      uint8_t actualPattern = (kSegmentOn == HIGH) ? pattern : ~pattern;
-      SPI.beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
-      SPI.transfer(actualPattern);
-      SPI.endTransaction();
-      digitalWriteFast(kLatchPin, HIGH);
-    }
+    static void drawSegments(uint8_t pattern);
 
     // DigitalWriter functions for writing digit pins.
     static void digitalWriteFastDigit00Low() { digitalWriteFast(4, LOW); }
@@ -75,5 +71,7 @@ class FastSpiDriver: public ace_segment::ModulatingDigitDriver {
     static void digitalWriteFastDigit03Low() { digitalWriteFast(7, LOW); }
     static void digitalWriteFastDigit03High() { digitalWriteFast(7, HIGH); }
 };
+
+#endif
 
 #endif

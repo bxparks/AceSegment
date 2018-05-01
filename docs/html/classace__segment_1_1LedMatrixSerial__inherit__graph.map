@@ -1,4 +1,4 @@
 <map id="ace_segment::LedMatrixSerial" name="ace_segment::LedMatrixSerial">
-<area shape="rect" id="node3" href="$classace__segment_1_1LedMatrixSpi.html" title="Similar to LedMatrixSerial accept that it uses SPI to talk to the 74HC595 chip instead of the shiftOu..." alt="" coords="13,155,197,181"/>
-<area shape="rect" id="node2" href="$classace__segment_1_1LedMatrix.html" title="ace_segment::LedMatrix" alt="" coords="22,5,187,32"/>
+<area shape="rect" id="node3" href="$classace__segment_1_1LedMatrixSpi.html" title="Similar to LedMatrixSerial but uses SPI to talk to the 74HC595 chip instead of the shiftOut() method..." alt="" coords="13,155,197,181"/>
+<area shape="rect" id="node2" href="$classace__segment_1_1LedMatrix.html" title="Class that represents the abstraction of a particular LED display wiring. " alt="" coords="22,5,187,32"/>
 </map>

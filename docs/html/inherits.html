@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.2.0</span>
+   &#160;<span id="projectnumber">0.3.0</span>
    </div>
    <div id="projectbrief">An adjustable, configurable, and extensible framework for rendering seven segment LED displays.</div>
   </td>
@@ -72,16 +72,16 @@ $(function() {
 <area shape="rect" id="node1" href="classace__segment_1_1CharWriter.html" title="The CharWriter supports mapping of ASCII (0 &#45; 127) characters to segment patterns supported by Render..." alt="" coords="5,5,176,32"/>
 </map>
 </td></tr>
-<tr><td><img src="inherit_graph_1.png" border="0" alt="" usemap="#ace__segment_1_1DimmingDigit"/>
-<map name="ace__segment_1_1DimmingDigit" id="ace__segment_1_1DimmingDigit">
-<area shape="rect" id="node1" href="classace__segment_1_1DimmingDigit.html" title="ace_segment::DimmingDigit" alt="" coords="5,5,192,32"/>
+<tr><td><img src="inherit_graph_1.png" border="0" alt="" usemap="#ace__segment_1_1DimmablePattern"/>
+<map name="ace__segment_1_1DimmablePattern" id="ace__segment_1_1DimmablePattern">
+<area shape="rect" id="node1" href="classace__segment_1_1DimmablePattern.html" title="ace_segment::DimmablePattern" alt="" coords="5,5,215,32"/>
 </map>
 </td></tr>
 <tr><td><img src="inherit_graph_2.png" border="0" alt="" usemap="#ace__segment_1_1Driver"/>
 <map name="ace__segment_1_1Driver" id="ace__segment_1_1Driver">
-<area shape="rect" id="node1" href="classace__segment_1_1Driver.html" title="Base class of drivers which knows how to transfer the bit patterns stored in the array of DimmingDigi..." alt="" coords="5,38,148,65"/>
-<area shape="rect" id="node2" href="classace__segment_1_1DigitDriver.html" title="ace_segment::DigitDriver" alt="" coords="208,13,379,39"/>
-<area shape="rect" id="node4" href="classace__segment_1_1SegmentDriver.html" title="ace_segment::SegmentDriver" alt="" coords="196,63,391,90"/>
+<area shape="rect" id="node1" href="classace__segment_1_1Driver.html" title="Base class of drivers which knows how to transfer the bit patterns stored in the array of DimmablePat..." alt="" coords="5,38,148,65"/>
+<area shape="rect" id="node2" href="classace__segment_1_1DigitDriver.html" title="A Driver that assumes that the resistors are on the segments so the multiplexing occurs by scanning t..." alt="" coords="208,13,379,39"/>
+<area shape="rect" id="node4" href="classace__segment_1_1SegmentDriver.html" title="A Driver that assumes that the resistors are on the digits so the multiplexing occurs by scanning thr..." alt="" coords="196,63,391,90"/>
 <area shape="rect" id="node3" href="classace__segment_1_1ModulatingDigitDriver.html" title="ace_segment::ModulatingDigit\lDriver" alt="" coords="439,5,637,47"/>
 </map>
 </td></tr>
@@ -102,10 +102,10 @@ $(function() {
 </td></tr>
 <tr><td><img src="inherit_graph_6.png" border="0" alt="" usemap="#ace__segment_1_1LedMatrix"/>
 <map name="ace__segment_1_1LedMatrix" id="ace__segment_1_1LedMatrix">
-<area shape="rect" id="node1" href="classace__segment_1_1LedMatrix.html" title="ace_segment::LedMatrix" alt="" coords="5,31,171,57"/>
+<area shape="rect" id="node1" href="classace__segment_1_1LedMatrix.html" title="Class that represents the abstraction of a particular LED display wiring. " alt="" coords="5,31,171,57"/>
 <area shape="rect" id="node2" href="classace__segment_1_1LedMatrixDirect.html" title="ace_segment::LedMatrixDirect" alt="" coords="219,5,419,32"/>
 <area shape="rect" id="node3" href="classace__segment_1_1LedMatrixSerial.html" title="An LedMatrix with an 74HC595 Serial&#45;To&#45;Parallel converter chip on the segment pins. " alt="" coords="219,56,418,83"/>
-<area shape="rect" id="node4" href="classace__segment_1_1LedMatrixSpi.html" title="Similar to LedMatrixSerial accept that it uses SPI to talk to the 74HC595 chip instead of the shiftOu..." alt="" coords="467,56,651,83"/>
+<area shape="rect" id="node4" href="classace__segment_1_1LedMatrixSpi.html" title="Similar to LedMatrixSerial but uses SPI to talk to the 74HC595 chip instead of the shiftOut() method..." alt="" coords="467,56,651,83"/>
 </map>
 </td></tr>
 <tr><td><img src="inherit_graph_7.png" border="0" alt="" usemap="#ace__segment_1_1Renderer"/>
@@ -123,17 +123,24 @@ $(function() {
 <area shape="rect" id="node1" href="classace__segment_1_1StringWriter.html" title="Class that writes out a string, collapsing &#39;. " alt="" coords="5,5,183,32"/>
 </map>
 </td></tr>
-<tr><td><img src="inherit_graph_10.png" border="0" alt="" usemap="#ace__segment_1_1StyledDigit"/>
-<map name="ace__segment_1_1StyledDigit" id="ace__segment_1_1StyledDigit">
-<area shape="rect" id="node1" href="classace__segment_1_1StyledDigit.html" title="Data structure that keeps track of the state of each digit (its segment bit pattern and its style)..." alt="" coords="5,5,177,32"/>
+<tr><td><img src="inherit_graph_10.png" border="0" alt="" usemap="#ace__segment_1_1StyledPattern"/>
+<map name="ace__segment_1_1StyledPattern" id="ace__segment_1_1StyledPattern">
+<area shape="rect" id="node1" href="classace__segment_1_1StyledPattern.html" title="Data structure that keeps track of the state of each digit (its segment bit pattern and its style)..." alt="" coords="5,5,192,32"/>
 </map>
 </td></tr>
-<tr><td><img src="inherit_graph_11.png" border="0" alt="" usemap="#ace__segment_1_1TimingStats"/>
+<tr><td><img src="inherit_graph_11.png" border="0" alt="" usemap="#ace__segment_1_1Styler"/>
+<map name="ace__segment_1_1Styler" id="ace__segment_1_1Styler">
+<area shape="rect" id="node1" href="classace__segment_1_1Styler.html" title="Interface for classes which apply a style to the given bit pattern and brightness. " alt="" coords="5,31,148,57"/>
+<area shape="rect" id="node2" href="classace__segment_1_1BlinkStyler.html" title="ace_segment::BlinkStyler" alt="" coords="198,5,369,32"/>
+<area shape="rect" id="node3" href="classace__segment_1_1PulseStyler.html" title="ace_segment::PulseStyler" alt="" coords="196,56,371,83"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_12.png" border="0" alt="" usemap="#ace__segment_1_1TimingStats"/>
 <map name="ace__segment_1_1TimingStats" id="ace__segment_1_1TimingStats">
 <area shape="rect" id="node1" href="classace__segment_1_1TimingStats.html" title="ace_segment::TimingStats" alt="" coords="5,5,184,32"/>
 </map>
 </td></tr>
-<tr><td><img src="inherit_graph_12.png" border="0" alt="" usemap="#ace__segment_1_1Util"/>
+<tr><td><img src="inherit_graph_13.png" border="0" alt="" usemap="#ace__segment_1_1Util"/>
 <map name="ace__segment_1_1Util" id="ace__segment_1_1Util">
 <area shape="rect" id="node1" href="classace__segment_1_1Util.html" title="ace_segment::Util" alt="" coords="5,5,133,32"/>
 </map>

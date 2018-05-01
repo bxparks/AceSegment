@@ -30,15 +30,8 @@ namespace ace_segment {
 void LedMatrixSerial::configure() {
   LedMatrix::configure();
 
-  // TODO: Are these the correct initial values for the 74HC595?
-  // Seems like there's an initial time of random values right at the beginning
-  // before the Nano gets reset a second time. I think the proper solution is
-  // to hook up the OE pin of the 74HC595 to a data pin, and set it HIGH
-  // (inactive) by default (pull up resistor?) unless actively set LOW.
-  mHardware->digitalWrite(mLatchPin, LOW);
-  mHardware->digitalWrite(mDataPin, LOW);
-  mHardware->digitalWrite(mClockPin, LOW);
-
+  // Actual values of latchPin, dataPin and clockPin don't matter because the
+  // functions are triggered on a rising edge, not on the level.
   mHardware->pinMode(mLatchPin, OUTPUT);
   mHardware->pinMode(mDataPin, OUTPUT);
   mHardware->pinMode(mClockPin, OUTPUT);
@@ -47,6 +40,17 @@ void LedMatrixSerial::configure() {
     uint8_t pin = mGroupPins[group];
     mHardware->pinMode(pin, OUTPUT);
     mHardware->digitalWrite(pin, mGroupOff);
+  }
+}
+
+void LedMatrixSerial::finish() {
+  mHardware->pinMode(mLatchPin, INPUT);
+  mHardware->pinMode(mDataPin, INPUT);
+  mHardware->pinMode(mClockPin, INPUT);
+
+  for (uint8_t group = 0; group < mNumGroups; group++) {
+    uint8_t pin = mGroupPins[group];
+    mHardware->pinMode(pin, INPUT);
   }
 }
 

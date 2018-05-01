@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['micros',['micros',['../classace__segment_1_1Hardware.html#a577bbefb50970431da768e99e8765798',1,'ace_segment::Hardware']]],
-  ['millis',['millis',['../classace__segment_1_1Hardware.html#a967adfe2fb7acb7eecca011e34a4a690',1,'ace_segment::Hardware']]],
-  ['modulatingdigitdriver',['ModulatingDigitDriver',['../classace__segment_1_1ModulatingDigitDriver.html',1,'ace_segment::ModulatingDigitDriver'],['../classace__segment_1_1ModulatingDigitDriver.html#acb7ea555663d194616f47d9605956c8d',1,'ace_segment::ModulatingDigitDriver::ModulatingDigitDriver()']]]
+  ['ledmatrix',['LedMatrix',['../classace__segment_1_1LedMatrix.html',1,'ace_segment']]],
+  ['ledmatrixdirect',['LedMatrixDirect',['../classace__segment_1_1LedMatrixDirect.html',1,'ace_segment']]],
+  ['ledmatrixserial',['LedMatrixSerial',['../classace__segment_1_1LedMatrixSerial.html',1,'ace_segment']]],
+  ['ledmatrixspi',['LedMatrixSpi',['../classace__segment_1_1LedMatrixSpi.html',1,'ace_segment']]]
 ];
