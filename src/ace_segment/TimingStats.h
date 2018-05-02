@@ -39,7 +39,7 @@ class TimingStats {
 
     void reset() {
       mExpDecayAvg = 0;
-      mMin = (uint16_t) (-1);
+      mMin = UINT16_MAX;
       mMax = 0;
       mSum = 0;
       mCount = 0;
