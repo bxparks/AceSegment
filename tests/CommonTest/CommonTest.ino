@@ -127,12 +127,12 @@ class TimingStatsTest: public TestOnce {
 };
 
 testF(TimingStatsTest, reset) {
-  assertEqual(0U, mStats->getCount());
-  assertEqual(0U, mStats->getCounter());
-  assertEqual(0xffffU, mStats->getMin());
-  assertEqual(0U, mStats->getMax());
-  assertEqual(0U, mStats->getAvg());
-  assertEqual(0U, mStats->getExpDecayAvg());
+  assertEqual((uint16_t)0, mStats->getCount());
+  assertEqual((uint16_t)0, mStats->getCounter());
+  assertEqual(UINT16_MAX, mStats->getMin());
+  assertEqual((uint16_t)0, mStats->getMax());
+  assertEqual((uint16_t)0, mStats->getAvg());
+  assertEqual((uint16_t)0, mStats->getExpDecayAvg());
 }
 
 testF(TimingStatsTest, update) {
@@ -140,16 +140,16 @@ testF(TimingStatsTest, update) {
   mStats->update(3);
   mStats->update(10);
 
-  assertEqual(3U, mStats->getCount());
-  assertEqual(3U, mStats->getCounter());
-  assertEqual(1U, mStats->getMin());
-  assertEqual(10U, mStats->getMax());
-  assertEqual(4U, mStats->getAvg());
-  assertEqual(5U, mStats->getExpDecayAvg());
+  assertEqual((uint16_t)3, mStats->getCount());
+  assertEqual((uint16_t)3, mStats->getCounter());
+  assertEqual((uint16_t)1, mStats->getMin());
+  assertEqual((uint16_t)10, mStats->getMax());
+  assertEqual((uint16_t)4, mStats->getAvg());
+  assertEqual((uint16_t)5, mStats->getExpDecayAvg());
 
   mStats->reset();
-  assertEqual(0U, mStats->getCount());
-  assertEqual(3U, mStats->getCounter());
+  assertEqual((uint16_t)0, mStats->getCount());
+  assertEqual((uint16_t)3, mStats->getCounter());
 }
 
 // ----------------------------------------------------------------------
