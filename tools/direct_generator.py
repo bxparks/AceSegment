@@ -6,6 +6,19 @@ Generate a version of ModulatingDigitDriver using digitalWriteFast()
 assuming a directing wiring of LED display to the microcontroller pins.
 """
 
+# TODO: I think the drawSegments() method can be dramatically sped up by
+# unrolling the for-loop, then using the pin numbers that's known at compile
+# time and provided to this script, we can avoid the call to writeSegment(),
+# avoiding the array look up in kSegmentWriters[]. We can write out the 16
+# variations of the digitalWriteFast() methods directly, in a series of eight
+# if-statements that look like this:
+#
+#   if (pattern & elementMask)
+#     digitalWriteFast(x, kSegmentOn)
+#   else
+#     digitalWriteFast(x, kSegmentOff);
+
+
 import logging
 from generator import Generator
 
