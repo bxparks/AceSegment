@@ -84,6 +84,28 @@ The development version can be installed by cloning the
 directory used by the Arduino IDE. (The result is a directory named
 `./libraries/AceSegment`.) The `master` branch contains the stable release.
 
+### Source Code
+
+The source files are organized as follows:
+* `src/AceSegment.h` - main header file
+* `src/ace_segment/` - implementation files
+* `src/ace_segment/testing/` - internal testing files
+
+### Docs
+
+The [docs/](docs/) directory contains the
+[Doxygen docs published on GitHub Pages](https://bxparks.github.io/AceSegment/html).
+
+### Examples
+
+The following example sketches provided:
+
+* [AceSegmentDemo.ino](examples/AceSegmentDemo):
+  a demo program that exercises a large fraction of the feature of the framework
+* [AutoBenchmark.ino](examples/AutoBenchmark):
+  a program that performs CPU benchmarking of almost all of the various
+  supported configurations of the framework
+
 ## LED Wiring
 
 AceSegment library supports the following wiring configurations:
@@ -117,16 +139,9 @@ transistors.
 
 ## Usage
 
-### Examples
-
-There are 2 example sketches provided:
-* `examples/AceSegmentDemo/`: a demo program that exercises a large fraction
-  of the feature of the framework
-* `examples/AutoBenchmark/`: a program that performs CPU benchmarking of
-  most (if not all) of the various configurations of the framework
-
 ### Include Header and Namespace
 
+Only a single header file `AceSegment.h` is required to use this library.
 To prevent name clashes with other libraries that the calling code may use, all
 classes are defined in the `ace_segment` namespace. To use the code without
 prepending the `ace_segment::` prefix, use the `using` directive:
@@ -184,11 +199,6 @@ these classes.
   `Renderer`.
 * `DriverBuilder`: A class that knows how to select and configure the
   appropriate subclass of `Driver`.
-
-#### Doxygen Docs
-
-The [Doxygen docs for these classes](https://bxparks.github.io/AceSegment/html)
-are published through GitHub Pages.
 
 ### Setting Up the Resources
 
@@ -578,7 +588,7 @@ MCU                     LED display
 The `DriverBuilder` configuration is similar to before but we add
 a `useModulatingDriver()` option along with the number of
 subfields to use:
-``` 
+```
 const uint8_t NUM_SUBFIELDS = 16;
 const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
 const uint8_t segmentPins[8] = {8, 9, 10, 11, 12, 13, 14, 15};
@@ -1223,52 +1233,18 @@ average, and maximum amount of time taken by a call to `renderField()` method.
 The stats object reset periodically, by default every 1200 calls to
 `renderField()` but can be changed.
 
-Here is the output of the `examples/AutoBenchmark/` sketch which iterates
-through every supported variation of `Driver`, calls `renderField()` about a
-1000 times, then reports the min/avg/max CPU time (in microseconds) collected by
-the `TimingStats` object in the `Renderer`. The sketch was run on an Arduino
-Nano clone (16MHz ATmega328P), using a frame rate of 60Hz, with 16 subfields per
-field for the `useModulatingDriver()` option:
-
-```
-------------+--------+------------+------+--------+-------------+
-resistorsOn | wiring | modulation | fast | styles | min/avg/max |
-------------|--------|------------|------|--------|-------------|
-digits      | direct |            |      |        |  32/ 37/ 64 |
-digits      | direct |            |      | styles |  32/ 67/112 |
-digits      | serial |            |      |        |  32/ 37/ 60 |
-digits      | serial |            |      | styles |  32/ 67/112 |
-digits      | spi    |            |      |        |  32/ 37/ 64 |
-digits      | spi    |            |      | styles |  32/ 67/112 |
-segments    | direct |            |      |        |  24/ 33/ 56 |
-segments    | direct |            |      | styles |  24/ 78/140 |
-segments    | serial |            |      |        |  24/ 33/ 56 |
-segments    | serial |            |      | styles |  24/135/224 |
-segments    | spi    |            |      |        |  24/ 33/ 56 |
-segments    | spi    |            |      | styles |  24/ 51/ 96 |
-segments    | direct | modulation |      |        |  12/ 14/ 60 |
-segments    | direct | modulation |      | styles |  12/ 18/152 |
-segments    | serial | modulation |      |        |  12/ 14/ 60 |
-segments    | serial | modulation |      | styles |  12/ 22/236 |
-segments    | spi    | modulation |      |        |  12/ 14/ 60 |
-segments    | spi    | modulation |      | styles |  12/ 16/116 |
-segments    | direct | modulation | fast |        |  12/ 14/ 52 |
-segments    | direct | modulation | fast | styles |  12/ 16/ 96 |
-segments    | serial | modulation | fast |        |  12/ 14/ 48 |
-segments    | serial | modulation | fast | styles |  12/ 15/ 92 |
-segments    | spi    | modulation | fast |        |  12/ 14/ 48 |
-segments    | spi    | modulation | fast | styles |  12/ 15/ 84 |
-------------+--------+------------+------+--------+-------------+
-```
+The benchmark numbers can be seen in
+[examples/AutoBenchmark](examples/AutoBenchmark).
 
 If we want to drive a 4 digit LED display at 60 frames per second, using a
 subfield modulation of 16 subfields per field, we get a field rate of 3.84 kHz,
-or 260 microseconds per field. All of the options had a maximum time
-of less than 260 microseconds.
+or 260 microseconds per field. We see in the table that all of the options had a
+maximum time of less than 260 microseconds required on a 16MHz ATmega328P
+processor,
 
-The `fast_driver.py` script generates C++ code (indicated by `fast` above) that
-is fast enough to allow pulse width modulation even on an 8MHz ATmega328P
-microcontroller.
+The `fast_driver.py` script generates C++ code (indicated by `fast` in the
+benchmarks) that is fast enough to allow pulse width modulation even on an 8MHz
+ATmega328P microcontroller powered at 3.3V.
 
 ## System Requirements
 
