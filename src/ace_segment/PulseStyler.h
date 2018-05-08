@@ -56,7 +56,7 @@ class PulseStyler: public Styler {
       Util::incrementMod(mCurrentFrame, mFramesPerPulse);
     }
 
-    virtual void apply(uint8_t* pattern, uint8_t* brightness) override {
+    virtual void apply(uint8_t* /* pattern */, uint8_t* brightness) override {
       *brightness = ((uint16_t) mPulseFraction * (*brightness)) / 256;
     }
 

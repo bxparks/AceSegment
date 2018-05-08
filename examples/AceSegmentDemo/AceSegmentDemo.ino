@@ -22,7 +22,8 @@ uint8_t loopMode = LOOP_MODE_AUTO_RENDER;
 const uint8_t BUTTON_PIN = 2; // change this to the button pin
 AceButton button;
 
-void handleEvent(AceButton* button, uint8_t eventType, uint8_t buttonState) {
+void handleEvent(AceButton* /* button */, uint8_t eventType,
+    uint8_t /* buttonState */) {
   switch (eventType) {
     case AceButton::kEventReleased:
       if (loopMode == LOOP_MODE_AUTO_RENDER) {
@@ -293,9 +294,11 @@ void singleStep() {
 
 void autoRender() {
   static unsigned long lastUpdateTime = millis();
+#if PRINT_STATS == 1
   static unsigned long stopWatchStart = lastUpdateTime;
   static uint32_t loopCount = 0;
   static uint16_t lastStatsCounter = 0;
+#endif
 
   unsigned long now = millis();
   if (now - lastUpdateTime > 1000) {

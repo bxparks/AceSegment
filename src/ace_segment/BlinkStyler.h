@@ -42,7 +42,7 @@ class BlinkStyler: public Styler{
       Util::incrementMod(mCurrentFrame, mFramesPerBlink);
     }
 
-    virtual void apply(uint8_t* pattern, uint8_t* brightness) override {
+    virtual void apply(uint8_t* /* pattern */, uint8_t* brightness) override {
       if (mBlinkState == kOff) {
         *brightness = 0;
       }

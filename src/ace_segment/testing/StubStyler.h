@@ -10,7 +10,8 @@ class StubStyler: public Styler {
   public:
     virtual void calcForFrame() override {}
 
-    virtual void apply(uint8_t* pattern, uint8_t* brightness) override {}
+    virtual void apply(uint8_t* /* pattern */, uint8_t* /* brightness */ )
+        override {}
 
     virtual bool requiresBrightness() override { return false; }
 };
