@@ -72,11 +72,13 @@ void setupAceButton() {
 #define WRITE_MODE_SCROLL 4
 #define WRITE_MODE_CLOCK 5
 
-// Print Stats
-#define PRINT_STATS 0
-
 // Use polling or interrupt.
 #define USE_INTERRUPT 0
+
+// Print Stats. If USE_INTERRUPT is 0 (so using renderWhenReady()), writing to
+// Serial can cause the display to flicker due to timing jitters. Turning stats
+// off will make the display as smooth as the interrupt version.
+#define PRINT_STATS 0
 
 // Define the Driver to use. Use DRIVER_MODE_NONE to get flash/static
 // consumption without any AceSegment code. Then set to the other modes to get
@@ -126,7 +128,7 @@ const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
 
 #if DRIVER_MODE > DRIVER_MODE_NONE
 // Set up the chain of resources and their dependencies.
-DimmablePattern dimmingPattern[NUM_DIGITS];
+DimmablePattern dimmablePatterns[NUM_DIGITS];
 StyledPattern styledPatterns[NUM_DIGITS];
 
 // The chain of resources.
@@ -178,7 +180,7 @@ void setupAceSegment() {
   #if DRIVER_MODE == DRIVER_MODE_MODULATING_DIGIT
       .useModulatingDriver(NUM_SUBFIELDS)
   #endif
-      .setDimmablePatterns(dimmingPattern)
+      .setDimmablePatterns(dimmablePatterns)
   #if USE_TRANSISTORS == 1
       .useTransistors()
   #endif
@@ -194,7 +196,7 @@ void setupAceSegment() {
       .setResistorsOnDigits()
       .setDigitPins(digitPins)
       .setSegmentDirectPins(segmentPins)
-      .setDimmablePatterns(dimmingPattern)
+      .setDimmablePatterns(dimmablePatterns)
   #if USE_TRANSISTORS == 1
       .useTransistors()
   #endif
@@ -202,11 +204,13 @@ void setupAceSegment() {
 #else
   #ifdef __AVR__
     #if DRIVER_MODE == DRIVER_MODE_FAST_DIRECT
-      driver = new FastDirectDriver(dimmingPattern, NUM_DIGITS, NUM_SUBFIELDS);
+      driver = new FastDirectDriver(
+          dimmablePatterns, NUM_DIGITS, NUM_SUBFIELDS);
     #elif DRIVER_MODE == DRIVER_MODE_FAST_SERIAL
-      driver = new FastSerialDriver(dimmingPattern, NUM_DIGITS, NUM_SUBFIELDS);
+      driver = new FastSerialDriver(
+          dimmablePatterns, NUM_DIGITS, NUM_SUBFIELDS);
     #elif DRIVER_MODE == DRIVER_MODE_FAST_SPI
-      driver = new FastSpiDriver(dimmingPattern, NUM_DIGITS, NUM_SUBFIELDS);
+      driver = new FastSpiDriver(dimmablePatterns, NUM_DIGITS, NUM_SUBFIELDS);
     #endif
   #endif
 #endif
@@ -378,7 +382,7 @@ void writeClock() {
   static uint8_t hh = 0;
   static uint8_t mm = 0;
 
-  clockWriter->writeClock(hh, true, mm);
+  clockWriter->writeClock(hh, mm);
 
   Util::incrementMod(mm, (uint8_t)100);
   if (mm == 0) {
