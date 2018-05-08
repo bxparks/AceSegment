@@ -89,6 +89,9 @@ void setupAceButton() {
 // Transistor drivers on digits.
 #define USE_TRANSISTORS 1
 
+// Common Cathode or Anode
+#define COMMON_CATHODE 0
+
 const uint8_t FRAMES_PER_SECOND = 60;
 const uint8_t NUM_SUBFIELDS = 16;
 
@@ -153,7 +156,11 @@ void setupAceSegment() {
     || DRIVER_MODE == DRIVER_MODE_MODULATING_DIGIT
   driver = DriverBuilder(hardware)
       .setNumDigits(NUM_DIGITS)
+  #if COMMON_CATHODE == 1
       .setCommonCathode()
+  #else
+      .setCommonAnode()
+  #endif
       .setResistorsOnSegments()
       .setDigitPins(digitPins)
   #if LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT
@@ -174,7 +181,11 @@ void setupAceSegment() {
 #elif DRIVER_MODE == DRIVER_MODE_SEGMENT
   driver = DriverBuilder(hardware)
       .setNumDigits(NUM_DIGITS)
+  #if COMMON_CATHODE == 1
       .setCommonCathode()
+  #else
+      .setCommonAnode()
+  #endif
       .setResistorsOnDigits()
       .setDigitPins(digitPins)
       .setSegmentDirectPins(segmentPins)
@@ -296,9 +307,9 @@ void autoRender() {
   unsigned long elapsedTime = now - stopWatchStart;
   if (elapsedTime >= 2000) {
 #if DRIVER_MODE > DRIVER_MODE_NONE
-    TimingStats stats = renderer->getTimingStats();
+    ace_segment::TimingStats stats = renderer->getTimingStats();
 #else
-    TimingStats stats;
+    ace_segment::TimingStats stats;
 #endif
     uint32_t elapsedCount = stats.getCounter() - lastStatsCounter;
     lastStatsCounter = stats.getCounter();
