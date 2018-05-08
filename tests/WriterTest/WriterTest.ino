@@ -241,3 +241,76 @@ testF(HexWriterTest, writeAt_outOfBounds) {
   assertEqual(StyledPattern::kStyleNormal, styledPatterns[4].style);
 }
 
+// ----------------------------------------------------------------------
+// Tests for ClockWriter.
+// ----------------------------------------------------------------------
+
+class ClockWriterTest: public TestOnce {
+  protected:
+    virtual void setup() override {
+      TestOnce::setup();
+
+      mRenderer = new FakeRenderer(styledPatterns, NUM_DIGITS, stylers);
+      mRenderer->configure();
+      mClockWriter = new ClockWriter(mRenderer);
+      clearStyledPatterns();
+    }
+
+    virtual void teardown() override {
+      delete mClockWriter;
+      delete mRenderer;
+
+      TestOnce::teardown();
+    }
+
+    FakeRenderer *mRenderer;
+    ClockWriter *mClockWriter;
+};
+
+testF(ClockWriterTest, toBcd) {
+  assertEqual(0x00, ClockWriter::toBcd(00));
+  assertEqual(0x42, ClockWriter::toBcd(42));
+  assertEqual(0x99, ClockWriter::toBcd(99));
+  assertEqual(0x99, ClockWriter::toBcd(100));
+}
+
+testF(ClockWriterTest, writeBcdClock) {
+  mClockWriter->writeBcdClock(0x12, 0x30);
+  assertEqual(0b00000110, styledPatterns[0].pattern);
+  assertEqual(StyledPattern::kStyleNormal, styledPatterns[0].style);
+  assertEqual(0b01011011 | 0x80, styledPatterns[1].pattern);
+  assertEqual(StyledPattern::kStyleNormal, styledPatterns[1].style);
+  assertEqual(0b01001111, styledPatterns[2].pattern);
+  assertEqual(StyledPattern::kStyleNormal, styledPatterns[2].style);
+  assertEqual(0b00111111, styledPatterns[3].pattern);
+  assertEqual(StyledPattern::kStyleNormal, styledPatterns[3].style);
+}
+
+testF(ClockWriterTest, writeClock) {
+  mClockWriter->writeClock(12, 30);
+  assertEqual(0b00000110, styledPatterns[0].pattern);
+  assertEqual(StyledPattern::kStyleNormal, styledPatterns[0].style);
+  assertEqual(0b01011011 | 0x80, styledPatterns[1].pattern);
+  assertEqual(StyledPattern::kStyleNormal, styledPatterns[1].style);
+  assertEqual(0b01001111, styledPatterns[2].pattern);
+  assertEqual(StyledPattern::kStyleNormal, styledPatterns[2].style);
+  assertEqual(0b00111111, styledPatterns[3].pattern);
+  assertEqual(StyledPattern::kStyleNormal, styledPatterns[3].style);
+}
+
+testF(ClockWriterTest, writeCharAt) {
+  mClockWriter->writeCharAt(1, ClockWriter::kP);
+  assertEqual(0b01110011, styledPatterns[1].pattern);
+  assertEqual(StyledPattern::kStyleNormal, styledPatterns[1].style);
+
+  mClockWriter->writeStyleAt(1, STYLE_BLINK);
+  assertEqual(STYLE_BLINK, styledPatterns[1].style);
+}
+
+testF(ClockWriterTest, writeColon) {
+  mClockWriter->writeClock(12, 30); // colon on by default
+  assertEqual(0b01011011 | 0x80, styledPatterns[1].pattern);
+
+  mClockWriter->writeColon(false); // turns it off
+  assertEqual(0b01011011, styledPatterns[1].pattern);
+}

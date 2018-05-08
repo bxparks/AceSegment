@@ -44,6 +44,7 @@ SOFTWARE.
 #include "ace_segment/RendererBuilder.h"
 #include "ace_segment/CharWriter.h"
 #include "ace_segment/HexWriter.h"
+#include "ace_segment/ClockWriter.h"
 #include "ace_segment/StringWriter.h"
 
 // Version format: xxyyzz == "xx.yy.zz"

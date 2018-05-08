@@ -53,9 +53,6 @@ void setupAceButton() {
 // Configurations for AceSegment
 //------------------------------------------------------------------
 
-// Use polling or interrupt.
-#define USE_INTERRUPT 0
-
 #define DRIVER_MODE_NONE 0
 #define DRIVER_MODE_DIGIT 1
 #define DRIVER_MODE_MODULATING_DIGIT 2
@@ -73,6 +70,13 @@ void setupAceButton() {
 #define WRITE_MODE_CHAR 2
 #define WRITE_MODE_STRING 3
 #define WRITE_MODE_SCROLL 4
+#define WRITE_MODE_CLOCK 5
+
+// Print Stats
+#define PRINT_STATS 0
+
+// Use polling or interrupt.
+#define USE_INTERRUPT 0
 
 // Define the Driver to use. Use DRIVER_MODE_NONE to get flash/static
 // consumption without any AceSegment code. Then set to the other modes to get
@@ -84,7 +88,7 @@ void setupAceButton() {
 #define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
 
 // Type of characters to write to the LED display
-#define WRITE_MODE WRITE_MODE_HEX
+#define WRITE_MODE WRITE_MODE_CLOCK
 
 // Transistor drivers on digits.
 #define USE_TRANSISTORS 1
@@ -133,6 +137,7 @@ BlinkStyler* blinkStyler;
 Renderer* renderer;
 CharWriter* charWriter;
 HexWriter* hexWriter;
+ClockWriter* clockWriter;
 StringWriter* stringWriter;
 
 #if USE_INTERRUPT == 1
@@ -224,6 +229,8 @@ void setupAceSegment() {
 #elif WRITE_MODE == WRITE_MODE_STRING || WRITE_MODE == WRITE_MODE_SCROLL
   charWriter = new CharWriter(renderer);
   stringWriter = new StringWriter(charWriter);
+#elif WRITE_MODE == WRITE_MODE_CLOCK
+  clockWriter = new ClockWriter(renderer);
 #endif
 
 #if USE_INTERRUPT == 1
@@ -299,18 +306,21 @@ void autoRender() {
     writeStrings();
   #elif WRITE_MODE == WRITE_MODE_SCROLL
     scrollString("   Angela is the best.");
+  #elif WRITE_MODE == WRITE_MODE_CLOCK
+    writeClock();
   #endif
 #endif
   }
 
+#if PRINT_STATS == 1
   // Print out statistics every N seconds.
   unsigned long elapsedTime = now - stopWatchStart;
   if (elapsedTime >= 2000) {
-#if DRIVER_MODE > DRIVER_MODE_NONE
+  #if DRIVER_MODE > DRIVER_MODE_NONE
     ace_segment::TimingStats stats = renderer->getTimingStats();
-#else
+  #else
     ace_segment::TimingStats stats;
-#endif
+  #endif
     uint32_t elapsedCount = stats.getCounter() - lastStatsCounter;
     lastStatsCounter = stats.getCounter();
     uint16_t renderDurationAverage = stats.getAvg();
@@ -338,6 +348,7 @@ void autoRender() {
   } else {
     loopCount++;
   }
+#endif
 
 #if DRIVER_MODE > DRIVER_MODE_NONE
 #if USE_INTERRUPT == 0
@@ -345,8 +356,6 @@ void autoRender() {
 #endif
 #endif
 }
-
-#if DRIVER_MODE > DRIVER_MODE_NONE && WRITE_MODE > WRITE_MODE_NONE
 
 #if WRITE_MODE == WRITE_MODE_HEX
 void writeHexes() {
@@ -361,6 +370,20 @@ void writeHexes() {
   hexWriter->writeHexAt(3, c, BLINK_STYLE);
 
   Util::incrementMod(c, HexWriter::kNumCharacters);
+}
+#endif
+
+#if WRITE_MODE == WRITE_MODE_CLOCK
+void writeClock() {
+  static uint8_t hh = 0;
+  static uint8_t mm = 0;
+
+  clockWriter->writeClock(hh, true, mm);
+
+  Util::incrementMod(mm, (uint8_t)100);
+  if (mm == 0) {
+    Util::incrementMod(hh, (uint8_t)100);
+  }
 }
 #endif
 
@@ -403,10 +426,13 @@ void writeStrings() {
 }
 #endif
 
+#if WRITE_MODE == WRITE_MODE_SCROLL
+
 void scrollString(const char* s) {
   static uint8_t i = 0;
 
   stringWriter->writeStringAt(0, &s[i], true /* padRight */);
   Util::incrementMod(i, (uint8_t) strlen(s));
 }
+
 #endif

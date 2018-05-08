@@ -176,6 +176,9 @@ depend on the lower-level classes:
   used by the `Renderer` class. Three additional characters are supported:
   `kSpace`, `kMinus` and `kPeriod`. (Note that decimal numerals are a subset of
   hexadecimal numerals.)
+* `ClockWriter`: A class that writes a clock string "hh:mm" to the `Renderer`
+  class. A few additional symbols are supported `kSpace`, `kMinus` and `kA` ("A"
+  for AM) and `kP` ("P" for PM).
 * `CharWriter`: A class that convert an ASCII character represented by a `char`
   (code 0-127) to a bit pattern used by the `Renderer` class. Not all ASCII
   characters can be rendered on a seven segment display legibly but the
@@ -1038,6 +1041,22 @@ additional symbols:
 
 A `HexWriter` consumes about 200 bytes of flash memory.
 
+### ClockWriter
+
+There are special, 4 digit,  seven segment LED displays which replace the
+decimal point with the colon symbol ":" between the 2 digits on either side so
+that it can display a time in the format "hh:mm".
+
+The class supports the following methods:
+* `void writeClock(uint8_t hh, uint8_t mm)`
+* `void writeBcdClock(uint8_t hh, uint8_t mm)` - Binary Coded Decimal
+* `void writeColon(bool state = true)`
+* `void writeCharAt(uint8_t digit, uint8_t c)`
+* `void writeCharAt(uint8_t digit, uint8_t c, uint8_t style)`
+* `void writeStyleAt(uint8_t digit, uint8_t style)`
+
+A `ClockWriter` consumes about (_TBD_) bytes of flash memory.
+
 ### CharWriter
 
 It is possible to represent many of the ASCII (0-127) characters on a
@@ -1176,6 +1195,7 @@ Here are the sizes of the various classes on the 8-bit AVR microcontrollers
 * sizeof(Renderer): 54
 * sizeof(RendererBuilder): 22
 * sizeof(HexWriter): 2
+* sizeof(ClockWriter): 3
 * sizeof(CharWriter): 2
 * sizeof(StringWriter): 2
 
