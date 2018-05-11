@@ -64,6 +64,7 @@ const uint8_t ClockWriter::kCharacterArray[] PROGMEM = {
   0b01000000, /* - */
   0b01110111, /* A */
   0b01110011, /* P */
+  0b01100011, /* degrees symbol */
 };
 
 const uint8_t ClockWriter::kNumCharacters =

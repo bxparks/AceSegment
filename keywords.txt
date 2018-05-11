@@ -1,5 +1,5 @@
 #######################################
-# Syntax Coloring Map for AUnit library
+# Syntax Coloring Map for AceSegment library
 #######################################
 
 #######################################
@@ -19,6 +19,7 @@ StyledPattern	KEYWORD1
 Renderer	KEYWORD1
 RendererBuilder	KEYWORD1
 HexWriter	KEYWORD1
+ClockWriter	KEYWORD1
 CharWriter	KEYWORD1
 StringWriter	KEYWORD1
 
@@ -95,6 +96,13 @@ writeHexAt	KEYWORD2
 writeStyleAt	KEYWORD2
 writeDecimalPointAt	KEYWORD2
 
+# ClockWriter.h
+getNumDigits	KEYWORD2
+writeClock	KEYWORD2
+writeBcdClock	KEYWORD2
+writeCharAt	KEYWORD2
+writeColon	KEYWORD2
+
 # CharWriter.h
 getNumDigits	KEYWORD2
 writeCharAt	KEYWORD2
@@ -148,6 +156,14 @@ kNumCharacters	LITERAL1
 kSpace	LITERAL1
 kPeriod	LITERAL1
 kMinus	LITERAL1
+
+# HexWriter.h
+kNumCharacters	LITERAL1
+kSpace	LITERAL1
+kMinus	LITERAL1
+kA	LITERAL1
+kP	LITERAL1
+kDegrees	LITERAL1
 
 # CharWriter.h
 kNumCharacters	LITERAL1

@@ -53,6 +53,9 @@ class ClockWriter {
     /** The "A" character for "AM". */
     static const uint8_t kP = 13;
 
+    /** The superscript degrees symbol for temperature degrees. */
+    static const uint8_t kDegrees = 14;
+
     /**
      * Constructor.
      *

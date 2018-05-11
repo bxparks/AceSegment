@@ -24,18 +24,20 @@ SOFTWARE.
 
 #ifndef FLASH_H
 
-#ifdef ESP8266
+#if defined(ESP8266)
   #include <pgmspace.h>
+#elif defined(ESP32)
+  #include <pgmspace.h>
+  // Clobber the incorrect definition of FPSTR
+  #undef FPSTR
+  #define FPSTR(pstr_pointer) \
+      (reinterpret_cast<const __FlashStringHelper *>(pstr_pointer))
 #else
   #include <avr/pgmspace.h>
-#endif
-
-class __FlashStringHelper;
-
-// Defined in ESP8266, not defined in AVR or Teensy
-#ifndef FPSTR
   #define FPSTR(pstr_pointer) \
       (reinterpret_cast<const __FlashStringHelper *>(pstr_pointer))
 #endif
+
+class __FlashStringHelper;
 
 #endif
