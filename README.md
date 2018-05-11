@@ -90,6 +90,8 @@ The source files are organized as follows:
 * `src/AceSegment.h` - main header file
 * `src/ace_segment/` - implementation files
 * `src/ace_segment/testing/` - internal testing files
+* `tests/` - unit tests which require [AUnit](https://github.com/bxparks/AUnit)
+* `examples/` - example sketches
 
 ### Docs
 
@@ -98,7 +100,7 @@ The [docs/](docs/) directory contains the
 
 ### Examples
 
-The following example sketches provided:
+The following example sketches are provided:
 
 * [AceSegmentDemo.ino](examples/AceSegmentDemo):
   a demo program that exercises a large fraction of the feature of the framework
@@ -1282,9 +1284,6 @@ The library has been tested on the following hardware:
 * Arduino Pro Micro clone (16 MHz ATmega32U4, 5V) - limited software testing
 * Teensy 3.2 (48 MHz ARM Cortex-M0+) - verified compile
 * NodeMCU 1.0 clone (ESP-12E module, 80MHz ESP8266) - verified compile
-
-The unit tests require [AUnit](https://github.com/bxparks/AUnit)
-to be installed.
 
 ## Changelog
 
