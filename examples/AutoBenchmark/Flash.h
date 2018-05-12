@@ -22,8 +22,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef FLASH_H
+#ifndef ACE_SEGMENT_AUTO_BENCHMARK_FLASH_H
 
+#include <WString.h> // FPSTR, __FlashStringHelper
 #if defined(ESP8266)
   #include <pgmspace.h>
 #elif defined(ESP32)
@@ -37,7 +38,5 @@ SOFTWARE.
   #define FPSTR(pstr_pointer) \
       (reinterpret_cast<const __FlashStringHelper *>(pstr_pointer))
 #endif
-
-class __FlashStringHelper;
 
 #endif
