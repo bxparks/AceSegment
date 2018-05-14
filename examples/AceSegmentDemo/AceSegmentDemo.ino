@@ -88,7 +88,7 @@ void setupAceButton() {
 
 // Applies only for DRIVER_MODE_DIGIT, DRIVER_MODE_MODULATING_DIGIT,
 // DRIVER_MODE_SEGMENT. Ignored for others.
-#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
+#define LED_MATRIX_MODE LED_MATRIX_MODE_SERIAL
 
 // Type of characters to write to the LED display
 #define WRITE_MODE WRITE_MODE_CLOCK
@@ -97,7 +97,7 @@ void setupAceButton() {
 #define USE_TRANSISTORS 1
 
 // Common Cathode or Anode
-#define COMMON_CATHODE 0
+#define COMMON_CATHODE 1
 
 const uint8_t FRAMES_PER_SECOND = 60;
 const uint8_t NUM_SUBFIELDS = 16;
@@ -110,7 +110,7 @@ const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
 
 #if DRIVER_MODE == DRIVER_MODE_SEGMENT
   // 4 digits, resistors on digits
-  const uint8_t segmentPins[8] = {8, 9, 10, 11, 12, 14, 15, 16};
+  const uint8_t segmentPins[8] = {8, 9, 10, 11, 12, 14, 15, 13};
 #else
   #if ((DRIVER_MODE == DRIVER_MODE_DIGIT \
       || DRIVER_MODE == DRIVER_MODE_MODULATING_DIGIT \
@@ -118,7 +118,7 @@ const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
         && LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT) \
       || DRIVER_MODE == DRIVER_MODE_FAST_DIRECT
     // 4 digits, resistors on segments
-    const uint8_t segmentPins[8] = {8, 9, 10, 11, 12, 14, 15, 16};
+    const uint8_t segmentPins[8] = {8, 9, 10, 11, 12, 14, 15, 13};
   #else
     // 4 digits, resistors on segments, serial-to-parallel converter on segments
     const uint8_t latchPin = SS; // ST_CP on 74HC595
