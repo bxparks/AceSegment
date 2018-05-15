@@ -71,23 +71,41 @@ class ClockWriter {
     /** Get the number of digits. */
     uint8_t getNumDigits() { return mRenderer->getNumDigits(); }
 
+    /**
+     * Write the character at the specified position. Write a space if
+     * the character is undefined.
+     */
+    void writeCharAt(uint8_t digit, uint8_t c);
+
+    /**
+     * Write the character at the specified position with the given style.
+     * If the character is undefined, write a space character instead.
+     */
+    void writeCharAt(uint8_t digit, uint8_t c, uint8_t style);
+
+    /** Write the style for a given digit, leaving the character unchanged. */
+    void writeStyleAt(uint8_t digit, uint8_t style) {
+      if (digit >= getNumDigits()) return;
+      mRenderer->writeStyleAt(digit, style);
+    }
+
+    /**
+     * Write a 2-digit BCD number at position digit. If one of the hex digits
+     * is greater than 9, then print " " (1 space).
+     */
+    void writeBcdAt(uint8_t digit, uint8_t bcd);
+
+    /**
+     * Write a 2-digit decimal number at position digit. If the number is
+     * greater than 100, then print "  " (2 spaces).
+     */
+    void writeDecimalAt(uint8_t digit, uint8_t d);
+
     /** Write "hh:mm". */
     void writeClock(uint8_t hh, uint8_t mm);
 
     /** Write "hh:mm", with hh and mm in Binary Coded Decimal (BCD) format. */
     void writeBcdClock(uint8_t hhBcd, uint8_t mmBcd);
-
-    /** Write the character at the specified position. */
-    void writeCharAt(uint8_t digit, uint8_t c);
-
-    /** Write the character at the specified position. */
-    void writeCharAt(uint8_t digit, uint8_t c, uint8_t style);
-
-    /** Write the style for a given digit, leaving character unchanged. */
-    void writeStyleAt(uint8_t digit, uint8_t style) {
-      if (digit >= getNumDigits()) return;
-      mRenderer->writeStyleAt(digit, style);
-    }
 
     /**
      * Write the colon symbol between 'hh' and 'mm'.

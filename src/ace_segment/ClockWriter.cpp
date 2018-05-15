@@ -74,7 +74,7 @@ void ClockWriter::writeCharAt(uint8_t digit, uint8_t c, uint8_t style) {
   if (digit >= getNumDigits()) return;
   uint8_t pattern = ((uint8_t) c < kNumCharacters)
       ? pgm_read_byte(&kCharacterArray[(uint8_t) c])
-      : kMinus;
+      : kSpace;
   mRenderer->writePatternAt(digit, pattern, style);
 }
 
@@ -82,30 +82,39 @@ void ClockWriter::writeCharAt(uint8_t digit, uint8_t c) {
   if (digit >= getNumDigits()) return;
   uint8_t pattern = ((uint8_t) c < kNumCharacters)
       ? pgm_read_byte(&kCharacterArray[(uint8_t) c])
-      : kMinus;
+      : kSpace;
   mRenderer->writePatternAt(digit, pattern);
+}
+
+void ClockWriter::writeBcdAt(uint8_t digit, uint8_t bcd) {
+  uint8_t c0 = (bcd & 0xF0) >> 4;
+  uint8_t c1 = (bcd & 0x0F);
+  if (c0 > 9) c0 = kSpace;
+  if (c1 > 9) c1 = kSpace;
+  writeCharAt(digit++, c0);
+  writeCharAt(digit, c1);
+}
+
+void ClockWriter::writeDecimalAt(uint8_t digit, uint8_t d) {
+  uint8_t bcd = toBcd(d);
+  writeBcdAt(digit, bcd);
 }
 
 void ClockWriter::writeClock(uint8_t hh, uint8_t mm) {
   uint8_t hhBcd = toBcd(hh);
   uint8_t mmBcd = toBcd(mm);
   writeBcdClock(hhBcd, mmBcd);
+  writeColon(true);
 }
 
 void ClockWriter::writeBcdClock(uint8_t hhBcd, uint8_t mmBcd) {
-  uint8_t c0 = (hhBcd & 0xf0) >> 4;
-  uint8_t c1 = (hhBcd & 0x0f);
-  uint8_t c2 = (mmBcd & 0xf0) >> 4;
-  uint8_t c3 = (mmBcd & 0x0f);
-  writeCharAt(0, c0);
-  writeCharAt(1, c1);
-  writeCharAt(2, c2);
-  writeCharAt(3, c3);
+  writeBcdAt(0, hhBcd);
+  writeBcdAt(2, mmBcd);
   writeColon(true);
 }
 
 uint8_t ClockWriter::toBcd(uint8_t d) {
-  if (d >= 100) return 0x99;
+  if (d >= 100) return 0xFF;
   uint8_t h1 = d / 10;
   uint8_t h0 = d - (h1 * 10);
   return (h1 << 4) | h0;
