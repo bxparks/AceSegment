@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include <Arduino.h>
 #include "BenchmarkBundle.h"
 #ifdef __AVR__
   #include "FastDirectDriver.h"
@@ -29,9 +30,25 @@ SOFTWARE.
   #include "FastSpiDriver.h"
 #endif
 
-const uint8_t BenchmarkBundle::kDigitPins[kNumDigits] = {4, 5, 6, 7};
-const uint8_t BenchmarkBundle::kSegmentDirectPins[8] =
-    {8, 9, 10, 11, 12, 14, 15, 16};
+#if defined(ESP8266)
+  // NodeMCU doesn't have 12 available pins to directly drive 4 digits with 8
+  // segments. Serial or SPI drivers are probably the only opion (though
+  // haven't tested in real life). For the  purposes of the AutoBenchmark,
+  // just use some arbitrary pins which don't cause trouble.
+  const uint8_t BenchmarkBundle::kDigitPins[kNumDigits] = {D3, D4, D5, D6};
+  const uint8_t BenchmarkBundle::kSegmentDirectPins[8] =
+      {D7, D7, D7, D7, D7, D7, D7, D7};
+#elif defined(ESP32)
+  // Use some random GPIO pins for benchmark purposes.
+  const uint8_t BenchmarkBundle::kDigitPins[kNumDigits] = {T3, T4, T5, T6};
+  const uint8_t BenchmarkBundle::kSegmentDirectPins[8] =
+      {T7, T7, T7, T7, T7, T7, T7, T7};
+#else
+  // These pins should work for AVR and Teensy.
+  const uint8_t BenchmarkBundle::kDigitPins[kNumDigits] = {4, 5, 6, 7};
+  const uint8_t BenchmarkBundle::kSegmentDirectPins[8] =
+      {8, 9, 10, 11, 12, 14, 15, 13};
+#endif
 
 // Normally it's not a good idea to do so much in a constructor but this is
 // just a diagnostic program.
