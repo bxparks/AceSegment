@@ -30,10 +30,10 @@ SOFTWARE.
 #include <AUnit.h>
 #include "TestableHardware.h"
 
-using aunit::TestOnce;
-
 namespace ace_segment {
 namespace testing {
+
+using aunit::TestOnce;
 
 /**
  * Base class to assert various hardware events on TestableHardware.
