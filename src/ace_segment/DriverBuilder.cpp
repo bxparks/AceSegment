@@ -40,10 +40,8 @@ LedMatrix* DriverBuilder::buildLedMatrix() {
   LedMatrix* matrix;
   if (mLedMatrixType == kTypeLedMatrixDirect) {
     if (mResistorsOnSegments) {
-      LedMatrixDirect* ledMatrix =
-          new LedMatrixDirect(mHardware, mNumDigits, mNumSegments);
-      ledMatrix->setGroupPins(mDigitPins);
-      ledMatrix->setElementPins(mSegmentPins);
+      LedMatrixDirect* ledMatrix = new LedMatrixDirect(
+          mHardware, mNumDigits, mNumSegments, mDigitPins, mSegmentPins);
       if (mCommonCathode) {
         ledMatrix->setCathodeOnGroup();
       } else {
@@ -51,10 +49,8 @@ LedMatrix* DriverBuilder::buildLedMatrix() {
       }
       matrix = ledMatrix;
     } else {
-      LedMatrixDirect* ledMatrix =
-          new LedMatrixDirect(mHardware, mNumSegments, mNumDigits);
-      ledMatrix->setGroupPins(mSegmentPins);
-      ledMatrix->setElementPins(mDigitPins);
+      LedMatrixDirect* ledMatrix = new LedMatrixDirect(
+          mHardware, mNumSegments, mNumDigits, mSegmentPins, mDigitPins);
       // If the resistors are on the Digit pins, then the "anode" and "cathode"
       // pins become flipped electrically, because we're scanning the LED
       // matrix in the other direction.
@@ -69,12 +65,12 @@ LedMatrix* DriverBuilder::buildLedMatrix() {
     // We support only resistors on segments for SerialToParallel
     LedMatrixSerial* ledMatrix;
     if (mLedMatrixType == kTypeLedMatrixSerial) {
-      ledMatrix = new LedMatrixSerial(mHardware, mNumDigits, mNumSegments);
+      ledMatrix = new LedMatrixSerial(mHardware, mNumDigits, mNumSegments,
+          mDigitPins, mLatchPin, mDataPin, mClockPin);
     } else {
-      ledMatrix = new LedMatrixSpi(mHardware, mNumDigits, mNumSegments);
+      ledMatrix = new LedMatrixSpi(mHardware, mNumDigits, mNumSegments,
+          mDigitPins, mLatchPin, mDataPin, mClockPin);
     }
-    ledMatrix->setGroupPins(mDigitPins);
-    ledMatrix->setElementPins(mLatchPin, mDataPin, mClockPin);
     if (mCommonCathode) {
       ledMatrix->setCathodeOnGroup();
     } else {

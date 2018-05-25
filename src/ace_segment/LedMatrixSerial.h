@@ -41,19 +41,15 @@ class Hardware;
  */
 class LedMatrixSerial: public LedMatrix {
   public:
-    LedMatrixSerial(Hardware* hardware, uint8_t numGroups, uint8_t numElements):
-        LedMatrix(hardware, numGroups, numElements)
+    LedMatrixSerial(Hardware* hardware, uint8_t numGroups, uint8_t numElements,
+        const uint8_t* groupPins, uint8_t latchPin, uint8_t dataPin,
+        uint8_t clockPin):
+        LedMatrix(hardware, numGroups, numElements),
+        mGroupPins(groupPins),
+        mLatchPin(latchPin),
+        mDataPin(dataPin),
+        mClockPin(clockPin)
     {}
-
-    void setGroupPins(const uint8_t* groupPins) {
-      mGroupPins = groupPins;
-    }
-
-    void setElementPins(uint8_t latchPin, uint8_t dataPin, uint8_t clockPin) {
-      mLatchPin = latchPin;
-      mDataPin = dataPin;
-      mClockPin = clockPin;
-    }
 
     virtual void configure() override;
 
@@ -69,10 +65,10 @@ class LedMatrixSerial: public LedMatrix {
     /** Write to group pin identified by 'group'. */
     void writeGroupPin(uint8_t group, uint8_t output);
 
-    const uint8_t* mGroupPins;
-    uint8_t mLatchPin;
-    uint8_t mDataPin;
-    uint8_t mClockPin;
+    const uint8_t* const mGroupPins;
+    const uint8_t mLatchPin;
+    const uint8_t mDataPin;
+    const uint8_t mClockPin;
 };
 
 }

@@ -27,18 +27,6 @@ SOFTWARE.
 
 namespace ace_segment {
 
-// TODO: Consider moving this into the constructor, now that there's a
-// DriverBuilder.
-void LedMatrixDirect::setGroupPins(const uint8_t* groupPins) {
-  mGroupPins = groupPins;
-}
-
-// TODO: Consider moving this into the constructor, now that there's a
-// DriverBuilder.
-void LedMatrixDirect::setElementPins(const uint8_t* elementPins) {
-  mElementPins = elementPins;
-}
-
 void LedMatrixDirect::configure() {
   LedMatrix::configure();
 

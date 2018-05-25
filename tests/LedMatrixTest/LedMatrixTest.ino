@@ -71,9 +71,7 @@ class LedMatrixDirectTest: public BaseHardwareTest {
     virtual void setup() override {
       BaseHardwareTest::setup();
       mLedMatrix = new LedMatrixDirect(
-          mHardware, NUM_DIGITS, NUM_SEGMENTS);
-      mLedMatrix->setGroupPins(digitPins);
-      mLedMatrix->setElementPins(segmentPins);
+          mHardware, NUM_DIGITS, NUM_SEGMENTS, digitPins, segmentPins);
       mLedMatrix->setCathodeOnGroup();
 
       mLedMatrix->configure();
@@ -167,10 +165,8 @@ class LedMatrixSerialTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
       BaseHardwareTest::setup();
-      mLedMatrix = new LedMatrixSerial(
-          mHardware, NUM_DIGITS, NUM_SEGMENTS);
-      mLedMatrix->setGroupPins(digitPins);
-      mLedMatrix->setElementPins(latchPin, dataPin, clockPin);
+      mLedMatrix = new LedMatrixSerial(mHardware, NUM_DIGITS, NUM_SEGMENTS,
+          digitPins, latchPin, dataPin, clockPin);
       mLedMatrix->setCathodeOnGroup();
 
       mLedMatrix->configure();
@@ -243,10 +239,8 @@ class LedMatrixSpiTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
       BaseHardwareTest::setup();
-      mLedMatrix = new LedMatrixSpi(
-          mHardware, NUM_DIGITS, NUM_SEGMENTS);
-      mLedMatrix->setGroupPins(digitPins);
-      mLedMatrix->setElementPins(latchPin, dataPin, clockPin);
+      mLedMatrix = new LedMatrixSpi(mHardware, NUM_DIGITS, NUM_SEGMENTS,
+          digitPins, latchPin, dataPin, clockPin);
       mLedMatrix->setCathodeOnGroup();
 
       mLedMatrix->configure();

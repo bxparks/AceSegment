@@ -74,8 +74,8 @@ class LedMatrix {
 
     /** If a transistor drives the group, invert the logic levels. */
     void invertGroupLevels() {
-      mGroupOn = 1 - mGroupOn;
-      mGroupOff =  1 - mGroupOff;
+      mGroupOn ^= 0x1;
+      mGroupOff ^=  0x1;
     }
 
     /** Configure the pins for the given LED wiring. */

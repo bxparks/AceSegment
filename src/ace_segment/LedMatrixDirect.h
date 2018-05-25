@@ -31,13 +31,12 @@ namespace ace_segment {
 
 class LedMatrixDirect: public LedMatrix {
   public:
-    LedMatrixDirect(Hardware* hardware, uint8_t numGroups, uint8_t numElements):
-        LedMatrix(hardware, numGroups, numElements)
+    LedMatrixDirect(Hardware* hardware, uint8_t numGroups, uint8_t numElements,
+        const uint8_t* groupPins, const uint8_t* elementPins):
+        LedMatrix(hardware, numGroups, numElements),
+        mGroupPins(groupPins),
+        mElementPins(elementPins)
     {}
-
-    void setGroupPins(const uint8_t* groupPins);
-
-    void setElementPins(const uint8_t* elementPins);
 
     virtual void configure() override;
 
@@ -62,8 +61,8 @@ class LedMatrixDirect: public LedMatrix {
       mHardware->digitalWrite(elementPin, output);
     }
 
-    const uint8_t* mGroupPins;
-    const uint8_t* mElementPins;
+    const uint8_t* const mGroupPins;
+    const uint8_t* const mElementPins;
 };
 
 }

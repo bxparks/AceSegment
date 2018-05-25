@@ -37,8 +37,11 @@ class Hardware;
  */
 class LedMatrixSpi: public LedMatrixSerial {
   public:
-    LedMatrixSpi(Hardware* hardware, uint8_t numGroups, uint8_t numElements):
-        LedMatrixSerial(hardware, numGroups, numElements)
+    LedMatrixSpi(Hardware* hardware, uint8_t numGroups, uint8_t numElements,
+        const uint8_t* groupPins, uint8_t latchPin, uint8_t dataPin,
+        uint8_t clockPin):
+        LedMatrixSerial(hardware, numGroups, numElements, groupPins,
+            latchPin, dataPin, clockPin)
     {}
 
     virtual void configure() override;
