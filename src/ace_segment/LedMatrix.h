@@ -48,35 +48,39 @@ class Hardware;
  */
 class LedMatrix {
   public:
-    LedMatrix(Hardware* hardware, uint8_t numGroups, uint8_t numElements):
+
+    /**
+     * @param hardware pointer to Hardware instance
+     * @param cathodeOnGroup the LED common cathodes are on the groups
+     * @param useTransistorsOnGroups transistors used on groups, which
+     *    invert the logic level for the group lines
+     * @param useTransistorsOnElements transistors used on elements, which
+     *    invert the logic level for the element lines
+     * @param numGroups number of group lines
+     * @param numElements number of element lines
+     */
+    LedMatrix(Hardware* hardware, bool cathodeOnGroup,
+            bool useTransistorsOnGroups, bool useTransistorsOnElements,
+            uint8_t numGroups, uint8_t numElements):
         mHardware(hardware),
         mNumGroups(numGroups),
-        mNumElements(numElements)
-    {}
+        mNumElements(numElements) {
+
+      if (cathodeOnGroup) {
+        setCathodeOnGroup();
+      } else {
+        setAnodeOnGroup();
+      }
+
+      if (useTransistorsOnGroups) {
+        invertGroupLevels();
+      }
+      if (useTransistorsOnElements) {
+        invertElementLevels();
+      }
+    }
 
     virtual ~LedMatrix() {}
-
-    /** LED negative terminals are on the group line. Required. */
-    void setCathodeOnGroup() {
-      mGroupOn = LOW;
-      mGroupOff = HIGH;
-      mElementOn = HIGH;
-      mElementOff = LOW;
-    }
-
-    /** LED positive terminals are on the group line. Required. */
-    void setAnodeOnGroup() {
-      mGroupOn = HIGH;
-      mGroupOff = LOW;
-      mElementOn = LOW;
-      mElementOff = HIGH;
-    }
-
-    /** If a transistor drives the group, invert the logic levels. */
-    void invertGroupLevels() {
-      mGroupOn ^= 0x1;
-      mGroupOff ^=  0x1;
-    }
 
     /** Configure the pins for the given LED wiring. */
     virtual void configure() {}
@@ -91,6 +95,34 @@ class LedMatrix {
     virtual void drawElements(uint8_t pattern) = 0;
 
   protected:
+    /** LED negative terminals are on the group line. */
+    void setCathodeOnGroup() {
+      mGroupOn = LOW;
+      mGroupOff = HIGH;
+      mElementOn = HIGH;
+      mElementOff = LOW;
+    }
+
+    /** LED positive terminals are on the group line. */
+    void setAnodeOnGroup() {
+      mGroupOn = HIGH;
+      mGroupOff = LOW;
+      mElementOn = LOW;
+      mElementOff = HIGH;
+    }
+
+    /** If a transistor drives the group, invert the logic levels. */
+    void invertGroupLevels() {
+      mGroupOn ^= 0x1;
+      mGroupOff ^=  0x1;
+    }
+
+    /** If a transistor drives the elements, invert the logic levels. */
+    void invertElementLevels() {
+      mElementOn ^= 0x1;
+      mElementOff ^=  0x1;
+    }
+
     Hardware* const mHardware;
     const uint8_t mNumGroups;
     const uint8_t mNumElements;

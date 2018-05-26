@@ -183,7 +183,7 @@ void setupAceSegment() {
   #endif
       .setDimmablePatterns(dimmablePatterns)
   #if USE_TRANSISTORS == 1
-      .useTransistors()
+      .useTransistorsOnDigits()
   #endif
       .build();
 #elif DRIVER_MODE == DRIVER_MODE_SEGMENT
@@ -199,7 +199,7 @@ void setupAceSegment() {
       .setSegmentDirectPins(segmentPins)
       .setDimmablePatterns(dimmablePatterns)
   #if USE_TRANSISTORS == 1
-      .useTransistors()
+      .useTransistorsOnSegments()
   #endif
       .build();
 #else
