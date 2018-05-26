@@ -42,12 +42,12 @@ class Hardware;
 class LedMatrixSerial: public LedMatrix {
   public:
     LedMatrixSerial(Hardware* hardware, bool cathodeOnGroup,
-            bool useTransistorsOnGroups, bool useTransistorsOnElements,
+            bool transistorsOnGroups, bool transistorsOnElements,
             uint8_t numGroups, uint8_t numElements,
             const uint8_t* groupPins, uint8_t latchPin, uint8_t dataPin,
             uint8_t clockPin):
-        LedMatrix(hardware, cathodeOnGroup, useTransistorsOnGroups,
-            useTransistorsOnElements, numGroups, numElements),
+        LedMatrix(hardware, cathodeOnGroup, transistorsOnGroups,
+            transistorsOnElements, numGroups, numElements),
         mGroupPins(groupPins),
         mLatchPin(latchPin),
         mDataPin(dataPin),

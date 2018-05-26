@@ -61,12 +61,12 @@ class DriverBuilder {
       return *this;
     }
 
-    DriverBuilder& useTransistorsOnDigits() {
+    DriverBuilder& transistorsOnDigits() {
       mUseTransistorsOnDigits = true;
       return *this;
     }
 
-    DriverBuilder& useTransistorsOnSegments() {
+    DriverBuilder& transistorsOnSegments() {
       mUseTransistorsOnSegments = true;
       return *this;
     }

@@ -52,15 +52,15 @@ class LedMatrix {
     /**
      * @param hardware pointer to Hardware instance
      * @param cathodeOnGroup the LED common cathodes are on the groups
-     * @param useTransistorsOnGroups transistors used on groups, which
+     * @param transistorsOnGroups transistors used on groups, which
      *    invert the logic level for the group lines
-     * @param useTransistorsOnElements transistors used on elements, which
+     * @param transistorsOnElements transistors used on elements, which
      *    invert the logic level for the element lines
      * @param numGroups number of group lines
      * @param numElements number of element lines
      */
     LedMatrix(Hardware* hardware, bool cathodeOnGroup,
-            bool useTransistorsOnGroups, bool useTransistorsOnElements,
+            bool transistorsOnGroups, bool transistorsOnElements,
             uint8_t numGroups, uint8_t numElements):
         mHardware(hardware),
         mNumGroups(numGroups),
@@ -72,10 +72,10 @@ class LedMatrix {
         setAnodeOnGroup();
       }
 
-      if (useTransistorsOnGroups) {
+      if (transistorsOnGroups) {
         invertGroupLevels();
       }
-      if (useTransistorsOnElements) {
+      if (transistorsOnElements) {
         invertElementLevels();
       }
     }

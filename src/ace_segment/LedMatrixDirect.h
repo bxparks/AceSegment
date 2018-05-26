@@ -32,11 +32,11 @@ namespace ace_segment {
 class LedMatrixDirect: public LedMatrix {
   public:
     LedMatrixDirect(Hardware* hardware, bool cathodeOnGroup,
-            bool useTransistorsOnGroups, bool useTransistorsOnElements,
+            bool transistorsOnGroups, bool transistorsOnElements,
             uint8_t numGroups, uint8_t numElements,
             const uint8_t* groupPins, const uint8_t* elementPins):
-        LedMatrix(hardware, cathodeOnGroup, useTransistorsOnGroups,
-            useTransistorsOnElements, numGroups, numElements),
+        LedMatrix(hardware, cathodeOnGroup, transistorsOnGroups,
+            transistorsOnElements, numGroups, numElements),
         mGroupPins(groupPins),
         mElementPins(elementPins)
     {}

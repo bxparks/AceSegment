@@ -71,8 +71,8 @@ class LedMatrixDirectTest: public BaseHardwareTest {
     virtual void setup() override {
       BaseHardwareTest::setup();
       mLedMatrix = new LedMatrixDirect(mHardware, true /* cathodeOnGroup */,
-          false /* useTransistorsOnGroups */,
-          false /* useTransistorsOnElements */,
+          false /* transistorsOnGroups */,
+          false /* transistorsOnElements */,
           NUM_DIGITS, NUM_SEGMENTS, digitPins, segmentPins);
 
       mLedMatrix->configure();
@@ -167,8 +167,8 @@ class LedMatrixSerialTest: public BaseHardwareTest {
     virtual void setup() override {
       BaseHardwareTest::setup();
       mLedMatrix = new LedMatrixSerial(mHardware, true /* cathodeOnGroup */,
-          false /* useTransistorsOnGroups */,
-          false /* useTransistorsOnElements */,
+          false /* transistorsOnGroups */,
+          false /* transistorsOnElements */,
           NUM_DIGITS, NUM_SEGMENTS, digitPins, latchPin, dataPin, clockPin);
 
       mLedMatrix->configure();
@@ -242,8 +242,8 @@ class LedMatrixSpiTest: public BaseHardwareTest {
     virtual void setup() override {
       BaseHardwareTest::setup();
       mLedMatrix = new LedMatrixSpi(mHardware,
-          true /* cathodeOnGroup */, false /* useTransistorsOnGroups */,
-          false /* useTransistorsOnElements */,
+          true /* cathodeOnGroup */, false /* transistorsOnGroups */,
+          false /* transistorsOnElements */,
           NUM_DIGITS, NUM_SEGMENTS, digitPins, latchPin, dataPin, clockPin);
 
       mLedMatrix->configure();
