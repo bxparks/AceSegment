@@ -22,33 +22,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_LED_MATRIX_SERIAL_H
-#define ACE_SEGMENT_LED_MATRIX_SERIAL_H
+#ifndef ACE_SEGMENT_LED_MATRIX_FULL_SERIAL_H
+#define ACE_SEGMENT_LED_MATRIX_FULL_SERIAL_H
 
-#include "LedMatrixSplit.h"
+#include "LedMatrixMerged.h"
 
 namespace ace_segment {
 
 class Hardware;
 
 /**
- * An implementation of LedMatrixSplit with an 74HC595 Serial-To-Parallel
- * converter chip on the segment pins. The wiring is as follows:
+ * An LedMatrix with an 74HC595 Serial-To-Parallel converter chip on the
+ * both the digit and segment pins. Uses software SPI. The wiring is as follows:
  *
  *   latchPin/D10/SS -- ST_CP (Phillips) / RCK (TI) / Pin 12 (rising)
  *   dataPin/D11/MOSI -- DS (Phillips) / SER (TI) / Pin 14
  *   clockPin/D13/SCK -- SH_CP (Phillips) / SRCK (TI) / Pin 11 (rising)
  */
-class LedMatrixSerial: public LedMatrixSplit {
+class LedMatrixMergedSerial: public LedMatrixMerged {
   public:
-    LedMatrixSerial(Hardware* hardware, bool cathodeOnGroup,
+    LedMatrixMergedSerial(Hardware* hardware, bool cathodeOnGroup,
             bool transistorsOnGroups, bool transistorsOnElements,
             uint8_t numGroups, uint8_t numElements,
-            const uint8_t* groupPins, uint8_t latchPin, uint8_t dataPin,
-            uint8_t clockPin):
-        LedMatrixSplit(hardware, cathodeOnGroup, transistorsOnGroups,
+            uint8_t latchPin, uint8_t dataPin, uint8_t clockPin):
+        LedMatrixMerged(hardware, cathodeOnGroup, transistorsOnGroups,
             transistorsOnElements, numGroups, numElements),
-        mGroupPins(groupPins),
         mLatchPin(latchPin),
         mDataPin(dataPin),
         mClockPin(clockPin)
@@ -58,21 +56,14 @@ class LedMatrixSerial: public LedMatrixSplit {
 
     virtual void finish() override;
 
-    virtual void enableGroup(uint8_t group) override;
-
-    virtual void disableGroup(uint8_t group) override;
-
-    virtual void drawElements(uint8_t pattern) override;
+    virtual void draw(uint8_t groupPattern, uint8_t elementPattern) override;
 
   protected:
-    /** Write to group pin identified by 'group'. */
-    void writeGroupPin(uint8_t group, uint8_t output);
-
-    const uint8_t* const mGroupPins;
     const uint8_t mLatchPin;
     const uint8_t mDataPin;
     const uint8_t mClockPin;
 };
 
 }
+
 #endif

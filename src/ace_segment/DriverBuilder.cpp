@@ -36,7 +36,7 @@ SOFTWARE.
 namespace ace_segment {
 
 /** The LedMatrix object returned must have its configure() called. */
-LedMatrix* DriverBuilder::buildLedMatrix() {
+LedMatrixSplit* DriverBuilder::buildLedMatrix() {
   if (mLedMatrixType == kTypeLedMatrixDirect) {
     if (mResistorsOnSegments) {
       return new LedMatrixDirect(mHardware,
@@ -65,7 +65,7 @@ LedMatrix* DriverBuilder::buildLedMatrix() {
 }
 
 Driver* DriverBuilder::build() {
-  LedMatrix* ledMatrix = buildLedMatrix();
+  LedMatrixSplit* ledMatrix = buildLedMatrix();
 
   if (mResistorsOnSegments) {
     if (mUseModulatingDriver) {

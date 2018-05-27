@@ -24,13 +24,14 @@ SOFTWARE.
 
 #include "Util.h"
 #include "Hardware.h"
-#include "LedMatrix.h"
+#include "LedMatrixSplit.h"
 #include "ModulatingDigitDriver.h"
 
 namespace ace_segment {
 
 void ModulatingDigitDriver::displayCurrentField() {
   if (mPreparedToSleep) return;
+  LedMatrixSplit* ledMatrix = static_cast<LedMatrixSplit*>(mLedMatrix);
 
   bool isCurrentDigitOn;
   DimmablePattern& dimmablePattern = mDimmablePatterns[mCurrentDigit];
@@ -42,7 +43,7 @@ void ModulatingDigitDriver::displayCurrentField() {
     // unpredicatble things) causes the mIsPrevDigitOn state to be wrong. We
     // want to be absolutely sure that 2 digits cannot be turned on at the same
     // time.
-    mLedMatrix->disableGroup(mPrevDigit);
+    ledMatrix->disableGroup(mPrevDigit);
 
     isCurrentDigitOn = false;
     mCurrentSubFieldMax = ((uint16_t) mNumSubFields * brightness) / 256;
@@ -56,7 +57,7 @@ void ModulatingDigitDriver::displayCurrentField() {
   if (brightness < 255 && mCurrentSubField >= mCurrentSubFieldMax) {
     // turn off the current digit
     if (isCurrentDigitOn) {
-      mLedMatrix->disableGroup(mCurrentDigit);
+      ledMatrix->disableGroup(mCurrentDigit);
       isCurrentDigitOn = false;
     }
   } else {
@@ -64,10 +65,10 @@ void ModulatingDigitDriver::displayCurrentField() {
     if (!isCurrentDigitOn) {
       SegmentPatternType segmentPattern = dimmablePattern.pattern;
       if (segmentPattern != mSegmentPattern) {
-        mLedMatrix->drawElements(segmentPattern);
+        ledMatrix->drawElements(segmentPattern);
         mSegmentPattern = segmentPattern;
       }
-      mLedMatrix->enableGroup(mCurrentDigit);
+      ledMatrix->enableGroup(mCurrentDigit);
       isCurrentDigitOn = true;
     }
   }

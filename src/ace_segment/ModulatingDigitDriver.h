@@ -30,12 +30,13 @@ SOFTWARE.
 
 namespace ace_segment {
 
+class LedMatrixSplit;
 class DimmablePattern;
 
 class ModulatingDigitDriver: public DigitDriver {
   public:
     /** Constructor. */
-    explicit ModulatingDigitDriver(LedMatrix* ledMatrix,
+    explicit ModulatingDigitDriver(LedMatrixSplit* ledMatrix,
             DimmablePattern* dimmablePatterns, uint8_t numDigits,
             uint8_t numSubFields, bool ownsLedMatrix = false):
         DigitDriver(ledMatrix, dimmablePatterns, numDigits, ownsLedMatrix),

@@ -26,13 +26,13 @@ SOFTWARE.
 #define ACE_SEGMENT_DRIVER_BUILDER_H
 
 #include "Hardware.h"
-#include "LedMatrix.h"
+#include "LedMatrixSplit.h"
 #include "Driver.h"
 
 namespace ace_segment {
 
 class Hardware;
-class LedMatrix;
+class LedMatrixSplit;
 class Driver;
 
 class DriverBuilder {
@@ -144,7 +144,7 @@ class DriverBuilder {
     static const uint8_t kTypeLedMatrixSerial = 1;
     static const uint8_t kTypeLedMatrixSpi = 2;
 
-    LedMatrix* buildLedMatrix();
+    LedMatrixSplit* buildLedMatrix();
 
     // parameters for LedMatrix
     Hardware* const mHardware;

@@ -22,35 +22,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_LED_MATRIX_SPI_H
-#define ACE_SEGMENT_LED_MATRIX_SPI_H
+#ifndef ACE_SEGMENT_LED_MATRIX_SPLIT_H
+#define ACE_SEGMENT_LED_MATRIX_SPLIT_H
 
-#include "LedMatrixSerial.h"
+#include "LedMatrix.h"
 
 namespace ace_segment {
 
-class Hardware;
-
 /**
- * Similar to LedMatrixSerial but uses SPI to talk to the 74HC595 chip instead
- * of the shiftOut() method.
+ * An LedMatrix that writes to group pins separately from the element pins.
  */
-class LedMatrixSpi: public LedMatrixSerial {
+class LedMatrixSplit: public LedMatrix {
   public:
-    LedMatrixSpi(Hardware* hardware, bool cathodeOnGroup,
-        bool transistorsOnGroups, bool transistorsOnElements,
-        uint8_t numGroups, uint8_t numElements, const uint8_t* groupPins,
-        uint8_t latchPin, uint8_t dataPin, uint8_t clockPin):
-        LedMatrixSerial(hardware, cathodeOnGroup, transistorsOnGroups,
-            transistorsOnElements, numGroups, numElements,
-            groupPins, latchPin, dataPin, clockPin)
+    LedMatrixSplit(Hardware* hardware, bool cathodeOnGroup,
+            bool transistorsOnGroups, bool transistorsOnElements,
+            uint8_t numGroups, uint8_t numElements):
+        LedMatrix(hardware, cathodeOnGroup, transistorsOnGroups,
+            transistorsOnElements, numGroups, numElements)
     {}
 
-    virtual void configure() override;
+    virtual void enableGroup(uint8_t group) = 0;
 
-    virtual void finish() override;
+    virtual void disableGroup(uint8_t group) = 0;
 
-    virtual void drawElements(uint8_t pattern) override;
+    virtual void drawElements(uint8_t pattern) = 0;
 };
 
 }

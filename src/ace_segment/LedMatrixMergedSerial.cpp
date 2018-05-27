@@ -22,37 +22,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_LED_MATRIX_SPI_H
-#define ACE_SEGMENT_LED_MATRIX_SPI_H
-
-#include "LedMatrixSerial.h"
+#include "Hardware.h"
+#include "LedMatrixMergedSerial.h"
 
 namespace ace_segment {
 
-class Hardware;
+void LedMatrixMergedSerial::configure() {
+  LedMatrix::configure();
 
-/**
- * Similar to LedMatrixSerial but uses SPI to talk to the 74HC595 chip instead
- * of the shiftOut() method.
- */
-class LedMatrixSpi: public LedMatrixSerial {
-  public:
-    LedMatrixSpi(Hardware* hardware, bool cathodeOnGroup,
-        bool transistorsOnGroups, bool transistorsOnElements,
-        uint8_t numGroups, uint8_t numElements, const uint8_t* groupPins,
-        uint8_t latchPin, uint8_t dataPin, uint8_t clockPin):
-        LedMatrixSerial(hardware, cathodeOnGroup, transistorsOnGroups,
-            transistorsOnElements, numGroups, numElements,
-            groupPins, latchPin, dataPin, clockPin)
-    {}
-
-    virtual void configure() override;
-
-    virtual void finish() override;
-
-    virtual void drawElements(uint8_t pattern) override;
-};
-
+  // Actual values of latchPin, dataPin and clockPin don't matter because the
+  // functions are triggered on a rising edge, not on the level.
+  mHardware->pinMode(mLatchPin, OUTPUT);
+  mHardware->pinMode(mDataPin, OUTPUT);
+  mHardware->pinMode(mClockPin, OUTPUT);
 }
 
-#endif
+void LedMatrixMergedSerial::finish() {
+  mHardware->pinMode(mLatchPin, INPUT);
+  mHardware->pinMode(mDataPin, INPUT);
+  mHardware->pinMode(mClockPin, INPUT);
+}
+
+void LedMatrixMergedSerial::draw(uint8_t groupPattern, uint8_t elementPattern) {
+  mHardware->digitalWrite(mLatchPin, LOW);
+  uint8_t actualElementPattern = (mElementOn == HIGH)
+      ? elementPattern : ~elementPattern;
+  uint8_t actualGroupPattern = (mGroupOn == HIGH)
+      ? groupPattern : ~groupPattern;
+  mHardware->shiftOut(mDataPin, mClockPin, MSBFIRST, actualGroupPattern);
+  mHardware->shiftOut(mDataPin, mClockPin, MSBFIRST, actualElementPattern);
+  mHardware->digitalWrite(mLatchPin, HIGH);
+}
+
+}

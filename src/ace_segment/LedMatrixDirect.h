@@ -25,17 +25,17 @@ SOFTWARE.
 #define ACE_SEGMENT_LED_MATRIX_DIRECT_H
 
 #include "Hardware.h"
-#include "LedMatrix.h"
+#include "LedMatrixSplit.h"
 
 namespace ace_segment {
 
-class LedMatrixDirect: public LedMatrix {
+class LedMatrixDirect: public LedMatrixSplit {
   public:
     LedMatrixDirect(Hardware* hardware, bool cathodeOnGroup,
             bool transistorsOnGroups, bool transistorsOnElements,
             uint8_t numGroups, uint8_t numElements,
             const uint8_t* groupPins, const uint8_t* elementPins):
-        LedMatrix(hardware, cathodeOnGroup, transistorsOnGroups,
+        LedMatrixSplit(hardware, cathodeOnGroup, transistorsOnGroups,
             transistorsOnElements, numGroups, numElements),
         mGroupPins(groupPins),
         mElementPins(elementPins)

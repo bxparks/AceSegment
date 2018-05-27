@@ -88,12 +88,6 @@ class LedMatrix {
     /** Turn off the pins by doing the opposite of configure(). */
     virtual void finish() {}
 
-    virtual void enableGroup(uint8_t group) = 0;
-
-    virtual void disableGroup(uint8_t group) = 0;
-
-    virtual void drawElements(uint8_t pattern) = 0;
-
   protected:
     /** LED negative terminals are on the group line. */
     void setCathodeOnGroup() {

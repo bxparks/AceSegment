@@ -26,6 +26,7 @@ SOFTWARE.
 #define ACE_SEGMENT_SEGMENT_DRIVER_H
 
 #include <stdint.h>
+#include "LedMatrixSplit.h"
 #include "Driver.h"
 
 namespace ace_segment {
@@ -39,7 +40,7 @@ class DimmablePattern;
 class SegmentDriver: public Driver {
   public:
     /** Constructor. */
-    explicit SegmentDriver(LedMatrix* ledMatrix,
+    explicit SegmentDriver(LedMatrixSplit* ledMatrix,
             DimmablePattern* dimmablePatterns,
             uint8_t numDigits, bool ownsLedMatrix = false):
         Driver(ledMatrix, dimmablePatterns, numDigits, ownsLedMatrix)

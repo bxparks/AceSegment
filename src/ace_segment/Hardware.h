@@ -82,6 +82,13 @@ class Hardware {
       SPI.endTransaction();
     }
 
+    /** Send byte through SPI. */
+    virtual void spiTransfer16(uint16_t value) {
+      SPI.beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
+      SPI.transfer16(value);
+      SPI.endTransaction();
+    }
+
   private:
     // disable copy-constructor and assignment operator
     Hardware(const Hardware&) = delete;

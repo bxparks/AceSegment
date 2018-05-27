@@ -24,31 +24,32 @@ SOFTWARE.
 
 #include "Hardware.h"
 #include "DigitDriver.h"
-#include "LedMatrix.h"
+#include "LedMatrixSplit.h"
 #include "Util.h"
 
 namespace ace_segment {
 
 void DigitDriver::displayCurrentField() {
   if (mPreparedToSleep) return;
+  LedMatrixSplit* ledMatrix = static_cast<LedMatrixSplit*>(mLedMatrix);
 
   if (mCurrentDigit != mPrevDigit) {
     // NOTE: If we kept a flag (e.g. mIsPrevDigitOn) that preserved whether the
     // previous iteration turned this digit on or off, we could bypass this
     // disableGroup(). But the CPU savings doesn't seem worth it.
-    mLedMatrix->disableGroup(mPrevDigit);
+    ledMatrix->disableGroup(mPrevDigit);
   }
 
   DimmablePattern& dimmablePattern = mDimmablePatterns[mCurrentDigit];
   if (dimmablePattern.brightness == 0) {
-    mLedMatrix->disableGroup(mCurrentDigit);
+    ledMatrix->disableGroup(mCurrentDigit);
   } else {
     SegmentPatternType segmentPattern = dimmablePattern.pattern;
     if (segmentPattern != mSegmentPattern) {
-      mLedMatrix->drawElements(segmentPattern);
+      ledMatrix->drawElements(segmentPattern);
       mSegmentPattern = segmentPattern;
     }
-    mLedMatrix->enableGroup(mCurrentDigit);
+    ledMatrix->enableGroup(mCurrentDigit);
   }
 
   mPrevDigit = mCurrentDigit;
@@ -57,7 +58,8 @@ void DigitDriver::displayCurrentField() {
 
 void DigitDriver::prepareToSleep() {
   Driver::prepareToSleep();
-  mLedMatrix->disableGroup(mPrevDigit);
+  LedMatrixSplit* ledMatrix = static_cast<LedMatrixSplit*>(mLedMatrix);
+  ledMatrix->disableGroup(mPrevDigit);
 }
 
 }
