@@ -34,7 +34,7 @@ void ModulatingDigitDriver::displayCurrentField() {
   LedMatrixSplit* ledMatrix = static_cast<LedMatrixSplit*>(mLedMatrix);
 
   bool isCurrentDigitOn;
-  DimmablePattern& dimmablePattern = mDimmablePatterns[mCurrentDigit];
+  const DimmablePattern& dimmablePattern = mDimmablePatterns[mCurrentDigit];
   uint8_t brightness = dimmablePattern.brightness;
   if (mCurrentDigit != mPrevDigit) {
     // NOTE: The following could be optimized away by wrapping it around an 'if

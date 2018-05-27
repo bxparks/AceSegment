@@ -40,7 +40,7 @@ void DigitDriver::displayCurrentField() {
     ledMatrix->disableGroup(mPrevDigit);
   }
 
-  DimmablePattern& dimmablePattern = mDimmablePatterns[mCurrentDigit];
+  const DimmablePattern& dimmablePattern = mDimmablePatterns[mCurrentDigit];
   if (dimmablePattern.brightness == 0) {
     ledMatrix->disableGroup(mCurrentDigit);
   } else {

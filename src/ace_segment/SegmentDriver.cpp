@@ -55,7 +55,7 @@ Driver::DigitPatternType SegmentDriver::getDigitBitPattern(uint8_t segment) {
   DigitPatternType digitMask = 0x1;
   DigitPatternType digitPattern = 0;
   for (uint8_t digit = 0; digit < mNumDigits; digit++) {
-    DimmablePattern& dimmablePattern = mDimmablePatterns[digit];
+    const DimmablePattern& dimmablePattern = mDimmablePatterns[digit];
     SegmentPatternType pattern = (dimmablePattern.brightness != 0)
         ? dimmablePattern.pattern : 0;
     if (pattern & segmentMask) {
