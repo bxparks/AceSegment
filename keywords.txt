@@ -124,7 +124,7 @@ setSegmentDirectPins	KEYWORD2
 setSegmentSerialPins	KEYWORD2
 setSegmentSpiPins	KEYWORD2
 setDimmablePatterns	KEYWORD2
-useModulatingDriver	KEYWORD2
+useModulation	KEYWORD2
 build	KEYWORD2
 
 # RendererBuilder.h

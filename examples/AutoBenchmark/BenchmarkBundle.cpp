@@ -85,7 +85,7 @@ BenchmarkBundle::BenchmarkBundle(const DriverConfig* driverConfig) {
         builder.setSegmentSpiPins(kLatchPin, kDataPin, kClockPin);
       }
       if (driverConfig->mModulation == DriverConfig::UseModulation) {
-        builder.useModulatingDriver(kNumSubFields);
+        builder.useModulation(kNumSubFields);
       }
       mDriver = builder.build();
     } else {

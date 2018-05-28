@@ -9,18 +9,18 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <digitalWriteFast.h>
-#include <ace_segment/ModulatingDigitDriver.h>
+#include <ace_segment/DigitDriver.h>
 #include <ace_segment/Util.h>
 
 #ifndef ACE_SEGMENT_FastSpiDriver_H
 #define ACE_SEGMENT_FastSpiDriver_H
 
-class FastSpiDriver: public ace_segment::ModulatingDigitDriver {
+class FastSpiDriver: public ace_segment::DigitDriver {
   public:
     // Constructor
     FastSpiDriver(ace_segment::DimmablePattern* dimmablePatterns,
             uint8_t numDigits, uint8_t numSubFields):
-        ace_segment::ModulatingDigitDriver(
+        ace_segment::DigitDriver(
             nullptr /* ledMatrix */, dimmablePatterns, numDigits, numSubFields)
     {}
 
@@ -28,6 +28,7 @@ class FastSpiDriver: public ace_segment::ModulatingDigitDriver {
     virtual ~FastSpiDriver() override {}
 
     virtual void configure() override;
+    virtual void finish() override;
     virtual void displayCurrentField() override;
     virtual void prepareToSleep() override;
 

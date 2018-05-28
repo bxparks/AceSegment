@@ -7,18 +7,18 @@
 
 #include <stdint.h>
 #include <digitalWriteFast.h>
-#include <ace_segment/ModulatingDigitDriver.h>
+#include <ace_segment/DigitDriver.h>
 #include <ace_segment/Util.h>
 
 #ifndef ACE_SEGMENT_FastSerialDriver_H
 #define ACE_SEGMENT_FastSerialDriver_H
 
-class FastSerialDriver: public ace_segment::ModulatingDigitDriver {
+class FastSerialDriver: public ace_segment::DigitDriver {
   public:
     // Constructor
     FastSerialDriver(ace_segment::DimmablePattern* dimmablePatterns,
             uint8_t numDigits, uint8_t numSubFields):
-        ace_segment::ModulatingDigitDriver(
+        ace_segment::DigitDriver(
             nullptr /* ledMatrix */, dimmablePatterns, numDigits, numSubFields)
     {}
 

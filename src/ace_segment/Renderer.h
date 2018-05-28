@@ -96,7 +96,7 @@ class Renderer {
     /**
      * Set brightness expressed as a fraction of 256. In other words, 255 is
      * brightest (default); 1 is 1/256 of full brightness. Requires the support
-     * of useModulatingDriver() option in DriverBuilder. If the driver doesn't
+     * of useModulation() option in DriverBuilder. If the driver doesn't
      * support brightness, then anything above 0 is full brightness and 0 turns
      * off the digit.
      */

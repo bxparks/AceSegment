@@ -31,7 +31,6 @@ SOFTWARE.
 #include <ace_segment/LedMatrixSerial.h>
 #include <ace_segment/LedMatrixSpi.h>
 #include <ace_segment/DigitDriver.h>
-#include <ace_segment/ModulatingDigitDriver.h>
 #include <ace_segment/SegmentDriver.h>
 #include <ace_segment/TimingStats.h>
 #include <ace_segment/testing/FakeDriver.h>
@@ -67,8 +66,6 @@ void setup() {
   Serial.println(sizeof(SegmentDriver));
   Serial.print(F("sizeof(DigitDriver): "));
   Serial.println(sizeof(DigitDriver));
-  Serial.print(F("sizeof(ModulatingDigitDriver): "));
-  Serial.println(sizeof(ModulatingDigitDriver));
   Serial.print(F("sizeof(DriverBuilder): "));
   Serial.println(sizeof(DriverBuilder));
   Serial.print(F("sizeof(BlinkStyler): "));

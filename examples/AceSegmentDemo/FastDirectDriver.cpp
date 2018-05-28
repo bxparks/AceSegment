@@ -71,7 +71,21 @@ void FastDirectDriver::configure() {
     writeSegment(segment, kSegmentOff);
   }
 
-  ace_segment::ModulatingDigitDriver::configure();
+  ace_segment::DigitDriver::configure();
+}
+
+void FastDirectDriver::finish() {
+  ace_segment::DigitDriver::finish();
+
+  for (uint8_t digit = 0; digit < mNumDigits; digit++) {
+    uint8_t groupPin = kDigitPins[digit];
+    pinMode(groupPin, INPUT);
+  }
+
+  for (uint8_t segment = 0; segment < kNumSegments; segment++) {
+    uint8_t elementPin = kSegmentPins[segment];
+    pinMode(elementPin, INPUT);
+  }
 }
 
 void FastDirectDriver::displayCurrentField() {

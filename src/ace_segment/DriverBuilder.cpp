@@ -29,7 +29,6 @@ SOFTWARE.
 #include "LedMatrixSpi.h"
 #include "Driver.h"
 #include "DigitDriver.h"
-#include "ModulatingDigitDriver.h"
 #include "SegmentDriver.h"
 #include "DriverBuilder.h"
 
@@ -68,13 +67,8 @@ Driver* DriverBuilder::build() {
   LedMatrixSplit* ledMatrix = buildLedMatrix();
 
   if (mResistorsOnSegments) {
-    if (mUseModulatingDriver) {
-      return new ModulatingDigitDriver(ledMatrix, mDimmablePatterns,
-          mNumDigits, mNumSubFields, true /* ownsLedMatrix */);
-    } else {
-      return new DigitDriver(ledMatrix, mDimmablePatterns, mNumDigits,
-          true /* ownsLedMatrix */);
-    }
+    return new DigitDriver(ledMatrix, mDimmablePatterns, mNumDigits,
+        mNumSubFields, true /* ownsLedMatrix */);
   } else {
     return new SegmentDriver(ledMatrix, mDimmablePatterns, mNumDigits,
         true /* ownsLedMatrix */);

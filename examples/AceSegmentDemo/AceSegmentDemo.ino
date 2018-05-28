@@ -55,16 +55,15 @@ void setupAceButton() {
 //------------------------------------------------------------------
 
 #define DRIVER_MODE_NONE 0
-#define DRIVER_MODE_DIGIT 1
-#define DRIVER_MODE_MODULATING_DIGIT 2
-#define DRIVER_MODE_SEGMENT 3
-#define DRIVER_MODE_FAST_DIRECT 4
-#define DRIVER_MODE_FAST_SERIAL 5
-#define DRIVER_MODE_FAST_SPI 6
+#define DRIVER_MODE_DIRECT_DIGIT 1
+#define DRIVER_MODE_DIRECT_FAST_DIGIT 2
+#define DRIVER_MODE_DIRECT_SEGMENT 3
 
-#define LED_MATRIX_MODE_DIRECT 1
-#define LED_MATRIX_MODE_SERIAL 2
-#define LED_MATRIX_MODE_SPI 3
+#define DRIVER_MODE_SERIAL_DIGIT 4
+#define DRIVER_MODE_SERIAL_FAST_DIGIT 5
+
+#define DRIVER_MODE_SPI_DIGIT 6
+#define DRIVER_MODE_SPI_FAST_DIGIT 7
 
 #define WRITE_MODE_NONE 0
 #define WRITE_MODE_HEX 1
@@ -84,11 +83,7 @@ void setupAceButton() {
 // Define the Driver to use. Use DRIVER_MODE_NONE to get flash/static
 // consumption without any AceSegment code. Then set to the other modes to get
 // flash/static memory usage.
-#define DRIVER_MODE DRIVER_MODE_MODULATING_DIGIT
-
-// Applies only for DRIVER_MODE_DIGIT, DRIVER_MODE_MODULATING_DIGIT,
-// DRIVER_MODE_SEGMENT. Ignored for others.
-#define LED_MATRIX_MODE LED_MATRIX_MODE_SERIAL
+#define DRIVER_MODE DRIVER_MODE_DIRECT_DIGIT
 
 // Type of characters to write to the LED display
 #define WRITE_MODE WRITE_MODE_CLOCK
@@ -108,23 +103,16 @@ const uint8_t PULSE_STYLE = 2;
 const uint8_t NUM_DIGITS = 4;
 const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
 
-#if DRIVER_MODE == DRIVER_MODE_SEGMENT
-  // 4 digits, resistors on digits
+#if DRIVER_MODE == DRIVER_MODE_DIRECT_DIGIT || \
+    DRIVER_MODE == DRIVER_MODE_DIRECT_SEGMENT || \
+    DRIVER_MODE == DRIVER_MODE_DIRECT_FAST_DIGIT
+  // 4 digits, resistors on segments
   const uint8_t segmentPins[8] = {8, 9, 10, 11, 12, 14, 15, 13};
 #else
-  #if ((DRIVER_MODE == DRIVER_MODE_DIGIT \
-      || DRIVER_MODE == DRIVER_MODE_MODULATING_DIGIT \
-      || DRIVER_MODE == DRIVER_MODE_SEGMENT) \
-        && LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT) \
-      || DRIVER_MODE == DRIVER_MODE_FAST_DIRECT
-    // 4 digits, resistors on segments
-    const uint8_t segmentPins[8] = {8, 9, 10, 11, 12, 14, 15, 13};
-  #else
-    // 4 digits, resistors on segments, serial-to-parallel converter on segments
-    const uint8_t latchPin = SS; // ST_CP on 74HC595
-    const uint8_t dataPin = MOSI; // DS on 74HC595
-    const uint8_t clockPin = SCK; // SH_CP on 74HC595
-  #endif
+  // 4 digits, resistors on segments, serial-to-parallel converter on segments
+  const uint8_t latchPin = SS; // ST_CP on 74HC595
+  const uint8_t dataPin = MOSI; // DS on 74HC595
+  const uint8_t clockPin = SCK; // SH_CP on 74HC595
 #endif
 
 #if DRIVER_MODE > DRIVER_MODE_NONE
@@ -160,61 +148,74 @@ void setupAceSegment() {
   hardware = new Hardware();
 
   // Create the Driver.
-#if DRIVER_MODE == DRIVER_MODE_DIGIT \
-    || DRIVER_MODE == DRIVER_MODE_MODULATING_DIGIT
+#if DRIVER_MODE == DRIVER_MODE_DIRECT_DIGIT
   driver = DriverBuilder(hardware)
       .setNumDigits(NUM_DIGITS)
-  #if COMMON_CATHODE == 1
-      .setCommonCathode()
-  #else
-      .setCommonAnode()
-  #endif
       .setResistorsOnSegments()
       .setDigitPins(digitPins)
-  #if LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT
       .setSegmentDirectPins(segmentPins)
-  #elif LED_MATRIX_MODE == LED_MATRIX_MODE_SERIAL
-      .setSegmentSerialPins(latchPin, dataPin, clockPin)
-  #else
-      .setSegmentSpiPins(latchPin, dataPin, clockPin)
-  #endif
-  #if DRIVER_MODE == DRIVER_MODE_MODULATING_DIGIT
-      .useModulatingDriver(NUM_SUBFIELDS)
-  #endif
+      .useModulation(NUM_SUBFIELDS)
       .setDimmablePatterns(dimmablePatterns)
+      .setCommonCathode(COMMON_CATHODE != 1)
   #if USE_TRANSISTORS == 1
       .transistorsOnDigits()
   #endif
       .build();
-#elif DRIVER_MODE == DRIVER_MODE_SEGMENT
+#elif DRIVER_MODE == DRIVER_MODE_SERIAL_DIGIT
   driver = DriverBuilder(hardware)
       .setNumDigits(NUM_DIGITS)
-  #if COMMON_CATHODE == 1
-      .setCommonCathode()
-  #else
-      .setCommonAnode()
+      .setResistorsOnSegments()
+      .setDigitPins(digitPins)
+      .setSegmentSerialPins(latchPin, dataPin, clockPin)
+      .useModulation(NUM_SUBFIELDS)
+      .setDimmablePatterns(dimmablePatterns)
+      .setCommonCathode(COMMON_CATHODE != 0)
+  #if USE_TRANSISTORS == 1
+      .transistorsOnDigits()
   #endif
+      .build();
+#elif DRIVER_MODE == DRIVER_MODE_SPI_DIGIT
+  driver = DriverBuilder(hardware)
+      .setNumDigits(NUM_DIGITS)
+      .setResistorsOnSegments()
+      .setDigitPins(digitPins)
+      .setSegmentSpiPins(latchPin, dataPin, clockPin)
+      .useModulation(NUM_SUBFIELDS)
+      .setDimmablePatterns(dimmablePatterns)
+      .setCommonCathode(COMMON_CATHODE != 0)
+  #if USE_TRANSISTORS == 1
+      .transistorsOnDigits()
+  #endif
+      .build();
+#elif DRIVER_MODE == DRIVER_MODE_DIRECT_SEGMENT
+  driver = DriverBuilder(hardware)
+      .setNumDigits(NUM_DIGITS)
       .setResistorsOnDigits()
       .setDigitPins(digitPins)
       .setSegmentDirectPins(segmentPins)
       .setDimmablePatterns(dimmablePatterns)
+      .setCommonCathode(COMMON_CATHODE != 1)
   #if USE_TRANSISTORS == 1
       .transistorsOnSegments()
   #endif
       .build();
 #else
   #ifdef __AVR__
-    #if DRIVER_MODE == DRIVER_MODE_FAST_DIRECT
+    #if DRIVER_MODE == DRIVER_MODE_DIRECT_FAST_DIGIT
       driver = new FastDirectDriver(
           dimmablePatterns, NUM_DIGITS, NUM_SUBFIELDS);
-    #elif DRIVER_MODE == DRIVER_MODE_FAST_SERIAL
+    #elif DRIVER_MODE == DRIVER_MODE_SERIAL_FAST_DIGIT
       driver = new FastSerialDriver(
           dimmablePatterns, NUM_DIGITS, NUM_SUBFIELDS);
-    #elif DRIVER_MODE == DRIVER_MODE_FAST_SPI
-      driver = new FastSpiDriver(dimmablePatterns, NUM_DIGITS, NUM_SUBFIELDS);
+    #elif DRIVER_MODE == DRIVER_MODE_SPI_FAST_DIGIT
+      driver = new FastSpiDriver(
+          dimmablePatterns, NUM_DIGITS, NUM_SUBFIELDS);
     #endif
+  #else
+    #error Unsupported platform
   #endif
 #endif
+
   driver->configure();
 
   // Create the Renderer.

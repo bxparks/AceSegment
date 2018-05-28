@@ -61,6 +61,11 @@ class DriverBuilder {
       return *this;
     }
 
+    DriverBuilder& setCommonCathode(bool commonCathode) {
+      mCommonCathode = commonCathode;
+      return *this;
+    }
+
     DriverBuilder& transistorsOnDigits() {
       mUseTransistorsOnDigits = true;
       return *this;
@@ -131,8 +136,7 @@ class DriverBuilder {
      * @param numSubFields number subfields per field, 16 seems to be a good
      * reasonable. A minimum of 1 is imposed if set to 0.
      */
-    DriverBuilder& useModulatingDriver(uint8_t numSubFields) {
-      mUseModulatingDriver = true;
+    DriverBuilder& useModulation(uint8_t numSubFields) {
       mNumSubFields = (numSubFields > 0) ? numSubFields : 1;
       return *this;
     }
@@ -163,8 +167,7 @@ class DriverBuilder {
 
     // parameters for Driver
     DimmablePattern* mDimmablePatterns = nullptr;
-    bool mUseModulatingDriver = false;
-    uint8_t mNumSubFields = 16;
+    uint8_t mNumSubFields = 1;
 };
 
 }

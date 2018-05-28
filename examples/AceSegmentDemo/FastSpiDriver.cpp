@@ -41,8 +41,21 @@ void FastSpiDriver::configure() {
   pinMode(kClockPin, OUTPUT);
 
   SPI.begin();
+  ace_segment::DigitDriver::configure();
+}
 
-  ace_segment::ModulatingDigitDriver::configure();
+void FastSpiDriver::finish() {
+  ace_segment::DigitDriver::finish();
+  SPI.end();
+
+  for (uint8_t digit = 0; digit < mNumDigits; digit++) {
+    uint8_t groupPin = kDigitPins[digit];
+    pinMode(groupPin, INPUT);
+  }
+
+  pinMode(kLatchPin, INPUT);
+  pinMode(kDataPin, INPUT);
+  pinMode(kClockPin, INPUT);
 }
 
 void FastSpiDriver::displayCurrentField() {

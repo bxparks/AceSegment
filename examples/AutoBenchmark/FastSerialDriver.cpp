@@ -39,11 +39,11 @@ void FastSerialDriver::configure() {
   pinMode(kDataPin, OUTPUT);
   pinMode(kClockPin, OUTPUT);
 
-  ace_segment::ModulatingDigitDriver::configure();
+  ace_segment::DigitDriver::configure();
 }
 
 void FastSerialDriver::finish() {
-  ace_segment::ModulatingDigitDriver::finish();
+  ace_segment::DigitDriver::finish();
 
   for (uint8_t digit = 0; digit < mNumDigits; digit++) {
     uint8_t groupPin = kDigitPins[digit];

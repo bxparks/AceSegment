@@ -32,11 +32,9 @@ namespace testing {
 
 /**
  * A fake instance of Driver so that Renderer can be tested in isolation.
- * Acts a bit like a ModulatingDigitDriver.
  */
 class FakeDriver: public Driver {
   public:
-    /** Constructor. */
     explicit FakeDriver(DimmablePattern* dimmablePatterns, uint8_t numDigits):
         Driver(nullptr /* ledMatrix */, dimmablePatterns, numDigits)
     {}
@@ -55,7 +53,7 @@ class FakeDriver: public Driver {
       mNumSubFields = numSubFields;
     }
 
-    uint8_t mNumSubFields;
+    uint8_t mNumSubFields = 1;
 };
 
 }

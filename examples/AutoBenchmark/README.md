@@ -4,7 +4,7 @@ The `AutoBenchmark` sketch iterates through every supported variation of
 `Driver`, calls `renderField()` about a 1000 times, then reports the min/avg/max
 CPU time (in microseconds) collected by the `TimingStats` object in the
 `Renderer`. It uses a frame rate of 60Hz, with 16 subfields per field for the
-`useModulatingDriver()` option.
+`useModulation()` option.
 
 ## Arduino Nano clone
 * 16MHz ATmega328P

@@ -7,18 +7,18 @@
 
 #include <stdint.h>
 #include <digitalWriteFast.h>
-#include <ace_segment/ModulatingDigitDriver.h>
+#include <ace_segment/DigitDriver.h>
 #include <ace_segment/Util.h>
 
 #ifndef ACE_SEGMENT_FastDirectDriver_H
 #define ACE_SEGMENT_FastDirectDriver_H
 
-class FastDirectDriver: public ace_segment::ModulatingDigitDriver {
+class FastDirectDriver: public ace_segment::DigitDriver {
   public:
     // Constructor
     FastDirectDriver(ace_segment::DimmablePattern* dimmablePatterns,
             uint8_t numDigits, uint8_t numSubFields):
-        ace_segment::ModulatingDigitDriver(
+        ace_segment::DigitDriver(
             nullptr /* ledMatrix */, dimmablePatterns, numDigits, numSubFields)
     {}
 
@@ -26,6 +26,7 @@ class FastDirectDriver: public ace_segment::ModulatingDigitDriver {
     virtual ~FastDirectDriver() override {}
 
     virtual void configure() override;
+    virtual void finish() override;
     virtual void displayCurrentField() override;
     virtual void prepareToSleep() override;
 

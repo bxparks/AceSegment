@@ -588,7 +588,7 @@ testF(SegmentDriverTest, prepareToSleep) {
 }
 
 // ----------------------------------------------------------------------
-// Tests for ModulatingDigitDriver. numSubFieldsPerField = 3
+// Tests for DigitDriver w/ Modulation at numSubFieldsPerField = 3
 // ----------------------------------------------------------------------
 
 class ModulatingDigitDriverTest: public BaseHardwareTest {
@@ -602,7 +602,7 @@ class ModulatingDigitDriverTest: public BaseHardwareTest {
           .setDigitPins(digitPins)
           .setSegmentDirectPins(segmentPins)
           .setDimmablePatterns(dimmablePatterns)
-          .useModulatingDriver(NUM_SUB_FIELDS)
+          .useModulation(NUM_SUB_FIELDS)
           .build();
       mDriver->configure();
       mHardware->clear();
@@ -956,87 +956,6 @@ testF(ModulatingDigitDriverTest, prepareToSleep) {
       Event::kTypeDigitalWrite, 10, SEGMENT_OFF,
       Event::kTypeDigitalWrite, 11, SEGMENT_OFF,
       Event::kTypeDigitalWrite, 1, DIGIT_ON);
-}
-
-// ----------------------------------------------------------------------
-// Tests for ModulatingDigitDriver with an edge case of
-// numSubFieldsPerField = 1. This should not normally happen, but let's
-// make sure that the code doesn't blow up.
-// ----------------------------------------------------------------------
-
-class EdgeCaseModulatingDigitDriverTest: public BaseHardwareTest {
-  protected:
-    virtual void setup() override {
-      BaseHardwareTest::setup();
-      mDriver = DriverBuilder(mHardware)
-          .setNumDigits(NUM_DIGITS)
-          .setCommonCathode()
-          .setResistorsOnSegments()
-          .setDigitPins(digitPins)
-          .setSegmentDirectPins(segmentPins)
-          .setDimmablePatterns(dimmablePatterns)
-          .useModulatingDriver(1) // edge case of 1 subfield/field
-          .build();
-
-      mDriver->configure();
-      mHardware->clear();
-    }
-
-    virtual void teardown() override {
-      delete mDriver;
-      BaseHardwareTest::teardown();
-    }
-
-    Driver* mDriver;
-};
-
-testF(EdgeCaseModulatingDigitDriverTest, displayCurrentField) {
-  mDriver->setPattern(0, 0x11, 255);
-  mDriver->setPattern(1, 0x22, 128);
-  mDriver->setPattern(2, 0x55, 64);
-  mDriver->setPattern(3, 0x11, 0);
-
-  // field 0.0, should be "on" even though integer round off with a
-  // numSubFields of 1 would normally cause a brightness of 0
-  mHardware->clear();
-  mDriver->displayCurrentField();
-  assertEvents(10,
-      Event::kTypeDigitalWrite, 3, DIGIT_OFF,
-      Event::kTypeDigitalWrite, 4, SEGMENT_ON,
-      Event::kTypeDigitalWrite, 5, SEGMENT_OFF,
-      Event::kTypeDigitalWrite, 6, SEGMENT_OFF,
-      Event::kTypeDigitalWrite, 7, SEGMENT_OFF,
-      Event::kTypeDigitalWrite, 8, SEGMENT_ON,
-      Event::kTypeDigitalWrite, 9, SEGMENT_OFF,
-      Event::kTypeDigitalWrite, 10, SEGMENT_OFF,
-      Event::kTypeDigitalWrite, 11, SEGMENT_OFF,
-      Event::kTypeDigitalWrite, 0, DIGIT_ON);
-
-  // field 1.0, the next iteration goes to the next frame
-  mHardware->clear();
-  mDriver->displayCurrentField();
-  assertEvents(1,
-      Event::kTypeDigitalWrite, 0, DIGIT_OFF);
-
-  // field 2.0, the next iteration goes to the next frame
-  mHardware->clear();
-  mDriver->displayCurrentField();
-  assertEvents(1,
-      Event::kTypeDigitalWrite, 1, DIGIT_OFF);
-
-  // field 3.0, the next iteration goes to the next frame
-  mHardware->clear();
-  mDriver->displayCurrentField();
-  assertEvents(1,
-      Event::kTypeDigitalWrite, 2, DIGIT_OFF);
-
-  // field 0.0, should be "on" again, and we reuse the bit patterns from
-  // the previous iteration.
-  mHardware->clear();
-  mDriver->displayCurrentField();
-  assertEvents(2,
-      Event::kTypeDigitalWrite, 3, DIGIT_OFF,
-      Event::kTypeDigitalWrite, 0, DIGIT_ON);
 }
 
 // ----------------------------------------------------------------------

@@ -31,12 +31,19 @@ namespace ace_segment {
 
 void DigitDriver::displayCurrentField() {
   if (mPreparedToSleep) return;
+
+  if (mNumSubFields == 1) {
+    displayCurrentFieldPlain();
+  } else {
+    displayCurrentFieldModulated();
+  }
+}
+
+void DigitDriver::displayCurrentFieldPlain() {
   LedMatrixSplit* ledMatrix = static_cast<LedMatrixSplit*>(mLedMatrix);
 
   if (mCurrentDigit != mPrevDigit) {
-    // NOTE: If we kept a flag (e.g. mIsPrevDigitOn) that preserved whether the
-    // previous iteration turned this digit on or off, we could bypass this
-    // disableGroup(). But the CPU savings doesn't seem worth it.
+    // NOTE: mIsPrevDigitOn not used for optimization.
     ledMatrix->disableGroup(mPrevDigit);
   }
 
@@ -54,6 +61,58 @@ void DigitDriver::displayCurrentField() {
 
   mPrevDigit = mCurrentDigit;
   Util::incrementMod(mCurrentDigit, mNumDigits);
+}
+
+void DigitDriver::displayCurrentFieldModulated() {
+  LedMatrixSplit* ledMatrix = static_cast<LedMatrixSplit*>(mLedMatrix);
+
+  bool isCurrentDigitOn;
+  const DimmablePattern& dimmablePattern = mDimmablePatterns[mCurrentDigit];
+  uint8_t brightness = dimmablePattern.brightness;
+  if (mCurrentDigit != mPrevDigit) {
+    // NOTE: The following could be optimized away by wrapping it around an 'if
+    // (mIsPrevDigitOn)' statement. But I think it's safer to issue a redundant
+    // disable-digit command just in case something else (interrupts or other
+    // unpredicatble things) causes the mIsPrevDigitOn state to be wrong. We
+    // want to be absolutely sure that 2 digits cannot be turned on at the same
+    // time.
+    ledMatrix->disableGroup(mPrevDigit);
+
+    isCurrentDigitOn = false;
+    mCurrentSubFieldMax = ((uint16_t) mNumSubFields * brightness) / 256;
+  } else {
+    isCurrentDigitOn = mIsPrevDigitOn;
+  }
+
+  // No matter how small the mNumSubFields, we want:
+  // * If brightness == 0, then subfield 0 should be OFF.
+  // * If birghtness == 255, then special case that to be ON.
+  if (brightness < 255 && mCurrentSubField >= mCurrentSubFieldMax) {
+    // turn off the current digit
+    if (isCurrentDigitOn) {
+      ledMatrix->disableGroup(mCurrentDigit);
+      isCurrentDigitOn = false;
+    }
+  } else {
+    // turn on the current digit
+    if (!isCurrentDigitOn) {
+      SegmentPatternType segmentPattern = dimmablePattern.pattern;
+      if (segmentPattern != mSegmentPattern) {
+        ledMatrix->drawElements(segmentPattern);
+        mSegmentPattern = segmentPattern;
+      }
+      ledMatrix->enableGroup(mCurrentDigit);
+      isCurrentDigitOn = true;
+    }
+  }
+
+  mCurrentSubField++;
+  mPrevDigit = mCurrentDigit;
+  mIsPrevDigitOn = isCurrentDigitOn;
+  if (mCurrentSubField >= mNumSubFields) {
+    Util::incrementMod(mCurrentDigit, mNumDigits);
+    mCurrentSubField = 0;
+  }
 }
 
 void DigitDriver::prepareToSleep() {
