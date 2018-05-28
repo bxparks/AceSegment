@@ -28,8 +28,8 @@ SOFTWARE.
 #include <AUnit.h>
 #include <AceSegment.h>
 #include <ace_segment/LedMatrixDirect.h>
-#include <ace_segment/LedMatrixSerial.h>
-#include <ace_segment/LedMatrixSpi.h>
+#include <ace_segment/LedMatrixSplitSerial.h>
+#include <ace_segment/LedMatrixSplitSpi.h>
 #include <ace_segment/DigitDriver.h>
 #include <ace_segment/SegmentDriver.h>
 #include <ace_segment/TimingStats.h>
@@ -56,10 +56,10 @@ void setup() {
   Serial.println(sizeof(Hardware));
   Serial.print(F("sizeof(LedMatrixDirect): "));
   Serial.println(sizeof(LedMatrixDirect));
-  Serial.print(F("sizeof(LedMatrixSerial): "));
-  Serial.println(sizeof(LedMatrixSerial));
-  Serial.print(F("sizeof(LedMatrixSpi): "));
-  Serial.println(sizeof(LedMatrixSpi));
+  Serial.print(F("sizeof(LedMatrixSplitSerial): "));
+  Serial.println(sizeof(LedMatrixSplitSerial));
+  Serial.print(F("sizeof(LedMatrixSplitSpi): "));
+  Serial.println(sizeof(LedMatrixSplitSpi));
   Serial.print(F("sizeof(Driver): "));
   Serial.println(sizeof(Driver));
   Serial.print(F("sizeof(SegmentDriver): "));

@@ -9,8 +9,8 @@ digitalWriteFast() methods of https://github.com/NicksonYap/digitalWriteFast.
 The resulting class can be used where a 'Driver' object created by
 'DriverBuilder' would normally be used. There are 3 versions:
   * --segment_direct_pins - equivalent to LedMatrixDirect
-  * --segment_serial_pins - equivalent to LedMatrixSerial
-  * --segment_spi_pins - equivalent to LedMatrixSpi
+  * --segment_serial_pins - equivalent to LedMatrixSplitSerial
+  * --segment_spi_pins - equivalent to LedMatrixSplitSpi
 
 Usage: fast_driver.py [-h] [flags ...]
 
@@ -49,14 +49,14 @@ Benchmarks for AceSegmentDemo
           flash/static: 8640/490
           min: 8us; avg: 15us; max: 120us
   --segment_serial_pins:
-      LedMatrixSerial
+      LedMatrixSplitSerial
           flash/static: 9248/498
           min: 8us; avg: 20us; max: 212us
       --digital_write_fast
           flash/static: 8394/450
           min: 8us; avg: 13us; max: 80us
   --segment_spi_pins:
-      LedMatrixSpi
+      LedMatrixSplitSpi
           flash/static: 9248/498
           min: 12us; avg: 14us; max: 100us
       --digital_write_fast

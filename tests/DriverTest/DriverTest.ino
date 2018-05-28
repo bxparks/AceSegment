@@ -959,7 +959,7 @@ testF(ModulatingDigitDriverTest, prepareToSleep) {
 }
 
 // ----------------------------------------------------------------------
-// Tests for DigitDriver w/ LedMatrixSerial.
+// Tests for DigitDriver w/ LedMatrixSplitSerial.
 // ----------------------------------------------------------------------
 
 class DigitDriverSerialLedMatrixTest: public BaseHardwareTest {

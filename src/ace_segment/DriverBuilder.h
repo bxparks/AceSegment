@@ -99,7 +99,7 @@ class DriverBuilder {
 
     DriverBuilder& setSegmentSerialPins(uint8_t latchPin, uint8_t dataPin,
         uint8_t clockPin) {
-      mLedMatrixType = kTypeLedMatrixSerial;
+      mLedMatrixType = kTypeLedMatrixSplitSerial;
 
       // We support only resistors on segments in this configuration.
       mResistorsOnSegments = true;
@@ -113,7 +113,7 @@ class DriverBuilder {
 
     DriverBuilder& setSegmentSpiPins(uint8_t latchPin, uint8_t dataPin,
         uint8_t clockPin) {
-      mLedMatrixType = kTypeLedMatrixSpi;
+      mLedMatrixType = kTypeLedMatrixSplitSpi;
 
       // We support only resistors on segments in this configuration.
       mResistorsOnSegments = true;
@@ -145,8 +145,8 @@ class DriverBuilder {
 
   private:
     static const uint8_t kTypeLedMatrixDirect = 0;
-    static const uint8_t kTypeLedMatrixSerial = 1;
-    static const uint8_t kTypeLedMatrixSpi = 2;
+    static const uint8_t kTypeLedMatrixSplitSerial = 1;
+    static const uint8_t kTypeLedMatrixSplitSpi = 2;
 
     LedMatrixSplit* buildLedMatrix();
 

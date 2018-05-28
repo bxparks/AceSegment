@@ -22,27 +22,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <SPI.h>
-#include "Hardware.h"
-#include "LedMatrixSpi.h"
+#ifndef ACE_SEGMENT_LED_MATRIX_SPI_H
+#define ACE_SEGMENT_LED_MATRIX_SPI_H
+
+#include "LedMatrixSplitSerial.h"
 
 namespace ace_segment {
 
-void LedMatrixSpi::configure() {
-  LedMatrixSerial::configure();
-  mHardware->spiBegin();
+class Hardware;
+
+/**
+ * Similar to LedMatrixSplitSerial but uses SPI to talk to the 74HC595 chip
+ * instead of the shiftOut() method.
+ */
+class LedMatrixSplitSpi: public LedMatrixSplitSerial {
+  public:
+    LedMatrixSplitSpi(Hardware* hardware, bool cathodeOnGroup,
+        bool transistorsOnGroups, bool transistorsOnElements,
+        uint8_t numGroups, uint8_t numElements, const uint8_t* groupPins,
+        uint8_t latchPin, uint8_t dataPin, uint8_t clockPin):
+        LedMatrixSplitSerial(hardware, cathodeOnGroup, transistorsOnGroups,
+            transistorsOnElements, numGroups, numElements,
+            groupPins, latchPin, dataPin, clockPin)
+    {}
+
+    virtual void configure() override;
+
+    virtual void finish() override;
+
+    virtual void drawElements(uint8_t pattern) override;
+};
+
 }
 
-void LedMatrixSpi::finish() {
-  mHardware->spiEnd();
-  LedMatrixSerial::finish();
-}
-
-void LedMatrixSpi::drawElements(uint8_t pattern) {
-  mHardware->digitalWrite(mLatchPin, LOW);
-  uint8_t actualPattern = (mElementOn == HIGH) ? pattern : ~pattern;
-  mHardware->spiTransfer(actualPattern);
-  mHardware->digitalWrite(mLatchPin, HIGH);
-}
-
-}
+#endif

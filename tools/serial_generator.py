@@ -4,7 +4,7 @@
 """
 Generate a version of DigitDriver using digitalWriteFast()
 with the segment pins connected through a 74HC595 serial-to-parallel chip.
-Similar to LedMatrixSerial class.
+Similar to LedMatrixSplitSerial class.
 """
 
 import logging

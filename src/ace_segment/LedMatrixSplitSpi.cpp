@@ -22,56 +22,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include <SPI.h>
 #include "Hardware.h"
-#include "LedMatrixSerial.h"
+#include "LedMatrixSplitSpi.h"
 
 namespace ace_segment {
 
-void LedMatrixSerial::configure() {
-  LedMatrix::configure();
-
-  // Actual values of latchPin, dataPin and clockPin don't matter because the
-  // functions are triggered on a rising edge, not on the level.
-  mHardware->pinMode(mLatchPin, OUTPUT);
-  mHardware->pinMode(mDataPin, OUTPUT);
-  mHardware->pinMode(mClockPin, OUTPUT);
-
-  for (uint8_t group = 0; group < mNumGroups; group++) {
-    uint8_t pin = mGroupPins[group];
-    mHardware->pinMode(pin, OUTPUT);
-    mHardware->digitalWrite(pin, mGroupOff);
-  }
+void LedMatrixSplitSpi::configure() {
+  LedMatrixSplitSerial::configure();
+  mHardware->spiBegin();
 }
 
-void LedMatrixSerial::finish() {
-  mHardware->pinMode(mLatchPin, INPUT);
-  mHardware->pinMode(mDataPin, INPUT);
-  mHardware->pinMode(mClockPin, INPUT);
-
-  for (uint8_t group = 0; group < mNumGroups; group++) {
-    uint8_t pin = mGroupPins[group];
-    mHardware->pinMode(pin, INPUT);
-  }
+void LedMatrixSplitSpi::finish() {
+  mHardware->spiEnd();
+  LedMatrixSplitSerial::finish();
 }
 
-void LedMatrixSerial::enableGroup(uint8_t group) {
-  writeGroupPin(group, mGroupOn);
-}
-
-void LedMatrixSerial::disableGroup(uint8_t group) {
-  writeGroupPin(group, mGroupOff);
-}
-
-void LedMatrixSerial::drawElements(uint8_t pattern) {
+void LedMatrixSplitSpi::drawElements(uint8_t pattern) {
   mHardware->digitalWrite(mLatchPin, LOW);
   uint8_t actualPattern = (mElementOn == HIGH) ? pattern : ~pattern;
-  mHardware->shiftOut(mDataPin, mClockPin, MSBFIRST, actualPattern);
+  mHardware->spiTransfer(actualPattern);
   mHardware->digitalWrite(mLatchPin, HIGH);
-}
-
-void LedMatrixSerial::writeGroupPin(uint8_t group, uint8_t output) {
-  uint8_t groupPin = mGroupPins[group];
-  mHardware->digitalWrite(groupPin, output);
 }
 
 }

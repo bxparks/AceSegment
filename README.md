@@ -1185,11 +1185,11 @@ Here are the sizes of the various classes on the 8-bit AVR microcontrollers
 * sizeof(TimingStats): 14
 * sizeof(Hardware): 2
 * sizeof(LedMatrixDirect): 14
-* sizeof(LedMatrixSerial): 15
-* sizeof(LedMatrixSpi): 15
+* sizeof(LedMatrixSplitSerial): 15
+* sizeof(LedMatrixSplitSpi): 15
 * sizeof(Driver): 9
 * sizeof(SegmentDriver): 12
-* sizeof(DigitDriver): 14
+* sizeof(DigitDriver): 16
 * sizeof(DriverBuilder): 19
 * sizeof(BlinkStyler): 7
 * sizeof(PulseStyler): 9

@@ -25,8 +25,8 @@ SOFTWARE.
 #include "Hardware.h"
 #include "LedMatrix.h"
 #include "LedMatrixDirect.h"
-#include "LedMatrixSerial.h"
-#include "LedMatrixSpi.h"
+#include "LedMatrixSplitSerial.h"
+#include "LedMatrixSplitSpi.h"
 #include "Driver.h"
 #include "DigitDriver.h"
 #include "SegmentDriver.h"
@@ -51,12 +51,12 @@ LedMatrixSplit* DriverBuilder::buildLedMatrix() {
     }
   } else {
     // We support only resistors on segments for SerialToParallel
-    if (mLedMatrixType == kTypeLedMatrixSerial) {
-      return new LedMatrixSerial(mHardware, mCommonCathode,
+    if (mLedMatrixType == kTypeLedMatrixSplitSerial) {
+      return new LedMatrixSplitSerial(mHardware, mCommonCathode,
           mUseTransistorsOnDigits, mUseTransistorsOnSegments, mNumDigits,
           mNumSegments, mDigitPins, mLatchPin, mDataPin, mClockPin);
     } else {
-      return new LedMatrixSpi(mHardware, mCommonCathode,
+      return new LedMatrixSplitSpi(mHardware, mCommonCathode,
           mUseTransistorsOnDigits, mUseTransistorsOnSegments, mNumDigits,
           mNumSegments, mDigitPins, mLatchPin, mDataPin, mClockPin);
     }

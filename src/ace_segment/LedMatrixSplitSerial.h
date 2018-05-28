@@ -39,9 +39,9 @@ class Hardware;
  *   dataPin/D11/MOSI -- DS (Phillips) / SER (TI) / Pin 14
  *   clockPin/D13/SCK -- SH_CP (Phillips) / SRCK (TI) / Pin 11 (rising)
  */
-class LedMatrixSerial: public LedMatrixSplit {
+class LedMatrixSplitSerial: public LedMatrixSplit {
   public:
-    LedMatrixSerial(Hardware* hardware, bool cathodeOnGroup,
+    LedMatrixSplitSerial(Hardware* hardware, bool cathodeOnGroup,
             bool transistorsOnGroups, bool transistorsOnElements,
             uint8_t numGroups, uint8_t numElements,
             const uint8_t* groupPins, uint8_t latchPin, uint8_t dataPin,

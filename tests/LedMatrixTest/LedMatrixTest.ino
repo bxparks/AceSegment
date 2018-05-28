@@ -28,8 +28,8 @@ SOFTWARE.
 #include <AUnit.h>
 #include <AceSegment.h>
 #include <ace_segment/LedMatrixDirect.h>
-#include <ace_segment/LedMatrixSerial.h>
-#include <ace_segment/LedMatrixSpi.h>
+#include <ace_segment/LedMatrixSplitSerial.h>
+#include <ace_segment/LedMatrixSplitSpi.h>
 #include <ace_segment/testing/TestableHardware.h>
 #include <ace_segment/testing/BaseHardwareTest.h>
 
@@ -159,14 +159,15 @@ testF(LedMatrixDirectTest, drawElements) {
 }
 
 // ----------------------------------------------------------------------
-// Tests for LedMatrixSerial.
+// Tests for LedMatrixSplitSerial.
 // ----------------------------------------------------------------------
 
-class LedMatrixSerialTest: public BaseHardwareTest {
+class LedMatrixSplitSerialTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
       BaseHardwareTest::setup();
-      mLedMatrix = new LedMatrixSerial(mHardware, true /* cathodeOnGroup */,
+      mLedMatrix = new LedMatrixSplitSerial(mHardware,
+          true /* cathodeOnGroup */,
           false /* transistorsOnGroups */,
           false /* transistorsOnElements */,
           NUM_DIGITS, NUM_SEGMENTS, digitPins, latchPin, dataPin, clockPin);
@@ -180,10 +181,10 @@ class LedMatrixSerialTest: public BaseHardwareTest {
       BaseHardwareTest::teardown();
     }
 
-    LedMatrixSerial* mLedMatrix;
+    LedMatrixSplitSerial* mLedMatrix;
 };
 
-testF(LedMatrixSerialTest, configure) {
+testF(LedMatrixSplitSerialTest, configure) {
   mLedMatrix->configure();
   assertEvents(11,
       Event::kTypePinMode, latchPin, OUTPUT,
@@ -212,19 +213,19 @@ testF(LedMatrixSerialTest, configure) {
 
 }
 
-testF(LedMatrixSerialTest, enableGroup) {
+testF(LedMatrixSplitSerialTest, enableGroup) {
   mLedMatrix->enableGroup(1);
   assertEvents(1,
       Event::kTypeDigitalWrite, 1, LOW);
 }
 
-testF(LedMatrixSerialTest, disableGroup) {
+testF(LedMatrixSplitSerialTest, disableGroup) {
   mLedMatrix->disableGroup(1);
   assertEvents(1,
       Event::kTypeDigitalWrite, 1, HIGH);
 }
 
-testF(LedMatrixSerialTest, drawElements) {
+testF(LedMatrixSplitSerialTest, drawElements) {
   mLedMatrix->drawElements(0x55);
   assertEvents(3,
       Event::kTypeDigitalWrite, latchPin, LOW,
@@ -234,14 +235,14 @@ testF(LedMatrixSerialTest, drawElements) {
 }
 
 // ----------------------------------------------------------------------
-// Tests for LedMatrixSpi.
+// Tests for LedMatrixSplitSpi.
 // ----------------------------------------------------------------------
 
-class LedMatrixSpiTest: public BaseHardwareTest {
+class LedMatrixSplitSpiTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
       BaseHardwareTest::setup();
-      mLedMatrix = new LedMatrixSpi(mHardware,
+      mLedMatrix = new LedMatrixSplitSpi(mHardware,
           true /* cathodeOnGroup */, false /* transistorsOnGroups */,
           false /* transistorsOnElements */,
           NUM_DIGITS, NUM_SEGMENTS, digitPins, latchPin, dataPin, clockPin);
@@ -255,10 +256,10 @@ class LedMatrixSpiTest: public BaseHardwareTest {
       BaseHardwareTest::teardown();
     }
 
-    LedMatrixSpi* mLedMatrix;
+    LedMatrixSplitSpi* mLedMatrix;
 };
 
-testF(LedMatrixSpiTest, configure) {
+testF(LedMatrixSplitSpiTest, configure) {
   mLedMatrix->configure();
   assertEvents(12,
       Event::kTypePinMode, latchPin, OUTPUT,
@@ -287,19 +288,19 @@ testF(LedMatrixSpiTest, configure) {
       Event::kTypePinMode, 3, INPUT);
 }
 
-testF(LedMatrixSpiTest, enableGroup) {
+testF(LedMatrixSplitSpiTest, enableGroup) {
   mLedMatrix->enableGroup(1);
   assertEvents(1,
       Event::kTypeDigitalWrite, 1, LOW);
 }
 
-testF(LedMatrixSpiTest, disableGroup) {
+testF(LedMatrixSplitSpiTest, disableGroup) {
   mLedMatrix->disableGroup(1);
   assertEvents(1,
       Event::kTypeDigitalWrite, 1, HIGH);
 }
 
-testF(LedMatrixSpiTest, drawElements) {
+testF(LedMatrixSplitSpiTest, drawElements) {
   mLedMatrix->drawElements(0x55);
   assertEvents(3,
       Event::kTypeDigitalWrite, latchPin, LOW,
