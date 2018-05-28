@@ -37,6 +37,7 @@ class DimmablePattern;
  * A Driver that assumes that the resistors are on the digits so the
  * multiplexing occurs by scanning through the segments.
  */
+// TODO: use mNumSegments, instead of relying on kNumSegments
 class SegmentDriver: public Driver {
   public:
     /** Constructor. */
