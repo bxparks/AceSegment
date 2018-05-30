@@ -54,16 +54,20 @@ void setupAceButton() {
 // Configurations for AceSegment
 //------------------------------------------------------------------
 
+#define BOARD_TYPE_MINI 0
+#define BOARD_TYPE_MICRO 1
+#define BOARD_TYPE BOARD_TYPE_MICRO
+
 #define DRIVER_MODE_NONE 0
 #define DRIVER_MODE_DIRECT_DIGIT 1
 #define DRIVER_MODE_DIRECT_FAST_DIGIT 2
 #define DRIVER_MODE_DIRECT_SEGMENT 3
-
 #define DRIVER_MODE_SERIAL_DIGIT 4
 #define DRIVER_MODE_SERIAL_FAST_DIGIT 5
-
 #define DRIVER_MODE_SPI_DIGIT 6
 #define DRIVER_MODE_SPI_FAST_DIGIT 7
+#define DRIVER_MODE_MERGED_SERIAL_DIGIT 8
+#define DRIVER_MODE_MERGED_SPI_DIGIT 9
 
 #define WRITE_MODE_NONE 0
 #define WRITE_MODE_HEX 1
@@ -83,19 +87,19 @@ void setupAceButton() {
 // Define the Driver to use. Use DRIVER_MODE_NONE to get flash/static
 // consumption without any AceSegment code. Then set to the other modes to get
 // flash/static memory usage.
-#define DRIVER_MODE DRIVER_MODE_DIRECT_DIGIT
+#define DRIVER_MODE DRIVER_MODE_MERGED_SPI_DIGIT
 
 // Type of characters to write to the LED display
 #define WRITE_MODE WRITE_MODE_CLOCK
 
-// Transistor drivers on digits.
-#define USE_TRANSISTORS 1
+// Transistors on the digits or segments which do NOT have the resistors.
+#define USE_TRANSISTORS true
 
 // Common Cathode or Anode
-#define COMMON_CATHODE 1
+#define COMMON_CATHODE true
 
 const uint8_t FRAMES_PER_SECOND = 60;
-const uint8_t NUM_SUBFIELDS = 16;
+const uint8_t NUM_SUBFIELDS = 1;
 
 const uint8_t BLINK_STYLE = 1;
 const uint8_t PULSE_STYLE = 2;
@@ -103,16 +107,25 @@ const uint8_t PULSE_STYLE = 2;
 const uint8_t NUM_DIGITS = 4;
 const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
 
+const uint8_t NUM_SEGMENTS = 8;
 #if DRIVER_MODE == DRIVER_MODE_DIRECT_DIGIT || \
     DRIVER_MODE == DRIVER_MODE_DIRECT_SEGMENT || \
     DRIVER_MODE == DRIVER_MODE_DIRECT_FAST_DIGIT
   // 4 digits, resistors on segments
-  const uint8_t segmentPins[8] = {8, 9, 10, 11, 12, 14, 15, 13};
+  const uint8_t segmentPins[NUM_SEGMENTS] = {8, 9, 10, 11, 12, 14, 15, 13};
 #else
-  // 4 digits, resistors on segments, serial-to-parallel converter on segments
-  const uint8_t latchPin = SS; // ST_CP on 74HC595
-  const uint8_t dataPin = MOSI; // DS on 74HC595
-  const uint8_t clockPin = SCK; // SH_CP on 74HC595
+  #if BOARD_TYPE == BOARD_TYPE_MINI
+    // 4 digits, resistors on segments, serial-to-parallel converter on segments
+    const uint8_t latchPin = SS; // ST_CP on 74HC595
+    const uint8_t dataPin = MOSI; // DS on 74HC595
+    const uint8_t clockPin = SCK; // SH_CP on 74HC595
+  #elif BOARD_TYPE == BOARD_TYPE_MICRO
+    const uint8_t latchPin = 10; // ST_CP on 74HC595
+    const uint8_t dataPin = MOSI; // DS on 74HC595
+    const uint8_t clockPin = SCK; // SH_CP on 74HC595
+  #else
+    #error Unsupported BOARD_TYPE
+  #endif
 #endif
 
 #if DRIVER_MODE > DRIVER_MODE_NONE
@@ -122,6 +135,7 @@ StyledPattern styledPatterns[NUM_DIGITS];
 
 // The chain of resources.
 Hardware* hardware;
+Wrapper* wrapper;
 Driver* driver;
 PulseStyler* pulseStyler;
 BlinkStyler* blinkStyler;
@@ -149,56 +163,48 @@ void setupAceSegment() {
 
   // Create the Driver.
 #if DRIVER_MODE == DRIVER_MODE_DIRECT_DIGIT
-  driver = DriverBuilder(hardware)
-      .setNumDigits(NUM_DIGITS)
-      .setResistorsOnSegments()
-      .setDigitPins(digitPins)
-      .setSegmentDirectPins(segmentPins)
-      .useModulation(NUM_SUBFIELDS)
-      .setDimmablePatterns(dimmablePatterns)
-      .setCommonCathode(COMMON_CATHODE != 1)
-  #if USE_TRANSISTORS == 1
-      .transistorsOnDigits()
-  #endif
-      .build();
+  wrapper = new DirectDigitWrapper(
+      hardware, dimmablePatterns,
+      COMMON_CATHODE, USE_TRANSISTORS,
+      false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
+      NUM_SUBFIELDS, digitPins, segmentPins);
+  driver = wrapper->getDriver();
 #elif DRIVER_MODE == DRIVER_MODE_SERIAL_DIGIT
-  driver = DriverBuilder(hardware)
-      .setNumDigits(NUM_DIGITS)
-      .setResistorsOnSegments()
-      .setDigitPins(digitPins)
-      .setSegmentSerialPins(latchPin, dataPin, clockPin)
-      .useModulation(NUM_SUBFIELDS)
-      .setDimmablePatterns(dimmablePatterns)
-      .setCommonCathode(COMMON_CATHODE != 0)
-  #if USE_TRANSISTORS == 1
-      .transistorsOnDigits()
-  #endif
-      .build();
+  wrapper = new SplitSerialDigitWrapper(
+      hardware, dimmablePatterns,
+      COMMON_CATHODE, USE_TRANSISTORS,
+      false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
+      NUM_SUBFIELDS, digitPins, latchPin, dataPin, clockPin);
+  driver = wrapper->getDriver();
 #elif DRIVER_MODE == DRIVER_MODE_SPI_DIGIT
-  driver = DriverBuilder(hardware)
-      .setNumDigits(NUM_DIGITS)
-      .setResistorsOnSegments()
-      .setDigitPins(digitPins)
-      .setSegmentSpiPins(latchPin, dataPin, clockPin)
-      .useModulation(NUM_SUBFIELDS)
-      .setDimmablePatterns(dimmablePatterns)
-      .setCommonCathode(COMMON_CATHODE != 0)
-  #if USE_TRANSISTORS == 1
-      .transistorsOnDigits()
-  #endif
-      .build();
+  wrapper = new SplitSerialDigitWrapper(
+      hardware, dimmablePatterns,
+      COMMON_CATHODE, USE_TRANSISTORS,
+      false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
+      NUM_SUBFIELDS, digitPins, latchPin, dataPin, clockPin);
+  driver = wrapper->getDriver();
 #elif DRIVER_MODE == DRIVER_MODE_DIRECT_SEGMENT
-  driver = DriverBuilder(hardware)
-      .setNumDigits(NUM_DIGITS)
-      .setResistorsOnDigits()
-      .setDigitPins(digitPins)
-      .setSegmentDirectPins(segmentPins)
-      .setDimmablePatterns(dimmablePatterns)
-      .setCommonCathode(COMMON_CATHODE != 1)
-  #if USE_TRANSISTORS == 1
-      .transistorsOnSegments()
-  #endif
-      .build();
+  wrapper = new DirectSegmentWrapper(
+      hardware, dimmablePatterns, COMMON_CATHODE,
+      false /* transistorsOnDigits */,
+      USE_TRANSISTORS /* transistorsOnSegments */,
+      NUM_DIGITS, NUM_SEGMENTS,
+      NUM_SUBFIELDS, digitPins, segmentPins);
+  driver = wrapper->getDriver();
+#elif DRIVER_MODE == DRIVER_MODE_MERGED_SERIAL_DIGIT
+  wrapper = new MergedSerialDigitWrapper(
+      hardware, dimmablePatterns,
+      !COMMON_CATHODE, USE_TRANSISTORS,
+      false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
+      NUM_SUBFIELDS, latchPin, dataPin, clockPin);
+  driver = wrapper->getDriver();
+#elif DRIVER_MODE == DRIVER_MODE_MERGED_SPI_DIGIT
+  wrapper = new MergedSpiDigitWrapper(
+      hardware, dimmablePatterns,
+      !COMMON_CATHODE, USE_TRANSISTORS,
+      false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
+      NUM_SUBFIELDS, latchPin, dataPin, clockPin);
+  driver = wrapper->getDriver();
 #else
   #ifdef __AVR__
     #if DRIVER_MODE == DRIVER_MODE_DIRECT_FAST_DIGIT

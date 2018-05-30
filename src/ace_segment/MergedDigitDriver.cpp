@@ -22,33 +22,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-/**
- * @mainpage AceSegment Library
- *
- * This is the Doxygen documentation for the
- * <a href="https://github.com/bxparks/AceSegment">AceSegment Library</a>.
- */
+#include "Hardware.h"
+#include "MergedDigitDriver.h"
+#include "LedMatrixMerged.h"
+#include "Util.h"
 
-#ifndef ACE_SEGMENT_ACE_SEGMENT_H
-#define ACE_SEGMENT_ACE_SEGMENT_H
+namespace ace_segment {
 
-#include "ace_segment/Util.h"
-#include "ace_segment/Hardware.h"
-#include "ace_segment/DimmablePattern.h"
-#include "ace_segment/Driver.h"
-#include "ace_segment/Drivers.h"
-#include "ace_segment/DriverBuilder.h"
-#include "ace_segment/StyledPattern.h"
-#include "ace_segment/BlinkStyler.h"
-#include "ace_segment/PulseStyler.h"
-#include "ace_segment/Renderer.h"
-#include "ace_segment/RendererBuilder.h"
-#include "ace_segment/CharWriter.h"
-#include "ace_segment/HexWriter.h"
-#include "ace_segment/ClockWriter.h"
-#include "ace_segment/StringWriter.h"
+// TODO: add code to perform PWM
+void MergedDigitDriver::displayCurrentField() {
+  if (mPreparedToSleep) return;
 
-// Version format: xxyyzz == "xx.yy.zz"
-#define ACE_SEGMENT_VERSION 000300
+  DigitPatternType digitPattern = 0x0;
+  SegmentPatternType segmentPattern = 0x0;
 
-#endif
+  const DimmablePattern& dimmablePattern = mDimmablePatterns[mCurrentDigit];
+  if (dimmablePattern.brightness != 0) {
+    segmentPattern = dimmablePattern.pattern;
+    digitPattern = 0x1 << mCurrentDigit;
+  }
+
+  LedMatrixMerged* ledMatrix = static_cast<LedMatrixMerged*>(mLedMatrix);
+  ledMatrix->draw(digitPattern, segmentPattern);
+
+  Util::incrementMod(mCurrentDigit, mNumDigits);
+}
+
+void MergedDigitDriver::prepareToSleep() {
+  Driver::prepareToSleep();
+  LedMatrixMerged* ledMatrix = static_cast<LedMatrixMerged*>(mLedMatrix);
+  ledMatrix->draw(0, 0);
+}
+
+}
