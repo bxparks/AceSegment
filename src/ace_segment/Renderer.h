@@ -48,7 +48,20 @@ class Styler;
  */
 class Renderer {
   public:
-    /** Constructor. */
+    /**
+     * Constructor.
+     *
+     * @param hardware pointer to an instance of Hardware. Required.
+     * @param driver pointer to a Driver instance. Required.
+     * @param styledPatterns an array of StyledPattern representing the LED
+     *    digits
+     * @param styleTable a pointer to an instance of StyleTable. Optional,
+     *    can be nullptr.
+     * @param numDigits number of digits in the LED display
+     * @param framesPerSecond the rate at which the LED display will be
+     *    refreshed
+     * @param statsResetInterval milliseconds between TimingStats reset
+     */
     explicit Renderer(Hardware* hardware, Driver* driver,
             StyledPattern* styledPatterns, const StyleTable *styleTable,
             uint8_t numDigits, uint8_t framesPerSecond,
