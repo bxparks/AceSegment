@@ -15,9 +15,9 @@ DriverBuilder	KEYWORD1
 Styler	KEYWORD1
 BlinkStyler	KEYWORD1
 PulseStyler	KEYWORD1
+StyleTable	KEYWORD1
 StyledPattern	KEYWORD1
 Renderer	KEYWORD1
-RendererBuilder	KEYWORD1
 HexWriter	KEYWORD1
 ClockWriter	KEYWORD1
 CharWriter	KEYWORD1
@@ -46,6 +46,7 @@ millis	KEYWORD2
 spiBegin	KEYWORD2
 spiEnd	KEYWORD2
 spiTransfer	KEYWORD2
+spiTransfer16	KEYWORD2
 
 # LedMatrix.h
 configure	KEYWORD2
@@ -67,7 +68,7 @@ setPattern	KEYWORD2
 setBrightness	KEYWORD2
 
 # Styler.h
-configure	KEYWORD2
+calcForFrame	KEYWORD2
 apply	KEYWORD2
 requiresBrightness	KEYWORD2
 
@@ -84,11 +85,6 @@ renderField	KEYWORD2
 renderFieldWhenReady	KEYWORD2
 getTimingStats	KEYWORD2
 getStyledDigit	KEYWORD2
-calcBlinkStateForFrame	KEYWORD2
-calcPulseFractionForFrame	KEYWORD2
-calcBlinkStateForFrame	KEYWORD2
-calcPulseFractionForFrame	KEYWORD2
-calcBrightness	KEYWORD2
 
 # HexWriter.h
 getNumDigits	KEYWORD2
@@ -127,11 +123,9 @@ setDimmablePatterns	KEYWORD2
 useModulation	KEYWORD2
 build	KEYWORD2
 
-# RendererBuilder.h
-setFramesPerSecond	KEYWORD2
-setStatsResetInterval	KEYWORD2
+# StyleTable.h
 setStyler	KEYWORD2
-build	KEYWORD2
+getStyler	KEYWORD2
 
 #######################################
 # Instances (KEYWORD2)
@@ -148,7 +142,7 @@ kOn	LITERAL1
 # StyledPattern.h
 kStyleNormal	LITERAL1
 
-# Renderer.h
+# StyleTable.h
 kNumStyles	LITERAL1
 
 # HexWriter.h

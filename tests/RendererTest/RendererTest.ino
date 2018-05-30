@@ -150,6 +150,7 @@ class RendererTest: public TestOnce {
     static const uint8_t kStyleBlinkFast = 2;
     static const uint8_t kStylePulseSlow = 3;
     static const uint8_t kStylePulseFast = 4;
+    static const uint16_t kStatsResetInterval = 1200;
 
     virtual void setup() override {
       TestOnce::setup();
@@ -158,6 +159,7 @@ class RendererTest: public TestOnce {
       memset(styledPatterns, 0, (NUM_DIGITS+1) * sizeof(StyledPattern));
 
       hardware = new TestableHardware();
+
       driver = new FakeDriver(dimmablePatterns, NUM_DIGITS);
       driver->setNumSubFields(NUM_SUB_FIELDS);
       driver->configure();
@@ -167,13 +169,14 @@ class RendererTest: public TestOnce {
       pulseSlow = new PulseStyler(FRAMES_PER_SECOND, kPulseSlowDurationMillis);
       pulseFast = new PulseStyler(FRAMES_PER_SECOND, kPulseFastDurationMillis);
 
-      renderer = RendererBuilder(hardware, driver, styledPatterns, NUM_DIGITS)
-          .setFramesPerSecond(FRAMES_PER_SECOND)
-          .setStyler(kStyleBlinkSlow, blinkSlow)
-          .setStyler(kStyleBlinkFast, blinkFast)
-          .setStyler(kStylePulseSlow, pulseSlow)
-          .setStyler(kStylePulseFast, pulseFast)
-          .build();
+      styleTable = new StyleTable();
+      styleTable->setStyler(kStyleBlinkSlow, blinkSlow);
+      styleTable->setStyler(kStyleBlinkFast, blinkFast);
+      styleTable->setStyler(kStylePulseSlow, pulseSlow);
+      styleTable->setStyler(kStylePulseFast, pulseFast);
+
+      renderer = new Renderer(hardware, driver, styledPatterns, styleTable,
+          NUM_DIGITS, FRAMES_PER_SECOND, kStatsResetInterval);
       renderer->writeBrightness(255);
       renderer->configure();
 
@@ -182,6 +185,7 @@ class RendererTest: public TestOnce {
 
     virtual void teardown() override {
       delete renderer;
+      delete styleTable;
       delete pulseFast;
       delete pulseSlow;
       delete blinkFast;
@@ -228,6 +232,7 @@ class RendererTest: public TestOnce {
     BlinkStyler* blinkSlow;
     PulseStyler* pulseFast;
     PulseStyler* pulseSlow;
+    StyleTable* styleTable;
     Renderer* renderer;
 };
 
@@ -339,7 +344,7 @@ testF(RendererTest, activeStyles) {
   assertActiveStyles(5, 1, 1, 1, 1, 0);
 
   // verify that writing an invalid style does nothing
-  renderer->writeStyleAt(0, Renderer::kNumStyles);
+  renderer->writeStyleAt(0, StyleTable::kNumStyles);
   assertActiveStyles(5, 1, 1, 1, 1, 0);
 
   // verify that write pattern with an unregistered style does nothing

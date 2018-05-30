@@ -101,6 +101,8 @@ void setupAceButton() {
 const uint8_t FRAMES_PER_SECOND = 60;
 const uint8_t NUM_SUBFIELDS = 1;
 
+const uint16_t STATS_RESET_INTERVAL = 1200;
+
 const uint8_t BLINK_STYLE = 1;
 const uint8_t PULSE_STYLE = 2;
 
@@ -139,6 +141,7 @@ Wrapper* wrapper;
 Driver* driver;
 PulseStyler* pulseStyler;
 BlinkStyler* blinkStyler;
+StyleTable* styleTable;
 Renderer* renderer;
 CharWriter* charWriter;
 HexWriter* hexWriter;
@@ -227,11 +230,12 @@ void setupAceSegment() {
   // Create the Renderer.
   pulseStyler = new PulseStyler(FRAMES_PER_SECOND, 2000);
   blinkStyler = new BlinkStyler(FRAMES_PER_SECOND, 800);
-  renderer = RendererBuilder(hardware, driver, styledPatterns, NUM_DIGITS)
-      .setFramesPerSecond(FRAMES_PER_SECOND)
-      .setStyler(BLINK_STYLE, blinkStyler)
-      .setStyler(PULSE_STYLE, pulseStyler)
-      .build();
+  styleTable = new StyleTable();
+  styleTable->setStyler(BLINK_STYLE, blinkStyler);
+  styleTable->setStyler(PULSE_STYLE, pulseStyler);
+
+  renderer = new Renderer(hardware, driver, styledPatterns, styleTable,
+      NUM_DIGITS, FRAMES_PER_SECOND, STATS_RESET_INTERVAL);
   renderer->configure();
 
 #if WRITE_MODE == WRITE_MODE_HEX

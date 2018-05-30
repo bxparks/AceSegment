@@ -39,13 +39,12 @@ namespace testing {
  */
 class FakeRenderer: public Renderer {
   public:
-    FakeRenderer(StyledPattern* styledPatterns, uint8_t numDigits,
-        Styler** stylers):
+    FakeRenderer(StyledPattern* styledPatterns, StyleTable* styleTable,
+            uint8_t numDigits):
         Renderer(nullptr /* hardware */, nullptr /* driver */,
-            styledPatterns, numDigits,
+            styledPatterns, styleTable, numDigits,
             60 /* framesPerSecond */,
-            1200 /* statsResetInterval */,
-            stylers /* stylers */)
+            1200 /* statsResetInterval */)
     {}
 
     /** A stub implementation to prevent dependency on Hardware and Driver. */

@@ -27,6 +27,7 @@ SOFTWARE.
 #include "StyledPattern.h"
 #include "Hardware.h"
 #include "Styler.h"
+#include "StyleTable.h"
 #include "Renderer.h"
 
 namespace ace_segment {
@@ -49,15 +50,15 @@ void Renderer::configure() {
   mStats.reset();
 
   // Reset the active styles.
-  memset(mActiveStyles, 0, kNumStyles * sizeof(uint8_t));
+  memset(mActiveStyles, 0, StyleTable::kNumStyles * sizeof(uint8_t));
   mActiveStyles[0] = mNumDigits;
 }
 
 void Renderer::writePatternAt(uint8_t digit, uint8_t pattern, uint8_t style) {
   if (digit >= mNumDigits) return;
-  if (style >= kNumStyles) return;
+  if (style >= StyleTable::kNumStyles) return;
   // style 0 is always allowed
-  if (style > 0 && mStylers[style] == nullptr) return;
+  if (style > 0 && mStyleTable->getStyler(style) == nullptr) return;
 
   StyledPattern& styledPattern = mStyledPatterns[digit];
   styledPattern.pattern = pattern;
@@ -75,9 +76,9 @@ void Renderer::writePatternAt(uint8_t digit, uint8_t pattern) {
 
 void Renderer::writeStyleAt(uint8_t digit, uint8_t style) {
   if (digit >= mNumDigits) return;
-  if (style >= kNumStyles) return;
+  if (style >= StyleTable::kNumStyles) return;
   // style 0 is always allowed
-  if (style > 0 && mStylers[style] == nullptr) return;
+  if (style > 0 && mStyleTable->getStyler(style) == nullptr) return;
 
   StyledPattern& styledPattern = mStyledPatterns[digit];
 
@@ -135,11 +136,10 @@ void Renderer::updateFrame() {
 }
 
 void Renderer::updateStylers() {
-  // Update the active Stylers.
   // Style 0 is the no-op style that does nothing.
-  for (uint8_t style = 1; style < kNumStyles; style++) {
+  for (uint8_t style = 1; style < StyleTable::kNumStyles; style++) {
     if (mActiveStyles[style] > 0) {
-      Styler* styler = mStylers[style];
+      Styler* styler = mStyleTable->getStyler(style);
       if (isStylerSupported(styler)) {
         styler->calcForFrame();
       }
@@ -168,8 +168,8 @@ void Renderer::renderStyledPatterns() {
     uint8_t brightness = mBrightness;
 
     uint8_t style = styledPattern.style;
-    if (0 < style && style < kNumStyles) {
-      Styler* styler = mStylers[style];
+    if (0 < style && style < StyleTable::kNumStyles) {
+      Styler* styler = mStyleTable->getStyler(style);
       if (isStylerSupported(styler)) {
         styler->apply(&pattern, &brightness);
       }

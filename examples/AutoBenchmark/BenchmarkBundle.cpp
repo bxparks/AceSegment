@@ -103,15 +103,12 @@ BenchmarkBundle::BenchmarkBundle(const DriverConfig* driverConfig) {
   memset(mStyledPatterns, 0, kNumDigits * sizeof(StyledPattern));
   mBlinkStyler = new BlinkStyler(kFramePerSecond, kBlinkDuration);
   mPulseStyler = new PulseStyler(kFramePerSecond, kPulseDuration);
-  RendererBuilder rendererBuilder =
-      RendererBuilder(mHardware, mDriver, mStyledPatterns, kNumDigits)
-      .setFramesPerSecond(kFramePerSecond)
-      .setStatsResetInterval(0);
+  mStyleTable = new StyleTable();
   if (driverConfig->mStyle == DriverConfig::UseStyles) {
-      rendererBuilder
-          .setStyler(kBlinkStyle, mBlinkStyler)
-          .setStyler(kPulseStyle, mPulseStyler);
+    mStyleTable->setStyler(kBlinkStyle, mBlinkStyler);
+    mStyleTable->setStyler(kPulseStyle, mPulseStyler);
   }
-  mRenderer = rendererBuilder.build();
+  mRenderer = new Renderer(mHardware, mDriver, mStyledPatterns,
+          mStyleTable, kNumDigits, kFramePerSecond, 0);
   mCharWriter = new CharWriter(mRenderer);
 }

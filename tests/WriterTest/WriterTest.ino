@@ -57,11 +57,11 @@ class BaseWriterTest: public TestOnce {
     virtual void setup() override {
       mBlinkStyler = new StubStyler();
       mPulseStyler = new StubStyler();
-      memset(mStylers, 0, sizeof(Styler*) * Renderer::kNumStyles);
-      mStylers[kStyleBlink] = mBlinkStyler;
-      mStylers[kStylePulse] = mPulseStyler;
+      mStyleTable = new StyleTable();
+      mStyleTable->setStyler(kStyleBlink, mBlinkStyler);
+      mStyleTable->setStyler(kStylePulse, mPulseStyler);
 
-      mRenderer = new FakeRenderer(mStyledPatterns, NUM_DIGITS, mStylers);
+      mRenderer = new FakeRenderer(mStyledPatterns, mStyleTable, NUM_DIGITS);
       mRenderer->configure();
 
       clearStyledPatterns();
@@ -69,6 +69,7 @@ class BaseWriterTest: public TestOnce {
 
     virtual void teardown() override {
       delete mRenderer;
+      delete mStyleTable;
       delete mPulseStyler;
       delete mBlinkStyler;
     }
@@ -85,13 +86,11 @@ class BaseWriterTest: public TestOnce {
     // create NUM_DIGITS+1 elements for doing array bound checking
     StyledPattern mStyledPatterns[NUM_DIGITS + 1];
 
-    // Mapping of style codes to Stylers
-    Styler* mStylers[Renderer::kNumStyles];
-
   private:
     // Create a mapping of style code to Styler
     Styler* mBlinkStyler;
     Styler* mPulseStyler;
+    StyleTable* mStyleTable;
 };
 
 // ----------------------------------------------------------------------

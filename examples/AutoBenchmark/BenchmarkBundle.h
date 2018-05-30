@@ -54,6 +54,7 @@ struct BenchmarkBundle {
   ~BenchmarkBundle() {
     delete mCharWriter;
     delete mRenderer;
+    delete mStyleTable;
     delete mPulseStyler;
     delete mBlinkStyler;
     delete mDriver;
@@ -76,6 +77,7 @@ struct BenchmarkBundle {
   StyledPattern mStyledPatterns[kNumDigits];
   BlinkStyler* mBlinkStyler;
   PulseStyler* mPulseStyler;
+  StyleTable* mStyleTable;
   Renderer* mRenderer;
 
   CharWriter* mCharWriter;

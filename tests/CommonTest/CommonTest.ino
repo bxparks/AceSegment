@@ -30,6 +30,8 @@ SOFTWARE.
 #include <ace_segment/LedMatrixDirect.h>
 #include <ace_segment/LedMatrixSplitSerial.h>
 #include <ace_segment/LedMatrixSplitSpi.h>
+#include <ace_segment/LedMatrixMergedSerial.h>
+#include <ace_segment/LedMatrixMergedSpi.h>
 #include <ace_segment/DigitDriver.h>
 #include <ace_segment/SegmentDriver.h>
 #include <ace_segment/TimingStats.h>
@@ -60,22 +62,24 @@ void setup() {
   Serial.println(sizeof(LedMatrixSplitSerial));
   Serial.print(F("sizeof(LedMatrixSplitSpi): "));
   Serial.println(sizeof(LedMatrixSplitSpi));
+  Serial.print(F("sizeof(LedMatrixMergedSerial): "));
+  Serial.println(sizeof(LedMatrixMergedSerial));
+  Serial.print(F("sizeof(LedMatrixMergedSpi): "));
+  Serial.println(sizeof(LedMatrixMergedSpi));
   Serial.print(F("sizeof(Driver): "));
   Serial.println(sizeof(Driver));
   Serial.print(F("sizeof(SegmentDriver): "));
   Serial.println(sizeof(SegmentDriver));
   Serial.print(F("sizeof(DigitDriver): "));
   Serial.println(sizeof(DigitDriver));
-  Serial.print(F("sizeof(DriverBuilder): "));
-  Serial.println(sizeof(DriverBuilder));
   Serial.print(F("sizeof(BlinkStyler): "));
   Serial.println(sizeof(BlinkStyler));
   Serial.print(F("sizeof(PulseStyler): "));
   Serial.println(sizeof(PulseStyler));
+  Serial.print(F("sizeof(StyleTable): "));
+  Serial.println(sizeof(StyleTable));
   Serial.print(F("sizeof(Renderer): "));
   Serial.println(sizeof(Renderer));
-  Serial.print(F("sizeof(RendererBuilder): "));
-  Serial.println(sizeof(RendererBuilder));
   Serial.print(F("sizeof(HexWriter): "));
   Serial.println(sizeof(HexWriter));
   Serial.print(F("sizeof(ClockWriter): "));

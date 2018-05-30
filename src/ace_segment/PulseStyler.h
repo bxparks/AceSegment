@@ -30,6 +30,10 @@ SOFTWARE.
 
 namespace ace_segment {
 
+/**
+ * Implements a pulsing style for a given digit.
+ * Not thread-safe.
+ */
 class PulseStyler: public Styler {
   public:
     PulseStyler(uint8_t framesPerSecond, uint16_t durationMillis):

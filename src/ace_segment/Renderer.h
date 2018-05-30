@@ -26,8 +26,9 @@ SOFTWARE.
 #define ACE_SEGMENT_RENDERER_H
 
 #include <stdint.h>
-#include "Driver.h"
 #include "TimingStats.h"
+#include "Driver.h"
+#include "StyleTable.h"
 
 namespace ace_segment {
 
@@ -47,29 +48,19 @@ class Styler;
  */
 class Renderer {
   public:
-    /**
-     * Maximum number of styles. Valid style indexes are [0, kNumStyles-1].
-     * Style 0 is reserved for "no-style" and cannot be changed by the user, so
-     * the number of user-accessible styles is (kNumStyles - 1).
-     */
-    static const uint8_t kNumStyles = 6;
-
     /** Constructor. */
     explicit Renderer(Hardware* hardware, Driver* driver,
-            StyledPattern* styledPatterns, uint8_t numDigits,
-            uint8_t framesPerSecond, uint16_t statsResetInterval,
-            Styler** stylers):
+            StyledPattern* styledPatterns, const StyleTable *styleTable,
+            uint8_t numDigits, uint8_t framesPerSecond,
+            uint16_t statsResetInterval):
         mHardware(hardware),
         mDriver(driver),
         mStyledPatterns(styledPatterns),
+        mStyleTable(styleTable),
         mNumDigits(numDigits),
         mFramesPerSecond(framesPerSecond),
         mStatsResetInterval(statsResetInterval)
-    {
-      for (uint8_t i = 0; i < kNumStyles; i++) {
-        mStylers[i] = (stylers != nullptr) ? stylers[i] : nullptr;
-      }
-    }
+    {}
 
     /** Destructor. */
     virtual ~Renderer() {}
@@ -184,22 +175,19 @@ class Renderer {
     Hardware* const mHardware;
     Driver* const mDriver;
     StyledPattern* const mStyledPatterns;
+    const StyleTable* const mStyleTable;
     const uint8_t mNumDigits;
     const uint8_t mFramesPerSecond;
-
-    // statistics
     const uint16_t mStatsResetInterval;
-    TimingStats mStats;
 
-    // Array of Stylers. Index 0 is reserved and represents the "no-style"
-    // setting which does nothing. It cannot be set by the the client code.
-    Styler* mStylers[kNumStyles];
+    // TODO: change to a pointer to allow disabling it
+    TimingStats mStats;
 
     // Count of the number of times the given style index is used in the
     // mStyledPatterns array. We update this map during writePatternAt() and
     // writeStyleAt() to avoid calculating this in renderField() which saves
     // CPU cycles.
-    uint8_t mActiveStyles[kNumStyles];
+    uint8_t mActiveStyles[StyleTable::kNumStyles];
 
     // global brightness, can be changed during runtime
     uint8_t mBrightness = 255;

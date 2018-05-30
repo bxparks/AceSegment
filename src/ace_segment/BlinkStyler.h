@@ -30,7 +30,11 @@ SOFTWARE.
 
 namespace ace_segment {
 
-class BlinkStyler: public Styler{
+/**
+ * Implement a blinking style for a particular digit.
+ * Not thread-safe.
+ */
+class BlinkStyler: public Styler {
   public:
     BlinkStyler(uint8_t framesPerSecond, uint16_t durationMillis):
       mFramesPerBlink((uint32_t) framesPerSecond * durationMillis / 1000)
