@@ -29,10 +29,17 @@ SOFTWARE.
 
 namespace ace_segment {
 
-// TODO: add code to perform PWM
 void MergedDigitDriver::displayCurrentField() {
   if (mPreparedToSleep) return;
 
+  if (mNumSubFields == 1) {
+    displayCurrentFieldPlain();
+  } else {
+    displayCurrentFieldModulated();
+  }
+}
+
+void MergedDigitDriver::displayCurrentFieldPlain() {
   DigitPatternType digitPattern = 0x0;
   SegmentPatternType segmentPattern = 0x0;
 
@@ -46,6 +53,41 @@ void MergedDigitDriver::displayCurrentField() {
   ledMatrix->draw(digitPattern, segmentPattern);
 
   Util::incrementMod(mCurrentDigit, mNumDigits);
+}
+
+void MergedDigitDriver::displayCurrentFieldModulated() {
+  LedMatrixMerged* ledMatrix = static_cast<LedMatrixMerged*>(mLedMatrix);
+  DigitPatternType digitPattern = 0x0;
+  SegmentPatternType segmentPattern = 0x0;
+
+  // Calculate the maximum subfield duration for a given digit.
+  const DimmablePattern& dimmablePattern = mDimmablePatterns[mCurrentDigit];
+  uint8_t brightness = dimmablePattern.brightness;
+  if (mCurrentDigit != mPrevDigit) {
+    mCurrentSubFieldMax = ((uint16_t) mNumSubFields * brightness) / 256;
+  }
+
+  // No matter how small the mNumSubFields, we want:
+  // * If brightness == 0, then subfield 0 should be OFF.
+  // * If brightness == 255, then special case that to be ON.
+  if (brightness == 255 || mCurrentSubField < mCurrentSubFieldMax) {
+    // turn on the current digit
+    segmentPattern = dimmablePattern.pattern;
+    digitPattern = (0x1 << mCurrentDigit);
+  }
+
+  if (segmentPattern != mSegmentPattern || digitPattern != mDigitPattern) {
+    ledMatrix->draw(digitPattern, segmentPattern);
+    mDigitPattern = digitPattern;
+    mSegmentPattern = segmentPattern;
+  }
+
+  mCurrentSubField++;
+  mPrevDigit = mCurrentDigit;
+  if (mCurrentSubField >= mNumSubFields) {
+    Util::incrementMod(mCurrentDigit, mNumDigits);
+    mCurrentSubField = 0;
+  }
 }
 
 void MergedDigitDriver::prepareToSleep() {
