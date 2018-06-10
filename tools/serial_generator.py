@@ -2,7 +2,7 @@
 #
 # MIT License
 """
-Generate a version of DigitDriver using digitalWriteFast()
+Generate a version of SplitDigitDriver using digitalWriteFast()
 with the segment pins connected through a 74HC595 serial-to-parallel chip.
 Similar to LedMatrixSplitSerial class.
 """
@@ -22,18 +22,18 @@ class DriverGenerator(Generator):
 
 #include <stdint.h>
 #include <digitalWriteFast.h>
-#include <ace_segment/DigitDriver.h>
+#include <ace_segment/SplitDigitDriver.h>
 #include <ace_segment/Util.h>
 
 #ifndef ACE_SEGMENT_{class_name}_H
 #define ACE_SEGMENT_{class_name}_H
 
-class {class_name}: public ace_segment::DigitDriver {{
+class {class_name}: public ace_segment::SplitDigitDriver {{
   public:
     // Constructor
     {class_name}(ace_segment::DimmablePattern* dimmablePatterns,
             uint8_t numDigits, uint8_t numSubFields):
-        ace_segment::DigitDriver(
+        ace_segment::SplitDigitDriver(
             nullptr /* ledMatrix */, dimmablePatterns, numDigits, numSubFields)
     {{}}
 
@@ -120,11 +120,11 @@ void {class_name}::configure() {{
   pinMode(kDataPin, OUTPUT);
   pinMode(kClockPin, OUTPUT);
 
-  ace_segment::DigitDriver::configure();
+  ace_segment::SplitDigitDriver::configure();
 }}
 
 void {class_name}::finish() {{
-  ace_segment::DigitDriver::finish();
+  ace_segment::SplitDigitDriver::finish();
 
   for (uint8_t digit = 0; digit < mNumDigits; digit++) {{
     uint8_t groupPin = kDigitPins[digit];

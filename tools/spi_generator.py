@@ -2,7 +2,7 @@
 #
 # MIT License
 """
-Generate a version of DigitDriver using digitalWriteFast()
+Generate a version of SplitDigitDriver using digitalWriteFast()
 with the segment pins connected through a 74HC595 serial-to-parallel chip,
 using SPI to transfer bits to the chip. Similar to LedMatrixSpi class.
 """
@@ -24,18 +24,18 @@ class DriverGenerator(Generator):
 #include <Arduino.h>
 #include <SPI.h>
 #include <digitalWriteFast.h>
-#include <ace_segment/DigitDriver.h>
+#include <ace_segment/SplitDigitDriver.h>
 #include <ace_segment/Util.h>
 
 #ifndef ACE_SEGMENT_{class_name}_H
 #define ACE_SEGMENT_{class_name}_H
 
-class {class_name}: public ace_segment::DigitDriver {{
+class {class_name}: public ace_segment::SplitDigitDriver {{
   public:
     // Constructor
     {class_name}(ace_segment::DimmablePattern* dimmablePatterns,
             uint8_t numDigits, uint8_t numSubFields):
-        ace_segment::DigitDriver(
+        ace_segment::SplitDigitDriver(
             nullptr /* ledMatrix */, dimmablePatterns, numDigits, numSubFields)
     {{}}
 
@@ -117,11 +117,11 @@ void {class_name}::configure() {{
   pinMode(kClockPin, OUTPUT);
 
   SPI.begin();
-  ace_segment::DigitDriver::configure();
+  ace_segment::SplitDigitDriver::configure();
 }}
 
 void {class_name}::finish() {{
-  ace_segment::DigitDriver::finish();
+  ace_segment::SplitDigitDriver::finish();
   SPI.end();
 
   for (uint8_t digit = 0; digit < mNumDigits; digit++) {{

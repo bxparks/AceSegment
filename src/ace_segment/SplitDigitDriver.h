@@ -37,10 +37,10 @@ class DimmablePattern;
  * A Driver that assumes that the resistors are on the segments so the
  * multiplexing occurs by scanning through the digits.
  */
-class DigitDriver: public Driver {
+class SplitDigitDriver: public Driver {
   public:
     /** Constructor. */
-    explicit DigitDriver(LedMatrixSplit* ledMatrix,
+    explicit SplitDigitDriver(LedMatrixSplit* ledMatrix,
             DimmablePattern* dimmablePatterns, uint8_t numDigits,
             uint8_t numSubFields, bool ownsLedMatrix = false):
         Driver(ledMatrix, dimmablePatterns, numDigits, ownsLedMatrix),
@@ -115,8 +115,8 @@ class DigitDriver: public Driver {
 
   private:
     // disable copy-constructor and assignment operator
-    DigitDriver(const DigitDriver&) = delete;
-    DigitDriver& operator=(const DigitDriver&) = delete;
+    SplitDigitDriver(const SplitDigitDriver&) = delete;
+    SplitDigitDriver& operator=(const SplitDigitDriver&) = delete;
 
     /** Display field normally without modulation. */
     void displayCurrentFieldPlain();

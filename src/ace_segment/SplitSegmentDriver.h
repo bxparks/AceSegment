@@ -38,10 +38,10 @@ class DimmablePattern;
  * multiplexing occurs by scanning through the segments.
  */
 // TODO: use mNumSegments, instead of relying on kNumSegments
-class SegmentDriver: public Driver {
+class SplitSegmentDriver: public Driver {
   public:
     /** Constructor. */
-    explicit SegmentDriver(LedMatrixSplit* ledMatrix,
+    explicit SplitSegmentDriver(LedMatrixSplit* ledMatrix,
             DimmablePattern* dimmablePatterns,
             uint8_t numDigits, bool ownsLedMatrix = false):
         Driver(ledMatrix, dimmablePatterns, numDigits, ownsLedMatrix)
@@ -64,8 +64,8 @@ class SegmentDriver: public Driver {
 
   private:
     // disable copy-constructor and assignment operator
-    SegmentDriver(const SegmentDriver&) = delete;
-    SegmentDriver& operator=(const SegmentDriver&) = delete;
+    SplitSegmentDriver(const SplitSegmentDriver&) = delete;
+    SplitSegmentDriver& operator=(const SplitSegmentDriver&) = delete;
 
     /** Get the digit bit pattern for the given segment. */
     DigitPatternType getDigitBitPattern(uint8_t segment);

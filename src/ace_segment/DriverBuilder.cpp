@@ -28,8 +28,8 @@ SOFTWARE.
 #include "LedMatrixSplitSerial.h"
 #include "LedMatrixSplitSpi.h"
 #include "Driver.h"
-#include "DigitDriver.h"
-#include "SegmentDriver.h"
+#include "SplitDigitDriver.h"
+#include "SplitSegmentDriver.h"
 #include "DriverBuilder.h"
 
 namespace ace_segment {
@@ -67,10 +67,10 @@ Driver* DriverBuilder::build() {
   LedMatrixSplit* ledMatrix = buildLedMatrix();
 
   if (mResistorsOnSegments) {
-    return new DigitDriver(ledMatrix, mDimmablePatterns, mNumDigits,
+    return new SplitDigitDriver(ledMatrix, mDimmablePatterns, mNumDigits,
         mNumSubFields, true /* ownsLedMatrix */);
   } else {
-    return new SegmentDriver(ledMatrix, mDimmablePatterns, mNumDigits,
+    return new SplitSegmentDriver(ledMatrix, mDimmablePatterns, mNumDigits,
         true /* ownsLedMatrix */);
   }
 }

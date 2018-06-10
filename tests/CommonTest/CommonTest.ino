@@ -32,8 +32,8 @@ SOFTWARE.
 #include <ace_segment/LedMatrixSplitSpi.h>
 #include <ace_segment/LedMatrixMergedSerial.h>
 #include <ace_segment/LedMatrixMergedSpi.h>
-#include <ace_segment/DigitDriver.h>
-#include <ace_segment/SegmentDriver.h>
+#include <ace_segment/SplitDigitDriver.h>
+#include <ace_segment/SplitSegmentDriver.h>
 #include <ace_segment/TimingStats.h>
 #include <ace_segment/testing/FakeDriver.h>
 
@@ -68,10 +68,10 @@ void setup() {
   Serial.println(sizeof(LedMatrixMergedSpi));
   Serial.print(F("sizeof(Driver): "));
   Serial.println(sizeof(Driver));
-  Serial.print(F("sizeof(SegmentDriver): "));
-  Serial.println(sizeof(SegmentDriver));
-  Serial.print(F("sizeof(DigitDriver): "));
-  Serial.println(sizeof(DigitDriver));
+  Serial.print(F("sizeof(SplitSegmentDriver): "));
+  Serial.println(sizeof(SplitSegmentDriver));
+  Serial.print(F("sizeof(SplitDigitDriver): "));
+  Serial.println(sizeof(SplitDigitDriver));
   Serial.print(F("sizeof(BlinkStyler): "));
   Serial.println(sizeof(BlinkStyler));
   Serial.print(F("sizeof(PulseStyler): "));

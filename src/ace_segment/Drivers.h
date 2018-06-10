@@ -31,8 +31,8 @@ SOFTWARE.
 #include "LedMatrixSplitSerial.h"
 #include "LedMatrixSplitSpi.h"
 #include "Driver.h"
-#include "DigitDriver.h"
-#include "SegmentDriver.h"
+#include "SplitDigitDriver.h"
+#include "SplitSegmentDriver.h"
 #include "MergedDigitDriver.h"
 
 namespace ace_segment {
@@ -59,7 +59,7 @@ class DirectDigitWrapper: public Wrapper {
 
   private:
     LedMatrixSplitDirect mLedMatrix;
-    DigitDriver mDriver;
+    SplitDigitDriver mDriver;
 };
 
 class DirectSegmentWrapper: public Wrapper {
@@ -79,7 +79,7 @@ class DirectSegmentWrapper: public Wrapper {
 
   private:
     LedMatrixSplitDirect mLedMatrix;
-    SegmentDriver mDriver;
+    SplitSegmentDriver mDriver;
 };
 
 class SplitSerialDigitWrapper: public Wrapper {
@@ -100,7 +100,7 @@ class SplitSerialDigitWrapper: public Wrapper {
 
   private:
     LedMatrixSplitSerial mLedMatrix;
-    DigitDriver mDriver;
+    SplitDigitDriver mDriver;
 };
 
 class SplitSpiDigitWrapper: public Wrapper {
@@ -121,7 +121,7 @@ class SplitSpiDigitWrapper: public Wrapper {
 
   private:
     LedMatrixSplitSpi mLedMatrix;
-    DigitDriver mDriver;
+    SplitDigitDriver mDriver;
 };
 
 class MergedSerialDigitWrapper: public Wrapper {

@@ -41,11 +41,11 @@ void FastSpiDriver::configure() {
   pinMode(kClockPin, OUTPUT);
 
   SPI.begin();
-  ace_segment::DigitDriver::configure();
+  ace_segment::SplitDigitDriver::configure();
 }
 
 void FastSpiDriver::finish() {
-  ace_segment::DigitDriver::finish();
+  ace_segment::SplitDigitDriver::finish();
   SPI.end();
 
   for (uint8_t digit = 0; digit < mNumDigits; digit++) {

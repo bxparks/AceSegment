@@ -23,13 +23,13 @@ SOFTWARE.
 */
 
 #include "Hardware.h"
-#include "DigitDriver.h"
+#include "SplitDigitDriver.h"
 #include "LedMatrixSplit.h"
 #include "Util.h"
 
 namespace ace_segment {
 
-void DigitDriver::displayCurrentField() {
+void SplitDigitDriver::displayCurrentField() {
   if (mPreparedToSleep) return;
 
   if (mNumSubFields == 1) {
@@ -39,7 +39,7 @@ void DigitDriver::displayCurrentField() {
   }
 }
 
-void DigitDriver::displayCurrentFieldPlain() {
+void SplitDigitDriver::displayCurrentFieldPlain() {
   LedMatrixSplit* ledMatrix = static_cast<LedMatrixSplit*>(mLedMatrix);
 
   if (mCurrentDigit != mPrevDigit) {
@@ -63,7 +63,7 @@ void DigitDriver::displayCurrentFieldPlain() {
   Util::incrementMod(mCurrentDigit, mNumDigits);
 }
 
-void DigitDriver::displayCurrentFieldModulated() {
+void SplitDigitDriver::displayCurrentFieldModulated() {
   LedMatrixSplit* ledMatrix = static_cast<LedMatrixSplit*>(mLedMatrix);
 
   bool isCurrentDigitOn;
@@ -115,7 +115,7 @@ void DigitDriver::displayCurrentFieldModulated() {
   }
 }
 
-void DigitDriver::prepareToSleep() {
+void SplitDigitDriver::prepareToSleep() {
   Driver::prepareToSleep();
   LedMatrixSplit* ledMatrix = static_cast<LedMatrixSplit*>(mLedMatrix);
   ledMatrix->disableGroup(mPrevDigit);

@@ -23,13 +23,13 @@ SOFTWARE.
 */
 
 #include "Hardware.h"
-#include "SegmentDriver.h"
+#include "SplitSegmentDriver.h"
 #include "LedMatrixSplit.h"
 #include "Util.h"
 
 namespace ace_segment {
 
-void SegmentDriver::displayCurrentField() {
+void SplitSegmentDriver::displayCurrentField() {
   if (mPreparedToSleep) return;
   LedMatrixSplit* ledMatrix = static_cast<LedMatrixSplit*>(mLedMatrix);
 
@@ -50,7 +50,8 @@ void SegmentDriver::displayCurrentField() {
   Util::incrementMod(mCurrentSegment, kNumSegments);
 }
 
-Driver::DigitPatternType SegmentDriver::getDigitBitPattern(uint8_t segment) {
+Driver::DigitPatternType SplitSegmentDriver::getDigitBitPattern(
+    uint8_t segment) {
   SegmentPatternType segmentMask = (0x1 << segment);
   DigitPatternType digitMask = 0x1;
   DigitPatternType digitPattern = 0;
@@ -66,10 +67,10 @@ Driver::DigitPatternType SegmentDriver::getDigitBitPattern(uint8_t segment) {
   return digitPattern;
 }
 
-void SegmentDriver::prepareToSleep() {
+void SplitSegmentDriver::prepareToSleep() {
   Driver::prepareToSleep();
   // TODO: Should we just remove this if-statement? Like
-  // DigitDriver::prepareToSleep?
+  // SplitDigitDriver::prepareToSleep?
   if (mCurrentSegment != mPrevSegment) {
     LedMatrixSplit* ledMatrix = static_cast<LedMatrixSplit*>(mLedMatrix);
     ledMatrix->disableGroup(mPrevSegment);
