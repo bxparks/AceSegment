@@ -138,7 +138,7 @@ StyledPattern styledPatterns[NUM_DIGITS];
 
 // The chain of resources.
 Hardware* hardware;
-Wrapper* wrapper;
+DriverModule* driverModule;
 Driver* driver;
 PulseStyler* pulseStyler;
 BlinkStyler* blinkStyler;
@@ -167,48 +167,48 @@ void setupAceSegment() {
 
   // Create the Driver.
 #if DRIVER_MODE == DRIVER_MODE_DIRECT_DIGIT
-  wrapper = new DirectDigitWrapper(
+  driverModule = new SplitDirectDigitDriverModule(
       hardware, dimmablePatterns,
       COMMON_CATHODE, USE_TRANSISTORS,
       false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
       NUM_SUBFIELDS, digitPins, segmentPins);
-  driver = wrapper->getDriver();
+  driver = driverModule->getDriver();
 #elif DRIVER_MODE == DRIVER_MODE_SERIAL_DIGIT
-  wrapper = new SplitSerialDigitWrapper(
+  driverModule = new SplitSerialDigitDriverModule(
       hardware, dimmablePatterns,
       COMMON_CATHODE, USE_TRANSISTORS,
       false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
       NUM_SUBFIELDS, digitPins, latchPin, dataPin, clockPin);
-  driver = wrapper->getDriver();
+  driver = driverModule->getDriver();
 #elif DRIVER_MODE == DRIVER_MODE_SPI_DIGIT
-  wrapper = new SplitSerialDigitWrapper(
+  driverModule = new SplitSerialDigitDriverModule(
       hardware, dimmablePatterns,
       COMMON_CATHODE, USE_TRANSISTORS,
       false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
       NUM_SUBFIELDS, digitPins, latchPin, dataPin, clockPin);
-  driver = wrapper->getDriver();
+  driver = driverModule->getDriver();
 #elif DRIVER_MODE == DRIVER_MODE_DIRECT_SEGMENT
-  wrapper = new DirectSegmentWrapper(
+  driverModule = new SplitDirectSegmentDriverModule(
       hardware, dimmablePatterns, COMMON_CATHODE,
       false /* transistorsOnDigits */,
       USE_TRANSISTORS /* transistorsOnSegments */,
       NUM_DIGITS, NUM_SEGMENTS,
       NUM_SUBFIELDS, digitPins, segmentPins);
-  driver = wrapper->getDriver();
+  driver = driverModule->getDriver();
 #elif DRIVER_MODE == DRIVER_MODE_MERGED_SERIAL_DIGIT
-  wrapper = new MergedSerialDigitWrapper(
+  driverModule = new MergedSerialDigitDriverModule(
       hardware, dimmablePatterns,
       !COMMON_CATHODE, USE_TRANSISTORS,
       false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
       NUM_SUBFIELDS, latchPin, dataPin, clockPin);
-  driver = wrapper->getDriver();
+  driver = driverModule->getDriver();
 #elif DRIVER_MODE == DRIVER_MODE_MERGED_SPI_DIGIT
-  wrapper = new MergedSpiDigitWrapper(
+  driverModule = new MergedSpiDigitDriverModule(
       hardware, dimmablePatterns,
       !COMMON_CATHODE, USE_TRANSISTORS,
       false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
       NUM_SUBFIELDS, latchPin, dataPin, clockPin);
-  driver = wrapper->getDriver();
+  driver = driverModule->getDriver();
 #else
   #ifdef __AVR__
     #if DRIVER_MODE == DRIVER_MODE_DIRECT_FAST_DIGIT

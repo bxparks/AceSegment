@@ -37,14 +37,14 @@ SOFTWARE.
 
 namespace ace_segment {
 
-class Wrapper {
+class DriverModule {
   public:
     virtual Driver* getDriver() = 0;
 };
 
-class DirectDigitWrapper: public Wrapper {
+class SplitDirectDigitDriverModule: public DriverModule {
   public:
-    DirectDigitWrapper(Hardware* hardware, 
+    SplitDirectDigitDriverModule(Hardware* hardware,
             DimmablePattern* dimmablePatterns, bool commonCathode,
             bool transistorsOnDigits, bool transistorsOnSegments,
             uint8_t numDigits, uint8_t numSegments, uint8_t numSubFields,
@@ -62,9 +62,9 @@ class DirectDigitWrapper: public Wrapper {
     SplitDigitDriver mDriver;
 };
 
-class DirectSegmentWrapper: public Wrapper {
+class SplitDirectSegmentDriverModule: public DriverModule {
   public:
-    DirectSegmentWrapper(Hardware* hardware, 
+    SplitDirectSegmentDriverModule(Hardware* hardware,
             DimmablePattern* dimmablePatterns, bool commonCathode,
             bool transistorsOnDigits, bool transistorsOnSegments,
             uint8_t numDigits, uint8_t numSegments, uint8_t numSubFields,
@@ -82,9 +82,9 @@ class DirectSegmentWrapper: public Wrapper {
     SplitSegmentDriver mDriver;
 };
 
-class SplitSerialDigitWrapper: public Wrapper {
+class SplitSerialDigitDriverModule: public DriverModule {
   public:
-    SplitSerialDigitWrapper(Hardware* hardware, 
+    SplitSerialDigitDriverModule(Hardware* hardware,
             DimmablePattern* dimmablePatterns, bool commonCathode,
             bool transistorsOnDigits, bool transistorsOnSegments,
             uint8_t numDigits, uint8_t numSegments, uint8_t numSubFields,
@@ -103,9 +103,9 @@ class SplitSerialDigitWrapper: public Wrapper {
     SplitDigitDriver mDriver;
 };
 
-class SplitSpiDigitWrapper: public Wrapper {
+class SplitSpiDigitDriverModule: public DriverModule {
   public:
-    SplitSpiDigitWrapper(Hardware* hardware, 
+    SplitSpiDigitDriverModule(Hardware* hardware,
             DimmablePattern* dimmablePatterns, bool commonCathode,
             bool transistorsOnDigits, bool transistorsOnSegments,
             uint8_t numDigits, uint8_t numSegments, uint8_t numSubFields,
@@ -124,9 +124,9 @@ class SplitSpiDigitWrapper: public Wrapper {
     SplitDigitDriver mDriver;
 };
 
-class MergedSerialDigitWrapper: public Wrapper {
+class MergedSerialDigitDriverModule: public DriverModule {
   public:
-    MergedSerialDigitWrapper(Hardware* hardware, 
+    MergedSerialDigitDriverModule(Hardware* hardware,
             DimmablePattern* dimmablePatterns,
             bool commonCathode, bool transistorsOnDigits,
             bool transistorsOnSegments, uint8_t numDigits, uint8_t numSegments,
@@ -145,9 +145,9 @@ class MergedSerialDigitWrapper: public Wrapper {
     MergedDigitDriver mDriver;
 };
 
-class MergedSpiDigitWrapper: public Wrapper {
+class MergedSpiDigitDriverModule: public DriverModule {
   public:
-    MergedSpiDigitWrapper(Hardware* hardware, 
+    MergedSpiDigitDriverModule(Hardware* hardware,
             DimmablePattern* dimmablePatterns,
             bool commonCathode, bool transistorsOnDigits,
             bool transistorsOnSegments, uint8_t numDigits, uint8_t numSegments,
