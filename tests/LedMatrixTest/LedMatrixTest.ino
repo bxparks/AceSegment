@@ -27,7 +27,7 @@ SOFTWARE.
 #include <stdarg.h>
 #include <AUnit.h>
 #include <AceSegment.h>
-#include <ace_segment/LedMatrixDirect.h>
+#include <ace_segment/LedMatrixSplitDirect.h>
 #include <ace_segment/LedMatrixSplitSerial.h>
 #include <ace_segment/LedMatrixSplitSpi.h>
 #include <ace_segment/testing/TestableHardware.h>
@@ -63,14 +63,15 @@ void loop() {
 }
 
 // ----------------------------------------------------------------------
-// Tests for LedMatrixDirect.
+// Tests for LedMatrixSplitDirect.
 // ----------------------------------------------------------------------
 
-class LedMatrixDirectTest: public BaseHardwareTest {
+class LedMatrixSplitDirectTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
       BaseHardwareTest::setup();
-      mLedMatrix = new LedMatrixDirect(mHardware, true /* cathodeOnGroup */,
+      mLedMatrix = new LedMatrixSplitDirect(mHardware,
+          true /* cathodeOnGroup */,
           false /* transistorsOnGroups */,
           false /* transistorsOnElements */,
           NUM_DIGITS, NUM_SEGMENTS, digitPins, segmentPins);
@@ -84,10 +85,10 @@ class LedMatrixDirectTest: public BaseHardwareTest {
       BaseHardwareTest::teardown();
     }
 
-    LedMatrixDirect* mLedMatrix;
+    LedMatrixSplitDirect* mLedMatrix;
 };
 
-testF(LedMatrixDirectTest, configure) {
+testF(LedMatrixSplitDirectTest, configure) {
   mLedMatrix->configure();
   assertEvents(24,
       Event::kTypePinMode, 0, OUTPUT,
@@ -132,19 +133,19 @@ testF(LedMatrixDirectTest, configure) {
       Event::kTypePinMode, 11, INPUT);
 }
 
-testF(LedMatrixDirectTest, enableGroup) {
+testF(LedMatrixSplitDirectTest, enableGroup) {
   mLedMatrix->enableGroup(1);
   assertEvents(1,
       Event::kTypeDigitalWrite, 1, LOW);
 }
 
-testF(LedMatrixDirectTest, disableGroup) {
+testF(LedMatrixSplitDirectTest, disableGroup) {
   mLedMatrix->disableGroup(1);
   assertEvents(1,
       Event::kTypeDigitalWrite, 1, HIGH);
 }
 
-testF(LedMatrixDirectTest, drawElements) {
+testF(LedMatrixSplitDirectTest, drawElements) {
   mLedMatrix->drawElements(0x55);
   assertEvents(8,
       Event::kTypeDigitalWrite, 4, HIGH,

@@ -24,7 +24,7 @@ SOFTWARE.
 
 #include "Hardware.h"
 #include "LedMatrix.h"
-#include "LedMatrixDirect.h"
+#include "LedMatrixSplitDirect.h"
 #include "LedMatrixSplitSerial.h"
 #include "LedMatrixSplitSpi.h"
 #include "Driver.h"
@@ -36,16 +36,16 @@ namespace ace_segment {
 
 /** The LedMatrix object returned must have its configure() called. */
 LedMatrixSplit* DriverBuilder::buildLedMatrix() {
-  if (mLedMatrixType == kTypeLedMatrixDirect) {
+  if (mLedMatrixType == kTypeLedMatrixSplitDirect) {
     if (mResistorsOnSegments) {
-      return new LedMatrixDirect(mHardware,
+      return new LedMatrixSplitDirect(mHardware,
           mCommonCathode, mUseTransistorsOnDigits, mUseTransistorsOnSegments,
           mNumDigits, mNumSegments, mDigitPins, mSegmentPins);
     } else {
       // If the resistors are on the Digit pins, then the "anode" and "cathode"
       // pins become flipped electrically, because we're scanning the LED
       // matrix in the other direction.
-      return new LedMatrixDirect(mHardware,
+      return new LedMatrixSplitDirect(mHardware,
           !mCommonCathode, mUseTransistorsOnSegments, mUseTransistorsOnDigits,
           mNumSegments, mNumDigits, mSegmentPins, mDigitPins);
     }

@@ -92,7 +92,7 @@ class DriverBuilder {
     }
 
     DriverBuilder& setSegmentDirectPins(const uint8_t* segmentPins) {
-      mLedMatrixType = kTypeLedMatrixDirect;
+      mLedMatrixType = kTypeLedMatrixSplitDirect;
       mSegmentPins = segmentPins;
       return *this;
     }
@@ -144,7 +144,7 @@ class DriverBuilder {
     Driver* build();
 
   private:
-    static const uint8_t kTypeLedMatrixDirect = 0;
+    static const uint8_t kTypeLedMatrixSplitDirect = 0;
     static const uint8_t kTypeLedMatrixSplitSerial = 1;
     static const uint8_t kTypeLedMatrixSplitSpi = 2;
 
@@ -158,7 +158,7 @@ class DriverBuilder {
     bool mCommonCathode = true;
     bool mUseTransistorsOnDigits = false;
     bool mUseTransistorsOnSegments = false;
-    uint8_t mLedMatrixType = kTypeLedMatrixDirect;
+    uint8_t mLedMatrixType = kTypeLedMatrixSplitDirect;
     const uint8_t* mDigitPins = nullptr;
     const uint8_t* mSegmentPins = nullptr;
     uint8_t mLatchPin = 0;

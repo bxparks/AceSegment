@@ -27,7 +27,7 @@ SOFTWARE.
 #include <stdarg.h>
 #include <AUnit.h>
 #include <AceSegment.h>
-#include <ace_segment/LedMatrixDirect.h>
+#include <ace_segment/LedMatrixSplitDirect.h>
 #include <ace_segment/LedMatrixSplitSerial.h>
 #include <ace_segment/LedMatrixSplitSpi.h>
 #include <ace_segment/LedMatrixMergedSerial.h>
@@ -56,8 +56,8 @@ void setup() {
   Serial.println(sizeof(TimingStats));
   Serial.print(F("sizeof(Hardware): "));
   Serial.println(sizeof(Hardware));
-  Serial.print(F("sizeof(LedMatrixDirect): "));
-  Serial.println(sizeof(LedMatrixDirect));
+  Serial.print(F("sizeof(LedMatrixSplitDirect): "));
+  Serial.println(sizeof(LedMatrixSplitDirect));
   Serial.print(F("sizeof(LedMatrixSplitSerial): "));
   Serial.println(sizeof(LedMatrixSplitSerial));
   Serial.print(F("sizeof(LedMatrixSplitSpi): "));

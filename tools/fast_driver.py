@@ -8,7 +8,7 @@ Generate an implementation of ace_segment::Driver which uses the
 digitalWriteFast() methods of https://github.com/NicksonYap/digitalWriteFast.
 The resulting class can be used where a 'Driver' object created by
 'DriverBuilder' would normally be used. There are 3 versions:
-  * --segment_direct_pins - equivalent to LedMatrixDirect
+  * --segment_direct_pins - equivalent to LedMatrixSplitDirect
   * --segment_serial_pins - equivalent to LedMatrixSplitSerial
   * --segment_spi_pins - equivalent to LedMatrixSplitSpi
 
@@ -39,7 +39,7 @@ Benchmarks for AceSegmentDemo
 (frame rate: 60Hz, 4 fields/frame, 16 subfields/field):
 
   --segment_direct_pins:
-      LedMatrixDirect
+      LedMatrixSplitDirect
           flash/static: 9252/506
           min: 8us; avg: 16us; max: 140us
       --digital_write_fast

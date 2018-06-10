@@ -23,11 +23,11 @@ SOFTWARE.
 */
 
 #include "Hardware.h"
-#include "LedMatrixDirect.h"
+#include "LedMatrixSplitDirect.h"
 
 namespace ace_segment {
 
-void LedMatrixDirect::configure() {
+void LedMatrixSplitDirect::configure() {
   LedMatrix::configure();
 
   for (uint8_t group = 0; group < mNumGroups; group++) {
@@ -42,7 +42,7 @@ void LedMatrixDirect::configure() {
   }
 }
 
-void LedMatrixDirect::finish() {
+void LedMatrixSplitDirect::finish() {
   for (uint8_t group = 0; group < mNumGroups; group++) {
     uint8_t digitalPin = mGroupPins[group];
     mHardware->pinMode(digitalPin, INPUT);
@@ -53,15 +53,15 @@ void LedMatrixDirect::finish() {
   }
 }
 
-void LedMatrixDirect::enableGroup(uint8_t group) {
+void LedMatrixSplitDirect::enableGroup(uint8_t group) {
   writeGroupPin(group, mGroupOn);
 }
 
-void LedMatrixDirect::disableGroup(uint8_t group) {
+void LedMatrixSplitDirect::disableGroup(uint8_t group) {
   writeGroupPin(group, mGroupOff);
 }
 
-void LedMatrixDirect::drawElements(uint8_t pattern) {
+void LedMatrixSplitDirect::drawElements(uint8_t pattern) {
   uint8_t elementMask = 0x1;
   for (uint8_t element = 0; element < mNumElements; element++) {
     uint8_t output =

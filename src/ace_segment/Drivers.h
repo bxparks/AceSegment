@@ -25,7 +25,7 @@ SOFTWARE.
 #ifndef ACE_SEGMENT_DRIVERS_H
 #define ACE_SEGMENT_DRIVERS_H
 
-#include "LedMatrixDirect.h"
+#include "LedMatrixSplitDirect.h"
 #include "LedMatrixMergedSerial.h"
 #include "LedMatrixMergedSpi.h"
 #include "LedMatrixSplitSerial.h"
@@ -58,7 +58,7 @@ class DirectDigitWrapper: public Wrapper {
     virtual Driver* getDriver() override { return &mDriver; }
 
   private:
-    LedMatrixDirect mLedMatrix;
+    LedMatrixSplitDirect mLedMatrix;
     DigitDriver mDriver;
 };
 
@@ -78,7 +78,7 @@ class DirectSegmentWrapper: public Wrapper {
     virtual Driver* getDriver() override { return &mDriver; }
 
   private:
-    LedMatrixDirect mLedMatrix;
+    LedMatrixSplitDirect mLedMatrix;
     SegmentDriver mDriver;
 };
 

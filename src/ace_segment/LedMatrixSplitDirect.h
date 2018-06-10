@@ -29,9 +29,9 @@ SOFTWARE.
 
 namespace ace_segment {
 
-class LedMatrixDirect: public LedMatrixSplit {
+class LedMatrixSplitDirect: public LedMatrixSplit {
   public:
-    LedMatrixDirect(Hardware* hardware, bool cathodeOnGroup,
+    LedMatrixSplitDirect(Hardware* hardware, bool cathodeOnGroup,
             bool transistorsOnGroups, bool transistorsOnElements,
             uint8_t numGroups, uint8_t numElements,
             const uint8_t* groupPins, const uint8_t* elementPins):
