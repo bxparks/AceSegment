@@ -39,10 +39,11 @@ const int8_t SEGMENT_ON = HIGH;
 const int8_t SEGMENT_OFF = LOW;
 
 const int8_t NUM_DIGITS = 4;
+const int8_t NUM_SEGMENTS = 8;
 const uint16_t FRAMES_PER_SECOND = 60;
 const int8_t NUM_SUB_FIELDS = 3;
 const uint8_t digitPins[NUM_DIGITS] = {0, 1, 2, 3};
-const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
+const uint8_t segmentPins[NUM_SEGMENTS] = {4, 5, 6, 7, 8, 9, 10, 11};
 const uint8_t latchPin = 12;
 const uint8_t dataPin = 13;
 const uint8_t clockPin = 14;
@@ -62,8 +63,6 @@ void setup() {
   //TestRunner::include("SplitDigitDriverTest*");
   //TestRunner::include("SplitSegmentDriverTest*");
   //TestRunner::include("ModulatingSplitDigitDriverTest*");
-  //TestRunner::include("EdgeCaseModulatingSplitDigitDriverTest*");
-  //TestRunner::include("EdgeCaseModulatingSplitDigitDriverTest*");
   //TestRunner::include("SplitDigitDriverSerialLedMatrixTest*");
 
   Serial.println(F("setup(): end"));
@@ -81,24 +80,27 @@ class SplitDigitDriverTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
       BaseHardwareTest::setup();
-      mDriver = DriverBuilder(mHardware)
-          .setNumDigits(NUM_DIGITS)
-          .setCommonCathode()
-          .setResistorsOnSegments()
-          .setDigitPins(digitPins)
-          .setSegmentDirectPins(segmentPins)
-          .setDimmablePatterns(dimmablePatterns)
-          .build();
-
+      mDriverModule = new SplitDirectDigitDriverModule(mHardware,
+          dimmablePatterns,
+          true /* commonCathode */,
+          false /* transistorsOnDigits */,
+          false /* transistorsOnSegments */,
+          NUM_DIGITS,
+          NUM_SEGMENTS,
+          1 /* numSubFields */,
+          digitPins,
+          segmentPins);
+      mDriver = mDriverModule->getDriver();
       mDriver->configure();
       mHardware->clear();
     }
 
     virtual void teardown() override {
-      delete mDriver;
+      delete mDriverModule;
       BaseHardwareTest::teardown();
     }
 
+    DriverModule* mDriverModule;
     Driver* mDriver;
 };
 
@@ -374,23 +376,27 @@ class SplitSegmentDriverTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
       BaseHardwareTest::setup();
-      mDriver = DriverBuilder(mHardware)
-          .setNumDigits(NUM_DIGITS)
-          .setCommonCathode()
-          .setResistorsOnDigits()
-          .setDigitPins(digitPins)
-          .setSegmentDirectPins(segmentPins)
-          .setDimmablePatterns(dimmablePatterns)
-          .build();
+      mDriverModule = new SplitDirectSegmentDriverModule(mHardware,
+          dimmablePatterns,
+          true /* commonCathode */,
+          false /* transistorsOnDigits */,
+          false /* transistorsOnSegments */,
+          NUM_DIGITS,
+          NUM_SEGMENTS,
+          1 /* numSubFields */,
+          digitPins,
+          segmentPins);
+      mDriver = mDriverModule->getDriver();
       mDriver->configure();
       mHardware->clear();
     }
 
     virtual void teardown() override {
-      delete mDriver;
+      delete mDriverModule;
       BaseHardwareTest::teardown();
     }
 
+    DriverModule* mDriverModule;
     Driver* mDriver;
 };
 
@@ -595,24 +601,27 @@ class ModulatingSplitDigitDriverTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
       BaseHardwareTest::setup();
-      mDriver = DriverBuilder(mHardware)
-          .setNumDigits(NUM_DIGITS)
-          .setCommonCathode()
-          .setResistorsOnSegments()
-          .setDigitPins(digitPins)
-          .setSegmentDirectPins(segmentPins)
-          .setDimmablePatterns(dimmablePatterns)
-          .useModulation(NUM_SUB_FIELDS)
-          .build();
+      mDriverModule = new SplitDirectDigitDriverModule(mHardware,
+          dimmablePatterns,
+          true /* commonCathode */,
+          false /* transistorsOnDigits */,
+          false /* transistorsOnSegments */,
+          NUM_DIGITS,
+          NUM_SEGMENTS,
+          NUM_SUB_FIELDS,
+          digitPins,
+          segmentPins);
+      mDriver = mDriverModule->getDriver();
       mDriver->configure();
       mHardware->clear();
     }
 
     virtual void teardown() override {
-      delete mDriver;
+      delete mDriverModule;
       BaseHardwareTest::teardown();
     }
 
+    DriverModule* mDriverModule;
     Driver* mDriver;
 };
 
@@ -966,23 +975,26 @@ class SplitDigitDriverSerialLedMatrixTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
       BaseHardwareTest::setup();
-      mDriver = DriverBuilder(mHardware)
-          .setNumDigits(NUM_DIGITS)
-          .setCommonCathode()
-          .setResistorsOnSegments()
-          .setDigitPins(digitPins)
-          .setSegmentSerialPins(latchPin, dataPin, clockPin)
-          .setDimmablePatterns(dimmablePatterns)
-          .build();
-
+      mDriverModule = new SplitSerialDigitDriverModule(mHardware,
+          dimmablePatterns,
+          true /* commonCathode */,
+          false /* transistorsOnDigits */,
+          false /* transistorsOnSegments */,
+          NUM_DIGITS,
+          NUM_SEGMENTS,
+          1 /* numSubFields */,
+          digitPins,
+          latchPin, dataPin, clockPin);
+      mDriver = mDriverModule->getDriver();
       mDriver->configure();
       mHardware->clear();
     }
     virtual void teardown() override {
-      delete mDriver;
+      delete mDriverModule;
       BaseHardwareTest::teardown();
     }
 
+    DriverModule* mDriverModule;
     Driver* mDriver;
 };
 

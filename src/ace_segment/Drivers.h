@@ -39,6 +39,7 @@ namespace ace_segment {
 
 class DriverModule {
   public:
+    virtual ~DriverModule() {};
     virtual Driver* getDriver() = 0;
 };
 
