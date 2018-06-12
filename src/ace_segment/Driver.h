@@ -58,12 +58,10 @@ class Driver {
     typedef uint8_t DigitPatternType;
 
     /**
-     * Virtual destructor needed to clean up LedMatrix that was created on the
-     * heap by DriverBuilder. Normally, the Driver will be created once and
-     * never deleted, however unit tests will create multiple versions of
-     * Driver and will call the destructor to clean up after each test.
+     * Virtual destructor. Needed in unit tests where multiple drivers are
+     * created and deleted.
      */
-    virtual ~Driver();
+    virtual ~Driver() {}
 
     /**
      * Configure the driver. Usually called only once in a program.
@@ -141,23 +139,18 @@ class Driver {
      * @param dimmablePatterns An array of DimmablePattern objects that
      * represents each digit.
      * @param numDigits
-     * @param ownsLedMatrix If true, the Driver object owns the ledMatrix and
-     * will delete it in the destructor. Default is false, but set to true
-     * by DriverBuidler.
      */
     explicit Driver(LedMatrix* ledMatrix, DimmablePattern* dimmablePatterns,
-            uint8_t numDigits, bool ownsLedMatrix = false):
+            uint8_t numDigits):
         mLedMatrix(ledMatrix),
         mDimmablePatterns(dimmablePatterns),
         mNumDigits(numDigits),
-        mOwnsLedMatrix(ownsLedMatrix),
         mPreparedToSleep(false)
     {}
 
     LedMatrix* const mLedMatrix;
     DimmablePattern* const mDimmablePatterns;
     const uint8_t mNumDigits;
-    const bool mOwnsLedMatrix;
 
     volatile bool mPreparedToSleep;
 };

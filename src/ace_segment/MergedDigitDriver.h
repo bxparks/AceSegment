@@ -42,8 +42,8 @@ class MergedDigitDriver: public Driver {
     /** Constructor. */
     explicit MergedDigitDriver(LedMatrixMerged* ledMatrix,
             DimmablePattern* dimmablePatterns, uint8_t numDigits,
-            uint8_t numSubFields, bool ownsLedMatrix = false):
-        Driver(ledMatrix, dimmablePatterns, numDigits, ownsLedMatrix),
+            uint8_t numSubFields):
+        Driver(ledMatrix, dimmablePatterns, numDigits),
         mNumSubFields(numSubFields)
     {}
 

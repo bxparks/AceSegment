@@ -42,9 +42,8 @@ class SplitSegmentDriver: public Driver {
   public:
     /** Constructor. */
     explicit SplitSegmentDriver(LedMatrixSplit* ledMatrix,
-            DimmablePattern* dimmablePatterns,
-            uint8_t numDigits, bool ownsLedMatrix = false):
-        Driver(ledMatrix, dimmablePatterns, numDigits, ownsLedMatrix)
+            DimmablePattern* dimmablePatterns, uint8_t numDigits):
+        Driver(ledMatrix, dimmablePatterns, numDigits)
     {}
 
     virtual void configure() override {
