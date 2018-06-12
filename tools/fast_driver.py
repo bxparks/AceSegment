@@ -6,11 +6,11 @@
 """
 Generate an implementation of ace_segment::Driver which uses the
 digitalWriteFast() methods of https://github.com/NicksonYap/digitalWriteFast.
-The resulting class can be used where a 'Driver' object created by
-'DriverBuilder' would normally be used. There are 3 versions:
-  * --segment_direct_pins - equivalent to LedMatrixSplitDirect
-  * --segment_serial_pins - equivalent to LedMatrixSplitSerial
-  * --segment_spi_pins - equivalent to LedMatrixSplitSpi
+The resulting class can be used where a 'SplitDigitDriver' object would
+normally be used. There are 3 versions:
+  * --segment_direct_pins - uses LedMatrixSplitDirect
+  * --segment_serial_pins - uses LedMatrixSplitSerial
+  * --segment_spi_pins - uses LedMatrixSplitSpi
 
 Usage: fast_driver.py [-h] [flags ...]
 

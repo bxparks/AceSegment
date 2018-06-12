@@ -11,7 +11,6 @@ Hardware	KEYWORD1
 LedMatrix	KEYWORD1
 DimmablePattern	KEYWORD1
 Driver	KEYWORD1
-DriverBuilder	KEYWORD1
 Styler	KEYWORD1
 BlinkStyler	KEYWORD1
 PulseStyler	KEYWORD1
@@ -107,21 +106,6 @@ writeDecimalPointAt	KEYWORD2
 
 # StringWriter.
 writeStringAt	KEYWORD2
-
-# DriverBuilder.h
-setNumDigits	KEYWORD2
-setNumSegments	KEYWORD2
-setCommonAnode	KEYWORD2
-setCommonCathode	KEYWORD2
-setResistorsOnDigits	KEYWORD2
-setResistorsOnSegments	KEYWORD2
-setDigitPins	KEYWORD2
-setSegmentDirectPins	KEYWORD2
-setSegmentSerialPins	KEYWORD2
-setSegmentSpiPins	KEYWORD2
-setDimmablePatterns	KEYWORD2
-useModulation	KEYWORD2
-build	KEYWORD2
 
 # StyleTable.h
 setStyler	KEYWORD2
