@@ -68,12 +68,12 @@ class SplitDirectSegmentDriverModule: public DriverModule {
     SplitDirectSegmentDriverModule(Hardware* hardware,
             DimmablePattern* dimmablePatterns, bool commonCathode,
             bool transistorsOnDigits, bool transistorsOnSegments,
-            uint8_t numDigits, uint8_t numSegments, uint8_t numSubFields,
+            uint8_t numDigits, uint8_t numSegments,
             const uint8_t* digitPins, const uint8_t* segmentPins):
         mLedMatrix(hardware, !commonCathode, transistorsOnSegments,
             transistorsOnDigits, numSegments, numDigits, segmentPins,
             digitPins),
-        mDriver(&mLedMatrix, dimmablePatterns, numDigits, numSubFields)
+        mDriver(&mLedMatrix, dimmablePatterns, numDigits)
     {}
 
     virtual Driver* getDriver() override { return &mDriver; }

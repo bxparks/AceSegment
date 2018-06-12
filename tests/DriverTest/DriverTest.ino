@@ -383,7 +383,6 @@ class SplitSegmentDriverTest: public BaseHardwareTest {
           false /* transistorsOnSegments */,
           NUM_DIGITS,
           NUM_SEGMENTS,
-          1 /* numSubFields */,
           digitPins,
           segmentPins);
       mDriver = mDriverModule->getDriver();

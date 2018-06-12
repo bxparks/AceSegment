@@ -27,18 +27,17 @@ SOFTWARE.
 
 #include <stdint.h>
 
-class __FlashStringHelper;
-
 struct DriverConfig {
-  enum ResistorWiring {
-    ResistorsOnDigits,
-    ResistorsOnSegments
-  };
-
-  enum PinWiring {
-    DirectPins,
-    SerialPins,
-    SpiPins
+  enum DriverOption {
+    SplitDirectDigitDriverOption,
+    SplitDirectSegmentDriverOption,
+    SplitSerialDigitDriverOption,
+    SplitSpiDigitDriverOption,
+    MergedSerialDigitDriverOption,
+    MergedSpiDigitDriverOption,
+    FastDirectDriverOption,
+    FastSerialDriverOption,
+    FastSpiDriverOption,
   };
 
   enum Modulation {
@@ -46,36 +45,19 @@ struct DriverConfig {
     UseModulation
   };
 
-  enum Fast {
-    NoFastDriver,
-    UseFastDriver
-  };
-
   enum Style {
     NoStyles,
     UseStyles
   };
 
-  DriverConfig(
-      ResistorWiring resistorWiring, PinWiring pinWiring,
-      Modulation modulation, Fast fast, Style style,
-      const __FlashStringHelper* label):
-    mResistorWiring(resistorWiring),
-    mPinWiring(pinWiring),
-    mModulation(modulation),
-    mFast(fast),
-    mStyle(style),
-    mLabel(label)
-  {}
-
-  const ResistorWiring mResistorWiring;
-  const PinWiring mPinWiring;
+  const DriverOption mDriverOption;
   const Modulation mModulation;
-  const Fast mFast;
   const Style mStyle;
-  const __FlashStringHelper* const mLabel;
+
+  static uint8_t getMaxWidthDriverLabel();
 
   static const DriverConfig kDriverConfigs[];
+  static const char* kDriverOptionLabels[];
   static const uint8_t kNumDriverConfigs;
 };
 

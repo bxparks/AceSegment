@@ -35,8 +35,9 @@ struct BenchmarkBundle {
   static const uint8_t kFramePerSecond = 60;
   static const uint8_t kNumSubFields = 16;
   static const uint8_t kNumDigits = 4;
+  static const uint8_t kNumSegments = 8;
   static const uint8_t kDigitPins[kNumDigits];
-  static const uint8_t kSegmentDirectPins[8];
+  static const uint8_t kSegmentDirectPins[kNumSegments];
 
   static const uint8_t kLatchPin = SS; // ST_CP on 74HC595
   static const uint8_t kDataPin = MOSI; // DS on 74HC595
@@ -57,7 +58,11 @@ struct BenchmarkBundle {
     delete mStyleTable;
     delete mPulseStyler;
     delete mBlinkStyler;
-    delete mDriver;
+    if (mDriverModule != nullptr) {
+      delete mDriverModule;
+    } else {
+      delete mDriver;
+    }
     delete mHardware;
   }
 
@@ -71,7 +76,8 @@ struct BenchmarkBundle {
   }
 
   Hardware* mHardware;
-  DimmablePattern mDimmingPatterns[kNumDigits];
+  DimmablePattern mDimmablePatterns[kNumDigits];
+  DriverModule* mDriverModule;
   Driver* mDriver;
 
   StyledPattern mStyledPatterns[kNumDigits];

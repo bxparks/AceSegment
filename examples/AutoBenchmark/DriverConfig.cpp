@@ -25,160 +25,103 @@ SOFTWARE.
 #include "Flash.h"
 #include "DriverConfig.h"
 
-  //"------------+--------+------------+------+--------+-------------+";
-static const char kLabelDigitsDirect[] PROGMEM =
-    "digits      | direct |            |      |        |";
-static const char kLabelDigitsDirectStyles[] PROGMEM =
-    "digits      | direct |            |      | styles |";
+static const char kLabelSplitDirectDigitDriverOption[] PROGMEM =
+    "SplitDirectDigitDriver";
+static const char kLabelSplitDirectSegmentDriverOption[] PROGMEM =
+    "SplitDirectSegmentDriver";
+static const char kLabelSplitSerialDigitDriverOption[] PROGMEM =
+    "SplitSerialDigitDriver";
+static const char kLabelSplitSpiDigitDriverOption[] PROGMEM =
+    "SplitSpiDigitDriver";
+static const char kLabelMergedSerialDigitDriverOption[] PROGMEM =
+    "MergedSerialDigitDriver";
+static const char kLabelMergedSpiDigitDriverOption[] PROGMEM =
+    "MergedSpiDigitDriver";
+static const char kLabelFastDirectDriverOption[] PROGMEM =
+    "FastDirectDriver";
+static const char kLabelFastSerialDriverOption[] PROGMEM =
+    "FastSerialDriver";
+static const char kLabelFastSpiDriverOption[] PROGMEM =
+    "FastSpiDriver";
 
-static const char kLabelDigitsSerial[] PROGMEM =
-    "digits      | serial |            |      |        |";
-static const char kLabelDigitsSerialStyles[] PROGMEM =
-    "digits      | serial |            |      | styles |";
+// These must appear in the same order as DriverConfig::DriverOption enum.
+const char* DriverConfig::kDriverOptionLabels[] = {
+  kLabelSplitDirectDigitDriverOption,
+  kLabelSplitDirectSegmentDriverOption,
+  kLabelSplitSerialDigitDriverOption,
+  kLabelSplitSpiDigitDriverOption,
+  kLabelMergedSerialDigitDriverOption,
+  kLabelMergedSpiDigitDriverOption,
+  kLabelFastDirectDriverOption,
+  kLabelFastSerialDriverOption,
+  kLabelFastSpiDriverOption,
+};
 
-static const char kLabelDigitsSpi[] PROGMEM =
-    "digits      | spi    |            |      |        |";
-static const char kLabelDigitsSpiStyles[] PROGMEM =
-    "digits      | spi    |            |      | styles |";
-
-static const char kLabelSegmentsDirect[] PROGMEM =
-    "segments    | direct |            |      |        |";
-static const char kLabelSegmentsDirectStyles[] PROGMEM =
-    "segments    | direct |            |      | styles |";
-
-static const char kLabelSegmentsSerial[] PROGMEM =
-    "segments    | serial |            |      |        |";
-static const char kLabelSegmentsSerialStyles[] PROGMEM =
-    "segments    | serial |            |      | styles |";
-
-static const char kLabelSegmentsSpi[] PROGMEM =
-    "segments    | spi    |            |      |        |";
-static const char kLabelSegmentsSpiStyles[] PROGMEM =
-    "segments    | spi    |            |      | styles |";
-
-static const char kLabelSegmentsDirectModulation[] PROGMEM =
-    "segments    | direct | modulation |      |        |";
-static const char kLabelSegmentsDirectModulationStyles[] PROGMEM =
-    "segments    | direct | modulation |      | styles |";
-
-static const char kLabelSegmentsSerialModulation[] PROGMEM =
-    "segments    | serial | modulation |      |        |";
-static const char kLabelSegmentsSerialModulationStyles[] PROGMEM =
-    "segments    | serial | modulation |      | styles |";
-
-static const char kLabelSegmentsSpiModulation[] PROGMEM =
-    "segments    | spi    | modulation |      |        |";
-static const char kLabelSegmentsSpiModulationStyles[] PROGMEM =
-    "segments    | spi    | modulation |      | styles |";
-
-static const char kLabelSegmentsDirectModulationFast[] PROGMEM =
-    "segments    | direct | modulation | fast |        |";
-static const char kLabelSegmentsDirectModulationFastStyles[] PROGMEM =
-    "segments    | direct | modulation | fast | styles |";
-
-static const char kLabelSegmentsSerialModulationFast[] PROGMEM =
-    "segments    | serial | modulation | fast |        |";
-static const char kLabelSegmentsSerialModulationFastStyles[] PROGMEM =
-    "segments    | serial | modulation | fast | styles |";
-
-static const char kLabelSegmentsSpiModulationFast[] PROGMEM =
-    "segments    | spi    | modulation | fast |        |";
-static const char kLabelSegmentsSpiModulationFastStyles[] PROGMEM =
-    "segments    | spi    | modulation | fast | styles |";
-
-
-// The strings below would consume 47 x 12 = 564 bytes of static memory if they
-// were not placed in PROGMEM.
 const DriverConfig DriverConfig::kDriverConfigs[] {
+  {SplitDirectDigitDriverOption, NoModulation, NoStyles},
+  {SplitDirectDigitDriverOption, NoModulation, UseStyles},
 
-  // Renderers using no Styles, which should make these fast.
+  {SplitDirectDigitDriverOption, NoModulation, NoStyles},
+  {SplitDirectDigitDriverOption, NoModulation, UseStyles},
+  {SplitDirectDigitDriverOption, UseModulation, NoStyles},
+  {SplitDirectDigitDriverOption, UseModulation, UseStyles},
 
-  DriverConfig(
-      ResistorsOnDigits, DirectPins, NoModulation, NoFastDriver, NoStyles,
-      FPSTR(kLabelDigitsDirect)),
-  DriverConfig(
-      ResistorsOnDigits, DirectPins, NoModulation, NoFastDriver, UseStyles,
-      FPSTR(kLabelDigitsDirectStyles)),
+  {SplitDirectSegmentDriverOption, NoModulation, NoStyles},
+  {SplitDirectSegmentDriverOption, NoModulation, UseStyles},
 
-  DriverConfig(
-      ResistorsOnDigits, SerialPins, NoModulation, NoFastDriver, NoStyles,
-      FPSTR(kLabelDigitsSerial)),
-  DriverConfig(
-      ResistorsOnDigits, SerialPins, NoModulation, NoFastDriver, UseStyles,
-      FPSTR(kLabelDigitsSerialStyles)),
+  {SplitSerialDigitDriverOption, NoModulation, NoStyles},
+  {SplitSerialDigitDriverOption, NoModulation, UseStyles},
+  {SplitSerialDigitDriverOption, UseModulation, NoStyles},
+  {SplitSerialDigitDriverOption, UseModulation, UseStyles},
 
-  DriverConfig(
-      ResistorsOnDigits, SpiPins, NoModulation, NoFastDriver, NoStyles,
-      FPSTR(kLabelDigitsSpi)),
-  DriverConfig(
-      ResistorsOnDigits, SpiPins, NoModulation, NoFastDriver, UseStyles,
-      FPSTR(kLabelDigitsSpiStyles)),
+  {SplitSpiDigitDriverOption, NoModulation, NoStyles},
+  {SplitSpiDigitDriverOption, NoModulation, UseStyles},
+  {SplitSpiDigitDriverOption, UseModulation, NoStyles},
+  {SplitSpiDigitDriverOption, UseModulation, UseStyles},
 
-  DriverConfig(
-      ResistorsOnSegments, DirectPins, NoModulation, NoFastDriver, NoStyles,
-      FPSTR(kLabelSegmentsDirect)),
-  DriverConfig(
-      ResistorsOnSegments, DirectPins, NoModulation, NoFastDriver, UseStyles,
-      FPSTR(kLabelSegmentsDirectStyles)),
+  {MergedSerialDigitDriverOption, NoModulation, NoStyles},
+  {MergedSerialDigitDriverOption, NoModulation, UseStyles},
+  {MergedSerialDigitDriverOption, UseModulation, NoStyles},
+  {MergedSerialDigitDriverOption, UseModulation, UseStyles},
 
-  DriverConfig(
-      ResistorsOnSegments, SerialPins, NoModulation, NoFastDriver, NoStyles,
-      FPSTR(kLabelSegmentsSerial)),
-  DriverConfig(
-      ResistorsOnSegments, SerialPins, NoModulation, NoFastDriver, UseStyles,
-      FPSTR(kLabelSegmentsSerialStyles)),
-
-  DriverConfig(
-      ResistorsOnSegments, SpiPins, NoModulation, NoFastDriver, NoStyles,
-      FPSTR(kLabelSegmentsSpi)),
-  DriverConfig(
-      ResistorsOnSegments, SpiPins, NoModulation, NoFastDriver, UseStyles,
-      FPSTR(kLabelSegmentsSpiStyles)),
-
-  DriverConfig(
-      ResistorsOnSegments, DirectPins, UseModulation, NoFastDriver, NoStyles,
-      FPSTR(kLabelSegmentsDirectModulation)),
-  DriverConfig(
-      ResistorsOnSegments, DirectPins, UseModulation, NoFastDriver, UseStyles,
-      FPSTR(kLabelSegmentsDirectModulationStyles)),
-
-  DriverConfig(
-      ResistorsOnSegments, SerialPins, UseModulation, NoFastDriver, NoStyles,
-      FPSTR(kLabelSegmentsSerialModulation)),
-  DriverConfig(
-      ResistorsOnSegments, SerialPins, UseModulation, NoFastDriver, UseStyles,
-      FPSTR(kLabelSegmentsSerialModulationStyles)),
-
-  DriverConfig(
-      ResistorsOnSegments, SpiPins, UseModulation, NoFastDriver, NoStyles,
-      FPSTR(kLabelSegmentsSpiModulation)),
-  DriverConfig(
-      ResistorsOnSegments, SpiPins, UseModulation, NoFastDriver, UseStyles,
-      FPSTR(kLabelSegmentsSpiModulationStyles)),
+  {MergedSpiDigitDriverOption, NoModulation, NoStyles},
+  {MergedSpiDigitDriverOption, NoModulation, UseStyles},
+  {MergedSpiDigitDriverOption, UseModulation, NoStyles},
+  {MergedSpiDigitDriverOption, UseModulation, UseStyles},
 
 #ifdef __AVR__
-  DriverConfig(
-      ResistorsOnSegments, DirectPins, UseModulation, UseFastDriver, NoStyles,
-      FPSTR(kLabelSegmentsDirectModulationFast)),
-  DriverConfig(
-      ResistorsOnSegments, DirectPins, UseModulation, UseFastDriver, UseStyles,
-      FPSTR(kLabelSegmentsDirectModulationFastStyles)),
 
-  DriverConfig(
-      ResistorsOnSegments, SerialPins, UseModulation, UseFastDriver, NoStyles,
-      FPSTR(kLabelSegmentsSerialModulationFast)),
-  DriverConfig(
-      ResistorsOnSegments, SerialPins, UseModulation, UseFastDriver, UseStyles,
-      FPSTR(kLabelSegmentsSerialModulationFastStyles)),
+  {FastDirectDriverOption, NoModulation, NoStyles},
+  {FastDirectDriverOption, NoModulation, UseStyles},
+  {FastDirectDriverOption, UseModulation, NoStyles},
+  {FastDirectDriverOption, UseModulation, UseStyles},
 
-  DriverConfig(
-      ResistorsOnSegments, SpiPins, UseModulation, UseFastDriver, NoStyles,
-      FPSTR(kLabelSegmentsSpiModulationFast)),
-  DriverConfig(
-      ResistorsOnSegments, SpiPins, UseModulation, UseFastDriver, UseStyles,
-      FPSTR(kLabelSegmentsSpiModulationFastStyles)),
+  {FastSerialDriverOption, NoModulation, NoStyles},
+  {FastSerialDriverOption, NoModulation, UseStyles},
+  {FastSerialDriverOption, UseModulation, NoStyles},
+  {FastSerialDriverOption, UseModulation, UseStyles},
+
+  {FastSpiDriverOption, NoModulation, NoStyles},
+  {FastSpiDriverOption, NoModulation, UseStyles},
+  {FastSpiDriverOption, UseModulation, NoStyles},
+  {FastSpiDriverOption, UseModulation, UseStyles},
+
 #endif
 };
 
 const uint8_t DriverConfig::kNumDriverConfigs =
-    sizeof(kDriverConfigs) / sizeof(kDriverConfigs[0]);
+    sizeof(DriverConfig::kDriverConfigs)
+        / sizeof(DriverConfig::kDriverConfigs[0]);
+
+uint8_t DriverConfig::getMaxWidthDriverLabel() {
+  const uint8_t numLabels = sizeof(kDriverOptionLabels)
+      / sizeof(kDriverOptionLabels[0]);
+  uint8_t maxWidth = 0;
+  for (uint8_t i = 0; i < numLabels; i++) {
+    uint8_t width = strlen_P(kDriverOptionLabels[i]);
+    if (width > maxWidth) {
+      maxWidth = width;
+    }
+  }
+  return maxWidth;
+}

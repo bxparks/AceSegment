@@ -102,12 +102,13 @@ void setupBenchmark(const DriverConfig* driverConfig) {
 // Loop for AutoBenchmark
 //------------------------------------------------------------------
 
+  //"SplitDirectSegmentDriverOption";
 static const char kBoundary[] PROGMEM =
-    "------------+--------+------------+------+--------+-------------+";
+    "-------------------------------|------------+--------+-------------+";
 static const char kHeader[] PROGMEM =
-    "resistorsOn | wiring | modulation | fast | styles | min/avg/max |";
+    "driver                         | modulation | styles | min/avg/max |";
 static const char kDivider[] PROGMEM =
-    "------------|--------|------------|------|--------|-------------|";
+    "-------------------------------|------------|--------|-------------|";
 
 void loop() {
   if (loopMode == LOOP_MODE_BEGIN) {
@@ -163,10 +164,40 @@ void nextBenchmark() {
 
 void printTimingStats(const DriverConfig* driverConfig,
     const TimingStats& stats) {
-  Serial.print(driverConfig->mLabel);
+  printLabel(driverConfig);
 
   char buf[15]; // 12 should be enough, but give 3 more just in case
   sprintf(buf, " %3d/%3d/%3d |", stats.getMin(), stats.getAvg(),
       stats.getMax());
   Serial.println(buf);
+}
+
+void printLabel(const DriverConfig* driverConfig) {
+  // Print driver label
+  uint8_t index = static_cast<uint8_t>(driverConfig->mDriverOption);
+  const char* label = DriverConfig::kDriverOptionLabels[index];
+  uint8_t width = strlen_P(label);
+  // maxWidth could be calculated just once, but good enough for now
+  uint8_t maxWidth = DriverConfig::getMaxWidthDriverLabel();
+  Serial.print(FPSTR(label));
+  for (uint8_t i = 0; i < maxWidth - width; i++) {
+    Serial.print(' ');
+  }
+  Serial.print(' ');
+
+  // Print modulation option
+  if (driverConfig->mModulation == DriverConfig::NoModulation) {
+    Serial.print("| -          ");
+  } else {
+    Serial.print("| Y          ");
+  }
+
+  // Print style option
+  if (driverConfig->mStyle == DriverConfig::NoStyles) {
+    Serial.print("| -      ");
+  } else {
+    Serial.print("| Y      ");
+  }
+
+  Serial.print("|");
 }

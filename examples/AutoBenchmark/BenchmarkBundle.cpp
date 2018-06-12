@@ -32,8 +32,8 @@ SOFTWARE.
 
 #if defined(ESP8266)
   // NodeMCU doesn't have 12 available pins to directly drive 4 digits with 8
-  // segments. Serial or SPI drivers are probably the only opion (though
-  // haven't tested in real life). For the  purposes of the AutoBenchmark,
+  // segments. Serial or SPI drivers are probably the only options (though I
+  // haven't tested this in real life). For the  purposes of the AutoBenchmark,
   // just use some arbitrary pins which don't cause trouble.
   const uint8_t BenchmarkBundle::kDigitPins[kNumDigits] = {D3, D4, D5, D6};
   const uint8_t BenchmarkBundle::kSegmentDirectPins[8] =
@@ -55,48 +55,93 @@ SOFTWARE.
 BenchmarkBundle::BenchmarkBundle(const DriverConfig* driverConfig) {
   mHardware = new Hardware();
 
-  // Create the Driver.
-  if (driverConfig->mFast) {
-#ifdef __AVR__
-    if (driverConfig->mPinWiring == DriverConfig::DirectPins) {
-      mDriver = new FastDirectDriver(
-          mDimmingPatterns, kNumDigits, kNumSubFields);
-    } else if (driverConfig->mPinWiring == DriverConfig::SerialPins) {
-      mDriver = new FastSerialDriver(
-          mDimmingPatterns, kNumDigits, kNumSubFields);
-    } else {
-      mDriver = new FastSpiDriver(
-          mDimmingPatterns, kNumDigits, kNumSubFields);
-    }
-#endif
+  // Determine numSubFields used for modulation
+  uint8_t numSubFields;
+  if (driverConfig->mModulation == DriverConfig::NoModulation) {
+    numSubFields = 1;
   } else {
-    DriverBuilder builder = DriverBuilder(mHardware)
-          .setDimmablePatterns(mDimmingPatterns);
-    if (driverConfig->mResistorWiring == DriverConfig::ResistorsOnSegments) {
-      builder.setNumDigits(kNumDigits)
-          .setCommonCathode()
-          .setResistorsOnSegments()
-          .setDigitPins(kDigitPins);
-      if (driverConfig->mPinWiring == DriverConfig::DirectPins) {
-        builder.setSegmentDirectPins(kSegmentDirectPins);
-      } else if (driverConfig->mPinWiring == DriverConfig::SerialPins) {
-        builder.setSegmentSerialPins(kLatchPin, kDataPin, kClockPin);
-      } else {
-        builder.setSegmentSpiPins(kLatchPin, kDataPin, kClockPin);
-      }
-      if (driverConfig->mModulation == DriverConfig::UseModulation) {
-        builder.useModulation(kNumSubFields);
-      }
-      mDriver = builder.build();
-    } else {
-      mDriver = builder.setNumDigits(kNumDigits)
-        .setCommonCathode()
-        .setResistorsOnDigits()
-        .setDigitPins(kDigitPins)
-        .setSegmentDirectPins(kSegmentDirectPins)
-        .setDimmablePatterns(mDimmingPatterns)
-        .build();
-    }
+    numSubFields = kNumSubFields;
+  }
+
+  // Create the Driver.
+  mDriverModule = nullptr;
+  if (driverConfig->mDriverOption == DriverConfig::FastDirectDriverOption) {
+#ifdef __AVR__
+    mDriver = new FastDirectDriver(
+        mDimmablePatterns, kNumDigits, numSubFields);
+#endif
+  } else if (driverConfig->mDriverOption
+      == DriverConfig::FastSerialDriverOption) {
+#ifdef __AVR__
+    mDriver = new FastSerialDriver(
+        mDimmablePatterns, kNumDigits, numSubFields);
+#endif
+  } else if (driverConfig->mDriverOption
+      == DriverConfig::FastSpiDriverOption) {
+#ifdef __AVR__
+    mDriver = new FastSpiDriver(
+        mDimmablePatterns, kNumDigits, numSubFields);
+#endif
+  } else if (driverConfig->mDriverOption
+      == DriverConfig::SplitDirectDigitDriverOption) {
+    mDriverModule = new SplitDirectDigitDriverModule(
+        mHardware, mDimmablePatterns,
+        true /* commonCathode */,
+        false /* transistorsOnDigits */,
+        false /* transistorsOnSegments */,
+        kNumDigits, kNumSegments, numSubFields,
+        kDigitPins, kSegmentDirectPins);
+    mDriver = mDriverModule->getDriver();
+  } else if (driverConfig->mDriverOption
+      == DriverConfig::SplitDirectSegmentDriverOption) {
+    mDriverModule = new SplitDirectSegmentDriverModule(
+        mHardware, mDimmablePatterns,
+        true /* commonCathode */,
+        false /* transistorsOnDigits */,
+        false /* transistorsOnSegments */,
+        kNumDigits, kNumSegments,
+        kDigitPins, kSegmentDirectPins);
+    mDriver = mDriverModule->getDriver();
+  } else if (driverConfig->mDriverOption
+      == DriverConfig::SplitSerialDigitDriverOption) {
+    mDriverModule = new SplitSerialDigitDriverModule(
+        mHardware, mDimmablePatterns,
+        true /* commonCathode */,
+        false /* transistorsOnDigits */,
+        false /* transistorsOnSegments */,
+        kNumDigits, kNumSegments, numSubFields,
+        kDigitPins, kLatchPin, kDataPin, kClockPin);
+    mDriver = mDriverModule->getDriver();
+  } else if (driverConfig->mDriverOption
+      == DriverConfig::SplitSpiDigitDriverOption) {
+    mDriverModule = new SplitSpiDigitDriverModule(
+        mHardware, mDimmablePatterns,
+        true /* commonCathode */,
+        false /* transistorsOnDigits */,
+        false /* transistorsOnSegments */,
+        kNumDigits, kNumSegments, numSubFields,
+        kDigitPins, kLatchPin, kDataPin, kClockPin);
+    mDriver = mDriverModule->getDriver();
+  } else if (driverConfig->mDriverOption
+      == DriverConfig::MergedSerialDigitDriverOption) {
+    mDriverModule = new MergedSerialDigitDriverModule(
+        mHardware, mDimmablePatterns,
+        true /* commonCathode */,
+        false /* transistorsOnDigits */,
+        false /* transistorsOnSegments */,
+        kNumDigits, kNumSegments, numSubFields,
+        kLatchPin, kDataPin, kClockPin);
+    mDriver = mDriverModule->getDriver();
+  } else if (driverConfig->mDriverOption
+      == DriverConfig::MergedSpiDigitDriverOption) {
+    mDriverModule = new MergedSpiDigitDriverModule(
+        mHardware, mDimmablePatterns,
+        true /* commonCathode */,
+        false /* transistorsOnDigits */,
+        false /* transistorsOnSegments */,
+        kNumDigits, kNumSegments, numSubFields,
+        kLatchPin, kDataPin, kClockPin);
+    mDriver = mDriverModule->getDriver();
   }
 
   // Create the Renderer.
