@@ -45,12 +45,15 @@ void LedMatrixMergedSerial::finish() {
 
 void LedMatrixMergedSerial::draw(uint8_t groupPattern, uint8_t elementPattern) {
   mHardware->digitalWrite(mLatchPin, LOW);
-  uint8_t actualElementPattern = (mElementOn == HIGH)
-      ? elementPattern : ~elementPattern;
+
   uint8_t actualGroupPattern = (mGroupOn == HIGH)
       ? groupPattern : ~groupPattern;
   mHardware->shiftOut(mDataPin, mClockPin, MSBFIRST, actualGroupPattern);
+
+  uint8_t actualElementPattern = (mElementOn == HIGH)
+      ? elementPattern : ~elementPattern;
   mHardware->shiftOut(mDataPin, mClockPin, MSBFIRST, actualElementPattern);
+
   mHardware->digitalWrite(mLatchPin, HIGH);
 }
 

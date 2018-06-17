@@ -60,10 +60,11 @@ void setup() {
 
   //Serial.println(F("setup(): setting excludes and includes"));
   //TestRunner::exclude("*");
-  //TestRunner::include("SplitDigitDriverTest*");
-  //TestRunner::include("SplitSegmentDriverTest*");
+  //TestRunner::include("SplitDirectDigitDriverTest*");
   //TestRunner::include("ModulatingSplitDigitDriverTest*");
-  //TestRunner::include("SplitDigitDriverSerialLedMatrixTest*");
+  //TestRunner::include("SplitDirectSegmentDriverTest*");
+  //TestRunner::include("SplitSerialDigitDriverTest*");
+  //TestRunner::include("MergedSerialDigitDriverTest*");
 
   Serial.println(F("setup(): end"));
 }
@@ -76,7 +77,7 @@ void loop() {
 // Tests for SplitDigitDriver.
 // ----------------------------------------------------------------------
 
-class SplitDigitDriverTest: public BaseHardwareTest {
+class SplitDirectDigitDriverTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
       BaseHardwareTest::setup();
@@ -104,7 +105,7 @@ class SplitDigitDriverTest: public BaseHardwareTest {
     Driver* mDriver;
 };
 
-testF(SplitDigitDriverTest, configure) {
+testF(SplitDirectDigitDriverTest, configure) {
   mDriver->configure();
   assertEvents(24,
       Event::kTypePinMode, 0, OUTPUT,
@@ -150,7 +151,7 @@ testF(SplitDigitDriverTest, configure) {
       Event::kTypePinMode, 11, INPUT);
 }
 
-testF(SplitDigitDriverTest, displayCurrentField_one_dark) {
+testF(SplitDirectDigitDriverTest, displayCurrentField_one_dark) {
   mDriver->setPattern(0, 0x11, 255);
   mDriver->setPattern(1, 0x22, 128);
   mDriver->setPattern(2, 0x55, 64);
@@ -224,7 +225,7 @@ testF(SplitDigitDriverTest, displayCurrentField_one_dark) {
       Event::kTypeDigitalWrite, 0, DIGIT_ON);
 }
 
-testF(SplitDigitDriverTest, displayCurrentField_repeated_segment_pattern) {
+testF(SplitDirectDigitDriverTest, displayCurrentField_repeated_segment_pattern) {
   mDriver->setPattern(0, 0x11, 255);
   mDriver->setPattern(1, 0x22, 128);
   mDriver->setPattern(2, 0x55, 64);
@@ -316,7 +317,7 @@ testF(SplitDigitDriverTest, displayCurrentField_repeated_segment_pattern) {
       Event::kTypeDigitalWrite, 1, DIGIT_ON);
 }
 
-testF(SplitDigitDriverTest, prepareToSleep) {
+testF(SplitDirectDigitDriverTest, prepareToSleep) {
   //enableVerbosity(Verbosity::kAssertionPassed);
 
   mDriver->setPattern(0, 0x11, 255);
@@ -372,7 +373,7 @@ testF(SplitDigitDriverTest, prepareToSleep) {
 // Tests for SplitSegmentDriver.
 // ----------------------------------------------------------------------
 
-class SplitSegmentDriverTest: public BaseHardwareTest {
+class SplitDirectSegmentDriverTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
       BaseHardwareTest::setup();
@@ -399,7 +400,7 @@ class SplitSegmentDriverTest: public BaseHardwareTest {
     Driver* mDriver;
 };
 
-testF(SplitSegmentDriverTest, configure) {
+testF(SplitDirectSegmentDriverTest, configure) {
   mDriver->configure();
   assertEvents(24,
       Event::kTypePinMode, 4, OUTPUT,
@@ -445,7 +446,7 @@ testF(SplitSegmentDriverTest, configure) {
       Event::kTypePinMode, 3, INPUT);
 }
 
-testF(SplitSegmentDriverTest, displayCurrentField_one_dark) {
+testF(SplitDirectSegmentDriverTest, displayCurrentField_one_dark) {
   // The following segment patterns were crafted so that digitPattern(7) bits
   // have the same digitPattern as digitPattern(0), which should cause the digit
   // bits to be reused between the two iterations.
@@ -550,7 +551,7 @@ testF(SplitSegmentDriverTest, displayCurrentField_one_dark) {
       Event::kTypeDigitalWrite, 4, SEGMENT_ON);
 }
 
-testF(SplitSegmentDriverTest, prepareToSleep) {
+testF(SplitDirectSegmentDriverTest, prepareToSleep) {
   mDriver->setPattern(0, 0x91, 255);  // 1001 0001
   mDriver->setPattern(1, 0x22, 128);  // 0010 0010
   mDriver->setPattern(2, 0xD5, 64);   // 1101 0101
@@ -593,10 +594,10 @@ testF(SplitSegmentDriverTest, prepareToSleep) {
 }
 
 // ----------------------------------------------------------------------
-// Tests for SplitDigitDriver w/ Modulation at numSubFieldsPerField = 3
+// Tests for SplitDirectDigitDriver w/ Modulation at numSubFieldsPerField = 3
 // ----------------------------------------------------------------------
 
-class ModulatingSplitDigitDriverTest: public BaseHardwareTest {
+class ModulatingSplitDirectDigitDriverTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
       BaseHardwareTest::setup();
@@ -624,7 +625,7 @@ class ModulatingSplitDigitDriverTest: public BaseHardwareTest {
     Driver* mDriver;
 };
 
-testF(ModulatingSplitDigitDriverTest, configure) {
+testF(ModulatingSplitDirectDigitDriverTest, configure) {
   mDriver->configure();
   assertEvents(24,
       Event::kTypePinMode, 0, OUTPUT,
@@ -670,7 +671,7 @@ testF(ModulatingSplitDigitDriverTest, configure) {
       Event::kTypePinMode, 11, INPUT);
 }
 
-testF(ModulatingSplitDigitDriverTest, displayCurrentField_one_dark) {
+testF(ModulatingSplitDirectDigitDriverTest, displayCurrentField_one_dark) {
   mDriver->setPattern(0, 0x11, 255);
   mDriver->setPattern(1, 0x22, 128);
   mDriver->setPattern(2, 0x55, 64);
@@ -785,7 +786,7 @@ testF(ModulatingSplitDigitDriverTest, displayCurrentField_one_dark) {
   assertEvents(0); // 255 is special, always on regardless of integer roundoff
 }
 
-testF(ModulatingSplitDigitDriverTest,
+testF(ModulatingSplitDirectDigitDriverTest,
     displayCurrentField_repeated_segment_pattern) {
   mDriver->setPattern(0, 0x11, 255);
   mDriver->setPattern(1, 0x22, 128);
@@ -904,7 +905,7 @@ testF(ModulatingSplitDigitDriverTest,
   assertEvents(0);
 }
 
-testF(ModulatingSplitDigitDriverTest, prepareToSleep) {
+testF(ModulatingSplitDirectDigitDriverTest, prepareToSleep) {
   mDriver->setPattern(0, 0x11, 255);
   mDriver->setPattern(1, 0x22, 128);
   mDriver->setPattern(2, 0x55, 64);
@@ -970,7 +971,7 @@ testF(ModulatingSplitDigitDriverTest, prepareToSleep) {
 // Tests for SplitDigitDriver w/ LedMatrixSplitSerial.
 // ----------------------------------------------------------------------
 
-class SplitDigitDriverSerialLedMatrixTest: public BaseHardwareTest {
+class SplitSerialDigitDriverTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
       BaseHardwareTest::setup();
@@ -997,7 +998,7 @@ class SplitDigitDriverSerialLedMatrixTest: public BaseHardwareTest {
     Driver* mDriver;
 };
 
-testF(SplitDigitDriverSerialLedMatrixTest, configure) {
+testF(SplitSerialDigitDriverTest, configure) {
   mDriver->configure();
   assertEvents(11,
       Event::kTypePinMode, latchPin, OUTPUT,
@@ -1025,7 +1026,7 @@ testF(SplitDigitDriverSerialLedMatrixTest, configure) {
       Event::kTypePinMode, 3, INPUT);
 }
 
-testF(SplitDigitDriverSerialLedMatrixTest, displayCurrentField) {
+testF(SplitSerialDigitDriverTest, displayCurrentField) {
 
   mDriver->setPattern(0, 0x11, 255);
   mDriver->setPattern(1, 0x22, 128);
@@ -1052,3 +1053,75 @@ testF(SplitDigitDriverSerialLedMatrixTest, displayCurrentField) {
       Event::kTypeDigitalWrite, latchPin, HIGH,
       Event::kTypeDigitalWrite, 1, DIGIT_ON);
 }
+
+// ----------------------------------------------------------------------
+// Tests for MergedDigitDriver w/ LedMatrixMergedSerial.
+// ----------------------------------------------------------------------
+
+class MergedSerialDigitDriverTest: public BaseHardwareTest {
+  protected:
+    virtual void setup() override {
+      BaseHardwareTest::setup();
+      mDriverModule = new MergedSerialDigitDriverModule(mHardware,
+          dimmablePatterns,
+          true /* commonCathode */,
+          false /* transistorsOnDigits */,
+          false /* transistorsOnSegments */,
+          NUM_DIGITS,
+          NUM_SEGMENTS,
+          1 /* numSubFields */,
+          latchPin, dataPin, clockPin);
+      mDriver = mDriverModule->getDriver();
+      mDriver->configure();
+      mHardware->clear();
+    }
+    virtual void teardown() override {
+      delete mDriverModule;
+      BaseHardwareTest::teardown();
+    }
+
+    DriverModule* mDriverModule;
+    Driver* mDriver;
+};
+
+testF(MergedSerialDigitDriverTest, configure) {
+  mDriver->configure();
+  assertEvents(3,
+      Event::kTypePinMode, latchPin, OUTPUT,
+      Event::kTypePinMode, dataPin, OUTPUT,
+      Event::kTypePinMode, clockPin, OUTPUT);
+  assertEqual((uint16_t)(4), mDriver->getFieldsPerFrame());
+
+  mHardware->clear();
+  mDriver->finish();
+  assertEvents(3,
+      Event::kTypePinMode, latchPin, INPUT,
+      Event::kTypePinMode, dataPin, INPUT,
+      Event::kTypePinMode, clockPin, INPUT);
+}
+
+testF(MergedSerialDigitDriverTest, displayCurrentField) {
+  mDriver->setPattern(0, 0x11, 255);
+  mDriver->setPattern(1, 0x22, 128);
+  mDriver->setPattern(2, 0x55, 64);
+  mDriver->setPattern(3, 0x11, 0);
+
+  // display field 0
+  mHardware->clear();
+  mDriver->displayCurrentField();
+  assertEvents(4,
+      Event::kTypeDigitalWrite, latchPin, LOW,
+      Event::kTypeShiftOut, dataPin, clockPin, MSBFIRST, ~0x01,
+      Event::kTypeShiftOut, dataPin, clockPin, MSBFIRST, 0x11,
+      Event::kTypeDigitalWrite, latchPin, HIGH);
+
+  // display field 1
+  mHardware->clear();
+  mDriver->displayCurrentField();
+  assertEvents(4,
+      Event::kTypeDigitalWrite, latchPin, LOW,
+      Event::kTypeShiftOut, dataPin, clockPin, MSBFIRST, ~0x02,
+      Event::kTypeShiftOut, dataPin, clockPin, MSBFIRST, 0x22,
+      Event::kTypeDigitalWrite, latchPin, HIGH);
+}
+
