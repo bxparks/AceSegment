@@ -72,6 +72,11 @@ void BaseHardwareTest::assertEvents(uint8_t n, ...) {
           assertEqual(value, event.arg1);
         }
         break;
+      case Event::kTypeSpiTransfer16: {
+          uint16_t value = va_arg(args, int);
+          assertEqual(value, event.arg5);
+        }
+        break;
       default:
         // Unknown event type
         failTestNow();

@@ -39,12 +39,14 @@ class Event {
     static const uint8_t kTypeSpiBegin = 3;
     static const uint8_t kTypeSpiTransfer = 4;
     static const uint8_t kTypeSpiEnd = 5;
+    static const uint8_t kTypeSpiTransfer16 = 6;
 
     uint8_t type; // arg0
     uint8_t arg1;
     uint8_t arg2;
     uint8_t arg3;
     uint8_t arg4;
+    uint16_t arg5; // used by spiTransfer16()
 };
 
 class TestableHardware: public Hardware {
@@ -113,6 +115,15 @@ class TestableHardware: public Hardware {
         Event& event = mEvents[mNumRecords];
         event.type = Event::kTypeSpiTransfer;
         event.arg1 = value;
+        mNumRecords++;
+      }
+    }
+
+    virtual void spiTransfer16(uint16_t value) override {
+      if (mNumRecords < kMaxRecords) {
+        Event& event = mEvents[mNumRecords];
+        event.type = Event::kTypeSpiTransfer16;
+        event.arg5 = value;
         mNumRecords++;
       }
     }

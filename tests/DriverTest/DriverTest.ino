@@ -1125,3 +1125,74 @@ testF(MergedSerialDigitDriverTest, displayCurrentField) {
       Event::kTypeDigitalWrite, latchPin, HIGH);
 }
 
+// ----------------------------------------------------------------------
+// Tests for MergedDigitDriver w/ LedMatrixMergedSpi.
+// ----------------------------------------------------------------------
+
+class MergedSpiDigitDriverTest: public BaseHardwareTest {
+  protected:
+    virtual void setup() override {
+      BaseHardwareTest::setup();
+      mDriverModule = new MergedSpiDigitDriverModule(mHardware,
+          dimmablePatterns,
+          true /* commonCathode */,
+          false /* transistorsOnDigits */,
+          false /* transistorsOnSegments */,
+          NUM_DIGITS,
+          NUM_SEGMENTS,
+          1 /* numSubFields */,
+          latchPin, dataPin, clockPin);
+      mDriver = mDriverModule->getDriver();
+      mDriver->configure();
+      mHardware->clear();
+    }
+    virtual void teardown() override {
+      delete mDriverModule;
+      BaseHardwareTest::teardown();
+    }
+
+    DriverModule* mDriverModule;
+    Driver* mDriver;
+};
+
+testF(MergedSpiDigitDriverTest, configure) {
+  mDriver->configure();
+  assertEvents(4,
+      Event::kTypePinMode, latchPin, OUTPUT,
+      Event::kTypePinMode, dataPin, OUTPUT,
+      Event::kTypePinMode, clockPin, OUTPUT,
+      Event::kTypeSpiBegin);
+  assertEqual((uint16_t)(4), mDriver->getFieldsPerFrame());
+
+  mHardware->clear();
+  mDriver->finish();
+  assertEvents(4,
+      Event::kTypeSpiEnd,
+      Event::kTypePinMode, latchPin, INPUT,
+      Event::kTypePinMode, dataPin, INPUT,
+      Event::kTypePinMode, clockPin, INPUT);
+}
+
+testF(MergedSpiDigitDriverTest, displayCurrentField) {
+  mDriver->setPattern(0, 0x11, 255);
+  mDriver->setPattern(1, 0x22, 128);
+  mDriver->setPattern(2, 0x55, 64);
+  mDriver->setPattern(3, 0x11, 0);
+
+  // display field 0
+  mHardware->clear();
+  mDriver->displayCurrentField();
+  assertEvents(3,
+      Event::kTypeDigitalWrite, latchPin, LOW,
+      Event::kTypeSpiTransfer16, (~0x01 << 8) | 0x11,
+      Event::kTypeDigitalWrite, latchPin, HIGH);
+
+  // display field 1
+  mHardware->clear();
+  mDriver->displayCurrentField();
+  assertEvents(3,
+      Event::kTypeDigitalWrite, latchPin, LOW,
+      Event::kTypeSpiTransfer16, (~0x02 << 8) | 0x22,
+      Event::kTypeDigitalWrite, latchPin, HIGH);
+}
+
