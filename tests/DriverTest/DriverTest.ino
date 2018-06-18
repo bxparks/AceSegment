@@ -74,7 +74,7 @@ void loop() {
 }
 
 // ----------------------------------------------------------------------
-// Tests for SplitDigitDriver.
+// Tests for SplitDigitDriver w/ LedMatrixDirect
 // ----------------------------------------------------------------------
 
 class SplitDirectDigitDriverTest: public BaseHardwareTest {
@@ -370,7 +370,7 @@ testF(SplitDirectDigitDriverTest, prepareToSleep) {
 }
 
 // ----------------------------------------------------------------------
-// Tests for SplitSegmentDriver.
+// Tests for SplitSegmentDriver w/ LedMatrixDirect.
 // ----------------------------------------------------------------------
 
 class SplitDirectSegmentDriverTest: public BaseHardwareTest {
@@ -1027,7 +1027,6 @@ testF(SplitSerialDigitDriverTest, configure) {
 }
 
 testF(SplitSerialDigitDriverTest, displayCurrentField) {
-
   mDriver->setPattern(0, 0x11, 255);
   mDriver->setPattern(1, 0x22, 128);
   mDriver->setPattern(2, 0x55, 64);
@@ -1050,6 +1049,94 @@ testF(SplitSerialDigitDriverTest, displayCurrentField) {
       Event::kTypeDigitalWrite, 0, DIGIT_OFF,
       Event::kTypeDigitalWrite, latchPin, LOW,
       Event::kTypeShiftOut, dataPin, clockPin, MSBFIRST, 0x22,
+      Event::kTypeDigitalWrite, latchPin, HIGH,
+      Event::kTypeDigitalWrite, 1, DIGIT_ON);
+}
+
+// ----------------------------------------------------------------------
+// Tests for SplitDigitDriver w/ LedMatrixSplitSpi.
+// ----------------------------------------------------------------------
+
+class SplitSpiDigitDriverTest: public BaseHardwareTest {
+  protected:
+    virtual void setup() override {
+      BaseHardwareTest::setup();
+      mDriverModule = new SplitSpiDigitDriverModule(mHardware,
+          dimmablePatterns,
+          true /* commonCathode */,
+          false /* transistorsOnDigits */,
+          false /* transistorsOnSegments */,
+          NUM_DIGITS,
+          NUM_SEGMENTS,
+          1 /* numSubFields */,
+          digitPins,
+          latchPin, dataPin, clockPin);
+      mDriver = mDriverModule->getDriver();
+      mDriver->configure();
+      mHardware->clear();
+    }
+    virtual void teardown() override {
+      delete mDriverModule;
+      BaseHardwareTest::teardown();
+    }
+
+    DriverModule* mDriverModule;
+    Driver* mDriver;
+};
+
+testF(SplitSpiDigitDriverTest, configure) {
+  mDriver->configure();
+  assertEvents(12,
+      Event::kTypePinMode, latchPin, OUTPUT,
+      Event::kTypePinMode, dataPin, OUTPUT,
+      Event::kTypePinMode, clockPin, OUTPUT,
+      Event::kTypePinMode, 0, OUTPUT,
+      Event::kTypeDigitalWrite, 0, HIGH,
+      Event::kTypePinMode, 1, OUTPUT,
+      Event::kTypeDigitalWrite, 1, HIGH,
+      Event::kTypePinMode, 2, OUTPUT,
+      Event::kTypeDigitalWrite, 2, HIGH,
+      Event::kTypePinMode, 3, OUTPUT,
+      Event::kTypeDigitalWrite, 3, HIGH,
+      Event::kTypeSpiBegin);
+  assertEqual((uint16_t)(4), mDriver->getFieldsPerFrame());
+
+  mHardware->clear();
+  mDriver->finish();
+  assertEvents(8,
+      Event::kTypeSpiEnd,
+      Event::kTypePinMode, latchPin, INPUT,
+      Event::kTypePinMode, dataPin, INPUT,
+      Event::kTypePinMode, clockPin, INPUT,
+      Event::kTypePinMode, 0, INPUT,
+      Event::kTypePinMode, 1, INPUT,
+      Event::kTypePinMode, 2, INPUT,
+      Event::kTypePinMode, 3, INPUT);
+}
+
+testF(SplitSpiDigitDriverTest, displayCurrentField) {
+  mDriver->setPattern(0, 0x11, 255);
+  mDriver->setPattern(1, 0x22, 128);
+  mDriver->setPattern(2, 0x55, 64);
+  mDriver->setPattern(3, 0x11, 0);
+
+  // display field 0
+  mHardware->clear();
+  mDriver->displayCurrentField();
+  assertEvents(5,
+      Event::kTypeDigitalWrite, 3, DIGIT_OFF,
+      Event::kTypeDigitalWrite, latchPin, LOW,
+      Event::kTypeSpiTransfer, 0x11,
+      Event::kTypeDigitalWrite, latchPin, HIGH,
+      Event::kTypeDigitalWrite, 0, DIGIT_ON);
+
+  // display field 1
+  mHardware->clear();
+  mDriver->displayCurrentField();
+  assertEvents(5,
+      Event::kTypeDigitalWrite, 0, DIGIT_OFF,
+      Event::kTypeDigitalWrite, latchPin, LOW,
+      Event::kTypeSpiTransfer, 0x22,
       Event::kTypeDigitalWrite, latchPin, HIGH,
       Event::kTypeDigitalWrite, 1, DIGIT_ON);
 }
