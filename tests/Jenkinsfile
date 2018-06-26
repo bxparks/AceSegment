@@ -17,7 +17,7 @@ pipeline {
             }
         }
 
-        stage('Build') { 
+        stage('Test') {
             steps {
                 sh "AUniter/auniter.sh \
                     --pref sketchbook.path=$WORKSPACE \
