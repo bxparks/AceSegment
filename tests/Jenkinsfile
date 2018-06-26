@@ -16,7 +16,16 @@ pipeline {
                 }
             }
         }
-
+        stage('Example') {
+            steps {
+                sh "AUniter/auniter.sh \
+                    --pref sketchbook.path=$WORKSPACE \
+                    --config libraries/AceSegment/tests/auniter.conf \
+                    --boards nano:/dev/ttyUSB0 \
+                    --verify \
+                    libraries/AceSegment/examples/*"
+            }
+        }
         stage('Test') {
             steps {
                 sh "AUniter/auniter.sh \
