@@ -24,7 +24,7 @@ pipeline {
                 }
             }
         }
-        stage('Example') {
+        stage('Examples') {
             steps {
                 sh "AUniter/auniter.sh \
                     --pref sketchbook.path=$WORKSPACE \
@@ -34,7 +34,7 @@ pipeline {
                     libraries/AceSegment/examples/*"
             }
         }
-        stage('Test') {
+        stage('Tests') {
             steps {
                 sh "AUniter/auniter.sh \
                     --pref sketchbook.path=$WORKSPACE \
