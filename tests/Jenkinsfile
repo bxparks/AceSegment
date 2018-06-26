@@ -22,7 +22,7 @@ pipeline {
                 sh "AUniter/auniter.sh \
                     --pref sketchbook.path=$WORKSPACE \
                     --config libraries/AceSegment/tests/AUniterConfig \
-                    --boards nano \
+                    --boards nano:/dev/ttyUSB0 \
                     --upload \
                     libraries/AceSegment/tests/*Test"
             }
