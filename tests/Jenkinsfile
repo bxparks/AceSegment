@@ -21,7 +21,7 @@ pipeline {
             steps {
                 sh "AUniter/auniter.sh \
                     --pref sketchbook.path=$WORKSPACE \
-                    --config /libraries/AceSegment/tests/AUniterConfig \
+                    --config libraries/AceSegment/tests/AUniterConfig \
                     --boards nano \
                     --upload \
                     libraries/AceSegment/tests/*Test"
