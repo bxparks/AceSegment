@@ -24,7 +24,7 @@ pipeline {
                     --config /libraries/AceSegment/tests/AUniterConfig \
                     --boards nano \
                     --upload \
-                    libraries/AceSegment/tests/*Test'
+                    libraries/AceSegment/tests/*Test"
             }
         }
     }
