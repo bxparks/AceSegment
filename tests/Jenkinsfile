@@ -23,7 +23,7 @@ pipeline {
                     --pref sketchbook.path=$WORKSPACE \
                     --config /libraries/AceSegment/tests/AUniterConfig \
                     --boards nano \
-                    --verify \
+                    --upload \
                     libraries/AceSegment/tests/*Test'
             }
         }
