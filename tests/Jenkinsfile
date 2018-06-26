@@ -14,6 +14,14 @@ pipeline {
                     git url: 'https://github.com/bxparks/AUnit',
                         branch: 'develop'
                 }
+                dir('libraries/AceButton') {
+                    git url: 'https://github.com/bxparks/AceButton',
+                        branch: 'develop'
+                }
+                dir('libraries/digitalWriteFast') {
+                    git url: 'https://github.com/NicksonYap/digitalWriteFast',
+                        branch: 'master'
+                }
             }
         }
         stage('Example') {
