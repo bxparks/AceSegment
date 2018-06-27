@@ -24,7 +24,7 @@ pipeline {
                 }
             }
         }
-        stage('Examples') {
+        stage('Verify Examples') {
             steps {
                 sh "AUniter/auniter.sh \
                     --pref sketchbook.path=$WORKSPACE \
@@ -34,7 +34,17 @@ pipeline {
                     libraries/AceSegment/examples/*"
             }
         }
-        stage('Tests') {
+        stage('Verify Tests') {
+            steps {
+                sh "AUniter/auniter.sh \
+                    --pref sketchbook.path=$WORKSPACE \
+                    --config libraries/AceSegment/tests/auniter.conf \
+                    --boards nano:/dev/ttyUSB0 \
+                    --verify \
+                    libraries/AceSegment/tests/*Test"
+            }
+        }
+        stage('Test') {
             steps {
                 sh "AUniter/auniter.sh \
                     --pref sketchbook.path=$WORKSPACE \
