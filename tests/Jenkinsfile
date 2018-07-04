@@ -60,4 +60,22 @@ pipeline {
             }
         }
     }
+    post {
+        failure {
+            script {
+                if (env.BADGE_BUCKET?.trim()) {
+                    sh "AUniter/badgeservice/set-badge-status.sh \
+                        $BADGE_BUCKET AceSegment FAILED"
+                }
+            }
+        }
+        success {
+            script {
+                if (env.BADGE_BUCKET?.trim()) {
+                    sh "AUniter/badgeservice/set-badge-status.sh \
+                        $BADGE_BUCKET AceSegment PASSED"
+                }
+            }
+        }
+    }
 }
