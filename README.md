@@ -4,6 +4,8 @@ segment LED displays on Arduino platforms
 
 Version: 0.3.0 (2018-04-30)
 
+![https://us-central1-xparks2015.cloudfunctions.net/badge?project=AceSegment]
+
 ## Summary
 
 The AceSegment library provides a number of classes that can display
