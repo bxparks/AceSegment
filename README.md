@@ -4,7 +4,7 @@ segment LED displays on Arduino platforms
 
 Version: 0.3.0 (2018-04-30)
 
-[![AUniter Jenkins Badge](https://us-central1-xparks2015.cloudfunctions.net/badge?project=AceSegment)](https://github.com/bxparks/AUniter)
+[![AUniter Jenkins Badge](https://us-central1-xparks2018.cloudfunctions.net/badge?project=AceSegment)](https://github.com/bxparks/AUniter)
 
 ## Summary
 
