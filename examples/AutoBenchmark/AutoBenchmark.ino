@@ -29,7 +29,7 @@ SOFTWARE.
  * pasted directly into the README.md file as a code block. This saves a lot of
  * error-prone manual collection of these numbers.
  *
- * DriverConfig contains an enumeration of all DriverModule configurations
+ * DriverConfig contains an enumeration of all Driver configurations
  * which are currently supported. For each DriverConfig, the Driver is
  * used to construct the Renderer stack and all of its dependencies. It calls
  * Renderer::displayField() a number of times (NUM_FIELD_SAMPLES is 1800), then

@@ -37,134 +37,110 @@ SOFTWARE.
 
 namespace ace_segment {
 
-class DriverModule {
-  public:
-    virtual ~DriverModule() {};
-    virtual Driver* getDriver() = 0;
-};
+class SplitDirectDigitDriver:
+    private LedMatrixSplitDirect,
+    public SplitDigitDriver {
 
-class SplitDirectDigitDriverModule: public DriverModule {
   public:
-    SplitDirectDigitDriverModule(Hardware* hardware,
+    SplitDirectDigitDriver(Hardware* hardware,
             DimmablePattern* dimmablePatterns, bool commonCathode,
             bool transistorsOnDigits, bool transistorsOnSegments,
             uint8_t numDigits, uint8_t numSegments, uint8_t numSubFields,
             const uint8_t* digitPins, const uint8_t* segmentPins):
-        mLedMatrix(hardware, commonCathode, transistorsOnDigits,
+        LedMatrixSplitDirect(hardware, commonCathode, transistorsOnDigits,
             transistorsOnSegments, numDigits, numSegments, digitPins,
             segmentPins),
-        mDriver(&mLedMatrix, dimmablePatterns, numDigits, numSubFields)
+        SplitDigitDriver(this, dimmablePatterns, numDigits, numSubFields)
     {}
-
-    virtual Driver* getDriver() override { return &mDriver; }
-
-  private:
-    LedMatrixSplitDirect mLedMatrix;
-    SplitDigitDriver mDriver;
 };
 
-class SplitDirectSegmentDriverModule: public DriverModule {
+class SplitDirectSegmentDriver:
+    private LedMatrixSplitDirect,
+    public SplitSegmentDriver {
+
   public:
-    SplitDirectSegmentDriverModule(Hardware* hardware,
+    SplitDirectSegmentDriver(Hardware* hardware,
             DimmablePattern* dimmablePatterns, bool commonCathode,
             bool transistorsOnDigits, bool transistorsOnSegments,
             uint8_t numDigits, uint8_t numSegments,
             const uint8_t* digitPins, const uint8_t* segmentPins):
-        mLedMatrix(hardware, !commonCathode, transistorsOnSegments,
+        LedMatrixSplitDirect(hardware, !commonCathode, transistorsOnSegments,
             transistorsOnDigits, numSegments, numDigits, segmentPins,
             digitPins),
-        mDriver(&mLedMatrix, dimmablePatterns, numDigits)
+        SplitSegmentDriver(this, dimmablePatterns, numDigits)
     {}
-
-    virtual Driver* getDriver() override { return &mDriver; }
-
-  private:
-    LedMatrixSplitDirect mLedMatrix;
-    SplitSegmentDriver mDriver;
 };
 
-class SplitSerialDigitDriverModule: public DriverModule {
+class SplitSerialDigitDriver:
+    private LedMatrixSplitSerial,
+    public SplitDigitDriver {
+
   public:
-    SplitSerialDigitDriverModule(Hardware* hardware,
+    SplitSerialDigitDriver(Hardware* hardware,
             DimmablePattern* dimmablePatterns, bool commonCathode,
             bool transistorsOnDigits, bool transistorsOnSegments,
             uint8_t numDigits, uint8_t numSegments, uint8_t numSubFields,
             const uint8_t* digitPins, const uint8_t latchPin,
             uint8_t dataPin, uint8_t clockPin):
-        mLedMatrix(hardware, commonCathode, transistorsOnDigits,
+        LedMatrixSplitSerial(hardware, commonCathode, transistorsOnDigits,
             transistorsOnSegments, numDigits, numSegments, digitPins,
             latchPin, dataPin, clockPin),
-        mDriver(&mLedMatrix, dimmablePatterns, numDigits, numSubFields)
+        SplitDigitDriver(this, dimmablePatterns, numDigits, numSubFields)
     {}
-
-    virtual Driver* getDriver() override { return &mDriver; }
-
-  private:
-    LedMatrixSplitSerial mLedMatrix;
-    SplitDigitDriver mDriver;
 };
 
-class SplitSpiDigitDriverModule: public DriverModule {
+class SplitSpiDigitDriver:
+    private LedMatrixSplitSpi,
+    public SplitDigitDriver {
+
   public:
-    SplitSpiDigitDriverModule(Hardware* hardware,
+    SplitSpiDigitDriver(Hardware* hardware,
             DimmablePattern* dimmablePatterns, bool commonCathode,
             bool transistorsOnDigits, bool transistorsOnSegments,
             uint8_t numDigits, uint8_t numSegments, uint8_t numSubFields,
             const uint8_t* digitPins, uint8_t latchPin,
             uint8_t dataPin, uint8_t clockPin):
-        mLedMatrix(hardware, commonCathode, transistorsOnDigits,
+        LedMatrixSplitSpi(hardware, commonCathode, transistorsOnDigits,
             transistorsOnSegments, numDigits, numSegments, digitPins,
             latchPin, dataPin, clockPin),
-        mDriver(&mLedMatrix, dimmablePatterns, numDigits, numSubFields)
+        SplitDigitDriver(this, dimmablePatterns, numDigits, numSubFields)
     {}
-
-    virtual Driver* getDriver() override { return &mDriver; }
-
-  private:
-    LedMatrixSplitSpi mLedMatrix;
-    SplitDigitDriver mDriver;
 };
 
-class MergedSerialDigitDriverModule: public DriverModule {
+class MergedSerialDigitDriver:
+    private LedMatrixMergedSerial,
+    public MergedDigitDriver {
+
   public:
-    MergedSerialDigitDriverModule(Hardware* hardware,
+    MergedSerialDigitDriver(Hardware* hardware,
             DimmablePattern* dimmablePatterns,
             bool commonCathode, bool transistorsOnDigits,
             bool transistorsOnSegments, uint8_t numDigits, uint8_t numSegments,
             uint8_t numSubFields,
             uint8_t latchPin, uint8_t dataPin, uint8_t clockPin):
-        mLedMatrix(hardware, commonCathode, transistorsOnDigits,
+        LedMatrixMergedSerial(hardware, commonCathode, transistorsOnDigits,
             transistorsOnSegments, numDigits, numSegments,
             latchPin, dataPin, clockPin),
-        mDriver(&mLedMatrix, dimmablePatterns, numDigits, numSubFields)
+        MergedDigitDriver(this, dimmablePatterns, numDigits, numSubFields)
     {}
-
-    virtual Driver* getDriver() override { return &mDriver; }
-
-  private:
-    LedMatrixMergedSerial mLedMatrix;
-    MergedDigitDriver mDriver;
 };
 
-class MergedSpiDigitDriverModule: public DriverModule {
+class MergedSpiDigitDriver:
+    private LedMatrixMergedSpi,
+    public MergedDigitDriver{
+
   public:
-    MergedSpiDigitDriverModule(Hardware* hardware,
+    MergedSpiDigitDriver(Hardware* hardware,
             DimmablePattern* dimmablePatterns,
             bool commonCathode, bool transistorsOnDigits,
             bool transistorsOnSegments, uint8_t numDigits, uint8_t numSegments,
             uint8_t numSubFields,
             uint8_t latchPin, uint8_t dataPin, uint8_t clockPin):
-        mLedMatrix(hardware, commonCathode, transistorsOnDigits,
+        LedMatrixMergedSpi(hardware, commonCathode, transistorsOnDigits,
             transistorsOnSegments, numDigits, numSegments,
             latchPin, dataPin, clockPin),
-        mDriver(&mLedMatrix, dimmablePatterns, numDigits, numSubFields)
+        MergedDigitDriver(this, dimmablePatterns, numDigits, numSubFields)
     {}
-
-    virtual Driver* getDriver() override { return &mDriver; }
-
-  private:
-    LedMatrixMergedSpi mLedMatrix;
-    MergedDigitDriver mDriver;
 };
 
 }

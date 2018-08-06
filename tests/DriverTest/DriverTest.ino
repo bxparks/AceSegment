@@ -81,7 +81,7 @@ class SplitDirectDigitDriverTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
       BaseHardwareTest::setup();
-      mDriverModule = new SplitDirectDigitDriverModule(mHardware,
+      mDriver = new SplitDirectDigitDriver(mHardware,
           dimmablePatterns,
           true /* commonCathode */,
           false /* transistorsOnDigits */,
@@ -91,17 +91,15 @@ class SplitDirectDigitDriverTest: public BaseHardwareTest {
           1 /* numSubFields */,
           digitPins,
           segmentPins);
-      mDriver = mDriverModule->getDriver();
       mDriver->configure();
       mHardware->clear();
     }
 
     virtual void teardown() override {
-      delete mDriverModule;
+      delete mDriver;
       BaseHardwareTest::teardown();
     }
 
-    DriverModule* mDriverModule;
     Driver* mDriver;
 };
 
@@ -377,7 +375,7 @@ class SplitDirectSegmentDriverTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
       BaseHardwareTest::setup();
-      mDriverModule = new SplitDirectSegmentDriverModule(mHardware,
+      mDriver = new SplitDirectSegmentDriver(mHardware,
           dimmablePatterns,
           true /* commonCathode */,
           false /* transistorsOnDigits */,
@@ -386,17 +384,15 @@ class SplitDirectSegmentDriverTest: public BaseHardwareTest {
           NUM_SEGMENTS,
           digitPins,
           segmentPins);
-      mDriver = mDriverModule->getDriver();
       mDriver->configure();
       mHardware->clear();
     }
 
     virtual void teardown() override {
-      delete mDriverModule;
+      delete mDriver;
       BaseHardwareTest::teardown();
     }
 
-    DriverModule* mDriverModule;
     Driver* mDriver;
 };
 
@@ -601,7 +597,7 @@ class ModulatingSplitDirectDigitDriverTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
       BaseHardwareTest::setup();
-      mDriverModule = new SplitDirectDigitDriverModule(mHardware,
+      mDriver = new SplitDirectDigitDriver(mHardware,
           dimmablePatterns,
           true /* commonCathode */,
           false /* transistorsOnDigits */,
@@ -611,17 +607,15 @@ class ModulatingSplitDirectDigitDriverTest: public BaseHardwareTest {
           NUM_SUB_FIELDS,
           digitPins,
           segmentPins);
-      mDriver = mDriverModule->getDriver();
       mDriver->configure();
       mHardware->clear();
     }
 
     virtual void teardown() override {
-      delete mDriverModule;
+      delete mDriver;
       BaseHardwareTest::teardown();
     }
 
-    DriverModule* mDriverModule;
     Driver* mDriver;
 };
 
@@ -975,7 +969,7 @@ class SplitSerialDigitDriverTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
       BaseHardwareTest::setup();
-      mDriverModule = new SplitSerialDigitDriverModule(mHardware,
+      mDriver = new SplitSerialDigitDriver(mHardware,
           dimmablePatterns,
           true /* commonCathode */,
           false /* transistorsOnDigits */,
@@ -985,16 +979,14 @@ class SplitSerialDigitDriverTest: public BaseHardwareTest {
           1 /* numSubFields */,
           digitPins,
           latchPin, dataPin, clockPin);
-      mDriver = mDriverModule->getDriver();
       mDriver->configure();
       mHardware->clear();
     }
     virtual void teardown() override {
-      delete mDriverModule;
+      delete mDriver;
       BaseHardwareTest::teardown();
     }
 
-    DriverModule* mDriverModule;
     Driver* mDriver;
 };
 
@@ -1061,7 +1053,7 @@ class SplitSpiDigitDriverTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
       BaseHardwareTest::setup();
-      mDriverModule = new SplitSpiDigitDriverModule(mHardware,
+      mDriver = new SplitSpiDigitDriver(mHardware,
           dimmablePatterns,
           true /* commonCathode */,
           false /* transistorsOnDigits */,
@@ -1071,16 +1063,14 @@ class SplitSpiDigitDriverTest: public BaseHardwareTest {
           1 /* numSubFields */,
           digitPins,
           latchPin, dataPin, clockPin);
-      mDriver = mDriverModule->getDriver();
       mDriver->configure();
       mHardware->clear();
     }
     virtual void teardown() override {
-      delete mDriverModule;
+      delete mDriver;
       BaseHardwareTest::teardown();
     }
 
-    DriverModule* mDriverModule;
     Driver* mDriver;
 };
 
@@ -1149,7 +1139,7 @@ class MergedSerialDigitDriverTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
       BaseHardwareTest::setup();
-      mDriverModule = new MergedSerialDigitDriverModule(mHardware,
+      mDriver = new MergedSerialDigitDriver(mHardware,
           dimmablePatterns,
           true /* commonCathode */,
           false /* transistorsOnDigits */,
@@ -1158,16 +1148,14 @@ class MergedSerialDigitDriverTest: public BaseHardwareTest {
           NUM_SEGMENTS,
           1 /* numSubFields */,
           latchPin, dataPin, clockPin);
-      mDriver = mDriverModule->getDriver();
       mDriver->configure();
       mHardware->clear();
     }
     virtual void teardown() override {
-      delete mDriverModule;
+      delete mDriver;
       BaseHardwareTest::teardown();
     }
 
-    DriverModule* mDriverModule;
     Driver* mDriver;
 };
 
@@ -1220,7 +1208,7 @@ class MergedSpiDigitDriverTest: public BaseHardwareTest {
   protected:
     virtual void setup() override {
       BaseHardwareTest::setup();
-      mDriverModule = new MergedSpiDigitDriverModule(mHardware,
+      mDriver = new MergedSpiDigitDriver(mHardware,
           dimmablePatterns,
           true /* commonCathode */,
           false /* transistorsOnDigits */,
@@ -1229,16 +1217,14 @@ class MergedSpiDigitDriverTest: public BaseHardwareTest {
           NUM_SEGMENTS,
           1 /* numSubFields */,
           latchPin, dataPin, clockPin);
-      mDriver = mDriverModule->getDriver();
       mDriver->configure();
       mHardware->clear();
     }
     virtual void teardown() override {
-      delete mDriverModule;
+      delete mDriver;
       BaseHardwareTest::teardown();
     }
 
-    DriverModule* mDriverModule;
     Driver* mDriver;
 };
 

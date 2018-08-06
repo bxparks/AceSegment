@@ -138,7 +138,6 @@ StyledPattern styledPatterns[NUM_DIGITS];
 
 // The chain of resources.
 Hardware* hardware;
-DriverModule* driverModule;
 Driver* driver;
 PulseStyler* pulseStyler;
 BlinkStyler* blinkStyler;
@@ -167,48 +166,41 @@ void setupAceSegment() {
 
   // Create the Driver.
 #if DRIVER_MODE == DRIVER_MODE_DIRECT_DIGIT
-  driverModule = new SplitDirectDigitDriverModule(
+  driver = new SplitDirectDigitDriver(
       hardware, dimmablePatterns,
       COMMON_CATHODE, USE_TRANSISTORS,
       false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
       NUM_SUBFIELDS, digitPins, segmentPins);
-  driver = driverModule->getDriver();
 #elif DRIVER_MODE == DRIVER_MODE_SERIAL_DIGIT
-  driverModule = new SplitSerialDigitDriverModule(
+  driver = new SplitSerialDigitDriver(
       hardware, dimmablePatterns,
       COMMON_CATHODE, USE_TRANSISTORS,
       false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
       NUM_SUBFIELDS, digitPins, latchPin, dataPin, clockPin);
-  driver = driverModule->getDriver();
 #elif DRIVER_MODE == DRIVER_MODE_SPI_DIGIT
-  driverModule = new SplitSerialDigitDriverModule(
+  driver = new SplitSerialDigitDriver(
       hardware, dimmablePatterns,
       COMMON_CATHODE, USE_TRANSISTORS,
       false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
       NUM_SUBFIELDS, digitPins, latchPin, dataPin, clockPin);
-  driver = driverModule->getDriver();
 #elif DRIVER_MODE == DRIVER_MODE_DIRECT_SEGMENT
-  driverModule = new SplitDirectSegmentDriverModule(
+  driver = new SplitDirectSegmentDriver(
       hardware, dimmablePatterns, COMMON_CATHODE,
       false /* transistorsOnDigits */,
       USE_TRANSISTORS /* transistorsOnSegments */,
-      NUM_DIGITS, NUM_SEGMENTS,
-      NUM_SUBFIELDS, digitPins, segmentPins);
-  driver = driverModule->getDriver();
+      NUM_DIGITS, NUM_SEGMENTS, digitPins, segmentPins);
 #elif DRIVER_MODE == DRIVER_MODE_MERGED_SERIAL_DIGIT
-  driverModule = new MergedSerialDigitDriverModule(
+  driver = new MergedSerialDigitDriver(
       hardware, dimmablePatterns,
       !COMMON_CATHODE, USE_TRANSISTORS,
       false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
       NUM_SUBFIELDS, latchPin, dataPin, clockPin);
-  driver = driverModule->getDriver();
 #elif DRIVER_MODE == DRIVER_MODE_MERGED_SPI_DIGIT
-  driverModule = new MergedSpiDigitDriverModule(
+  driver = new MergedSpiDigitDriver(
       hardware, dimmablePatterns,
       !COMMON_CATHODE, USE_TRANSISTORS,
       false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
       NUM_SUBFIELDS, latchPin, dataPin, clockPin);
-  driver = driverModule->getDriver();
 #else
   #ifdef __AVR__
     #if DRIVER_MODE == DRIVER_MODE_DIRECT_FAST_DIGIT

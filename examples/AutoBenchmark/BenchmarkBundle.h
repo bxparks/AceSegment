@@ -58,11 +58,7 @@ struct BenchmarkBundle {
     delete mStyleTable;
     delete mPulseStyler;
     delete mBlinkStyler;
-    if (mDriverModule != nullptr) {
-      delete mDriverModule;
-    } else {
-      delete mDriver;
-    }
+    delete mDriver;
     delete mHardware;
   }
 
@@ -77,7 +73,6 @@ struct BenchmarkBundle {
 
   Hardware* mHardware;
   DimmablePattern mDimmablePatterns[kNumDigits];
-  DriverModule* mDriverModule;
   Driver* mDriver;
 
   StyledPattern mStyledPatterns[kNumDigits];

@@ -64,7 +64,6 @@ BenchmarkBundle::BenchmarkBundle(const DriverConfig* driverConfig) {
   }
 
   // Create the Driver.
-  mDriverModule = nullptr;
   if (driverConfig->mDriverOption == DriverConfig::FastDirectDriverOption) {
 #ifdef __AVR__
     mDriver = new FastDirectDriver(
@@ -84,64 +83,58 @@ BenchmarkBundle::BenchmarkBundle(const DriverConfig* driverConfig) {
 #endif
   } else if (driverConfig->mDriverOption
       == DriverConfig::SplitDirectDigitDriverOption) {
-    mDriverModule = new SplitDirectDigitDriverModule(
+    mDriver = new SplitDirectDigitDriver(
         mHardware, mDimmablePatterns,
         true /* commonCathode */,
         false /* transistorsOnDigits */,
         false /* transistorsOnSegments */,
         kNumDigits, kNumSegments, numSubFields,
         kDigitPins, kSegmentDirectPins);
-    mDriver = mDriverModule->getDriver();
   } else if (driverConfig->mDriverOption
       == DriverConfig::SplitDirectSegmentDriverOption) {
-    mDriverModule = new SplitDirectSegmentDriverModule(
+    mDriver = new SplitDirectSegmentDriver(
         mHardware, mDimmablePatterns,
         true /* commonCathode */,
         false /* transistorsOnDigits */,
         false /* transistorsOnSegments */,
         kNumDigits, kNumSegments,
         kDigitPins, kSegmentDirectPins);
-    mDriver = mDriverModule->getDriver();
   } else if (driverConfig->mDriverOption
       == DriverConfig::SplitSerialDigitDriverOption) {
-    mDriverModule = new SplitSerialDigitDriverModule(
+    mDriver = new SplitSerialDigitDriver(
         mHardware, mDimmablePatterns,
         true /* commonCathode */,
         false /* transistorsOnDigits */,
         false /* transistorsOnSegments */,
         kNumDigits, kNumSegments, numSubFields,
         kDigitPins, kLatchPin, kDataPin, kClockPin);
-    mDriver = mDriverModule->getDriver();
   } else if (driverConfig->mDriverOption
       == DriverConfig::SplitSpiDigitDriverOption) {
-    mDriverModule = new SplitSpiDigitDriverModule(
+    mDriver = new SplitSpiDigitDriver(
         mHardware, mDimmablePatterns,
         true /* commonCathode */,
         false /* transistorsOnDigits */,
         false /* transistorsOnSegments */,
         kNumDigits, kNumSegments, numSubFields,
         kDigitPins, kLatchPin, kDataPin, kClockPin);
-    mDriver = mDriverModule->getDriver();
   } else if (driverConfig->mDriverOption
       == DriverConfig::MergedSerialDigitDriverOption) {
-    mDriverModule = new MergedSerialDigitDriverModule(
+    mDriver = new MergedSerialDigitDriver(
         mHardware, mDimmablePatterns,
         true /* commonCathode */,
         false /* transistorsOnDigits */,
         false /* transistorsOnSegments */,
         kNumDigits, kNumSegments, numSubFields,
         kLatchPin, kDataPin, kClockPin);
-    mDriver = mDriverModule->getDriver();
   } else if (driverConfig->mDriverOption
       == DriverConfig::MergedSpiDigitDriverOption) {
-    mDriverModule = new MergedSpiDigitDriverModule(
+    mDriver = new MergedSpiDigitDriver(
         mHardware, mDimmablePatterns,
         true /* commonCathode */,
         false /* transistorsOnDigits */,
         false /* transistorsOnSegments */,
         kNumDigits, kNumSegments, numSubFields,
         kLatchPin, kDataPin, kClockPin);
-    mDriver = mDriverModule->getDriver();
   }
 
   // Create the Renderer.
