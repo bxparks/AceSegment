@@ -40,19 +40,19 @@ class BlinkStyler: public Styler {
       mFramesPerBlink((uint32_t) framesPerSecond * durationMillis / 1000)
     {}
 
-    virtual void calcForFrame() override {
+    void calcForFrame() override {
       uint16_t middleOfBlink = mFramesPerBlink / 2;
       mBlinkState = (mCurrentFrame < middleOfBlink) ? kOn : kOff;
       Util::incrementMod(mCurrentFrame, mFramesPerBlink);
     }
 
-    virtual void apply(uint8_t* /* pattern */, uint8_t* brightness) override {
+    void apply(uint8_t* /* pattern */, uint8_t* brightness) override {
       if (mBlinkState == kOff) {
         *brightness = 0;
       }
     }
 
-    virtual bool requiresBrightness() override { return false; }
+    bool requiresBrightness() override { return false; }
 
   private:
     static const uint8_t kOff = 0;

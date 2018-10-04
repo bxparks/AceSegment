@@ -54,7 +54,7 @@ class BaseWriterTest: public TestOnce {
     static const uint8_t kStyleBlink = 1;
     static const uint8_t kStylePulse = 2;
 
-    virtual void setup() override {
+    void setup() override {
       mBlinkStyler = new StubStyler();
       mPulseStyler = new StubStyler();
       mStyleTable = new StyleTable();
@@ -67,7 +67,7 @@ class BaseWriterTest: public TestOnce {
       clearStyledPatterns();
     }
 
-    virtual void teardown() override {
+    void teardown() override {
       delete mRenderer;
       delete mStyleTable;
       delete mPulseStyler;
@@ -99,12 +99,12 @@ class BaseWriterTest: public TestOnce {
 
 class CharWriterTest: public BaseWriterTest {
   protected:
-    virtual void setup() override {
+    void setup() override {
       BaseWriterTest::setup();
       mCharWriter = new CharWriter(mRenderer);
     }
 
-    virtual void teardown() override {
+    void teardown() override {
       delete mCharWriter;
       BaseWriterTest::teardown();
     }
@@ -150,13 +150,13 @@ testF(CharWriterTest, writeAt_outOfBounds) {
 
 class StringWriterTest: public BaseWriterTest {
   protected:
-    virtual void setup() override {
+    void setup() override {
       BaseWriterTest::setup();
       mCharWriter = new CharWriter(mRenderer);
       mStringWriter = new StringWriter(mCharWriter);
     }
 
-    virtual void teardown() override {
+    void teardown() override {
       delete mStringWriter;
       delete mCharWriter;
       BaseWriterTest::teardown();
@@ -196,12 +196,12 @@ testF(StringWriterTest, writeStringAt) {
 
 class HexWriterTest: public BaseWriterTest {
   protected:
-    virtual void setup() override {
+    void setup() override {
       BaseWriterTest::setup();
       mHexWriter = new HexWriter(mRenderer);
     }
 
-    virtual void teardown() override {
+    void teardown() override {
       delete mHexWriter;
       BaseWriterTest::teardown();
     }
@@ -247,12 +247,12 @@ testF(HexWriterTest, writeAt_outOfBounds) {
 
 class ClockWriterTest: public BaseWriterTest {
   protected:
-    virtual void setup() override {
+    void setup() override {
       BaseWriterTest::setup();
       mClockWriter = new ClockWriter(mRenderer);
     }
 
-    virtual void teardown() override {
+    void teardown() override {
       delete mClockWriter;
       BaseWriterTest::teardown();
     }

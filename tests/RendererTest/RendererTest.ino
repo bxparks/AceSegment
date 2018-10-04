@@ -64,12 +64,12 @@ void loop() {
 
 class BlinkStylerTest: public TestOnce {
   protected:
-    virtual void setup() override {
+    void setup() override {
       TestOnce::setup();
       blinkStyler = new BlinkStyler(30 /* fps */, 1000 /* durationMillis */);
     }
 
-    virtual void teardown() override {
+    void teardown() override {
       delete blinkStyler;
       TestOnce::teardown();
     }
@@ -95,12 +95,12 @@ testF(BlinkStylerTest, test) {
 
 class PulseStylerTest: public TestOnce {
   protected:
-    virtual void setup() override {
+    void setup() override {
       TestOnce::setup();
       pulseStyler = new PulseStyler(30 /* fps */, 1000 /* durationMillis */);
     }
 
-    virtual void teardown() override {
+    void teardown() override {
       delete pulseStyler;
       TestOnce::teardown();
     }
@@ -152,7 +152,7 @@ class RendererTest: public TestOnce {
     static const uint8_t kStylePulseFast = 4;
     static const uint16_t kStatsResetInterval = 1200;
 
-    virtual void setup() override {
+    void setup() override {
       TestOnce::setup();
 
       memset(dimmablePatterns, 0, (NUM_DIGITS+1) * sizeof(DimmablePattern));
@@ -183,7 +183,7 @@ class RendererTest: public TestOnce {
       hardware->clear();
     }
 
-    virtual void teardown() override {
+    void teardown() override {
       delete renderer;
       delete styleTable;
       delete pulseFast;

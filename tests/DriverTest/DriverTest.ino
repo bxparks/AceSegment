@@ -79,7 +79,7 @@ void loop() {
 
 class SplitDirectDigitDriverTest: public BaseHardwareTest {
   protected:
-    virtual void setup() override {
+    void setup() override {
       BaseHardwareTest::setup();
       mDriver = new SplitDirectDigitDriver(mHardware,
           dimmablePatterns,
@@ -95,7 +95,7 @@ class SplitDirectDigitDriverTest: public BaseHardwareTest {
       mHardware->clear();
     }
 
-    virtual void teardown() override {
+    void teardown() override {
       delete mDriver;
       BaseHardwareTest::teardown();
     }
@@ -373,7 +373,7 @@ testF(SplitDirectDigitDriverTest, prepareToSleep) {
 
 class SplitDirectSegmentDriverTest: public BaseHardwareTest {
   protected:
-    virtual void setup() override {
+    void setup() override {
       BaseHardwareTest::setup();
       mDriver = new SplitDirectSegmentDriver(mHardware,
           dimmablePatterns,
@@ -388,7 +388,7 @@ class SplitDirectSegmentDriverTest: public BaseHardwareTest {
       mHardware->clear();
     }
 
-    virtual void teardown() override {
+    void teardown() override {
       delete mDriver;
       BaseHardwareTest::teardown();
     }
@@ -595,7 +595,7 @@ testF(SplitDirectSegmentDriverTest, prepareToSleep) {
 
 class ModulatingSplitDirectDigitDriverTest: public BaseHardwareTest {
   protected:
-    virtual void setup() override {
+    void setup() override {
       BaseHardwareTest::setup();
       mDriver = new SplitDirectDigitDriver(mHardware,
           dimmablePatterns,
@@ -611,7 +611,7 @@ class ModulatingSplitDirectDigitDriverTest: public BaseHardwareTest {
       mHardware->clear();
     }
 
-    virtual void teardown() override {
+    void teardown() override {
       delete mDriver;
       BaseHardwareTest::teardown();
     }
@@ -967,7 +967,7 @@ testF(ModulatingSplitDirectDigitDriverTest, prepareToSleep) {
 
 class SplitSerialDigitDriverTest: public BaseHardwareTest {
   protected:
-    virtual void setup() override {
+    void setup() override {
       BaseHardwareTest::setup();
       mDriver = new SplitSerialDigitDriver(mHardware,
           dimmablePatterns,
@@ -982,7 +982,7 @@ class SplitSerialDigitDriverTest: public BaseHardwareTest {
       mDriver->configure();
       mHardware->clear();
     }
-    virtual void teardown() override {
+    void teardown() override {
       delete mDriver;
       BaseHardwareTest::teardown();
     }
@@ -1051,7 +1051,7 @@ testF(SplitSerialDigitDriverTest, displayCurrentField) {
 
 class SplitSpiDigitDriverTest: public BaseHardwareTest {
   protected:
-    virtual void setup() override {
+    void setup() override {
       BaseHardwareTest::setup();
       mDriver = new SplitSpiDigitDriver(mHardware,
           dimmablePatterns,
@@ -1066,7 +1066,7 @@ class SplitSpiDigitDriverTest: public BaseHardwareTest {
       mDriver->configure();
       mHardware->clear();
     }
-    virtual void teardown() override {
+    void teardown() override {
       delete mDriver;
       BaseHardwareTest::teardown();
     }
@@ -1137,7 +1137,7 @@ testF(SplitSpiDigitDriverTest, displayCurrentField) {
 
 class MergedSerialDigitDriverTest: public BaseHardwareTest {
   protected:
-    virtual void setup() override {
+    void setup() override {
       BaseHardwareTest::setup();
       mDriver = new MergedSerialDigitDriver(mHardware,
           dimmablePatterns,
@@ -1151,7 +1151,7 @@ class MergedSerialDigitDriverTest: public BaseHardwareTest {
       mDriver->configure();
       mHardware->clear();
     }
-    virtual void teardown() override {
+    void teardown() override {
       delete mDriver;
       BaseHardwareTest::teardown();
     }
@@ -1206,7 +1206,7 @@ testF(MergedSerialDigitDriverTest, displayCurrentField) {
 
 class MergedSpiDigitDriverTest: public BaseHardwareTest {
   protected:
-    virtual void setup() override {
+    void setup() override {
       BaseHardwareTest::setup();
       mDriver = new MergedSpiDigitDriver(mHardware,
           dimmablePatterns,
@@ -1220,7 +1220,7 @@ class MergedSpiDigitDriverTest: public BaseHardwareTest {
       mDriver->configure();
       mHardware->clear();
     }
-    virtual void teardown() override {
+    void teardown() override {
       delete mDriver;
       BaseHardwareTest::teardown();
     }

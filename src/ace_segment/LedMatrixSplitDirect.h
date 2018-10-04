@@ -41,15 +41,15 @@ class LedMatrixSplitDirect: public LedMatrixSplit {
         mElementPins(elementPins)
     {}
 
-    virtual void configure() override;
+    void configure() override;
 
-    virtual void finish() override;
+    void finish() override;
 
-    virtual void enableGroup(uint8_t group) override;
+    void enableGroup(uint8_t group) override;
 
-    virtual void disableGroup(uint8_t group) override;
+    void disableGroup(uint8_t group) override;
 
-    virtual void drawElements(uint8_t pattern) override;
+    void drawElements(uint8_t pattern) override;
 
   private:
     /** Write to group pin identified by 'group'. */

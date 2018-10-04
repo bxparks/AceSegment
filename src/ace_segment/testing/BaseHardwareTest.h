@@ -40,12 +40,12 @@ using aunit::TestOnce;
  */
 class BaseHardwareTest: public TestOnce {
   protected:
-    virtual void setup() override {
+    void setup() override {
       TestOnce::setup();
       mHardware = new TestableHardware();
     }
 
-    virtual void teardown() override {
+    void teardown() override {
       delete mHardware;
       TestOnce::teardown();
     }

@@ -118,11 +118,11 @@ test(incrementMod) {
 
 class TimingStatsTest: public TestOnce {
   protected:
-    virtual void setup() override {
+    void setup() override {
       mStats = new TimingStats();
     }
 
-    virtual void teardown() override {
+    void teardown() override {
       delete mStats;
     }
 
@@ -162,13 +162,13 @@ testF(TimingStatsTest, update) {
 
 class FakeDriverTest: public TestOnce {
   protected:
-    virtual void setup() override {
+    void setup() override {
       TestOnce::setup();
       mDriver = new FakeDriver(dimmablePatterns, NUM_DIGITS);
       mDriver->configure();
     }
 
-    virtual void teardown() override {
+    void teardown() override {
       delete mDriver;
       TestOnce::teardown();
     }

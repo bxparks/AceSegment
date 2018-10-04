@@ -57,11 +57,11 @@ class TestableHardware: public Hardware {
 
     virtual ~TestableHardware() {}
 
-    virtual unsigned long micros() override { return mMicros; }
+    unsigned long micros() override { return mMicros; }
 
-    virtual unsigned long millis() override { return mMillis; }
+    unsigned long millis() override { return mMillis; }
 
-    virtual void pinMode(uint8_t pin, uint8_t mode) override {
+    void pinMode(uint8_t pin, uint8_t mode) override {
       if (mNumRecords < kMaxRecords) {
         Event& event = mEvents[mNumRecords];
         event.type = Event::kTypePinMode;
@@ -71,7 +71,7 @@ class TestableHardware: public Hardware {
       }
     }
 
-    virtual void digitalWrite(uint8_t pin, uint8_t value) override {
+    void digitalWrite(uint8_t pin, uint8_t value) override {
       if (mNumRecords < kMaxRecords) {
         Event& event = mEvents[mNumRecords];
         event.type = Event::kTypeDigitalWrite;
@@ -81,7 +81,7 @@ class TestableHardware: public Hardware {
       }
     }
 
-    virtual void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder,
+    void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder,
         uint8_t value) override {
       if (mNumRecords < kMaxRecords) {
         Event& event = mEvents[mNumRecords];
@@ -94,7 +94,7 @@ class TestableHardware: public Hardware {
       }
     }
 
-    virtual void spiBegin() override {
+    void spiBegin() override {
       if (mNumRecords < kMaxRecords) {
         Event& event = mEvents[mNumRecords];
         event.type = Event::kTypeSpiBegin;
@@ -102,7 +102,7 @@ class TestableHardware: public Hardware {
       }
     }
 
-    virtual void spiEnd() override {
+    void spiEnd() override {
       if (mNumRecords < kMaxRecords) {
         Event& event = mEvents[mNumRecords];
         event.type = Event::kTypeSpiEnd;
@@ -110,7 +110,7 @@ class TestableHardware: public Hardware {
       }
     }
 
-    virtual void spiTransfer(uint8_t value) override {
+    void spiTransfer(uint8_t value) override {
       if (mNumRecords < kMaxRecords) {
         Event& event = mEvents[mNumRecords];
         event.type = Event::kTypeSpiTransfer;
@@ -119,7 +119,7 @@ class TestableHardware: public Hardware {
       }
     }
 
-    virtual void spiTransfer16(uint16_t value) override {
+    void spiTransfer16(uint16_t value) override {
       if (mNumRecords < kMaxRecords) {
         Event& event = mEvents[mNumRecords];
         event.type = Event::kTypeSpiTransfer16;

@@ -46,11 +46,11 @@ class LedMatrixSplitSpi: public LedMatrixSplitSerial {
             groupPins, latchPin, dataPin, clockPin)
     {}
 
-    virtual void configure() override;
+    void configure() override;
 
-    virtual void finish() override;
+    void finish() override;
 
-    virtual void drawElements(uint8_t pattern) override;
+    void drawElements(uint8_t pattern) override;
 };
 
 }

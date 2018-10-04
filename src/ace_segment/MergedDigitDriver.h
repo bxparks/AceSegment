@@ -47,20 +47,20 @@ class MergedDigitDriver: public Driver {
         mNumSubFields(numSubFields)
     {}
 
-    virtual void configure() override {
+    void configure() override {
       Driver::configure();
       mCurrentDigit = 0;
     }
 
-    virtual uint16_t getFieldsPerFrame() override {
+    uint16_t getFieldsPerFrame() override {
       return mNumDigits * mNumSubFields;
     }
 
-    virtual bool isBrightnessSupported() override { return mNumSubFields > 1; }
+    bool isBrightnessSupported() override { return mNumSubFields > 1; }
 
-    virtual void displayCurrentField() override;
+    void displayCurrentField() override;
 
-    virtual void prepareToSleep() override;
+    void prepareToSleep() override;
 
   protected:
     /** If this is greater than 1, use displayCurrentFieldModulated(). */

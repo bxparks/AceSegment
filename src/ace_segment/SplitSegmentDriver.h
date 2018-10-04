@@ -46,20 +46,20 @@ class SplitSegmentDriver: public Driver {
         Driver(ledMatrix, dimmablePatterns, numDigits)
     {}
 
-    virtual void configure() override {
+    void configure() override {
       Driver::configure();
       mCurrentSegment = 0;
       mPrevSegment = kNumSegments - 1;
       mDigitPattern = 0;
     }
 
-    virtual uint16_t getFieldsPerFrame() override { return kNumSegments; }
+    uint16_t getFieldsPerFrame() override { return kNumSegments; }
 
-    virtual bool isBrightnessSupported() override { return false; }
+    bool isBrightnessSupported() override { return false; }
 
-    virtual void displayCurrentField() override;
+    void displayCurrentField() override;
 
-    virtual void prepareToSleep() override;
+    void prepareToSleep() override;
 
   private:
     // disable copy-constructor and assignment operator

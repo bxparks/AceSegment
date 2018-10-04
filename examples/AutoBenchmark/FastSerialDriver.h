@@ -23,12 +23,12 @@ class FastSerialDriver: public ace_segment::SplitDigitDriver {
     {}
 
     // Destructor
-    virtual ~FastSerialDriver() override {}
+    ~FastSerialDriver() override {}
 
-    virtual void configure() override;
-    virtual void finish() override;
-    virtual void displayCurrentField() override;
-    virtual void prepareToSleep() override;
+    void configure() override;
+    void finish() override;
+    void displayCurrentField() override;
+    void prepareToSleep() override;
 
   private:
     typedef void (*DigitalWriter)(void);

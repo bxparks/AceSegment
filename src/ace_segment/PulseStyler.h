@@ -42,7 +42,7 @@ class PulseStyler: public Styler {
           / framesPerSecond / durationMillis)
     {}
 
-    virtual void calcForFrame() override {
+    void calcForFrame() override {
       uint16_t middleOfPulse = mFramesPerPulse / 2;
 
       uint16_t fraction;
@@ -60,11 +60,11 @@ class PulseStyler: public Styler {
       Util::incrementMod(mCurrentFrame, mFramesPerPulse);
     }
 
-    virtual void apply(uint8_t* /* pattern */, uint8_t* brightness) override {
+    void apply(uint8_t* /* pattern */, uint8_t* brightness) override {
       *brightness = ((uint16_t) mPulseFraction * (*brightness)) / 256;
     }
 
-    virtual bool requiresBrightness() override { return true; }
+    bool requiresBrightness() override { return true; }
 
   private:
     const uint16_t mFramesPerPulse;

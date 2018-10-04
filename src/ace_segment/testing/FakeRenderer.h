@@ -48,7 +48,7 @@ class FakeRenderer: public Renderer {
     {}
 
     /** A stub implementation to prevent dependency on Hardware and Driver. */
-    virtual void configure()  override {}
+    void configure()  override {}
 };
 
 }

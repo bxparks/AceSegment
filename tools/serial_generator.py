@@ -38,12 +38,12 @@ class {class_name}: public ace_segment::SplitDigitDriver {{
     {{}}
 
     // Destructor
-    virtual ~{class_name}() override {{}}
+    ~{class_name}() override {{}}
 
-    virtual void configure() override;
-    virtual void finish() override;
-    virtual void displayCurrentField() override;
-    virtual void prepareToSleep() override;
+    void configure() override;
+    void finish() override;
+    void displayCurrentField() override;
+    void prepareToSleep() override;
 
   private:
     typedef void (*DigitalWriter)(void);

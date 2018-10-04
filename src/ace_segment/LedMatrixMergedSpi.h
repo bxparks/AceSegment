@@ -50,11 +50,11 @@ class LedMatrixMergedSpi: public LedMatrixMergedSerial {
             dataPin, clockPin)
     {}
 
-    virtual void configure() override;
+    void configure() override;
 
-    virtual void finish() override;
+    void finish() override;
 
-    virtual void draw(uint8_t groupPattern, uint8_t elementPattern) override;
+    void draw(uint8_t groupPattern, uint8_t elementPattern) override;
 };
 
 }

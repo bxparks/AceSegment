@@ -68,7 +68,7 @@ void loop() {
 
 class LedMatrixSplitDirectTest: public BaseHardwareTest {
   protected:
-    virtual void setup() override {
+    void setup() override {
       BaseHardwareTest::setup();
       mLedMatrix = new LedMatrixSplitDirect(mHardware,
           true /* cathodeOnGroup */,
@@ -80,7 +80,7 @@ class LedMatrixSplitDirectTest: public BaseHardwareTest {
       mHardware->clear();
     }
 
-    virtual void teardown() override {
+    void teardown() override {
       delete mLedMatrix;
       BaseHardwareTest::teardown();
     }
@@ -165,7 +165,7 @@ testF(LedMatrixSplitDirectTest, drawElements) {
 
 class LedMatrixSplitSerialTest: public BaseHardwareTest {
   protected:
-    virtual void setup() override {
+    void setup() override {
       BaseHardwareTest::setup();
       mLedMatrix = new LedMatrixSplitSerial(mHardware,
           true /* cathodeOnGroup */,
@@ -177,7 +177,7 @@ class LedMatrixSplitSerialTest: public BaseHardwareTest {
       mHardware->clear();
     }
 
-    virtual void teardown() override {
+    void teardown() override {
       delete mLedMatrix;
       BaseHardwareTest::teardown();
     }
@@ -241,7 +241,7 @@ testF(LedMatrixSplitSerialTest, drawElements) {
 
 class LedMatrixSplitSpiTest: public BaseHardwareTest {
   protected:
-    virtual void setup() override {
+    void setup() override {
       BaseHardwareTest::setup();
       mLedMatrix = new LedMatrixSplitSpi(mHardware,
           true /* cathodeOnGroup */, false /* transistorsOnGroups */,
@@ -252,7 +252,7 @@ class LedMatrixSplitSpiTest: public BaseHardwareTest {
       mHardware->clear();
     }
 
-    virtual void teardown() override {
+    void teardown() override {
       delete mLedMatrix;
       BaseHardwareTest::teardown();
     }

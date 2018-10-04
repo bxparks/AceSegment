@@ -39,13 +39,13 @@ class FakeDriver: public Driver {
         Driver(nullptr /* ledMatrix */, dimmablePatterns, numDigits)
     {}
 
-    virtual void displayCurrentField() override {}
+    void displayCurrentField() override {}
 
-    virtual uint16_t getFieldsPerFrame() override {
+    uint16_t getFieldsPerFrame() override {
       return (uint16_t) mNumSubFields * mNumDigits;
     }
 
-    virtual bool isBrightnessSupported() override {
+    bool isBrightnessSupported() override {
       return (mNumSubFields > 1);
     }
 
