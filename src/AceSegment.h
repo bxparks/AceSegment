@@ -47,7 +47,8 @@ SOFTWARE.
 #include "ace_segment/ClockWriter.h"
 #include "ace_segment/StringWriter.h"
 
-// Version format: xxyyzz == "xx.yy.zz"; 300 = 0.3.0
+// Version format: xxyyzz == "xx.yy.zz"
 #define ACE_SEGMENT_VERSION 300
+#define ACE_SEGMENT_VERSION_STRING "0.3"
 
 #endif
