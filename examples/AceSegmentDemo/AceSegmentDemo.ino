@@ -87,8 +87,8 @@ void setupAceButton() {
 // Define the Driver to use. Use DRIVER_MODE_NONE to get flash/static
 // consumption without any AceSegment code. Then set to the other modes to get
 // flash/static memory usage.
-#define DRIVER_MODE DRIVER_MODE_MERGED_SPI_DIGIT
-//#define DRIVER_MODE DRIVER_MODE_SPI_DIGIT
+//#define DRIVER_MODE DRIVER_MODE_MERGED_SPI_DIGIT
+#define DRIVER_MODE DRIVER_MODE_SPI_DIGIT
 
 // Type of characters to write to the LED display
 #define WRITE_MODE WRITE_MODE_CLOCK

@@ -37,6 +37,11 @@ SOFTWARE.
 
 namespace ace_segment {
 
+/**
+ * A driver that uses a GPIO pin to drive each digit and segment pins of
+ * the LED display. The resistors are assumed to be on the segments and can be
+ * driven at the same time, so the digits are multiplexed.
+ */
 class SplitDirectDigitDriver:
     private LedMatrixSplitDirect,
     public SplitDigitDriver {
@@ -54,6 +59,11 @@ class SplitDirectDigitDriver:
     {}
 };
 
+/**
+ * A driver that uses a GPIO pin to drive each digit and segment pins of
+ * the LED display. The resistors are assumed to be on the digits and can be
+ * driven at the same time, so the segments are multiplexed.
+ */
 class SplitDirectSegmentDriver:
     private LedMatrixSplitDirect,
     public SplitSegmentDriver {
@@ -71,6 +81,12 @@ class SplitDirectSegmentDriver:
     {}
 };
 
+/**
+ * A driver which uses an 74HC595 serial-to-parallel converter on the segment
+ * pins which have resistors, so that they can driven at the same time. The
+ * 74HC595 is programmed using the shiftOut() method on the Arduino. The digit
+ * pins are driven directly by the GPIO pins.
+ */
 class SplitSerialDigitDriver:
     private LedMatrixSplitSerial,
     public SplitDigitDriver {
@@ -89,6 +105,12 @@ class SplitSerialDigitDriver:
     {}
 };
 
+/**
+ * A driver which uses an 74HC595 serial-to-parallel converter on the segment
+ * pins which have resistors, so that they can driven at the same time. The
+ * 74HC595 is programmed using hardware SPI on the Arduino. The digit pins are
+ * driven directly by the GPIO pins.
+ */
 class SplitSpiDigitDriver:
     private LedMatrixSplitSpi,
     public SplitDigitDriver {
@@ -107,6 +129,12 @@ class SplitSpiDigitDriver:
     {}
 };
 
+/**
+ * A driver which uses 2 74HC595 chips on both the segment and digit pins.
+ * The segments are assumed to have the resistors so can be driven at the same
+ * time. The digits are multiplexed. The 74HC595 chipes are programmed using
+ * the shiftOut() method.
+ */
 class MergedSerialDigitDriver:
     private LedMatrixMergedSerial,
     public MergedDigitDriver {
@@ -125,6 +153,12 @@ class MergedSerialDigitDriver:
     {}
 };
 
+/**
+ * A driver which uses 2 74HC595 chips on both the segment and digit pins.
+ * The segments are assumed to have the resistors so can be driven at the same
+ * time. The digits are multiplexed. The 74HC595 chipes are programmed using
+ * hardware SPI.
+ */
 class MergedSpiDigitDriver:
     private LedMatrixMergedSpi,
     public MergedDigitDriver{
