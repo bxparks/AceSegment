@@ -4,19 +4,15 @@ segment LED displays on Arduino platforms
 
 Version: 0.3.0 (2018-04-30)
 
+Status: Experimental work in progress. Not ready for public consumption.
+
 [![AUniter Jenkins Badge](https://us-central1-xparks2018.cloudfunctions.net/badge?project=AceSegment)](https://github.com/bxparks/AUniter)
 
 ## Summary
 
 The AceSegment library provides a number of classes that can display
 digits, characters and other patterns on an "seven segment" LED display.
-It is called AceSegment because:
-* many of its timing parameters are **Adjustable** at runtime
-* many of its configurations (e.g. wiring modes) are
-  **Configurable** at compile-time by choosing the appropriate classes
-* the framework is **Extensible** by writing new versions of the `Driver` class
-
-The framework is intended to be used with LED displays which are more-or-less
+The framework is intended to be used with LED displays which are
 directly connected to the microcontroller through the GPIO pins,
 instead of through a specialized LED display driver chip, like
 the [MAX7219](https://www.maximintegrated.com/en/datasheet/index.mvp/id/1339)
