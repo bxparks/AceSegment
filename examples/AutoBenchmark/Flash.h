@@ -25,14 +25,8 @@ SOFTWARE.
 #ifndef ACE_SEGMENT_AUTO_BENCHMARK_FLASH_H
 
 #include <WString.h> // FPSTR, __FlashStringHelper
-#if defined(ESP8266)
+#if defined(ESP8266) || defined(ESP32) || defined(EPOXY_DUINO)
   #include <pgmspace.h>
-#elif defined(ESP32)
-  #include <pgmspace.h>
-  // Clobber the incorrect definition of FPSTR
-  #undef FPSTR
-  #define FPSTR(pstr_pointer) \
-      (reinterpret_cast<const __FlashStringHelper *>(pstr_pointer))
 #else
   #include <avr/pgmspace.h>
   #define FPSTR(pstr_pointer) \

@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 #include <stdarg.h>
+#include <Arduino.h>
 #include <AUnit.h>
 #include <AceSegment.h>
 #include <ace_segment/LedMatrixSplitDirect.h>
@@ -45,56 +46,6 @@ const int8_t NUM_DIGITS = 4;
 
 // create NUM_DIGITS+1 elements for doing array bound checking
 DimmablePattern dimmablePatterns[NUM_DIGITS + 1];
-
-void setup() {
-  delay(1000); // Wait for stability on some boards, otherwise garage on Serial
-  Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
-  while (!Serial); // Wait until Serial is ready - Leonardo/Micro
-  Serial.println(F("setup(): start"));
-
-  Serial.print(F("sizeof(TimingStats): "));
-  Serial.println(sizeof(TimingStats));
-  Serial.print(F("sizeof(Hardware): "));
-  Serial.println(sizeof(Hardware));
-  Serial.print(F("sizeof(LedMatrixSplitDirect): "));
-  Serial.println(sizeof(LedMatrixSplitDirect));
-  Serial.print(F("sizeof(LedMatrixSplitSerial): "));
-  Serial.println(sizeof(LedMatrixSplitSerial));
-  Serial.print(F("sizeof(LedMatrixSplitSpi): "));
-  Serial.println(sizeof(LedMatrixSplitSpi));
-  Serial.print(F("sizeof(LedMatrixMergedSerial): "));
-  Serial.println(sizeof(LedMatrixMergedSerial));
-  Serial.print(F("sizeof(LedMatrixMergedSpi): "));
-  Serial.println(sizeof(LedMatrixMergedSpi));
-  Serial.print(F("sizeof(Driver): "));
-  Serial.println(sizeof(Driver));
-  Serial.print(F("sizeof(SplitSegmentDriver): "));
-  Serial.println(sizeof(SplitSegmentDriver));
-  Serial.print(F("sizeof(SplitDigitDriver): "));
-  Serial.println(sizeof(SplitDigitDriver));
-  Serial.print(F("sizeof(BlinkStyler): "));
-  Serial.println(sizeof(BlinkStyler));
-  Serial.print(F("sizeof(PulseStyler): "));
-  Serial.println(sizeof(PulseStyler));
-  Serial.print(F("sizeof(StyleTable): "));
-  Serial.println(sizeof(StyleTable));
-  Serial.print(F("sizeof(Renderer): "));
-  Serial.println(sizeof(Renderer));
-  Serial.print(F("sizeof(HexWriter): "));
-  Serial.println(sizeof(HexWriter));
-  Serial.print(F("sizeof(ClockWriter): "));
-  Serial.println(sizeof(ClockWriter));
-  Serial.print(F("sizeof(CharWriter): "));
-  Serial.println(sizeof(CharWriter));
-  Serial.print(F("sizeof(StringWriter): "));
-  Serial.println(sizeof(StringWriter));
-
-  Serial.println(F("setup(): end"));
-}
-
-void loop() {
-  TestRunner::run();
-}
 
 // ----------------------------------------------------------------------
 // Tests for Util.
@@ -218,5 +169,60 @@ testF(FakeDriverTest, setBrightness_outOfBounds) {
   mDriver->setBrightness(4, 96);
   assertEqual(1, digitOutOfBounds.pattern);
   assertEqual(2, digitOutOfBounds.brightness);
+}
+
+//----------------------------------------------------------------------------
+
+void setup() {
+#if ! defined(EPOXY_DUINO)
+  delay(1000); // Wait for stability on some boards, otherwise garage on Serial
+#endif
+
+  Serial.begin(115200);
+  while (!Serial); // Wait until Serial is ready - Leonardo/Micro
+  Serial.println(F("setup(): start"));
+
+  Serial.print(F("sizeof(TimingStats): "));
+  Serial.println(sizeof(TimingStats));
+  Serial.print(F("sizeof(Hardware): "));
+  Serial.println(sizeof(Hardware));
+  Serial.print(F("sizeof(LedMatrixSplitDirect): "));
+  Serial.println(sizeof(LedMatrixSplitDirect));
+  Serial.print(F("sizeof(LedMatrixSplitSerial): "));
+  Serial.println(sizeof(LedMatrixSplitSerial));
+  Serial.print(F("sizeof(LedMatrixSplitSpi): "));
+  Serial.println(sizeof(LedMatrixSplitSpi));
+  Serial.print(F("sizeof(LedMatrixMergedSerial): "));
+  Serial.println(sizeof(LedMatrixMergedSerial));
+  Serial.print(F("sizeof(LedMatrixMergedSpi): "));
+  Serial.println(sizeof(LedMatrixMergedSpi));
+  Serial.print(F("sizeof(Driver): "));
+  Serial.println(sizeof(Driver));
+  Serial.print(F("sizeof(SplitSegmentDriver): "));
+  Serial.println(sizeof(SplitSegmentDriver));
+  Serial.print(F("sizeof(SplitDigitDriver): "));
+  Serial.println(sizeof(SplitDigitDriver));
+  Serial.print(F("sizeof(BlinkStyler): "));
+  Serial.println(sizeof(BlinkStyler));
+  Serial.print(F("sizeof(PulseStyler): "));
+  Serial.println(sizeof(PulseStyler));
+  Serial.print(F("sizeof(StyleTable): "));
+  Serial.println(sizeof(StyleTable));
+  Serial.print(F("sizeof(Renderer): "));
+  Serial.println(sizeof(Renderer));
+  Serial.print(F("sizeof(HexWriter): "));
+  Serial.println(sizeof(HexWriter));
+  Serial.print(F("sizeof(ClockWriter): "));
+  Serial.println(sizeof(ClockWriter));
+  Serial.print(F("sizeof(CharWriter): "));
+  Serial.println(sizeof(CharWriter));
+  Serial.print(F("sizeof(StringWriter): "));
+  Serial.println(sizeof(StringWriter));
+
+  Serial.println(F("setup(): end"));
+}
+
+void loop() {
+  TestRunner::run();
 }
 

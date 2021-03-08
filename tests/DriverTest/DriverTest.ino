@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 #include <stdarg.h>
+#include <Arduino.h>
 #include <AUnit.h>
 #include <AceSegment.h>
 #include <ace_segment/testing/BaseHardwareTest.h>
@@ -51,27 +52,6 @@ const uint8_t clockPin = 14;
 // create NUM_DIGITS+1 elements for doing array bound checking
 DimmablePattern dimmablePatterns[NUM_DIGITS + 1];
 StyledPattern styledPatterns[NUM_DIGITS + 1];
-
-void setup() {
-  delay(1000); // Wait for stability on some boards, otherwise garage on Serial
-  Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
-  while (!Serial); // Wait until Serial is ready - Leonardo/Micro
-  Serial.println(F("setup(): start"));
-
-  //Serial.println(F("setup(): setting excludes and includes"));
-  //TestRunner::exclude("*");
-  //TestRunner::include("SplitDirectDigitDriverTest*");
-  //TestRunner::include("ModulatingSplitDigitDriverTest*");
-  //TestRunner::include("SplitDirectSegmentDriverTest*");
-  //TestRunner::include("SplitSerialDigitDriverTest*");
-  //TestRunner::include("MergedSerialDigitDriverTest*");
-
-  Serial.println(F("setup(): end"));
-}
-
-void loop() {
-  TestRunner::run();
-}
 
 // ----------------------------------------------------------------------
 // Tests for SplitDigitDriver w/ LedMatrixDirect
@@ -1269,3 +1249,25 @@ testF(MergedSpiDigitDriverTest, displayCurrentField) {
       Event::kTypeDigitalWrite, latchPin, HIGH);
 }
 
+//----------------------------------------------------------------------------
+
+void setup() {
+#if ! defined(EPOXY_DUINO)
+  delay(1000); // Wait for stability on some boards, otherwise garage on Serial
+#endif
+
+  Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
+  while (!Serial); // Wait until Serial is ready - Leonardo/Micro
+
+  //Serial.println(F("setup(): setting excludes and includes"));
+  //TestRunner::exclude("*");
+  //TestRunner::include("SplitDirectDigitDriverTest*");
+  //TestRunner::include("ModulatingSplitDigitDriverTest*");
+  //TestRunner::include("SplitDirectSegmentDriverTest*");
+  //TestRunner::include("SplitSerialDigitDriverTest*");
+  //TestRunner::include("MergedSerialDigitDriverTest*");
+}
+
+void loop() {
+  TestRunner::run();
+}

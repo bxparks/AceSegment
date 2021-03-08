@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 #include <stdarg.h>
+#include <Arduino.h>
 #include <AUnit.h>
 #include <AceSegment.h>
 #include <ace_segment/LedMatrixSplitDirect.h>
@@ -51,16 +52,6 @@ const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
 const uint8_t latchPin = 12;
 const uint8_t dataPin = 13;
 const uint8_t clockPin = 14;
-
-void setup() {
-  delay(1000); // Wait for stability on some boards, otherwise garage on Serial
-  Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
-  while (!Serial); // Wait until Serial is ready - Leonardo/Micro
-}
-
-void loop() {
-  TestRunner::run();
-}
 
 // ----------------------------------------------------------------------
 // Tests for LedMatrixSplitDirect.
@@ -310,3 +301,17 @@ testF(LedMatrixSplitSpiTest, drawElements) {
   );
 }
 
+//-----------------------------------------------------------------------------
+
+void setup() {
+#if ! defined(EPOXY_DUINO)
+  delay(1000); // Wait for stability on some boards, otherwise garage on Serial
+#endif
+
+  Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
+  while (!Serial); // Wait until Serial is ready - Leonardo/Micro
+}
+
+void loop() {
+  TestRunner::run();
+}

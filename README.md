@@ -1,12 +1,13 @@
 # AceSegment
+
 An adjustable, configurable, and extensible framework for rendering seven
 segment LED displays on Arduino platforms
 
-Version: 0.3.0 (2018-04-30)
+**Version**: 0.3.0 (2018-04-30)
 
-Status: Experimental work in progress. Not ready for public consumption.
+**Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
-[![AUniter Jenkins Badge](https://us-central1-xparks2018.cloudfunctions.net/badge?project=AceSegment)](https://github.com/bxparks/AUniter)
+**Status**: Experimental work in progress. Not ready for public consumption.
 
 ## Summary
 
@@ -1281,10 +1282,6 @@ The library has been tested on the following hardware:
 * Arduino Pro Micro clone (16 MHz ATmega32U4, 5V) - limited software testing
 * Teensy 3.2 (48 MHz ARM Cortex-M0+) - verified compile
 * NodeMCU 1.0 clone (ESP-12E module, 80MHz ESP8266) - verified compile
-
-## Changelog
-
-See [CHANGELOG.md](CHANGELOG.md).
 
 ## License
 

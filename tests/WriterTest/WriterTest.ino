@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 #include <stdarg.h>
+#include <Arduino.h>
 #include <AUnit.h>
 #include <AceSegment.h>
 #include <ace_segment/testing/FakeRenderer.h>
@@ -33,16 +34,6 @@ SOFTWARE.
 using namespace aunit;
 using namespace ace_segment;
 using namespace ace_segment::testing;
-
-void setup() {
-  delay(1000); // Wait for stability on some boards, otherwise garage on Serial
-  Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
-  while (!Serial); // Wait until Serial is ready - Leonardo/Micro
-}
-
-void loop() {
-  TestRunner::run();
-}
 
 // ----------------------------------------------------------------------
 // Tests for BaseWriterTest.
@@ -338,4 +329,19 @@ testF(ClockWriterTest, writeColon) {
 
   mClockWriter->writeColon(false); // turns it off
   assertEqual(0b01011011, mStyledPatterns[1].pattern);
+}
+
+//-----------------------------------------------------------------------------
+
+void setup() {
+#if ! defined(EPOXY_DUINO)
+  delay(1000); // Wait for stability on some boards, otherwise garage on Serial
+#endif
+
+  Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
+  while (!Serial); // Wait until Serial is ready - Leonardo/Micro
+}
+
+void loop() {
+  TestRunner::run();
 }

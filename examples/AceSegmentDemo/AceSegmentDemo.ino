@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <AceButton.h>
 #include <AceSegment.h>
 #ifdef __AVR__
@@ -266,106 +267,8 @@ void setupAceSegment() {
 // Configurations for AceSegmentDemo
 //------------------------------------------------------------------
 
-void setup() {
-  delay(1000); // Wait for stability on some boards, otherwise garage on Serial
-  Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
-  while (!Serial); // Wait until Serial is ready - Leonardo/Micro
-  Serial.println(F("setup(): begin"));
-
-  setupAceButton();
-
-#if DRIVER_MODE > DRIVER_MODE_NONE
-  setupAceSegment();
-#endif
-
-  Serial.println(F("setup(): end"));
-}
-
-void loop() {
-  if (loopMode == LOOP_MODE_STEP) {
-    singleStep();
-    loopMode = LOOP_MODE_PAUSE;
-  } else if (loopMode == LOOP_MODE_AUTO_RENDER) {
-    autoRender();
-  }
-
-  button.check();
-}
-
 void singleStep() {
   renderer->renderField();
-}
-
-void autoRender() {
-  static unsigned long lastUpdateTime = millis();
-#if PRINT_STATS == 1
-  static unsigned long stopWatchStart = lastUpdateTime;
-  static uint32_t loopCount = 0;
-  static uint16_t lastStatsCounter = 0;
-#endif
-
-  unsigned long now = millis();
-  if (now - lastUpdateTime > 1000) {
-    lastUpdateTime = now;
-
-#if DRIVER_MODE > DRIVER_MODE_NONE
-  #if WRITE_MODE == WRITE_MODE_HEX
-    writeHexes();
-  #elif WRITE_MODE == WRITE_MODE_CHAR
-    writeChars();
-  #elif WRITE_MODE == WRITE_MODE_STRING
-    writeStrings();
-  #elif WRITE_MODE == WRITE_MODE_SCROLL
-    scrollString("   Angela is the best.");
-  #elif WRITE_MODE == WRITE_MODE_CLOCK
-    writeClock();
-  #endif
-#endif
-  }
-
-#if PRINT_STATS == 1
-  // Print out statistics every N seconds.
-  unsigned long elapsedTime = now - stopWatchStart;
-  if (elapsedTime >= 2000) {
-  #if DRIVER_MODE > DRIVER_MODE_NONE
-    ace_segment::TimingStats stats = renderer->getTimingStats();
-  #else
-    ace_segment::TimingStats stats;
-  #endif
-    uint32_t elapsedCount = stats.getCounter() - lastStatsCounter;
-    lastStatsCounter = stats.getCounter();
-    uint16_t renderDurationAverage = stats.getAvg();
-    uint16_t renderDurationMin = stats.getMin();
-    uint16_t renderDurationMax = stats.getMax();
-
-    Serial.print(F("loops: "));
-    Serial.print(loopCount);
-    Serial.print(F("; renders: "));
-    Serial.print(elapsedCount);
-    Serial.print(F("; t: "));
-    Serial.print(elapsedTime / 1000);
-    Serial.print(F("s; fields/s: "));
-    Serial.print((uint32_t) elapsedCount * 1000 / elapsedTime);
-    Serial.print(F("Hz; min: "));
-    Serial.print(renderDurationMin);
-    Serial.print(F("us; avg: "));
-    Serial.print(renderDurationAverage);
-    Serial.print(F("us; max: "));
-    Serial.print(renderDurationMax);
-    Serial.println(F("us"));
-
-    stopWatchStart = now;
-    loopCount = 0;
-  } else {
-    loopCount++;
-  }
-#endif
-
-#if DRIVER_MODE > DRIVER_MODE_NONE
-#if USE_INTERRUPT == 0
-  renderer->renderFieldWhenReady();
-#endif
-#endif
 }
 
 #if WRITE_MODE == WRITE_MODE_HEX
@@ -447,3 +350,106 @@ void scrollString(const char* s) {
 }
 
 #endif
+
+void autoRender() {
+  static unsigned long lastUpdateTime = millis();
+#if PRINT_STATS == 1
+  static unsigned long stopWatchStart = lastUpdateTime;
+  static uint32_t loopCount = 0;
+  static uint16_t lastStatsCounter = 0;
+#endif
+
+  unsigned long now = millis();
+  if (now - lastUpdateTime > 1000) {
+    lastUpdateTime = now;
+
+#if DRIVER_MODE > DRIVER_MODE_NONE
+  #if WRITE_MODE == WRITE_MODE_HEX
+    writeHexes();
+  #elif WRITE_MODE == WRITE_MODE_CHAR
+    writeChars();
+  #elif WRITE_MODE == WRITE_MODE_STRING
+    writeStrings();
+  #elif WRITE_MODE == WRITE_MODE_SCROLL
+    scrollString("   Angela is the best.");
+  #elif WRITE_MODE == WRITE_MODE_CLOCK
+    writeClock();
+  #endif
+#endif
+  }
+
+#if PRINT_STATS == 1
+  // Print out statistics every N seconds.
+  unsigned long elapsedTime = now - stopWatchStart;
+  if (elapsedTime >= 2000) {
+  #if DRIVER_MODE > DRIVER_MODE_NONE
+    ace_segment::TimingStats stats = renderer->getTimingStats();
+  #else
+    ace_segment::TimingStats stats;
+  #endif
+    uint32_t elapsedCount = stats.getCounter() - lastStatsCounter;
+    lastStatsCounter = stats.getCounter();
+    uint16_t renderDurationAverage = stats.getAvg();
+    uint16_t renderDurationMin = stats.getMin();
+    uint16_t renderDurationMax = stats.getMax();
+
+    Serial.print(F("loops: "));
+    Serial.print(loopCount);
+    Serial.print(F("; renders: "));
+    Serial.print(elapsedCount);
+    Serial.print(F("; t: "));
+    Serial.print(elapsedTime / 1000);
+    Serial.print(F("s; fields/s: "));
+    Serial.print((uint32_t) elapsedCount * 1000 / elapsedTime);
+    Serial.print(F("Hz; min: "));
+    Serial.print(renderDurationMin);
+    Serial.print(F("us; avg: "));
+    Serial.print(renderDurationAverage);
+    Serial.print(F("us; max: "));
+    Serial.print(renderDurationMax);
+    Serial.println(F("us"));
+
+    stopWatchStart = now;
+    loopCount = 0;
+  } else {
+    loopCount++;
+  }
+#endif
+
+#if DRIVER_MODE > DRIVER_MODE_NONE
+#if USE_INTERRUPT == 0
+  renderer->renderFieldWhenReady();
+#endif
+#endif
+}
+
+//-----------------------------------------------------------------------------
+
+void setup() {
+#if ! defined(EPOXY_DUINO)
+  delay(1000); // Wait for stability on some boards, otherwise garage on Serial
+#endif
+
+  Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
+  while (!Serial); // Wait until Serial is ready - Leonardo/Micro
+  Serial.println(F("setup(): begin"));
+
+  setupAceButton();
+
+#if DRIVER_MODE > DRIVER_MODE_NONE
+  setupAceSegment();
+#endif
+
+  Serial.println(F("setup(): end"));
+}
+
+void loop() {
+  if (loopMode == LOOP_MODE_STEP) {
+    singleStep();
+    loopMode = LOOP_MODE_PAUSE;
+  } else if (loopMode == LOOP_MODE_AUTO_RENDER) {
+    autoRender();
+  }
+
+  button.check();
+}

@@ -38,9 +38,10 @@ SOFTWARE.
  */
 
 #include <stdio.h>
+#include <Arduino.h>
 #include <AceSegment.h>
 #include "Flash.h"
-#ifdef __AVR__
+#ifdef ARDUINO_ARCH_AVR
   #include "FastDirectDriver.h"
   #include "FastSerialDriver.h"
   #include "FastSpiDriver.h"
@@ -54,6 +55,10 @@ void writeChars();
 void finishBenchmark();
 void setupBenchmark();
 void nextBenchmark();
+void printTimingStats(
+    const DriverConfig* driverConfig,
+    const TimingStats& stats);
+void printLabel(const DriverConfig* driverConfig);
 
 //------------------------------------------------------------------
 // Setup for AutoBenchmark
@@ -67,18 +72,6 @@ static uint8_t loopMode = LOOP_MODE_BEGIN;
 
 const DriverConfig* driverConfig = nullptr;
 BenchmarkBundle* benchmarkBundle = nullptr;
-
-void setup() {
-  delay(1000); // Wait for stability on some boards, otherwise garage on Serial
-  Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
-  while (!Serial); // Wait until Serial is ready - Leonardo/Micro
-  Serial.println(F("setup(): begin"));
-
-  driverConfig = &DriverConfig::kDriverConfigs[0];
-  setupBenchmark(driverConfig);
-
-  Serial.println(F("setup(): end"));
-}
 
 void finishBenchmark() {
   if (benchmarkBundle == nullptr) return;
@@ -109,23 +102,6 @@ static const char kHeader[] PROGMEM =
     "driver                         | modulation | styles | min/avg/max |";
 static const char kDivider[] PROGMEM =
     "-------------------------------|------------|--------|-------------|";
-
-void loop() {
-  if (loopMode == LOOP_MODE_BEGIN) {
-    Serial.println(FPSTR(kBoundary));
-    Serial.println(FPSTR(kHeader));
-    Serial.println(FPSTR(kDivider));
-    loopMode = LOOP_MODE_RENDER;
-  } else if (loopMode == LOOP_MODE_RENDER) {
-    render();
-  } else if (loopMode == LOOP_MODE_NEXT_DRIVER) {
-    finishBenchmark();
-    nextBenchmark();
-  } else if (loopMode == LOOP_MODE_FOOTER) {
-    Serial.println(FPSTR(kBoundary));
-    loopMode = LOOP_MODE_DONE;
-  }
-}
 
 void render() {
   // Number of renderFields() to sample, should be between (1, 2) *
@@ -200,4 +176,38 @@ void printLabel(const DriverConfig* driverConfig) {
   }
 
   Serial.print("|");
+}
+
+//-----------------------------------------------------------------------------
+
+void setup() {
+#if ! defined(EPOXY_DUINO)
+  delay(1000); // Wait for stability on some boards, otherwise garage on Serial
+#endif
+
+  Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
+  while (!Serial); // Wait until Serial is ready - Leonardo/Micro
+  Serial.println(F("setup(): begin"));
+
+  driverConfig = &DriverConfig::kDriverConfigs[0];
+  setupBenchmark(driverConfig);
+
+  Serial.println(F("setup(): end"));
+}
+
+void loop() {
+  if (loopMode == LOOP_MODE_BEGIN) {
+    Serial.println(FPSTR(kBoundary));
+    Serial.println(FPSTR(kHeader));
+    Serial.println(FPSTR(kDivider));
+    loopMode = LOOP_MODE_RENDER;
+  } else if (loopMode == LOOP_MODE_RENDER) {
+    render();
+  } else if (loopMode == LOOP_MODE_NEXT_DRIVER) {
+    finishBenchmark();
+    nextBenchmark();
+  } else if (loopMode == LOOP_MODE_FOOTER) {
+    Serial.println(FPSTR(kBoundary));
+    loopMode = LOOP_MODE_DONE;
+  }
 }

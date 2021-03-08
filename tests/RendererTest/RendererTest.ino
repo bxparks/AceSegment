@@ -25,6 +25,7 @@ SOFTWARE.
 */
 
 #include <stdarg.h>
+#include <Arduino.h>
 #include <AUnit.h>
 #include <AceSegment.h>
 #include <ace_segment/testing/TestableHardware.h>
@@ -41,22 +42,6 @@ const int8_t NUM_SUB_FIELDS = 3;
 // create NUM_DIGITS+1 elements for doing array bound checking
 DimmablePattern dimmablePatterns[NUM_DIGITS + 1];
 StyledPattern styledPatterns[NUM_DIGITS + 1];
-
-void setup() {
-  delay(1000); // Wait for stability on some boards, otherwise garage on Serial
-  Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
-  while (!Serial); // Wait until Serial is ready - Leonardo/Micro
-  Serial.println(F("setup(): start"));
-
-  //TestRunner::exclude("*");
-  //TestRunner::include("RendererTest", "activeStyles");
-
-  Serial.println(F("setup(): end"));
-}
-
-void loop() {
-  TestRunner::run();
-}
 
 // ----------------------------------------------------------------------
 // Tests for various Stylers.
@@ -471,4 +456,20 @@ testF(RendererTest, renderField_dimmedBrightness) {
   assertDimmablePatternsEqual(4, 0x11, 0, 0x22, 0, 0x33, 119, 0x44, 105);
 }
 
+//-----------------------------------------------------------------------------
 
+void setup() {
+#if ! defined(EPOXY_DUINO)
+  delay(1000); // Wait for stability on some boards, otherwise garage on Serial
+#endif
+
+  Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
+  while (!Serial); // Wait until Serial is ready - Leonardo/Micro
+
+  //TestRunner::exclude("*");
+  //TestRunner::include("RendererTest", "activeStyles");
+}
+
+void loop() {
+  TestRunner::run();
+}
