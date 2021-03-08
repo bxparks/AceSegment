@@ -1,5 +1,7 @@
 # AceSegment
 
+[![AUnit Tests](https://github.com/bxparks/AceSegment/actions/workflows/aunit_tests.yml/badge.svg)](https://github.com/bxparks/AceSegment/actions/workflows/aunit_tests.yml)
+
 An adjustable, configurable, and extensible framework for rendering seven
 segment LED displays on Arduino platforms
 

@@ -19,7 +19,6 @@ jobs:
         cd ..
         git clone https://github.com/bxparks/AUnit
         git clone https://github.com/bxparks/AceButton
-        git clone https://github.com/bxparks/AceSegment
         git clone https://github.com/bxparks/EpoxyDuino
 
     - name: Verify examples

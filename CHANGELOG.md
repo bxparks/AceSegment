@@ -1,5 +1,8 @@
 # Changelog
 
+* Unreleased
+    * Add Makefiles to run tests and compile examples using EpoxyDuino.
+    * Add GitHub workflow continuous integration.
 * 0.3.0 (2018-04-30)
     * Extract and generalize blinking and pulsing code to support custom styles.
     * Add support for going to sleep and waking up from sleep.
