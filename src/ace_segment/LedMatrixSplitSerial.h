@@ -41,37 +41,42 @@ class Hardware;
  */
 class LedMatrixSplitSerial: public LedMatrixSplit {
   public:
-    LedMatrixSplitSerial(Hardware* hardware, bool cathodeOnGroup,
-            bool transistorsOnGroups, bool transistorsOnElements,
-            uint8_t numGroups, uint8_t numElements,
-            const uint8_t* groupPins, uint8_t latchPin, uint8_t dataPin,
-            uint8_t clockPin):
-        LedMatrixSplit(hardware, cathodeOnGroup, transistorsOnGroups,
-            transistorsOnElements, numGroups, numElements),
-        mGroupPins(groupPins),
-        mLatchPin(latchPin),
-        mDataPin(dataPin),
-        mClockPin(clockPin)
+    LedMatrixSplitSerial(
+        SpiAdapter* spiAdapter,
+        bool cathodeOnGroup,
+        bool transistorsOnGroups,
+        bool transistorsOnElements,
+        uint8_t numGroups,
+        uint8_t numElements,
+        const uint8_t* groupPins
+    ) :
+        mSpiAdapter(spiAdapter),
+        LedMatrixSplit(
+            cathodeOnGroup,
+            transistorsOnGroups,
+            transistorsOnElements,
+            numGroups,
+            numElements,
+            groupPins)
     {}
 
-    void configure() override;
+    void configure() override {
+      mSpiAdapter->spiBegin();
+      LedMatrix::configure();
+    }
 
-    void finish() override;
+    void finish() override {
+      mSpiAdapter->spiEnd();
+      LedMatrix::finish();
+    }
 
-    void enableGroup(uint8_t group) override;
+    void drawElements(uint8_t pattern) override {
+      uint8_t actualPattern = (mElementOn == HIGH) ? pattern : ~pattern;
+      mSpiAdapter.transfer(actualPattern);
+    }
 
-    void disableGroup(uint8_t group) override;
-
-    void drawElements(uint8_t pattern) override;
-
-  protected:
-    /** Write to group pin identified by 'group'. */
-    void writeGroupPin(uint8_t group, uint8_t output);
-
-    const uint8_t* const mGroupPins;
-    const uint8_t mLatchPin;
-    const uint8_t mDataPin;
-    const uint8_t mClockPin;
+  private:
+    const SpiAdapter* const mSpiAdapter;
 };
 
 }

@@ -62,7 +62,6 @@ class LedMatrix {
     LedMatrix(Hardware* hardware, bool cathodeOnGroup,
             bool transistorsOnGroups, bool transistorsOnElements,
             uint8_t numGroups, uint8_t numElements):
-        mHardware(hardware),
         mNumGroups(numGroups),
         mNumElements(numElements) {
 
@@ -83,10 +82,10 @@ class LedMatrix {
     virtual ~LedMatrix() {}
 
     /** Configure the pins for the given LED wiring. */
-    virtual void configure() {}
+    virtual void configure() = 0;
 
     /** Turn off the pins by doing the opposite of configure(). */
-    virtual void finish() {}
+    virtual void finish() = 0;
 
   protected:
     /** LED negative terminals are on the group line. */
@@ -117,7 +116,7 @@ class LedMatrix {
       mElementOff ^=  0x1;
     }
 
-    Hardware* const mHardware;
+  protected:
     const uint8_t mNumGroups;
     const uint8_t mNumElements;
 

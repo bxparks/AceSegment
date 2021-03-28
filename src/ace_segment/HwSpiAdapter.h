@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2018 Brian T. Park
+Copyright (c) 2021 Brian T. Park
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,52 +22,60 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_HARDWARE_H
-#define ACE_SEGMENT_HARDWARE_H
+#ifndef ACE_SEGMENT_HW_SPI_ADAPTER_H
+#define ACE_SEGMENT_HW_SPI_ADAPTER_H
 
 #include <stdint.h>
+#include <Arduino.h>
+#include <SPI.h>
 
 namespace ace_segment {
 
-class Hardware {
+/** Hardware SPI. */
+class HwSpiAdapter : public SpiAdapter {
   public:
-    /** Constructor. */
-    Hardware() {}
+    SwSpiAdapter(
+        uint8_t latchPin,
+        uint8_t dataPin,
+        uint8_t clockPin
+    ) :
+        mLatchPin(latchPin),
+        mDataPin(dataPin),
+        mClockPin(clockPin)
+    {}
 
-    /** Destructor. */
-    virtual ~Hardware() {}
-
-    /** Write value to pin. */
-    virtual void digitalWrite(uint8_t pin, uint8_t value) {
-      ::digitalWrite(pin, value);
+    void spiBegin() override {
+      pinMode(mLatchPin, OUTPUT);
+      pinMode(mDataPin, OUTPUT);
+      pinMode(mClockPin, OUTPUT);
+      SPI.begin();
     }
 
-    /** Set pin mode. */
-    virtual void pinMode(uint8_t pin, uint8_t mode) {
-      ::pinMode(pin, mode);
+    void spiEnd() override {
+      pinMode(mLatchPin, INPUT);
+      pinMode(mDataPin, INPUT);
+      pinMode(mClockPin, INPUT);
+      SPI.end();
     }
 
-    /** Shift out. */
-    virtual void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder,
-        uint8_t value) {
+    void spiTransfer(uint8_t value) override {
+      SPI.beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
+      SPI.transfer(value);
+      SPI.endTransaction();
     }
 
-    /** Get the current micros  */
-    virtual unsigned long micros() {
-      return ::micros();
-    }
-
-    /** Get the current millis  */
-    virtual unsigned long millis() {
-      return ::millis();
+    void spiTransfer16(uint16_t value) override {
+      SPI.beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
+      SPI.transfer16(value);
+      SPI.endTransaction();
     }
 
   private:
-    // disable copy-constructor and assignment operator
-    Hardware(const Hardware&) = delete;
-    Hardware& operator=(const Hardware&) = delete;
+    uint8_t const mLatchPin;
+    uint8_t const mDataPin;
+    uint8_t const mClockPin;
 };
 
-}
+} // ace_segment
 
 #endif

@@ -34,18 +34,57 @@ namespace ace_segment {
  */
 class LedMatrixSplit: public LedMatrix {
   public:
-    LedMatrixSplit(Hardware* hardware, bool cathodeOnGroup,
-            bool transistorsOnGroups, bool transistorsOnElements,
-            uint8_t numGroups, uint8_t numElements):
-        LedMatrix(hardware, cathodeOnGroup, transistorsOnGroups,
-            transistorsOnElements, numGroups, numElements)
+    LedMatrixSplit(
+        bool cathodeOnGroup,
+        bool transistorsOnGroups,
+        bool transistorsOnElements,
+        uint8_t numGroups,
+        uint8_t numElements,
+        const uint8_t* groupPins
+    ) :
+        LedMatrix(
+            cathodeOnGroup,
+            transistorsOnGroups,
+            transistorsOnElements,
+            numGroups,
+            numElements),
+        mGroupPins(groupPins)
     {}
 
-    virtual void enableGroup(uint8_t group) = 0;
+    virtual void configure() {
+      for (uint8_t group = 0; group < mNumGroups; group++) {
+        uint8_t pin = mGroupPins[group];
+        mHardware->pinMode(pin, OUTPUT);
+        mHardware->digitalWrite(pin, mGroupOff);
+      }
+    }
 
-    virtual void disableGroup(uint8_t group) = 0;
+    virtual void finish() {
+      for (uint8_t group = 0; group < mNumGroups; group++) {
+        uint8_t pin = mGroupPins[group];
+        mHardware->pinMode(pin, INPUT);
+      }
+    }
+
+    void LedMatrixSplitSerial::enableGroup(uint8_t group) {
+      writeGroupPin(group, mGroupOn);
+    }
+
+    void LedMatrixSplitSerial::disableGroup(uint8_t group) {
+      writeGroupPin(group, mGroupOff);
+    }
 
     virtual void drawElements(uint8_t pattern) = 0;
+
+  protected:
+    /** Write to group pin identified by 'group'. */
+    void writeGroupPin(uint8_t group, uint8_t output) {
+      uint8_t groupPin = mGroupPins[group];
+      mHardware->digitalWrite(groupPin, output);
+    }
+
+  protected:
+    const uint8_t* const mGroupPins;
 };
 
 }

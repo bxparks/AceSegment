@@ -31,12 +31,23 @@ namespace ace_segment {
 
 class LedMatrixSplitDirect: public LedMatrixSplit {
   public:
-    LedMatrixSplitDirect(Hardware* hardware, bool cathodeOnGroup,
-            bool transistorsOnGroups, bool transistorsOnElements,
-            uint8_t numGroups, uint8_t numElements,
-            const uint8_t* groupPins, const uint8_t* elementPins):
-        LedMatrixSplit(hardware, cathodeOnGroup, transistorsOnGroups,
-            transistorsOnElements, numGroups, numElements),
+    LedMatrixSplitDirect(
+        Hardware* hardware,
+        bool cathodeOnGroup,
+        bool transistorsOnGroups,
+        bool transistorsOnElements,
+        uint8_t numGroups,
+        uint8_t numElements,
+        const uint8_t* groupPins,
+        const uint8_t* elementPins
+    ) :
+        LedMatrixSplit(
+            cathodeOnGroup,
+            transistorsOnGroups,
+            transistorsOnElements,
+            numGroups,
+            numElements),
+        mHardware(hardware),
         mGroupPins(groupPins),
         mElementPins(elementPins)
     {}
@@ -45,26 +56,17 @@ class LedMatrixSplitDirect: public LedMatrixSplit {
 
     void finish() override;
 
-    void enableGroup(uint8_t group) override;
-
-    void disableGroup(uint8_t group) override;
-
     void drawElements(uint8_t pattern) override;
 
   private:
-    /** Write to group pin identified by 'group'. */
-    void writeGroupPin(uint8_t group, uint8_t output) {
-      uint8_t groupPin = mGroupPins[group];
-      mHardware->digitalWrite(groupPin, output);
-    }
-
     /** Write to the element pin identified by 'element'. */
     void writeElementPin(uint8_t element, uint8_t output) {
       uint8_t elementPin = mElementPins[element];
       mHardware->digitalWrite(elementPin, output);
     }
 
-    const uint8_t* const mGroupPins;
+  private:
+    Hardware* const mHardware;
     const uint8_t* const mElementPins;
 };
 

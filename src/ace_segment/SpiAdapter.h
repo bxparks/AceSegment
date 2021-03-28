@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2018 Brian T. Park
+Copyright (c) 2021 Brian T. Park
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,9 +22,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "Hardware.h"
-#include "LedMatrixSplitSerial.h"
+#ifndef ACE_SEGMENT_SPI_ADAPTER_H
+#define ACE_SEGMENT_SPI_ADAPTER_H
+
+#include <stdint.h>
 
 namespace ace_segment {
 
-}
+/** Simple interface to select between a hardware SPI or software SPI. */
+class SpiAdapter {
+  /** Begin SPI. Also sets SPI pins to OUTPUT mode. */
+  virtual void spiBegin() = 0;
+
+  /** End SPI. Also sets SPI pins to INPUT mode. */
+  virtual void spiEnd() = 0;
+
+  /** Send byte through SPI. */
+  virtual void spiTransfer(uint8_t value) = 0;
+
+  /** Send word through SPI. */
+  virtual void spiTransfer16(uint16_t value) = 0;
+};
+
+} // ace_segment
+
+#endif

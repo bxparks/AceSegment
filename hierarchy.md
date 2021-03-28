@@ -14,10 +14,14 @@ to help create the right set of objects for the given LED wiring situtation.
     * virtual shiftOut()
     * virtual micros()
     * virtual millis()
+
+* SpiAdapter
     * virtual spiBegin()
     * virtual spiEnd()
     * virtual spiTransfer()
     * virtual spiTransfer16()
+    * SwSpiAdapter
+    * HwSpiAdapter
 
 ## Wiring and LedMatrix Classes
 
@@ -45,10 +49,10 @@ to help create the right set of objects for the given LED wiring situtation.
     * LedMatrixSplit
         * LedMatrixSplitDirect (all pins are directly driven)
         * LedMatrixSplitSerial (element pins via SwSPI)
-        * LedMatrixSplitSpi (element pins via HwSPI)
+            * LedMatrixSplitSpi (element pins via HwSPI)
     * LedMatrixMerged
         * LedMatrixMergedSerial (group and element pins via SwSPI)
-        * LedMatrixMergedSpi (group and element pins via HwSPI)
+            * LedMatrixMergedSpi (group and element pins via HwSPI)
 
 ## Driver Classes
 
