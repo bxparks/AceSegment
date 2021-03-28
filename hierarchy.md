@@ -67,8 +67,8 @@ to help create the right set of objects for the given LED wiring situtation.
     * setBrightness()
 * subclasses
     * SplitDigitDriver
-    * SplitSegmentDriver
     * MergedDigitDriver
+    * SplitSegmentDriver (X - archived)
     * MergedSegmentDriver (X - not implemented)
 
 ## CompositeDrivers
@@ -77,23 +77,15 @@ Composite classes combine the correct `LedMatrix` object with the matching
 `Driver` object. The composite object multiplely inherits from both `LedMatrix`
 and `Driver` class. The number of combinations are:
 
-* (SplitDigitDriver | SplitSegmentDriver) x LedMatrixDirect = 2
-* (SplitDigitDriver | SplitSegmentDriver)
-    x (LedMatrixSplitSerial | LedMatrixSplitSpi) = 4
-    * But we don't implement SplitSegmentDriver, so only 2
-* (MergedDigitDriver | MergedSegmentDriver)
-    x (LedMatrixMergedSerial | LedMatrixMergedSpi) = 4
-    * But we don't implement MergedSegmentDriver, so only 2
-* Total: 2 + 2 + 2 = 6
+* (SplitDigitDriver) x LedMatrixDirect = 1
+* (SplitDigitDriver) x (LedMatrixSplitSerial | LedMatrixSplitSpi) = 2
+* (MergedDigitDriver) x (LedMatrixMergedSerial | LedMatrixMergedSpi) = 2
+* Total: 1 + 2 + 2 = 5
 * classes
     * SplitDirectDigitDriver
         * LedMatrixSplitDirect
         * SplitDigitDriver
         * (Resistors on segments, transistor on digits, all pins direct to MCU)
-    * SplitDirectSegmentDriver
-        * LedMatrixSplitDirect
-        * SplitSegmentDriver
-        * (Resistors on digits, transitors on segments, all pins direct to MCU)
     * SplitSerialDigitDriver
         * LedMatrixSplitSerial
         * SplitDigitDriver

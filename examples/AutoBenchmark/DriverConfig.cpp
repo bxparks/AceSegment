@@ -27,8 +27,6 @@ SOFTWARE.
 
 static const char kLabelSplitDirectDigitDriverOption[] PROGMEM =
     "SplitDirectDigitDriver";
-static const char kLabelSplitDirectSegmentDriverOption[] PROGMEM =
-    "SplitDirectSegmentDriver";
 static const char kLabelSplitSerialDigitDriverOption[] PROGMEM =
     "SplitSerialDigitDriver";
 static const char kLabelSplitSpiDigitDriverOption[] PROGMEM =
@@ -47,7 +45,6 @@ static const char kLabelFastSpiDriverOption[] PROGMEM =
 // These must appear in the same order as DriverConfig::DriverOption enum.
 const char* DriverConfig::kDriverOptionLabels[] = {
   kLabelSplitDirectDigitDriverOption,
-  kLabelSplitDirectSegmentDriverOption,
   kLabelSplitSerialDigitDriverOption,
   kLabelSplitSpiDigitDriverOption,
   kLabelMergedSerialDigitDriverOption,
@@ -65,9 +62,6 @@ const DriverConfig DriverConfig::kDriverConfigs[] {
   {SplitDirectDigitDriverOption, NoModulation, UseStyles},
   {SplitDirectDigitDriverOption, UseModulation, NoStyles},
   {SplitDirectDigitDriverOption, UseModulation, UseStyles},
-
-  {SplitDirectSegmentDriverOption, NoModulation, NoStyles},
-  {SplitDirectSegmentDriverOption, NoModulation, UseStyles},
 
   {SplitSerialDigitDriverOption, NoModulation, NoStyles},
   {SplitSerialDigitDriverOption, NoModulation, UseStyles},

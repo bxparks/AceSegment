@@ -91,15 +91,6 @@ BenchmarkBundle::BenchmarkBundle(const DriverConfig* driverConfig) {
         kNumDigits, kNumSegments, numSubFields,
         kDigitPins, kSegmentDirectPins);
   } else if (driverConfig->mDriverOption
-      == DriverConfig::SplitDirectSegmentDriverOption) {
-    mDriver = new SplitDirectSegmentDriver(
-        mHardware, mDimmablePatterns,
-        true /* commonCathode */,
-        false /* transistorsOnDigits */,
-        false /* transistorsOnSegments */,
-        kNumDigits, kNumSegments,
-        kDigitPins, kSegmentDirectPins);
-  } else if (driverConfig->mDriverOption
       == DriverConfig::SplitSerialDigitDriverOption) {
     mDriver = new SplitSerialDigitDriver(
         mHardware, mDimmablePatterns,

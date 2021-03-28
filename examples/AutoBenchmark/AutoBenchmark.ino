@@ -95,7 +95,6 @@ void setupBenchmark(const DriverConfig* driverConfig) {
 // Loop for AutoBenchmark
 //------------------------------------------------------------------
 
-  //"SplitDirectSegmentDriverOption";
 static const char kBoundary[] PROGMEM =
     "-------------------------------|------------+--------+-------------+";
 static const char kHeader[] PROGMEM =

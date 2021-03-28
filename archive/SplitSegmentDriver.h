@@ -36,6 +36,10 @@ class DimmablePattern;
 /**
  * A Driver that assumes that the resistors are on the digits so the
  * multiplexing occurs by scanning through the segments.
+ *
+ * This was an interesting intellectual exercise, but multiplexing across the
+ * segments is not very useful. But it does increase code complexity so I have
+ * removed it from the main code base and archived it.
  */
 // TODO: use mNumSegments, instead of relying on kNumSegments
 class SplitSegmentDriver: public Driver {

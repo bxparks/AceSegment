@@ -32,7 +32,6 @@ SOFTWARE.
 #include "LedMatrixSplitSpi.h"
 #include "Driver.h"
 #include "SplitDigitDriver.h"
-#include "SplitSegmentDriver.h"
 #include "MergedDigitDriver.h"
 
 namespace ace_segment {
@@ -56,28 +55,6 @@ class SplitDirectDigitDriver:
             transistorsOnSegments, numDigits, numSegments, digitPins,
             segmentPins),
         SplitDigitDriver(this, dimmablePatterns, numDigits, numSubFields)
-    {}
-};
-
-/**
- * A driver that uses a GPIO pin to drive each digit and segment pins of
- * the LED display. The resistors are assumed to be on the digits and can be
- * driven at the same time, so the segments are multiplexed.
- */
-class SplitDirectSegmentDriver:
-    private LedMatrixSplitDirect,
-    public SplitSegmentDriver {
-
-  public:
-    SplitDirectSegmentDriver(Hardware* hardware,
-            DimmablePattern* dimmablePatterns, bool commonCathode,
-            bool transistorsOnDigits, bool transistorsOnSegments,
-            uint8_t numDigits, uint8_t numSegments,
-            const uint8_t* digitPins, const uint8_t* segmentPins):
-        LedMatrixSplitDirect(hardware, !commonCathode, transistorsOnSegments,
-            transistorsOnDigits, numSegments, numDigits, segmentPins,
-            digitPins),
-        SplitSegmentDriver(this, dimmablePatterns, numDigits)
     {}
 };
 

@@ -7,6 +7,10 @@
   #include "FastSpiDriver.h"
 #endif
 
+//------------------------------------------------------------------
+// Hardware configuration.
+//------------------------------------------------------------------
+
 #ifndef ENABLE_SERIAL_DEBUG
 #define ENABLE_SERIAL_DEBUG 0
 #endif
@@ -78,13 +82,12 @@ void setupAceButton() {
 #define DRIVER_MODE_NONE 0
 #define DRIVER_MODE_DIRECT_DIGIT 1
 #define DRIVER_MODE_DIRECT_FAST_DIGIT 2
-#define DRIVER_MODE_DIRECT_SEGMENT 3
-  #define DRIVER_MODE_SERIAL_DIGIT 4
-#define DRIVER_MODE_SERIAL_FAST_DIGIT 5
-#define DRIVER_MODE_SPI_DIGIT 6
-#define DRIVER_MODE_SPI_FAST_DIGIT 7
-#define DRIVER_MODE_MERGED_SERIAL_DIGIT 8
-#define DRIVER_MODE_MERGED_SPI_DIGIT 9
+#define DRIVER_MODE_SERIAL_DIGIT 3
+#define DRIVER_MODE_SERIAL_FAST_DIGIT 4
+#define DRIVER_MODE_SPI_DIGIT 5
+#define DRIVER_MODE_SPI_FAST_DIGIT 6
+#define DRIVER_MODE_MERGED_SERIAL_DIGIT 7
+#define DRIVER_MODE_MERGED_SPI_DIGIT 8
 
 // Use polling or interrupt.
 #define USE_INTERRUPT 0
@@ -117,7 +120,6 @@ const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
 const uint8_t NUM_SEGMENTS = 8;
 
 #if DRIVER_MODE == DRIVER_MODE_DIRECT_DIGIT || \
-    DRIVER_MODE == DRIVER_MODE_DIRECT_SEGMENT || \
     DRIVER_MODE == DRIVER_MODE_DIRECT_FAST_DIGIT
   // 4 digits, resistors on segments on Pro Micro.
   const uint8_t segmentPins[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
@@ -174,12 +176,6 @@ void setupAceSegment() {
       COMMON_CATHODE, USE_TRANSISTORS,
       false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
       NUM_SUBFIELDS, digitPins, latchPin, dataPin, clockPin);
-#elif DRIVER_MODE == DRIVER_MODE_DIRECT_SEGMENT
-  driver = new SplitDirectSegmentDriver(
-      hardware, dimmablePatterns, COMMON_CATHODE,
-      false /* transistorsOnDigits */,
-      USE_TRANSISTORS /* transistorsOnSegments */,
-      NUM_DIGITS, NUM_SEGMENTS, digitPins, segmentPins);
 #elif DRIVER_MODE == DRIVER_MODE_MERGED_SERIAL_DIGIT
   driver = new MergedSerialDigitDriver(
       hardware, dimmablePatterns,

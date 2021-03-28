@@ -30,7 +30,6 @@ SOFTWARE.
 struct DriverConfig {
   enum DriverOption {
     SplitDirectDigitDriverOption,
-    SplitDirectSegmentDriverOption,
     SplitSerialDigitDriverOption,
     SplitSpiDigitDriverOption,
     MergedSerialDigitDriverOption,

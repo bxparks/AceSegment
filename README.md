@@ -862,11 +862,6 @@ terms that we
   multiplexes through the digits. Each rendering of the digit is a *field* and
   for a 4-digit display, there are 4 fields per frame.
 
-  If the current limiting resistors are on the digits (not recommended unless
-  absolutely necessary given the constraints), then the `SegmentDriver`
-  multiplexes through the 8 segments (7 plus the decimal point). Each segment
-  will light across multiple digits, and there are 8 fields per frame.
-
 A *frame* rate of about 60Hz is recommended to eliminate obvious visual
 flickering. If the LED display has 4 digits, and we use "resistors on segments"
 configuration, then we need to have a *field* rate of 240Hz. We will see later
