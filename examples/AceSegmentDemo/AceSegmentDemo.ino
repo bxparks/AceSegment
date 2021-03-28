@@ -20,7 +20,14 @@ const uint8_t LOOP_MODE_AUTO_RENDER = 2;
 uint8_t loopMode = LOOP_MODE_AUTO_RENDER;
 
 // Configuration for AceButton, to support Single-Step
-const uint8_t BUTTON_PIN = 2; // change this to the button pin
+
+#if defined(AUNITER_LED_CLOCK)
+  const uint8_t MODE_BUTTON_PIN = 8;
+  const uint8_t CHANGE_BUTTON_PIN = 9;
+#else
+  #error Unknown AUNITER environment
+#endif
+
 AceButton button;
 
 void handleEvent(AceButton* /* button */, uint8_t eventType,
@@ -43,9 +50,9 @@ void handleEvent(AceButton* /* button */, uint8_t eventType,
 }
 
 void setupAceButton() {
-  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  pinMode(MODE_BUTTON_PIN, INPUT_PULLUP);
   button.setEventHandler(handleEvent);
-  button.init(BUTTON_PIN);
+  button.init(MODE_BUTTON_PIN);
   ButtonConfig* config = button.getButtonConfig();
   config->setFeature(ButtonConfig::kFeatureLongPress);
   config->setFeature(ButtonConfig::kFeatureSuppressAfterLongPress);
@@ -54,10 +61,6 @@ void setupAceButton() {
 //------------------------------------------------------------------
 // Configurations for AceSegment
 //------------------------------------------------------------------
-
-#define BOARD_TYPE_MINI 0
-#define BOARD_TYPE_MICRO 1
-#define BOARD_TYPE BOARD_TYPE_MICRO
 
 #define DRIVER_MODE_NONE 0
 #define DRIVER_MODE_DIRECT_DIGIT 1
@@ -89,7 +92,7 @@ void setupAceButton() {
 // consumption without any AceSegment code. Then set to the other modes to get
 // flash/static memory usage.
 //#define DRIVER_MODE DRIVER_MODE_MERGED_SPI_DIGIT
-#define DRIVER_MODE DRIVER_MODE_SPI_DIGIT
+#define DRIVER_MODE DRIVER_MODE_MERGED_SERIAL_DIGIT
 
 // Type of characters to write to the LED display
 #define WRITE_MODE WRITE_MODE_CLOCK
@@ -112,50 +115,41 @@ const uint8_t NUM_DIGITS = 4;
 const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
 
 const uint8_t NUM_SEGMENTS = 8;
+
 #if DRIVER_MODE == DRIVER_MODE_DIRECT_DIGIT || \
     DRIVER_MODE == DRIVER_MODE_DIRECT_SEGMENT || \
     DRIVER_MODE == DRIVER_MODE_DIRECT_FAST_DIGIT
-  // 4 digits, resistors on segments
-  const uint8_t segmentPins[NUM_SEGMENTS] = {8, 9, 10, 11, 12, 14, 15, 13};
+  // 4 digits, resistors on segments on Pro Micro.
+  const uint8_t segmentPins[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
 #else
-  #if BOARD_TYPE == BOARD_TYPE_MINI
-    // 4 digits, resistors on segments, serial-to-parallel converter on segments
-    const uint8_t latchPin = SS; // ST_CP on 74HC595
-    const uint8_t dataPin = MOSI; // DS on 74HC595
-    const uint8_t clockPin = SCK; // SH_CP on 74HC595
-  #elif BOARD_TYPE == BOARD_TYPE_MICRO
-    const uint8_t latchPin = 10; // ST_CP on 74HC595
-    const uint8_t dataPin = MOSI; // DS on 74HC595
-    const uint8_t clockPin = SCK; // SH_CP on 74HC595
-  #else
-    #error Unsupported BOARD_TYPE
-  #endif
+  const uint8_t latchPin = 10; // ST_CP on 74HC595
+  const uint8_t dataPin = MOSI; // DS on 74HC595
+  const uint8_t clockPin = SCK; // SH_CP on 74HC595
 #endif
 
 #if DRIVER_MODE > DRIVER_MODE_NONE
-// Set up the chain of resources and their dependencies.
-DimmablePattern dimmablePatterns[NUM_DIGITS];
-StyledPattern styledPatterns[NUM_DIGITS];
+  // Set up the chain of resources and their dependencies.
+  DimmablePattern dimmablePatterns[NUM_DIGITS];
+  StyledPattern styledPatterns[NUM_DIGITS];
 
-// The chain of resources.
-Hardware* hardware;
-Driver* driver;
-PulseStyler* pulseStyler;
-BlinkStyler* blinkStyler;
-StyleTable* styleTable;
-Renderer* renderer;
-CharWriter* charWriter;
-HexWriter* hexWriter;
-ClockWriter* clockWriter;
-StringWriter* stringWriter;
+  // The chain of resources.
+  Hardware* hardware;
+  Driver* driver;
+  PulseStyler* pulseStyler;
+  BlinkStyler* blinkStyler;
+  StyleTable* styleTable;
+  Renderer* renderer;
+  CharWriter* charWriter;
+  HexWriter* hexWriter;
+  ClockWriter* clockWriter;
+  StringWriter* stringWriter;
 
-#if USE_INTERRUPT == 1
-// interrupt handler for timer 2
-ISR(TIMER2_COMPA_vect) {
-  renderer->renderField();
-}
-#endif
-
+  #if USE_INTERRUPT == 1
+  // interrupt handler for timer 2
+  ISR(TIMER2_COMPA_vect) {
+    renderer->renderField();
+  }
+  #endif
 #endif
 
 #if DRIVER_MODE > DRIVER_MODE_NONE
@@ -193,13 +187,13 @@ void setupAceSegment() {
 #elif DRIVER_MODE == DRIVER_MODE_MERGED_SERIAL_DIGIT
   driver = new MergedSerialDigitDriver(
       hardware, dimmablePatterns,
-      !COMMON_CATHODE, USE_TRANSISTORS,
+      false /*commonCathode*/, USE_TRANSISTORS,
       false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
       NUM_SUBFIELDS, latchPin, dataPin, clockPin);
 #elif DRIVER_MODE == DRIVER_MODE_MERGED_SPI_DIGIT
   driver = new MergedSpiDigitDriver(
       hardware, dimmablePatterns,
-      !COMMON_CATHODE, USE_TRANSISTORS,
+      false /*commonCathode*/, USE_TRANSISTORS,
       false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
       NUM_SUBFIELDS, latchPin, dataPin, clockPin);
 #else
