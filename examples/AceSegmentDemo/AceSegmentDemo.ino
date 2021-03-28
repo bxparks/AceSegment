@@ -76,13 +76,6 @@ void setupAceButton() {
 #define DRIVER_MODE_MERGED_SERIAL_DIGIT 8
 #define DRIVER_MODE_MERGED_SPI_DIGIT 9
 
-#define WRITE_MODE_NONE 0
-#define WRITE_MODE_HEX 1
-#define WRITE_MODE_CHAR 2
-#define WRITE_MODE_STRING 3
-#define WRITE_MODE_SCROLL 4
-#define WRITE_MODE_CLOCK 5
-
 // Use polling or interrupt.
 #define USE_INTERRUPT 0
 
@@ -96,9 +89,6 @@ void setupAceButton() {
 // flash/static memory usage.
 //#define DRIVER_MODE DRIVER_MODE_MERGED_SPI_DIGIT
 #define DRIVER_MODE DRIVER_MODE_MERGED_SERIAL_DIGIT
-
-// Type of characters to write to the LED display
-#define WRITE_MODE WRITE_MODE_CLOCK
 
 // Transistors on the digits or segments which do NOT have the resistors.
 #define USE_TRANSISTORS true
@@ -215,16 +205,10 @@ void setupAceSegment() {
       NUM_DIGITS, FRAMES_PER_SECOND, STATS_RESET_INTERVAL);
   renderer->configure();
 
-#if WRITE_MODE == WRITE_MODE_HEX
   hexWriter = new HexWriter(renderer);
-#elif WRITE_MODE == WRITE_MODE_CHAR
-  charWriter = new CharWriter(renderer);
-#elif WRITE_MODE == WRITE_MODE_STRING || WRITE_MODE == WRITE_MODE_SCROLL
   charWriter = new CharWriter(renderer);
   stringWriter = new StringWriter(charWriter);
-#elif WRITE_MODE == WRITE_MODE_CLOCK
   clockWriter = new ClockWriter(renderer);
-#endif
 
 #if USE_INTERRUPT == 1
   // set up Timer 2
@@ -254,23 +238,33 @@ void singleStep() {
   renderer->renderField();
 }
 
-#if WRITE_MODE == WRITE_MODE_HEX
+const uint8_t DEMO_MODE_COUNT = 4;
+const uint8_t DEMO_MODE_HEX = 0;
+const uint8_t DEMO_MODE_CHAR = 1;
+const uint8_t DEMO_MODE_SCROLL = 2;
+const uint8_t DEMO_MODE_CLOCK = 3;
+
+// Demo mode.
+uint8_t demoMode = DEMO_MODE_CHAR;
+
 void writeHexes() {
   static uint8_t c = 0;
 
-  uint8_t buffer[3];
-  buffer[0] = (c & 0xf0) >> 4;
-  buffer[1] = (c & 0x0f);
-  hexWriter->writeHexAt(0, buffer[0]);
-  hexWriter->writeHexAt(1, buffer[1]);
+  uint8_t hexHigh = (c & 0xf0) >> 4;
+  uint8_t hexLow = (c & 0x0f);
+  hexWriter->writeHexAt(0, hexHigh);
+  hexWriter->writeHexAt(1, hexLow);
   hexWriter->writeHexAt(2, HexWriter::kMinus);
   hexWriter->writeHexAt(3, c);
 
-  Util::incrementMod(c, HexWriter::kNumCharacters);
+  if (c < HexWriter::kNumCharacters * 2) {
+    Util::incrementMod(c, HexWriter::kNumCharacters);
+  } else {
+    c = 0;
+    Util::incrementMod(demoMode, DEMO_MODE_COUNT);
+  }
 }
-#endif
 
-#if WRITE_MODE == WRITE_MODE_CLOCK
 void writeClock() {
   static uint8_t hh = 0;
   static uint8_t mm = 0;
@@ -278,29 +272,23 @@ void writeClock() {
   clockWriter->writeClock(hh, mm);
 
   Util::incrementMod(mm, (uint8_t)100);
-  if (mm == 0) {
-    Util::incrementMod(hh, (uint8_t)100);
-  }
+  Util::incrementMod(hh, (uint8_t)100);
 }
-#endif
 
-#if WRITE_MODE == WRITE_MODE_CHAR
 void writeChars() {
   static uint8_t c = 0;
 
-  char buffer[3];
-  buffer[0] = (c & 0xf0) >> 4;
-  buffer[1] = (c & 0x0f);
-  charWriter->writeCharAt(0, buffer[0]);
-  charWriter->writeCharAt(1, buffer[1]);
-  charWriter->writeCharAt(2, '-');
+  uint8_t hexHigh = (c & 0xf0) >> 4;
+  uint8_t hexLow = (c & 0x0f);
+  hexWriter->writeHexAt(0, hexHigh);
+  hexWriter->writeHexAt(1, hexLow);
+  charWriter->writeDecimalPointAt(1);
+  charWriter->writeCharAt(2, ' ');
   charWriter->writeCharAt(3, c);
 
   Util::incrementMod(c, CharWriter::kNumCharacters);
 }
-#endif
 
-#if WRITE_MODE == WRITE_MODE_STRING
 void writeStrings() {
   static const char* STRINGS[] = {
     /*
@@ -315,27 +303,24 @@ void writeStrings() {
   };
 
   static const uint8_t NUM_STRINGS = sizeof(STRINGS) / sizeof(STRINGS[0]);
-
   static uint8_t i = 0;
 
   stringWriter->writeStringAt(0, STRINGS[i]);
+
   Util::incrementMod(i, NUM_STRINGS);
 }
-#endif
-
-#if WRITE_MODE == WRITE_MODE_SCROLL
 
 void scrollString(const char* s) {
   static uint8_t i = 0;
 
   stringWriter->writeStringAt(0, &s[i], true /* padRight */);
-  Util::incrementMod(i, (uint8_t) strlen(s));
+  Util::Util::incrementMod(i, (uint8_t) strlen(s));
 }
 
-#endif
-
 void autoRender() {
+  static uint16_t iter = 0;
   static unsigned long lastUpdateTime = millis();
+
 #if PRINT_STATS == 1
   static unsigned long stopWatchStart = lastUpdateTime;
   static uint32_t loopCount = 0;
@@ -343,22 +328,26 @@ void autoRender() {
 #endif
 
   unsigned long now = millis();
-  if (now - lastUpdateTime > 1000) {
+  if (now - lastUpdateTime > 200) {
     lastUpdateTime = now;
+    if (iter == 0) {
+      Serial.print(F("Demo Mode: "));
+      Serial.println(demoMode);
+    }
 
-#if DRIVER_MODE > DRIVER_MODE_NONE
-  #if WRITE_MODE == WRITE_MODE_HEX
-    writeHexes();
-  #elif WRITE_MODE == WRITE_MODE_CHAR
-    writeChars();
-  #elif WRITE_MODE == WRITE_MODE_STRING
-    writeStrings();
-  #elif WRITE_MODE == WRITE_MODE_SCROLL
-    scrollString("   Angela is the best.");
-  #elif WRITE_MODE == WRITE_MODE_CLOCK
-    writeClock();
-  #endif
-#endif
+    if (demoMode == DEMO_MODE_HEX) {
+      writeHexes();
+    } else if (demoMode == DEMO_MODE_CHAR) {
+      writeChars();
+    } else if (demoMode == DEMO_MODE_SCROLL) {
+      scrollString("   Angela is the best.");
+    } else if (demoMode == DEMO_MODE_CLOCK) {
+      writeClock();
+    }
+    if (iter++ >= 100) {
+      Util::incrementMod(demoMode, DEMO_MODE_COUNT);
+      iter = 0;
+    }
   }
 
 #if PRINT_STATS == 1
