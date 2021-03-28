@@ -171,7 +171,7 @@ void setupAceSegment() {
       false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
       NUM_SUBFIELDS, digitPins, latchPin, dataPin, clockPin);
 #elif DRIVER_MODE == DRIVER_MODE_SPI_DIGIT
-  driver = new SplitSerialDigitDriver(
+  driver = new SplitSpiDigitDriver(
       hardware, dimmablePatterns,
       COMMON_CATHODE, USE_TRANSISTORS,
       false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
