@@ -40,7 +40,15 @@ class DimmablePattern;
 // TODO: use mNumSegments, instead of relying on kNumSegments
 class SplitSegmentDriver: public Driver {
   public:
-    /** Constructor. */
+    /**
+     * Constructor. Note that subfields cannot be supported by this class
+     * because the 'group' spans across multiple digit segments, so we cannot
+     * control the brightness of just a single digit.
+     *
+     * @param ledMatrix instance of LedMatrix that understanding the wiring
+     * @param dimmablePatterns array of digit patterns
+     * @param numDigits number of dimmablePatterns
+     */
     explicit SplitSegmentDriver(LedMatrixSplit* ledMatrix,
             DimmablePattern* dimmablePatterns, uint8_t numDigits):
         Driver(ledMatrix, dimmablePatterns, numDigits)

@@ -137,7 +137,7 @@ class Driver {
      * @param ledMatrix The ledMatrix can be null for a FakeDriver but normally
      * it is expected to be non-null.
      * @param dimmablePatterns An array of DimmablePattern objects that
-     * represents each digit.
+     *    represents each digit. This resource is provided by the caller
      * @param numDigits
      */
     explicit Driver(LedMatrix* ledMatrix, DimmablePattern* dimmablePatterns,

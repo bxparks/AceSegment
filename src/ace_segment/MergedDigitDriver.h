@@ -39,7 +39,15 @@ class DimmablePattern;
  */
 class MergedDigitDriver: public Driver {
   public:
-    /** Constructor. */
+    /**
+     * Constructor.
+     *
+     * @param ledMatrix instance of LedMatrix that understanding the wiring
+     * @param dimmablePatterns array of digit patterns
+     * @param numDigits number of dimmablePatterns
+     * @param numSubFields split a single frame into this many fields so that we
+     *   can control its apparent brightness
+     */
     explicit MergedDigitDriver(LedMatrixMerged* ledMatrix,
             DimmablePattern* dimmablePatterns, uint8_t numDigits,
             uint8_t numSubFields):

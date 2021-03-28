@@ -43,6 +43,10 @@ class LedMatrixMerged: public LedMatrix {
             transistorsOnElements, numGroups, numElements)
     {}
 
+    /**
+     * Write out the group and element patterns in a single 16-bit stream
+     * with the group bits in the MSB and the element bits in the LSB.
+     */
     virtual void draw(uint8_t groupPattern, uint8_t elementPattern) = 0;
 };
 
