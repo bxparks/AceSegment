@@ -22,13 +22,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_DIMMING_DIGIT_H
-#define ACE_SEGMENT_DIMMING_DIGIT_H
+#ifndef ACE_SEGMENT_DIMMABLE_PATTERN_H
+#define ACE_SEGMENT_DIMMABLE_PATTERN_H
 
 #include <stdint.h>
 
 namespace ace_segment {
 
+/**
+ * An 8-bit pattern corresponding to each LED segment, along with an 8-bit
+ * brightness factor that allows the brightness to be controlled on a per-digit
+ * (i.e. per-group) basis.
+ */
 class DimmablePattern {
   public:
     static const uint8_t kOff = 0;
