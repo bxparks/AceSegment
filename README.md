@@ -34,14 +34,11 @@ Here are the features supported by this framework:
     * `shiftOut()`
     * hardware SPI
 * transistors drivers to handle high currents
-* configurable and extensible bit pattern styles (e.g. blinking and pulsing)
 
 The framework splits the responsibility of displaying LED digits into two
 main parts:
 * The `Renderer` is the higher-level class that allows bit patterns of an LED
-  digit to be associated with a particular style (e.g. blinking or pulsing).
-    * The user can choose to use pre-defined styles, or
-    * the user can provide custom styles.
+  digit to be associated with a particular brightness.
 * The `Driver` knows how to display the bit patterns to a specific
   physical wiring of an LED display. Different versions of the `Driver`
   are provided to cover some of the basic wiring configurations:
@@ -168,13 +165,9 @@ depend on the lower-level classes:
   `DimmablePattern` to the seven segment leds. Different subclasses implement
   different types of wiring, but the user does not need to aware of the various
   subclasses. That complexity is managed by the `DriverBuilder` class.
-* `StyledPattern`: A class that represents the bit patterns digit which can have
-  certain style attributes (e.g. blinking, or pulsing). A `StyledPattern` is
-  converted into a `DimmablePattern` by the `Renderer`.
-* `Renderer`: A class that knows how to convert a `StyledPattern` into the
-  `DimmablePattern` that a `Driver` knows how to diplay. A `Renderer` also
-  knows how to modulate the brightness of a `DimmablePattern` to achieve
-  the style indicated by `StyledPattern`.
+* `Renderer`: A class that knows how to call the `Driver` to render the frames
+  and possible fields of the frame. A `Renderer` also knows how to modulate the
+  brightness of a `DimmablePattern`.
 * `HexWriter`: A class that print a hexadecimal numeral (0-F) to a bit pattern
   used by the `Renderer` class. Three additional characters are supported:
   `kSpace`, `kMinus` and `kPeriod`. (Note that decimal numerals are a subset of
@@ -241,7 +234,6 @@ const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
 const uint8_t segmentPins[8] = {8, 9, 10, 11, 12, 13, 14, 15};
 
 DimmablePattern dimmablePatterns[NUM_DIGITS];
-StyledPattern styledPatterns[NUM_DIGITS];
 
 // The chain of resources.
 Hardware* hardware;
@@ -274,7 +266,7 @@ void setup() {
   driver->configure();
 
   // Create and configure the Renderer.
-  renderer = RendererBuilder(hardware, driver, styledPatterns, NUM_DIGITS)
+  renderer = RendererBuilder(hardware, driver, dimmablePatterns, NUM_DIGITS)
       .setFramesPerSecond(FRAMES_PER_SECOND)
       ...
       .build();
@@ -760,62 +752,30 @@ Digits      | SPI    | Modulation | -          |
 ------------+--------+------------+------------|
 ```
 
-### Styles
-
-The `Renderer` is responsible for translating the bit `pattern` and a
-`style` code into a bit `pattern` and a `brightness`. An example of a
-`style` is a "blinking" style. If the blinking style is configured to blink
-every 800 milliseconds, the `Renderer` is responsible for turning on the bit
-patterns for 400 milliseconds, then turning off the bit patterns for 400
-millliseconds for a total blink duration of 800 milliseconds.
-
-The framework provides 2 pre-defined styles (blinking and pulsing), but the
-number of styles is limited only by imagination, so the `Renderer` allows
-end-users create custom style effects. The classes that implement styles are:
-* `Styler`: an interface class
-* `BlinkStyler`: implements the blinking style
-* `PulseStyler`: implements the pulsing style
-
-User-defined custom styles would subclass the `Styler` interface class.
-
-The `Renderer` contains a lookup table that associates a particular style code
-to an instance of a `Styler`.  The style code of `0` is reserved and means "no
-style". The maximum number of styles is defined by `Renderer::kNumStyles` and is
-currently `6`, which means five additional style codes (`1` to `5`) can be
-associated with any implementation of the `Styler` class. The association
-between a style code and a `Styler` is configurable by the end-user. The library
-does not pre-determine a particular style code, except for `style 0`.
-
 ### Configuring the Renderer
 
 The `Renderer` is dependent on the following resources, and these required
 parameters are given in the constructor of `RendererBuilder`:
 * `Hardware`
 * `Driver`
-* an array of `StyledPattern`
 
 The following optional parameters can be given to `RendererBuilder` to override
 the defaults. Each of these methods returns a reference to `*this` so they can
 be chained (see below):
 * `setFramesPerSecond(uint8_t framesPerSecond)` (default: 60)
 * `setStatsResetInterval(uint16_t fieldsPerStatsReset)` (default: 120)
-* `setStyle(uint8_t code, Styler* styler)`: call as many times as necessary
 
 The `build()` method creates an instance of `Renderer` with the given
 parameters. An example of configuring the `Renderer` is:
 ```
 const uint8_t NUM_DIGITS = 4;
-StyledPattern styledPatterns[NUM_DIGITS];
+DimmablePattern dimmablePatterns[NUM_DIGITS];
 
 const uint8_t FRAMES_PER_SECOND = 90;
 
 const uint16_t BLINK_DURATION_MILLIS = 800;
 const uint16_t PULSE_DURATION_MILLIS = 2000;
-const uint8_t BLINK_STYLE = 1;
-const uint8_t PULSE_STYLE = 2;
 
-PulseStyler* pulseStyler;
-BlinkStyler* blinkStyler;
 Renderer* renderer;
 
 void setup() {
@@ -823,13 +783,9 @@ void setup() {
   Hardware* hardware = ...;
   Driver* driver = ...;
 
-  blinkStyler = new BlinkStyler(FRAMES_PER_SECOND, BLINK_DURATION_MILLIS);
-  pulseStyler = new PulseStyler(FRAMES_PER_SECOND, PULSE_DURATION_MILLIS);
   renderer =
-      RendererBuilder(hardware, driver, styledPatterns, NUM_DIGITS)
+      RendererBuilder(hardware, driver, dimmablePatterns, NUM_DIGITS)
       .setFramesPerSecond(FRAMES_PER_SECOND)
-      .setStyler(BLINK_STYLE, blinkStyler)
-      .setStyler(PULSE_STYLE, pulseStyler)
       .build();
   renderer->configure();
   ...
@@ -842,12 +798,12 @@ void setup() {
 
 The `Renderer` contains a number of methods to write the bit patterns of
 the seven segment display:
-* `void writePatternAt(uint8_t digit, uint8_t pattern, uint8_t style)`
+* `void writePatternAt(uint8_t digit, uint8_t pattern, uint8_t brightness)`
 * `void writePatternAt(uint8_t digit, uint8_t pattern)`
-* `void writeStyleAt(uint8_t digit, uint8_t style)`
+* `void writeBrightnessAt(uint8_t digit, uint8_t brightness)`
 * `void writeDecimalPointAt(uint8_t digit, bool state = true)`
 
-The `digit` is the index into the `StyledPattern` array, from `0` to
+The `digit` is the index into the `DimmablePattern` array, from `0` to
 `NUM_DIGITS-1`. The `pattern` is an 8-bit integer which maps to the LED segments
 using the usual convention for a seven-segment LED ('a' is the least significant
 bit 0, decimal point 'dp' is the most seignificant bit 7):
@@ -866,19 +822,12 @@ Segment: dp g f e d c b a
 ```
 (Sometimes, the decimal point `dp` is labeled as an `h`).
 
-The `style` is an integer constant (0-5) associated with an instance of
-`Styler`. Style code `0` means "no style". The other codes can be assigned in
-the `RendererBuidler`.
+The `brightness` is an integer constant (0-255) associated with the digit.
 
 The `writeDecimalPointAt()` is a special method that sets the bit corresponding
 to the decimal point ('h', bit 7), no matter what previous pattern was there in
 initially. The `state` variable controls whether the decimal point should
 be turned on (default) or off (false).
-
-Some `Styler` classes need a `Driver` whose `Driver::isBrightnessSupported()`
-returns `true` to indicate that the driver supports brightness. If the `Driver`
-does not support brightness, the `Styler` should be written so that it does
-something reasonable, even if it means doing nothing.
 
 #### Global Brightness
 
@@ -934,12 +883,8 @@ how many fields there are in a frame and this information comes from the
 
 With the distinction between *frames* and *fields* explained, we can now explain
 how `Renderer::renderField()` works. The `Renderer` keeps an internal counter,
-and if the call occurs at a frame boundary, the `Renderer` calculates the
-`DimmablePattern` buffer in the `Driver` from the `StyledPattern` in the
-`Renderer`, and applies any changes to the digit bit patterns necessary to
-support the various digit styles (overall brightness, pulsing or blinking). Then
-the `Renderer` passes along the call to the `Driver` which will draw the
-resulting bit pattern on the LED display.
+and if the call occurs at a frame boundary, the `Renderer` calls to the `Driver`
+which will draw the resulting bit pattern on the LED display.
 
 If the call to `renderField()` occurs in the middle of a frame (i.e. in a
 field), then the `Renderer` simply passed along the call to the `Driver`, which
@@ -1032,8 +977,8 @@ table is stored in flash memory to conserve static memory.
 
 The class supports the following methods:
 * `void writeHexAt(uint8_t digit, uint8_t c)`
-* `void writeHexAt(uint8_t digit, uint8_t c, uint8_t style)`
-* `void writeStyleAt(uint8_t digit, uint8_t style)`
+* `void writeHexAt(uint8_t digit, uint8_t c, uint8_t brightness)`
+* `void writeBrightnessAt(uint8_t digit, uint8_t brightness)`
 * `void writeDecimalPointAt(uint8_t digit, bool state = true)`
 
 In addition to the numerals 0-15 (or 0x0-0xF), the class also supports these
@@ -1055,8 +1000,8 @@ The class supports the following methods:
 * `void writeBcdClock(uint8_t hh, uint8_t mm)` - Binary Coded Decimal
 * `void writeColon(bool state = true)`
 * `void writeCharAt(uint8_t digit, uint8_t c)`
-* `void writeCharAt(uint8_t digit, uint8_t c, uint8_t style)`
-* `void writeStyleAt(uint8_t digit, uint8_t style)`
+* `void writeCharAt(uint8_t digit, uint8_t c, uint8_t brightness)`
+* `void writeBrightnessAt(uint8_t digit, uint8_t brightness)`
 
 A `ClockWriter` consumes about (_TBD_) bytes of flash memory.
 
@@ -1072,8 +1017,8 @@ memory.
 
 The class supports the following methods:
 * `void writeCharAt(uint8_t digit, char c)`
-* `void writeCharAt(uint8_t digit, char c, uint8_t style)`
-* `void writeStyleAt(uint8_t digit, uint8_t style)`
+* `void writeCharAt(uint8_t digit, char c, uint8_t brightness)`
+* `void writeBrightnessAt(uint8_t digit, uint8_t brightness)`
 * `void writeDecimalPointAt(uint8_t digit, bool state = true)`
 
 A `CharWriter` consumes about 300 bytes of flash memory.
@@ -1109,13 +1054,13 @@ void scrollString(const char* s) {
 
 (TODO: Maybe move this code fragment into the StringWriter class. I'm not sure
 that we can push this down to the Renderer class because the Renderer not know
-how to translate a `char` into the bit patterns of `StyledPattern`. We could
-have the StringWriter present a complete array of translated `StyledPattern` to
+how to translate a `char` into the bit patterns of `DimmablePattern`. We could
+have the StringWriter present a complete array of translated `DimmablePattern` to
 the Renderer, but that seems like a waste of memory, since we don't need to
 precalcuate the bit pattern translation of the entire string. We only need to
 translate as many characters as will fit into the number of digits in the LED
 display. Also, it turns out the precalcuted strings won't really work, because
-the exact `StyledPattern` of the first digit depends on the scroll position. In
+the exact `DimmablePattern` of the first digit depends on the scroll position. In
 other words, a period '.' character will occupy an entire digit on the first LED
 digit, but will be collapsed into the previous character at other positions.)
 
@@ -1192,8 +1137,6 @@ Here are the sizes of the various classes on the 8-bit AVR microcontrollers
 * sizeof(SegmentDriver): 12
 * sizeof(DigitDriver): 16
 * sizeof(DriverBuilder): 19
-* sizeof(BlinkStyler): 7
-* sizeof(PulseStyler): 9
 * sizeof(Renderer): 54
 * sizeof(RendererBuilder): 22
 * sizeof(HexWriter): 2
@@ -1205,8 +1148,7 @@ Here are the sizes of the various classes on the 8-bit AVR microcontrollers
 
 For the most part, the user pays only for the feature that is being used. For
 example, if the `CharWriter` (which consumes 312 bytes of flash) is not used, it
-is not loaded into the program. Similarly, if the `BlinkStyler` is not used by
-the `Renderer`, that class is not loaded into the flash memory.
+is not loaded into the program.
 
 Here are the flash and static memory consumptions for various options.
 Tested on `examples/AceSegmentDemo`:

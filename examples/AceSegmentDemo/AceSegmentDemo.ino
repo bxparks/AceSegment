@@ -21,7 +21,10 @@ uint8_t loopMode = LOOP_MODE_AUTO_RENDER;
 
 // Configuration for AceButton, to support Single-Step
 
-#if defined(AUNITER_LED_CLOCK)
+#if defined(EPOXY_DUINO)
+  const uint8_t MODE_BUTTON_PIN = 8;
+  const uint8_t CHANGE_BUTTON_PIN = 9;
+#elif defined(AUNITER_LED_CLOCK)
   const uint8_t MODE_BUTTON_PIN = 8;
   const uint8_t CHANGE_BUTTON_PIN = 9;
 #else
@@ -108,9 +111,6 @@ const uint8_t NUM_SUBFIELDS = 1;
 
 const uint16_t STATS_RESET_INTERVAL = 1200;
 
-const uint8_t BLINK_STYLE = 1;
-const uint8_t PULSE_STYLE = 2;
-
 const uint8_t NUM_DIGITS = 4;
 const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
 
@@ -130,14 +130,10 @@ const uint8_t NUM_SEGMENTS = 8;
 #if DRIVER_MODE > DRIVER_MODE_NONE
   // Set up the chain of resources and their dependencies.
   DimmablePattern dimmablePatterns[NUM_DIGITS];
-  StyledPattern styledPatterns[NUM_DIGITS];
 
   // The chain of resources.
   Hardware* hardware;
   Driver* driver;
-  PulseStyler* pulseStyler;
-  BlinkStyler* blinkStyler;
-  StyleTable* styleTable;
   Renderer* renderer;
   CharWriter* charWriter;
   HexWriter* hexWriter;
@@ -215,14 +211,7 @@ void setupAceSegment() {
 
   driver->configure();
 
-  // Create the Renderer.
-  pulseStyler = new PulseStyler(FRAMES_PER_SECOND, 2000);
-  blinkStyler = new BlinkStyler(FRAMES_PER_SECOND, 800);
-  styleTable = new StyleTable();
-  styleTable->setStyler(BLINK_STYLE, blinkStyler);
-  styleTable->setStyler(PULSE_STYLE, pulseStyler);
-
-  renderer = new Renderer(hardware, driver, styledPatterns, styleTable,
+  renderer = new Renderer(hardware, driver, dimmablePatterns,
       NUM_DIGITS, FRAMES_PER_SECOND, STATS_RESET_INTERVAL);
   renderer->configure();
 
@@ -272,10 +261,10 @@ void writeHexes() {
   uint8_t buffer[3];
   buffer[0] = (c & 0xf0) >> 4;
   buffer[1] = (c & 0x0f);
-  hexWriter->writeHexAt(0, buffer[0], StyledPattern::kStyleNormal);
-  hexWriter->writeHexAt(1, buffer[1], PULSE_STYLE);
-  hexWriter->writeHexAt(2, HexWriter::kMinus, StyledPattern::kStyleNormal);
-  hexWriter->writeHexAt(3, c, BLINK_STYLE);
+  hexWriter->writeHexAt(0, buffer[0]);
+  hexWriter->writeHexAt(1, buffer[1]);
+  hexWriter->writeHexAt(2, HexWriter::kMinus);
+  hexWriter->writeHexAt(3, c);
 
   Util::incrementMod(c, HexWriter::kNumCharacters);
 }
@@ -302,10 +291,10 @@ void writeChars() {
   char buffer[3];
   buffer[0] = (c & 0xf0) >> 4;
   buffer[1] = (c & 0x0f);
-  charWriter->writeCharAt(0, buffer[0], StyledPattern::kStyleNormal);
-  charWriter->writeCharAt(1, buffer[1], PULSE_STYLE);
-  charWriter->writeCharAt(2, '-', StyledPattern::kStyleNormal);
-  charWriter->writeCharAt(3, c, BLINK_STYLE);
+  charWriter->writeCharAt(0, buffer[0]);
+  charWriter->writeCharAt(1, buffer[1]);
+  charWriter->writeCharAt(2, '-');
+  charWriter->writeCharAt(3, c);
 
   Util::incrementMod(c, CharWriter::kNumCharacters);
 }

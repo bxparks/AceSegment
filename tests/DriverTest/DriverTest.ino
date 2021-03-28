@@ -51,7 +51,6 @@ const uint8_t clockPin = 14;
 
 // create NUM_DIGITS+1 elements for doing array bound checking
 DimmablePattern dimmablePatterns[NUM_DIGITS + 1];
-StyledPattern styledPatterns[NUM_DIGITS + 1];
 
 // ----------------------------------------------------------------------
 // Tests for SplitDigitDriver w/ LedMatrixDirect

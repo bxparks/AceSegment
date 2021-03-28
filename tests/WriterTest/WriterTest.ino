@@ -29,11 +29,13 @@ SOFTWARE.
 #include <AUnit.h>
 #include <AceSegment.h>
 #include <ace_segment/testing/FakeRenderer.h>
-#include <ace_segment/testing/StubStyler.h>
 
 using namespace aunit;
 using namespace ace_segment;
 using namespace ace_segment::testing;
+
+const uint8_t CUSTOM_BRIGHTNESS = 64;
+const uint8_t DIFFERENT_BRIGHTNESS = 32;
 
 // ----------------------------------------------------------------------
 // Tests for BaseWriterTest.
@@ -42,46 +44,21 @@ using namespace ace_segment::testing;
 class BaseWriterTest: public TestOnce {
   protected:
     static const uint8_t NUM_DIGITS = 4;
-    static const uint8_t kStyleBlink = 1;
-    static const uint8_t kStylePulse = 2;
 
     void setup() override {
-      mBlinkStyler = new StubStyler();
-      mPulseStyler = new StubStyler();
-      mStyleTable = new StyleTable();
-      mStyleTable->setStyler(kStyleBlink, mBlinkStyler);
-      mStyleTable->setStyler(kStylePulse, mPulseStyler);
-
-      mRenderer = new FakeRenderer(mStyledPatterns, mStyleTable, NUM_DIGITS);
+      mRenderer = new FakeRenderer(mDimmablePatterns, NUM_DIGITS);
       mRenderer->configure();
-
-      clearStyledPatterns();
     }
 
     void teardown() override {
       delete mRenderer;
-      delete mStyleTable;
-      delete mPulseStyler;
-      delete mBlinkStyler;
     }
 
-    void clearStyledPatterns() {
-      for (int i = 0; i < NUM_DIGITS; i++) {
-        mStyledPatterns[i].pattern = 0;
-        mStyledPatterns[i].style = 0;
-      }
-    }
-
+  protected:
     FakeRenderer *mRenderer;
 
     // create NUM_DIGITS+1 elements for doing array bound checking
-    StyledPattern mStyledPatterns[NUM_DIGITS + 1];
-
-  private:
-    // Create a mapping of style code to Styler
-    Styler* mBlinkStyler;
-    Styler* mPulseStyler;
-    StyleTable* mStyleTable;
+    DimmablePattern mDimmablePatterns[NUM_DIGITS + 1];
 };
 
 // ----------------------------------------------------------------------
@@ -100,6 +77,7 @@ class CharWriterTest: public BaseWriterTest {
       BaseWriterTest::teardown();
     }
 
+  protected:
     CharWriter *mCharWriter;
 };
 
@@ -109,30 +87,31 @@ testF(CharWriterTest, getNumDigits) {
 
 testF(CharWriterTest, writeAt) {
   mCharWriter->writeCharAt(0, '0');
-  assertEqual(0b00111111, mStyledPatterns[0].pattern);
-  assertEqual(StyledPattern::kStyleNormal, mStyledPatterns[0].style);
+  assertEqual(0b00111111, mDimmablePatterns[0].pattern);
+  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[0].brightness);
 
-  mCharWriter->writeCharAt(1, '0', kStyleBlink);
-  assertEqual(0b00111111, mStyledPatterns[1].pattern);
-  assertEqual(kStyleBlink, mStyledPatterns[1].style);
+  mCharWriter->writeCharAt(1, '0', CUSTOM_BRIGHTNESS);
+  assertEqual(0b00111111, mDimmablePatterns[1].pattern);
+  assertEqual(CUSTOM_BRIGHTNESS, mDimmablePatterns[1].brightness);
 
-  mCharWriter->writeStyleAt(1, kStylePulse);
-  assertEqual(kStylePulse, mStyledPatterns[1].style);
+  mCharWriter->writeBrightnessAt(1, DIFFERENT_BRIGHTNESS);
+  assertEqual(DIFFERENT_BRIGHTNESS, mDimmablePatterns[1].brightness);
 
   mCharWriter->writeDecimalPointAt(1);
-  assertEqual(0b00111111 | 0x80, mStyledPatterns[1].pattern);
+  assertEqual(0b00111111 | 0x80, mDimmablePatterns[1].pattern);
 
   mCharWriter->writeDecimalPointAt(1, false);
-  assertEqual(0b00111111, mStyledPatterns[1].pattern);
+  assertEqual(0b00111111, mDimmablePatterns[1].pattern);
 }
 
 testF(CharWriterTest, writeAt_outOfBounds) {
-  mStyledPatterns[4].pattern = 0;
-  mStyledPatterns[4].style = StyledPattern::kStyleNormal;
-  mCharWriter->writeCharAt(4, 'a', kStyleBlink);
+  mDimmablePatterns[4].pattern = 0;
+  mDimmablePatterns[4].brightness = CUSTOM_BRIGHTNESS;
+
+  mCharWriter->writeCharAt(4, 'a', DIFFERENT_BRIGHTNESS);
   mCharWriter->writeDecimalPointAt(4);
-  assertEqual(0, mStyledPatterns[4].pattern);
-  assertEqual(StyledPattern::kStyleNormal, mStyledPatterns[4].style);
+  assertEqual(0, mDimmablePatterns[4].pattern);
+  assertEqual(CUSTOM_BRIGHTNESS, mDimmablePatterns[4].brightness);
 }
 
 // ----------------------------------------------------------------------
@@ -153,15 +132,15 @@ class StringWriterTest: public BaseWriterTest {
       BaseWriterTest::teardown();
     }
 
-    void assertStyledPatternsEqual(int n, ...) {
+    void assertDimmablePatternsEqual(int n, ...) {
       va_list args;
       va_start(args, n);
       for (int i = 0; i < n; i++) {
         uint8_t pattern = va_arg(args, int);
-        uint8_t style = va_arg(args, int);
-        const StyledPattern& styledPattern = mStyledPatterns[i];
-        assertEqual(pattern, styledPattern.pattern);
-        assertEqual(style, styledPattern.style);
+        uint8_t brightness = va_arg(args, int);
+        const DimmablePattern& dimmablePattern = mDimmablePatterns[i];
+        assertEqual(pattern, dimmablePattern.pattern);
+        assertEqual(brightness, dimmablePattern.brightness);
       }
       va_end(args);
     }
@@ -173,12 +152,14 @@ class StringWriterTest: public BaseWriterTest {
 testF(StringWriterTest, writeStringAt) {
   mStringWriter->writeStringAt(0, ".1.2.3");
 
-  // Should ge (".", "1.", "2.", "3") as the 4 digits
-  assertStyledPatternsEqual(4,
-    0b10000000, StyledPattern::kStyleNormal,
-    0b00000110 | 0x80, StyledPattern::kStyleNormal,
-    0b01011011 | 0x80, StyledPattern::kStyleNormal,
-    0b01001111, StyledPattern::kStyleNormal);
+  // Should be (".", "1.", "2.", "3") as the 4 digits
+  assertDimmablePatternsEqual(
+    4,
+    0b10000000, Renderer::kDefaultBrightness,
+    0b00000110 | 0x80, Renderer::kDefaultBrightness,
+    0b01011011 | 0x80, Renderer::kDefaultBrightness,
+    0b01001111, Renderer::kDefaultBrightness
+  );
 }
 
 // ----------------------------------------------------------------------
@@ -206,30 +187,31 @@ testF(HexWriterTest, getNumDigits) {
 
 testF(HexWriterTest, writeAt) {
   mHexWriter->writeHexAt(0, 0);
-  assertEqual(0b00111111, mStyledPatterns[0].pattern);
-  assertEqual(StyledPattern::kStyleNormal, mStyledPatterns[0].style);
+  assertEqual(0b00111111, mDimmablePatterns[0].pattern);
+  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[0].brightness);
 
-  mHexWriter->writeHexAt(1, 0, kStyleBlink);
-  assertEqual(0b00111111, mStyledPatterns[1].pattern);
-  assertEqual(kStyleBlink, mStyledPatterns[1].style);
+  mHexWriter->writeHexAt(1, 0, CUSTOM_BRIGHTNESS);
+  assertEqual(0b00111111, mDimmablePatterns[1].pattern);
+  assertEqual(CUSTOM_BRIGHTNESS, mDimmablePatterns[1].brightness);
 
-  mHexWriter->writeStyleAt(1, kStylePulse);
-  assertEqual(kStylePulse, mStyledPatterns[1].style);
+  mHexWriter->writeBrightnessAt(1, DIFFERENT_BRIGHTNESS);
+  assertEqual(DIFFERENT_BRIGHTNESS, mDimmablePatterns[1].brightness);
 
   mHexWriter->writeDecimalPointAt(1);
-  assertEqual(0b00111111 | 0x80, mStyledPatterns[1].pattern);
+  assertEqual(0b00111111 | 0x80, mDimmablePatterns[1].pattern);
 
   mHexWriter->writeDecimalPointAt(1, false);
-  assertEqual(0b00111111, mStyledPatterns[1].pattern);
+  assertEqual(0b00111111, mDimmablePatterns[1].pattern);
 }
 
 testF(HexWriterTest, writeAt_outOfBounds) {
-  mStyledPatterns[4].pattern = 0;
-  mStyledPatterns[4].style = StyledPattern::kStyleNormal;
-  mHexWriter->writeHexAt(4, HexWriter::kMinus, kStyleBlink);
+  mDimmablePatterns[4].pattern = 0;
+  mDimmablePatterns[4].brightness = CUSTOM_BRIGHTNESS;
+
+  mHexWriter->writeHexAt(4, HexWriter::kMinus, DIFFERENT_BRIGHTNESS);
   mHexWriter->writeDecimalPointAt(4);
-  assertEqual(0, mStyledPatterns[4].pattern);
-  assertEqual(StyledPattern::kStyleNormal, mStyledPatterns[4].style);
+  assertEqual(0, mDimmablePatterns[4].pattern);
+  assertEqual(CUSTOM_BRIGHTNESS, mDimmablePatterns[4].brightness);
 }
 
 // ----------------------------------------------------------------------
@@ -260,75 +242,75 @@ testF(ClockWriterTest, toBcd) {
 
 testF(ClockWriterTest, writeCharAt) {
   mClockWriter->writeCharAt(0, ClockWriter::kP);
-  assertEqual(0b01110011, mStyledPatterns[0].pattern);
-  assertEqual(StyledPattern::kStyleNormal, mStyledPatterns[0].style);
+  assertEqual(0b01110011, mDimmablePatterns[0].pattern);
+  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[0].brightness);
 
-  mClockWriter->writeCharAt(1, ClockWriter::kP, kStyleBlink);
-  assertEqual(0b01110011, mStyledPatterns[1].pattern);
-  assertEqual(kStyleBlink, mStyledPatterns[1].style);
+  mClockWriter->writeCharAt(1, ClockWriter::kP, CUSTOM_BRIGHTNESS);
+  assertEqual(0b01110011, mDimmablePatterns[1].pattern);
+  assertEqual(CUSTOM_BRIGHTNESS, mDimmablePatterns[1].brightness);
 
-  mClockWriter->writeStyleAt(1, kStylePulse);
-  assertEqual(kStylePulse, mStyledPatterns[1].style);
+  mClockWriter->writeBrightnessAt(1, DIFFERENT_BRIGHTNESS);
+  assertEqual(DIFFERENT_BRIGHTNESS, mDimmablePatterns[1].brightness);
 }
 
 testF(ClockWriterTest, writeBcdAt) {
   mClockWriter->writeBcdAt(0, 0x12);
-  assertEqual(0b00000110, mStyledPatterns[0].pattern);
-  assertEqual(0b01011011, mStyledPatterns[1].pattern);
-  assertEqual(StyledPattern::kStyleNormal, mStyledPatterns[0].style);
-  assertEqual(StyledPattern::kStyleNormal, mStyledPatterns[1].style);
+  assertEqual(0b00000110, mDimmablePatterns[0].pattern);
+  assertEqual(0b01011011, mDimmablePatterns[1].pattern);
+  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[0].brightness);
+  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[1].brightness);
 
   mClockWriter->writeBcdAt(2, 0xAF);
-  assertEqual(0x0, mStyledPatterns[2].pattern);
-  assertEqual(0x0, mStyledPatterns[3].pattern);
-  assertEqual(StyledPattern::kStyleNormal, mStyledPatterns[2].style);
-  assertEqual(StyledPattern::kStyleNormal, mStyledPatterns[3].style);
+  assertEqual(0x0, mDimmablePatterns[2].pattern);
+  assertEqual(0x0, mDimmablePatterns[3].pattern);
+  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[2].brightness);
+  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[3].brightness);
 }
 
 testF(ClockWriterTest, writeDecimalAt) {
   mClockWriter->writeDecimalAt(0, 12);
-  assertEqual(0b00000110, mStyledPatterns[0].pattern);
-  assertEqual(0b01011011, mStyledPatterns[1].pattern);
-  assertEqual(StyledPattern::kStyleNormal, mStyledPatterns[0].style);
-  assertEqual(StyledPattern::kStyleNormal, mStyledPatterns[1].style);
+  assertEqual(0b00000110, mDimmablePatterns[0].pattern);
+  assertEqual(0b01011011, mDimmablePatterns[1].pattern);
+  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[0].brightness);
+  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[1].brightness);
 
   mClockWriter->writeDecimalAt(2, 100);
-  assertEqual(0x0, mStyledPatterns[2].pattern);
-  assertEqual(0x0, mStyledPatterns[3].pattern);
-  assertEqual(StyledPattern::kStyleNormal, mStyledPatterns[2].style);
-  assertEqual(StyledPattern::kStyleNormal, mStyledPatterns[3].style);
+  assertEqual(0x0, mDimmablePatterns[2].pattern);
+  assertEqual(0x0, mDimmablePatterns[3].pattern);
+  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[2].brightness);
+  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[3].brightness);
 }
 
 testF(ClockWriterTest, writeBcdClock) {
   mClockWriter->writeBcdClock(0x12, 0x30);
-  assertEqual(0b00000110, mStyledPatterns[0].pattern);
-  assertEqual(StyledPattern::kStyleNormal, mStyledPatterns[0].style);
-  assertEqual(0b01011011 | 0x80, mStyledPatterns[1].pattern);
-  assertEqual(StyledPattern::kStyleNormal, mStyledPatterns[1].style);
-  assertEqual(0b01001111, mStyledPatterns[2].pattern);
-  assertEqual(StyledPattern::kStyleNormal, mStyledPatterns[2].style);
-  assertEqual(0b00111111, mStyledPatterns[3].pattern);
-  assertEqual(StyledPattern::kStyleNormal, mStyledPatterns[3].style);
+  assertEqual(0b00000110, mDimmablePatterns[0].pattern);
+  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[0].brightness);
+  assertEqual(0b01011011 | 0x80, mDimmablePatterns[1].pattern);
+  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[1].brightness);
+  assertEqual(0b01001111, mDimmablePatterns[2].pattern);
+  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[2].brightness);
+  assertEqual(0b00111111, mDimmablePatterns[3].pattern);
+  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[3].brightness);
 }
 
 testF(ClockWriterTest, writeClock) {
   mClockWriter->writeClock(12, 30);
-  assertEqual(0b00000110, mStyledPatterns[0].pattern);
-  assertEqual(StyledPattern::kStyleNormal, mStyledPatterns[0].style);
-  assertEqual(0b01011011 | 0x80, mStyledPatterns[1].pattern);
-  assertEqual(StyledPattern::kStyleNormal, mStyledPatterns[1].style);
-  assertEqual(0b01001111, mStyledPatterns[2].pattern);
-  assertEqual(StyledPattern::kStyleNormal, mStyledPatterns[2].style);
-  assertEqual(0b00111111, mStyledPatterns[3].pattern);
-  assertEqual(StyledPattern::kStyleNormal, mStyledPatterns[3].style);
+  assertEqual(0b00000110, mDimmablePatterns[0].pattern);
+  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[0].brightness);
+  assertEqual(0b01011011 | 0x80, mDimmablePatterns[1].pattern);
+  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[1].brightness);
+  assertEqual(0b01001111, mDimmablePatterns[2].pattern);
+  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[2].brightness);
+  assertEqual(0b00111111, mDimmablePatterns[3].pattern);
+  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[3].brightness);
 }
 
 testF(ClockWriterTest, writeColon) {
   mClockWriter->writeClock(12, 30); // colon on by default
-  assertEqual(0b01011011 | 0x80, mStyledPatterns[1].pattern);
+  assertEqual(0b01011011 | 0x80, mDimmablePatterns[1].pattern);
 
   mClockWriter->writeColon(false); // turns it off
-  assertEqual(0b01011011, mStyledPatterns[1].pattern);
+  assertEqual(0b01011011, mDimmablePatterns[1].pattern);
 }
 
 //-----------------------------------------------------------------------------

@@ -30,8 +30,6 @@ SOFTWARE.
 
 namespace ace_segment {
 
-class StyledPattern;
-
 namespace testing {
 
 /**
@@ -39,12 +37,14 @@ namespace testing {
  */
 class FakeRenderer: public Renderer {
   public:
-    FakeRenderer(StyledPattern* styledPatterns, StyleTable* styleTable,
-            uint8_t numDigits):
-        Renderer(nullptr /* hardware */, nullptr /* driver */,
-            styledPatterns, styleTable, numDigits,
-            60 /* framesPerSecond */,
-            1200 /* statsResetInterval */)
+    FakeRenderer(DimmablePattern* dimmablePatterns, uint8_t numDigits)
+      : Renderer(
+          nullptr /* hardware */,
+          nullptr /* driver */,
+          dimmablePatterns,
+          numDigits,
+          60 /* framesPerSecond */,
+          1200 /* statsResetInterval */)
     {}
 
     /** A stub implementation to prevent dependency on Hardware and Driver. */

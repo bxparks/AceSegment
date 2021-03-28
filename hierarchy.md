@@ -113,43 +113,26 @@ and `Driver` class. The number of combinations are:
 
 ## Renderer
 
-Translates `StyledPatter` (bit patterns with style meta information) into
-appropriate calls into `Driver` class. Style data is an index into `StyleTable`.
+Writes the `DimmablePattern` into the into the `Driver` class.
 
-* StyleTable
-    * array of `Styler` objects
-    * index 0 is the no-op styler
 * `updateFrame()`
-    * -> `renderStyledPattern()`
-        * -> `styler->apply()`
-        * -> `mDriver->setPattern(digit, pattern, brightness)`
-* `writePatternAt(digit, pattern, style)`
-* `writeStyleAt(digit, style)`
+    * -> `mDriver->setPattern(digit, pattern, brightness)`
+* deposes each frame into multiple fields, and calls the Driver for each field
+    * `renderFieldWhenReady()` - render by polling
+    * `renderField()` - render immediately, called from ISR
+* `writePatternAt(digit, pattern, brightness)`
+* `writeBrightnessAt(digit, brightness)`
 * `writeDecimalPointAt(digit, state)`
-* `renderFieldWhenReady()` - render by polling
-* `renderField()` - render immediately, called from ISR
-
-## Stylers
-
-* Styler
-    * `calcForFrame()`
-    * `apply(uint8_t* pattern, uint8_t* brightness)` - update brightness
-    * `bool requiresBrigthness()`
-* subclasses
-    * PulseStyler
-        * pulsate the digit
-    * BlinkStyler
-        * blink the digit
 
 ## Writers
 
 * `HexWriter(Renderer*)`
     * `writeHexAt()`
-    * `writeStyleAt()`
+    * `writeBrightnessAt()`
     * `writeDecimalPointAt()`
 * `CharWriter(Renderer*)`
     * `writeCharAt()`
-    * `writeStyleAt()`
+    * `writeBrightnessAt()`
     * `writeDecimalPointAt()`
 * `StringWriter(Renderer*)`
     * `writeStringAt()`

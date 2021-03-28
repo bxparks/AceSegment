@@ -202,12 +202,6 @@ void setup() {
   Serial.println(sizeof(SplitSegmentDriver));
   Serial.print(F("sizeof(SplitDigitDriver): "));
   Serial.println(sizeof(SplitDigitDriver));
-  Serial.print(F("sizeof(BlinkStyler): "));
-  Serial.println(sizeof(BlinkStyler));
-  Serial.print(F("sizeof(PulseStyler): "));
-  Serial.println(sizeof(PulseStyler));
-  Serial.print(F("sizeof(StyleTable): "));
-  Serial.println(sizeof(StyleTable));
   Serial.print(F("sizeof(Renderer): "));
   Serial.println(sizeof(Renderer));
   Serial.print(F("sizeof(HexWriter): "));

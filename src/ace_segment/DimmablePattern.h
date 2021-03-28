@@ -44,6 +44,14 @@ class DimmablePattern {
       brightness(kOn)
     {}
 
+    void setDecimalPoint() {
+      pattern |= 0x80;
+    }
+
+    void clearDecimalPoint() {
+      pattern &= ~0x80;
+    }
+
     uint8_t pattern; // segment bit pattern of the digit
     uint8_t brightness; // units of 1/256
 };

@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 #include <Arduino.h>
-#include "StyledPattern.h"
+#include "DimmablePattern.h"
 #include "ClockWriter.h"
 
 namespace ace_segment {
@@ -70,12 +70,12 @@ const uint8_t ClockWriter::kCharacterArray[] PROGMEM = {
 const uint8_t ClockWriter::kNumCharacters =
     sizeof(kCharacterArray)/sizeof(kCharacterArray[0]);
 
-void ClockWriter::writeCharAt(uint8_t digit, uint8_t c, uint8_t style) {
+void ClockWriter::writeCharAt(uint8_t digit, uint8_t c, uint8_t brightness) {
   if (digit >= getNumDigits()) return;
   uint8_t pattern = ((uint8_t) c < kNumCharacters)
       ? pgm_read_byte(&kCharacterArray[(uint8_t) c])
       : kSpace;
-  mRenderer->writePatternAt(digit, pattern, style);
+  mRenderer->writePatternAt(digit, pattern, brightness);
 }
 
 void ClockWriter::writeCharAt(uint8_t digit, uint8_t c) {

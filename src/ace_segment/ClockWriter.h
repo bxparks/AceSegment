@@ -26,7 +26,7 @@ SOFTWARE.
 #define ACE_SEGMENT_CLOCK_WRITER_H
 
 #include <stdint.h>
-#include "StyledPattern.h"
+#include "DimmablePattern.h"
 #include "Renderer.h"
 
 namespace ace_segment {
@@ -78,15 +78,17 @@ class ClockWriter {
     void writeCharAt(uint8_t digit, uint8_t c);
 
     /**
-     * Write the character at the specified position with the given style.
+     * Write the character at the specified position with the given brightness.
      * If the character is undefined, write a space character instead.
      */
-    void writeCharAt(uint8_t digit, uint8_t c, uint8_t style);
+    void writeCharAt(uint8_t digit, uint8_t c, uint8_t brightness);
 
-    /** Write the style for a given digit, leaving the character unchanged. */
-    void writeStyleAt(uint8_t digit, uint8_t style) {
+    /**
+     * Write the brightness for a given digit, leaving the character unchanged.
+     */
+    void writeBrightnessAt(uint8_t digit, uint8_t brightness) {
       if (digit >= getNumDigits()) return;
-      mRenderer->writeStyleAt(digit, style);
+      mRenderer->writeBrightnessAt(digit, brightness);
     }
 
     /**

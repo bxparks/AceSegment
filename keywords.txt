@@ -11,11 +11,6 @@ Hardware	KEYWORD1
 LedMatrix	KEYWORD1
 DimmablePattern	KEYWORD1
 Driver	KEYWORD1
-Styler	KEYWORD1
-BlinkStyler	KEYWORD1
-PulseStyler	KEYWORD1
-StyleTable	KEYWORD1
-StyledPattern	KEYWORD1
 Renderer	KEYWORD1
 HexWriter	KEYWORD1
 ClockWriter	KEYWORD1
@@ -66,11 +61,6 @@ isBrightnessSupported	KEYWORD2
 setPattern	KEYWORD2
 setBrightness	KEYWORD2
 
-# Styler.h
-calcForFrame	KEYWORD2
-apply	KEYWORD2
-requiresBrightness	KEYWORD2
-
 # Renderer.h
 configure	KEYWORD2
 getNumDigits	KEYWORD2
@@ -78,17 +68,16 @@ getFramesPerSecond	KEYWORD2
 getFieldsPerSecond	KEYWORD2
 writeBrightness	KEYWORD2
 writePatternAt	KEYWORD2
-writeStyleAt	KEYWORD2
+writeBrightnessAt	KEYWORD2
 writeDecimalPointAt	KEYWORD2
 renderField	KEYWORD2
 renderFieldWhenReady	KEYWORD2
 getTimingStats	KEYWORD2
-getStyledDigit	KEYWORD2
 
 # HexWriter.h
 getNumDigits	KEYWORD2
 writeHexAt	KEYWORD2
-writeStyleAt	KEYWORD2
+writeBrightnessAt	KEYWORD2
 writeDecimalPointAt	KEYWORD2
 
 # ClockWriter.h
@@ -101,15 +90,11 @@ writeColon	KEYWORD2
 # CharWriter.h
 getNumDigits	KEYWORD2
 writeCharAt	KEYWORD2
-writeStyleAt	KEYWORD2
+writeBrightnessAt	KEYWORD2
 writeDecimalPointAt	KEYWORD2
 
 # StringWriter.
 writeStringAt	KEYWORD2
-
-# StyleTable.h
-setStyler	KEYWORD2
-getStyler	KEYWORD2
 
 #######################################
 # Instances (KEYWORD2)
@@ -122,12 +107,6 @@ getStyler	KEYWORD2
 # DimmablePattern.h
 kOff	LITERAL1
 kOn	LITERAL1
-
-# StyledPattern.h
-kStyleNormal	LITERAL1
-
-# StyleTable.h
-kNumStyles	LITERAL1
 
 # HexWriter.h
 kNumCharacters	LITERAL1

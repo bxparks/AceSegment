@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 #include <Arduino.h>
-#include "StyledPattern.h"
+#include "DimmablePattern.h"
 #include "CharWriter.h"
 
 namespace ace_segment {
@@ -177,12 +177,12 @@ const uint8_t CharWriter::kCharacterArray[] PROGMEM = {
      UNKNOWN, /* (del) */
 };
 
-void CharWriter::writeCharAt(uint8_t digit, char c, uint8_t style) {
+void CharWriter::writeCharAt(uint8_t digit, char c, uint8_t brightness) {
   if (digit >= getNumDigits()) return;
   uint8_t pattern = ((uint8_t) c < kNumCharacters)
       ? pgm_read_byte(&kCharacterArray[(uint8_t) c])
       : UNKNOWN;
-  mRenderer->writePatternAt(digit, pattern, style);
+  mRenderer->writePatternAt(digit, pattern, brightness);
 }
 
 void CharWriter::writeCharAt(uint8_t digit, char c) {

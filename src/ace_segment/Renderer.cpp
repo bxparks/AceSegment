@@ -24,10 +24,8 @@ SOFTWARE.
 
 #include <Arduino.h>
 #include "Util.h"
-#include "StyledPattern.h"
+#include "DimmablePattern.h"
 #include "Hardware.h"
-#include "Styler.h"
-#include "StyleTable.h"
 #include "Renderer.h"
 
 namespace ace_segment {
@@ -48,59 +46,42 @@ void Renderer::configure() {
 
   // Reset statistics
   mStats.reset();
-
-  // Reset the active styles.
-  memset(mActiveStyles, 0, StyleTable::kNumStyles * sizeof(uint8_t));
-  mActiveStyles[0] = mNumDigits;
-}
-
-void Renderer::writePatternAt(uint8_t digit, uint8_t pattern, uint8_t style) {
-  if (digit >= mNumDigits) return;
-  if (style >= StyleTable::kNumStyles) return;
-  // style 0 is always allowed
-  if (style > 0 && mStyleTable != nullptr
-      && mStyleTable->getStyler(style) == nullptr) return;
-
-  StyledPattern& styledPattern = mStyledPatterns[digit];
-  styledPattern.pattern = pattern;
-
-  mActiveStyles[styledPattern.style]--;
-  mActiveStyles[style]++;
-  styledPattern.style = style;
 }
 
 void Renderer::writePatternAt(uint8_t digit, uint8_t pattern) {
   if (digit >= mNumDigits) return;
-  StyledPattern& styledPattern = mStyledPatterns[digit];
-  styledPattern.pattern = pattern;
+  DimmablePattern& dimmablePattern = mDimmablePatterns[digit];
+  dimmablePattern.pattern = pattern;
+  dimmablePattern.brightness = mBrightness;
 }
 
-void Renderer::writeStyleAt(uint8_t digit, uint8_t style) {
+void Renderer::writePatternAt(
+    uint8_t digit, uint8_t pattern, uint8_t brightness) {
   if (digit >= mNumDigits) return;
-  if (style >= StyleTable::kNumStyles) return;
-  // style 0 is always allowed
-  if (style > 0 && mStyleTable != nullptr
-      && mStyleTable->getStyler(style) == nullptr) return;
+  DimmablePattern& dimmablePattern = mDimmablePatterns[digit];
+  dimmablePattern.pattern = pattern;
+  dimmablePattern.brightness = brightness;
+}
 
-  StyledPattern& styledPattern = mStyledPatterns[digit];
-
-  mActiveStyles[styledPattern.style]--;
-  mActiveStyles[style]++;
-  styledPattern.style = style;
+void Renderer::writeBrightnessAt(uint8_t digit, uint8_t brightness) {
+  if (digit >= mNumDigits) return;
+  DimmablePattern& dimmablePattern = mDimmablePatterns[digit];
+  dimmablePattern.brightness = brightness;
 }
 
 void Renderer::writeDecimalPointAt(uint8_t digit, bool state) {
   if (digit >= mNumDigits) return;
-  StyledPattern& styledPattern = mStyledPatterns[digit];
+  DimmablePattern& dimmablePattern = mDimmablePatterns[digit];
   if (state) {
-    styledPattern.setDecimalPoint();
+    dimmablePattern.setDecimalPoint();
   } else {
-    styledPattern.clearDecimalPoint();
+    dimmablePattern.clearDecimalPoint();
   }
 }
 void Renderer::clear() {
   for (uint8_t i = 0; i < mNumDigits; i++) {
-    mStyledPatterns[i].pattern = 0;
+    mDimmablePatterns[i].pattern = 0;
+    mDimmablePatterns[i].brightness = 0;
   }
 }
 
@@ -129,32 +110,16 @@ void Renderer::renderField() {
 }
 
 void Renderer::updateFrame() {
-  updateStylers();
-  renderStyledPatterns();
+  for (uint8_t digit = 0; digit < mNumDigits; digit++) {
+    DimmablePattern& dimmablePattern = mDimmablePatterns[digit];
+    mDriver->setPattern(
+      digit, dimmablePattern.pattern, dimmablePattern.brightness);
+  }
+
   if (mStatsResetInterval > 0 &&
       mStats.getCount() >= mStatsResetInterval) {
     mStats.reset();
   }
-}
-
-void Renderer::updateStylers() {
-  if (mStyleTable == nullptr) return;
-
-  // Style 0 is the no-op style that does nothing.
-  for (uint8_t style = 1; style < StyleTable::kNumStyles; style++) {
-    if (mActiveStyles[style] > 0) {
-      Styler* styler = mStyleTable->getStyler(style);
-      if (isStylerSupported(styler)) {
-        styler->calcForFrame();
-      }
-    }
-  }
-}
-
-bool Renderer::isStylerSupported(Styler* styler) {
-  if (styler == nullptr) return false;
-  if (!styler->requiresBrightness()) return true;
-  return mIsBrightnessEnabled;
 }
 
 TimingStats Renderer::getTimingStats() {
@@ -162,24 +127,6 @@ TimingStats Renderer::getTimingStats() {
   TimingStats stats = mStats;
   interrupts();
   return stats;
-}
-
-void Renderer::renderStyledPatterns() {
-  for (uint8_t digit = 0; digit < mNumDigits; digit++) {
-    StyledPattern& styledPattern = mStyledPatterns[digit];
-
-    uint8_t pattern = styledPattern.pattern;
-    uint8_t brightness = mBrightness;
-
-    uint8_t style = styledPattern.style;
-    if (mStyleTable != nullptr && 0 < style && style < StyleTable::kNumStyles) {
-      Styler* styler = mStyleTable->getStyler(style);
-      if (isStylerSupported(styler)) {
-        styler->apply(&pattern, &brightness);
-      }
-    }
-    mDriver->setPattern(digit, pattern, brightness);
-  }
 }
 
 }

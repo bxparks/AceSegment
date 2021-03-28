@@ -28,19 +28,15 @@ SOFTWARE.
 #include <stdint.h>
 #include "TimingStats.h"
 #include "Driver.h"
-#include "StyleTable.h"
 
 namespace ace_segment {
 
-class StyledPattern;
+class DimmablePattern;
 class Hardware;
-class Styler;
 
 /**
  * A class that knows how to translate an array of led segement bit patterns
- * with style attributes to a displayable frame for the Driver class.
- * The supported style for each digit are (blinkSlow, blinkFast, pulseSlow,
- * pulseFast).
+ * with its brightness to a displayable frame for the Driver class.
  *
  * A frame is divided into fields, which is a partial rendering of a frame. The
  * renderField() (or renderFieldWhenReady()) method should be called to
@@ -48,28 +44,31 @@ class Styler;
  */
 class Renderer {
   public:
+    static const uint8_t kDefaultBrightness = 128;
+
     /**
      * Constructor.
      *
      * @param hardware pointer to an instance of Hardware. Required.
      * @param driver pointer to a Driver instance. Required.
-     * @param styledPatterns an array of StyledPattern representing the LED
+     * @param dimmablePatterns an array of DimmablePattern representing the LED
      *    digits
-     * @param styleTable a pointer to an instance of StyleTable. Optional,
-     *    can be nullptr.
      * @param numDigits number of digits in the LED display
      * @param framesPerSecond the rate at which the LED display will be
      *    refreshed
      * @param statsResetInterval milliseconds between TimingStats reset
      */
-    explicit Renderer(Hardware* hardware, Driver* driver,
-            StyledPattern* styledPatterns, const StyleTable *styleTable,
-            uint8_t numDigits, uint8_t framesPerSecond,
-            uint16_t statsResetInterval):
+    explicit Renderer(
+        Hardware* hardware,
+        Driver* driver,
+        DimmablePattern* dimmablePatterns,
+        uint8_t numDigits,
+        uint8_t framesPerSecond,
+        uint16_t statsResetInterval
+    ):
         mHardware(hardware),
         mDriver(driver),
-        mStyledPatterns(styledPatterns),
-        mStyleTable(styleTable),
+        mDimmablePatterns(dimmablePatterns),
         mNumDigits(numDigits),
         mFramesPerSecond(framesPerSecond),
         mStatsResetInterval(statsResetInterval)
@@ -109,28 +108,28 @@ class Renderer {
     }
 
     /**
-     * Write the pattern and style for a given digit.
-     * If the digit is out of bounds, the method does nothing.
-     * If the style is out of bounds or not registered, the method does nothing.
-     */
-    void writePatternAt(uint8_t digit, uint8_t pattern, uint8_t style);
-
-    /**
-     * Write the pattern for a given digit, leaving style unchanged.
-     * If the digit is out of bounds, the method does nothing.
+     * Write the pattern for a given digit, with the default brightness set
+     * by the global writeBrightness() method. If the digit is out of bounds,
+     * the method does nothing.
      */
     void writePatternAt(uint8_t digit, uint8_t pattern);
 
-    /**
-     * Write the style for a given digit, leaving pattern unchanged.
-     * If the style is out of bounds or not registered, the method does nothing.
+     /**
+     * Write the pattern and brightness for a given digit. If the digit is out
+     * of bounds, the method does nothing.
      */
-    void writeStyleAt(uint8_t digit, uint8_t style);
+    void writePatternAt(uint8_t digit, uint8_t pattern, uint8_t brightness);
+
+    /**
+     * Write the brightness for a given digit, leaving pattern unchanged.
+     * If the digit is out of bounds, the method does nothing.
+     */
+    void writeBrightnessAt(uint8_t digit, uint8_t brightness);
 
     /** Write the decimal point for the digit. */
     void writeDecimalPointAt(uint8_t digit, bool state = true);
 
-    /** Clear all digits, preserving the styles at each digit. */
+    /** Clear all digits to blank pattern and all brightness to 0. */
     void clear();
 
     /**
@@ -157,20 +156,6 @@ class Renderer {
     // TODO: make this a pointer and make stats gathering optional
     TimingStats getTimingStats();
 
-    /** Return a reference the styled digit. VisibleForTesting. */
-    StyledPattern& getStyledPattern(uint8_t i) {
-      return mStyledPatterns[i];
-    }
-
-    /**
-     * Return true if the given Styler is supported by the current Driver.
-     * VisibleForTesting.
-     */
-    bool isStylerSupported(Styler* styler);
-
-    /** Retrieve the array of active styles. VisibleForTesting. */
-    uint8_t* getActiveStyles() { return mActiveStyles; }
-
   private:
     // disable copy-constructor and assignment operator
     Renderer(const Renderer&) = delete;
@@ -179,16 +164,9 @@ class Renderer {
     /** Perform things that need to be done each frame. */
     void updateFrame();
 
-    /** Update the stylers active stylers indicated by mActiveStyles. */
-    void updateStylers();
-
-    /** Translate the StyledPatterns to DimmablePatterns for the Driver. */
-    void renderStyledPatterns();
-
     Hardware* const mHardware;
     Driver* const mDriver;
-    StyledPattern* const mStyledPatterns;
-    const StyleTable* const mStyleTable;
+    DimmablePattern* const mDimmablePatterns;
     const uint8_t mNumDigits;
     const uint8_t mFramesPerSecond;
     const uint16_t mStatsResetInterval;
@@ -196,14 +174,8 @@ class Renderer {
     // TODO: change to a pointer to allow disabling it
     TimingStats mStats;
 
-    // Count of the number of times the given style index is used in the
-    // mStyledPatterns array. We update this map during writePatternAt() and
-    // writeStyleAt() to avoid calculating this in renderField() which saves
-    // CPU cycles.
-    uint8_t mActiveStyles[StyleTable::kNumStyles];
-
     // global brightness, can be changed during runtime
-    uint8_t mBrightness = 255;
+    uint8_t mBrightness = kDefaultBrightness;
 
     // does the Driver support brightness?
     bool mIsBrightnessEnabled = false;
