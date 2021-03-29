@@ -99,7 +99,7 @@ void setup() {
 #elif FEATURE == FEATURE_MERGED_SW_SPI
   hardware = new Hardware();
   driver = new MergedSerialDigitDriver(
-      hardware, dimmablePatterns, false /*commonCathode*/, USE_TRANSISTORS,
+      dimmablePatterns, false /*commonCathode*/, USE_TRANSISTORS,
       false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
       NUM_SUBFIELDS, latchPin, dataPin, clockPin);
   driver->configure();
@@ -112,7 +112,7 @@ void setup() {
 #elif FEATURE == FEATURE_MERGED_HW_SPI
   hardware = new Hardware();
   driver = new MergedSpiDigitDriver(
-      hardware, dimmablePatterns, false /*commonCathode*/, USE_TRANSISTORS,
+      dimmablePatterns, false /*commonCathode*/, USE_TRANSISTORS,
       false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
       NUM_SUBFIELDS, latchPin, dataPin, clockPin);
   driver->configure();
