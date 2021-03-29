@@ -47,10 +47,7 @@ void Renderer::displayCurrentFieldPlain() {
     mLedMatrix->disableGroup(mCurrentDigit);
   } else {
     const uint8_t pattern = mPatterns[mCurrentDigit];
-    if (pattern != mPattern) {
-      mPattern = pattern;
-      mLedMatrix->draw(mCurrentDigit, pattern);
-    }
+    mLedMatrix->draw(mCurrentDigit, pattern);
   }
 
   mPrevDigit = mCurrentDigit;
