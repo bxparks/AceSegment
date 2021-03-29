@@ -13,8 +13,6 @@ class TestableSpiAdapter : public SpiAdapter {
       mNumRecords(0)
     {}
 
-    virtual ~TestableSpiAdapter() {}
-
     void spiBegin() const override {
       if (mNumRecords < kMaxRecords) {
         Event& event = mEvents[mNumRecords];

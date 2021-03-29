@@ -54,8 +54,6 @@ class TestableHardware: public Hardware {
       mNumRecords(0)
     {}
 
-    virtual ~TestableHardware() {}
-
     unsigned long micros() const override { return mMicros; }
 
     unsigned long millis() const override { return mMillis; }

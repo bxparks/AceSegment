@@ -35,9 +35,6 @@ class Hardware {
     /** Constructor. */
     Hardware() {}
 
-    /** Destructor. */
-    virtual ~Hardware() {}
-
     /** Write value to pin. */
     virtual void digitalWrite(uint8_t pin, uint8_t value) const {
       ::digitalWrite(pin, value);
