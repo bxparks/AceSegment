@@ -60,7 +60,8 @@ class SplitDirectDigitDriverTest: public BaseHardwareTest {
   protected:
     void setup() override {
       BaseHardwareTest::setup();
-      mDriver = new SplitDirectDigitDriver(mHardware,
+      mDriver = new SplitDirectDigitDriver(
+          mHardware,
           dimmablePatterns,
           true /* commonCathode */,
           false /* transistorsOnDigits */,
@@ -354,7 +355,8 @@ class ModulatingSplitDirectDigitDriverTest: public BaseHardwareTest {
   protected:
     void setup() override {
       BaseHardwareTest::setup();
-      mDriver = new SplitDirectDigitDriver(mHardware,
+      mDriver = new SplitDirectDigitDriver(
+          mHardware,
           dimmablePatterns,
           true /* commonCathode */,
           false /* transistorsOnDigits */,
@@ -726,7 +728,8 @@ class SplitSerialDigitDriverTest: public BaseHardwareTest {
   protected:
     void setup() override {
       BaseHardwareTest::setup();
-      mDriver = new SplitSerialDigitDriver(mHardware,
+      mDriver = new SplitSerialDigitDriver(
+          mHardware,
           dimmablePatterns,
           true /* commonCathode */,
           false /* transistorsOnDigits */,

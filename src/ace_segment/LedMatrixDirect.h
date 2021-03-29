@@ -29,10 +29,10 @@ SOFTWARE.
 
 namespace ace_segment {
 
-class LedMatrixSplitDirect: public LedMatrixSplit {
+class LedMatrixDirect: public LedMatrixSplit {
   public:
-    LedMatrixSplitDirect(
-        Hardware* hardware,
+    LedMatrixDirect(
+        const Hardware* hardware,
         bool cathodeOnGroup,
         bool transistorsOnGroups,
         bool transistorsOnElements,
@@ -42,21 +42,44 @@ class LedMatrixSplitDirect: public LedMatrixSplit {
         const uint8_t* elementPins
     ) :
         LedMatrixSplit(
+            hardware,
             cathodeOnGroup,
             transistorsOnGroups,
             transistorsOnElements,
             numGroups,
-            numElements),
-        mHardware(hardware),
-        mGroupPins(groupPins),
+            numElements,
+            groupPins),
         mElementPins(elementPins)
     {}
 
-    void configure() override;
+    void configure() override {
+      LedMatrixSplit::configure();
 
-    void finish() override;
+      for (uint8_t element = 0; element < mNumElements; element++) {
+        uint8_t elementPin = mElementPins[element];
+        mHardware->pinMode(elementPin, OUTPUT);
+        mHardware->digitalWrite(elementPin, mElementOff);
+      }
+    }
 
-    void drawElements(uint8_t pattern) override;
+    void finish() override {
+      LedMatrixSplit::finish();
+
+      for (uint8_t element = 0; element < mNumElements; element++) {
+        uint8_t elementPin = mElementPins[element];
+        mHardware->pinMode(elementPin, INPUT);
+      }
+    }
+
+    void drawElements(uint8_t pattern) override {
+      uint8_t elementMask = 0x1;
+      for (uint8_t element = 0; element < mNumElements; element++) {
+        uint8_t output =
+            (pattern & elementMask) ? mElementOn : mElementOff;
+        writeElementPin(element, output);
+        elementMask <<= 1;
+      }
+    }
 
   private:
     /** Write to the element pin identified by 'element'. */
@@ -66,7 +89,6 @@ class LedMatrixSplitDirect: public LedMatrixSplit {
     }
 
   private:
-    Hardware* const mHardware;
     const uint8_t* const mElementPins;
 };
 

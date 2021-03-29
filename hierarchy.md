@@ -11,7 +11,6 @@ to help create the right set of objects for the given LED wiring situtation.
     * virtual ~Hardware()
     * virtual digitalWrite()
     * virtual pinMode()
-    * virtual shiftOut()
     * virtual micros()
     * virtual millis()
 
@@ -20,39 +19,26 @@ to help create the right set of objects for the given LED wiring situtation.
     * virtual spiEnd()
     * virtual spiTransfer()
     * virtual spiTransfer16()
-    * SwSpiAdapter
-    * HwSpiAdapter
+    * Two implementation classes:
+        * SwSpiAdapter
+        * HwSpiAdapter
 
 ## Wiring and LedMatrix Classes
 
 **Wiring Types**
 
 * Split
-    * SplitDirect (all pins direct to MCU)
-    * SplitSerial (element pins through 74HC575 via SwSPI, group pins
-        direct)
-    * SplitSpi (element pins through 74HC575 via HwSPI, group pins direct)
+    * LedMatrixDirect (all pins direct to MCU)
+    * LedMatrixPartialSpi (element pins through 74HC575 via SPI, group pins
 * Merged
-    * MergedSerial (all pins through 74HC575 via SwSPI)
-    * MergedSpi (all pins through 74HC575 via HwSPI)
+    * LedMatrixFullSpi (all pins through 74HC575 via HwSPI)
 
 **LedMatrix Class**
 
-* Implements the 5 wiring combinations listed above.
-* Uses `Hardware` to determine whether to use `digitalWrite()` or
-    `spiTransfer()`
+* Implements the 3 wiring combinations listed above.
 * The resistor determines which LEDs can be turned on at the same time.
     * LEDs with resistors become "element"
     * The other lines become "groups"
-* Does not have any state information
-* subclasses (5 options)
-    * LedMatrixSplit
-        * LedMatrixSplitDirect (all pins are directly driven)
-        * LedMatrixSplitSerial (element pins via SwSPI)
-            * LedMatrixSplitSpi (element pins via HwSPI)
-    * LedMatrixMerged
-        * LedMatrixMergedSerial (group and element pins via SwSPI)
-            * LedMatrixMergedSpi (group and element pins via HwSPI)
 
 ## Driver Classes
 
@@ -71,7 +57,12 @@ to help create the right set of objects for the given LED wiring situtation.
     * setBrightness()
 * subclasses
     * SplitDigitDriver
+        * SplitDirectDigitDriver (uses LedMatrixSplitDirect)
+        * SplitSerialDigitDriver
+        * SplitSpiDigitDriver
     * MergedDigitDriver
+        * MergedSerialDigitDriver
+        * MergedSpiDigitDriver
     * SplitSegmentDriver (X - archived)
     * MergedSegmentDriver (X - not implemented)
 
@@ -82,29 +73,29 @@ Composite classes combine the correct `LedMatrix` object with the matching
 and `Driver` class. The number of combinations are:
 
 * (SplitDigitDriver) x LedMatrixDirect = 1
-* (SplitDigitDriver) x (LedMatrixSplitSerial | LedMatrixSplitSpi) = 2
-* (MergedDigitDriver) x (LedMatrixMergedSerial | LedMatrixMergedSpi) = 2
+* (SplitDigitDriver) x (LedMatrixPartialSpi (SW | HW)) = 2
+* (MergedDigitDriver) x (LedMatrixFullSpi (SW | HW)) = 2
 * Total: 1 + 2 + 2 = 5
 * classes
     * SplitDirectDigitDriver
-        * LedMatrixSplitDirect
+        * LedMatrixDirect
         * SplitDigitDriver
         * (Resistors on segments, transistor on digits, all pins direct to MCU)
-    * SplitSerialDigitDriver
-        * LedMatrixSplitSerial
+    * SplitSerialDigitDriver -> PartialSwSpiDriver
         * SplitDigitDriver
+        * LedMatrixPartialSpi (SW)
         * (Resistors on segments, transistors on digits thru 74HC595 via SwSPI)
-    * SplitSpiDigitDriver
-        * LedMatrixSplitSpi
+    * SplitSpiDigitDriver -> PartialHwSpiDriver
         * SplitDigitDriver
+        * LedMatrixPartialSpi (HW)
         * (Resistors on segments, transistors on digits thru 74HC595 via HwSPI)
-    * MergedSerialDigitDriver
-        * LedMatrixMergedSerial
+    * MergedSerialDigitDriver -> FullSwSpiDriver
         * MergedDigitDriver
+        * LedMatrixFullSpi (SW)
         * (Resistors on segments, transistors on digits, all pins via SwSPI)
-    * MergedSpiDigitDriver
-        * LedMatrixMergedSpi
+    * MergedSpiDigitDriver -> FullHwSpiDriver
         * MergedDigitDriver
+        * LedMatrixFullSpi (HW)
         * (Resistors on segments, transistors on digits, all pins via HwSPI)
 
 ## Renderer

@@ -111,7 +111,7 @@ BenchmarkBundle::BenchmarkBundle(const DriverConfig* driverConfig) {
   } else if (driverConfig->mDriverOption
       == DriverConfig::MergedSerialDigitDriverOption) {
     mDriver = new MergedSerialDigitDriver(
-        mHardware, mDimmablePatterns,
+        mDimmablePatterns,
         true /* commonCathode */,
         false /* transistorsOnDigits */,
         false /* transistorsOnSegments */,
@@ -120,7 +120,7 @@ BenchmarkBundle::BenchmarkBundle(const DriverConfig* driverConfig) {
   } else if (driverConfig->mDriverOption
       == DriverConfig::MergedSpiDigitDriverOption) {
     mDriver = new MergedSpiDigitDriver(
-        mHardware, mDimmablePatterns,
+        mDimmablePatterns,
         true /* commonCathode */,
         false /* transistorsOnDigits */,
         false /* transistorsOnSegments */,

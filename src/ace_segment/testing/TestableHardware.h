@@ -35,7 +35,6 @@ class Event {
   public:
     static const uint8_t kTypeDigitalWrite = 0;
     static const uint8_t kTypePinMode = 1;
-    static const uint8_t kTypeShiftOut = 2;
     static const uint8_t kTypeSpiBegin = 3;
     static const uint8_t kTypeSpiTransfer = 4;
     static const uint8_t kTypeSpiEnd = 5;
@@ -57,11 +56,11 @@ class TestableHardware: public Hardware {
 
     virtual ~TestableHardware() {}
 
-    unsigned long micros() override { return mMicros; }
+    unsigned long micros() const override { return mMicros; }
 
-    unsigned long millis() override { return mMillis; }
+    unsigned long millis() const override { return mMillis; }
 
-    void pinMode(uint8_t pin, uint8_t mode) override {
+    void pinMode(uint8_t pin, uint8_t mode) const override {
       if (mNumRecords < kMaxRecords) {
         Event& event = mEvents[mNumRecords];
         event.type = Event::kTypePinMode;
@@ -71,7 +70,7 @@ class TestableHardware: public Hardware {
       }
     }
 
-    void digitalWrite(uint8_t pin, uint8_t value) override {
+    void digitalWrite(uint8_t pin, uint8_t value) const override {
       if (mNumRecords < kMaxRecords) {
         Event& event = mEvents[mNumRecords];
         event.type = Event::kTypeDigitalWrite;
@@ -81,54 +80,7 @@ class TestableHardware: public Hardware {
       }
     }
 
-    void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder,
-        uint8_t value) override {
-      if (mNumRecords < kMaxRecords) {
-        Event& event = mEvents[mNumRecords];
-        event.type = Event::kTypeShiftOut;
-        event.arg1 = dataPin;
-        event.arg2 = clockPin;
-        event.arg3 = bitOrder;
-        event.arg4 = value;
-        mNumRecords++;
-      }
-    }
-
-    void spiBegin() override {
-      if (mNumRecords < kMaxRecords) {
-        Event& event = mEvents[mNumRecords];
-        event.type = Event::kTypeSpiBegin;
-        mNumRecords++;
-      }
-    }
-
-    void spiEnd() override {
-      if (mNumRecords < kMaxRecords) {
-        Event& event = mEvents[mNumRecords];
-        event.type = Event::kTypeSpiEnd;
-        mNumRecords++;
-      }
-    }
-
-    void spiTransfer(uint8_t value) override {
-      if (mNumRecords < kMaxRecords) {
-        Event& event = mEvents[mNumRecords];
-        event.type = Event::kTypeSpiTransfer;
-        event.arg1 = value;
-        mNumRecords++;
-      }
-    }
-
-    void spiTransfer16(uint16_t value) override {
-      if (mNumRecords < kMaxRecords) {
-        Event& event = mEvents[mNumRecords];
-        event.type = Event::kTypeSpiTransfer16;
-        event.arg5 = value;
-        mNumRecords++;
-      }
-    }
-
-    // test routines
+    // methods to set what this object returns
 
     void setMicros(unsigned long micros) { mMicros = micros; }
 
@@ -150,8 +102,8 @@ class TestableHardware: public Hardware {
     unsigned long mMillis;
     unsigned long mMicros;
 
-    Event mEvents[kMaxRecords];
-    uint8_t mNumRecords;
+    mutable Event mEvents[kMaxRecords];
+    mutable uint8_t mNumRecords;
 };
 
 } // namespace testing

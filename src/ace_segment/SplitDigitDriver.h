@@ -22,8 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_DIGIT_DRIVER_H
-#define ACE_SEGMENT_DIGIT_DRIVER_H
+#ifndef ACE_SEGMENT_SPLIT_DIGIT_DRIVER_H
+#define ACE_SEGMENT_SPLIT_DIGIT_DRIVER_H
 
 #include <stdint.h>
 #include "LedMatrixSplit.h"
@@ -34,8 +34,12 @@ namespace ace_segment {
 class DimmablePattern;
 
 /**
- * A Driver that assumes that the resistors are on the segments so the
- * multiplexing occurs by scanning through the digits.
+ * An LED Driver that assumes that the resistors are on the segments so the
+ * multiplexing occurs by scanning through the digits. The segments are
+ * controlled via SPI. But the digits are controlled directly through individual
+ * pins. Those pins cannot be updated instantly, so this class takes special
+ * care to turn off the previous digit before turning on the next digit in the
+ * multiplexing.
  */
 class SplitDigitDriver: public Driver {
   public:
@@ -48,9 +52,12 @@ class SplitDigitDriver: public Driver {
      * @param numSubFields split a single frame into this many fields so that we
      *   can control its apparent brightness
      */
-    explicit SplitDigitDriver(LedMatrixSplit* ledMatrix,
-            DimmablePattern* dimmablePatterns, uint8_t numDigits,
-            uint8_t numSubFields):
+    explicit SplitDigitDriver(
+        LedMatrixSplit* ledMatrix,
+        DimmablePattern* dimmablePatterns,
+        uint8_t numDigits,
+        uint8_t numSubFields
+    ) :
         Driver(ledMatrix, dimmablePatterns, numDigits),
         mNumSubFields(numSubFields)
     {}

@@ -22,32 +22,62 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_LED_MATRIX_MERGED_H
-#define ACE_SEGMENT_LED_MATRIX_MERGED_H
+#ifndef ACE_SEGMENT_LED_MATRIX_FULL_SPI_H
+#define ACE_SEGMENT_LED_MATRIX_FULL_SPI_H
 
 #include "LedMatrix.h"
+#include "SpiAdapter.h"
 
 namespace ace_segment {
 
 class Hardware;
 
 /**
- * An LedMatrix that writes to both group and element pins at the same time.
+ * An LedMatrix that writes to both group and element pins via SPI.
  */
-class LedMatrixMerged: public LedMatrix {
+class LedMatrixFullSpi: public LedMatrix {
   public:
-    LedMatrixMerged(Hardware* hardware, bool cathodeOnGroup,
-            bool transistorsOnGroups, bool transistorsOnElements,
-            uint8_t numGroups, uint8_t numElements):
-        LedMatrix(hardware, cathodeOnGroup, transistorsOnGroups,
-            transistorsOnElements, numGroups, numElements)
+    LedMatrixFullSpi(
+        const SpiAdapter* spiAdapter,
+        bool cathodeOnGroup,
+        bool transistorsOnGroups,
+        bool transistorsOnElements,
+        uint8_t numGroups,
+        uint8_t numElements
+    ) :
+        LedMatrix(
+            cathodeOnGroup,
+            transistorsOnGroups,
+            transistorsOnElements,
+            numGroups,
+            numElements),
+        mSpiAdapter(spiAdapter)
     {}
+
+    void configure() override {
+      mSpiAdapter->spiBegin();
+    }
+
+    void finish() override {
+      mSpiAdapter->spiEnd();
+    }
 
     /**
      * Write out the group and element patterns in a single 16-bit stream
      * with the group bits in the MSB and the element bits in the LSB.
      */
-    virtual void draw(uint8_t groupPattern, uint8_t elementPattern) = 0;
+    void draw(uint8_t groupPattern, uint8_t elementPattern) {
+      uint8_t actualElementPattern = (mElementOn == HIGH)
+          ? elementPattern : ~elementPattern;
+      uint8_t actualGroupPattern = (mGroupOn == HIGH)
+          ? groupPattern : ~groupPattern;
+
+      mSpiAdapter->spiTransfer16(
+          actualGroupPattern << 8 | actualElementPattern);
+    }
+
+  private:
+    const SpiAdapter* const mSpiAdapter;
 };
 
 }

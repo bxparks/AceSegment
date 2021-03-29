@@ -140,8 +140,11 @@ class Driver {
      *    represents each digit. This resource is provided by the caller
      * @param numDigits
      */
-    explicit Driver(LedMatrix* ledMatrix, DimmablePattern* dimmablePatterns,
-            uint8_t numDigits):
+    explicit Driver(
+        LedMatrix* ledMatrix,
+        DimmablePattern* dimmablePatterns,
+        uint8_t numDigits
+    ) :
         mLedMatrix(ledMatrix),
         mDimmablePatterns(dimmablePatterns),
         mNumDigits(numDigits),

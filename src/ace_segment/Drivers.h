@@ -25,14 +25,14 @@ SOFTWARE.
 #ifndef ACE_SEGMENT_DRIVERS_H
 #define ACE_SEGMENT_DRIVERS_H
 
-#include "LedMatrixSplitDirect.h"
-#include "LedMatrixMergedSerial.h"
-#include "LedMatrixMergedSpi.h"
-#include "LedMatrixSplitSerial.h"
-#include "LedMatrixSplitSpi.h"
+#include "LedMatrixDirect.h"
+#include "LedMatrixPartialSpi.h"
+#include "LedMatrixFullSpi.h"
 #include "Driver.h"
 #include "SplitDigitDriver.h"
 #include "MergedDigitDriver.h"
+#include "SwSpiAdapter.h"
+#include "HwSpiAdapter.h"
 
 namespace ace_segment {
 
@@ -41,21 +41,36 @@ namespace ace_segment {
  * the LED display. The resistors are assumed to be on the segments and can be
  * driven at the same time, so the digits are multiplexed.
  */
-class SplitDirectDigitDriver:
-    private LedMatrixSplitDirect,
-    public SplitDigitDriver {
+class SplitDirectDigitDriver : public SplitDigitDriver {
 
   public:
-    SplitDirectDigitDriver(Hardware* hardware,
-            DimmablePattern* dimmablePatterns, bool commonCathode,
-            bool transistorsOnDigits, bool transistorsOnSegments,
-            uint8_t numDigits, uint8_t numSegments, uint8_t numSubFields,
-            const uint8_t* digitPins, const uint8_t* segmentPins):
-        LedMatrixSplitDirect(hardware, commonCathode, transistorsOnDigits,
-            transistorsOnSegments, numDigits, numSegments, digitPins,
-            segmentPins),
-        SplitDigitDriver(this, dimmablePatterns, numDigits, numSubFields)
+    SplitDirectDigitDriver(
+        Hardware* hardware,
+        DimmablePattern* dimmablePatterns,
+        bool commonCathode,
+        bool transistorsOnDigits,
+        bool transistorsOnSegments,
+        uint8_t numDigits,
+        uint8_t numSegments,
+        uint8_t numSubFields,
+        const uint8_t* digitPins,
+        const uint8_t* segmentPins
+    ) :
+        SplitDigitDriver(
+            &mLedMatrix, dimmablePatterns, numDigits, numSubFields),
+        mLedMatrix(
+            hardware,
+            commonCathode,
+            transistorsOnDigits,
+            transistorsOnSegments,
+            numDigits,
+            numSegments,
+            digitPins,
+            segmentPins)
     {}
+
+  private:
+    LedMatrixDirect mLedMatrix;
 };
 
 /**
@@ -64,22 +79,40 @@ class SplitDirectDigitDriver:
  * 74HC595 is programmed using the shiftOut() method on the Arduino. The digit
  * pins are driven directly by the GPIO pins.
  */
-class SplitSerialDigitDriver:
-    private LedMatrixSplitSerial,
-    public SplitDigitDriver {
+class SplitSerialDigitDriver : public SplitDigitDriver {
 
   public:
-    SplitSerialDigitDriver(Hardware* hardware,
-            DimmablePattern* dimmablePatterns, bool commonCathode,
-            bool transistorsOnDigits, bool transistorsOnSegments,
-            uint8_t numDigits, uint8_t numSegments, uint8_t numSubFields,
-            const uint8_t* digitPins, const uint8_t latchPin,
-            uint8_t dataPin, uint8_t clockPin):
-        LedMatrixSplitSerial(hardware, commonCathode, transistorsOnDigits,
-            transistorsOnSegments, numDigits, numSegments, digitPins,
-            latchPin, dataPin, clockPin),
-        SplitDigitDriver(this, dimmablePatterns, numDigits, numSubFields)
+    SplitSerialDigitDriver(
+        Hardware* hardware,
+        DimmablePattern* dimmablePatterns,
+        bool commonCathode,
+        bool transistorsOnDigits,
+        bool transistorsOnSegments,
+        uint8_t numDigits,
+        uint8_t numSegments,
+        uint8_t numSubFields,
+        const uint8_t* digitPins,
+        const uint8_t latchPin,
+        uint8_t dataPin,
+        uint8_t clockPin
+    ) :
+        SplitDigitDriver(
+            &mLedMatrix, dimmablePatterns, numDigits, numSubFields),
+        mLedMatrix(
+            hardware,
+            &mSpiAdapter,
+            commonCathode,
+            transistorsOnDigits,
+            transistorsOnSegments,
+            numDigits,
+            numSegments,
+            digitPins),
+        mSpiAdapter(latchPin, dataPin, clockPin)
     {}
+
+  private:
+    LedMatrixPartialSpi mLedMatrix;
+    SwSpiAdapter mSpiAdapter;
 };
 
 /**
@@ -88,22 +121,41 @@ class SplitSerialDigitDriver:
  * 74HC595 is programmed using hardware SPI on the Arduino. The digit pins are
  * driven directly by the GPIO pins.
  */
-class SplitSpiDigitDriver:
-    private LedMatrixSplitSpi,
-    public SplitDigitDriver {
+class SplitSpiDigitDriver : public SplitDigitDriver {
 
   public:
-    SplitSpiDigitDriver(Hardware* hardware,
-            DimmablePattern* dimmablePatterns, bool commonCathode,
-            bool transistorsOnDigits, bool transistorsOnSegments,
-            uint8_t numDigits, uint8_t numSegments, uint8_t numSubFields,
-            const uint8_t* digitPins, uint8_t latchPin,
-            uint8_t dataPin, uint8_t clockPin):
-        LedMatrixSplitSpi(hardware, commonCathode, transistorsOnDigits,
-            transistorsOnSegments, numDigits, numSegments, digitPins,
-            latchPin, dataPin, clockPin),
-        SplitDigitDriver(this, dimmablePatterns, numDigits, numSubFields)
+    SplitSpiDigitDriver(
+        Hardware* hardware,
+        DimmablePattern* dimmablePatterns,
+        bool commonCathode,
+        bool transistorsOnDigits,
+        bool transistorsOnSegments,
+        uint8_t numDigits,
+        uint8_t numSegments,
+        uint8_t numSubFields,
+        const uint8_t* digitPins,
+        uint8_t latchPin,
+        uint8_t dataPin,
+        uint8_t clockPin
+    ) :
+        SplitDigitDriver(
+            &mLedMatrix, dimmablePatterns, numDigits, numSubFields),
+        mLedMatrix(
+            hardware,
+            &mSpiAdapter,
+            commonCathode,
+            transistorsOnDigits,
+            transistorsOnSegments,
+            numDigits,
+            numSegments,
+            digitPins),
+        mSpiAdapter(latchPin, dataPin, clockPin)
+
     {}
+
+  private:
+    LedMatrixPartialSpi mLedMatrix;
+    HwSpiAdapter mSpiAdapter;
 };
 
 /**
@@ -112,22 +164,36 @@ class SplitSpiDigitDriver:
  * time. The digits are multiplexed. The 74HC595 chipes are programmed using
  * the shiftOut() method.
  */
-class MergedSerialDigitDriver:
-    private LedMatrixMergedSerial,
-    public MergedDigitDriver {
+class MergedSerialDigitDriver : public MergedDigitDriver {
 
   public:
-    MergedSerialDigitDriver(Hardware* hardware,
-            DimmablePattern* dimmablePatterns,
-            bool commonCathode, bool transistorsOnDigits,
-            bool transistorsOnSegments, uint8_t numDigits, uint8_t numSegments,
-            uint8_t numSubFields,
-            uint8_t latchPin, uint8_t dataPin, uint8_t clockPin):
-        LedMatrixMergedSerial(hardware, commonCathode, transistorsOnDigits,
-            transistorsOnSegments, numDigits, numSegments,
-            latchPin, dataPin, clockPin),
-        MergedDigitDriver(this, dimmablePatterns, numDigits, numSubFields)
+    MergedSerialDigitDriver(
+        DimmablePattern* dimmablePatterns,
+        bool commonCathode,
+        bool transistorsOnDigits,
+        bool transistorsOnSegments,
+        uint8_t numDigits,
+        uint8_t numSegments,
+        uint8_t numSubFields,
+        uint8_t latchPin,
+        uint8_t dataPin,
+        uint8_t clockPin
+    ) :
+        MergedDigitDriver(
+            &mLedMatrix, dimmablePatterns, numDigits, numSubFields),
+        mLedMatrix(
+            &mSpiAdapter,
+            commonCathode,
+            transistorsOnDigits,
+            transistorsOnSegments,
+            numDigits,
+            numSegments),
+        mSpiAdapter(latchPin, dataPin, clockPin)
     {}
+
+  private:
+    LedMatrixFullSpi mLedMatrix;
+    SwSpiAdapter mSpiAdapter;
 };
 
 /**
@@ -136,22 +202,36 @@ class MergedSerialDigitDriver:
  * time. The digits are multiplexed. The 74HC595 chipes are programmed using
  * hardware SPI.
  */
-class MergedSpiDigitDriver:
-    private LedMatrixMergedSpi,
-    public MergedDigitDriver{
+class MergedSpiDigitDriver : public MergedDigitDriver{
 
   public:
-    MergedSpiDigitDriver(Hardware* hardware,
-            DimmablePattern* dimmablePatterns,
-            bool commonCathode, bool transistorsOnDigits,
-            bool transistorsOnSegments, uint8_t numDigits, uint8_t numSegments,
-            uint8_t numSubFields,
-            uint8_t latchPin, uint8_t dataPin, uint8_t clockPin):
-        LedMatrixMergedSpi(hardware, commonCathode, transistorsOnDigits,
-            transistorsOnSegments, numDigits, numSegments,
-            latchPin, dataPin, clockPin),
-        MergedDigitDriver(this, dimmablePatterns, numDigits, numSubFields)
+    MergedSpiDigitDriver(
+        DimmablePattern* dimmablePatterns,
+        bool commonCathode,
+        bool transistorsOnDigits,
+        bool transistorsOnSegments,
+        uint8_t numDigits,
+        uint8_t numSegments,
+        uint8_t numSubFields,
+        uint8_t latchPin,
+        uint8_t dataPin,
+        uint8_t clockPin
+    ) :
+        MergedDigitDriver(
+            &mLedMatrix, dimmablePatterns, numDigits, numSubFields),
+        mLedMatrix(
+            &mSpiAdapter,
+            commonCathode,
+            transistorsOnDigits,
+            transistorsOnSegments,
+            numDigits,
+            numSegments),
+        mSpiAdapter(latchPin, dataPin, clockPin)
     {}
+
+  private:
+    LedMatrixFullSpi mLedMatrix;
+    HwSpiAdapter mSpiAdapter;
 };
 
 }

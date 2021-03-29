@@ -25,8 +25,8 @@ SOFTWARE.
 #ifndef ACE_SEGMENT_LED_MATRIX_H
 #define ACE_SEGMENT_LED_MATRIX_H
 
+// TODO: Replace with kLow (0x00) and kHigh (0xFF)
 #include <Arduino.h> // LOW and HIGH
-
 #if LOW != 0 || HIGH != 1
   #error LOW is not 0 or HIGH is not 1
 #endif
@@ -36,13 +36,38 @@ namespace ace_segment {
 class Hardware;
 
 /**
- * Class that represents the abstraction of a particular LED display wiring.
- * If the resistors are on the segments, then the segments become the
- * Elements and the digits become the Groups.
- * If the resistors are on the digits, then the digits become the Elements
- * and the segments become the Groups.
+ * Class that represents the abstraction of a particular LED display wiring, and
+ * knows how to turn off and turn on a specific group of LEDs with a specific
+ * pattern. This class is stateless, it does not know what is currently being
+ * displayed on the LED segments.
+ *
+ * There are roughly 2 slightly different APIs:
+ *
+ *  * LedMatrixSplit
+ *    * Assumes that the Group pins are directly controllable using
+ *      digitalWrite() methods.
+ *    * The rendering methods are `enableGroup()`, `disableGroup()`
+ *      and `drawElements()`.
+ *    * Two subclasses are provided: 
+ *      * LedMatrixDirect: The Segment pins are directly controlled.
+ *      * LedMatrixPartialSpi: The Segment pins are attached to an 74HC595 chip,
+ *        and is configured using SPI (either software or hardware).
+ *  * LedMatrixFullSpi
+ *    * Both the Group and Element pins are controlled by 74HC595 chips
+ *      using SPI (software or hardware).
+ *    * The rendering method is just the `draw()` method which sets both
+ *      the group and element states.
+ *
+ * If the resistors are on the segments, then the segments become the Elements
+ * and the digits become the Groups.
+ *
+ * If the resistors are on the digits, then the digits become the Elements and
+ * the segments become the Groups. This configuration is not very useful and has
+ * not been tested very much.
+ *
  * The setCathodeOnGroup() and setAnnodeOnGroup() methods determine the
  * polarity of the LED with respect to the Group line.
+ *
  * The invertGroupLevels() should be called when transistors are used
  * on the Group lines to handle higher currents.
  */
@@ -50,7 +75,6 @@ class LedMatrix {
   public:
 
     /**
-     * @param hardware pointer to Hardware instance
      * @param cathodeOnGroup the LED common cathodes are on the groups
      * @param transistorsOnGroups transistors used on groups, which
      *    invert the logic level for the group lines
@@ -59,9 +83,13 @@ class LedMatrix {
      * @param numGroups number of group lines
      * @param numElements number of element lines
      */
-    LedMatrix(Hardware* hardware, bool cathodeOnGroup,
-            bool transistorsOnGroups, bool transistorsOnElements,
-            uint8_t numGroups, uint8_t numElements):
+    LedMatrix(
+        bool cathodeOnGroup,
+        bool transistorsOnGroups,
+        bool transistorsOnElements,
+        uint8_t numGroups,
+        uint8_t numElements
+    ) :
         mNumGroups(numGroups),
         mNumElements(numElements) {
 

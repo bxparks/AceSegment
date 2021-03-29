@@ -34,7 +34,7 @@ namespace ace_segment {
 /** Hardware SPI. */
 class HwSpiAdapter : public SpiAdapter {
   public:
-    SwSpiAdapter(
+    HwSpiAdapter(
         uint8_t latchPin,
         uint8_t dataPin,
         uint8_t clockPin
@@ -44,30 +44,34 @@ class HwSpiAdapter : public SpiAdapter {
         mClockPin(clockPin)
     {}
 
-    void spiBegin() override {
+    void spiBegin() const override {
       pinMode(mLatchPin, OUTPUT);
       pinMode(mDataPin, OUTPUT);
       pinMode(mClockPin, OUTPUT);
       SPI.begin();
     }
 
-    void spiEnd() override {
+    void spiEnd() const override {
       pinMode(mLatchPin, INPUT);
       pinMode(mDataPin, INPUT);
       pinMode(mClockPin, INPUT);
       SPI.end();
     }
 
-    void spiTransfer(uint8_t value) override {
+    void spiTransfer(uint8_t value) const override {
+      digitalWrite(mLatchPin, LOW);
       SPI.beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
       SPI.transfer(value);
       SPI.endTransaction();
+      digitalWrite(mLatchPin, HIGH);
     }
 
-    void spiTransfer16(uint16_t value) override {
+    void spiTransfer16(uint16_t value) const override {
+      digitalWrite(mLatchPin, LOW);
       SPI.beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
       SPI.transfer16(value);
       SPI.endTransaction();
+      digitalWrite(mLatchPin, HIGH);
     }
 
   private:

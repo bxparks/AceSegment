@@ -26,6 +26,7 @@ SOFTWARE.
 #define ACE_SEGMENT_LED_MATRIX_SPLIT_H
 
 #include "LedMatrix.h"
+#include "Hardware.h"
 
 namespace ace_segment {
 
@@ -35,6 +36,7 @@ namespace ace_segment {
 class LedMatrixSplit: public LedMatrix {
   public:
     LedMatrixSplit(
+        const Hardware* hardware,
         bool cathodeOnGroup,
         bool transistorsOnGroups,
         bool transistorsOnElements,
@@ -48,6 +50,7 @@ class LedMatrixSplit: public LedMatrix {
             transistorsOnElements,
             numGroups,
             numElements),
+        mHardware(hardware),
         mGroupPins(groupPins)
     {}
 
@@ -66,17 +69,17 @@ class LedMatrixSplit: public LedMatrix {
       }
     }
 
-    void LedMatrixSplitSerial::enableGroup(uint8_t group) {
+    void enableGroup(uint8_t group) {
       writeGroupPin(group, mGroupOn);
     }
 
-    void LedMatrixSplitSerial::disableGroup(uint8_t group) {
+    void disableGroup(uint8_t group) {
       writeGroupPin(group, mGroupOff);
     }
 
     virtual void drawElements(uint8_t pattern) = 0;
 
-  protected:
+  private:
     /** Write to group pin identified by 'group'. */
     void writeGroupPin(uint8_t group, uint8_t output) {
       uint8_t groupPin = mGroupPins[group];
@@ -84,6 +87,7 @@ class LedMatrixSplit: public LedMatrix {
     }
 
   protected:
+    const Hardware* const mHardware;
     const uint8_t* const mGroupPins;
 };
 

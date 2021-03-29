@@ -26,6 +26,7 @@ SOFTWARE.
 #define ACE_SEGMENT_LED_MATRIX_SERIAL_H
 
 #include "LedMatrixSplit.h"
+#include "SpiAdapter.h"
 
 namespace ace_segment {
 
@@ -39,10 +40,11 @@ class Hardware;
  *   dataPin/D11/MOSI -- DS (Phillips) / SER (TI) / Pin 14
  *   clockPin/D13/SCK -- SH_CP (Phillips) / SRCK (TI) / Pin 11 (rising)
  */
-class LedMatrixSplitSerial: public LedMatrixSplit {
+class LedMatrixPartialSpi: public LedMatrixSplit {
   public:
-    LedMatrixSplitSerial(
-        SpiAdapter* spiAdapter,
+    LedMatrixPartialSpi(
+        const Hardware* hardware,
+        const SpiAdapter* spiAdapter,
         bool cathodeOnGroup,
         bool transistorsOnGroups,
         bool transistorsOnElements,
@@ -50,29 +52,32 @@ class LedMatrixSplitSerial: public LedMatrixSplit {
         uint8_t numElements,
         const uint8_t* groupPins
     ) :
-        mSpiAdapter(spiAdapter),
         LedMatrixSplit(
+            hardware,
             cathodeOnGroup,
             transistorsOnGroups,
             transistorsOnElements,
             numGroups,
             numElements,
-            groupPins)
+            groupPins),
+        mSpiAdapter(spiAdapter)
     {}
 
     void configure() override {
+      LedMatrixSplit::configure();
+
       mSpiAdapter->spiBegin();
-      LedMatrix::configure();
     }
 
     void finish() override {
+      LedMatrixSplit::finish();
+
       mSpiAdapter->spiEnd();
-      LedMatrix::finish();
     }
 
     void drawElements(uint8_t pattern) override {
       uint8_t actualPattern = (mElementOn == HIGH) ? pattern : ~pattern;
-      mSpiAdapter.transfer(actualPattern);
+      mSpiAdapter->spiTransfer(actualPattern);
     }
 
   private:

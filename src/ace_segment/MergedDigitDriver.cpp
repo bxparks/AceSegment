@@ -24,7 +24,7 @@ SOFTWARE.
 
 #include "Hardware.h"
 #include "MergedDigitDriver.h"
-#include "LedMatrixMerged.h"
+#include "LedMatrixFullSpi.h"
 #include "Util.h"
 
 namespace ace_segment {
@@ -49,14 +49,14 @@ void MergedDigitDriver::displayCurrentFieldPlain() {
     digitPattern = 0x1 << mCurrentDigit;
   }
 
-  LedMatrixMerged* ledMatrix = static_cast<LedMatrixMerged*>(mLedMatrix);
+  LedMatrixFullSpi* ledMatrix = static_cast<LedMatrixFullSpi*>(mLedMatrix);
   ledMatrix->draw(digitPattern, segmentPattern);
 
   Util::incrementMod(mCurrentDigit, mNumDigits);
 }
 
 void MergedDigitDriver::displayCurrentFieldModulated() {
-  LedMatrixMerged* ledMatrix = static_cast<LedMatrixMerged*>(mLedMatrix);
+  LedMatrixFullSpi* ledMatrix = static_cast<LedMatrixFullSpi*>(mLedMatrix);
   DigitPatternType digitPattern = 0x0;
   SegmentPatternType segmentPattern = 0x0;
 
@@ -92,7 +92,7 @@ void MergedDigitDriver::displayCurrentFieldModulated() {
 
 void MergedDigitDriver::prepareToSleep() {
   Driver::prepareToSleep();
-  LedMatrixMerged* ledMatrix = static_cast<LedMatrixMerged*>(mLedMatrix);
+  LedMatrixFullSpi* ledMatrix = static_cast<LedMatrixFullSpi*>(mLedMatrix);
   ledMatrix->draw(0, 0);
 }
 

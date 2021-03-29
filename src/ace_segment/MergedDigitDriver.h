@@ -26,7 +26,7 @@ SOFTWARE.
 #define ACE_SEGMENT_MERGED_DIGIT_DRIVER_H
 
 #include <stdint.h>
-#include "LedMatrixMerged.h"
+#include "LedMatrixFullSpi.h"
 #include "Driver.h"
 
 namespace ace_segment {
@@ -34,8 +34,13 @@ namespace ace_segment {
 class DimmablePattern;
 
 /**
- * A Driver that assumes that the resistors are on the segments so the
- * multiplexing occurs by scanning through the digits.
+ * An LED Driver that assumes that the resistors are on the segments so the
+ * multiplexing occurs by scanning through the digits. Both the segment pins on
+ * the LED and the digit pins are both controlled by an 74HC595 chip which is
+ * configured through SPI. The transition from LOW to HIGH on the ST_CK pin
+ * (tied to the SPI SS) pin sets the output pins to the shift register pins
+ * instantly. So unlike SplitDigitDriver, we don't bother making sure that the
+ * previous digit is turned off before activating the next digit.
  */
 class MergedDigitDriver: public Driver {
   public:
@@ -48,9 +53,12 @@ class MergedDigitDriver: public Driver {
      * @param numSubFields split a single frame into this many fields so that we
      *   can control its apparent brightness
      */
-    explicit MergedDigitDriver(LedMatrixMerged* ledMatrix,
-            DimmablePattern* dimmablePatterns, uint8_t numDigits,
-            uint8_t numSubFields):
+    explicit MergedDigitDriver(
+        LedMatrixFullSpi* ledMatrix,
+        DimmablePattern* dimmablePatterns,
+        uint8_t numDigits,
+        uint8_t numSubFields
+    ) :
         Driver(ledMatrix, dimmablePatterns, numDigits),
         mNumSubFields(numSubFields)
     {}

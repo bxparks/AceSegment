@@ -89,6 +89,9 @@ void setupAceButton() {
 #define DRIVER_MODE_MERGED_SERIAL_DIGIT 7
 #define DRIVER_MODE_MERGED_SPI_DIGIT 8
 
+// Define the Driver to use.
+#define DRIVER_MODE DRIVER_MODE_MERGED_SPI_DIGIT
+
 // Use polling or interrupt.
 #define USE_INTERRUPT 0
 
@@ -96,12 +99,6 @@ void setupAceButton() {
 // Serial can cause the display to flicker due to timing jitters. Turning stats
 // off will make the display as smooth as the interrupt version.
 #define PRINT_STATS 0
-
-// Define the Driver to use. Use DRIVER_MODE_NONE to get flash/static
-// consumption without any AceSegment code. Then set to the other modes to get
-// flash/static memory usage.
-//#define DRIVER_MODE DRIVER_MODE_MERGED_SPI_DIGIT
-#define DRIVER_MODE DRIVER_MODE_MERGED_SERIAL_DIGIT
 
 // Transistors on the digits or segments which do NOT have the resistors.
 #define USE_TRANSISTORS true
@@ -178,13 +175,13 @@ void setupAceSegment() {
       NUM_SUBFIELDS, digitPins, latchPin, dataPin, clockPin);
 #elif DRIVER_MODE == DRIVER_MODE_MERGED_SERIAL_DIGIT
   driver = new MergedSerialDigitDriver(
-      hardware, dimmablePatterns,
+      dimmablePatterns,
       false /*commonCathode*/, USE_TRANSISTORS,
       false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
       NUM_SUBFIELDS, latchPin, dataPin, clockPin);
 #elif DRIVER_MODE == DRIVER_MODE_MERGED_SPI_DIGIT
   driver = new MergedSpiDigitDriver(
-      hardware, dimmablePatterns,
+      dimmablePatterns,
       false /*commonCathode*/, USE_TRANSISTORS,
       false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
       NUM_SUBFIELDS, latchPin, dataPin, clockPin);

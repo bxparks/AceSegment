@@ -53,17 +53,6 @@ void BaseHardwareTest::assertEvents(uint8_t n, ...) {
           assertEqual(mode, event.arg2);
         }
         break;
-      case Event::kTypeShiftOut: {
-          uint8_t dataPin = va_arg(args, int);
-          uint8_t clockPin = va_arg(args, int);
-          uint8_t bitOrder = va_arg(args, int);
-          uint8_t value = va_arg(args, int);
-          assertEqual(dataPin, event.arg1);
-          assertEqual(clockPin, event.arg2);
-          assertEqual(bitOrder, event.arg3);
-          assertEqual(value, event.arg4);
-        }
-        break;
       case Event::kTypeSpiBegin:
         break;
       case Event::kTypeSpiEnd:

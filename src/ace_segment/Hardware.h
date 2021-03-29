@@ -26,6 +26,7 @@ SOFTWARE.
 #define ACE_SEGMENT_HARDWARE_H
 
 #include <stdint.h>
+#include <Arduino.h>
 
 namespace ace_segment {
 
@@ -38,27 +39,22 @@ class Hardware {
     virtual ~Hardware() {}
 
     /** Write value to pin. */
-    virtual void digitalWrite(uint8_t pin, uint8_t value) {
+    virtual void digitalWrite(uint8_t pin, uint8_t value) const {
       ::digitalWrite(pin, value);
     }
 
     /** Set pin mode. */
-    virtual void pinMode(uint8_t pin, uint8_t mode) {
+    virtual void pinMode(uint8_t pin, uint8_t mode) const {
       ::pinMode(pin, mode);
     }
 
-    /** Shift out. */
-    virtual void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder,
-        uint8_t value) {
-    }
-
     /** Get the current micros  */
-    virtual unsigned long micros() {
+    virtual unsigned long micros() const {
       return ::micros();
     }
 
     /** Get the current millis  */
-    virtual unsigned long millis() {
+    virtual unsigned long millis() const {
       return ::millis();
     }
 

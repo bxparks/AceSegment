@@ -31,17 +31,18 @@ namespace ace_segment {
 
 /** Simple interface to select between a hardware SPI or software SPI. */
 class SpiAdapter {
-  /** Begin SPI. Also sets SPI pins to OUTPUT mode. */
-  virtual void spiBegin() = 0;
+  public:
+    /** Begin SPI. Also sets SPI pins to OUTPUT mode. */
+    virtual void spiBegin() const = 0;
 
-  /** End SPI. Also sets SPI pins to INPUT mode. */
-  virtual void spiEnd() = 0;
+    /** End SPI. Also sets SPI pins to INPUT mode. */
+    virtual void spiEnd() const = 0;
 
-  /** Send byte through SPI. */
-  virtual void spiTransfer(uint8_t value) = 0;
+    /** Send byte through SPI. */
+    virtual void spiTransfer(uint8_t value) const = 0;
 
-  /** Send word through SPI. */
-  virtual void spiTransfer16(uint16_t value) = 0;
+    /** Send word through SPI. */
+    virtual void spiTransfer16(uint16_t value) const = 0;
 };
 
 } // ace_segment
