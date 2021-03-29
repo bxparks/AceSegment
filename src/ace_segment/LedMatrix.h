@@ -81,17 +81,11 @@ class LedMatrix {
      * @param transistorsOnElements transistors used on elements, which
      *    invert the logic level for the element lines
      * @param numGroups number of group lines
-     * @param numElements number of element lines
      */
     LedMatrix(
         bool cathodeOnGroup,
         bool transistorsOnGroups,
-        bool transistorsOnElements,
-        uint8_t numGroups,
-        uint8_t numElements
-    ) :
-        mNumGroups(numGroups),
-        mNumElements(numElements) {
+        bool transistorsOnElements) {
 
       if (cathodeOnGroup) {
         setCathodeOnGroup();
@@ -107,13 +101,23 @@ class LedMatrix {
       }
     }
 
-    virtual ~LedMatrix() {}
-
     /** Configure the pins for the given LED wiring. */
-    virtual void configure() = 0;
+    virtual void begin() = 0;
 
-    /** Turn off the pins by doing the opposite of configure(). */
-    virtual void finish() = 0;
+    /** Turn off the pins by doing the opposite of begin(). */
+    virtual void end() = 0;
+
+    /** Write element patterns for the given group. */
+    virtual void draw(uint8_t group, uint8_t elementPattern) = 0;
+
+    /** Disable the elements of given group. */
+    virtual void disableGroup(uint8_t group) = 0;
+
+    /** Enable the elements of given group. */
+    virtual void enableGroup(uint8_t group) = 0;
+
+    /** Clear everything. */
+    virtual void clear() = 0;
 
   protected:
     /** LED negative terminals are on the group line. */
@@ -145,9 +149,7 @@ class LedMatrix {
     }
 
   protected:
-    const uint8_t mNumGroups;
-    const uint8_t mNumElements;
-
+    // TODO: Change these to XorMask
     uint8_t mGroupOn;
     uint8_t mGroupOff;
     uint8_t mElementOn;

@@ -41,20 +41,18 @@ class LedMatrixSplit: public LedMatrix {
         bool transistorsOnGroups,
         bool transistorsOnElements,
         uint8_t numGroups,
-        uint8_t numElements,
         const uint8_t* groupPins
     ) :
         LedMatrix(
             cathodeOnGroup,
             transistorsOnGroups,
-            transistorsOnElements,
-            numGroups,
-            numElements),
+            transistorsOnElements),
         mHardware(hardware),
+        mNumGroups(numGroups),
         mGroupPins(groupPins)
     {}
 
-    virtual void configure() {
+    void begin() override {
       for (uint8_t group = 0; group < mNumGroups; group++) {
         uint8_t pin = mGroupPins[group];
         mHardware->pinMode(pin, OUTPUT);
@@ -62,21 +60,41 @@ class LedMatrixSplit: public LedMatrix {
       }
     }
 
-    virtual void finish() {
+    void end() override {
       for (uint8_t group = 0; group < mNumGroups; group++) {
         uint8_t pin = mGroupPins[group];
         mHardware->pinMode(pin, INPUT);
       }
     }
 
-    void enableGroup(uint8_t group) {
+    void draw(uint8_t group, uint8_t elementPattern) override {
+      if (group != mPrevGroup) {
+        disableGroup(mPrevGroup);
+      }
+
+      drawElements(elementPattern);
+      enableGroup(group);
+      mPrevGroup = group;
+    }
+
+    void enableGroup(uint8_t group) override {
       writeGroupPin(group, mGroupOn);
+      mPrevGroup = group;
     }
 
-    void disableGroup(uint8_t group) {
+    void disableGroup(uint8_t group) override {
       writeGroupPin(group, mGroupOff);
+      mPrevGroup = group;
     }
 
+    void clear() override {
+      for (uint8_t group = 0; group < mNumGroups; group++) {
+        disableGroup(group);
+      }
+      drawElements(0);
+    }
+
+  protected:
     virtual void drawElements(uint8_t pattern) = 0;
 
   private:
@@ -88,7 +106,10 @@ class LedMatrixSplit: public LedMatrix {
 
   protected:
     const Hardware* const mHardware;
+    uint8_t const mNumGroups;
     const uint8_t* const mGroupPins;
+
+    uint8_t mPrevGroup = 0;
 };
 
 }

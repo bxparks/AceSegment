@@ -23,7 +23,6 @@ SOFTWARE.
 */
 
 #include <Arduino.h>
-#include "DimmablePattern.h"
 #include "HexWriter.h"
 
 namespace ace_segment {
@@ -68,20 +67,12 @@ const uint8_t HexWriter::kCharacterArray[] PROGMEM = {
 const uint8_t HexWriter::kNumCharacters =
     sizeof(kCharacterArray)/sizeof(kCharacterArray[0]);
 
-void HexWriter::writeHexAt(uint8_t digit, uint8_t c, uint8_t brightness) {
-  if (digit >= getNumDigits()) return;
-  uint8_t pattern = ((uint8_t) c < kNumCharacters)
-      ? pgm_read_byte(&kCharacterArray[(uint8_t) c])
-      : kMinus;
-  mRenderer->writePatternAt(digit, pattern, brightness);
-}
-
 void HexWriter::writeHexAt(uint8_t digit, uint8_t c) {
-  if (digit >= getNumDigits()) return;
+  if (digit >= mSegmentDisplay->getNumDigits()) return;
   uint8_t pattern = ((uint8_t) c < kNumCharacters)
       ? pgm_read_byte(&kCharacterArray[(uint8_t) c])
-      : kMinus;
-  mRenderer->writePatternAt(digit, pattern);
+      : kMinus; // out of range
+  mSegmentDisplay->writePatternAt(digit, pattern);
 }
 
 }

@@ -26,7 +26,6 @@ SOFTWARE.
 #define ACE_SEGMENT_TIMING_STATS_H
 
 #include <stdint.h>
-#include "Driver.h"
 
 namespace ace_segment {
 

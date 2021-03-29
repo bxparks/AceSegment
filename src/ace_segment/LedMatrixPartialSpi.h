@@ -49,7 +49,6 @@ class LedMatrixPartialSpi: public LedMatrixSplit {
         bool transistorsOnGroups,
         bool transistorsOnElements,
         uint8_t numGroups,
-        uint8_t numElements,
         const uint8_t* groupPins
     ) :
         LedMatrixSplit(
@@ -58,23 +57,23 @@ class LedMatrixPartialSpi: public LedMatrixSplit {
             transistorsOnGroups,
             transistorsOnElements,
             numGroups,
-            numElements,
             groupPins),
         mSpiAdapter(spiAdapter)
     {}
 
-    void configure() override {
-      LedMatrixSplit::configure();
+    void begin() override {
+      LedMatrixSplit::begin();
 
       mSpiAdapter->spiBegin();
     }
 
-    void finish() override {
-      LedMatrixSplit::finish();
+    void end() override {
+      LedMatrixSplit::end();
 
       mSpiAdapter->spiEnd();
     }
 
+  protected:
     void drawElements(uint8_t pattern) override {
       uint8_t actualPattern = (mElementOn == HIGH) ? pattern : ~pattern;
       mSpiAdapter->spiTransfer(actualPattern);

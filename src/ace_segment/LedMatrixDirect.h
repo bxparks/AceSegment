@@ -37,8 +37,8 @@ class LedMatrixDirect: public LedMatrixSplit {
         bool transistorsOnGroups,
         bool transistorsOnElements,
         uint8_t numGroups,
-        uint8_t numElements,
         const uint8_t* groupPins,
+        uint8_t numElements,
         const uint8_t* elementPins
     ) :
         LedMatrixSplit(
@@ -47,13 +47,13 @@ class LedMatrixDirect: public LedMatrixSplit {
             transistorsOnGroups,
             transistorsOnElements,
             numGroups,
-            numElements,
             groupPins),
+        mNumElements(numElements),
         mElementPins(elementPins)
     {}
 
-    void configure() override {
-      LedMatrixSplit::configure();
+    void begin() override {
+      LedMatrixSplit::begin();
 
       for (uint8_t element = 0; element < mNumElements; element++) {
         uint8_t elementPin = mElementPins[element];
@@ -62,8 +62,8 @@ class LedMatrixDirect: public LedMatrixSplit {
       }
     }
 
-    void finish() override {
-      LedMatrixSplit::finish();
+    void end() override {
+      LedMatrixSplit::end();
 
       for (uint8_t element = 0; element < mNumElements; element++) {
         uint8_t elementPin = mElementPins[element];
@@ -71,6 +71,7 @@ class LedMatrixDirect: public LedMatrixSplit {
       }
     }
 
+  protected:
     void drawElements(uint8_t pattern) override {
       uint8_t elementMask = 0x1;
       for (uint8_t element = 0; element < mNumElements; element++) {
@@ -89,6 +90,7 @@ class LedMatrixDirect: public LedMatrixSplit {
     }
 
   private:
+    uint8_t const mNumElements;
     const uint8_t* const mElementPins;
 };
 

@@ -26,168 +26,163 @@ SOFTWARE.
 #define ACE_SEGMENT_RENDERER_H
 
 #include <stdint.h>
-#include "TimingStats.h"
-#include "Driver.h"
+#include "LedMatrix.h"
 
 namespace ace_segment {
 
-class DimmablePattern;
-class Hardware;
-
 /**
- * A class that knows how to translate an array of led segement bit patterns
- * with its brightness to a displayable frame for the Driver class.
+ * A class that multiplexes an array of segment patterns through each digit,
+ * using the provided LedMatrix set the led segments for each digit.
+ * Multiplexing occurs by scanning through the digits. This class knows how to
+ * render a single field of a frame, where a frame and field are defined below.
+ * Interestingly, this classes does not know about the timing between successive
+ * rendering of fields. This is provided by SegmentDisplay, either through
+ * polling or through an ISR.
  *
- * A frame is divided into fields, which is a partial rendering of a frame. The
- * renderField() (or renderFieldWhenReady()) method should be called to
- * successively render each field of a frame.
+ * A single frame is the rendering of all digits of the LED module. If it has 4
+ * digis, then each frame is composed of 4 fields. Brightness control through
+ * PWM modulation requires the brightnesses array and numSubFields > 1. Each
+ * digit is rendered for numSubFields times, before moving to the next digit.
+ * The numSubFields becomes the number of available brightness levels. The total
+ * number of fields per frame is (digits * numSubFields).
  */
 class Renderer {
   public:
-    static const uint8_t kDefaultBrightness = 128;
-
     /**
      * Constructor.
      *
-     * @param hardware pointer to an instance of Hardware. Required.
-     * @param driver pointer to a Driver instance. Required.
-     * @param dimmablePatterns an array of DimmablePattern representing the LED
-     *    digits
-     * @param numDigits number of digits in the LED display
-     * @param framesPerSecond the rate at which the LED display will be
-     *    refreshed
-     * @param statsResetInterval milliseconds between TimingStats reset
+     * @param ledMatrix instance of LedMatrix that understanding the wiring
+     * @param numSubFields split a single digit field into this many subfields
+     *    so that we can control its apparent brightness
+     * @param numDigits number of patterns
+     * @param patterns array of segment pattern per digit, not nullable
+     * @param brightnesses array of brightness for each digit, nullable
      */
     explicit Renderer(
-        Hardware* hardware,
-        Driver* driver,
-        DimmablePattern* dimmablePatterns,
+        LedMatrix* ledMatrix,
         uint8_t numDigits,
-        uint8_t framesPerSecond,
-        uint16_t statsResetInterval
-    ):
-        mHardware(hardware),
-        mDriver(driver),
-        mDimmablePatterns(dimmablePatterns),
+        const uint8_t* patterns,
+        const uint8_t* brightnesses = nullptr,
+        uint8_t numSubFields = 1
+    ) :
+        mLedMatrix(ledMatrix),
         mNumDigits(numDigits),
-        mFramesPerSecond(framesPerSecond),
-        mStatsResetInterval(statsResetInterval)
+        mPatterns(patterns),
+        mBrightnesses(brightnesses),
+        mNumSubFields(numSubFields)
     {}
 
-    /** Destructor. */
-    virtual ~Renderer() {}
+    void begin() {
+      mCurrentDigit = 0;
+      mPrevDigit = mNumDigits - 1;
+      mCurrentSubField = 0;
+      mCurrentSubFieldMax = 0;
+      mPattern = 0;
+      mPreparedToSleep = false;
 
-    /**
-     * Configure the driver with the parameters given by in the constructor.
-     * Normally, this should be called only once after construction. Unit tests
-     * will sometimes change a parameter of FakeDriver and call this a second
-     * time.
-     */
-    virtual void configure();
-
-    /** Get the number of digits. */
-    uint8_t getNumDigits() { return mNumDigits; }
-
-    /** Return the frames per second. */
-    uint16_t getFramesPerSecond() { return mFramesPerSecond; }
-
-    /** Return the fields per second. */
-    uint16_t getFieldsPerSecond() {
-      return mFramesPerSecond * mDriver->getFieldsPerFrame();
+      mLedMatrix->clear();
     }
 
-    /**
-     * Set brightness expressed as a fraction of 256. In other words, 255 is
-     * brightest (default); 1 is 1/256 of full brightness. Requires Driver
-     * modulation using numSubFields greater than 1. If the driver doesn't
-     * support brightness, then anything above 0 is full brightness and 0 turns
-     * off the digit.
-     */
-    void writeBrightness(uint8_t brightness) {
-      mBrightness = brightness;
+    void end() {}
+
+    uint16_t getFieldsPerFrame() {
+      return mNumDigits * mNumSubFields;
     }
 
-    /**
-     * Write the pattern for a given digit, with the default brightness set
-     * by the global writeBrightness() method. If the digit is out of bounds,
-     * the method does nothing.
-     */
-    void writePatternAt(uint8_t digit, uint8_t pattern);
-
-     /**
-     * Write the pattern and brightness for a given digit. If the digit is out
-     * of bounds, the method does nothing.
-     */
-    void writePatternAt(uint8_t digit, uint8_t pattern, uint8_t brightness);
+    bool isBrightnessSupported() { return mNumSubFields > 1; }
 
     /**
-     * Write the brightness for a given digit, leaving pattern unchanged.
-     * If the digit is out of bounds, the method does nothing.
+     * Display the current field, usually just the current digit. If modulation
+     * is supported, then each digit is PWM modulated over mNumSubFields.
      */
-    void writeBrightnessAt(uint8_t digit, uint8_t brightness);
-
-    /** Write the decimal point for the digit. */
-    void writeDecimalPointAt(uint8_t digit, bool state = true);
-
-    /** Clear all digits to blank pattern and all brightness to 0. */
-    void clear();
+    void displayCurrentField();
 
     /**
-     * Display one field of a frame when the time is right. This is a polling
-     * method, so call this slightly more frequently than getFieldsPerSecond().
-     *
-     * @return Returns true if renderField() was called and the field was
-     * rendered. The flag can be used to optimize the polling of
-     * getTimingStats(). If the return value is false, there's no need to call
-     * getTimingStats() again, since it will not have changed.
+     * Prepare to go to sleep by clearing the frame, and setting a flag so that
+     * it doesn't turn itself back on through an interrupt.
      */
-    bool renderFieldWhenReady();
+    void prepareToSleep() {
+      mPreparedToSleep = true;
+      mLedMatrix->clear();
+    }
 
-    /**
-     * Render the current field immediately. Designed to be called from a timer
-     * interrupt handler.
-     */
-    void renderField();
-
-    /**
-     * Return stats. For debugging only. TimingStats is returned by 'value' to
-     * be safe from interrupts.
-     */
-    // TODO: make this a pointer and make stats gathering optional
-    TimingStats getTimingStats();
+    /** Wake up from sleep. */
+    void wakeFromSleep() { mPreparedToSleep = false; }
 
   private:
     // disable copy-constructor and assignment operator
     Renderer(const Renderer&) = delete;
     Renderer& operator=(const Renderer&) = delete;
 
-    /** Perform things that need to be done each frame. */
-    void updateFrame();
+    /** Display field normally without modulation. */
+    void displayCurrentFieldPlain();
 
-    Hardware* const mHardware;
-    Driver* const mDriver;
-    DimmablePattern* const mDimmablePatterns;
-    const uint8_t mNumDigits;
-    const uint8_t mFramesPerSecond;
-    const uint16_t mStatsResetInterval;
+    /** Display field using subfield modulation. */
+    void displayCurrentFieldModulated();
 
-    // TODO: change to a pointer to allow disabling it
-    TimingStats mStats;
+  private:
+    /**
+     * Number of segments on a single digit. To support a 14-segment LED display
+     * or a 16-segment LED display, we would need to change various bit fields
+     * from uint8_t to uint16_t. It's a bit of work but doable.
+     */
+    static const uint8_t kNumSegments = 8;
 
-    // global brightness, can be changed during runtime
-    uint8_t mBrightness = kDefaultBrightness;
+    /** LedMatrix instance that knows how to set and unset LED segments. */
+    LedMatrix* const mLedMatrix;
 
-    // does the Driver support brightness?
-    bool mIsBrightnessEnabled = false;
+    /** Number of digits. */
+    uint8_t const mNumDigits;
 
-    // variables to support renderFieldWhenReady()
-    uint16_t mMicrosPerField;
-    uint16_t mLastRenderFieldMicros;
+    /** Pattern for each digit. Not nullable. */
+    uint8_t const* const mPatterns;
 
-    // each call to renderField() increment current field counter modulo the
-    // fieldsPerFrame, so certain calculations can be performed once per frame
-    uint16_t mFieldsPerFrame;
-    uint16_t mCurrentField;
+    /** Brightness for each digit. Nullable. */
+    const uint8_t* const mBrightnesses;
+
+    /**
+     * Number of subfields to render per digit.
+     * If this is greater than 1, use displayCurrentFieldModulated().
+     */
+    uint8_t const mNumSubFields;
+
+    /**
+     * Within the displayCurrentField() method, mCurrentDigit is the current
+     * digit that is being drawn. It is incremented to the next digit just
+     * before returning from that method.
+     */
+    uint8_t mCurrentDigit;
+
+    /**
+     * Within the displayCurrentField() method, the mPrevDigit is the digit
+     * that was displayed on the previous call to displayCurrentField(). It is
+     * set to the digit that was just displayed before returning. It will be
+     * equal to mCurrentDigit when multiple fields are drawn for the same
+     * digit.
+     */
+    uint8_t mPrevDigit;
+
+    /**
+     * Used by displayCurrentFieldModulated() and subclasses generated by
+     * fast_driver.py.
+     */
+    uint8_t mCurrentSubField;
+
+    /**
+     * Used by displayCurrentFieldModulated() and subclasses generated by
+     * fast_driver.py
+     */
+    uint8_t mCurrentSubFieldMax;
+
+    /**
+     * The segment pattern that is currently displaying on the LED. Used to
+     * optimize the displayCurrentFieldModulated() method if the current
+     * pattern is the same as the previous pattern.
+     */
+    uint8_t mPattern;
+
+    /** Set to true just before going to sleep. */
+    volatile bool mPreparedToSleep;
 };
 
 }

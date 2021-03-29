@@ -26,43 +26,29 @@ SOFTWARE.
 #define ACE_SEGMENT_CHAR_WRITER_H
 
 #include <stdint.h>
-#include "DimmablePattern.h"
-#include "Renderer.h"
+#include "SegmentDisplay.h"
 
 namespace ace_segment {
 
 /**
  * The CharWriter supports mapping of ASCII (0 - 127) characters to segment
- * patterns supported by Renderer.
+ * patterns supported by SegmentDisplay.
  */
 class CharWriter {
   public:
     static const uint8_t kNumCharacters = 128;
 
     /** Constructor. */
-    explicit CharWriter(Renderer* renderer):
-        mRenderer(renderer)
+    explicit CharWriter(SegmentDisplay* segmentDisplay):
+        mSegmentDisplay(segmentDisplay)
     {}
 
-    /** Get the number of digits. */
-    uint8_t getNumDigits() { return mRenderer->getNumDigits(); }
-
     /** Write the character at the specified position. */
-    void writeCharAt(uint8_t digit, char c);
+    void writeCharAt(uint8_t pos, char c);
 
-    /** Write the character at the specified position. */
-    void writeCharAt(uint8_t digit, char c, uint8_t brightness);
-
-    /** Write the brightness for a given digit, leaving character unchanged. */
-    void writeBrightnessAt(uint8_t digit, uint8_t brightness) {
-      if (digit >= getNumDigits()) return;
-      mRenderer->writeBrightnessAt(digit, brightness);
-    }
-
-    /** Write the decimal point at digit. */
-    void writeDecimalPointAt(uint8_t digit, bool state = true) {
-      if (digit >= getNumDigits()) return;
-      mRenderer->writeDecimalPointAt(digit, state);
+    /** Get total number of digits in display. */
+    SegmentDisplay* getSegmentDisplay() const {
+      return mSegmentDisplay;
     }
 
   private:
@@ -73,7 +59,7 @@ class CharWriter {
     CharWriter(const CharWriter&) = delete;
     CharWriter& operator=(const CharWriter&) = delete;
 
-    Renderer* const mRenderer;
+    SegmentDisplay* const mSegmentDisplay;
 };
 
 }

@@ -27,6 +27,7 @@ SOFTWARE.
 
 #include <stdint.h>
 #include <Arduino.h>
+#include "SpiAdapter.h"
 
 namespace ace_segment {
 

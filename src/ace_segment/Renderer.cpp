@@ -22,111 +22,69 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <Arduino.h>
-#include "Util.h"
-#include "DimmablePattern.h"
 #include "Hardware.h"
 #include "Renderer.h"
+#include "LedMatrix.h"
+#include "Util.h"
 
 namespace ace_segment {
 
-void Renderer::configure() {
-  uint16_t nowMicros = mHardware->micros();
+void Renderer::displayCurrentField() {
+  if (mPreparedToSleep) return;
 
-  // Extract driver specific info.
-  mIsBrightnessEnabled = mDriver->isBrightnessSupported();
-  mFieldsPerFrame = mDriver->getFieldsPerFrame();
-
-  // Counters for frames and fields.
-  mCurrentField = 0;
-
-  // Set up durations for polling.
-  mMicrosPerField = 1000000UL / getFieldsPerSecond();
-  mLastRenderFieldMicros = nowMicros;
-
-  // Reset statistics
-  mStats.reset();
-}
-
-void Renderer::writePatternAt(uint8_t digit, uint8_t pattern) {
-  if (digit >= mNumDigits) return;
-  DimmablePattern& dimmablePattern = mDimmablePatterns[digit];
-  dimmablePattern.pattern = pattern;
-  dimmablePattern.brightness = mBrightness;
-}
-
-void Renderer::writePatternAt(
-    uint8_t digit, uint8_t pattern, uint8_t brightness) {
-  if (digit >= mNumDigits) return;
-  DimmablePattern& dimmablePattern = mDimmablePatterns[digit];
-  dimmablePattern.pattern = pattern;
-  dimmablePattern.brightness = brightness;
-}
-
-void Renderer::writeBrightnessAt(uint8_t digit, uint8_t brightness) {
-  if (digit >= mNumDigits) return;
-  DimmablePattern& dimmablePattern = mDimmablePatterns[digit];
-  dimmablePattern.brightness = brightness;
-}
-
-void Renderer::writeDecimalPointAt(uint8_t digit, bool state) {
-  if (digit >= mNumDigits) return;
-  DimmablePattern& dimmablePattern = mDimmablePatterns[digit];
-  if (state) {
-    dimmablePattern.setDecimalPoint();
+  if (mNumSubFields == 1) {
+    displayCurrentFieldPlain();
   } else {
-    dimmablePattern.clearDecimalPoint();
-  }
-}
-void Renderer::clear() {
-  for (uint8_t i = 0; i < mNumDigits; i++) {
-    mDimmablePatterns[i].pattern = 0;
-    mDimmablePatterns[i].brightness = 0;
+    displayCurrentFieldModulated();
   }
 }
 
-bool Renderer::renderFieldWhenReady() {
-  uint16_t now = mHardware->micros();
-  uint16_t elapsedMicros = now - mLastRenderFieldMicros;
-  if (elapsedMicros >= mMicrosPerField) {
-    renderField();
-    mLastRenderFieldMicros = now;
-    return true;
+void Renderer::displayCurrentFieldPlain() {
+  const uint8_t brightness = (mBrightnesses)
+      ? mBrightnesses[mCurrentDigit]
+      : 0xFF;
+  if (brightness == 0) {
+    mLedMatrix->disableGroup(mCurrentDigit);
   } else {
-    return false;
+    const uint8_t pattern = mPatterns[mCurrentDigit];
+    if (pattern != mPattern) {
+      mPattern = pattern;
+      mLedMatrix->draw(mCurrentDigit, pattern);
+    }
   }
+
+  mPrevDigit = mCurrentDigit;
+  Util::incrementMod(mCurrentDigit, mNumDigits);
 }
 
-void Renderer::renderField() {
-  uint16_t now = mHardware->micros();
-  if (mCurrentField == 0) {
-    updateFrame();
-  }
-  mDriver->displayCurrentField();
-  Util::incrementMod(mCurrentField, mFieldsPerFrame);
-
-  uint16_t duration = mHardware->micros() - now;
-  mStats.update(duration);
-}
-
-void Renderer::updateFrame() {
-  for (uint8_t digit = 0; digit < mNumDigits; digit++) {
-    DimmablePattern& dimmablePattern = mDimmablePatterns[digit];
-    mDriver->setPattern(
-      digit, dimmablePattern.pattern, dimmablePattern.brightness);
+void Renderer::displayCurrentFieldModulated() {
+  // Calculate the maximum subfield duration for a given digit.
+  const uint8_t brightness = (mBrightnesses)
+      ? mBrightnesses[mCurrentDigit]
+      : 0xFF;
+  if (mCurrentDigit != mPrevDigit) {
+    mCurrentSubFieldMax = ((uint16_t) mNumSubFields * brightness) / 256;
   }
 
-  if (mStatsResetInterval > 0 &&
-      mStats.getCount() >= mStatsResetInterval) {
-    mStats.reset();
-  }
-}
+  // No matter how small the mNumSubFields, we want:
+  // * If brightness == 0, then subfield 0 should be OFF.
+  // * If brightness == 255, then special case that to be ON.
+  const uint8_t pattern =
+      (brightness == 255 || mCurrentSubField < mCurrentSubFieldMax)
+      ? mPatterns[mCurrentDigit]
+      : 0;
 
-TimingStats Renderer::getTimingStats() {
-  noInterrupts();
-  TimingStats stats = mStats;
-  interrupts();
-  return stats;
+  if (pattern != mPattern || mCurrentDigit != mPrevDigit) {
+    mLedMatrix->draw(mCurrentDigit, pattern);
+    mPattern = pattern;
+  }
+
+  mCurrentSubField++;
+  mPrevDigit = mCurrentDigit;
+  if (mCurrentSubField >= mNumSubFields) {
+    Util::incrementMod(mCurrentDigit, mNumDigits);
+    mCurrentSubField = 0;
+  }
 }
 
 }

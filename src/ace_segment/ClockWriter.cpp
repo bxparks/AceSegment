@@ -23,7 +23,6 @@ SOFTWARE.
 */
 
 #include <Arduino.h>
-#include "DimmablePattern.h"
 #include "ClockWriter.h"
 
 namespace ace_segment {
@@ -70,34 +69,26 @@ const uint8_t ClockWriter::kCharacterArray[] PROGMEM = {
 const uint8_t ClockWriter::kNumCharacters =
     sizeof(kCharacterArray)/sizeof(kCharacterArray[0]);
 
-void ClockWriter::writeCharAt(uint8_t digit, uint8_t c, uint8_t brightness) {
-  if (digit >= getNumDigits()) return;
+void ClockWriter::writeCharAt(uint8_t pos, uint8_t c) {
+  if (pos >= mSegmentDisplay->getNumDigits()) return;
   uint8_t pattern = ((uint8_t) c < kNumCharacters)
       ? pgm_read_byte(&kCharacterArray[(uint8_t) c])
       : kSpace;
-  mRenderer->writePatternAt(digit, pattern, brightness);
+  mSegmentDisplay->writePatternAt(pos, pattern);
 }
 
-void ClockWriter::writeCharAt(uint8_t digit, uint8_t c) {
-  if (digit >= getNumDigits()) return;
-  uint8_t pattern = ((uint8_t) c < kNumCharacters)
-      ? pgm_read_byte(&kCharacterArray[(uint8_t) c])
-      : kSpace;
-  mRenderer->writePatternAt(digit, pattern);
-}
-
-void ClockWriter::writeBcdAt(uint8_t digit, uint8_t bcd) {
+void ClockWriter::writeBcdAt(uint8_t pos, uint8_t bcd) {
   uint8_t c0 = (bcd & 0xF0) >> 4;
   uint8_t c1 = (bcd & 0x0F);
   if (c0 > 9) c0 = kSpace;
   if (c1 > 9) c1 = kSpace;
-  writeCharAt(digit++, c0);
-  writeCharAt(digit, c1);
+  writeCharAt(pos++, c0);
+  writeCharAt(pos, c1);
 }
 
-void ClockWriter::writeDecimalAt(uint8_t digit, uint8_t d) {
+void ClockWriter::writeDecimalAt(uint8_t pos, uint8_t d) {
   uint8_t bcd = toBcd(d);
-  writeBcdAt(digit, bcd);
+  writeBcdAt(pos, bcd);
 }
 
 void ClockWriter::writeClock(uint8_t hh, uint8_t mm) {

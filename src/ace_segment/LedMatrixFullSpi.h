@@ -41,24 +41,20 @@ class LedMatrixFullSpi: public LedMatrix {
         const SpiAdapter* spiAdapter,
         bool cathodeOnGroup,
         bool transistorsOnGroups,
-        bool transistorsOnElements,
-        uint8_t numGroups,
-        uint8_t numElements
+        bool transistorsOnElements
     ) :
         LedMatrix(
             cathodeOnGroup,
             transistorsOnGroups,
-            transistorsOnElements,
-            numGroups,
-            numElements),
+            transistorsOnElements),
         mSpiAdapter(spiAdapter)
     {}
 
-    void configure() override {
+    void begin() override {
       mSpiAdapter->spiBegin();
     }
 
-    void finish() override {
+    void end() override {
       mSpiAdapter->spiEnd();
     }
 
@@ -66,18 +62,39 @@ class LedMatrixFullSpi: public LedMatrix {
      * Write out the group and element patterns in a single 16-bit stream
      * with the group bits in the MSB and the element bits in the LSB.
      */
-    void draw(uint8_t groupPattern, uint8_t elementPattern) {
-      uint8_t actualElementPattern = (mElementOn == HIGH)
-          ? elementPattern : ~elementPattern;
+    void draw(uint8_t group, uint8_t elementPattern) override {
+      uint8_t groupPattern = 0x1 << group; // Would a lookup table be faster?
+
+      // TODO: Use an XOR mask instead of these conditionals.
       uint8_t actualGroupPattern = (mGroupOn == HIGH)
           ? groupPattern : ~groupPattern;
+      uint8_t actualElementPattern = (mElementOn == HIGH)
+          ? elementPattern : ~elementPattern;
 
+      mSpiAdapter->spiTransfer16(
+          actualGroupPattern << 8 | actualElementPattern);
+      mPrevElementPattern = elementPattern;
+    }
+
+    void enableGroup(uint8_t group) override {
+      draw(group, mPrevElementPattern);
+    }
+
+    void disableGroup(uint8_t group) override {
+      (void) group;
+      clear();
+    }
+
+    void clear() override {
+      uint8_t actualGroupPattern = (mGroupOn == HIGH) ? 0x00: 0xFF;
+      uint8_t actualElementPattern = (mElementOn == HIGH) ? 0x00 : 0xFF;
       mSpiAdapter->spiTransfer16(
           actualGroupPattern << 8 | actualElementPattern);
     }
 
   private:
     const SpiAdapter* const mSpiAdapter;
+    uint8_t mPrevElementPattern;
 };
 
 }

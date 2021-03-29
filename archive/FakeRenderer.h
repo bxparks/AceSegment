@@ -25,30 +25,36 @@ SOFTWARE.
 #ifndef ACE_SEGMENT_FAKE_RENDERER_H
 #define ACE_SEGMENT_FAKE_RENDERER_H
 
-#include <stdint.h>
-#include "../Renderer.h"
+#include "../Driver.h"
 
 namespace ace_segment {
-
 namespace testing {
 
 /**
- * A fake version of Renderer for testing purposes.
+ * A fake instance of Renderer so that it can be tested in isolation.
+ * Previously called "FakeDriver".
  */
 class FakeRenderer: public Renderer {
   public:
-    FakeRenderer(DimmablePattern* dimmablePatterns, uint8_t numDigits)
-      : Renderer(
-          nullptr /* hardware */,
-          nullptr /* driver */,
-          dimmablePatterns,
-          numDigits,
-          60 /* framesPerSecond */,
-          1200 /* statsResetInterval */)
+    explicit FakeRenderer(DimmablePattern* dimmablePatterns, uint8_t numDigits):
+        Driver(nullptr /* ledMatrix */, dimmablePatterns, numDigits)
     {}
 
-    /** A stub implementation to prevent dependency on Hardware and Driver. */
-    void configure()  override {}
+    void displayCurrentField() override {}
+
+    uint16_t getFieldsPerFrame() override {
+      return (uint16_t) mNumSubFields * mNumDigits;
+    }
+
+    bool isBrightnessSupported() override {
+      return (mNumSubFields > 1);
+    }
+
+    void setNumSubFields(uint8_t numSubFields) {
+      mNumSubFields = numSubFields;
+    }
+
+    uint8_t mNumSubFields = 1;
 };
 
 }

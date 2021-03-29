@@ -22,38 +22,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_FAKE_DRIVER_H
-#define ACE_SEGMENT_FAKE_DRIVER_H
+#ifndef ACE_SEGMENT_FAKE_SEGMENT_DISPLAY_H
+#define ACE_SEGMENT_FAKE_SEGMENT_DISPLAY_H
 
-#include "../Driver.h"
+#include <stdint.h>
+#include "../Renderer.h"
 
 namespace ace_segment {
+
 namespace testing {
 
 /**
- * A fake instance of Driver so that Renderer can be tested in isolation.
+ * A fake version of SegmentDisplay for testing purposes. Previously called
+ * "FakeRenderer".
  */
-class FakeDriver: public Driver {
+class FakeSegmentDisplay: public SegmentDisplay {
   public:
-    explicit FakeDriver(DimmablePattern* dimmablePatterns, uint8_t numDigits):
-        Driver(nullptr /* ledMatrix */, dimmablePatterns, numDigits)
+    FakeSegmentDisplay(DimmablePattern* dimmablePatterns, uint8_t numDigits)
+      : SegmentDisplay(
+          nullptr /* hardware */,
+          nullptr /* driver */,
+          dimmablePatterns,
+          numDigits,
+          60 /* framesPerSecond */,
+          1200 /* statsResetInterval */)
     {}
 
-    void displayCurrentField() override {}
-
-    uint16_t getFieldsPerFrame() override {
-      return (uint16_t) mNumSubFields * mNumDigits;
-    }
-
-    bool isBrightnessSupported() override {
-      return (mNumSubFields > 1);
-    }
-
-    void setNumSubFields(uint8_t numSubFields) {
-      mNumSubFields = numSubFields;
-    }
-
-    uint8_t mNumSubFields = 1;
+    /** A stub implementation to prevent dependency on Hardware and Driver. */
+    void configure()  override {}
 };
 
 }
