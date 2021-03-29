@@ -24,7 +24,7 @@ using namespace ace_button;
 #define DRIVER_MODE_MERGED_SPI_DIGIT 8
 
 // Define the Driver to use.
-#define DRIVER_MODE DRIVER_MODE_MERGED_SERIAL_DIGIT
+#define DRIVER_MODE DRIVER_MODE_MERGED_SPI_DIGIT
 
 // Use polling or interrupt.
 #define USE_INTERRUPT 0
@@ -39,15 +39,12 @@ using namespace ace_button;
 const uint8_t FRAMES_PER_SECOND = 60;
 const uint8_t NUM_SUBFIELDS = 1;
 
-const uint16_t STATS_RESET_INTERVAL = 1200;
-
 const uint8_t NUM_DIGITS = 4;
 const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
 
-const uint8_t NUM_SEGMENTS = 8;
-
 #if DRIVER_MODE == DRIVER_MODE_DIRECT_DIGIT
   // 4 digits, resistors on segments on Pro Micro.
+  const uint8_t NUM_SEGMENTS = 8;
   const uint8_t segmentPins[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
 #else
   const uint8_t latchPin = 10; // ST_CP on 74HC595
@@ -60,14 +57,14 @@ Hardware hardware;
 
 #if DRIVER_MODE == DRIVER_MODE_DIRECT_DIGIT
   LedMatrixDirect ledMatrix(
-    &hardware,
-    true /*commonCathode*/,
-    true /*transitorOnGroups*/,
-    false /* transistorsOnSegments */,
-    NUM_DIGITS,
-    digitPins,
-    NUM_SEGMENTS,
-    segmentPins);
+      &hardware,
+      true /*commonCathode*/,
+      true /*transitorOnGroups*/,
+      false /* transistorsOnSegments */,
+      NUM_DIGITS,
+      digitPins,
+      NUM_SEGMENTS,
+      segmentPins);
 #elif DRIVER_MODE == DRIVER_MODE_SERIAL_DIGIT
   SwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
   LedMatrixPartialSpi ledMatrix(
@@ -107,16 +104,13 @@ Hardware hardware;
 #endif
 
 uint8_t patterns[8];
-Renderer renderer(
-    &ledMatrix,
+Renderer renderer(&ledMatrix, NUM_DIGITS, patterns);
+SegmentDisplay segmentDisplay(
+    &hardware,
+    &renderer,
+    FRAMES_PER_SECOND,
     NUM_DIGITS,
     patterns);
-SegmentDisplay segmentDisplay(
-  &hardware,
-  &renderer,
-  FRAMES_PER_SECOND,
-  NUM_DIGITS,
-  patterns);
 
 HexWriter hexWriter(&segmentDisplay);
 ClockWriter clockWriter(&segmentDisplay);
@@ -167,11 +161,11 @@ const uint8_t DEMO_LOOP_MODE_PAUSED = 1;
 uint8_t demoLoopMode = DEMO_LOOP_MODE_AUTO;
 
 const uint8_t DEMO_MODE_COUNT = 5;
-const uint8_t DEMO_MODE_HEX = 0;
-const uint8_t DEMO_MODE_CHAR = 1;
-const uint8_t DEMO_MODE_STRINGS = 2;
-const uint8_t DEMO_MODE_SCROLL = 3;
-const uint8_t DEMO_MODE_CLOCK = 4;
+const uint8_t DEMO_MODE_CLOCK = 0;
+const uint8_t DEMO_MODE_HEX = 1;
+const uint8_t DEMO_MODE_CHAR = 2;
+const uint8_t DEMO_MODE_STRINGS = 3;
+const uint8_t DEMO_MODE_SCROLL = 4;
 
 // Demo mode.
 uint8_t demoMode = DEMO_MODE_HEX;
@@ -200,8 +194,10 @@ void writeClock() {
 
   clockWriter.writeClock(hh, mm);
 
-  Util::incrementMod(mm, (uint8_t)100);
-  Util::incrementMod(hh, (uint8_t)100);
+  Util::incrementMod(mm, (uint8_t)60);
+  if (mm == 0) {
+    Util::incrementMod(hh, (uint8_t)60);
+  }
 }
 
 void writeChars() {
@@ -245,7 +241,9 @@ void scrollString(const char* s) {
 
 /** Display the demo pattern selected by demoMode. */
 void displayDemo() {
-  if (demoMode == DEMO_MODE_HEX) {
+  if (demoMode == DEMO_MODE_CLOCK) {
+    writeClock();
+  } else if (demoMode == DEMO_MODE_HEX) {
     writeHexes();
   } else if (demoMode == DEMO_MODE_CHAR) {
     writeChars();
@@ -253,8 +251,6 @@ void displayDemo() {
     writeStrings();
   } else if (demoMode == DEMO_MODE_SCROLL) {
     scrollString("   Angela is the best.");
-  } else if (demoMode == DEMO_MODE_CLOCK) {
-    writeClock();
   }
 }
 
@@ -397,6 +393,7 @@ void handleEvent(AceButton* button, uint8_t eventType, uint8_t buttonState) {
   } else if (pin == CHANGE_BUTTON_PIN) {
     switch (eventType) {
       case AceButton::kEventReleased:
+      case AceButton::kEventClicked:
         if (renderMode == RENDER_MODE_AUTO) {
           renderMode = RENDER_MODE_PAUSED;
           if (ENABLE_SERIAL_DEBUG >= 1) {
