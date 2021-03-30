@@ -14,18 +14,34 @@
 using namespace ace_segment;
 using namespace ace_button;
 
+#define LED_MATRIX_MODE_DIRECT 1
+#define LED_MATRIX_MODE_PARIAL_SW_SPI 2
+#define LED_MATRIX_MODE_PARTIAL_HW_SPI 3
+#define LED_MATRIX_MODE_FULL_SW_SPI 4
+#define LED_MATRIX_MODE_FULL_HW_SPI 5
+
+// LedClock buttons can be configured to use either pins (2, 3) or (8, 9)
+// through DIP switches. On the Pro Micro, (2, 3) are used for I2C. The LED
+// Module using Direct Digit Pins are wired to use (8, 9), so we must use (2,
+// 3) with that LED Module.
+const uint8_t MODE_BUTTON_PIN = 2;
+const uint8_t CHANGE_BUTTON_PIN = 3;
+
+#if defined(EPOXY_DUINO)
+  #define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
+#elif defined(AUNITER_LED_CLOCK_DIRECT)
+  #define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
+#elif defined(AUNITER_LED_CLOCK_PARTIAL)
+  #define LED_MATRIX_MODE LED_MATRIX_MODE_PARTIAL_HW_SPI
+#elif defined(AUNITER_LED_CLOCK_FULL)
+  #define LED_MATRIX_MODE LED_MATRIX_MODE_FULL_HW_SPI
+#else
+  #error Unknown AUNITER environment
+#endif
+
 //------------------------------------------------------------------
 // Configurations for AceSegment
 //------------------------------------------------------------------
-
-#define DRIVER_MODE_DIRECT_DIGIT 1
-#define DRIVER_MODE_SERIAL_DIGIT 3
-#define DRIVER_MODE_SPI_DIGIT 5
-#define DRIVER_MODE_MERGED_SERIAL_DIGIT 7
-#define DRIVER_MODE_MERGED_SPI_DIGIT 8
-
-// Define the Driver to use.
-#define DRIVER_MODE DRIVER_MODE_MERGED_SPI_DIGIT
 
 // Use polling or interrupt.
 #define USE_INTERRUPT 0
@@ -43,7 +59,7 @@ const uint8_t NUM_SUBFIELDS = 1;
 const uint8_t NUM_DIGITS = 4;
 const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
 
-#if DRIVER_MODE == DRIVER_MODE_DIRECT_DIGIT
+#if LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT
   // 4 digits, resistors on segments on Pro Micro.
   const uint8_t NUM_SEGMENTS = 8;
   const uint8_t segmentPins[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
@@ -56,17 +72,17 @@ const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
 // The chain of resources.
 Hardware hardware;
 
-#if DRIVER_MODE == DRIVER_MODE_DIRECT_DIGIT
+#if LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT
   LedMatrixDirect ledMatrix(
       &hardware,
-      true /*commonCathode*/,
+      false /*commonCathode*/,
       true /*transitorOnGroups*/,
       false /* transistorsOnSegments */,
       NUM_DIGITS,
       digitPins,
       NUM_SEGMENTS,
       segmentPins);
-#elif DRIVER_MODE == DRIVER_MODE_SERIAL_DIGIT
+#elif LED_MATRIX_MODE == LED_MATRIX_MODE_PARIAL_SW_SPI
   SwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
   LedMatrixPartialSpi ledMatrix(
       &hardware,
@@ -76,7 +92,7 @@ Hardware hardware;
       false /* transistorsOnElements */,
       NUM_DIGITS,
       digitPins):
-#elif DRIVER_MODE == DRIVER_MODE_SPI_DIGIT
+#elif LED_MATRIX_MODE == LED_MATRIX_MODE_PARTIAL_HW_SPI
   HwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
   LedMatrixPartialSpi ledMatrix(
       &hardware,
@@ -86,14 +102,14 @@ Hardware hardware;
       false /* transistorsOnElements */,
       NUM_DIGITS,
       digitPins);
-#elif DRIVER_MODE == DRIVER_MODE_MERGED_SERIAL_DIGIT
+#elif LED_MATRIX_MODE == LED_MATRIX_MODE_FULL_SW_SPI
   SwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
   LedMatrixFullSpi ledMatrix(
       &spiAdapter,
       false /*commonCathode*/,
       true /*transitorOnGroups*/,
       false /* transistorsOnElements */);
-#elif DRIVER_MODE == DRIVER_MODE_MERGED_SPI_DIGIT
+#elif LED_MATRIX_MODE == LED_MATRIX_MODE_FULL_HW_SPI
   HwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
   LedMatrixFullSpi ledMatrix(
       &spiAdapter,
@@ -101,7 +117,7 @@ Hardware hardware;
       true /*transitorOnGroups*/,
       false /* transistorsOnElements */);
 #else
-  #error Unsupported DRIVER_MODE
+  #error Unsupported LED_MATRIX_MODE
 #endif
 
 uint8_t patterns[8];
@@ -127,10 +143,16 @@ ISR(TIMER2_COMPA_vect) {
 
 // Setup the various resources.
 void setupAceSegment() {
-  spiAdapter.spiBegin();
-  ledMatrix.begin();
-  renderer.begin();
-  segmentDisplay.begin();
+  #if LED_MATRIX_MODE == LED_MATRIX_MODE_PARIAL_SW_SPI \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_PARTIAL_HW_SPI \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_FULL_SW_SPI \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_FULL_HW_SPI
+    spiAdapter.spiBegin();
+  #endif
+
+    ledMatrix.begin();
+    renderer.begin();
+    segmentDisplay.begin();
 
 #if USE_INTERRUPT == 1
   // set up Timer 2
@@ -263,7 +285,7 @@ void nextDemo() {
 
 /** Loop within a single demo. */
 void demoLoop() {
-  static uint16_t iter = 0;
+  //static uint16_t iter = 0;
   static unsigned long lastUpdateTime = millis();
 
 #if PRINT_STATS == 1
@@ -338,16 +360,6 @@ const uint8_t RENDER_MODE_PAUSED = 1;
 uint8_t renderMode = RENDER_MODE_AUTO;
 
 // Configuration for AceButton, to support Single-Step
-
-#if defined(EPOXY_DUINO)
-  const uint8_t MODE_BUTTON_PIN = 8;
-  const uint8_t CHANGE_BUTTON_PIN = 9;
-#elif defined(AUNITER_LED_CLOCK)
-  const uint8_t MODE_BUTTON_PIN = 8;
-  const uint8_t CHANGE_BUTTON_PIN = 9;
-#else
-  #error Unknown AUNITER environment
-#endif
 
 AceButton modeButton(MODE_BUTTON_PIN);
 AceButton changeButton(CHANGE_BUTTON_PIN);
