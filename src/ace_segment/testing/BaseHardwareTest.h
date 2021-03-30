@@ -42,12 +42,11 @@ class BaseHardwareTest: public TestOnce {
   protected:
     void setup() override {
       TestOnce::setup();
-      mHardware = new TestableHardware();
     }
 
     void teardown() override {
-      delete mHardware;
       TestOnce::teardown();
+      mHardware.clear();
     }
 
     /**
@@ -58,7 +57,7 @@ class BaseHardwareTest: public TestOnce {
      */
     void assertEvents(uint8_t n, ...);
 
-    TestableHardware* mHardware;
+    TestableHardware mHardware;
 };
 
 } // namespace testing
