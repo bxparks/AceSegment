@@ -26,10 +26,12 @@ SOFTWARE.
 #define ACE_SEGMENT_SEGMENT_DISPLAY_H
 
 #include <stdint.h>
-#include "TimingStats.h"
+#include <AceCommon.h> // TimingStats
 #include "Renderer.h"
 
 namespace ace_segment {
+
+using ace_common::TimingStats;
 
 class Hardware;
 
@@ -42,6 +44,7 @@ class Hardware;
  * successively render each field of a frame.
  */
 class SegmentDisplay {
+
   public:
     static const uint8_t kDefaultBrightness = 128;
 

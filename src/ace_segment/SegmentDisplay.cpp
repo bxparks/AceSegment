@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 #include <Arduino.h>
-#include <AceCommon.h> // incrementMod()
+#include <AceCommon.h> // incrementMod(), TimingStats
 #include "Hardware.h"
 #include "SegmentDisplay.h"
 

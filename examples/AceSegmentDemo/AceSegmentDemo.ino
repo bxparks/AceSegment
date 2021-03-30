@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <AceButton.h>
+#include <AceCommon.h> // incrementMod()
 #include <AceSegment.h>
 
 //------------------------------------------------------------------
@@ -181,10 +182,10 @@ void writeHexes() {
   hexWriter.writeHexAt(3, c);
 
   if (c < HexWriter::kNumCharacters * 2) {
-    Util::incrementMod(c, HexWriter::kNumCharacters);
+    ace_common::incrementMod(c, HexWriter::kNumCharacters);
   } else {
     c = 0;
-    Util::incrementMod(demoMode, DEMO_MODE_COUNT);
+    ace_common::incrementMod(demoMode, DEMO_MODE_COUNT);
   }
 }
 
@@ -194,9 +195,9 @@ void writeClock() {
 
   clockWriter.writeClock(hh, mm);
 
-  Util::incrementMod(mm, (uint8_t)60);
+  ace_common::incrementMod(mm, (uint8_t)60);
   if (mm == 0) {
-    Util::incrementMod(hh, (uint8_t)60);
+    ace_common::incrementMod(hh, (uint8_t)60);
   }
 }
 
@@ -211,7 +212,7 @@ void writeChars() {
   charWriter.writeCharAt(2, ' ');
   charWriter.writeCharAt(3, c);
 
-  Util::incrementMod(c, CharWriter::kNumCharacters);
+  ace_common::incrementMod(c, CharWriter::kNumCharacters);
 }
 
 void writeStrings() {
@@ -229,14 +230,14 @@ void writeStrings() {
 
   stringWriter.writeStringAt(0, STRINGS[i]);
 
-  Util::incrementMod(i, NUM_STRINGS);
+  ace_common::incrementMod(i, NUM_STRINGS);
 }
 
 void scrollString(const char* s) {
   static uint8_t i = 0;
 
   stringWriter.writeStringAt(0, &s[i], true /* padRight */);
-  Util::Util::incrementMod(i, (uint8_t) strlen(s));
+  ace_common::incrementMod(i, (uint8_t) strlen(s));
 }
 
 /** Display the demo pattern selected by demoMode. */
@@ -256,7 +257,7 @@ void displayDemo() {
 
 /** Go to the next demo */
 void nextDemo() {
-  Util::incrementMod(demoMode, DEMO_MODE_COUNT);
+  ace_common::incrementMod(demoMode, DEMO_MODE_COUNT);
   displayDemo();
 }
 
@@ -280,7 +281,7 @@ void demoLoop() {
 
     /*
     if (iter++ >= 100) {
-      Util::incrementMod(demoMode, DEMO_MODE_COUNT);
+      ace_common::incrementMod(demoMode, DEMO_MODE_COUNT);
       iter = 0;
     }
     */

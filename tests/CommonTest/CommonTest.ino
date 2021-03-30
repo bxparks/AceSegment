@@ -27,81 +27,19 @@ SOFTWARE.
 #include <stdarg.h>
 #include <Arduino.h>
 #include <AUnit.h>
+#include <AceCommon.h> // TimingStats
 #include <AceSegment.h>
-#include <ace_segment/LedMatrixDirect.h>
-#include <ace_segment/LedMatrixPartialSpi.h>
-#include <ace_segment/LedMatrixFullSpi.h>
-#include <ace_segment/SplitDigitDriver.h>
-#include <ace_segment/TimingStats.h>
 #include <ace_segment/testing/FakeDriver.h>
 
 using namespace aunit;
 using namespace ace_segment;
 using namespace ace_segment::testing;
+using ace_common::TimingStats;
 
 const int8_t NUM_DIGITS = 4;
 
 // create NUM_DIGITS+1 elements for doing array bound checking
 DimmablePattern dimmablePatterns[NUM_DIGITS + 1];
-
-// ----------------------------------------------------------------------
-// Tests for Util.
-// ----------------------------------------------------------------------
-
-test(incrementMod) {
-  uint8_t i = 0;
-  uint8_t n = 3;
-
-  Util::incrementMod(i, n);
-  assertEqual(i, 1);
-  Util::incrementMod(i, n);
-  assertEqual(i, 2);
-  Util::incrementMod(i, n);
-  assertEqual(i, 0);
-}
-
-// ----------------------------------------------------------------------
-// Tests for TimingStats.
-// ----------------------------------------------------------------------
-
-class TimingStatsTest: public TestOnce {
-  protected:
-    void setup() override {
-      mStats = new TimingStats();
-    }
-
-    void teardown() override {
-      delete mStats;
-    }
-
-    TimingStats* mStats;
-};
-
-testF(TimingStatsTest, reset) {
-  assertEqual((uint16_t)0, mStats->getCount());
-  assertEqual((uint16_t)0, mStats->getCounter());
-  assertEqual(UINT16_MAX, mStats->getMin());
-  assertEqual((uint16_t)0, mStats->getMax());
-  assertEqual((uint16_t)0, mStats->getAvg());
-  assertEqual((uint16_t)0, mStats->getExpDecayAvg());
-}
-
-testF(TimingStatsTest, update) {
-  mStats->update(1);
-  mStats->update(3);
-  mStats->update(10);
-
-  assertEqual((uint16_t)3, mStats->getCount());
-  assertEqual((uint16_t)3, mStats->getCounter());
-  assertEqual((uint16_t)1, mStats->getMin());
-  assertEqual((uint16_t)10, mStats->getMax());
-  assertEqual((uint16_t)4, mStats->getAvg());
-  assertEqual((uint16_t)5, mStats->getExpDecayAvg());
-
-  mStats->reset();
-  assertEqual((uint16_t)0, mStats->getCount());
-  assertEqual((uint16_t)3, mStats->getCounter());
-}
 
 // ----------------------------------------------------------------------
 // Test FakeDriver to test some common methods of Driver and to be sure that
@@ -179,8 +117,6 @@ void setup() {
   while (!Serial); // Wait until Serial is ready - Leonardo/Micro
   Serial.println(F("setup(): start"));
 
-  Serial.print(F("sizeof(TimingStats): "));
-  Serial.println(sizeof(TimingStats));
   Serial.print(F("sizeof(Hardware): "));
   Serial.println(sizeof(Hardware));
   Serial.print(F("sizeof(LedMatrixDirect): "));
@@ -189,12 +125,10 @@ void setup() {
   Serial.println(sizeof(LedMatrixPartialSpi));
   Serial.print(F("sizeof(LedMatrixFullSpi): "));
   Serial.println(sizeof(LedMatrixFullSpi));
-  Serial.print(F("sizeof(Driver): "));
-  Serial.println(sizeof(Driver));
-  Serial.print(F("sizeof(SplitDigitDriver): "));
-  Serial.println(sizeof(SplitDigitDriver));
   Serial.print(F("sizeof(Renderer): "));
   Serial.println(sizeof(Renderer));
+  Serial.print(F("sizeof(SegmentDisplay): "));
+  Serial.println(sizeof(SegmentDisplay));
   Serial.print(F("sizeof(HexWriter): "));
   Serial.println(sizeof(HexWriter));
   Serial.print(F("sizeof(ClockWriter): "));

@@ -13,7 +13,7 @@
 // numbers printed out by the Arduino compiler. The numbers will be printed on
 // the STDOUT, which then can be saved to a file specific for a particular
 // hardware platform, e.g. "nano.txt" or "esp8266.txt".
-#define FEATURE 0
+#define FEATURE 1
 
 // List of features of AceSegment that we want to gather memory usage numbers.
 #define FEATURE_BASELINE 0
