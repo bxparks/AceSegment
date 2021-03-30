@@ -38,19 +38,68 @@ volatile int disableCompilerOptimization = 0;
   const uint8_t NUM_SUBFIELDS = 1;
   const bool COMMON_CATHODE = true;
   const bool USE_TRANSISTORS = true;
-  const uint16_t STATS_RESET_INTERVAL = 1200;
   const uint8_t latchPin = 10; // ST_CP on 74HC595
   const uint8_t dataPin = MOSI; // DS on 74HC595
   const uint8_t clockPin = SCK; // SH_CP on 74HC595
   const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
   const uint8_t segmentPins[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
 
-  // Dynamic Resources for AceSegment. TODO: Replace pointers with values.
-  DimmablePattern dimmablePatterns[NUM_DIGITS];
-  Hardware* hardware;
-  Driver* driver;
-  Renderer* renderer;
+  Hardware hardware;
 
+  #if FEATURE == FEATURE_DIRECT
+    LedMatrixDirect ledMatrix(
+        &hardware,
+        true /*commonCathode*/,
+        true /*transitorOnGroups*/,
+        false /* transistorsOnSegments */,
+        NUM_DIGITS,
+        digitPins,
+        NUM_SEGMENTS,
+        segmentPins);
+  #elif FEATURE == FEATURE_SPLIT_SW_SPI
+    SwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
+    LedMatrixPartialSpi ledMatrix(
+        &hardware,
+        &spiAdapter,
+        true /*commonCathode*/,
+        true /*transitorOnGroups*/,
+        false /* transistorsOnElements */,
+        NUM_DIGITS,
+        digitPins);
+  #elif FEATURE == FEATURE_SPLIT_HW_SPI
+    HwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
+    LedMatrixPartialSpi ledMatrix(
+        &hardware,
+        &spiAdapter,
+        true /*commonCathode*/,
+        true /*transitorOnGroups*/,
+        false /* transistorsOnElements */,
+        NUM_DIGITS,
+        digitPins);
+  #elif FEATURE == FEATURE_MERGED_SW_SPI
+    SwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
+    LedMatrixFullSpi ledMatrix(
+        &spiAdapter,
+        false /*commonCathode*/,
+        true /*transitorOnGroups*/,
+        false /* transistorsOnElements */);
+  #elif FEATURE == FEATURE_MERGED_HW_SPI
+    HwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
+    LedMatrixFullSpi ledMatrix(
+        &spiAdapter,
+        false /*commonCathode*/,
+        true /*transitorOnGroups*/,
+        false /* transistorsOnElements */);
+  #endif
+
+  uint8_t patterns[NUM_DIGITS];
+  Renderer renderer(&ledMatrix, NUM_DIGITS, patterns);
+  SegmentDisplay segmentDisplay(
+      &hardware,
+      &renderer,
+      FRAMES_PER_SECOND,
+      NUM_DIGITS,
+      patterns);
 #endif
 
 void setup() {
@@ -58,69 +107,43 @@ void setup() {
   disableCompilerOptimization = 3;
 
 #elif FEATURE == FEATURE_DIRECT
-  hardware = new Hardware();
-  driver = new SplitDirectDigitDriver(
-      hardware, dimmablePatterns, COMMON_CATHODE, USE_TRANSISTORS,
-      false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
-      NUM_SUBFIELDS, digitPins, segmentPins);
-  driver->configure();
-  renderer = new Renderer(hardware, driver, dimmablePatterns,
-      NUM_DIGITS, FRAMES_PER_SECOND, STATS_RESET_INTERVAL);
-  renderer->configure();
-  renderer->writePatternAt(0, 0x3A, 128);
-  disableCompilerOptimization = dimmablePatterns[1].pattern;
+  ledMatrix.begin();
+  renderer.begin();
+  segmentDisplay.begin();
+  segmentDisplay.writePatternAt(0, 0x3A);
+  disableCompilerOptimization = patterns[1];
 
 #elif FEATURE == FEATURE_SPLIT_SW_SPI
-  hardware = new Hardware();
-  driver = new SplitSerialDigitDriver(
-      hardware, dimmablePatterns, COMMON_CATHODE, USE_TRANSISTORS,
-      false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
-      NUM_SUBFIELDS, digitPins, latchPin, dataPin, clockPin);
-  driver->configure();
-  renderer = new Renderer(hardware, driver, dimmablePatterns,
-      NUM_DIGITS, FRAMES_PER_SECOND, STATS_RESET_INTERVAL);
-  renderer->configure();
-  renderer->writePatternAt(0, 0x3A, 128);
-  disableCompilerOptimization = dimmablePatterns[1].pattern;
+  spiAdapter.spiBegin();
+  ledMatrix.begin();
+  renderer.begin();
+  segmentDisplay.begin();
+  segmentDisplay.writePatternAt(0, 0x3A);
+  disableCompilerOptimization = patterns[1];
 
 #elif FEATURE == FEATURE_SPLIT_HW_SPI
-  hardware = new Hardware();
-  driver = new SplitSpiDigitDriver(
-      hardware, dimmablePatterns, COMMON_CATHODE, USE_TRANSISTORS,
-      false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
-      NUM_SUBFIELDS, digitPins, latchPin, dataPin, clockPin);
-  driver->configure();
-  renderer = new Renderer(hardware, driver, dimmablePatterns,
-      NUM_DIGITS, FRAMES_PER_SECOND, STATS_RESET_INTERVAL);
-  renderer->configure();
-  renderer->writePatternAt(0, 0x3A, 128);
-  disableCompilerOptimization = dimmablePatterns[1].pattern;
+  spiAdapter.spiBegin();
+  ledMatrix.begin();
+  renderer.begin();
+  segmentDisplay.begin();
+  segmentDisplay.writePatternAt(0, 0x3A);
+  disableCompilerOptimization = patterns[1];
 
 #elif FEATURE == FEATURE_MERGED_SW_SPI
-  hardware = new Hardware();
-  driver = new MergedSerialDigitDriver(
-      dimmablePatterns, false /*commonCathode*/, USE_TRANSISTORS,
-      false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
-      NUM_SUBFIELDS, latchPin, dataPin, clockPin);
-  driver->configure();
-  renderer = new Renderer(hardware, driver, dimmablePatterns,
-      NUM_DIGITS, FRAMES_PER_SECOND, STATS_RESET_INTERVAL);
-  renderer->configure();
-  renderer->writePatternAt(0, 0x3A, 128);
-  disableCompilerOptimization = dimmablePatterns[1].pattern;
+  spiAdapter.spiBegin();
+  ledMatrix.begin();
+  renderer.begin();
+  segmentDisplay.begin();
+  segmentDisplay.writePatternAt(0, 0x3A);
+  disableCompilerOptimization = patterns[1];
 
 #elif FEATURE == FEATURE_MERGED_HW_SPI
-  hardware = new Hardware();
-  driver = new MergedSpiDigitDriver(
-      dimmablePatterns, false /*commonCathode*/, USE_TRANSISTORS,
-      false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
-      NUM_SUBFIELDS, latchPin, dataPin, clockPin);
-  driver->configure();
-  renderer = new Renderer(hardware, driver, dimmablePatterns,
-      NUM_DIGITS, FRAMES_PER_SECOND, STATS_RESET_INTERVAL);
-  renderer->configure();
-  renderer->writePatternAt(0, 0x3A, 128);
-  disableCompilerOptimization = dimmablePatterns[1].pattern;
+  spiAdapter.spiBegin();
+  ledMatrix.begin();
+  renderer.begin();
+  segmentDisplay.begin();
+  segmentDisplay.writePatternAt(0, 0x3A);
+  disableCompilerOptimization = patterns[1];
 
 #else
   #error Unknown FEATURE
@@ -130,6 +153,6 @@ void setup() {
 
 void loop() {
 #if FEATURE > FEATURE_BASELINE
-  renderer->renderFieldWhenReady();
+  segmentDisplay.renderFieldWhenReady();
 #endif
 }
