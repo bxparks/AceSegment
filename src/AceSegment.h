@@ -32,7 +32,6 @@ SOFTWARE.
 #ifndef ACE_SEGMENT_ACE_SEGMENT_H
 #define ACE_SEGMENT_ACE_SEGMENT_H
 
-#include "ace_segment/Util.h"
 #include "ace_segment/Hardware.h"
 #include "ace_segment/SwSpiAdapter.h"
 #include "ace_segment/HwSpiAdapter.h"

@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 #include <Arduino.h>
-#include "Util.h"
+#include <AceCommon.h> // incrementMod()
 #include "Hardware.h"
 #include "SegmentDisplay.h"
 
@@ -72,7 +72,7 @@ bool SegmentDisplay::renderFieldWhenReady() {
 void SegmentDisplay::renderField() {
   uint16_t now = mHardware->micros();
   mRenderer->displayCurrentField();
-  Util::incrementMod(mCurrentField, mFieldsPerFrame);
+  ace_common::incrementMod(mCurrentField, mFieldsPerFrame);
 
   uint16_t duration = mHardware->micros() - now;
   if (mTimingStats) mTimingStats->update(duration);

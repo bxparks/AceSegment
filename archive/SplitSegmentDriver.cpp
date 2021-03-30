@@ -22,10 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include <AceCommon.h> // incrementMod()
 #include "Hardware.h"
 #include "SplitSegmentDriver.h"
 #include "LedMatrixSplit.h"
-#include "Util.h"
 
 namespace ace_segment {
 
@@ -47,7 +47,7 @@ void SplitSegmentDriver::displayCurrentField() {
   }
 
   mPrevSegment = mCurrentSegment;
-  Util::incrementMod(mCurrentSegment, kNumSegments);
+  ace_common::incrementMod(mCurrentSegment, kNumSegments);
 }
 
 Driver::DigitPatternType SplitSegmentDriver::getDigitBitPattern(

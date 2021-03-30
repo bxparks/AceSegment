@@ -22,10 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include <AceCommon.h> // incrementMod()
 #include "Hardware.h"
 #include "MergedDigitDriver.h"
 #include "LedMatrixFullSpi.h"
-#include "Util.h"
 
 namespace ace_segment {
 
@@ -52,7 +52,7 @@ void MergedDigitDriver::displayCurrentFieldPlain() {
   LedMatrixFullSpi* ledMatrix = static_cast<LedMatrixFullSpi*>(mLedMatrix);
   ledMatrix->draw(digitPattern, segmentPattern);
 
-  Util::incrementMod(mCurrentDigit, mNumDigits);
+  ace_common::incrementMod(mCurrentDigit, mNumDigits);
 }
 
 void MergedDigitDriver::displayCurrentFieldModulated() {
@@ -85,7 +85,7 @@ void MergedDigitDriver::displayCurrentFieldModulated() {
   mCurrentSubField++;
   mPrevDigit = mCurrentDigit;
   if (mCurrentSubField >= mNumSubFields) {
-    Util::incrementMod(mCurrentDigit, mNumDigits);
+    ace_common::incrementMod(mCurrentDigit, mNumDigits);
     mCurrentSubField = 0;
   }
 }

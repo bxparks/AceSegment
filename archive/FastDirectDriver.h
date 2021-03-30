@@ -8,7 +8,6 @@
 #include <stdint.h>
 #include <digitalWriteFast.h>
 #include <ace_segment/SplitDigitDriver.h>
-#include <ace_segment/Util.h>
 
 #ifndef ACE_SEGMENT_FastDirectDriver_H
 #define ACE_SEGMENT_FastDirectDriver_H

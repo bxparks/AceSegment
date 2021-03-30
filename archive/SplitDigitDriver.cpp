@@ -22,10 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include <AceCommon.h> // incrementMod()
 #include "Hardware.h"
 #include "SplitDigitDriver.h"
 #include "LedMatrixSplit.h"
-#include "Util.h"
 
 namespace ace_segment {
 
@@ -60,7 +60,7 @@ void SplitDigitDriver::displayCurrentFieldPlain() {
   }
 
   mPrevDigit = mCurrentDigit;
-  Util::incrementMod(mCurrentDigit, mNumDigits);
+  ace_common::incrementMod(mCurrentDigit, mNumDigits);
 }
 
 void SplitDigitDriver::displayCurrentFieldModulated() {
@@ -110,7 +110,7 @@ void SplitDigitDriver::displayCurrentFieldModulated() {
   mPrevDigit = mCurrentDigit;
   mIsPrevDigitOn = isCurrentDigitOn;
   if (mCurrentSubField >= mNumSubFields) {
-    Util::incrementMod(mCurrentDigit, mNumDigits);
+    ace_common::incrementMod(mCurrentDigit, mNumDigits);
     mCurrentSubField = 0;
   }
 }

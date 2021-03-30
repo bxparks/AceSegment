@@ -22,10 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include <AceCommon.h> // incrementMod()
 #include "Hardware.h"
 #include "Renderer.h"
 #include "LedMatrix.h"
-#include "Util.h"
 
 namespace ace_segment {
 
@@ -51,7 +51,7 @@ void Renderer::displayCurrentFieldPlain() {
   }
 
   mPrevDigit = mCurrentDigit;
-  Util::incrementMod(mCurrentDigit, mNumDigits);
+  ace_common::incrementMod(mCurrentDigit, mNumDigits);
 }
 
 void Renderer::displayCurrentFieldModulated() {
@@ -79,7 +79,7 @@ void Renderer::displayCurrentFieldModulated() {
   mCurrentSubField++;
   mPrevDigit = mCurrentDigit;
   if (mCurrentSubField >= mNumSubFields) {
-    Util::incrementMod(mCurrentDigit, mNumDigits);
+    ace_common::incrementMod(mCurrentDigit, mNumDigits);
     mCurrentSubField = 0;
   }
 }

@@ -10,7 +10,6 @@
 #include <SPI.h>
 #include <digitalWriteFast.h>
 #include <ace_segment/SplitDigitDriver.h>
-#include <ace_segment/Util.h>
 
 #ifndef ACE_SEGMENT_FastSpiDriver_H
 #define ACE_SEGMENT_FastSpiDriver_H

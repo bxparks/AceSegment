@@ -24,8 +24,8 @@ class DriverGenerator(Generator):
 #include <Arduino.h>
 #include <SPI.h>
 #include <digitalWriteFast.h>
+#include <AceCommon.h> // incrementMod()
 #include <ace_segment/SplitDigitDriver.h>
-#include <ace_segment/Util.h>
 
 #ifndef ACE_SEGMENT_{class_name}_H
 #define ACE_SEGMENT_{class_name}_H
@@ -170,7 +170,7 @@ void {class_name}::displayCurrentField() {{
   mPrevDigit = mCurrentDigit;
   mIsPrevDigitOn = isCurrentDigitOn;
   if (mCurrentSubField >= mNumSubFields) {{
-    ace_segment::Util::incrementMod(mCurrentDigit, mNumDigits);
+    ace_common::incrementMod(mCurrentDigit, mNumDigits);
     mCurrentSubField = 0;
   }}
 }}
