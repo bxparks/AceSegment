@@ -22,8 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_LED_MATRIX_SERIAL_H
-#define ACE_SEGMENT_LED_MATRIX_SERIAL_H
+#ifndef ACE_SEGMENT_LED_MATRIX_PARTIAL_SPI_H
+#define ACE_SEGMENT_LED_MATRIX_PARTIAL_SPI_H
 
 #include "LedMatrixSplit.h"
 #include "SpiAdapter.h"
@@ -34,7 +34,10 @@ class Hardware;
 
 /**
  * An implementation of LedMatrixSplit with an 74HC595 Serial-To-Parallel
- * converter chip on the segment pins. The wiring is as follows:
+ * converter chip on the segment pins, with the digit pins directly connected to
+ * the microcontroller.
+ *
+ * The wiring is as follows:
  *
  *   latchPin/D10/SS -- ST_CP (Phillips) / RCK (TI) / Pin 12 (rising)
  *   dataPin/D11/MOSI -- DS (Phillips) / SER (TI) / Pin 14
