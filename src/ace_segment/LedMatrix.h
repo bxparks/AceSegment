@@ -65,41 +65,34 @@ class Hardware;
  * the segments become the Groups. This configuration is not very useful and has
  * not been tested very much.
  *
- * The setCathodeOnGroup() and setAnnodeOnGroup() methods determine the
- * polarity of the LED with respect to the Group line.
- *
- * The invertGroupLevels() should be called when transistors are used
- * on the Group lines to handle higher currents.
+ * The groupOnPattern and elementOnPattern is the bit pattern that activates
+ * the group or element. For example, a Common Cathode places the negative
+ * end of the LED on the group pin and the element pins are positive. So
+ * groupOnPattern should be kActiveLowPattern and elementOnPattern should be
+ * kActiveHighPattern. However, if a driver transitor is placed on the group
+ * pins to handle the higher current, then it inverts the logic on the group
+ * pins, so groupOnPattern must be set to kActiveHighPattern.
  */
 class LedMatrix {
   public:
 
+    /** Bit pattern to indicate that logical 1 activates group or element. */
+    static constexpr uint8_t kActiveHighPattern = 0xFF;
+
+    /** Bit pattern to indicate that logical 0 activates group or element. */
+    static constexpr uint8_t kActiveLowPattern = 0x00;
+
     /**
-     * @param cathodeOnGroup the LED common cathodes are on the groups
-     * @param transistorsOnGroups transistors used on groups, which
-     *    invert the logic level for the group lines
-     * @param transistorsOnElements transistors used on elements, which
-     *    invert the logic level for the element lines
-     * @param numGroups number of group lines
+     * @param groupOnPattern bit pattern that turns on the groups
+     * @param elementOnPattern bit pattern that turns on the elements on group
      */
     LedMatrix(
-        bool cathodeOnGroup,
-        bool transistorsOnGroups,
-        bool transistorsOnElements) {
-
-      if (cathodeOnGroup) {
-        setCathodeOnGroup();
-      } else {
-        setAnodeOnGroup();
-      }
-
-      if (transistorsOnGroups) {
-        invertGroupLevels();
-      }
-      if (transistorsOnElements) {
-        invertElementLevels();
-      }
-    }
+        uint8_t groupOnPattern,
+        uint8_t elementOnPattern
+    ) :
+        mGroupXorMask(~groupOnPattern),
+        mElementXorMask(~elementOnPattern)
+    {}
 
     /** Configure the pins for the given LED wiring. */
     virtual void begin() = 0;
@@ -120,40 +113,8 @@ class LedMatrix {
     virtual void clear() = 0;
 
   protected:
-    /** LED negative terminals are on the group line. */
-    void setCathodeOnGroup() {
-      mGroupOn = LOW;
-      mGroupOff = HIGH;
-      mElementOn = HIGH;
-      mElementOff = LOW;
-    }
-
-    /** LED positive terminals are on the group line. */
-    void setAnodeOnGroup() {
-      mGroupOn = HIGH;
-      mGroupOff = LOW;
-      mElementOn = LOW;
-      mElementOff = HIGH;
-    }
-
-    /** If a transistor drives the group, invert the logic levels. */
-    void invertGroupLevels() {
-      mGroupOn ^= 0x1;
-      mGroupOff ^=  0x1;
-    }
-
-    /** If a transistor drives the elements, invert the logic levels. */
-    void invertElementLevels() {
-      mElementOn ^= 0x1;
-      mElementOff ^=  0x1;
-    }
-
-  protected:
-    // TODO: Change these to XorMask
-    uint8_t mGroupOn;
-    uint8_t mGroupOff;
-    uint8_t mElementOn;
-    uint8_t mElementOff;
+    uint8_t const mGroupXorMask;
+    uint8_t const mElementXorMask;
 };
 
 }

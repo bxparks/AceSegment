@@ -73,49 +73,49 @@ const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
 Hardware hardware;
 
 #if LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT
+  // Common Anode, with transitions on Group pins
   LedMatrixDirect ledMatrix(
       &hardware,
-      false /*commonCathode*/,
-      true /*transitorOnGroups*/,
-      false /* transistorsOnSegments */,
+      LedMatrix::kActiveLowPattern /*groupOnPattern*/,
+      LedMatrix::kActiveLowPattern /*elementOnPattern*/,
       NUM_DIGITS,
       digitPins,
       NUM_SEGMENTS,
       segmentPins);
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_PARIAL_SW_SPI
+  // Common Cathode, with transistors on Group pins
   SwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
   LedMatrixPartialSpi ledMatrix(
       &hardware,
       &spiAdapter,
-      true /*commonCathode*/,
-      true /*transitorOnGroups*/,
-      false /* transistorsOnElements */,
+      LedMatrix::kActiveHighPattern /*groupOnPattern*/,
+      LedMatrix::kActiveHighPattern /*elementOnPattern*/,
       NUM_DIGITS,
       digitPins):
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_PARTIAL_HW_SPI
+  // Common Cathode, with transistors on Group pins
   HwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
   LedMatrixPartialSpi ledMatrix(
       &hardware,
       &spiAdapter,
-      true /*commonCathode*/,
-      true /*transitorOnGroups*/,
-      false /* transistorsOnElements */,
+      LedMatrix::kActiveHighPattern /*groupOnPattern*/,
+      LedMatrix::kActiveHighPattern /*elementOnPattern*/,
       NUM_DIGITS,
       digitPins);
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_FULL_SW_SPI
+  // Common Anode, with transistors on Group pins
   SwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
   LedMatrixFullSpi ledMatrix(
       &spiAdapter,
-      false /*commonCathode*/,
-      true /*transitorOnGroups*/,
-      false /* transistorsOnElements */);
+      LedMatrix::kActiveLowPattern /*groupOnPattern*/,
+      LedMatrix::kActiveLowPattern /*elementOnPattern*/);
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_FULL_HW_SPI
+  // Common Anode, with transistors on Group pins
   HwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
   LedMatrixFullSpi ledMatrix(
       &spiAdapter,
-      false /*commonCathode*/,
-      true /*transitorOnGroups*/,
-      false /* transistorsOnElements */);
+      LedMatrix::kActiveLowPattern /*groupOnPattern*/,
+      LedMatrix::kActiveLowPattern /*elementOnPattern*/);
 #else
   #error Unsupported LED_MATRIX_MODE
 #endif

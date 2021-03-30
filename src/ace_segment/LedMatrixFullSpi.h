@@ -33,20 +33,18 @@ namespace ace_segment {
 class Hardware;
 
 /**
- * An LedMatrix that writes to both group and element pins via SPI.
+ * An LedMatrix that writes to both group and element pins via SPI. The group
+ * pins are assumed to be connected to the most significant byte. The element
+ * pins are connected to the least signficiant byte.
  */
 class LedMatrixFullSpi: public LedMatrix {
   public:
     LedMatrixFullSpi(
         const SpiAdapter* spiAdapter,
-        bool cathodeOnGroup,
-        bool transistorsOnGroups,
-        bool transistorsOnElements
+        uint8_t groupOnPattern,
+        uint8_t elementOnPattern
     ) :
-        LedMatrix(
-            cathodeOnGroup,
-            transistorsOnGroups,
-            transistorsOnElements),
+        LedMatrix(groupOnPattern, elementOnPattern),
         mSpiAdapter(spiAdapter)
     {}
 
@@ -65,11 +63,8 @@ class LedMatrixFullSpi: public LedMatrix {
     void draw(uint8_t group, uint8_t elementPattern) override {
       uint8_t groupPattern = 0x1 << group; // Would a lookup table be faster?
 
-      // TODO: Use an XOR mask instead of these conditionals.
-      uint8_t actualGroupPattern = (mGroupOn == HIGH)
-          ? groupPattern : ~groupPattern;
-      uint8_t actualElementPattern = (mElementOn == HIGH)
-          ? elementPattern : ~elementPattern;
+      uint8_t actualGroupPattern = (groupPattern ^ mGroupXorMask);
+      uint8_t actualElementPattern = (elementPattern ^ mElementXorMask);
 
       mSpiAdapter->spiTransfer16(
           actualGroupPattern << 8 | actualElementPattern);
@@ -86,8 +81,8 @@ class LedMatrixFullSpi: public LedMatrix {
     }
 
     void clear() override {
-      uint8_t actualGroupPattern = (mGroupOn == HIGH) ? 0x00: 0xFF;
-      uint8_t actualElementPattern = (mElementOn == HIGH) ? 0x00 : 0xFF;
+      uint8_t actualGroupPattern = 0x00 ^ mGroupXorMask;
+      uint8_t actualElementPattern = 0x00 ^ mElementXorMask;
       mSpiAdapter->spiTransfer16(
           actualGroupPattern << 8 | actualElementPattern);
     }

@@ -48,17 +48,15 @@ class LedMatrixPartialSpi: public LedMatrixSplit {
     LedMatrixPartialSpi(
         const Hardware* hardware,
         const SpiAdapter* spiAdapter,
-        bool cathodeOnGroup,
-        bool transistorsOnGroups,
-        bool transistorsOnElements,
+        uint8_t groupOnPattern,
+        uint8_t elementOnPattern,
         uint8_t numGroups,
         const uint8_t* groupPins
     ) :
         LedMatrixSplit(
             hardware,
-            cathodeOnGroup,
-            transistorsOnGroups,
-            transistorsOnElements,
+            groupOnPattern,
+            elementOnPattern,
             numGroups,
             groupPins),
         mSpiAdapter(spiAdapter)
@@ -78,7 +76,7 @@ class LedMatrixPartialSpi: public LedMatrixSplit {
 
   protected:
     void drawElements(uint8_t pattern) override {
-      uint8_t actualPattern = (mElementOn == HIGH) ? pattern : ~pattern;
+      uint8_t actualPattern = pattern ^ mElementXorMask;
       mSpiAdapter->spiTransfer(actualPattern);
     }
 

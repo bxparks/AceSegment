@@ -13,7 +13,7 @@
 // numbers printed out by the Arduino compiler. The numbers will be printed on
 // the STDOUT, which then can be saved to a file specific for a particular
 // hardware platform, e.g. "nano.txt" or "esp8266.txt".
-#define FEATURE 1
+#define FEATURE 0
 
 // List of features of AceSegment that we want to gather memory usage numbers.
 #define FEATURE_BASELINE 0
@@ -47,49 +47,49 @@ volatile int disableCompilerOptimization = 0;
   Hardware hardware;
 
   #if FEATURE == FEATURE_DIRECT
+    // Common Anode, with transitions on Group pins
     LedMatrixDirect ledMatrix(
         &hardware,
-        true /*commonCathode*/,
-        true /*transitorOnGroups*/,
-        false /* transistorsOnSegments */,
+        LedMatrix::kActiveLowPattern /*groupOnPattern*/,
+        LedMatrix::kActiveLowPattern /*elementOnPattern*/,
         NUM_DIGITS,
         digitPins,
         NUM_SEGMENTS,
         segmentPins);
   #elif FEATURE == FEATURE_SPLIT_SW_SPI
+    // Common Cathode, with transistors on Group pins
     SwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
     LedMatrixPartialSpi ledMatrix(
         &hardware,
         &spiAdapter,
-        true /*commonCathode*/,
-        true /*transitorOnGroups*/,
-        false /* transistorsOnElements */,
+        LedMatrix::kActiveHighPattern /*groupOnPattern*/,
+        LedMatrix::kActiveHighPattern /*elementOnPattern*/,
         NUM_DIGITS,
         digitPins);
   #elif FEATURE == FEATURE_SPLIT_HW_SPI
+    // Common Cathode, with transistors on Group pins
     HwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
     LedMatrixPartialSpi ledMatrix(
         &hardware,
         &spiAdapter,
-        true /*commonCathode*/,
-        true /*transitorOnGroups*/,
-        false /* transistorsOnElements */,
+        LedMatrix::kActiveHighPattern /*groupOnPattern*/,
+        LedMatrix::kActiveHighPattern /*elementOnPattern*/,
         NUM_DIGITS,
         digitPins);
   #elif FEATURE == FEATURE_MERGED_SW_SPI
+    // Common Cathode, with transistors on Group pins
     SwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
     LedMatrixFullSpi ledMatrix(
         &spiAdapter,
-        false /*commonCathode*/,
-        true /*transitorOnGroups*/,
-        false /* transistorsOnElements */);
+        LedMatrix::kActiveLowPattern /*groupOnPattern*/,
+        LedMatrix::kActiveLowPattern /*elementOnPattern*/);
   #elif FEATURE == FEATURE_MERGED_HW_SPI
+    // Common Cathode, with transistors on Group pins
     HwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
     LedMatrixFullSpi ledMatrix(
         &spiAdapter,
-        false /*commonCathode*/,
-        true /*transitorOnGroups*/,
-        false /* transistorsOnElements */);
+        LedMatrix::kActiveLowPattern /*groupOnPattern*/,
+        LedMatrix::kActiveLowPattern /*elementOnPattern*/);
   #endif
 
   uint8_t patterns[NUM_DIGITS];

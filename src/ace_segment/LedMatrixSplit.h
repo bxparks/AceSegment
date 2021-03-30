@@ -37,16 +37,12 @@ class LedMatrixSplit: public LedMatrix {
   public:
     LedMatrixSplit(
         const Hardware* hardware,
-        bool cathodeOnGroup,
-        bool transistorsOnGroups,
-        bool transistorsOnElements,
+        uint8_t groupOnPattern,
+        uint8_t elementOnPattern,
         uint8_t numGroups,
         const uint8_t* groupPins
     ) :
-        LedMatrix(
-            cathodeOnGroup,
-            transistorsOnGroups,
-            transistorsOnElements),
+        LedMatrix(groupOnPattern, elementOnPattern),
         mHardware(hardware),
         mNumGroups(numGroups),
         mGroupPins(groupPins)
@@ -56,7 +52,7 @@ class LedMatrixSplit: public LedMatrix {
       for (uint8_t group = 0; group < mNumGroups; group++) {
         uint8_t pin = mGroupPins[group];
         mHardware->pinMode(pin, OUTPUT);
-        mHardware->digitalWrite(pin, mGroupOff);
+        mHardware->digitalWrite(pin, (0x00 ^ mGroupXorMask) & 0x1);
       }
     }
 
@@ -78,12 +74,12 @@ class LedMatrixSplit: public LedMatrix {
     }
 
     void enableGroup(uint8_t group) override {
-      writeGroupPin(group, mGroupOn);
+      writeGroupPin(group, 0x1);
       mPrevGroup = group;
     }
 
     void disableGroup(uint8_t group) override {
-      writeGroupPin(group, mGroupOff);
+      writeGroupPin(group, 0x0);
       mPrevGroup = group;
     }
 
@@ -101,7 +97,7 @@ class LedMatrixSplit: public LedMatrix {
     /** Write to group pin identified by 'group'. */
     void writeGroupPin(uint8_t group, uint8_t output) {
       uint8_t groupPin = mGroupPins[group];
-      mHardware->digitalWrite(groupPin, output);
+      mHardware->digitalWrite(groupPin, (output ^ mGroupXorMask) & 0x1);
     }
 
   protected:

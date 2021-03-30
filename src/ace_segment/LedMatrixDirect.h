@@ -29,13 +29,16 @@ SOFTWARE.
 
 namespace ace_segment {
 
+/**
+ * An LedMatrix that whose group pins and element pins are wired directly to the
+ * MCU.
+ */
 class LedMatrixDirect: public LedMatrixSplit {
   public:
     LedMatrixDirect(
         const Hardware* hardware,
-        bool cathodeOnGroup,
-        bool transistorsOnGroups,
-        bool transistorsOnElements,
+        uint8_t groupActivePattern,
+        uint8_t elementActivePattern,
         uint8_t numGroups,
         const uint8_t* groupPins,
         uint8_t numElements,
@@ -43,9 +46,8 @@ class LedMatrixDirect: public LedMatrixSplit {
     ) :
         LedMatrixSplit(
             hardware,
-            cathodeOnGroup,
-            transistorsOnGroups,
-            transistorsOnElements,
+            groupActivePattern,
+            elementActivePattern,
             numGroups,
             groupPins),
         mNumElements(numElements),
@@ -58,7 +60,7 @@ class LedMatrixDirect: public LedMatrixSplit {
       for (uint8_t element = 0; element < mNumElements; element++) {
         uint8_t elementPin = mElementPins[element];
         mHardware->pinMode(elementPin, OUTPUT);
-        mHardware->digitalWrite(elementPin, mElementOff);
+        mHardware->digitalWrite(elementPin, (0x00 ^ mElementXorMask) & 0x1);
       }
     }
 
@@ -73,12 +75,10 @@ class LedMatrixDirect: public LedMatrixSplit {
 
   protected:
     void drawElements(uint8_t pattern) override {
-      uint8_t elementMask = 0x1;
       for (uint8_t element = 0; element < mNumElements; element++) {
-        uint8_t output =
-            (pattern & elementMask) ? mElementOn : mElementOff;
+        uint8_t output = pattern /*& 0x1*/; // bit mask not needed
         writeElementPin(element, output);
-        elementMask <<= 1;
+        pattern >>= 1;
       }
     }
 
@@ -86,7 +86,7 @@ class LedMatrixDirect: public LedMatrixSplit {
     /** Write to the element pin identified by 'element'. */
     void writeElementPin(uint8_t element, uint8_t output) {
       uint8_t elementPin = mElementPins[element];
-      mHardware->digitalWrite(elementPin, output);
+      mHardware->digitalWrite(elementPin, (output ^ mElementXorMask) & 0x1);
     }
 
   private:
