@@ -36,7 +36,7 @@ by the runtime environment of the processor. For example, it often seems like
 the ESP8266 allocates flash memory in blocks of a certain quantity, so the
 calculated flash size can jump around in unexpected ways.
 
-**Version**: AceSegment v0.3
+**Version**: AceSegment v0.4
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -105,6 +105,11 @@ before substantional refactoring in 2021.
   into a single `draw(group, elementPattern)` method.
 * Reduce flash by 20-50 bytes on AVR by merging `Renderer` into
   `SegmentDisplay`.
+* Reduce flash by 100-200 bytes on AVR, SAMD21, STM32 and ESP8266 by
+  templatizing the `SegmentDisplay` on `NUM_DIGITS` and `NUM_SUBFIELDS`, and
+  merging `patterns` and `brightnesses` arrays directly into `SegmentDisplay`.
+  Flash usage actually goes up by ~40 bytes on Teensy3.2, but it has enough
+  flash memory.
 
 ## Arduino Nano
 
