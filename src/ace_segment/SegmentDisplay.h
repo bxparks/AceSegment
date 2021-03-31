@@ -71,11 +71,11 @@ class SegmentDisplay {
     ):
         mHardware(hardware),
         mRenderer(renderer),
-        mFramesPerSecond(framesPerSecond),
-        mNumDigits(numDigits),
         mPatterns(patterns),
         mBrightnesses(brightnesses),
-        mTimingStats(timingStats)
+        mTimingStats(timingStats),
+        mFramesPerSecond(framesPerSecond),
+        mNumDigits(numDigits)
     {}
 
     /**
@@ -85,6 +85,9 @@ class SegmentDisplay {
      * time.
      */
     void begin();
+
+    /** A no-op end() function for consistency with other classes. */
+    void end() {}
 
     /** Get the number of digits. */
     uint8_t getNumDigits() const { return mNumDigits; }
@@ -162,13 +165,14 @@ class SegmentDisplay {
   private:
     static const uint8_t kMaxNumDigits = 8;
 
+    // Ordered to save space on 32-bit processors.
     Hardware* const mHardware;
     Renderer* const mRenderer;
-    const uint8_t mFramesPerSecond;
-    const uint8_t mNumDigits;
     uint8_t* const mPatterns;
     uint8_t* const mBrightnesses;
     TimingStats* mTimingStats;
+    uint8_t const mFramesPerSecond;
+    uint8_t const mNumDigits;
 
     // global brightness, can be changed during runtime
     uint8_t mBrightness = kDefaultBrightness;

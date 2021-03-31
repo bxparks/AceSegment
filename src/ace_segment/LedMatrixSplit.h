@@ -44,8 +44,8 @@ class LedMatrixSplit: public LedMatrix {
     ) :
         LedMatrix(groupOnPattern, elementOnPattern),
         mHardware(hardware),
-        mNumGroups(numGroups),
-        mGroupPins(groupPins)
+        mGroupPins(groupPins),
+        mNumGroups(numGroups)
     {}
 
     void begin() override {
@@ -101,9 +101,10 @@ class LedMatrixSplit: public LedMatrix {
     }
 
   protected:
+    // Arranged to save space on 32-bit processors.
     const Hardware* const mHardware;
-    uint8_t const mNumGroups;
     const uint8_t* const mGroupPins;
+    uint8_t const mNumGroups;
 
     uint8_t mPrevGroup = 0;
 };
