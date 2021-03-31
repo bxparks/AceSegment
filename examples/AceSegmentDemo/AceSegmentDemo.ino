@@ -121,10 +121,9 @@ Hardware hardware;
 #endif
 
 uint8_t patterns[NUM_DIGITS];
-Renderer renderer(&ledMatrix, NUM_DIGITS, patterns);
 SegmentDisplay segmentDisplay(
     &hardware,
-    &renderer,
+    &ledMatrix,
     FRAMES_PER_SECOND,
     NUM_DIGITS,
     patterns);
@@ -151,7 +150,6 @@ void setupAceSegment() {
   #endif
 
     ledMatrix.begin();
-    renderer.begin();
     segmentDisplay.begin();
 
 #if USE_INTERRUPT == 1

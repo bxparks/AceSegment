@@ -38,7 +38,6 @@ SOFTWARE.
 #include "ace_segment/LedMatrixDirect.h"
 #include "ace_segment/LedMatrixPartialSpi.h"
 #include "ace_segment/LedMatrixFullSpi.h"
-#include "ace_segment/Renderer.h"
 #include "ace_segment/SegmentDisplay.h"
 #include "ace_segment/HexWriter.h"
 #include "ace_segment/ClockWriter.h"

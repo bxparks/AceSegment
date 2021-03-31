@@ -29,34 +29,6 @@ SOFTWARE.
 
 namespace ace_segment {
 
-void SegmentDisplay::begin() {
-  mFieldsPerFrame = mRenderer->getFieldsPerFrame();
-
-  // Counters for frames and fields.
-  mCurrentField = 0;
-
-  // Set up durations for polling.
-  mMicrosPerField = 1000000UL / getFieldsPerSecond();
-  mLastRenderFieldMicros = mHardware->micros();
-}
-
-void SegmentDisplay::writeDecimalPointAt(uint8_t digit, bool state) {
-  if (digit >= mNumDigits) return;
-  uint8_t pattern = mPatterns[digit];
-  if (state) {
-    pattern |= 0x80;
-  } else {
-    pattern &= ~0x80;
-  }
-  mPatterns[digit] = pattern;
-}
-
-void SegmentDisplay::clear() {
-  for (uint8_t i = 0; i < mNumDigits; i++) {
-    mPatterns[i] = 0;
-  }
-}
-
 bool SegmentDisplay::renderFieldWhenReady() {
   uint16_t now = mHardware->micros();
   uint16_t elapsedMicros = now - mLastRenderFieldMicros;
@@ -71,11 +43,54 @@ bool SegmentDisplay::renderFieldWhenReady() {
 
 void SegmentDisplay::renderField() {
   uint16_t now = mHardware->micros();
-  mRenderer->displayCurrentField();
-  ace_common::incrementMod(mCurrentField, mFieldsPerFrame);
-
+  displayCurrentField();
   uint16_t duration = mHardware->micros() - now;
   if (mTimingStats) mTimingStats->update(duration);
+}
+
+void SegmentDisplay::displayCurrentFieldPlain() {
+  const uint8_t brightness = (mBrightnesses)
+      ? mBrightnesses[mCurrentDigit]
+      : 0xFF;
+  if (brightness == 0) {
+    mLedMatrix->disableGroup(mCurrentDigit);
+  } else {
+    const uint8_t pattern = mPatterns[mCurrentDigit];
+    mLedMatrix->draw(mCurrentDigit, pattern);
+  }
+
+  mPrevDigit = mCurrentDigit;
+  ace_common::incrementMod(mCurrentDigit, mNumDigits);
+}
+
+void SegmentDisplay::displayCurrentFieldModulated() {
+  // Calculate the maximum subfield duration for a given digit.
+  const uint8_t brightness = (mBrightnesses)
+      ? mBrightnesses[mCurrentDigit]
+      : 0xFF;
+  if (mCurrentDigit != mPrevDigit) {
+    mCurrentSubFieldMax = ((uint16_t) mNumSubFields * brightness) / 256;
+  }
+
+  // No matter how small the mNumSubFields, we want:
+  // * If brightness == 0, then subfield 0 should be OFF.
+  // * If brightness == 255, then special case that to be ON.
+  const uint8_t pattern =
+      (brightness == 0xFF || mCurrentSubField < mCurrentSubFieldMax)
+      ? mPatterns[mCurrentDigit]
+      : 0;
+
+  if (pattern != mPattern || mCurrentDigit != mPrevDigit) {
+    mLedMatrix->draw(mCurrentDigit, pattern);
+    mPattern = pattern;
+  }
+
+  mCurrentSubField++;
+  mPrevDigit = mCurrentDigit;
+  if (mCurrentSubField >= mNumSubFields) {
+    ace_common::incrementMod(mCurrentDigit, mNumDigits);
+    mCurrentSubField = 0;
+  }
 }
 
 }

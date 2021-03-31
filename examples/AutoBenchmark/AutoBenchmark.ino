@@ -160,16 +160,14 @@ void runBenchmark(const char* name, LedMatrix& ledMatrix) {
   TimingStats timingStats;
   ledMatrix.begin();
 
-  Renderer renderer(&ledMatrix, NUM_DIGITS, patterns);
-  renderer.begin();
-
   SegmentDisplay segmentDisplay(
       &hardware,
-      &renderer,
+      &ledMatrix,
       FRAMES_PER_SECOND,
       NUM_DIGITS,
       patterns,
       nullptr /*brightnesses*/,
+      1 /*numSubFields*/,
       &timingStats);
   segmentDisplay.begin();
   segmentDisplay.writePatternAt(0, 0x13);
@@ -183,7 +181,6 @@ void runBenchmark(const char* name, LedMatrix& ledMatrix) {
   }
 
   segmentDisplay.end();
-  renderer.end();
   ledMatrix.end();
 
   printStats(name, timingStats);
@@ -215,8 +212,6 @@ void printSizeOf() {
   SERIAL_PORT_MONITOR.println(sizeof(LedMatrixPartialSpi));
   SERIAL_PORT_MONITOR.print(F("sizeof(LedMatrixFullSpi): "));
   SERIAL_PORT_MONITOR.println(sizeof(LedMatrixFullSpi));
-  SERIAL_PORT_MONITOR.print(F("sizeof(Renderer): "));
-  SERIAL_PORT_MONITOR.println(sizeof(Renderer));
   SERIAL_PORT_MONITOR.print(F("sizeof(SegmentDisplay): "));
   SERIAL_PORT_MONITOR.println(sizeof(SegmentDisplay));
   SERIAL_PORT_MONITOR.print(F("sizeof(HexWriter): "));
