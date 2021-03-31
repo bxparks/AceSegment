@@ -94,6 +94,11 @@ before substantional refactoring in 2021.
   classes, and removing virtual methods. Saves 250-300 bytes on AVR, 150-200 on
   SAMD, 150-300 on STM32, 200-300 on ESP8266, 300-1300 bytes on ESP32, 800-1300
   bytes on Teensy 3.2.
+* Reduce flash by 250-400 bytes on AVR by providing ability to use
+  `digitalWriteFast()` (https://github.com/NicksonYap/digitalWriteFast) using
+  the `fast/LedMatrixDirectFast.h` and `fast/SwSpiAdapterFast.h` classes.
+* Total flash size saved is around 2kB for AVR, from (4 to 4.4) kB to (2 to 2.5)
+  kB.
 
 ## Arduino Nano
 
@@ -108,10 +113,13 @@ before substantional refactoring in 2021.
 | baseline                        |    456/   11 |     0/    0 |
 |---------------------------------+--------------+-------------|
 | direct                          |   2566/  252 |  2110/  241 |
-| split_sw_spi                    |   2572/  246 |  2116/  235 |
-| split_hw_spi                    |   2634/  247 |  2178/  236 |
-| merged_sw_spi                   |   2448/  237 |  1992/  226 |
-| merged_hw_spi                   |   2522/  238 |  2066/  227 |
+| partial_sw_spi                  |   2572/  246 |  2116/  235 |
+| partial_hw_spi                  |   2634/  247 |  2178/  236 |
+| full_sw_spi                     |   2448/  237 |  1992/  226 |
+| full_hw_spi                     |   2522/  238 |  2066/  227 |
+| direct_fast                     |   2296/  280 |  1840/  269 |
+| partial_sw_fast                 |   2464/  244 |  2008/  233 |
+| full_sw_fast                    |   2056/  235 |  1600/  224 |
 +--------------------------------------------------------------+
 
 ```
@@ -129,10 +137,13 @@ before substantional refactoring in 2021.
 | baseline                        |   3472/  151 |     0/    0 |
 |---------------------------------+--------------+-------------|
 | direct                          |   4732/  217 |  1260/   66 |
-| split_sw_spi                    |   4740/  211 |  1268/   60 |
-| split_hw_spi                    |   4802/  212 |  1330/   61 |
-| merged_sw_spi                   |   4616/  202 |  1144/   51 |
-| merged_hw_spi                   |   4690/  203 |  1218/   52 |
+| partial_sw_spi                  |   4740/  211 |  1268/   60 |
+| partial_hw_spi                  |   4802/  212 |  1330/   61 |
+| full_sw_spi                     |   4616/  202 |  1144/   51 |
+| full_hw_spi                     |   4690/  203 |  1218/   52 |
+| direct_fast                     |   4348/  245 |   876/   94 |
+| partial_sw_fast                 |   4632/  209 |  1160/   58 |
+| full_sw_fast                    |   4108/  200 |   636/   49 |
 +--------------------------------------------------------------+
 
 ```
@@ -150,10 +161,10 @@ before substantional refactoring in 2021.
 | baseline                        |  10064/    0 |     0/    0 |
 |---------------------------------+--------------+-------------|
 | direct                          |  10928/    0 |   864/    0 |
-| split_sw_spi                    |  10984/    0 |   920/    0 |
-| split_hw_spi                    |  11432/    0 |  1368/    0 |
-| merged_sw_spi                   |  10872/    0 |   808/    0 |
-| merged_hw_spi                   |  11392/    0 |  1328/    0 |
+| partial_sw_spi                  |  10984/    0 |   920/    0 |
+| partial_hw_spi                  |  11432/    0 |  1368/    0 |
+| full_sw_spi                     |  10872/    0 |   808/    0 |
+| full_hw_spi                     |  11392/    0 |  1328/    0 |
 +--------------------------------------------------------------+
 
 ```
@@ -171,10 +182,10 @@ before substantional refactoring in 2021.
 | baseline                        |  19136/ 3788 |     0/    0 |
 |---------------------------------+--------------+-------------|
 | direct                          |  21648/ 4020 |  2512/  232 |
-| split_sw_spi                    |  21716/ 4024 |  2580/  236 |
-| split_hw_spi                    |  23456/ 4024 |  4320/  236 |
-| merged_sw_spi                   |  21616/ 4016 |  2480/  228 |
-| merged_hw_spi                   |  23404/ 4016 |  4268/  228 |
+| partial_sw_spi                  |  21716/ 4024 |  2580/  236 |
+| partial_hw_spi                  |  23456/ 4024 |  4320/  236 |
+| full_sw_spi                     |  21616/ 4016 |  2480/  228 |
+| full_hw_spi                     |  23404/ 4016 |  4268/  228 |
 +--------------------------------------------------------------+
 
 ```
@@ -192,10 +203,10 @@ before substantional refactoring in 2021.
 | baseline                        | 256700/26784 |     0/    0 |
 |---------------------------------+--------------+-------------|
 | direct                          | 260920/26972 |  4220/  188 |
-| split_sw_spi                    | 261008/26980 |  4308/  196 |
-| split_hw_spi                    | 262112/26988 |  5412/  204 |
-| merged_sw_spi                   | 260876/26960 |  4176/  176 |
-| merged_hw_spi                   | 262060/26968 |  5360/  184 |
+| partial_sw_spi                  | 261008/26980 |  4308/  196 |
+| partial_hw_spi                  | 262112/26988 |  5412/  204 |
+| full_sw_spi                     | 260876/26960 |  4176/  176 |
+| full_hw_spi                     | 262060/26968 |  5360/  184 |
 +--------------------------------------------------------------+
 
 ```
@@ -213,10 +224,10 @@ before substantional refactoring in 2021.
 | baseline                        | 197730/13100 |     0/    0 |
 |---------------------------------+--------------+-------------|
 | direct                          | 205976/13556 |  8246/  456 |
-| split_sw_spi                    | 206016/13556 |  8286/  456 |
-| split_hw_spi                    | 208308/13604 | 10578/  504 |
-| merged_sw_spi                   | 205884/13548 |  8154/  448 |
-| merged_hw_spi                   | 208252/13596 | 10522/  496 |
+| partial_sw_spi                  | 206016/13556 |  8286/  456 |
+| partial_hw_spi                  | 208308/13604 | 10578/  504 |
+| full_sw_spi                     | 205884/13548 |  8154/  448 |
+| full_hw_spi                     | 208252/13596 | 10522/  496 |
 +--------------------------------------------------------------+
 
 ```
@@ -235,10 +246,10 @@ before substantional refactoring in 2021.
 | baseline                        |   7624/ 3048 |     0/    0 |
 |---------------------------------+--------------+-------------|
 | direct                          |  12216/ 4208 |  4592/ 1160 |
-| split_sw_spi                    |  12248/ 4212 |  4624/ 1164 |
-| split_hw_spi                    |  13508/ 4268 |  5884/ 1220 |
-| merged_sw_spi                   |  12172/ 4204 |  4548/ 1156 |
-| merged_hw_spi                   |  13368/ 4260 |  5744/ 1212 |
+| partial_sw_spi                  |  12248/ 4212 |  4624/ 1164 |
+| partial_hw_spi                  |  13508/ 4268 |  5884/ 1220 |
+| full_sw_spi                     |  12172/ 4204 |  4548/ 1156 |
+| full_hw_spi                     |  13368/ 4260 |  5744/ 1212 |
 +--------------------------------------------------------------+
 
 ```

@@ -118,6 +118,11 @@ before substantional refactoring in 2021.
   classes, and removing virtual methods. Saves 250-300 bytes on AVR, 150-200 on
   SAMD, 150-300 on STM32, 200-300 on ESP8266, 300-1300 bytes on ESP32, 800-1300
   bytes on Teensy 3.2.
+* Reduce flash by 250-400 bytes on AVR by providing ability to use
+  `digitalWriteFast()` (https://github.com/NicksonYap/digitalWriteFast) using
+  the `fast/LedMatrixDirectFast.h` and `fast/SwSpiAdapterFast.h` classes.
+* Total flash size saved is around 2kB for AVR, from (4 to 4.4) kB to (2 to 2.5)
+  kB.
 
 ## Arduino Nano
 
