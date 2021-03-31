@@ -1,8 +1,8 @@
 /*
- * A program which compiles in different AceSegment Renderer using different
- * LED configurations to determine the flash and static memory sizes from the
- * output of the compiler. Set the FEATURE macro to various integer to compile
- * different algorithms.
+ * A program which compiles in different SegmentDisplay objects configured with
+ * using different LED configurations to determine the flash and static memory
+ * sizes from the output of the compiler. Set the FEATURE macro to various
+ * integer to compile different algorithms.
  */
 
 #include <Arduino.h>
@@ -93,10 +93,9 @@ volatile int disableCompilerOptimization = 0;
   #endif
 
   uint8_t patterns[NUM_DIGITS];
-  Renderer renderer(&ledMatrix, NUM_DIGITS, patterns);
   SegmentDisplay segmentDisplay(
       &hardware,
-      &renderer,
+      &ledMatrix,
       FRAMES_PER_SECOND,
       NUM_DIGITS,
       patterns);
@@ -108,7 +107,6 @@ void setup() {
 
 #elif FEATURE == FEATURE_DIRECT
   ledMatrix.begin();
-  renderer.begin();
   segmentDisplay.begin();
   segmentDisplay.writePatternAt(0, 0x3A);
   disableCompilerOptimization = patterns[1];
@@ -116,7 +114,6 @@ void setup() {
 #elif FEATURE == FEATURE_SPLIT_SW_SPI
   spiAdapter.spiBegin();
   ledMatrix.begin();
-  renderer.begin();
   segmentDisplay.begin();
   segmentDisplay.writePatternAt(0, 0x3A);
   disableCompilerOptimization = patterns[1];
@@ -124,7 +121,6 @@ void setup() {
 #elif FEATURE == FEATURE_SPLIT_HW_SPI
   spiAdapter.spiBegin();
   ledMatrix.begin();
-  renderer.begin();
   segmentDisplay.begin();
   segmentDisplay.writePatternAt(0, 0x3A);
   disableCompilerOptimization = patterns[1];
@@ -132,7 +128,6 @@ void setup() {
 #elif FEATURE == FEATURE_MERGED_SW_SPI
   spiAdapter.spiBegin();
   ledMatrix.begin();
-  renderer.begin();
   segmentDisplay.begin();
   segmentDisplay.writePatternAt(0, 0x3A);
   disableCompilerOptimization = patterns[1];
@@ -140,7 +135,6 @@ void setup() {
 #elif FEATURE == FEATURE_MERGED_HW_SPI
   spiAdapter.spiBegin();
   ledMatrix.begin();
-  renderer.begin();
   segmentDisplay.begin();
   segmentDisplay.writePatternAt(0, 0x3A);
   disableCompilerOptimization = patterns[1];

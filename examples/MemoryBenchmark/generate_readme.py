@@ -88,17 +88,23 @@ $ make README.md
 
 ## Library Size Changes
 
-v0.3: Initial MemoryBenchmark using the old v.0.3 implementation from 2018,
+**v0.3**
+
+* Initial MemoryBenchmark using the old v0.3 implementation from 2018,
 before substantional refactoring in 2021.
 
-Reduce library size from 4.0-4.4kB by about 200-500 bytes on AVR by simplifying
-`LedMatrix` class hierarchy by extracting out the `SpiAdapter` class to handle
-both hardware and software SPI, instead of calling `shiftOut()` directly.
+**v0.4**
 
-Reduce library size from 3.8-4.2kB down 800-1000 bytes on AVR by simplifying the
-`Driver` class hierarchy into a single `Renderer` class, by making the
-`LedMatrix` class into a better abstraction and unifying the API into a single
-`draw(group, elementPattern)` method.
+* Reduce flash size from 4.0-4.4kB by about 200-500 bytes on AVR by
+  simplifying `LedMatrix` class hierarchy by extracting out the `SpiAdapter`
+  class to handle both hardware and software SPI, instead of calling
+  `shiftOut()` directly.
+* Reduce flash size from 3.8-4.2kB down 800-1000 bytes on AVR by
+  simplifying the `Driver` class hierarchy into a single `Renderer` class, by
+  making the `LedMatrix` class into a better abstraction and unifying the API
+  into a single `draw(group, elementPattern)` method.
+* Reduce flash by 20-50 bytes on AVR by merging `Renderer` into
+  `SegmentDisplay`.
 
 ## Arduino Nano
 
