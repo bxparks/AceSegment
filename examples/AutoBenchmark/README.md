@@ -77,8 +77,10 @@ to match similar programs in the AceButton, AceCrc and AceTime libraries.
 Sizes of Objects:
 sizeof(Hardware): 1
 sizeof(SwSpiAdapter): 3
+sizeof(SwSpiAdapterFast<1,2,3>): 1
 sizeof(HwSpiAdapter): 3
 sizeof(LedMatrixDirect<Hardware>): 11
+sizeof(LedMatrixDirectFast<0..3, 0..7>): 3
 sizeof(LedMatrixPartialSpi<Hardware, SwSpiAdapter>): 10
 sizeof(LedMatrixFullSpi<HwSpiAdapter>): 5
 sizeof(LedDisplay): 3
@@ -93,10 +95,13 @@ CPU:
 | LedMatrix type            | min/avg/max | samples |
 |---------------------------+-------------+---------|
 | direct                    |  60/ 63/ 80 | 1200    |
-| partial_sw_spi            | 124/126/148 | 1200    |
-| partial_hw_spi            |  28/ 30/ 40 | 1200    |
-| full_sw_spi               | 212/215/236 | 1200    |
-| full_hw_spi               |  20/ 22/ 36 | 1200    |
+| partial_sw_spi            | 124/127/144 | 1200    |
+| partial_hw_spi            |  28/ 31/ 40 | 1200    |
+| full_sw_spi               | 212/215/244 | 1200    |
+| full_hw_spi               |  20/ 22/ 32 | 1200    |
+| direct_fast               |  24/ 27/ 40 | 1200    |
+| partial_sw_spi_fast       |  24/ 25/ 40 | 1200    |
+| full_sw_spi_fast          |  20/ 24/ 32 | 1200    |
 +---------------------------+-------------+---------+
 
 ```
@@ -112,8 +117,10 @@ CPU:
 Sizes of Objects:
 sizeof(Hardware): 1
 sizeof(SwSpiAdapter): 3
+sizeof(SwSpiAdapterFast<1,2,3>): 1
 sizeof(HwSpiAdapter): 3
 sizeof(LedMatrixDirect<Hardware>): 11
+sizeof(LedMatrixDirectFast<0..3, 0..7>): 3
 sizeof(LedMatrixPartialSpi<Hardware, SwSpiAdapter>): 10
 sizeof(LedMatrixFullSpi<HwSpiAdapter>): 5
 sizeof(LedDisplay): 3
@@ -128,10 +135,13 @@ CPU:
 | LedMatrix type            | min/avg/max | samples |
 |---------------------------+-------------+---------|
 | direct                    |  64/ 68/ 84 | 1200    |
-| partial_sw_spi            | 124/127/140 | 1200    |
-| partial_hw_spi            |  28/ 33/ 48 | 1200    |
+| partial_sw_spi            | 124/128/140 | 1200    |
+| partial_hw_spi            |  32/ 34/ 44 | 1200    |
 | full_sw_spi               | 208/213/224 | 1200    |
 | full_hw_spi               |  20/ 24/ 32 | 1200    |
+| direct_fast               |  24/ 26/ 40 | 1200    |
+| partial_sw_spi_fast       |  24/ 27/ 36 | 1200    |
+| full_sw_spi_fast          |  20/ 24/ 32 | 1200    |
 +---------------------------+-------------+---------+
 
 ```
@@ -161,11 +171,11 @@ CPU:
 +---------------------------+-------------+---------+
 | LedMatrix type            | min/avg/max | samples |
 |---------------------------+-------------+---------|
-| direct                    |  25/ 25/ 29 | 1200    |
+| direct                    |  25/ 25/ 30 | 1200    |
 | partial_sw_spi            |  52/ 52/ 57 | 1200    |
 | partial_hw_spi            |  23/ 23/ 28 | 1200    |
-| full_sw_spi               |  87/ 88/ 94 | 1200    |
-| full_hw_spi               |  22/ 22/ 27 | 1200    |
+| full_sw_spi               |  87/ 88/ 93 | 1200    |
+| full_hw_spi               |  22/ 22/ 26 | 1200    |
 +---------------------------+-------------+---------+
 
 ```
@@ -229,10 +239,10 @@ CPU:
 +---------------------------+-------------+---------+
 | LedMatrix type            | min/avg/max | samples |
 |---------------------------+-------------+---------|
-| direct                    |  12/ 12/ 33 | 1200    |
-| partial_sw_spi            |  28/ 29/ 45 | 1200    |
+| direct                    |  12/ 12/ 32 | 1200    |
+| partial_sw_spi            |  29/ 29/ 45 | 1200    |
 | partial_hw_spi            |  11/ 11/ 27 | 1200    |
-| full_sw_spi               |  50/ 50/ 65 | 1200    |
+| full_sw_spi               |  50/ 50/ 64 | 1200    |
 | full_hw_spi               |  12/ 12/ 24 | 1200    |
 +---------------------------+-------------+---------+
 
@@ -266,7 +276,7 @@ CPU:
 | direct                    |   2/  2/ 11 | 1200    |
 | partial_sw_spi            |   4/  4/ 13 | 1200    |
 | partial_hw_spi            |   9/  9/ 18 | 1200    |
-| full_sw_spi               |   7/  7/ 10 | 1200    |
+| full_sw_spi               |   7/  7/ 16 | 1200    |
 | full_hw_spi               |   9/  9/ 18 | 1200    |
 +---------------------------+-------------+---------+
 
@@ -300,9 +310,9 @@ CPU:
 |---------------------------+-------------+---------|
 | direct                    |   5/  6/ 10 | 1200    |
 | partial_sw_spi            |  10/ 10/ 14 | 1200    |
-| partial_hw_spi            |   4/  4/  7 | 1200    |
+| partial_hw_spi            |   4/  4/  8 | 1200    |
 | full_sw_spi               |  16/ 16/ 21 | 1200    |
-| full_hw_spi               |   3/  3/  7 | 1200    |
+| full_hw_spi               |   3/  3/  6 | 1200    |
 +---------------------------+-------------+---------+
 
 ```

@@ -14,7 +14,7 @@ sizeof(StringWriter): 4
 BENCHMARKS
 direct 5 6 10 1200
 partial_sw_spi 10 10 14 1200
-partial_hw_spi 4 4 7 1200
+partial_hw_spi 4 4 8 1200
 full_sw_spi 16 16 21 1200
-full_hw_spi 3 3 7 1200
+full_hw_spi 3 3 6 1200
 END

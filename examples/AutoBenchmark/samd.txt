@@ -12,9 +12,9 @@ sizeof(ClockWriter): 8
 sizeof(CharWriter): 4
 sizeof(StringWriter): 4
 BENCHMARKS
-direct 25 25 29 1200
+direct 25 25 30 1200
 partial_sw_spi 52 52 57 1200
 partial_hw_spi 23 23 28 1200
-full_sw_spi 87 88 94 1200
-full_hw_spi 22 22 27 1200
+full_sw_spi 87 88 93 1200
+full_hw_spi 22 22 26 1200
 END

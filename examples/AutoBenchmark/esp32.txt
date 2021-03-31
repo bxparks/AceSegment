@@ -15,6 +15,6 @@ BENCHMARKS
 direct 2 2 11 1200
 partial_sw_spi 4 4 13 1200
 partial_hw_spi 9 9 18 1200
-full_sw_spi 7 7 10 1200
+full_sw_spi 7 7 16 1200
 full_hw_spi 9 9 18 1200
 END
