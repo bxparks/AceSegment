@@ -2,19 +2,19 @@ SIZEOF
 sizeof(Hardware): 1
 sizeof(SwSpiAdapter): 3
 sizeof(HwSpiAdapter): 3
-sizeof(LedMatrixDirect<Hardware>): 13
-sizeof(LedMatrixPartialSpi<Hardware, SwSpiAdapter>): 12
-sizeof(LedMatrixFullSpi<HwSpiAdapter>): 7
+sizeof(LedMatrixDirect<Hardware>): 11
+sizeof(LedMatrixPartialSpi<Hardware, SwSpiAdapter>): 10
+sizeof(LedMatrixFullSpi<HwSpiAdapter>): 5
 sizeof(LedDisplay): 3
-sizeof(SegmentDisplay<Hardware, 4, 1>): 28
+sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 28
 sizeof(HexWriter): 2
 sizeof(ClockWriter): 3
 sizeof(CharWriter): 2
 sizeof(StringWriter): 2
 BENCHMARKS
-direct 64 69 84 1200
-partial_sw_spi 128 130 148 1200
-partial_hw_spi 32 35 48 1200
-full_sw_spi 212 216 244 1200
-full_hw_spi 20 23 32 1200
+direct 60 63 80 1200
+partial_sw_spi 124 126 148 1200
+partial_hw_spi 28 30 40 1200
+full_sw_spi 212 215 236 1200
+full_hw_spi 20 22 36 1200
 END
