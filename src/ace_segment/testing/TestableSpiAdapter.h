@@ -13,7 +13,7 @@ class TestableSpiAdapter : public SpiAdapter {
       mNumRecords(0)
     {}
 
-    void spiBegin() const override {
+    void begin() const override {
       if (mNumRecords < kMaxRecords) {
         Event& event = mEvents[mNumRecords];
         event.type = Event::kTypeSpiBegin;
@@ -21,7 +21,7 @@ class TestableSpiAdapter : public SpiAdapter {
       }
     }
 
-    void spiEnd() const override {
+    void end() const override {
       if (mNumRecords < kMaxRecords) {
         Event& event = mEvents[mNumRecords];
         event.type = Event::kTypeSpiEnd;
@@ -29,7 +29,7 @@ class TestableSpiAdapter : public SpiAdapter {
       }
     }
 
-    void spiTransfer(uint8_t value) const override {
+    void transfer(uint8_t value) const override {
       if (mNumRecords < kMaxRecords) {
         Event& event = mEvents[mNumRecords];
         event.type = Event::kTypeSpiTransfer;
@@ -38,7 +38,7 @@ class TestableSpiAdapter : public SpiAdapter {
       }
     }
 
-    void spiTransfer16(uint16_t value) const override {
+    void transfer16(uint16_t value) const override {
       if (mNumRecords < kMaxRecords) {
         Event& event = mEvents[mNumRecords];
         event.type = Event::kTypeSpiTransfer16;

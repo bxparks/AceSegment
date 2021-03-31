@@ -27,7 +27,6 @@ SOFTWARE.
 
 #include <stdint.h>
 #include <AceCommon.h> // TimingStats
-#include "LedMatrix.h"
 #include "LedDisplay.h"
 
 namespace ace_segment {
@@ -35,8 +34,8 @@ namespace ace_segment {
 using ace_common::TimingStats;
 
 /**
- * The user interface to the LED Segment display. Uses the LedMatrix to
- * multiplex the LED segments on the digits.
+ * The user interface to the LED Segment display. Uses an implementation of
+ * the LedMatrixBase class to multiplex the LED segments on the digits.
  *
  * A frame is divided into fields. A field is a partial rendering of a frame.
  * Normally, the one digit corresponds to one field. However if brightness
@@ -52,11 +51,13 @@ using ace_common::TimingStats;
  *    the appropriate time.
  *
  * @tparam H class that provides access to the hardware pin and timing functions
+ * @tparam LM LedMatrixBase class that provides access to LED segments
+      (elements) organized by digit (group)
  * @tparam DIGITS number of LED digits
  * @tparam SUBFIELDS number of rendering fields per digit for PWM, normally 1,
  *   but set to greater than 1 to get number of brightness levels
  */
-template <typename H, uint8_t DIGITS, uint8_t SUBFIELDS>
+template <typename H, typename LM, uint8_t DIGITS, uint8_t SUBFIELDS>
 class SegmentDisplay : public LedDisplay {
 
   public:
@@ -66,7 +67,7 @@ class SegmentDisplay : public LedDisplay {
      * Constructor.
      *
      * @param hardware pointer to an instance of Hardware. Required.
-     * @param ledMatrix instance of LedMatrix that understanding the wiring
+     * @param ledMatrix instance of LedMatrixBase that understanding the wiring
      * @param framesPerSecond the rate at which all digits of the LED display
      *    will be refreshed
      * @param numDigits number of digits in the LED display
@@ -76,7 +77,7 @@ class SegmentDisplay : public LedDisplay {
      */
     explicit SegmentDisplay(
         const H& hardware,
-        LedMatrix& ledMatrix,
+        const LM& ledMatrix,
         uint8_t framesPerSecond,
         TimingStats* timingStats = nullptr
     ):
@@ -277,8 +278,8 @@ class SegmentDisplay : public LedDisplay {
     /** Indirection to the low level digitalWrite(), micros(). */
     const H& mHardware;
 
-    /** LedMatrix instance that knows how to set and unset LED segments. */
-    LedMatrix& mLedMatrix;
+    /** LedMatrixBase instance that knows how to set and unset LED segments. */
+    const LM& mLedMatrix;
 
     /** Pattern for each digit. Not nullable. */
     uint8_t mPatterns[DIGITS];

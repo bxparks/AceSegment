@@ -74,7 +74,8 @@ Hardware hardware;
 
 #if LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT
   // Common Anode, with transitions on Group pins
-  LedMatrixDirect<Hardware> ledMatrix(
+  using LedMatrix = LedMatrixDirect<Hardware>;
+  LedMatrix ledMatrix(
       hardware,
       LedMatrix::kActiveLowPattern /*groupOnPattern*/,
       LedMatrix::kActiveLowPattern /*elementOnPattern*/,
@@ -85,7 +86,8 @@ Hardware hardware;
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_PARIAL_SW_SPI
   // Common Cathode, with transistors on Group pins
   SwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  LedMatrixPartialSpi<Hardware, SwSpiAdapter> ledMatrix(
+  using LedMatrix = LedMatrixPartialSpi<Hardware, SwSpiAdapter>;
+  LedMatrix ledMatrix(
       hardware,
       spiAdapter,
       LedMatrix::kActiveHighPattern /*groupOnPattern*/,
@@ -95,7 +97,8 @@ Hardware hardware;
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_PARTIAL_HW_SPI
   // Common Cathode, with transistors on Group pins
   HwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  LedMatrixPartialSpi<Hardware, HwSpiAdapter> ledMatrix(
+  using LedMatrix = LedMatrixPartialSpi<Hardware, HwSpiAdapter>;
+  LedMatrix ledMatrix(
       hardware,
       spiAdapter,
       LedMatrix::kActiveHighPattern /*groupOnPattern*/,
@@ -105,14 +108,16 @@ Hardware hardware;
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_FULL_SW_SPI
   // Common Anode, with transistors on Group pins
   SwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  LedMatrixFullSpi<SwSpiAdapter> ledMatrix(
+  using LedMatrix = LedMatrixFullSpi<SwSpiAdapter>;
+  LedMatrix ledMatrix(
       spiAdapter,
       LedMatrix::kActiveLowPattern /*groupOnPattern*/,
       LedMatrix::kActiveLowPattern /*elementOnPattern*/);
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_FULL_HW_SPI
   // Common Anode, with transistors on Group pins
   HwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  LedMatrixFullSpi<HwSpiAdapter> ledMatrix(
+  using LedMatrix = LedMatrixFullSpi<HwSpiAdapter>;
+  LedMatrix ledMatrix(
       spiAdapter,
       LedMatrix::kActiveLowPattern /*groupOnPattern*/,
       LedMatrix::kActiveLowPattern /*elementOnPattern*/);
@@ -120,7 +125,7 @@ Hardware hardware;
   #error Unsupported LED_MATRIX_MODE
 #endif
 
-SegmentDisplay<Hardware, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
+SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
     hardware, ledMatrix, FRAMES_PER_SECOND);
 
 HexWriter hexWriter(segmentDisplay);
@@ -141,7 +146,7 @@ void setupAceSegment() {
       || LED_MATRIX_MODE == LED_MATRIX_MODE_PARTIAL_HW_SPI \
       || LED_MATRIX_MODE == LED_MATRIX_MODE_FULL_SW_SPI \
       || LED_MATRIX_MODE == LED_MATRIX_MODE_FULL_HW_SPI
-    spiAdapter.spiBegin();
+    spiAdapter.begin();
   #endif
 
     ledMatrix.begin();

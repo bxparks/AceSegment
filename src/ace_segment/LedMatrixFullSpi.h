@@ -25,71 +25,63 @@ SOFTWARE.
 #ifndef ACE_SEGMENT_LED_MATRIX_FULL_SPI_H
 #define ACE_SEGMENT_LED_MATRIX_FULL_SPI_H
 
-#include "LedMatrix.h"
+#include "LedMatrixBase.h"
 
 namespace ace_segment {
 
 /**
- * An LedMatrix that writes to both group and element pins via SPI. The group
- * pins are assumed to be connected to the most significant byte. The element
- * pins are connected to the least signficiant byte.
+ * An LedMatrixBase that writes to both group and element pins via SPI. The
+ * group pins are assumed to be connected to the most significant byte. The
+ * element pins are connected to the least signficiant byte.
  *
  * @tparam SA class providing SPI, either SwSpiAdapter or HwSpiAdapter
  */
 template<typename SA>
-class LedMatrixFullSpi: public LedMatrix {
+class LedMatrixFullSpi: public LedMatrixBase {
   public:
     LedMatrixFullSpi(
         const SA& spiAdapter,
         uint8_t groupOnPattern,
         uint8_t elementOnPattern
     ) :
-        LedMatrix(groupOnPattern, elementOnPattern),
+        LedMatrixBase(groupOnPattern, elementOnPattern),
         mSpiAdapter(spiAdapter)
     {}
 
-    void begin() override {
-      mSpiAdapter.spiBegin();
-    }
+    void begin() const {}
 
-    void end() override {
-      mSpiAdapter.spiEnd();
-    }
+    void end() const {}
 
     /**
      * Write out the group and element patterns in a single 16-bit stream
      * with the group bits in the MSB and the element bits in the LSB.
      */
-    void draw(uint8_t group, uint8_t elementPattern) override {
+    void draw(uint8_t group, uint8_t elementPattern) const {
       uint8_t groupPattern = 0x1 << group; // Would a lookup table be faster?
 
       uint8_t actualGroupPattern = (groupPattern ^ mGroupXorMask);
       uint8_t actualElementPattern = (elementPattern ^ mElementXorMask);
 
-      mSpiAdapter.spiTransfer16(
+      mSpiAdapter.transfer16(
           actualGroupPattern << 8 | actualElementPattern);
       mPrevElementPattern = elementPattern;
     }
 
-    void enableGroup(uint8_t group) override {
+    void enableGroup(uint8_t group) const {
       draw(group, mPrevElementPattern);
     }
 
-    void disableGroup(uint8_t group) override {
+    void disableGroup(uint8_t group) const {
       (void) group;
       clear();
     }
 
-    void clear() override {
+    void clear() const {
       uint8_t actualGroupPattern = 0x00 ^ mGroupXorMask;
       uint8_t actualElementPattern = 0x00 ^ mElementXorMask;
-      mSpiAdapter.spiTransfer16(
+      mSpiAdapter.transfer16(
           actualGroupPattern << 8 | actualElementPattern);
     }
-
-  private:
-    /** Not used in this class. */
-    void drawElements(uint8_t /*pattern*/) override {}
 
   private:
     const SA& mSpiAdapter;
@@ -98,7 +90,7 @@ class LedMatrixFullSpi: public LedMatrix {
      * Remember the previous element pattern to support disableGroup() and
      * enableGroup().
      */
-    uint8_t mPrevElementPattern;
+    mutable uint8_t mPrevElementPattern;
 };
 
 }

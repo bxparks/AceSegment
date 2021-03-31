@@ -44,21 +44,21 @@ class HwSpiAdapter {
         mClockPin(clockPin)
     {}
 
-    void spiBegin() const {
+    void begin() const {
       pinMode(mLatchPin, OUTPUT);
       pinMode(mDataPin, OUTPUT);
       pinMode(mClockPin, OUTPUT);
       SPI.begin();
     }
 
-    void spiEnd() const {
+    void end() const {
       pinMode(mLatchPin, INPUT);
       pinMode(mDataPin, INPUT);
       pinMode(mClockPin, INPUT);
       SPI.end();
     }
 
-    void spiTransfer(uint8_t value) const {
+    void transfer(uint8_t value) const {
       digitalWrite(mLatchPin, LOW);
       SPI.beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
       SPI.transfer(value);
@@ -66,7 +66,7 @@ class HwSpiAdapter {
       digitalWrite(mLatchPin, HIGH);
     }
 
-    void spiTransfer16(uint16_t value) const {
+    void transfer16(uint16_t value) const {
       digitalWrite(mLatchPin, LOW);
       SPI.beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
       SPI.transfer16(value);

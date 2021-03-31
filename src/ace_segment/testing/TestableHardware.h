@@ -45,7 +45,7 @@ class Event {
     uint8_t arg2;
     uint8_t arg3;
     uint8_t arg4;
-    uint16_t arg5; // used by spiTransfer16()
+    uint16_t arg5; // used by transfer16()
 };
 
 class TestableHardware {

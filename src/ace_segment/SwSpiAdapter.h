@@ -43,25 +43,25 @@ class SwSpiAdapter {
         mClockPin(clockPin)
     {}
 
-    void spiBegin() const {
+    void begin() const {
       pinMode(mLatchPin, OUTPUT);
       pinMode(mDataPin, OUTPUT);
       pinMode(mClockPin, OUTPUT);
     }
 
-    void spiEnd() const {
+    void end() const {
       pinMode(mLatchPin, INPUT);
       pinMode(mDataPin, INPUT);
       pinMode(mClockPin, INPUT);
     }
 
-    void spiTransfer(uint8_t value) const {
+    void transfer(uint8_t value) const {
       digitalWrite(mLatchPin, LOW);
       shiftOut(mDataPin, mClockPin, MSBFIRST, value);
       digitalWrite(mLatchPin, HIGH);
     }
 
-    void spiTransfer16(uint16_t value) const {
+    void transfer16(uint16_t value) const {
       uint8_t msb = (value & 0xff00) >> 8;
       uint8_t lsb = (value & 0xff);
       digitalWrite(mLatchPin, LOW);

@@ -22,33 +22,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_LED_MATRIX_H
-#define ACE_SEGMENT_LED_MATRIX_H
+#ifndef ACE_SEGMENT_LED_MATRIX_BASE_H
+#define ACE_SEGMENT_LED_MATRIX_BASE_H
 
 namespace ace_segment {
 
 /**
  * Class that represents the abstraction of a particular LED display wiring, and
  * knows how to turn off and turn on a specific group of LEDs with a specific
- * pattern. This class is stateless, it does not know what is currently being
- * displayed on the LED segments.
+ * pattern. This class is conceptually stateless. The API exposes a class that
+ * does not remember the LED element patterns that is currently being displayed.
+ * (However, an implementation class may need to cache a small bit of
+ * information to implement this API abstraction.)
  *
- * There are roughly 2 slightly different APIs:
+ * I have provided 3 wiring implementations:
  *
- *  * LedMatrixSplit
- *    * Assumes that the Group pins are directly controllable using
- *      digitalWrite() methods.
- *    * The rendering methods are `enableGroup()`, `disableGroup()`
- *      and `drawElements()`.
- *    * Two subclasses are provided: 
- *      * LedMatrixDirect: The Segment pins are directly controlled.
- *      * LedMatrixPartialSpi: The Segment pins are attached to an 74HC595 chip,
- *        and is configured using SPI (either software or hardware).
+ *  * LedMatrixDirect
+ *      * The group and element pins are directly attached to GPIO pins
+ *        on the microcontroller.
+ *  * LedMatrixPartialSpi
+ *      * The group pins are directly attached to GPIO pins.
+ *      * The Segment pins are attached to an 74HC595 chip,
+ *        accessed through SPI (either software or hardware).
  *  * LedMatrixFullSpi
  *    * Both the Group and Element pins are controlled by 74HC595 chips
  *      using SPI (software or hardware).
- *    * The rendering method is just the `draw()` method which sets both
- *      the group and element states.
  *
  * If the resistors are on the segments, then the segments become the Elements
  * and the digits become the Groups.
@@ -65,7 +63,7 @@ namespace ace_segment {
  * pins to handle the higher current, then it inverts the logic on the group
  * pins, so groupOnPattern must be set to kActiveHighPattern.
  */
-class LedMatrix {
+class LedMatrixBase {
   public:
 
     /** Bit pattern to indicate that logical 1 activates group or element. */
@@ -78,7 +76,7 @@ class LedMatrix {
      * @param groupOnPattern bit pattern that turns on the groups
      * @param elementOnPattern bit pattern that turns on the elements on group
      */
-    LedMatrix(
+    LedMatrixBase(
         uint8_t groupOnPattern,
         uint8_t elementOnPattern
     ) :
@@ -87,28 +85,22 @@ class LedMatrix {
     {}
 
     /** Configure the pins for the given LED wiring. */
-    virtual void begin() = 0;
+    void begin() const {}
 
     /** Turn off the pins by doing the opposite of begin(). */
-    virtual void end() = 0;
+    void end() const {}
 
     /** Write element patterns for the given group. */
-    virtual void draw(uint8_t group, uint8_t elementPattern) = 0;
+    void draw(uint8_t /*group*/, uint8_t /*elementPattern*/) const {}
 
     /** Disable the elements of given group. */
-    virtual void disableGroup(uint8_t group) = 0;
+    void disableGroup(uint8_t /*group*/) const {}
 
     /** Enable the elements of given group. */
-    virtual void enableGroup(uint8_t group) = 0;
+    void enableGroup(uint8_t /*group*/) const {}
 
     /** Clear everything. */
-    virtual void clear() = 0;
-
-  protected:
-    /**
-     * Draw the element at the current group. Valid only for some subclasses.
-     */
-    virtual void drawElements(uint8_t pattern) = 0;
+    void clear() const {}
 
   protected:
     uint8_t const mGroupXorMask;

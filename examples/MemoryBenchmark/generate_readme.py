@@ -114,6 +114,10 @@ before substantional refactoring in 2021.
   ~250 bytes on ESP8266, 300-600 bytes on ESP32) by templatizing LedMatrix
   and SegmentDisplay on `NUM_DIGITS`, `NUM_SUBFIELDS`, `Hardware` class,
   `SwSpiAdapter` and `HwSpiAdapter`.
+* Reduce flash by flattening the `LedMatrix` hierarchy into templatized
+  classes, and removing virtual methods. Saves 250-300 bytes on AVR, 150-200 on
+  SAMD, 150-300 on STM32, 200-300 on ESP8266, 300-1300 bytes on ESP32, 800-1300
+  bytes on Teensy 3.2.
 
 ## Arduino Nano
 

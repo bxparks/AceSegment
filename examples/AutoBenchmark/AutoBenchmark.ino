@@ -90,50 +90,6 @@ const uint8_t CLOCK_PIN = SCK; // SH_CP on 74HC595
 
 Hardware hardware;
 
-// Common Anode, with transistors on Group pins
-LedMatrixDirect<Hardware> ledMatrixDirect(
-    hardware,
-    LedMatrix::kActiveLowPattern /*groupOnPattern*/,
-    LedMatrix::kActiveLowPattern /*elementOnPattern*/,
-    NUM_DIGITS,
-    DIGIT_PINS,
-    NUM_SEGMENTS,
-    SEGMENT_PINS);
-
-// Common Cathode, with transistors on Group pins
-SwSpiAdapter swSpiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-LedMatrixPartialSpi<Hardware, SwSpiAdapter> ledMatrixPartialSwSpi(
-    hardware,
-    swSpiAdapter,
-    LedMatrix::kActiveHighPattern /*groupOnPattern*/,
-    LedMatrix::kActiveHighPattern /*elementOnPattern*/,
-    NUM_DIGITS,
-    DIGIT_PINS);
-
-// Common Cathode, with transistors on Group pins
-HwSpiAdapter hwSpiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-LedMatrixPartialSpi<Hardware, HwSpiAdapter> ledMatrixPartialHwSpi(
-    hardware,
-    hwSpiAdapter,
-    LedMatrix::kActiveHighPattern /*groupOnPattern*/,
-    LedMatrix::kActiveHighPattern /*elementOnPattern*/,
-    NUM_DIGITS,
-    DIGIT_PINS);
-
-// Common Anode, with transistors on Group pins
-LedMatrixFullSpi<SwSpiAdapter> ledMatrixFullSwSpi(
-    swSpiAdapter,
-    LedMatrix::kActiveLowPattern /*groupOnPattern*/,
-    LedMatrix::kActiveLowPattern /*elementOnPattern*/);
-
-// Common Anode, with transistors on Group pins
-LedMatrixFullSpi<HwSpiAdapter> ledMatrixFullHwSpi(
-    hwSpiAdapter,
-    LedMatrix::kActiveLowPattern /*groupOnPattern*/,
-    LedMatrix::kActiveLowPattern /*elementOnPattern*/);
-
-uint8_t patterns[NUM_DIGITS];
-
 //------------------------------------------------------------------
 // Run benchmarks.
 //------------------------------------------------------------------
@@ -156,13 +112,11 @@ static void printStats(const char* name, TimingStats& stats) {
   SERIAL_PORT_MONITOR.println(NUM_FIELD_SAMPLES);
 }
 
-void runBenchmark(const char* name, LedMatrix& ledMatrix) {
-  TimingStats timingStats;
-  ledMatrix.begin();
+TimingStats timingStats;
 
-  SegmentDisplay<Hardware, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
-      hardware, ledMatrix, FRAMES_PER_SECOND, &timingStats);
-  segmentDisplay.begin();
+template <typename SD>
+void runBenchmark(const char* name, SD& segmentDisplay) {
+
   segmentDisplay.writePatternAt(0, 0x13);
   segmentDisplay.writePatternAt(0, 0x37);
   segmentDisplay.writePatternAt(0, 0x7F);
@@ -173,21 +127,125 @@ void runBenchmark(const char* name, LedMatrix& ledMatrix) {
     yield();
   }
 
-  segmentDisplay.end();
-  ledMatrix.end();
-
   printStats(name, timingStats);
   timingStats.reset();
+}
+
+// Common Anode, with transistors on Group pins
+void runDirect() {
+  using LedMatrix = LedMatrixDirect<Hardware>;
+  LedMatrix ledMatrix(
+      hardware,
+      LedMatrix::kActiveLowPattern /*groupOnPattern*/,
+      LedMatrix::kActiveLowPattern /*elementOnPattern*/,
+      NUM_DIGITS,
+      DIGIT_PINS,
+      NUM_SEGMENTS,
+      SEGMENT_PINS);
+  SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
+      hardware, ledMatrix, FRAMES_PER_SECOND, &timingStats);
+
+  ledMatrix.begin();
+  segmentDisplay.begin();
+  runBenchmark("direct", segmentDisplay);
+  segmentDisplay.end();
+  ledMatrix.end();
+}
+
+// Common Cathode, with transistors on Group pins
+void runPartialSwSpi() {
+  SwSpiAdapter swSpiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  using LedMatrix = LedMatrixPartialSpi<Hardware, SwSpiAdapter>;
+  LedMatrix ledMatrix(
+      hardware,
+      swSpiAdapter,
+      LedMatrix::kActiveHighPattern /*groupOnPattern*/,
+      LedMatrix::kActiveHighPattern /*elementOnPattern*/,
+      NUM_DIGITS,
+      DIGIT_PINS);
+  SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
+      hardware, ledMatrix, FRAMES_PER_SECOND, &timingStats);
+
+  swSpiAdapter.begin();
+  ledMatrix.begin();
+  segmentDisplay.begin();
+  runBenchmark("partial_sw_spi", segmentDisplay);
+  segmentDisplay.end();
+  ledMatrix.end();
+  swSpiAdapter.end();
+}
+
+// Common Cathode, with transistors on Group pins
+void runPartialHwSpi() {
+  HwSpiAdapter hwSpiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  using LedMatrix = LedMatrixPartialSpi<Hardware, HwSpiAdapter>;
+  LedMatrix ledMatrix(
+      hardware,
+      hwSpiAdapter,
+      LedMatrix::kActiveHighPattern /*groupOnPattern*/,
+      LedMatrix::kActiveHighPattern /*elementOnPattern*/,
+      NUM_DIGITS,
+      DIGIT_PINS);
+  SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
+      hardware, ledMatrix, FRAMES_PER_SECOND, &timingStats);
+
+  hwSpiAdapter.begin();
+  ledMatrix.begin();
+  segmentDisplay.begin();
+  runBenchmark("partial_hw_spi", segmentDisplay);
+  segmentDisplay.end();
+  ledMatrix.end();
+  hwSpiAdapter.end();
+}
+
+// Common Anode, with transistors on Group pins
+void runFullSwSpi() {
+  SwSpiAdapter swSpiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  using LedMatrix = LedMatrixFullSpi<SwSpiAdapter>;
+  LedMatrix ledMatrix(
+      swSpiAdapter,
+      LedMatrix::kActiveLowPattern /*groupOnPattern*/,
+      LedMatrix::kActiveLowPattern /*elementOnPattern*/);
+  SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
+      hardware, ledMatrix, FRAMES_PER_SECOND, &timingStats);
+
+  swSpiAdapter.begin();
+  ledMatrix.begin();
+  segmentDisplay.begin();
+  runBenchmark("full_sw_spi", segmentDisplay);
+  segmentDisplay.end();
+  ledMatrix.end();
+  swSpiAdapter.end();
+}
+
+// Common Anode, with transistors on Group pins
+void runFullHwSpi() {
+  HwSpiAdapter hwSpiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  using LedMatrix = LedMatrixFullSpi<HwSpiAdapter>;
+  LedMatrix ledMatrix(
+      hwSpiAdapter,
+      LedMatrix::kActiveLowPattern /*groupOnPattern*/,
+      LedMatrix::kActiveLowPattern /*elementOnPattern*/);
+  SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
+      hardware, ledMatrix, FRAMES_PER_SECOND, &timingStats);
+
+  hwSpiAdapter.begin();
+  ledMatrix.begin();
+  segmentDisplay.begin();
+  runBenchmark("full_hw_spi", segmentDisplay);
+  segmentDisplay.end();
+  ledMatrix.end();
+  hwSpiAdapter.end();
 }
 
 void runBenchmarks() {
   SERIAL_PORT_MONITOR.println(F("BENCHMARKS"));
 
-  runBenchmark("direct", ledMatrixDirect);
-  runBenchmark("partial_sw_spi", ledMatrixPartialSwSpi);
-  runBenchmark("partial_hw_spi", ledMatrixPartialHwSpi);
-  runBenchmark("full_sw_spi", ledMatrixFullSwSpi);
-  runBenchmark("full_hw_spi", ledMatrixFullHwSpi);
+  runDirect();
+  runPartialSwSpi();
+  runPartialHwSpi();
+  runFullSwSpi();
+  runFullHwSpi();
 }
 
 void printSizeOf() {
@@ -209,8 +267,10 @@ void printSizeOf() {
   SERIAL_PORT_MONITOR.println(sizeof(LedMatrixFullSpi<HwSpiAdapter>));
   SERIAL_PORT_MONITOR.print(F("sizeof(LedDisplay): "));
   SERIAL_PORT_MONITOR.println(sizeof(LedDisplay));
-  SERIAL_PORT_MONITOR.print(F("sizeof(SegmentDisplay<Hardware, 4, 1>): "));
-  SERIAL_PORT_MONITOR.println(sizeof(SegmentDisplay<Hardware, 4, 1>));
+  SERIAL_PORT_MONITOR.print(
+      F("sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): "));
+  SERIAL_PORT_MONITOR.println(
+      sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>));
   SERIAL_PORT_MONITOR.print(F("sizeof(HexWriter): "));
   SERIAL_PORT_MONITOR.println(sizeof(HexWriter));
   SERIAL_PORT_MONITOR.print(F("sizeof(ClockWriter): "));
