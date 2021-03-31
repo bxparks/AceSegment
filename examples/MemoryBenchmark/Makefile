@@ -17,10 +17,10 @@ README.md: $(TARGETS) generate_readme.py generate_table.awk
 benchmarks: $(TARGETS)
 
 nano.txt:
-	./collect.sh --cli nano $@
+	./collect.sh --num 8 --cli nano $@
 
 micro.txt:
-	./collect.sh --cli micro $@
+	./collect.sh --num 8 --cli micro $@
 
 samd.txt:
 	./collect.sh --cli samd $@

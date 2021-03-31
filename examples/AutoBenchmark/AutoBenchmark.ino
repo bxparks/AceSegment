@@ -39,6 +39,8 @@ SOFTWARE.
 #include <Arduino.h>
 #include <AceCommon.h> // TimingStats
 #include <AceSegment.h>
+#include <ace_segment/fast/LedMatrixDirectFast.h>
+#include <ace_segment/fast/SwSpiAdapterFast.h>
 
 using namespace ace_segment;
 using ace_common::TimingStats;
@@ -152,13 +154,33 @@ void runDirect() {
   ledMatrix.end();
 }
 
+#if defined(ARDUINO_ARCH_AVR)
+// Common Anode, with transistors on Group pins
+void runDirectFast() {
+  using LedMatrix = LedMatrixDirectFast<
+      4, 5, 6, 7,
+      8, 9, 10, 16, 14, 18, 19, 15>;
+  LedMatrix ledMatrix(
+      LedMatrix::kActiveLowPattern /*groupOnPattern*/,
+      LedMatrix::kActiveLowPattern /*elementOnPattern*/);
+  SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
+      hardware, ledMatrix, FRAMES_PER_SECOND, &timingStats);
+
+  ledMatrix.begin();
+  segmentDisplay.begin();
+  runBenchmark("direct_fast", segmentDisplay);
+  segmentDisplay.end();
+  ledMatrix.end();
+}
+#endif
+
 // Common Cathode, with transistors on Group pins
 void runPartialSwSpi() {
-  SwSpiAdapter swSpiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  SwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
   using LedMatrix = LedMatrixPartialSpi<Hardware, SwSpiAdapter>;
   LedMatrix ledMatrix(
       hardware,
-      swSpiAdapter,
+      spiAdapter,
       LedMatrix::kActiveHighPattern /*groupOnPattern*/,
       LedMatrix::kActiveHighPattern /*elementOnPattern*/,
       NUM_DIGITS,
@@ -166,22 +188,24 @@ void runPartialSwSpi() {
   SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
       hardware, ledMatrix, FRAMES_PER_SECOND, &timingStats);
 
-  swSpiAdapter.begin();
+  spiAdapter.begin();
   ledMatrix.begin();
   segmentDisplay.begin();
   runBenchmark("partial_sw_spi", segmentDisplay);
   segmentDisplay.end();
   ledMatrix.end();
-  swSpiAdapter.end();
+  spiAdapter.end();
 }
 
 // Common Cathode, with transistors on Group pins
-void runPartialHwSpi() {
-  HwSpiAdapter hwSpiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  using LedMatrix = LedMatrixPartialSpi<Hardware, HwSpiAdapter>;
+#if defined(ARDUINO_ARCH_AVR)
+void runPartialSwSpiFast() {
+  using SpiAdapter = SwSpiAdapterFast<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  SpiAdapter spiAdapter;
+  using LedMatrix = LedMatrixPartialSpi<Hardware, SpiAdapter>;
   LedMatrix ledMatrix(
       hardware,
-      hwSpiAdapter,
+      spiAdapter,
       LedMatrix::kActiveHighPattern /*groupOnPattern*/,
       LedMatrix::kActiveHighPattern /*elementOnPattern*/,
       NUM_DIGITS,
@@ -189,53 +213,100 @@ void runPartialHwSpi() {
   SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
       hardware, ledMatrix, FRAMES_PER_SECOND, &timingStats);
 
-  hwSpiAdapter.begin();
+  spiAdapter.begin();
+  ledMatrix.begin();
+  segmentDisplay.begin();
+  runBenchmark("partial_sw_spi_fast", segmentDisplay);
+  segmentDisplay.end();
+  ledMatrix.end();
+  spiAdapter.end();
+}
+#endif
+
+// Common Cathode, with transistors on Group pins
+void runPartialHwSpi() {
+  HwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  using LedMatrix = LedMatrixPartialSpi<Hardware, HwSpiAdapter>;
+  LedMatrix ledMatrix(
+      hardware,
+      spiAdapter,
+      LedMatrix::kActiveHighPattern /*groupOnPattern*/,
+      LedMatrix::kActiveHighPattern /*elementOnPattern*/,
+      NUM_DIGITS,
+      DIGIT_PINS);
+  SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
+      hardware, ledMatrix, FRAMES_PER_SECOND, &timingStats);
+
+  spiAdapter.begin();
   ledMatrix.begin();
   segmentDisplay.begin();
   runBenchmark("partial_hw_spi", segmentDisplay);
   segmentDisplay.end();
   ledMatrix.end();
-  hwSpiAdapter.end();
+  spiAdapter.end();
 }
 
 // Common Anode, with transistors on Group pins
 void runFullSwSpi() {
-  SwSpiAdapter swSpiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  SwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
   using LedMatrix = LedMatrixFullSpi<SwSpiAdapter>;
   LedMatrix ledMatrix(
-      swSpiAdapter,
+      spiAdapter,
       LedMatrix::kActiveLowPattern /*groupOnPattern*/,
       LedMatrix::kActiveLowPattern /*elementOnPattern*/);
   SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
       hardware, ledMatrix, FRAMES_PER_SECOND, &timingStats);
 
-  swSpiAdapter.begin();
+  spiAdapter.begin();
   ledMatrix.begin();
   segmentDisplay.begin();
   runBenchmark("full_sw_spi", segmentDisplay);
   segmentDisplay.end();
   ledMatrix.end();
-  swSpiAdapter.end();
+  spiAdapter.end();
 }
 
 // Common Anode, with transistors on Group pins
-void runFullHwSpi() {
-  HwSpiAdapter hwSpiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  using LedMatrix = LedMatrixFullSpi<HwSpiAdapter>;
+#if defined(ARDUINO_ARCH_AVR)
+void runFullSwSpiFast() {
+  using SpiAdapter = SwSpiAdapterFast<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  SpiAdapter spiAdapter;
+  using LedMatrix = LedMatrixFullSpi<SpiAdapter>;
   LedMatrix ledMatrix(
-      hwSpiAdapter,
+      spiAdapter,
       LedMatrix::kActiveLowPattern /*groupOnPattern*/,
       LedMatrix::kActiveLowPattern /*elementOnPattern*/);
   SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
       hardware, ledMatrix, FRAMES_PER_SECOND, &timingStats);
 
-  hwSpiAdapter.begin();
+  spiAdapter.begin();
+  ledMatrix.begin();
+  segmentDisplay.begin();
+  runBenchmark("full_sw_spi_fast", segmentDisplay);
+  segmentDisplay.end();
+  ledMatrix.end();
+  spiAdapter.end();
+}
+#endif
+
+// Common Anode, with transistors on Group pins
+void runFullHwSpi() {
+  HwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  using LedMatrix = LedMatrixFullSpi<HwSpiAdapter>;
+  LedMatrix ledMatrix(
+      spiAdapter,
+      LedMatrix::kActiveLowPattern /*groupOnPattern*/,
+      LedMatrix::kActiveLowPattern /*elementOnPattern*/);
+  SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
+      hardware, ledMatrix, FRAMES_PER_SECOND, &timingStats);
+
+  spiAdapter.begin();
   ledMatrix.begin();
   segmentDisplay.begin();
   runBenchmark("full_hw_spi", segmentDisplay);
   segmentDisplay.end();
   ledMatrix.end();
-  hwSpiAdapter.end();
+  spiAdapter.end();
 }
 
 void runBenchmarks() {
@@ -246,6 +317,12 @@ void runBenchmarks() {
   runPartialHwSpi();
   runFullSwSpi();
   runFullHwSpi();
+
+#if defined(ARDUINO_ARCH_AVR)
+  runDirectFast();
+  runPartialSwSpiFast();
+  runFullSwSpiFast();
+#endif
 }
 
 void printSizeOf() {
@@ -253,30 +330,53 @@ void printSizeOf() {
 
   SERIAL_PORT_MONITOR.print(F("sizeof(Hardware): "));
   SERIAL_PORT_MONITOR.println(sizeof(Hardware));
+
   SERIAL_PORT_MONITOR.print(F("sizeof(SwSpiAdapter): "));
   SERIAL_PORT_MONITOR.println(sizeof(SwSpiAdapter));
+
+#if defined(ARDUINO_ARCH_AVR)
+  SERIAL_PORT_MONITOR.print(F("sizeof(SwSpiAdapterFast<1,2,3>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(SwSpiAdapterFast<1,2,3>));
+#endif
+
   SERIAL_PORT_MONITOR.print(F("sizeof(HwSpiAdapter): "));
   SERIAL_PORT_MONITOR.println(sizeof(HwSpiAdapter));
+
   SERIAL_PORT_MONITOR.print(F("sizeof(LedMatrixDirect<Hardware>): "));
   SERIAL_PORT_MONITOR.println(sizeof(LedMatrixDirect<Hardware>));
+
+#if defined(ARDUINO_ARCH_AVR)
+  SERIAL_PORT_MONITOR.print(F("sizeof(LedMatrixDirectFast<0..3, 0..7>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(LedMatrixDirectFast<
+      2, 3, 4, 5,
+      6, 7, 8, 9, 10, 11, 12, 13>));
+#endif
+
   SERIAL_PORT_MONITOR.print(
       F("sizeof(LedMatrixPartialSpi<Hardware, SwSpiAdapter>): "));
   SERIAL_PORT_MONITOR.println(
       sizeof(LedMatrixPartialSpi<Hardware, SwSpiAdapter>));
+
   SERIAL_PORT_MONITOR.print(F("sizeof(LedMatrixFullSpi<HwSpiAdapter>): "));
   SERIAL_PORT_MONITOR.println(sizeof(LedMatrixFullSpi<HwSpiAdapter>));
+
   SERIAL_PORT_MONITOR.print(F("sizeof(LedDisplay): "));
   SERIAL_PORT_MONITOR.println(sizeof(LedDisplay));
+
   SERIAL_PORT_MONITOR.print(
       F("sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): "));
   SERIAL_PORT_MONITOR.println(
       sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>));
+
   SERIAL_PORT_MONITOR.print(F("sizeof(HexWriter): "));
   SERIAL_PORT_MONITOR.println(sizeof(HexWriter));
+
   SERIAL_PORT_MONITOR.print(F("sizeof(ClockWriter): "));
   SERIAL_PORT_MONITOR.println(sizeof(ClockWriter));
+
   SERIAL_PORT_MONITOR.print(F("sizeof(CharWriter): "));
   SERIAL_PORT_MONITOR.println(sizeof(CharWriter));
+
   SERIAL_PORT_MONITOR.print(F("sizeof(StringWriter): "));
   SERIAL_PORT_MONITOR.println(sizeof(StringWriter));
 }

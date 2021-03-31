@@ -120,8 +120,7 @@ class LedMatrixDirect : public LedMatrixBase {
     /** Send the pattern to the element pins. */
     void drawElements(uint8_t pattern) const {
       for (uint8_t element = 0; element < mNumElements; element++) {
-        uint8_t output = pattern;
-        writeElementPin(element, output);
+        writeElementPin(element, pattern);
         pattern >>= 1;
       }
     }

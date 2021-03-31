@@ -6,13 +6,15 @@
 # table that can be inserted into the README.md.
 
 BEGIN {
-  NUM_ALGORITHMS = 5
   labels[0] = "baseline"
   labels[1] = "direct";
-  labels[2] = "split_sw_spi";
-  labels[3] = "split_hw_spi";
-  labels[4] = "merged_sw_spi";
-  labels[5] = "merged_hw_spi";
+  labels[2] = "partial_sw_spi";
+  labels[3] = "partial_hw_spi";
+  labels[4] = "full_sw_spi";
+  labels[5] = "full_hw_spi";
+  labels[6] = "direct_fast";
+  labels[7] = "partial_sw_fast";
+  labels[8] = "full_sw_fast";
   record_index = 0
 }
 {
@@ -21,10 +23,12 @@ BEGIN {
   record_index++
 }
 END {
+  NUM_ENTRIES = record_index
+
   # Calculate the flash and memory deltas from baseline
   base_flash = u[0]["flash"]
   base_ram = u[0]["ram"]
-  for (i = 0; i <= NUM_ALGORITHMS; i++) {
+  for (i = 0; i < NUM_ENTRIES; i++) {
     u[i]["d_flash"] = u[i]["flash"]- base_flash
     u[i]["d_ram"] = u[i]["ram"]- base_ram
   }
@@ -35,7 +39,7 @@ END {
   printf("| %-31s | %6d/%5d | %5d/%5d |\n",
     labels[0], u[0]["flash"], u[0]["ram"], u[0]["d_flash"], u[0]["d_ram"])
   printf("|---------------------------------+--------------+-------------|\n")
-  for (i = 1 ; i <= NUM_ALGORITHMS; i++) {
+  for (i = 1 ; i < NUM_ENTRIES; i++) {
     printf("| %-31s | %6d/%5d | %5d/%5d |\n",
         labels[i], u[i]["flash"], u[i]["ram"], u[i]["d_flash"], u[i]["d_ram"])
   }
