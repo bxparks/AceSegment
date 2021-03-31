@@ -57,16 +57,16 @@ const uint8_t FRAMES_PER_SECOND = 60;
 const uint8_t NUM_SUBFIELDS = 1;
 
 const uint8_t NUM_DIGITS = 4;
-const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
+const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
 
 #if LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT
   // 4 digits, resistors on segments on Pro Micro.
   const uint8_t NUM_SEGMENTS = 8;
-  const uint8_t segmentPins[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
+  const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
 #else
-  const uint8_t latchPin = 10; // ST_CP on 74HC595
-  const uint8_t dataPin = MOSI; // DS on 74HC595
-  const uint8_t clockPin = SCK; // SH_CP on 74HC595
+  const uint8_t LATCH_PIN = 10; // ST_CP on 74HC595
+  const uint8_t DATA_PIN = MOSI; // DS on 74HC595
+  const uint8_t CLOCK_PIN = SCK; // SH_CP on 74HC595
 #endif
 
 // The chain of resources.
@@ -79,39 +79,39 @@ Hardware hardware;
       LedMatrix::kActiveLowPattern /*groupOnPattern*/,
       LedMatrix::kActiveLowPattern /*elementOnPattern*/,
       NUM_DIGITS,
-      digitPins,
+      DIGIT_PINS,
       NUM_SEGMENTS,
-      segmentPins);
+      SEGMENT_PINS);
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_PARIAL_SW_SPI
   // Common Cathode, with transistors on Group pins
-  SwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
+  SwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
   LedMatrixPartialSpi ledMatrix(
       &hardware,
       &spiAdapter,
       LedMatrix::kActiveHighPattern /*groupOnPattern*/,
       LedMatrix::kActiveHighPattern /*elementOnPattern*/,
       NUM_DIGITS,
-      digitPins):
+      DIGIT_PINS):
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_PARTIAL_HW_SPI
   // Common Cathode, with transistors on Group pins
-  HwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
+  HwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
   LedMatrixPartialSpi ledMatrix(
       &hardware,
       &spiAdapter,
       LedMatrix::kActiveHighPattern /*groupOnPattern*/,
       LedMatrix::kActiveHighPattern /*elementOnPattern*/,
       NUM_DIGITS,
-      digitPins);
+      DIGIT_PINS);
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_FULL_SW_SPI
   // Common Anode, with transistors on Group pins
-  SwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
+  SwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
   LedMatrixFullSpi ledMatrix(
       &spiAdapter,
       LedMatrix::kActiveLowPattern /*groupOnPattern*/,
       LedMatrix::kActiveLowPattern /*elementOnPattern*/);
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_FULL_HW_SPI
   // Common Anode, with transistors on Group pins
-  HwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
+  HwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
   LedMatrixFullSpi ledMatrix(
       &spiAdapter,
       LedMatrix::kActiveLowPattern /*groupOnPattern*/,
@@ -120,7 +120,7 @@ Hardware hardware;
   #error Unsupported LED_MATRIX_MODE
 #endif
 
-uint8_t patterns[8];
+uint8_t patterns[NUM_DIGITS];
 Renderer renderer(&ledMatrix, NUM_DIGITS, patterns);
 SegmentDisplay segmentDisplay(
     &hardware,
