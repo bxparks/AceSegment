@@ -48,8 +48,8 @@ volatile int disableCompilerOptimization = 0;
 
   #if FEATURE == FEATURE_DIRECT
     // Common Anode, with transitions on Group pins
-    LedMatrixDirect ledMatrix(
-        &hardware,
+    LedMatrixDirect<Hardware> ledMatrix(
+        hardware,
         LedMatrix::kActiveLowPattern /*groupOnPattern*/,
         LedMatrix::kActiveLowPattern /*elementOnPattern*/,
         NUM_DIGITS,
@@ -59,9 +59,9 @@ volatile int disableCompilerOptimization = 0;
   #elif FEATURE == FEATURE_SPLIT_SW_SPI
     // Common Cathode, with transistors on Group pins
     SwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
-    LedMatrixPartialSpi ledMatrix(
-        &hardware,
-        &spiAdapter,
+    LedMatrixPartialSpi<Hardware, SwSpiAdapter> ledMatrix(
+        hardware,
+        spiAdapter,
         LedMatrix::kActiveHighPattern /*groupOnPattern*/,
         LedMatrix::kActiveHighPattern /*elementOnPattern*/,
         NUM_DIGITS,
@@ -69,9 +69,9 @@ volatile int disableCompilerOptimization = 0;
   #elif FEATURE == FEATURE_SPLIT_HW_SPI
     // Common Cathode, with transistors on Group pins
     HwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
-    LedMatrixPartialSpi ledMatrix(
-        &hardware,
-        &spiAdapter,
+    LedMatrixPartialSpi<Hardware, HwSpiAdapter> ledMatrix(
+        hardware,
+        spiAdapter,
         LedMatrix::kActiveHighPattern /*groupOnPattern*/,
         LedMatrix::kActiveHighPattern /*elementOnPattern*/,
         NUM_DIGITS,
@@ -79,21 +79,21 @@ volatile int disableCompilerOptimization = 0;
   #elif FEATURE == FEATURE_MERGED_SW_SPI
     // Common Cathode, with transistors on Group pins
     SwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
-    LedMatrixFullSpi ledMatrix(
-        &spiAdapter,
+    LedMatrixFullSpi<SwSpiAdapter> ledMatrix(
+        spiAdapter,
         LedMatrix::kActiveLowPattern /*groupOnPattern*/,
         LedMatrix::kActiveLowPattern /*elementOnPattern*/);
   #elif FEATURE == FEATURE_MERGED_HW_SPI
     // Common Cathode, with transistors on Group pins
     HwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
-    LedMatrixFullSpi ledMatrix(
-        &spiAdapter,
+    LedMatrixFullSpi<HwSpiAdapter> ledMatrix(
+        spiAdapter,
         LedMatrix::kActiveLowPattern /*groupOnPattern*/,
         LedMatrix::kActiveLowPattern /*elementOnPattern*/);
   #endif
 
-  SegmentDisplay<NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
-      &hardware, &ledMatrix, FRAMES_PER_SECOND);
+  SegmentDisplay<Hardware, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
+      hardware, ledMatrix, FRAMES_PER_SECOND);
 #endif
 
 void setup() {

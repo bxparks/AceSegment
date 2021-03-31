@@ -48,17 +48,17 @@ class Event {
     uint16_t arg5; // used by spiTransfer16()
 };
 
-class TestableHardware: public Hardware {
+class TestableHardware {
   public:
     explicit TestableHardware():
       mNumRecords(0)
     {}
 
-    unsigned long micros() const override { return mMicros; }
+    unsigned long micros() const { return mMicros; }
 
-    unsigned long millis() const override { return mMillis; }
+    unsigned long millis() const { return mMillis; }
 
-    void pinMode(uint8_t pin, uint8_t mode) const override {
+    void pinMode(uint8_t pin, uint8_t mode) const {
       if (mNumRecords < kMaxRecords) {
         Event& event = mEvents[mNumRecords];
         event.type = Event::kTypePinMode;
@@ -68,7 +68,7 @@ class TestableHardware: public Hardware {
       }
     }
 
-    void digitalWrite(uint8_t pin, uint8_t value) const override {
+    void digitalWrite(uint8_t pin, uint8_t value) const {
       if (mNumRecords < kMaxRecords) {
         Event& event = mEvents[mNumRecords];
         event.type = Event::kTypeDigitalWrite;

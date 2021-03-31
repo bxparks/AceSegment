@@ -28,12 +28,11 @@ SOFTWARE.
 #include <stdint.h>
 #include <Arduino.h>
 #include <SPI.h>
-#include "SpiAdapter.h"
 
 namespace ace_segment {
 
 /** Hardware SPI. */
-class HwSpiAdapter : public SpiAdapter {
+class HwSpiAdapter {
   public:
     HwSpiAdapter(
         uint8_t latchPin,
@@ -45,21 +44,21 @@ class HwSpiAdapter : public SpiAdapter {
         mClockPin(clockPin)
     {}
 
-    void spiBegin() const override {
+    void spiBegin() const {
       pinMode(mLatchPin, OUTPUT);
       pinMode(mDataPin, OUTPUT);
       pinMode(mClockPin, OUTPUT);
       SPI.begin();
     }
 
-    void spiEnd() const override {
+    void spiEnd() const {
       pinMode(mLatchPin, INPUT);
       pinMode(mDataPin, INPUT);
       pinMode(mClockPin, INPUT);
       SPI.end();
     }
 
-    void spiTransfer(uint8_t value) const override {
+    void spiTransfer(uint8_t value) const {
       digitalWrite(mLatchPin, LOW);
       SPI.beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
       SPI.transfer(value);
@@ -67,7 +66,7 @@ class HwSpiAdapter : public SpiAdapter {
       digitalWrite(mLatchPin, HIGH);
     }
 
-    void spiTransfer16(uint16_t value) const override {
+    void spiTransfer16(uint16_t value) const {
       digitalWrite(mLatchPin, LOW);
       SPI.beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
       SPI.transfer16(value);

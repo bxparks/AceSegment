@@ -27,12 +27,11 @@ SOFTWARE.
 
 #include <stdint.h>
 #include <Arduino.h>
-#include "SpiAdapter.h"
 
 namespace ace_segment {
 
 /** Software SPI using shiftOut(). */
-class SwSpiAdapter : public SpiAdapter {
+class SwSpiAdapter {
   public:
     SwSpiAdapter(
         uint8_t latchPin,
@@ -44,25 +43,25 @@ class SwSpiAdapter : public SpiAdapter {
         mClockPin(clockPin)
     {}
 
-    void spiBegin() const override {
+    void spiBegin() const {
       pinMode(mLatchPin, OUTPUT);
       pinMode(mDataPin, OUTPUT);
       pinMode(mClockPin, OUTPUT);
     }
 
-    void spiEnd() const override {
+    void spiEnd() const {
       pinMode(mLatchPin, INPUT);
       pinMode(mDataPin, INPUT);
       pinMode(mClockPin, INPUT);
     }
 
-    void spiTransfer(uint8_t value) const override {
+    void spiTransfer(uint8_t value) const {
       digitalWrite(mLatchPin, LOW);
       shiftOut(mDataPin, mClockPin, MSBFIRST, value);
       digitalWrite(mLatchPin, HIGH);
     }
 
-    void spiTransfer16(uint16_t value) const override {
+    void spiTransfer16(uint16_t value) const {
       uint8_t msb = (value & 0xff00) >> 8;
       uint8_t lsb = (value & 0xff);
       digitalWrite(mLatchPin, LOW);

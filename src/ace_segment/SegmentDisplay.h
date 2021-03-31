@@ -27,15 +27,12 @@ SOFTWARE.
 
 #include <stdint.h>
 #include <AceCommon.h> // TimingStats
-#include "Hardware.h"
 #include "LedMatrix.h"
 #include "LedDisplay.h"
 
 namespace ace_segment {
 
 using ace_common::TimingStats;
-
-class Hardware;
 
 /**
  * The user interface to the LED Segment display. Uses the LedMatrix to
@@ -54,11 +51,12 @@ class Hardware;
  *    loop(), and an internal timing parameter will trigger a renderField() at
  *    the appropriate time.
  *
+ * @tparam H class that provides access to the hardware pin and timing functions
  * @tparam DIGITS number of LED digits
  * @tparam SUBFIELDS number of rendering fields per digit for PWM, normally 1,
  *   but set to greater than 1 to get number of brightness levels
  */
-template <uint8_t DIGITS, uint8_t SUBFIELDS>
+template <typename H, uint8_t DIGITS, uint8_t SUBFIELDS>
 class SegmentDisplay : public LedDisplay {
 
   public:
@@ -77,8 +75,8 @@ class SegmentDisplay : public LedDisplay {
      * @param timingStats instance of TimingStats (default: nullptr)
      */
     explicit SegmentDisplay(
-        Hardware* hardware,
-        LedMatrix* ledMatrix,
+        const H& hardware,
+        LedMatrix& ledMatrix,
         uint8_t framesPerSecond,
         TimingStats* timingStats = nullptr
     ):
@@ -98,7 +96,7 @@ class SegmentDisplay : public LedDisplay {
     void begin() {
       // Set up durations for the renderFieldWhenReady() polling function.
       mMicrosPerField = (uint32_t) 1000000UL / getFieldsPerSecond();
-      mLastRenderFieldMicros = mHardware->micros();
+      mLastRenderFieldMicros = mHardware.micros();
 
       // Initialize variables needed for multiplexing.
       mCurrentDigit = 0;
@@ -109,7 +107,7 @@ class SegmentDisplay : public LedDisplay {
 
       // misc
       mPreparedToSleep = false;
-      mLedMatrix->clear();
+      mLedMatrix.clear();
       if (SUBFIELDS > 1) {
         setGlobalBrightness(kDefaultBrightness);
       }
@@ -181,7 +179,7 @@ class SegmentDisplay : public LedDisplay {
      *    check.
      */
     bool renderFieldWhenReady() {
-      uint16_t now = mHardware->micros();
+      uint16_t now = mHardware.micros();
       uint16_t elapsedMicros = now - mLastRenderFieldMicros;
       if (elapsedMicros >= mMicrosPerField) {
         renderField();
@@ -197,9 +195,9 @@ class SegmentDisplay : public LedDisplay {
      * interrupt handler.
      */
     void renderField() {
-      uint16_t now = mHardware->micros();
+      uint16_t now = mHardware.micros();
       displayCurrentField();
-      uint16_t duration = mHardware->micros() - now;
+      uint16_t duration = mHardware.micros() - now;
       if (mTimingStats) mTimingStats->update(duration);
     }
 
@@ -209,7 +207,7 @@ class SegmentDisplay : public LedDisplay {
      */
     void prepareToSleep() {
       mPreparedToSleep = true;
-      mLedMatrix->clear();
+      mLedMatrix.clear();
     }
 
     /** Wake up from sleep. */
@@ -237,7 +235,7 @@ class SegmentDisplay : public LedDisplay {
     /** Display field normally without modulation. */
     void displayCurrentFieldPlain() {
       const uint8_t pattern = mPatterns[mCurrentDigit];
-      mLedMatrix->draw(mCurrentDigit, pattern);
+      mLedMatrix.draw(mCurrentDigit, pattern);
       mPrevDigit = mCurrentDigit;
       ace_common::incrementMod(mCurrentDigit, DIGITS);
     }
@@ -259,7 +257,7 @@ class SegmentDisplay : public LedDisplay {
           : 0;
 
       if (pattern != mPattern || mCurrentDigit != mPrevDigit) {
-        mLedMatrix->draw(mCurrentDigit, pattern);
+        mLedMatrix.draw(mCurrentDigit, pattern);
         mPattern = pattern;
       }
 
@@ -277,10 +275,10 @@ class SegmentDisplay : public LedDisplay {
     // Ordered to save space on 32-bit processors.
 
     /** Indirection to the low level digitalWrite(), micros(). */
-    Hardware* const mHardware;
+    const H& mHardware;
 
     /** LedMatrix instance that knows how to set and unset LED segments. */
-    LedMatrix* const mLedMatrix;
+    LedMatrix& mLedMatrix;
 
     /** Pattern for each digit. Not nullable. */
     uint8_t mPatterns[DIGITS];

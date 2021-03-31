@@ -110,6 +110,10 @@ before substantional refactoring in 2021.
   merging `patterns` and `brightnesses` arrays directly into `SegmentDisplay`.
   Flash usage actually goes up by ~40 bytes on Teensy3.2, but it has enough
   flash memory.
+* Reduce flash by 300-350 bytes on AVR (~150 on SAMD, 150-500 bytes on STM32,
+  ~250 bytes on ESP8266, 300-600 bytes on ESP32) by templatizing LedMatrix
+  and SegmentDisplay on `NUM_DIGITS`, `NUM_SUBFIELDS`, `Hardware` class,
+  `SwSpiAdapter` and `HwSpiAdapter`.
 
 ## Arduino Nano
 

@@ -30,35 +30,32 @@ SOFTWARE.
 
 namespace ace_segment {
 
+/**
+ * Class that provides a layer of indirection to various hardware pins and
+ * timing class. A different Hardware class can be used as a template parameter
+ * to SegmentDisplay.
+ */
 class Hardware {
   public:
-    /** Constructor. */
-    Hardware() {}
-
     /** Write value to pin. */
-    virtual void digitalWrite(uint8_t pin, uint8_t value) const {
+    void digitalWrite(uint8_t pin, uint8_t value) const {
       ::digitalWrite(pin, value);
     }
 
     /** Set pin mode. */
-    virtual void pinMode(uint8_t pin, uint8_t mode) const {
+    void pinMode(uint8_t pin, uint8_t mode) const {
       ::pinMode(pin, mode);
     }
 
     /** Get the current micros  */
-    virtual unsigned long micros() const {
+    unsigned long micros() const {
       return ::micros();
     }
 
     /** Get the current millis  */
-    virtual unsigned long millis() const {
+    unsigned long millis() const {
       return ::millis();
     }
-
-  private:
-    // disable copy-constructor and assignment operator
-    Hardware(const Hardware&) = delete;
-    Hardware& operator=(const Hardware&) = delete;
 };
 
 }

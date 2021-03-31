@@ -26,7 +26,6 @@ SOFTWARE.
 #define ACE_SEGMENT_LED_MATRIX_PARTIAL_SPI_H
 
 #include "LedMatrixSplit.h"
-#include "SpiAdapter.h"
 
 namespace ace_segment {
 
@@ -42,18 +41,22 @@ class Hardware;
  *   latchPin/D10/SS -- ST_CP (Phillips) / RCK (TI) / Pin 12 (rising)
  *   dataPin/D11/MOSI -- DS (Phillips) / SER (TI) / Pin 14
  *   clockPin/D13/SCK -- SH_CP (Phillips) / SRCK (TI) / Pin 11 (rising)
+ *
+ * @tparam H class that provides access to hardware pins and timing functions
+ * @tparam SA class providing SPI, either SwSpiAdapter or HwSpiAdapter
  */
-class LedMatrixPartialSpi: public LedMatrixSplit {
+template<typename H, typename SA>
+class LedMatrixPartialSpi : public LedMatrixSplit<H> {
   public:
     LedMatrixPartialSpi(
-        const Hardware* hardware,
-        const SpiAdapter* spiAdapter,
+        const H& hardware,
+        const SA& spiAdapter,
         uint8_t groupOnPattern,
         uint8_t elementOnPattern,
         uint8_t numGroups,
         const uint8_t* groupPins
     ) :
-        LedMatrixSplit(
+        LedMatrixSplit<H>(
             hardware,
             groupOnPattern,
             elementOnPattern,
@@ -63,25 +66,25 @@ class LedMatrixPartialSpi: public LedMatrixSplit {
     {}
 
     void begin() override {
-      LedMatrixSplit::begin();
+      LedMatrixSplit<H>::begin();
 
-      mSpiAdapter->spiBegin();
+      mSpiAdapter.spiBegin();
     }
 
     void end() override {
-      LedMatrixSplit::end();
+      LedMatrixSplit<H>::end();
 
-      mSpiAdapter->spiEnd();
+      mSpiAdapter.spiEnd();
     }
 
   protected:
     void drawElements(uint8_t pattern) override {
-      uint8_t actualPattern = pattern ^ mElementXorMask;
-      mSpiAdapter->spiTransfer(actualPattern);
+      uint8_t actualPattern = pattern ^ LedMatrixSplit<H>::mElementXorMask;
+      mSpiAdapter.spiTransfer(actualPattern);
     }
 
   private:
-    const SpiAdapter* const mSpiAdapter;
+    const SA& mSpiAdapter;
 };
 
 }

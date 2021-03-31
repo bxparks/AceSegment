@@ -26,21 +26,21 @@ SOFTWARE.
 #define ACE_SEGMENT_LED_MATRIX_FULL_SPI_H
 
 #include "LedMatrix.h"
-#include "SpiAdapter.h"
 
 namespace ace_segment {
-
-class Hardware;
 
 /**
  * An LedMatrix that writes to both group and element pins via SPI. The group
  * pins are assumed to be connected to the most significant byte. The element
  * pins are connected to the least signficiant byte.
+ *
+ * @tparam SA class providing SPI, either SwSpiAdapter or HwSpiAdapter
  */
+template<typename SA>
 class LedMatrixFullSpi: public LedMatrix {
   public:
     LedMatrixFullSpi(
-        const SpiAdapter* spiAdapter,
+        const SA& spiAdapter,
         uint8_t groupOnPattern,
         uint8_t elementOnPattern
     ) :
@@ -49,11 +49,11 @@ class LedMatrixFullSpi: public LedMatrix {
     {}
 
     void begin() override {
-      mSpiAdapter->spiBegin();
+      mSpiAdapter.spiBegin();
     }
 
     void end() override {
-      mSpiAdapter->spiEnd();
+      mSpiAdapter.spiEnd();
     }
 
     /**
@@ -66,7 +66,7 @@ class LedMatrixFullSpi: public LedMatrix {
       uint8_t actualGroupPattern = (groupPattern ^ mGroupXorMask);
       uint8_t actualElementPattern = (elementPattern ^ mElementXorMask);
 
-      mSpiAdapter->spiTransfer16(
+      mSpiAdapter.spiTransfer16(
           actualGroupPattern << 8 | actualElementPattern);
       mPrevElementPattern = elementPattern;
     }
@@ -83,12 +83,21 @@ class LedMatrixFullSpi: public LedMatrix {
     void clear() override {
       uint8_t actualGroupPattern = 0x00 ^ mGroupXorMask;
       uint8_t actualElementPattern = 0x00 ^ mElementXorMask;
-      mSpiAdapter->spiTransfer16(
+      mSpiAdapter.spiTransfer16(
           actualGroupPattern << 8 | actualElementPattern);
     }
 
   private:
-    const SpiAdapter* const mSpiAdapter;
+    /** Not used in this class. */
+    void drawElements(uint8_t /*pattern*/) override {}
+
+  private:
+    const SA& mSpiAdapter;
+
+    /**
+     * Remember the previous element pattern to support disableGroup() and
+     * enableGroup().
+     */
     uint8_t mPrevElementPattern;
 };
 

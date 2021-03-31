@@ -25,15 +25,7 @@ SOFTWARE.
 #ifndef ACE_SEGMENT_LED_MATRIX_H
 #define ACE_SEGMENT_LED_MATRIX_H
 
-// TODO: Replace with kLow (0x00) and kHigh (0xFF)
-#include <Arduino.h> // LOW and HIGH
-#if LOW != 0 || HIGH != 1
-  #error LOW is not 0 or HIGH is not 1
-#endif
-
 namespace ace_segment {
-
-class Hardware;
 
 /**
  * Class that represents the abstraction of a particular LED display wiring, and
@@ -111,6 +103,12 @@ class LedMatrix {
 
     /** Clear everything. */
     virtual void clear() = 0;
+
+  protected:
+    /**
+     * Draw the element at the current group. Valid only for some subclasses.
+     */
+    virtual void drawElements(uint8_t pattern) = 0;
 
   protected:
     uint8_t const mGroupXorMask;
