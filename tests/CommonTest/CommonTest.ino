@@ -115,30 +115,6 @@ void setup() {
 
   Serial.begin(115200);
   while (!Serial); // Wait until Serial is ready - Leonardo/Micro
-  Serial.println(F("setup(): start"));
-
-  Serial.print(F("sizeof(Hardware): "));
-  Serial.println(sizeof(Hardware));
-  Serial.print(F("sizeof(LedMatrixDirect): "));
-  Serial.println(sizeof(LedMatrixDirect));
-  Serial.print(F("sizeof(LedMatrixPartialSpi): "));
-  Serial.println(sizeof(LedMatrixPartialSpi));
-  Serial.print(F("sizeof(LedMatrixFullSpi): "));
-  Serial.println(sizeof(LedMatrixFullSpi));
-  Serial.print(F("sizeof(Renderer): "));
-  Serial.println(sizeof(Renderer));
-  Serial.print(F("sizeof(SegmentDisplay): "));
-  Serial.println(sizeof(SegmentDisplay));
-  Serial.print(F("sizeof(HexWriter): "));
-  Serial.println(sizeof(HexWriter));
-  Serial.print(F("sizeof(ClockWriter): "));
-  Serial.println(sizeof(ClockWriter));
-  Serial.print(F("sizeof(CharWriter): "));
-  Serial.println(sizeof(CharWriter));
-  Serial.print(F("sizeof(StringWriter): "));
-  Serial.println(sizeof(StringWriter));
-
-  Serial.println(F("setup(): end"));
 }
 
 void loop() {
