@@ -5,16 +5,16 @@ sizeof(HwSpiAdapter): 5
 sizeof(LedMatrixDirect): 13
 sizeof(LedMatrixPartialSpi): 12
 sizeof(LedMatrixFullSpi): 7
-sizeof(Renderer): 14
-sizeof(SegmentDisplay): 22
+sizeof(LedDisplay): 3
+sizeof(SegmentDisplay<4, 1>): 28
 sizeof(HexWriter): 2
 sizeof(ClockWriter): 3
 sizeof(CharWriter): 2
 sizeof(StringWriter): 2
 BENCHMARKS
 direct 76 82 96 1200
-partial_sw_spi 132 136 152 1200
+partial_sw_spi 132 137 152 1200
 partial_hw_spi 40 43 56 1200
 full_sw_spi 212 215 228 1200
-full_hw_spi 24 26 40 1200
+full_hw_spi 24 26 36 1200
 END

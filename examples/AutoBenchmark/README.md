@@ -81,8 +81,8 @@ sizeof(HwSpiAdapter): 5
 sizeof(LedMatrixDirect): 13
 sizeof(LedMatrixPartialSpi): 12
 sizeof(LedMatrixFullSpi): 7
-sizeof(Renderer): 14
-sizeof(SegmentDisplay): 22
+sizeof(LedDisplay): 3
+sizeof(SegmentDisplay<4, 1>): 28
 sizeof(HexWriter): 2
 sizeof(ClockWriter): 3
 sizeof(CharWriter): 2
@@ -95,8 +95,8 @@ CPU:
 | direct                    |  72/ 77/ 92 | 1200    |
 | partial_sw_spi            | 132/135/156 | 1200    |
 | partial_hw_spi            |  36/ 40/ 52 | 1200    |
-| full_sw_spi               | 212/217/240 | 1200    |
-| full_hw_spi               |  20/ 24/ 36 | 1200    |
+| full_sw_spi               | 212/217/244 | 1200    |
+| full_hw_spi               |  24/ 24/ 40 | 1200    |
 +---------------------------+-------------+---------+
 
 ```
@@ -116,8 +116,8 @@ sizeof(HwSpiAdapter): 5
 sizeof(LedMatrixDirect): 13
 sizeof(LedMatrixPartialSpi): 12
 sizeof(LedMatrixFullSpi): 7
-sizeof(Renderer): 14
-sizeof(SegmentDisplay): 22
+sizeof(LedDisplay): 3
+sizeof(SegmentDisplay<4, 1>): 28
 sizeof(HexWriter): 2
 sizeof(ClockWriter): 3
 sizeof(CharWriter): 2
@@ -128,10 +128,10 @@ CPU:
 | LedMatrix type            | min/avg/max | samples |
 |---------------------------+-------------+---------|
 | direct                    |  76/ 82/ 96 | 1200    |
-| partial_sw_spi            | 132/136/152 | 1200    |
+| partial_sw_spi            | 132/137/152 | 1200    |
 | partial_hw_spi            |  40/ 43/ 56 | 1200    |
 | full_sw_spi               | 212/215/228 | 1200    |
-| full_hw_spi               |  24/ 26/ 40 | 1200    |
+| full_hw_spi               |  24/ 26/ 36 | 1200    |
 +---------------------------+-------------+---------+
 
 ```
@@ -150,8 +150,8 @@ sizeof(HwSpiAdapter): 8
 sizeof(LedMatrixDirect): 24
 sizeof(LedMatrixPartialSpi): 24
 sizeof(LedMatrixFullSpi): 16
-sizeof(Renderer): 24
-sizeof(SegmentDisplay): 32
+sizeof(LedDisplay): 8
+sizeof(SegmentDisplay<4, 1>): 40
 sizeof(HexWriter): 4
 sizeof(ClockWriter): 8
 sizeof(CharWriter): 4
@@ -161,11 +161,11 @@ CPU:
 +---------------------------+-------------+---------+
 | LedMatrix type            | min/avg/max | samples |
 |---------------------------+-------------+---------|
-| direct                    |  32/ 32/ 37 | 1200    |
-| partial_sw_spi            |  56/ 57/ 61 | 1200    |
-| partial_hw_spi            |  28/ 28/ 32 | 1200    |
-| full_sw_spi               |  90/ 90/ 96 | 1200    |
-| full_hw_spi               |  24/ 24/ 28 | 1200    |
+| direct                    |  31/ 31/ 36 | 1200    |
+| partial_sw_spi            |  55/ 55/ 60 | 1200    |
+| partial_hw_spi            |  26/ 27/ 31 | 1200    |
+| full_sw_spi               |  88/ 89/ 94 | 1200    |
+| full_hw_spi               |  22/ 23/ 27 | 1200    |
 +---------------------------+-------------+---------+
 
 ```
@@ -184,8 +184,8 @@ sizeof(HwSpiAdapter): 8
 sizeof(LedMatrixDirect): 24
 sizeof(LedMatrixPartialSpi): 24
 sizeof(LedMatrixFullSpi): 16
-sizeof(Renderer): 24
-sizeof(SegmentDisplay): 32
+sizeof(LedDisplay): 8
+sizeof(SegmentDisplay<4, 1>): 40
 sizeof(HexWriter): 4
 sizeof(ClockWriter): 8
 sizeof(CharWriter): 4
@@ -195,11 +195,11 @@ CPU:
 +---------------------------+-------------+---------+
 | LedMatrix type            | min/avg/max | samples |
 |---------------------------+-------------+---------|
-| direct                    |  17/ 18/ 23 | 1200    |
-| partial_sw_spi            |  32/ 33/ 38 | 1200    |
-| partial_hw_spi            |  42/ 42/ 48 | 1200    |
-| full_sw_spi               |  53/ 53/ 59 | 1200    |
-| full_hw_spi               |  40/ 41/ 46 | 1200    |
+| direct                    |  17/ 17/ 22 | 1200    |
+| partial_sw_spi            |  31/ 32/ 37 | 1200    |
+| partial_hw_spi            |  42/ 42/ 47 | 1200    |
+| full_sw_spi               |  52/ 52/ 57 | 1200    |
+| full_hw_spi               |  40/ 40/ 45 | 1200    |
 +---------------------------+-------------+---------+
 
 ```
@@ -218,8 +218,8 @@ sizeof(HwSpiAdapter): 8
 sizeof(LedMatrixDirect): 24
 sizeof(LedMatrixPartialSpi): 24
 sizeof(LedMatrixFullSpi): 16
-sizeof(Renderer): 24
-sizeof(SegmentDisplay): 32
+sizeof(LedDisplay): 8
+sizeof(SegmentDisplay<4, 1>): 40
 sizeof(HexWriter): 4
 sizeof(ClockWriter): 8
 sizeof(CharWriter): 4
@@ -229,11 +229,11 @@ CPU:
 +---------------------------+-------------+---------+
 | LedMatrix type            | min/avg/max | samples |
 |---------------------------+-------------+---------|
-| direct                    |  16/ 16/ 53 | 1200    |
-| partial_sw_spi            |  31/ 31/ 52 | 1200    |
-| partial_hw_spi            |  13/ 13/ 17 | 1200    |
-| full_sw_spi               |  51/ 51/ 71 | 1200    |
-| full_hw_spi               |  13/ 13/ 17 | 1200    |
+| direct                    |  15/ 16/ 36 | 1200    |
+| partial_sw_spi            |  30/ 31/ 34 | 1200    |
+| partial_hw_spi            |  13/ 13/ 14 | 1200    |
+| full_sw_spi               |  50/ 50/ 65 | 1200    |
+| full_hw_spi               |  12/ 12/ 16 | 1200    |
 +---------------------------+-------------+---------+
 
 ```
@@ -252,8 +252,8 @@ sizeof(HwSpiAdapter): 8
 sizeof(LedMatrixDirect): 24
 sizeof(LedMatrixPartialSpi): 24
 sizeof(LedMatrixFullSpi): 16
-sizeof(Renderer): 24
-sizeof(SegmentDisplay): 32
+sizeof(LedDisplay): 8
+sizeof(SegmentDisplay<4, 1>): 40
 sizeof(HexWriter): 4
 sizeof(ClockWriter): 8
 sizeof(CharWriter): 4
@@ -263,11 +263,11 @@ CPU:
 +---------------------------+-------------+---------+
 | LedMatrix type            | min/avg/max | samples |
 |---------------------------+-------------+---------|
-| direct                    |   3/  4/ 13 | 1200    |
-| partial_sw_spi            |   5/  5/ 14 | 1200    |
-| partial_hw_spi            |  10/ 10/ 19 | 1200    |
+| direct                    |   3/  3/ 12 | 1200    |
+| partial_sw_spi            |   4/  5/ 14 | 1200    |
+| partial_hw_spi            |   9/  9/ 18 | 1200    |
 | full_sw_spi               |   7/  7/ 16 | 1200    |
-| full_hw_spi               |  10/ 10/ 18 | 1200    |
+| full_hw_spi               |   9/  9/ 18 | 1200    |
 +---------------------------+-------------+---------+
 
 ```
@@ -284,11 +284,11 @@ Sizes of Objects:
 sizeof(Hardware): 4
 sizeof(SwSpiAdapter): 8
 sizeof(HwSpiAdapter): 8
-sizeof(LedMatrixDirect): 28
-sizeof(LedMatrixPartialSpi): 28
+sizeof(LedMatrixDirect): 24
+sizeof(LedMatrixPartialSpi): 24
 sizeof(LedMatrixFullSpi): 16
-sizeof(Renderer): 24
-sizeof(SegmentDisplay): 32
+sizeof(LedDisplay): 8
+sizeof(SegmentDisplay<4, 1>): 40
 sizeof(HexWriter): 4
 sizeof(ClockWriter): 8
 sizeof(CharWriter): 4
@@ -298,11 +298,11 @@ CPU:
 +---------------------------+-------------+---------+
 | LedMatrix type            | min/avg/max | samples |
 |---------------------------+-------------+---------|
-| direct                    |   9/  9/ 13 | 1200    |
-| partial_sw_spi            |  13/ 13/ 17 | 1200    |
-| partial_hw_spi            |   6/  6/  9 | 1200    |
-| full_sw_spi               |  18/ 18/ 22 | 1200    |
-| full_hw_spi               |   5/  5/  8 | 1200    |
+| direct                    |   8/  8/ 13 | 1200    |
+| partial_sw_spi            |  12/ 12/ 16 | 1200    |
+| partial_hw_spi            |   6/  6/ 10 | 1200    |
+| full_sw_spi               |  17/ 17/ 22 | 1200    |
+| full_hw_spi               |   4/  4/  8 | 1200    |
 +---------------------------+-------------+---------+
 
 ```
