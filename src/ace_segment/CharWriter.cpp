@@ -177,11 +177,11 @@ const uint8_t CharWriter::kCharacterArray[] PROGMEM = {
 };
 
 void CharWriter::writeCharAt(uint8_t pos, char c) {
-  if (pos >= mSegmentDisplay->getNumDigits()) return;
+  if (pos >= mLedDisplay.getNumDigits()) return;
   uint8_t pattern = ((uint8_t) c < kNumCharacters)
       ? pgm_read_byte(&kCharacterArray[(uint8_t) c])
       : UNKNOWN;
-  mSegmentDisplay->writePatternAt(pos, pattern);
+  mLedDisplay.writePatternAt(pos, pattern);
 }
 
 }

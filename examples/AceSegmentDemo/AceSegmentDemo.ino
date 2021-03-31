@@ -120,18 +120,13 @@ Hardware hardware;
   #error Unsupported LED_MATRIX_MODE
 #endif
 
-uint8_t patterns[NUM_DIGITS];
-SegmentDisplay segmentDisplay(
-    &hardware,
-    &ledMatrix,
-    FRAMES_PER_SECOND,
-    NUM_DIGITS,
-    patterns);
+SegmentDisplay<NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
+    &hardware, &ledMatrix, FRAMES_PER_SECOND);
 
-HexWriter hexWriter(&segmentDisplay);
-ClockWriter clockWriter(&segmentDisplay);
-CharWriter charWriter(&segmentDisplay);
-StringWriter stringWriter(&charWriter);
+HexWriter hexWriter(segmentDisplay);
+ClockWriter clockWriter(segmentDisplay);
+CharWriter charWriter(segmentDisplay);
+StringWriter stringWriter(charWriter);
 
 #if USE_INTERRUPT == 1
 // interrupt handler for timer 2

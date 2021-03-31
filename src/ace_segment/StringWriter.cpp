@@ -28,9 +28,9 @@ SOFTWARE.
 namespace ace_segment {
 
 void StringWriter::writeStringAt(uint8_t digit, const char* s, bool padRight) {
-  SegmentDisplay* segmentDisplay = mCharWriter->getSegmentDisplay();
+  LedDisplay& ledDisplay = mCharWriter.getLedDisplay();
   bool charWasWritten = false;
-  uint8_t numDigits = segmentDisplay->getNumDigits();
+  uint8_t numDigits = ledDisplay.getNumDigits();
 
   while (true) {
     char c = *s;
@@ -40,14 +40,14 @@ void StringWriter::writeStringAt(uint8_t digit, const char* s, bool padRight) {
     // Use the decimal point just after a digit to render the '.' character.
     if (c == '.') {
       if (charWasWritten) {
-        segmentDisplay->writeDecimalPointAt(digit - 1);
+        ledDisplay.writeDecimalPointAt(digit - 1);
       } else {
-        mCharWriter->writeCharAt(digit, '.');
+        mCharWriter.writeCharAt(digit, '.');
         charWasWritten = false;
         digit++;
       }
     } else {
-      mCharWriter->writeCharAt(digit, c);
+      mCharWriter.writeCharAt(digit, c);
       charWasWritten = true;
       digit++;
     }
@@ -56,7 +56,7 @@ void StringWriter::writeStringAt(uint8_t digit, const char* s, bool padRight) {
 
   if (padRight) {
     for (; digit < numDigits; digit++) {
-      mCharWriter->writeCharAt(digit, ' ');
+      mCharWriter.writeCharAt(digit, ' ');
     }
   }
 }

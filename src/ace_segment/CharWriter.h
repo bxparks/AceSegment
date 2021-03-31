@@ -26,29 +26,29 @@ SOFTWARE.
 #define ACE_SEGMENT_CHAR_WRITER_H
 
 #include <stdint.h>
-#include "SegmentDisplay.h"
+#include "LedDisplay.h"
 
 namespace ace_segment {
 
 /**
  * The CharWriter supports mapping of ASCII (0 - 127) characters to segment
- * patterns supported by SegmentDisplay.
+ * patterns supported by LedDisplay.
  */
 class CharWriter {
   public:
     static const uint8_t kNumCharacters = 128;
 
     /** Constructor. */
-    explicit CharWriter(SegmentDisplay* segmentDisplay):
-        mSegmentDisplay(segmentDisplay)
+    explicit CharWriter(LedDisplay& ledDisplay):
+        mLedDisplay(ledDisplay)
     {}
 
     /** Write the character at the specified position. */
     void writeCharAt(uint8_t pos, char c);
 
-    /** Get total number of digits in display. */
-    SegmentDisplay* getSegmentDisplay() const {
-      return mSegmentDisplay;
+    /** Get the underlying LedDisplay. */
+    LedDisplay& getLedDisplay() const {
+      return mLedDisplay;
     }
 
   private:
@@ -59,7 +59,7 @@ class CharWriter {
     CharWriter(const CharWriter&) = delete;
     CharWriter& operator=(const CharWriter&) = delete;
 
-    SegmentDisplay* const mSegmentDisplay;
+    LedDisplay& mLedDisplay;
 };
 
 }

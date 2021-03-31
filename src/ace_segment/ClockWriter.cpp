@@ -70,11 +70,11 @@ const uint8_t ClockWriter::kNumCharacters =
     sizeof(kCharacterArray)/sizeof(kCharacterArray[0]);
 
 void ClockWriter::writeCharAt(uint8_t pos, uint8_t c) {
-  if (pos >= mSegmentDisplay->getNumDigits()) return;
+  if (pos >= mLedDisplay.getNumDigits()) return;
   uint8_t pattern = ((uint8_t) c < kNumCharacters)
       ? pgm_read_byte(&kCharacterArray[(uint8_t) c])
       : kSpace;
-  mSegmentDisplay->writePatternAt(pos, pattern);
+  mLedDisplay.writePatternAt(pos, pattern);
 }
 
 void ClockWriter::writeBcdAt(uint8_t pos, uint8_t bcd) {

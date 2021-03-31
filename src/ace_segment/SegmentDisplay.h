@@ -29,6 +29,7 @@ SOFTWARE.
 #include <AceCommon.h> // TimingStats
 #include "Hardware.h"
 #include "LedMatrix.h"
+#include "LedDisplay.h"
 
 namespace ace_segment {
 
@@ -42,8 +43,8 @@ class Hardware;
  *
  * A frame is divided into fields. A field is a partial rendering of a frame.
  * Normally, the one digit corresponds to one field. However if brightness
- * control is enabled by setting `numSubFields > 1`, then a single digit will be
- * rendered for numSubFields number of times so that the brightness of the digit
+ * control is enabled by setting `SUBFIELDS > 1`, then a single digit will be
+ * rendered for SUBFIELDS number of times so that the brightness of the digit
  * will be controlled by PWM.
  *
  * There are 2 ways to get the expected number of frames per second:
@@ -52,8 +53,13 @@ class Hardware;
  *  2) Call renderFieldWhenReady() polling method repeatedly from the global
  *    loop(), and an internal timing parameter will trigger a renderField() at
  *    the appropriate time.
+ *
+ * @tparam DIGITS number of LED digits
+ * @tparam SUBFIELDS number of rendering fields per digit for PWM, normally 1,
+ *   but set to greater than 1 to get number of brightness levels
  */
-class SegmentDisplay {
+template <uint8_t DIGITS, uint8_t SUBFIELDS>
+class SegmentDisplay : public LedDisplay {
 
   public:
     static const uint8_t kDefaultBrightness = 128;
@@ -68,28 +74,19 @@ class SegmentDisplay {
      * @param numDigits number of digits in the LED display
      * @param patterns array of segment pattern per digit, not nullable
      * @param brightnesses array of brightness for each digit (default: nullptr)
-     * @param numSubFields number of fields per digit so that we can control its
-     *    apparent brightness using PWM (default: 1)
      * @param timingStats instance of TimingStats (default: nullptr)
      */
     explicit SegmentDisplay(
         Hardware* hardware,
         LedMatrix* ledMatrix,
         uint8_t framesPerSecond,
-        uint8_t numDigits,
-        uint8_t* patterns,
-        uint8_t* brightnesses = nullptr,
-        uint8_t numSubFields = 1,
         TimingStats* timingStats = nullptr
     ):
-        mNumDigits(numDigits),
-        mFramesPerSecond(framesPerSecond),
-        mNumSubFields(numSubFields),
+        LedDisplay(DIGITS),
         mHardware(hardware),
         mLedMatrix(ledMatrix),
-        mPatterns(patterns),
-        mBrightnesses(brightnesses),
-        mTimingStats(timingStats)
+        mTimingStats(timingStats),
+        mFramesPerSecond(framesPerSecond)
     {}
 
     /**
@@ -105,7 +102,7 @@ class SegmentDisplay {
 
       // Initialize variables needed for multiplexing.
       mCurrentDigit = 0;
-      mPrevDigit = mNumDigits - 1;
+      mPrevDigit = DIGITS - 1;
       mCurrentSubField = 0;
       mCurrentSubFieldMax = 0;
       mPattern = 0;
@@ -113,6 +110,9 @@ class SegmentDisplay {
       // misc
       mPreparedToSleep = false;
       mLedMatrix->clear();
+      if (SUBFIELDS > 1) {
+        setGlobalBrightness(kDefaultBrightness);
+      }
     }
 
 
@@ -120,7 +120,7 @@ class SegmentDisplay {
     void end() {}
 
     /** Get the number of digits. */
-    uint8_t getNumDigits() const { return mNumDigits; }
+    uint8_t getNumDigits() const { return DIGITS; }
 
     /** Return the requested frames per second. */
     uint16_t getFramesPerSecond() const { return mFramesPerSecond; }
@@ -131,42 +131,22 @@ class SegmentDisplay {
     }
 
     /** Total fields per frame across all digits. */
-    uint16_t getFieldsPerFrame() const { return mNumDigits * mNumSubFields; }
+    uint16_t getFieldsPerFrame() const { return DIGITS * SUBFIELDS; }
 
-    /**
-     * Set global brightness expressed as a fraction of 256. In other words, 255
-     * is brightest (default); 1 is 1/256 of full brightness. Requires
-     * `numSubFields` greater than 1 and a non-null `brightnesses` array.
-     */
-    void setGlobalBrightness(uint8_t brightness) {
-      if (! mBrightnesses) return;
-      for (uint8_t i = 0; i < mNumDigits; i++) {
-        mBrightnesses[i] = brightness;
-      }
-    }
-
-    /**
-     * Write the pattern for a given pos. If the pos is out of bounds, the
-     * method does nothing.
-     */
-    void writePatternAt(uint8_t pos, uint8_t pattern) {
-      if (pos >= mNumDigits) return;
+    void writePatternAt(uint8_t pos, uint8_t pattern) override {
+      if (pos >= DIGITS) return;
       mPatterns[pos] = pattern;
     }
 
-    /**
-     * Write the brightness for a given pos, leaving pattern unchanged.
-     * If the pos is out of bounds, the method does nothing.
-     */
-    void setBrightnessAt(uint8_t pos, uint8_t brightness) {
-      if (! mBrightnesses) return;
-      if (pos >= mNumDigits) return;
-      mBrightnesses[pos] = brightness;
+    void setBrightnessAt(uint8_t pos, uint8_t brightness) override {
+      if (SUBFIELDS > 1) {
+        if (pos >= DIGITS) return;
+        mBrightnesses[pos] = brightness;
+      }
     }
 
-    /** Write the decimal point for the pos. */
-    void writeDecimalPointAt(uint8_t pos, bool state = true) {
-      if (pos >= mNumDigits) return;
+    void writeDecimalPointAt(uint8_t pos, bool state = true) override {
+      if (pos >= DIGITS) return;
       uint8_t pattern = mPatterns[pos];
       if (state) {
         pattern |= 0x80;
@@ -176,9 +156,16 @@ class SegmentDisplay {
       mPatterns[pos] = pattern;
     }
 
-    /** Clear all digits to blank pattern and all brightness to 0. */
-    void clear() {
-      for (uint8_t i = 0; i < mNumDigits; i++) {
+    void setGlobalBrightness(uint8_t brightness) override {
+      if (SUBFIELDS > 1) {
+        for (uint8_t i = 0; i < DIGITS; i++) {
+          mBrightnesses[i] = brightness;
+        }
+      }
+    }
+
+    void clear() override {
+      for (uint8_t i = 0; i < DIGITS; i++) {
         mPatterns[i] = 0;
       }
     }
@@ -193,13 +180,28 @@ class SegmentDisplay {
      *    TimingStats instance. If the return value is false, there's no need to
      *    check.
      */
-    bool renderFieldWhenReady();
+    bool renderFieldWhenReady() {
+      uint16_t now = mHardware->micros();
+      uint16_t elapsedMicros = now - mLastRenderFieldMicros;
+      if (elapsedMicros >= mMicrosPerField) {
+        renderField();
+        mLastRenderFieldMicros = now;
+        return true;
+      } else {
+        return false;
+      }
+    }
 
     /**
      * Render the current field immediately. Designed to be called from a timer
      * interrupt handler.
      */
-    void renderField();
+    void renderField() {
+      uint16_t now = mHardware->micros();
+      displayCurrentField();
+      uint16_t duration = mHardware->micros() - now;
+      if (mTimingStats) mTimingStats->update(duration);
+    }
 
     /**
      * Prepare to go to sleep by clearing the frame, and setting a flag so that
@@ -220,40 +222,59 @@ class SegmentDisplay {
 
     /**
      * Display the current field, usually just the current digit. If modulation
-     * is supported, then each digit is PWM modulated over mNumSubFields.
+     * is supported, then each digit is PWM modulated over SUBFIELDS.
      */
     void displayCurrentField() {
       if (mPreparedToSleep) return;
 
-      if (mNumSubFields == 1) {
-        displayCurrentFieldPlain();
-      } else {
+      if (SUBFIELDS > 1) {
         displayCurrentFieldModulated();
+      } else {
+        displayCurrentFieldPlain();
       }
     }
 
     /** Display field normally without modulation. */
-    void displayCurrentFieldPlain();
+    void displayCurrentFieldPlain() {
+      const uint8_t pattern = mPatterns[mCurrentDigit];
+      mLedMatrix->draw(mCurrentDigit, pattern);
+      mPrevDigit = mCurrentDigit;
+      ace_common::incrementMod(mCurrentDigit, DIGITS);
+    }
 
     /** Display field using subfield modulation. */
-    void displayCurrentFieldModulated();
+    void displayCurrentFieldModulated() {
+      // Calculate the maximum subfield duration for a given digit.
+      const uint8_t brightness = mBrightnesses[mCurrentDigit];
+      if (mCurrentDigit != mPrevDigit) {
+        mCurrentSubFieldMax = ((uint16_t) SUBFIELDS * brightness) / 256;
+      }
+
+      // No matter how small the SUBFIELDS, we want:
+      // * If brightness == 0, then subfield 0 should be OFF.
+      // * If brightness == 255, then special case that to be ON.
+      const uint8_t pattern =
+          (brightness == 0xFF || mCurrentSubField < mCurrentSubFieldMax)
+          ? mPatterns[mCurrentDigit]
+          : 0;
+
+      if (pattern != mPattern || mCurrentDigit != mPrevDigit) {
+        mLedMatrix->draw(mCurrentDigit, pattern);
+        mPattern = pattern;
+      }
+
+      mCurrentSubField++;
+      mPrevDigit = mCurrentDigit;
+      if (mCurrentSubField >= SUBFIELDS) {
+        ace_common::incrementMod(mCurrentDigit, DIGITS);
+        mCurrentSubField = 0;
+      }
+    }
 
   private:
     static const uint8_t kMaxNumDigits = 8;
 
     // Ordered to save space on 32-bit processors.
-
-    /** Number of digits. */
-    uint8_t const mNumDigits;
-
-    /** Number of full frames (all digits) rendered per second. */
-    uint8_t const mFramesPerSecond;
-
-    /**
-     * Number of subfields to render per digit.
-     * If this is greater than 1, use displayCurrentFieldModulated().
-     */
-    uint8_t const mNumSubFields;
 
     /** Indirection to the low level digitalWrite(), micros(). */
     Hardware* const mHardware;
@@ -262,10 +283,10 @@ class SegmentDisplay {
     LedMatrix* const mLedMatrix;
 
     /** Pattern for each digit. Not nullable. */
-    uint8_t* const mPatterns;
+    uint8_t mPatterns[DIGITS];
 
     /** Brightness for each digit. Nullable. */
-    uint8_t* const mBrightnesses;
+    uint8_t mBrightnesses[DIGITS];
 
     /** Gather performance stats about renderField(). Nullable. */
     TimingStats* const mTimingStats;
@@ -278,6 +299,9 @@ class SegmentDisplay {
     // variables to support renderFieldWhenReady()
     uint16_t mMicrosPerField;
     uint16_t mLastRenderFieldMicros;
+
+    /** Number of full frames (all digits) rendered per second. */
+    uint8_t const mFramesPerSecond;
 
     //-----------------------------------------------------------------------
     // Variables needed to keep track of the multiplexing of the digits,

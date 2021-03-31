@@ -26,12 +26,12 @@ SOFTWARE.
 #define ACE_SEGMENT_CLOCK_WRITER_H
 
 #include <stdint.h>
-#include "SegmentDisplay.h"
+#include "LedDisplay.h"
 
 namespace ace_segment {
 
 /**
- * The ClockWriter writes "hh:mm" to the SegmentDisplay. A few other characters
+ * The ClockWriter writes "hh:mm" to the LedDisplay. A few other characters
  * are supported: kSpace, kMinus, kA ("A" for AM) and kP ("P" for "PM").
  */
 class ClockWriter {
@@ -62,12 +62,17 @@ class ClockWriter {
      * this is digit 1 (counting from the left, 0-based).
      */
     explicit ClockWriter(
-        SegmentDisplay* segmentDisplay,
+        LedDisplay& ledDisplay,
         uint8_t colonDigit = 1
     ) :
-        mSegmentDisplay(segmentDisplay),
+        mLedDisplay(ledDisplay),
         mColonDigit(colonDigit)
     {}
+
+    /** Get the underlying LedDisplay. */
+    LedDisplay& getLedDisplay() const {
+      return mLedDisplay;
+    }
 
     /**
      * Write the character at the specified position. Write a space if
@@ -100,7 +105,7 @@ class ClockWriter {
      * @param state Set to false to turn off the colon.
      */
     void writeColon(bool state = true) {
-      mSegmentDisplay->writeDecimalPointAt(mColonDigit, state);
+      mLedDisplay.writeDecimalPointAt(mColonDigit, state);
     }
 
     /**
@@ -117,7 +122,7 @@ class ClockWriter {
     ClockWriter(const ClockWriter&) = delete;
     ClockWriter& operator=(const ClockWriter&) = delete;
 
-    SegmentDisplay* const mSegmentDisplay;
+    LedDisplay& mLedDisplay;
     uint8_t const mColonDigit;
 };
 

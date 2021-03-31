@@ -26,13 +26,13 @@ SOFTWARE.
 #define ACE_SEGMENT_HEX_WRITER_H
 
 #include <stdint.h>
-#include "SegmentDisplay.h"
+#include "LedDisplay.h"
 
 namespace ace_segment {
 
 /**
  * The HexWriter supports mapping of Hex characters to segment patterns
- * supported by SegmentDisplay. A few other characters are supported which
+ * supported by LedDisplay. A few other characters are supported which
  * should be self-explanatory: kSpace, kPeriod, kMinus.
  */
 class HexWriter {
@@ -44,8 +44,8 @@ class HexWriter {
     // TODO: Add 'degrees' symbol from ClockWriter.
 
     /** Constructor. */
-    explicit HexWriter(SegmentDisplay* segmentDisplay):
-        mSegmentDisplay(segmentDisplay)
+    explicit HexWriter(LedDisplay& ledDisplay) :
+        mLedDisplay(ledDisplay)
     {}
 
     /**
@@ -59,6 +59,11 @@ class HexWriter {
      */
     void writeHexAt(uint8_t pos, uint8_t c);
 
+    /** Get the underlying LedDisplay. */
+    LedDisplay& getLedDisplay() const {
+      return mLedDisplay;
+    }
+
   private:
     // Bit pattern map for hex characters.
     static const uint8_t kCharacterArray[];
@@ -67,7 +72,7 @@ class HexWriter {
     HexWriter(const HexWriter&) = delete;
     HexWriter& operator=(const HexWriter&) = delete;
 
-    SegmentDisplay* const mSegmentDisplay;
+    LedDisplay& mLedDisplay;
 };
 
 }

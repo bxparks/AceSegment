@@ -38,7 +38,7 @@ namespace ace_segment {
 class StringWriter {
   public:
     /** Constructor. */
-    explicit StringWriter(CharWriter* charWriter):
+    explicit StringWriter(CharWriter& charWriter):
         mCharWriter(charWriter)
     {}
 
@@ -53,12 +53,17 @@ class StringWriter {
      */
     void writeStringAt(uint8_t pos, const char* s, bool padRight = false);
 
+    /** Get the underlying LedDisplay. */
+    LedDisplay& getLedDisplay() const {
+      return mCharWriter.getLedDisplay();
+    }
+
   private:
     // disable copy-constructor and assignment operator
     StringWriter(const StringWriter&) = delete;
     StringWriter& operator=(const StringWriter&) = delete;
 
-    CharWriter* const mCharWriter;
+    CharWriter& mCharWriter;
 };
 
 }

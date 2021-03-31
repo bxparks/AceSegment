@@ -92,52 +92,54 @@ volatile int disableCompilerOptimization = 0;
         LedMatrix::kActiveLowPattern /*elementOnPattern*/);
   #endif
 
-  uint8_t patterns[NUM_DIGITS];
-  SegmentDisplay segmentDisplay(
-      &hardware,
-      &ledMatrix,
-      FRAMES_PER_SECOND,
-      NUM_DIGITS,
-      patterns);
+  SegmentDisplay<NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
+      &hardware, &ledMatrix, FRAMES_PER_SECOND);
 #endif
 
 void setup() {
 #if FEATURE == FEATURE_BASELINE
   disableCompilerOptimization = 3;
 
+// In the following, I used to grab the output of patterns[] and write to
+// disableCompilerOptimization to prevent the compiler from optimizing away the
+// entire program. But after templating SegmentDisplay, pattterns is no longer
+// accessible. But it does not matter because I realized that SegmentDisplay
+// performs a digitalWrite(), which has the same effect of disabling
+// optimizations.
+
 #elif FEATURE == FEATURE_DIRECT
   ledMatrix.begin();
   segmentDisplay.begin();
   segmentDisplay.writePatternAt(0, 0x3A);
-  disableCompilerOptimization = patterns[1];
+  segmentDisplay.renderField();
 
 #elif FEATURE == FEATURE_SPLIT_SW_SPI
   spiAdapter.spiBegin();
   ledMatrix.begin();
   segmentDisplay.begin();
   segmentDisplay.writePatternAt(0, 0x3A);
-  disableCompilerOptimization = patterns[1];
+  segmentDisplay.renderField();
 
 #elif FEATURE == FEATURE_SPLIT_HW_SPI
   spiAdapter.spiBegin();
   ledMatrix.begin();
   segmentDisplay.begin();
   segmentDisplay.writePatternAt(0, 0x3A);
-  disableCompilerOptimization = patterns[1];
+  segmentDisplay.renderField();
 
 #elif FEATURE == FEATURE_MERGED_SW_SPI
   spiAdapter.spiBegin();
   ledMatrix.begin();
   segmentDisplay.begin();
   segmentDisplay.writePatternAt(0, 0x3A);
-  disableCompilerOptimization = patterns[1];
+  segmentDisplay.renderField();
 
 #elif FEATURE == FEATURE_MERGED_HW_SPI
   spiAdapter.spiBegin();
   ledMatrix.begin();
   segmentDisplay.begin();
   segmentDisplay.writePatternAt(0, 0x3A);
-  disableCompilerOptimization = patterns[1];
+  segmentDisplay.renderField();
 
 #else
   #error Unknown FEATURE
