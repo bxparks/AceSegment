@@ -1,5 +1,3 @@
-#line 2 "BaseHardwareTest.h"
-
 /*
 MIT License
 
@@ -24,44 +22,52 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_BASE_HARDWARE_TEST_H
-#define ACE_SEGMENT_BASE_HARDWARE_TEST_H
+#ifndef ACE_SEGMENT_TESTABLE_LED_DISPLAY_H
+#define ACE_SEGMENT_TESTABLE_LED_DISPLAY_H
 
-#include <AUnit.h>
-#include "TestableHardware.h"
+#include "../LedDisplay.h"
 
 namespace ace_segment {
 namespace testing {
 
-using aunit::TestOnce;
+template <uint8_t NUM_DIGITS>
+class TestableLedDisplay : public LedDisplay {
+  public:
+    TestableLedDisplay() : LedDisplay(NUM_DIGITS) {}
 
-/**
- * Base class to assert various hardware events on TestableHardware.
- */
-class BaseHardwareTest: public TestOnce {
-  protected:
-    void setup() override {
-      TestOnce::setup();
+    virtual void writePatternAt(uint8_t pos, uint8_t pattern) override {
+      mPatterns[pos] = pattern;
     }
 
-    void teardown() override {
-      TestOnce::teardown();
-      mHardware.clear();
+    void setBrightnessAt(uint8_t pos, uint8_t brightness) override {}
+
+    void writeDecimalPointAt(uint8_t pos, bool state = true) override {
+      if (pos >= NUM_DIGITS) return;
+
+      uint8_t pattern = mPatterns[pos];
+      if (state) {
+        pattern |= 0x80;
+      } else {
+        pattern &= ~0x80;
+      }
+      mPatterns[pos] = pattern;
     }
 
-    /**
-     * assertEvents(numEvents,
-     *    type, arg1, arg2[, ...],
-     *    ...
-     *    type, arg1, arg2[, ...]);
-     */
-    void assertEvents(uint8_t n, ...);
+    void setGlobalBrightness(uint8_t brightness) override {}
 
-    TestableHardware mHardware;
+    void clear() override {
+      for (uint8_t i = 0; i < NUM_DIGITS + 1; ++i) {
+        mPatterns[i] = 0;
+      }
+    }
+
+    uint8_t* getPatterns() { return mPatterns; }
+
+  private:
+    uint8_t mPatterns[NUM_DIGITS + 1];
 };
 
-} // namespace testing
-} // namespace ace_segment
-
+} // testing
+} // ace_segment
 
 #endif

@@ -28,6 +28,8 @@ SOFTWARE.
 #include <Arduino.h> // OUTPUT, INPUT
 #include "LedMatrixBase.h"
 
+class LedMatrixPartialSpiTest_drawElements;
+
 namespace ace_segment {
 
 /**
@@ -108,6 +110,8 @@ class LedMatrixPartialSpi : public LedMatrixBase {
     }
 
   private:
+    friend class ::LedMatrixPartialSpiTest_drawElements;
+
     /** Send the pattern to the element pins. */
     void drawElements(uint8_t pattern) const {
       uint8_t actualPattern = pattern ^ mElementXorMask;

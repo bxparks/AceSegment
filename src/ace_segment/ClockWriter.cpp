@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 #include <Arduino.h>
+#include <AceCommon.h> // decTooBcd()
 #include "ClockWriter.h"
 
 namespace ace_segment {

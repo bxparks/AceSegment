@@ -29,6 +29,8 @@ SOFTWARE.
 #include <AceCommon.h> // TimingStats
 #include "LedDisplay.h"
 
+class SegmentDisplayTest_displayCurrentField;
+
 namespace ace_segment {
 
 using ace_common::TimingStats;
@@ -215,6 +217,8 @@ class SegmentDisplay : public LedDisplay {
     void wakeFromSleep() { mPreparedToSleep = false; }
 
   private:
+    friend class ::SegmentDisplayTest_displayCurrentField;
+
     // disable copy-constructor and assignment operator
     SegmentDisplay(const SegmentDisplay&) = delete;
     SegmentDisplay& operator=(const SegmentDisplay&) = delete;

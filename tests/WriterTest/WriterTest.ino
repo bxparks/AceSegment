@@ -1,164 +1,90 @@
 #line 2 "WriterTest.ino"
 
 /*
-MIT License
-
-Copyright (c) 2018 Brian T. Park
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
+ * MIT License
+ * Copyright (c) 2018 Brian T. Park
+ */
 
 #include <stdarg.h>
 #include <Arduino.h>
 #include <AUnit.h>
 #include <AceSegment.h>
-#include <ace_segment/testing/FakeRenderer.h>
+#include <ace_segment/testing/TestableLedDisplay.h>
 
-using namespace aunit;
+using aunit::TestRunner;
+using aunit::TestOnce;
 using namespace ace_segment;
 using namespace ace_segment::testing;
 
+const uint8_t NUM_DIGITS = 4;
 const uint8_t CUSTOM_BRIGHTNESS = 64;
 const uint8_t DIFFERENT_BRIGHTNESS = 32;
 
-// ----------------------------------------------------------------------
-// Tests for BaseWriterTest.
-// ----------------------------------------------------------------------
-
-class BaseWriterTest: public TestOnce {
-  protected:
-    static const uint8_t NUM_DIGITS = 4;
-
-    void setup() override {
-      mRenderer = new FakeRenderer(mDimmablePatterns, NUM_DIGITS);
-      mRenderer->configure();
-    }
-
-    void teardown() override {
-      delete mRenderer;
-    }
-
-  protected:
-    FakeRenderer *mRenderer;
-
-    // create NUM_DIGITS+1 elements for doing array bound checking
-    DimmablePattern mDimmablePatterns[NUM_DIGITS + 1];
-};
+TestableLedDisplay<NUM_DIGITS> ledDisplay;
+HexWriter hexWriter(ledDisplay);
+ClockWriter clockWriter(ledDisplay);
+CharWriter charWriter(ledDisplay);
+StringWriter stringWriter(charWriter);
 
 // ----------------------------------------------------------------------
 // Tests for CharWriter.
 // ----------------------------------------------------------------------
 
-class CharWriterTest: public BaseWriterTest {
+class CharWriterTest : public TestOnce {
   protected:
     void setup() override {
-      BaseWriterTest::setup();
-      mCharWriter = new CharWriter(mRenderer);
+      ledDisplay.clear();
+      mPatterns = ledDisplay.getPatterns();
     }
 
-    void teardown() override {
-      delete mCharWriter;
-      BaseWriterTest::teardown();
-    }
-
-  protected:
-    CharWriter *mCharWriter;
+    uint8_t* mPatterns;
 };
 
-testF(CharWriterTest, getNumDigits) {
-  assertEqual(NUM_DIGITS, mCharWriter->getNumDigits());
-}
-
 testF(CharWriterTest, writeAt) {
-  mCharWriter->writeCharAt(0, '0');
-  assertEqual(0b00111111, mDimmablePatterns[0].pattern);
-  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[0].brightness);
-
-  mCharWriter->writeCharAt(1, '0', CUSTOM_BRIGHTNESS);
-  assertEqual(0b00111111, mDimmablePatterns[1].pattern);
-  assertEqual(CUSTOM_BRIGHTNESS, mDimmablePatterns[1].brightness);
-
-  mCharWriter->writeBrightnessAt(1, DIFFERENT_BRIGHTNESS);
-  assertEqual(DIFFERENT_BRIGHTNESS, mDimmablePatterns[1].brightness);
-
-  mCharWriter->writeDecimalPointAt(1);
-  assertEqual(0b00111111 | 0x80, mDimmablePatterns[1].pattern);
-
-  mCharWriter->writeDecimalPointAt(1, false);
-  assertEqual(0b00111111, mDimmablePatterns[1].pattern);
+  charWriter.writeCharAt(0, '0');
+  assertEqual(0b00111111, mPatterns[0]);
 }
 
 testF(CharWriterTest, writeAt_outOfBounds) {
-  mDimmablePatterns[4].pattern = 0;
-  mDimmablePatterns[4].brightness = CUSTOM_BRIGHTNESS;
-
-  mCharWriter->writeCharAt(4, 'a', DIFFERENT_BRIGHTNESS);
-  mCharWriter->writeDecimalPointAt(4);
-  assertEqual(0, mDimmablePatterns[4].pattern);
-  assertEqual(CUSTOM_BRIGHTNESS, mDimmablePatterns[4].brightness);
+  mPatterns[4] = 0;
+  charWriter.writeCharAt(4, 'a');
+  assertEqual(0, mPatterns[4]);
 }
 
 // ----------------------------------------------------------------------
 // Tests for StringWriter.
 // ----------------------------------------------------------------------
 
-class StringWriterTest: public BaseWriterTest {
+class StringWriterTest : public TestOnce {
   protected:
     void setup() override {
-      BaseWriterTest::setup();
-      mCharWriter = new CharWriter(mRenderer);
-      mStringWriter = new StringWriter(mCharWriter);
+      ledDisplay.clear();
+      mPatterns = ledDisplay.getPatterns();
     }
 
-    void teardown() override {
-      delete mStringWriter;
-      delete mCharWriter;
-      BaseWriterTest::teardown();
-    }
-
-    void assertDimmablePatternsEqual(int n, ...) {
+    void assertPatternsEqual(int n, ...) {
       va_list args;
       va_start(args, n);
       for (int i = 0; i < n; i++) {
         uint8_t pattern = va_arg(args, int);
-        uint8_t brightness = va_arg(args, int);
-        const DimmablePattern& dimmablePattern = mDimmablePatterns[i];
-        assertEqual(pattern, dimmablePattern.pattern);
-        assertEqual(brightness, dimmablePattern.brightness);
+        assertEqual(pattern, mPatterns[i]);
       }
       va_end(args);
     }
 
-    CharWriter *mCharWriter;
-    StringWriter *mStringWriter;
+    uint8_t* mPatterns;
 };
 
 testF(StringWriterTest, writeStringAt) {
-  mStringWriter->writeStringAt(0, ".1.2.3");
+  stringWriter.writeStringAt(0, ".1.2.3");
 
   // Should be (".", "1.", "2.", "3") as the 4 digits
-  assertDimmablePatternsEqual(
+  assertPatternsEqual(
     4,
-    0b10000000, Renderer::kDefaultBrightness,
-    0b00000110 | 0x80, Renderer::kDefaultBrightness,
-    0b01011011 | 0x80, Renderer::kDefaultBrightness,
-    0b01001111, Renderer::kDefaultBrightness
+    0b10000000,
+    0b00000110 | 0x80,
+    0b01011011 | 0x80,
+    0b01001111
   );
 }
 
@@ -166,151 +92,104 @@ testF(StringWriterTest, writeStringAt) {
 // Tests for HexWriter.
 // ----------------------------------------------------------------------
 
-class HexWriterTest: public BaseWriterTest {
+class HexWriterTest : public TestOnce {
   protected:
     void setup() override {
-      BaseWriterTest::setup();
-      mHexWriter = new HexWriter(mRenderer);
+      ledDisplay.clear();
+      mPatterns = ledDisplay.getPatterns();
     }
 
-    void teardown() override {
-      delete mHexWriter;
-      BaseWriterTest::teardown();
-    }
-
-    HexWriter *mHexWriter;
+    uint8_t* mPatterns;
 };
 
-testF(HexWriterTest, getNumDigits) {
-  assertEqual(NUM_DIGITS, mHexWriter->getNumDigits());
-}
-
 testF(HexWriterTest, writeAt) {
-  mHexWriter->writeHexAt(0, 0);
-  assertEqual(0b00111111, mDimmablePatterns[0].pattern);
-  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[0].brightness);
+  hexWriter.writeHexAt(0, 0);
+  assertEqual(0b00111111, mPatterns[0]);
 
-  mHexWriter->writeHexAt(1, 0, CUSTOM_BRIGHTNESS);
-  assertEqual(0b00111111, mDimmablePatterns[1].pattern);
-  assertEqual(CUSTOM_BRIGHTNESS, mDimmablePatterns[1].brightness);
+  hexWriter.writeHexAt(1, 0);
+  ledDisplay.writeDecimalPointAt(1);
+  assertEqual(0b00111111 | 0x80, mPatterns[1]);
 
-  mHexWriter->writeBrightnessAt(1, DIFFERENT_BRIGHTNESS);
-  assertEqual(DIFFERENT_BRIGHTNESS, mDimmablePatterns[1].brightness);
-
-  mHexWriter->writeDecimalPointAt(1);
-  assertEqual(0b00111111 | 0x80, mDimmablePatterns[1].pattern);
-
-  mHexWriter->writeDecimalPointAt(1, false);
-  assertEqual(0b00111111, mDimmablePatterns[1].pattern);
+  ledDisplay.writeDecimalPointAt(1, false);
+  assertEqual(0b00111111, mPatterns[1]);
 }
 
 testF(HexWriterTest, writeAt_outOfBounds) {
-  mDimmablePatterns[4].pattern = 0;
-  mDimmablePatterns[4].brightness = CUSTOM_BRIGHTNESS;
+  mPatterns[4] = 0;
 
-  mHexWriter->writeHexAt(4, HexWriter::kMinus, DIFFERENT_BRIGHTNESS);
-  mHexWriter->writeDecimalPointAt(4);
-  assertEqual(0, mDimmablePatterns[4].pattern);
-  assertEqual(CUSTOM_BRIGHTNESS, mDimmablePatterns[4].brightness);
+  hexWriter.writeHexAt(4, HexWriter::kMinus);
+  ledDisplay.writeDecimalPointAt(4);
+  assertEqual(0, mPatterns[4]);
 }
 
 // ----------------------------------------------------------------------
 // Tests for ClockWriter.
 // ----------------------------------------------------------------------
 
-class ClockWriterTest: public BaseWriterTest {
+class ClockWriterTest: public TestOnce {
   protected:
     void setup() override {
-      BaseWriterTest::setup();
-      mClockWriter = new ClockWriter(mRenderer);
+      ledDisplay.clear();
+      mPatterns = ledDisplay.getPatterns();
     }
 
-    void teardown() override {
-      delete mClockWriter;
-      BaseWriterTest::teardown();
-    }
-
-    ClockWriter *mClockWriter;
+    uint8_t* mPatterns;
 };
 
 testF(ClockWriterTest, toBcd) {
-  assertEqual(0x00, ClockWriter::toBcd(00));
+  assertEqual(0x00, ClockWriter::toBcd(0));
   assertEqual(0x42, ClockWriter::toBcd(42));
   assertEqual(0x99, ClockWriter::toBcd(99));
   assertEqual(0xFF, ClockWriter::toBcd(100));
 }
 
 testF(ClockWriterTest, writeCharAt) {
-  mClockWriter->writeCharAt(0, ClockWriter::kP);
-  assertEqual(0b01110011, mDimmablePatterns[0].pattern);
-  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[0].brightness);
-
-  mClockWriter->writeCharAt(1, ClockWriter::kP, CUSTOM_BRIGHTNESS);
-  assertEqual(0b01110011, mDimmablePatterns[1].pattern);
-  assertEqual(CUSTOM_BRIGHTNESS, mDimmablePatterns[1].brightness);
-
-  mClockWriter->writeBrightnessAt(1, DIFFERENT_BRIGHTNESS);
-  assertEqual(DIFFERENT_BRIGHTNESS, mDimmablePatterns[1].brightness);
+  clockWriter.writeCharAt(0, ClockWriter::kP);
+  assertEqual(0b01110011, mPatterns[0]);
 }
 
 testF(ClockWriterTest, writeBcdAt) {
-  mClockWriter->writeBcdAt(0, 0x12);
-  assertEqual(0b00000110, mDimmablePatterns[0].pattern);
-  assertEqual(0b01011011, mDimmablePatterns[1].pattern);
-  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[0].brightness);
-  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[1].brightness);
+  clockWriter.writeBcdAt(0, 0x12);
+  assertEqual(0b00000110, mPatterns[0]);
+  assertEqual(0b01011011, mPatterns[1]);
 
-  mClockWriter->writeBcdAt(2, 0xAF);
-  assertEqual(0x0, mDimmablePatterns[2].pattern);
-  assertEqual(0x0, mDimmablePatterns[3].pattern);
-  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[2].brightness);
-  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[3].brightness);
+  clockWriter.writeBcdAt(2, 0xAF);
+  assertEqual(0x0, mPatterns[2]);
+  assertEqual(0x0, mPatterns[3]);
 }
 
 testF(ClockWriterTest, writeDecimalAt) {
-  mClockWriter->writeDecimalAt(0, 12);
-  assertEqual(0b00000110, mDimmablePatterns[0].pattern);
-  assertEqual(0b01011011, mDimmablePatterns[1].pattern);
-  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[0].brightness);
-  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[1].brightness);
+  clockWriter.writeDecimalAt(0, 12);
+  assertEqual(0b00000110, mPatterns[0]);
+  assertEqual(0b01011011, mPatterns[1]);
 
-  mClockWriter->writeDecimalAt(2, 100);
-  assertEqual(0x0, mDimmablePatterns[2].pattern);
-  assertEqual(0x0, mDimmablePatterns[3].pattern);
-  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[2].brightness);
-  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[3].brightness);
+  clockWriter.writeDecimalAt(2, 100);
+  assertEqual(0x0, mPatterns[2]);
+  assertEqual(0x0, mPatterns[3]);
 }
 
 testF(ClockWriterTest, writeBcdClock) {
-  mClockWriter->writeBcdClock(0x12, 0x30);
-  assertEqual(0b00000110, mDimmablePatterns[0].pattern);
-  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[0].brightness);
-  assertEqual(0b01011011 | 0x80, mDimmablePatterns[1].pattern);
-  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[1].brightness);
-  assertEqual(0b01001111, mDimmablePatterns[2].pattern);
-  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[2].brightness);
-  assertEqual(0b00111111, mDimmablePatterns[3].pattern);
-  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[3].brightness);
+  clockWriter.writeBcdClock(0x12, 0x30);
+  assertEqual(0b00000110, mPatterns[0]);
+  assertEqual(0b01011011 | 0x80, mPatterns[1]);
+  assertEqual(0b01001111, mPatterns[2]);
+  assertEqual(0b00111111, mPatterns[3]);
 }
 
 testF(ClockWriterTest, writeClock) {
-  mClockWriter->writeClock(12, 30);
-  assertEqual(0b00000110, mDimmablePatterns[0].pattern);
-  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[0].brightness);
-  assertEqual(0b01011011 | 0x80, mDimmablePatterns[1].pattern);
-  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[1].brightness);
-  assertEqual(0b01001111, mDimmablePatterns[2].pattern);
-  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[2].brightness);
-  assertEqual(0b00111111, mDimmablePatterns[3].pattern);
-  assertEqual(Renderer::kDefaultBrightness, mDimmablePatterns[3].brightness);
+  clockWriter.writeClock(12, 30);
+  assertEqual(0b00000110, mPatterns[0]);
+  assertEqual(0b01011011 | 0x80, mPatterns[1]);
+  assertEqual(0b01001111, mPatterns[2]);
+  assertEqual(0b00111111, mPatterns[3]);
 }
 
 testF(ClockWriterTest, writeColon) {
-  mClockWriter->writeClock(12, 30); // colon on by default
-  assertEqual(0b01011011 | 0x80, mDimmablePatterns[1].pattern);
+  clockWriter.writeClock(12, 30); // colon on by default
+  assertEqual(0b01011011 | 0x80, mPatterns[1]);
 
-  mClockWriter->writeColon(false); // turns it off
-  assertEqual(0b01011011, mDimmablePatterns[1].pattern);
+  clockWriter.writeColon(false); // turns it off
+  assertEqual(0b01011011, mPatterns[1]);
 }
 
 //-----------------------------------------------------------------------------

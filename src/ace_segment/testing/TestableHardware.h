@@ -25,57 +25,25 @@ SOFTWARE.
 #ifndef ACE_SEGMENT_TESTABLE_HARDWARE_H
 #define ACE_SEGMENT_TESTABLE_HARDWARE_H
 
-#include "../Hardware.h"
+#include "EventLog.h"
 
 namespace ace_segment {
 namespace testing {
 
-/** A record of one Hardware event. */
-class Event {
-  public:
-    static const uint8_t kTypeDigitalWrite = 0;
-    static const uint8_t kTypePinMode = 1;
-    static const uint8_t kTypeSpiBegin = 3;
-    static const uint8_t kTypeSpiTransfer = 4;
-    static const uint8_t kTypeSpiEnd = 5;
-    static const uint8_t kTypeSpiTransfer16 = 6;
-
-    uint8_t type; // arg0
-    uint8_t arg1;
-    uint8_t arg2;
-    uint8_t arg3;
-    uint8_t arg4;
-    uint16_t arg5; // used by transfer16()
-};
-
 class TestableHardware {
   public:
-    explicit TestableHardware():
-      mNumRecords(0)
-    {}
+    explicit TestableHardware() {}
 
     unsigned long micros() const { return mMicros; }
 
     unsigned long millis() const { return mMillis; }
 
     void pinMode(uint8_t pin, uint8_t mode) const {
-      if (mNumRecords < kMaxRecords) {
-        Event& event = mEvents[mNumRecords];
-        event.type = Event::kTypePinMode;
-        event.arg1 = pin;
-        event.arg2 = mode;
-        mNumRecords++;
-      }
+      mEventLog.addPinMode(pin, mode);
     }
 
     void digitalWrite(uint8_t pin, uint8_t value) const {
-      if (mNumRecords < kMaxRecords) {
-        Event& event = mEvents[mNumRecords];
-        event.type = Event::kTypeDigitalWrite;
-        event.arg1 = pin;
-        event.arg2 = value;
-        mNumRecords++;
-      }
+      mEventLog.addDigitalWrite(pin, value);
     }
 
     // methods to set what this object returns
@@ -84,24 +52,11 @@ class TestableHardware {
 
     void setMillis(unsigned long millis) { mMillis = millis; }
 
-    void clear() { mNumRecords = 0; }
-
-    uint8_t getNumRecords() { return mNumRecords; }
-
-    Event& getEvent(int i) { return mEvents[i]; }
-
-  private:
-    static const int kMaxRecords = 32;
-
-    // Disable copy-constructor and assignment operator
-    TestableHardware(const TestableHardware&) = delete;
-    TestableHardware& operator=(const TestableHardware&) = delete;
-
+  public:
     unsigned long mMillis;
     unsigned long mMicros;
 
-    mutable Event mEvents[kMaxRecords];
-    mutable uint8_t mNumRecords;
+    mutable EventLog mEventLog;
 };
 
 } // namespace testing

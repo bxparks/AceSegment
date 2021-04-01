@@ -27,6 +27,10 @@ SOFTWARE.
 
 #include "LedMatrixBase.h"
 
+class LedMatrixFullSpiTest_draw;
+class LedMatrixFullSpiTest_enableGroup;
+class LedMatrixFullSpiTest_disableGroup;
+
 namespace ace_segment {
 
 /**
@@ -81,9 +85,14 @@ class LedMatrixFullSpi: public LedMatrixBase {
       uint8_t actualElementPattern = 0x00 ^ mElementXorMask;
       mSpiAdapter.transfer16(
           actualGroupPattern << 8 | actualElementPattern);
+      mPrevElementPattern = 0x00;
     }
 
   private:
+    friend class ::LedMatrixFullSpiTest_draw;
+    friend class ::LedMatrixFullSpiTest_enableGroup;
+    friend class ::LedMatrixFullSpiTest_disableGroup;
+
     const SA& mSpiAdapter;
 
     /**

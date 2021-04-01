@@ -28,6 +28,8 @@ SOFTWARE.
 #include <Arduino.h> // OUTPUT, INPUT
 #include "LedMatrixBase.h"
 
+class LedMatrixDirectTest_drawElements;
+
 namespace ace_segment {
 
 /**
@@ -116,6 +118,7 @@ class LedMatrixDirect : public LedMatrixBase {
     }
 
   private:
+    friend class ::LedMatrixDirectTest_drawElements;
 
     /** Send the pattern to the element pins. */
     void drawElements(uint8_t pattern) const {
@@ -148,6 +151,6 @@ class LedMatrixDirect : public LedMatrixBase {
     mutable uint8_t mPrevGroup = 0;
 };
 
-}
+} // ace_segment
 
 #endif
