@@ -1,0 +1,20 @@
+SIZEOF
+sizeof(Hardware): 1
+sizeof(SwSpiAdapter): 3
+sizeof(HwSpiAdapter): 3
+sizeof(LedMatrixDirect<Hardware>): 20
+sizeof(LedMatrixPartialSpi<Hardware, SwSpiAdapter>): 20
+sizeof(LedMatrixFullSpi<HwSpiAdapter>): 12
+sizeof(LedDisplay): 8
+sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 40
+sizeof(HexWriter): 4
+sizeof(ClockWriter): 8
+sizeof(CharWriter): 4
+sizeof(StringWriter): 4
+BENCHMARKS
+direct 12 12 32 1200
+partial_sw_spi 29 29 45 1200
+partial_hw_spi 11 11 27 1200
+full_sw_spi 50 50 64 1200
+full_hw_spi 12 12 24 1200
+END

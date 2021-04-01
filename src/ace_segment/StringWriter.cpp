@@ -22,29 +22,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include "SegmentDisplay.h"
 #include "StringWriter.h"
 
 namespace ace_segment {
 
 void StringWriter::writeStringAt(uint8_t digit, const char* s, bool padRight) {
+  LedDisplay& ledDisplay = mCharWriter.getLedDisplay();
   bool charWasWritten = false;
-  uint8_t numDigits = mCharWriter->getNumDigits();
+  uint8_t numDigits = ledDisplay.getNumDigits();
 
   while (true) {
     char c = *s;
     if (c == 0) break;
     if (digit >= numDigits) break;
 
+    // Use the decimal point just after a digit to render the '.' character.
     if (c == '.') {
       if (charWasWritten) {
-        mCharWriter->writeDecimalPointAt(digit - 1);
+        ledDisplay.writeDecimalPointAt(digit - 1);
       } else {
-        mCharWriter->writeCharAt(digit, '.');
+        mCharWriter.writeCharAt(digit, '.');
         charWasWritten = false;
         digit++;
       }
     } else {
-      mCharWriter->writeCharAt(digit, c);
+      mCharWriter.writeCharAt(digit, c);
       charWasWritten = true;
       digit++;
     }
@@ -53,7 +56,7 @@ void StringWriter::writeStringAt(uint8_t digit, const char* s, bool padRight) {
 
   if (padRight) {
     for (; digit < numDigits; digit++) {
-      mCharWriter->writeCharAt(digit, ' ');
+      mCharWriter.writeCharAt(digit, ' ');
     }
   }
 }

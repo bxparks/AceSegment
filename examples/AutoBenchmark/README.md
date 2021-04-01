@@ -1,127 +1,323 @@
 # AutoBenchmark
 
-The `AutoBenchmark` sketch iterates through every supported variation of
-`Driver`, calls `renderField()` about a 1000 times, then reports the min/avg/max
-CPU time (in microseconds) collected by the `TimingStats` object in the
-`Renderer`. It uses a frame rate of 60Hz, with 16 subfields per field for the
-`useModulation()` option.
+This program creates instances of `SegmentDisplay` using different
+configurations of the `LedMatrix` class:
 
-## Arduino Nano clone
-* 16MHz ATmega328P
+* `direct`: group and segment pins directly connected to MCU
+* `partial_sw_spi`: group pins connected directly to MCU, but segment pins
+  connected to 74HC595 accessed through software SPI (`SwSpiAdapter`)
+* `partial_hw_spi`: group pins connected directly to MCU, but segment pins
+  connected to 74HC595 accessed through hardware SPI (`HwSpiAdapter`)
+* `full_sw_spi`: group pins and segment pins connected to 74HC595 accessed
+  through software SPI (`SwSpiAdapter`)
+* `full_hw_spi`: group pins and segment pins connected to 74HC595 accessed
+  through hardware SPI (`HwSpiAdapter`)
+
+It measures the time taken by `SegmentDisplay::displayCurrentField()` which
+renders a single digit (multiple fields make up a frame, a frame is the
+rendering of all digits on the display module).
+
+**Version**: AceSegment v0.4
+
+**DO NOT EDIT**: This file was auto-generated using `make README.md`.
+
+## Dependencies
+
+This program depends on the following libraries:
+
+* [AceCommon](https://github.com/bxparks/AceCommon)
+* [AceSegment](https://github.com/bxparks/AceButton)
+
+## How to Generate
+
+This requires the [AUniter](https://github.com/bxparks/AUniter) script
+to execute the Arduino IDE programmatically.
+
+The `Makefile` has rules to generate the `*.txt` results file for several
+microcontrollers that I usually support, but the `$ make benchmarks` command
+does not work very well because the USB port of the microcontroller is a
+dynamically changing parameter. I created a semi-automated way of collect the
+`*.txt` files:
+
+1. Connect the microcontroller to the serial port. I usually do this through a
+USB hub with individually controlled switch.
+2. Type `$ auniter ports` to determine its `/dev/ttyXXX` port number (e.g.
+`/dev/ttyUSB0` or `/dev/ttyACM0`).
+3. If the port is `USB0` or `ACM0`, type `$ make nano.txt`, etc.
+4. Switch off the old microontroller.
+5. Go to Step 1 and repeat for each microcontroller.
+
+The `generate_table.awk` program reads one of `*.txt` files and prints out an
+ASCII table that can be directly embedded into this README.md file. For example
+the following command produces the table in the Nano section below:
 
 ```
-------------+--------+------------+------+--------+-------------+
-resistorsOn | wiring | modulation | fast | styles | min/avg/max |
-------------|--------|------------|------|--------|-------------|
-digits      | direct |            |      |        |  32/ 37/ 64 |
-digits      | direct |            |      | styles |  32/ 67/112 |
-digits      | serial |            |      |        |  32/ 37/ 60 |
-digits      | serial |            |      | styles |  32/ 67/112 |
-digits      | spi    |            |      |        |  32/ 37/ 64 |
-digits      | spi    |            |      | styles |  32/ 67/112 |
-segments    | direct |            |      |        |  24/ 33/ 56 |
-segments    | direct |            |      | styles |  24/ 78/140 |
-segments    | serial |            |      |        |  24/ 33/ 56 |
-segments    | serial |            |      | styles |  24/135/224 |
-segments    | spi    |            |      |        |  24/ 33/ 56 |
-segments    | spi    |            |      | styles |  24/ 51/ 96 |
-segments    | direct | modulation |      |        |  12/ 14/ 60 |
-segments    | direct | modulation |      | styles |  12/ 18/152 |
-segments    | serial | modulation |      |        |  12/ 14/ 60 |
-segments    | serial | modulation |      | styles |  12/ 22/236 |
-segments    | spi    | modulation |      |        |  12/ 14/ 60 |
-segments    | spi    | modulation |      | styles |  12/ 16/116 |
-segments    | direct | modulation | fast |        |  12/ 14/ 52 |
-segments    | direct | modulation | fast | styles |  12/ 16/ 96 |
-segments    | serial | modulation | fast |        |  12/ 14/ 48 |
-segments    | serial | modulation | fast | styles |  12/ 15/ 92 |
-segments    | spi    | modulation | fast |        |  12/ 14/ 48 |
-segments    | spi    | modulation | fast | styles |  12/ 15/ 84 |
-------------+--------+------------+------+--------+-------------+
+$ ./generate_table.awk < nano.txt
+```
+
+Fortunately, we no longer need to run `generate_table.awk` for each `*.txt`
+file. The process has been automated using the `generate_readme.py` script which
+will be invoked by the following command:
+```
+$ make README.md
+```
+
+The CPU times below are given in microseconds. The "samples" column is the
+number of `TimingStats::update()` calls that were made.
+
+## CPU Time Changes
+
+v0.4: Huge refactoring of core AceSegment classes. Rewrote AutoBenchmark
+to match similar programs in the AceButton, AceCrc and AceTime libraries.
+
+## Arduino Nano
+
+* 16MHz ATmega328P
+* Arduino IDE 1.8.13
+* Arduino AVR Boards 1.8.3
+* `micros()` has a resolution of 4 microseconds
+
+```
+Sizes of Objects:
+sizeof(Hardware): 1
+sizeof(SwSpiAdapter): 3
+sizeof(SwSpiAdapterFast<1,2,3>): 1
+sizeof(HwSpiAdapter): 3
+sizeof(LedMatrixDirect<Hardware>): 11
+sizeof(LedMatrixDirectFast<0..3, 0..7>): 3
+sizeof(LedMatrixPartialSpi<Hardware, SwSpiAdapter>): 10
+sizeof(LedMatrixFullSpi<HwSpiAdapter>): 5
+sizeof(LedDisplay): 3
+sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 28
+sizeof(HexWriter): 2
+sizeof(ClockWriter): 3
+sizeof(CharWriter): 2
+sizeof(StringWriter): 2
+
+CPU:
++---------------------------+-------------+---------+
+| LedMatrix type            | min/avg/max | samples |
+|---------------------------+-------------+---------|
+| direct                    |  60/ 63/ 80 | 1200    |
+| partial_sw_spi            | 124/127/144 | 1200    |
+| partial_hw_spi            |  28/ 31/ 40 | 1200    |
+| full_sw_spi               | 212/215/244 | 1200    |
+| full_hw_spi               |  20/ 22/ 32 | 1200    |
+| direct_fast               |  24/ 27/ 40 | 1200    |
+| partial_sw_spi_fast       |  24/ 25/ 40 | 1200    |
+| full_sw_spi_fast          |  20/ 24/ 32 | 1200    |
++---------------------------+-------------+---------+
+
+```
+
+## Sparkfun Pro Micro
+
+* 16 MHz ATmega32U4
+* Arduino IDE 1.8.13
+* SparkFun AVR Boards 1.1.13
+* `micros()` has a resolution of 4 microseconds
+
+```
+Sizes of Objects:
+sizeof(Hardware): 1
+sizeof(SwSpiAdapter): 3
+sizeof(SwSpiAdapterFast<1,2,3>): 1
+sizeof(HwSpiAdapter): 3
+sizeof(LedMatrixDirect<Hardware>): 11
+sizeof(LedMatrixDirectFast<0..3, 0..7>): 3
+sizeof(LedMatrixPartialSpi<Hardware, SwSpiAdapter>): 10
+sizeof(LedMatrixFullSpi<HwSpiAdapter>): 5
+sizeof(LedDisplay): 3
+sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 28
+sizeof(HexWriter): 2
+sizeof(ClockWriter): 3
+sizeof(CharWriter): 2
+sizeof(StringWriter): 2
+
+CPU:
++---------------------------+-------------+---------+
+| LedMatrix type            | min/avg/max | samples |
+|---------------------------+-------------+---------|
+| direct                    |  64/ 68/ 84 | 1200    |
+| partial_sw_spi            | 124/128/140 | 1200    |
+| partial_hw_spi            |  32/ 34/ 44 | 1200    |
+| full_sw_spi               | 208/213/224 | 1200    |
+| full_hw_spi               |  20/ 24/ 32 | 1200    |
+| direct_fast               |  24/ 26/ 40 | 1200    |
+| partial_sw_spi_fast       |  24/ 27/ 36 | 1200    |
+| full_sw_spi_fast          |  20/ 24/ 32 | 1200    |
++---------------------------+-------------+---------+
+
+```
+
+## SAMD21 M0 Mini
+
+* 48 MHz ARM Cortex-M0+
+* Arduino IDE 1.8.13
+* Sparkfun SAMD Core 1.8.1
+
+```
+Sizes of Objects:
+sizeof(Hardware): 1
+sizeof(SwSpiAdapter): 3
+sizeof(HwSpiAdapter): 3
+sizeof(LedMatrixDirect<Hardware>): 20
+sizeof(LedMatrixPartialSpi<Hardware, SwSpiAdapter>): 20
+sizeof(LedMatrixFullSpi<HwSpiAdapter>): 12
+sizeof(LedDisplay): 8
+sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 40
+sizeof(HexWriter): 4
+sizeof(ClockWriter): 8
+sizeof(CharWriter): 4
+sizeof(StringWriter): 4
+
+CPU:
++---------------------------+-------------+---------+
+| LedMatrix type            | min/avg/max | samples |
+|---------------------------+-------------+---------|
+| direct                    |  25/ 25/ 30 | 1200    |
+| partial_sw_spi            |  52/ 52/ 57 | 1200    |
+| partial_hw_spi            |  23/ 23/ 28 | 1200    |
+| full_sw_spi               |  87/ 88/ 93 | 1200    |
+| full_hw_spi               |  22/ 22/ 26 | 1200    |
++---------------------------+-------------+---------+
+
+```
+
+## STM32
+
+* STM32 "Blue Pill", STM32F103C8, 72 MHz ARM Cortex-M3
+* Arduino IDE 1.8.13
+* STM32duino 1.9.0
+
+```
+Sizes of Objects:
+sizeof(Hardware): 1
+sizeof(SwSpiAdapter): 3
+sizeof(HwSpiAdapter): 3
+sizeof(LedMatrixDirect<Hardware>): 20
+sizeof(LedMatrixPartialSpi<Hardware, SwSpiAdapter>): 20
+sizeof(LedMatrixFullSpi<HwSpiAdapter>): 12
+sizeof(LedDisplay): 8
+sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 40
+sizeof(HexWriter): 4
+sizeof(ClockWriter): 8
+sizeof(CharWriter): 4
+sizeof(StringWriter): 4
+
+CPU:
++---------------------------+-------------+---------+
+| LedMatrix type            | min/avg/max | samples |
+|---------------------------+-------------+---------|
+| direct                    |  14/ 15/ 20 | 1200    |
+| partial_sw_spi            |  31/ 32/ 37 | 1200    |
+| partial_hw_spi            |  40/ 40/ 46 | 1200    |
+| full_sw_spi               |  54/ 54/ 60 | 1200    |
+| full_hw_spi               |  40/ 40/ 45 | 1200    |
++---------------------------+-------------+---------+
+
+```
+
+## ESP8266
+
+* NodeMCU 1.0 clone, 80MHz ESP8266
+* Arduino IDE 1.8.13
+* ESP8266 Boards 2.7.4
+
+```
+Sizes of Objects:
+sizeof(Hardware): 1
+sizeof(SwSpiAdapter): 3
+sizeof(HwSpiAdapter): 3
+sizeof(LedMatrixDirect<Hardware>): 20
+sizeof(LedMatrixPartialSpi<Hardware, SwSpiAdapter>): 20
+sizeof(LedMatrixFullSpi<HwSpiAdapter>): 12
+sizeof(LedDisplay): 8
+sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 40
+sizeof(HexWriter): 4
+sizeof(ClockWriter): 8
+sizeof(CharWriter): 4
+sizeof(StringWriter): 4
+
+CPU:
++---------------------------+-------------+---------+
+| LedMatrix type            | min/avg/max | samples |
+|---------------------------+-------------+---------|
+| direct                    |  12/ 12/ 32 | 1200    |
+| partial_sw_spi            |  29/ 29/ 45 | 1200    |
+| partial_hw_spi            |  11/ 11/ 27 | 1200    |
+| full_sw_spi               |  50/ 50/ 64 | 1200    |
+| full_hw_spi               |  12/ 12/ 24 | 1200    |
++---------------------------+-------------+---------+
+
+```
+
+## ESP32
+
+* ESP32-01 Dev Board, 240 MHz Tensilica LX6
+* Arduino IDE 1.8.13
+* ESP32 Boards 1.0.4
+
+```
+Sizes of Objects:
+sizeof(Hardware): 1
+sizeof(SwSpiAdapter): 3
+sizeof(HwSpiAdapter): 3
+sizeof(LedMatrixDirect<Hardware>): 20
+sizeof(LedMatrixPartialSpi<Hardware, SwSpiAdapter>): 20
+sizeof(LedMatrixFullSpi<HwSpiAdapter>): 12
+sizeof(LedDisplay): 8
+sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 40
+sizeof(HexWriter): 4
+sizeof(ClockWriter): 8
+sizeof(CharWriter): 4
+sizeof(StringWriter): 4
+
+CPU:
++---------------------------+-------------+---------+
+| LedMatrix type            | min/avg/max | samples |
+|---------------------------+-------------+---------|
+| direct                    |   2/  2/ 11 | 1200    |
+| partial_sw_spi            |   4/  4/ 13 | 1200    |
+| partial_hw_spi            |   9/  9/ 18 | 1200    |
+| full_sw_spi               |   7/  7/ 16 | 1200    |
+| full_hw_spi               |   9/  9/ 18 | 1200    |
++---------------------------+-------------+---------+
+
 ```
 
 ## Teensy 3.2
 
+* 96 MHz ARM Cortex-M4
+* Arduino IDE 1.8.13
+* Teensyduino 1.53
+* Compiler options: "Faster"
+
 ```
-------------+--------+------------+------+--------+-------------+
-resistorsOn | wiring | modulation | fast | styles | min/avg/max |
-------------|--------|------------|------|--------|-------------|
-digits      | direct |            |      |        |   4/  4/ 10 |
-digits      | direct |            |      | styles |   4/  8/ 16 |
-digits      | serial |            |      |        |   4/  5/ 11 |
-digits      | serial |            |      | styles |   4/  8/ 17 |
-digits      | spi    |            |      |        |   4/  5/ 11 |
-digits      | spi    |            |      | styles |   4/  8/ 17 |
-segments    | direct |            |      |        |   3/  4/ 10 |
-segments    | direct |            |      | styles |   3/  9/ 18 |
-segments    | serial |            |      |        |   3/  4/ 10 |
-segments    | serial |            |      | styles |   3/ 12/ 22 |
-segments    | spi    |            |      |        |   3/  4/ 10 |
-segments    | spi    |            |      | styles |   3/  7/ 15 |
-segments    | direct | modulation |      |        |   1/  2/  8 |
-segments    | direct | modulation |      | styles |   1/  2/ 18 |
-segments    | serial | modulation |      |        |   1/  2/  8 |
-segments    | serial | modulation |      | styles |   1/  2/ 22 |
-segments    | spi    | modulation |      |        |   1/  2/  9 |
-segments    | spi    | modulation |      | styles |   1/  2/ 16 |
-------------+--------+------------+------+--------+-------------+
+Sizes of Objects:
+sizeof(Hardware): 1
+sizeof(SwSpiAdapter): 3
+sizeof(HwSpiAdapter): 3
+sizeof(LedMatrixDirect<Hardware>): 20
+sizeof(LedMatrixPartialSpi<Hardware, SwSpiAdapter>): 20
+sizeof(LedMatrixFullSpi<HwSpiAdapter>): 12
+sizeof(LedDisplay): 8
+sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 40
+sizeof(HexWriter): 4
+sizeof(ClockWriter): 8
+sizeof(CharWriter): 4
+sizeof(StringWriter): 4
+
+CPU:
++---------------------------+-------------+---------+
+| LedMatrix type            | min/avg/max | samples |
+|---------------------------+-------------+---------|
+| direct                    |   5/  6/ 10 | 1200    |
+| partial_sw_spi            |  10/ 10/ 14 | 1200    |
+| partial_hw_spi            |   4/  4/  8 | 1200    |
+| full_sw_spi               |  16/ 16/ 21 | 1200    |
+| full_hw_spi               |   3/  3/  6 | 1200    |
++---------------------------+-------------+---------+
 
 ```
 
-## ESP8266 NodeMCU v1.0
-
-I'm not sure that the `max` numbers below should be trusted, since the WiFi code
-in the single-core ESP8266 adds random latency into the normal code execution
-path.
-
-```
-------------+--------+------------+------+--------+-------------+
-resistorsOn | wiring | modulation | fast | styles | min/avg/max |
-------------|--------|------------|------|--------|-------------|
-digits      | direct |            |      |        |   6/  6/ 81 |
-digits      | direct |            |      | styles |   6/ 12/ 43 |
-digits      | serial |            |      |        |   6/  6/ 30 |
-digits      | serial |            |      | styles |   6/ 12/ 39 |
-digits      | spi    |            |      |        |   6/  6/ 29 |
-digits      | spi    |            |      | styles |   6/ 12/ 39 |
-segments    | direct |            |      |        |   4/  5/ 25 |
-segments    | direct |            |      | styles |   4/ 15/ 36 |
-segments    | serial |            |      |        |   4/  5/ 28 |
-segments    | serial |            |      | styles |   4/ 26/ 57 |
-segments    | spi    |            |      |        |   4/  5/ 16 |
-segments    | spi    |            |      | styles |   4/ 14/ 93 |
-segments    | direct | modulation |      |        |   1/  2/ 28 |
-segments    | direct | modulation |      | styles |   1/  2/ 32 |
-segments    | serial | modulation |      |        |   1/  2/  9 |
-segments    | serial | modulation |      | styles |   1/  3/ 39 |
-segments    | spi    | modulation |      |        |   1/  2/ 12 |
-segments    | spi    | modulation |      | styles |   1/  2/ 63 |
-------------+--------+------------+------+--------+-------------+
-```
-
-## ESP32 Node32s
-
-```
-------------+--------+------------+------+--------+-------------+
-resistorsOn | wiring | modulation | fast | styles | min/avg/max |
-------------|--------|------------|------|--------|-------------|
-digits      | direct |            |      |        |   4/  5/ 41 |
-digits      | direct |            |      | styles |   4/  6/ 22 |
-digits      | serial |            |      |        |   4/  5/ 13 |
-digits      | serial |            |      | styles |   4/  6/ 14 |
-digits      | spi    |            |      |        |   4/  5/ 13 |
-digits      | spi    |            |      | styles |   4/  6/ 14 |
-segments    | direct |            |      |        |   2/  2/ 14 |
-segments    | direct |            |      | styles |   2/  4/ 15 |
-segments    | serial |            |      |        |   2/  2/ 14 |
-segments    | serial |            |      | styles |   2/  5/ 21 |
-segments    | spi    |            |      |        |   2/  2/ 10 |
-segments    | spi    |            |      | styles |   2/  9/ 51 |
-segments    | direct | modulation |      |        |   1/  1/ 18 |
-segments    | direct | modulation |      | styles |   1/  2/ 14 |
-segments    | serial | modulation |      |        |   1/  1/  9 |
-segments    | serial | modulation |      | styles |   1/  2/ 15 |
-segments    | spi    | modulation |      |        |   1/  1/  9 |
-segments    | spi    | modulation |      | styles |   1/  2/ 19 |
-------------+--------+------------+------+--------+-------------+
-```

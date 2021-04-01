@@ -26,14 +26,13 @@ SOFTWARE.
 #define ACE_SEGMENT_HEX_WRITER_H
 
 #include <stdint.h>
-#include "StyledPattern.h"
-#include "Renderer.h"
+#include "LedDisplay.h"
 
 namespace ace_segment {
 
 /**
  * The HexWriter supports mapping of Hex characters to segment patterns
- * supported by Renderer. A few other characters are supported which
+ * supported by LedDisplay. A few other characters are supported which
  * should be self-explanatory: kSpace, kPeriod, kMinus.
  */
 class HexWriter {
@@ -42,31 +41,27 @@ class HexWriter {
     static const uint8_t kSpace = 0x10;
     static const uint8_t kPeriod = 0x11;
     static const uint8_t kMinus = 0x12;
+    // TODO: Add 'degrees' symbol from ClockWriter.
 
     /** Constructor. */
-    explicit HexWriter(Renderer* renderer):
-        mRenderer(renderer)
+    explicit HexWriter(LedDisplay& ledDisplay) :
+        mLedDisplay(ledDisplay)
     {}
 
-    /** Get the number of digits. */
-    uint8_t getNumDigits() { return mRenderer->getNumDigits(); }
+    /**
+     * Write the single-digit hex character 'c' at the given position. The range
+     * of a hex digit is usually (0x0-0xF), but this supports a few more
+     * characters for convenience:
+     *
+     *  * kSpace = 0x10
+     *  * kPeriod = 0x11
+     *  * kMinus = 0x12
+     */
+    void writeHexAt(uint8_t pos, uint8_t c);
 
-    /** Write the hex at the specified position. */
-    void writeHexAt(uint8_t digit, uint8_t c);
-
-    /** Write the hex at the specified position. */
-    void writeHexAt(uint8_t digit, uint8_t c, uint8_t style);
-
-    /** Write the style for a given digit, leaving hex unchanged. */
-    void writeStyleAt(uint8_t digit, uint8_t style) {
-      if (digit >= getNumDigits()) return;
-      mRenderer->writeStyleAt(digit, style);
-    }
-
-    /** Write the decimal point at digit. */
-    void writeDecimalPointAt(uint8_t digit, bool state = true) {
-      if (digit >= getNumDigits()) return;
-      mRenderer->writeDecimalPointAt(digit, state);
+    /** Get the underlying LedDisplay. */
+    LedDisplay& getLedDisplay() const {
+      return mLedDisplay;
     }
 
   private:
@@ -77,7 +72,7 @@ class HexWriter {
     HexWriter(const HexWriter&) = delete;
     HexWriter& operator=(const HexWriter&) = delete;
 
-    Renderer* const mRenderer;
+    LedDisplay& mLedDisplay;
 };
 
 }

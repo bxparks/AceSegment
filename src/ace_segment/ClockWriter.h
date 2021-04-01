@@ -26,15 +26,13 @@ SOFTWARE.
 #define ACE_SEGMENT_CLOCK_WRITER_H
 
 #include <stdint.h>
-#include "StyledPattern.h"
-#include "Renderer.h"
+#include "LedDisplay.h"
 
 namespace ace_segment {
 
 /**
- * The ClockWriter writes "hh:mm" to the Renderer's segment patterns. A few
- * other characters are supported: kSpace, kMinus, kA ("A" for AM) and kP ("P"
- * for "PM").
+ * The ClockWriter writes "hh:mm" to the LedDisplay. A few other characters
+ * are supported: kSpace, kMinus, kA ("A" for AM) and kP ("P" for "PM").
  */
 class ClockWriter {
   public:
@@ -63,43 +61,37 @@ class ClockWriter {
      * mapped to bit 7 (i.e. 'H' segment). In a stadard 4 digit clock display,
      * this is digit 1 (counting from the left, 0-based).
      */
-    explicit ClockWriter(Renderer* renderer, uint8_t colonDigit = 1):
-        mRenderer(renderer),
+    explicit ClockWriter(
+        LedDisplay& ledDisplay,
+        uint8_t colonDigit = 1
+    ) :
+        mLedDisplay(ledDisplay),
         mColonDigit(colonDigit)
     {}
 
-    /** Get the number of digits. */
-    uint8_t getNumDigits() { return mRenderer->getNumDigits(); }
+    /** Get the underlying LedDisplay. */
+    LedDisplay& getLedDisplay() const {
+      return mLedDisplay;
+    }
 
     /**
      * Write the character at the specified position. Write a space if
      * the character is undefined.
      */
-    void writeCharAt(uint8_t digit, uint8_t c);
+    void writeCharAt(uint8_t pos, uint8_t c);
 
     /**
-     * Write the character at the specified position with the given style.
-     * If the character is undefined, write a space character instead.
+     * Write a 2-digit BCD number at position. If one of the hex digits
+     * is greater than 9, then print " " (1 space). E.g. 0x12 is printed as
+     * "12", but 0x1A is printed as "1 ".
      */
-    void writeCharAt(uint8_t digit, uint8_t c, uint8_t style);
-
-    /** Write the style for a given digit, leaving the character unchanged. */
-    void writeStyleAt(uint8_t digit, uint8_t style) {
-      if (digit >= getNumDigits()) return;
-      mRenderer->writeStyleAt(digit, style);
-    }
-
-    /**
-     * Write a 2-digit BCD number at position digit. If one of the hex digits
-     * is greater than 9, then print " " (1 space).
-     */
-    void writeBcdAt(uint8_t digit, uint8_t bcd);
+    void writeBcdAt(uint8_t pos, uint8_t bcd);
 
     /**
      * Write a 2-digit decimal number at position digit. If the number is
      * greater than 100, then print "  " (2 spaces).
      */
-    void writeDecimalAt(uint8_t digit, uint8_t d);
+    void writeDecimalAt(uint8_t pos, uint8_t d);
 
     /** Write "hh:mm". */
     void writeClock(uint8_t hh, uint8_t mm);
@@ -113,12 +105,12 @@ class ClockWriter {
      * @param state Set to false to turn off the colon.
      */
     void writeColon(bool state = true) {
-      mRenderer->writeDecimalPointAt(mColonDigit, state);
+      mLedDisplay.writeDecimalPointAt(mColonDigit, state);
     }
 
     /**
      * Convert decimal number into BCD (binary coded decimal).
-     * VisibleForTesting.
+     * VisibleForTesting. TODO: Replace with ace_common::toBcd().
      */
     static uint8_t toBcd(uint8_t d);
 
@@ -130,8 +122,8 @@ class ClockWriter {
     ClockWriter(const ClockWriter&) = delete;
     ClockWriter& operator=(const ClockWriter&) = delete;
 
-    Renderer* const mRenderer;
-    const uint8_t mColonDigit;
+    LedDisplay& mLedDisplay;
+    uint8_t const mColonDigit;
 };
 
 }

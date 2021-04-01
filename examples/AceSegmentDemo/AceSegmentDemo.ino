@@ -1,81 +1,57 @@
 #include <Arduino.h>
 #include <AceButton.h>
+#include <AceCommon.h> // incrementMod()
 #include <AceSegment.h>
-#ifdef __AVR__
-  #include "FastDirectDriver.h"
-  #include "FastSerialDriver.h"
-  #include "FastSpiDriver.h"
+#include <ace_segment/fast/LedMatrixDirectFast.h>
+#include <ace_segment/fast/SwSpiAdapterFast.h>
+
+//------------------------------------------------------------------
+// Hardware configuration.
+//------------------------------------------------------------------
+
+#ifndef ENABLE_SERIAL_DEBUG
+#define ENABLE_SERIAL_DEBUG 0
 #endif
 
 using namespace ace_segment;
 using namespace ace_button;
 
-//------------------------------------------------------------------
-// Configurations for AceButton
-//------------------------------------------------------------------
+#define LED_MATRIX_MODE_DIRECT 1
+#define LED_MATRIX_MODE_PARIAL_SW_SPI 2
+#define LED_MATRIX_MODE_PARTIAL_HW_SPI 3
+#define LED_MATRIX_MODE_FULL_SW_SPI 4
+#define LED_MATRIX_MODE_FULL_HW_SPI 5
+#define LED_MATRIX_MODE_DIRECT_FAST 6
+#define LED_MATRIX_MODE_PARTIAL_SW_SPI_FAST 7
+#define LED_MATRIX_MODE_FULL_SW_SPI_FAST 8
 
-const uint8_t LOOP_MODE_PAUSE = 0;
-const uint8_t LOOP_MODE_STEP = 1;
-const uint8_t LOOP_MODE_AUTO_RENDER = 2;
-uint8_t loopMode = LOOP_MODE_AUTO_RENDER;
+// LedClock buttons can be configured to use either pins (2, 3) or (8, 9)
+// through DIP switches. On the Pro Micro, (2, 3) are used for I2C. The LED
+// Module using Direct Digit Pins are wired to use (8, 9), so we must use (2,
+// 3) with that LED Module.
+const uint8_t MODE_BUTTON_PIN = 2;
+const uint8_t CHANGE_BUTTON_PIN = 3;
 
-// Configuration for AceButton, to support Single-Step
-const uint8_t BUTTON_PIN = 2; // change this to the button pin
-AceButton button;
-
-void handleEvent(AceButton* /* button */, uint8_t eventType,
-    uint8_t /* buttonState */) {
-  switch (eventType) {
-    case AceButton::kEventReleased:
-      if (loopMode == LOOP_MODE_AUTO_RENDER) {
-        loopMode = LOOP_MODE_PAUSE;
-        Serial.println(F("handleEvent(): paused"));
-      } else {
-        Serial.println(F("handleEvent(): stepping"));
-        loopMode = LOOP_MODE_STEP;
-      }
-      break;
-    case AceButton::kEventLongPressed:
-      Serial.println(F("handleEvent(): auto render"));
-      loopMode = LOOP_MODE_AUTO_RENDER;
-      break;
-  }
-}
-
-void setupAceButton() {
-  pinMode(BUTTON_PIN, INPUT_PULLUP);
-  button.setEventHandler(handleEvent);
-  button.init(BUTTON_PIN);
-  ButtonConfig* config = button.getButtonConfig();
-  config->setFeature(ButtonConfig::kFeatureLongPress);
-  config->setFeature(ButtonConfig::kFeatureSuppressAfterLongPress);
-}
+#if defined(EPOXY_DUINO)
+  #define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
+#elif defined(AUNITER_LED_CLOCK_DIRECT)
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
+  #define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT_FAST
+#elif defined(AUNITER_LED_CLOCK_PARTIAL)
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_PARTIAL_SW_SPI
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_PARTIAL_HW_SPI
+  #define LED_MATRIX_MODE LED_MATRIX_MODE_PARTIAL_SW_SPI_FAST
+#elif defined(AUNITER_LED_CLOCK_FULL)
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_FULL_SW_SPI
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_FULL_HW_SPI
+  #define LED_MATRIX_MODE LED_MATRIX_MODE_FULL_SW_SPI_FAST
+#else
+  #error Unknown AUNITER environment
+#endif
 
 //------------------------------------------------------------------
 // Configurations for AceSegment
 //------------------------------------------------------------------
-
-#define BOARD_TYPE_MINI 0
-#define BOARD_TYPE_MICRO 1
-#define BOARD_TYPE BOARD_TYPE_MICRO
-
-#define DRIVER_MODE_NONE 0
-#define DRIVER_MODE_DIRECT_DIGIT 1
-#define DRIVER_MODE_DIRECT_FAST_DIGIT 2
-#define DRIVER_MODE_DIRECT_SEGMENT 3
-#define DRIVER_MODE_SERIAL_DIGIT 4
-#define DRIVER_MODE_SERIAL_FAST_DIGIT 5
-#define DRIVER_MODE_SPI_DIGIT 6
-#define DRIVER_MODE_SPI_FAST_DIGIT 7
-#define DRIVER_MODE_MERGED_SERIAL_DIGIT 8
-#define DRIVER_MODE_MERGED_SPI_DIGIT 9
-
-#define WRITE_MODE_NONE 0
-#define WRITE_MODE_HEX 1
-#define WRITE_MODE_CHAR 2
-#define WRITE_MODE_STRING 3
-#define WRITE_MODE_SCROLL 4
-#define WRITE_MODE_CLOCK 5
 
 // Use polling or interrupt.
 #define USE_INTERRUPT 0
@@ -85,170 +61,147 @@ void setupAceButton() {
 // off will make the display as smooth as the interrupt version.
 #define PRINT_STATS 0
 
-// Define the Driver to use. Use DRIVER_MODE_NONE to get flash/static
-// consumption without any AceSegment code. Then set to the other modes to get
-// flash/static memory usage.
-//#define DRIVER_MODE DRIVER_MODE_MERGED_SPI_DIGIT
-#define DRIVER_MODE DRIVER_MODE_SPI_DIGIT
-
-// Type of characters to write to the LED display
-#define WRITE_MODE WRITE_MODE_CLOCK
-
 // Transistors on the digits or segments which do NOT have the resistors.
-#define USE_TRANSISTORS true
-
 // Common Cathode or Anode
-#define COMMON_CATHODE true
-
 const uint8_t FRAMES_PER_SECOND = 60;
 const uint8_t NUM_SUBFIELDS = 1;
 
-const uint16_t STATS_RESET_INTERVAL = 1200;
-
-const uint8_t BLINK_STYLE = 1;
-const uint8_t PULSE_STYLE = 2;
-
 const uint8_t NUM_DIGITS = 4;
-const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
+const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
 
-const uint8_t NUM_SEGMENTS = 8;
-#if DRIVER_MODE == DRIVER_MODE_DIRECT_DIGIT || \
-    DRIVER_MODE == DRIVER_MODE_DIRECT_SEGMENT || \
-    DRIVER_MODE == DRIVER_MODE_DIRECT_FAST_DIGIT
-  // 4 digits, resistors on segments
-  const uint8_t segmentPins[NUM_SEGMENTS] = {8, 9, 10, 11, 12, 14, 15, 13};
+#if LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT
+  // 4 digits, resistors on segments on Pro Micro.
+  const uint8_t NUM_SEGMENTS = 8;
+  const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
 #else
-  #if BOARD_TYPE == BOARD_TYPE_MINI
-    // 4 digits, resistors on segments, serial-to-parallel converter on segments
-    const uint8_t latchPin = SS; // ST_CP on 74HC595
-    const uint8_t dataPin = MOSI; // DS on 74HC595
-    const uint8_t clockPin = SCK; // SH_CP on 74HC595
-  #elif BOARD_TYPE == BOARD_TYPE_MICRO
-    const uint8_t latchPin = 10; // ST_CP on 74HC595
-    const uint8_t dataPin = MOSI; // DS on 74HC595
-    const uint8_t clockPin = SCK; // SH_CP on 74HC595
-  #else
-    #error Unsupported BOARD_TYPE
-  #endif
+  const uint8_t LATCH_PIN = 10; // ST_CP on 74HC595
+  const uint8_t DATA_PIN = MOSI; // DS on 74HC595
+  const uint8_t CLOCK_PIN = SCK; // SH_CP on 74HC595
 #endif
 
-#if DRIVER_MODE > DRIVER_MODE_NONE
-// Set up the chain of resources and their dependencies.
-DimmablePattern dimmablePatterns[NUM_DIGITS];
-StyledPattern styledPatterns[NUM_DIGITS];
-
 // The chain of resources.
-Hardware* hardware;
-Driver* driver;
-PulseStyler* pulseStyler;
-BlinkStyler* blinkStyler;
-StyleTable* styleTable;
-Renderer* renderer;
-CharWriter* charWriter;
-HexWriter* hexWriter;
-ClockWriter* clockWriter;
-StringWriter* stringWriter;
+Hardware hardware;
+
+#if LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT
+  // Common Anode, with transitions on Group pins
+  using LedMatrix = LedMatrixDirect<Hardware>;
+  LedMatrix ledMatrix(
+      hardware,
+      LedMatrix::kActiveLowPattern /*groupOnPattern*/,
+      LedMatrix::kActiveLowPattern /*elementOnPattern*/,
+      NUM_DIGITS,
+      DIGIT_PINS,
+      NUM_SEGMENTS,
+      SEGMENT_PINS);
+#elif LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT_FAST
+  // Common Anode, with transitions on Group pins
+  using LedMatrix = LedMatrixDirectFast<
+    4, 5, 6, 7,
+    8, 9, 10, 16, 14, 18, 19, 15
+  >;
+  LedMatrix ledMatrix(
+      LedMatrix::kActiveLowPattern /*groupOnPattern*/,
+      LedMatrix::kActiveLowPattern /*elementOnPattern*/);
+#elif LED_MATRIX_MODE == LED_MATRIX_MODE_PARIAL_SW_SPI
+  // Common Cathode, with transistors on Group pins
+  SwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  using LedMatrix = LedMatrixPartialSpi<Hardware, SwSpiAdapter>;
+  LedMatrix ledMatrix(
+      hardware,
+      spiAdapter,
+      LedMatrix::kActiveHighPattern /*groupOnPattern*/,
+      LedMatrix::kActiveHighPattern /*elementOnPattern*/,
+      NUM_DIGITS,
+      DIGIT_PINS):
+#elif LED_MATRIX_MODE == LED_MATRIX_MODE_PARTIAL_SW_SPI_FAST
+  // Common Cathode, with transistors on Group pins
+  using SpiAdapter = SwSpiAdapterFast<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  SpiAdapter spiAdapter;
+  using LedMatrix = LedMatrixPartialSpi<Hardware, SpiAdapter>;
+  LedMatrix ledMatrix(
+      hardware,
+      spiAdapter,
+      LedMatrix::kActiveHighPattern /*groupOnPattern*/,
+      LedMatrix::kActiveHighPattern /*elementOnPattern*/,
+      NUM_DIGITS,
+      DIGIT_PINS);
+#elif LED_MATRIX_MODE == LED_MATRIX_MODE_PARTIAL_HW_SPI
+  // Common Cathode, with transistors on Group pins
+  HwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  using LedMatrix = LedMatrixPartialSpi<Hardware, HwSpiAdapter>;
+  LedMatrix ledMatrix(
+      hardware,
+      spiAdapter,
+      LedMatrix::kActiveHighPattern /*groupOnPattern*/,
+      LedMatrix::kActiveHighPattern /*elementOnPattern*/,
+      NUM_DIGITS,
+      DIGIT_PINS);
+#elif LED_MATRIX_MODE == LED_MATRIX_MODE_FULL_SW_SPI
+  // Common Anode, with transistors on Group pins
+  SwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  using LedMatrix = LedMatrixFullSpi<SwSpiAdapter>;
+  LedMatrix ledMatrix(
+      spiAdapter,
+      LedMatrix::kActiveLowPattern /*groupOnPattern*/,
+      LedMatrix::kActiveLowPattern /*elementOnPattern*/);
+#elif LED_MATRIX_MODE == LED_MATRIX_MODE_FULL_SW_SPI_FAST
+  // Common Anode, with transistors on Group pins
+  using SpiAdapter = SwSpiAdapterFast<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  SpiAdapter spiAdapter;
+  using LedMatrix = LedMatrixFullSpi<SpiAdapter>;
+  LedMatrix ledMatrix(
+      spiAdapter,
+      LedMatrix::kActiveLowPattern /*groupOnPattern*/,
+      LedMatrix::kActiveLowPattern /*elementOnPattern*/);
+#elif LED_MATRIX_MODE == LED_MATRIX_MODE_FULL_HW_SPI
+  // Common Anode, with transistors on Group pins
+  HwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  using LedMatrix = LedMatrixFullSpi<HwSpiAdapter>;
+  LedMatrix ledMatrix(
+      spiAdapter,
+      LedMatrix::kActiveLowPattern /*groupOnPattern*/,
+      LedMatrix::kActiveLowPattern /*elementOnPattern*/);
+#else
+  #error Unsupported LED_MATRIX_MODE
+#endif
+
+SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
+    hardware, ledMatrix, FRAMES_PER_SECOND);
+
+HexWriter hexWriter(segmentDisplay);
+ClockWriter clockWriter(segmentDisplay);
+CharWriter charWriter(segmentDisplay);
+StringWriter stringWriter(charWriter);
 
 #if USE_INTERRUPT == 1
 // interrupt handler for timer 2
 ISR(TIMER2_COMPA_vect) {
-  renderer->renderField();
+  segmentDisplay.renderField();
 }
 #endif
 
-#endif
-
-#if DRIVER_MODE > DRIVER_MODE_NONE
-// Create the resources.
+// Setup the various resources.
 void setupAceSegment() {
-  // Hardware is exposed to the client code because it's shared between Drive
-  // and Renderer.
-  hardware = new Hardware();
-
-  // Create the Driver.
-#if DRIVER_MODE == DRIVER_MODE_DIRECT_DIGIT
-  driver = new SplitDirectDigitDriver(
-      hardware, dimmablePatterns,
-      COMMON_CATHODE, USE_TRANSISTORS,
-      false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
-      NUM_SUBFIELDS, digitPins, segmentPins);
-#elif DRIVER_MODE == DRIVER_MODE_SERIAL_DIGIT
-  driver = new SplitSerialDigitDriver(
-      hardware, dimmablePatterns,
-      COMMON_CATHODE, USE_TRANSISTORS,
-      false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
-      NUM_SUBFIELDS, digitPins, latchPin, dataPin, clockPin);
-#elif DRIVER_MODE == DRIVER_MODE_SPI_DIGIT
-  driver = new SplitSerialDigitDriver(
-      hardware, dimmablePatterns,
-      COMMON_CATHODE, USE_TRANSISTORS,
-      false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
-      NUM_SUBFIELDS, digitPins, latchPin, dataPin, clockPin);
-#elif DRIVER_MODE == DRIVER_MODE_DIRECT_SEGMENT
-  driver = new SplitDirectSegmentDriver(
-      hardware, dimmablePatterns, COMMON_CATHODE,
-      false /* transistorsOnDigits */,
-      USE_TRANSISTORS /* transistorsOnSegments */,
-      NUM_DIGITS, NUM_SEGMENTS, digitPins, segmentPins);
-#elif DRIVER_MODE == DRIVER_MODE_MERGED_SERIAL_DIGIT
-  driver = new MergedSerialDigitDriver(
-      hardware, dimmablePatterns,
-      !COMMON_CATHODE, USE_TRANSISTORS,
-      false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
-      NUM_SUBFIELDS, latchPin, dataPin, clockPin);
-#elif DRIVER_MODE == DRIVER_MODE_MERGED_SPI_DIGIT
-  driver = new MergedSpiDigitDriver(
-      hardware, dimmablePatterns,
-      !COMMON_CATHODE, USE_TRANSISTORS,
-      false /* transistorsOnSegments */, NUM_DIGITS, NUM_SEGMENTS,
-      NUM_SUBFIELDS, latchPin, dataPin, clockPin);
-#else
-  #ifdef __AVR__
-    #if DRIVER_MODE == DRIVER_MODE_DIRECT_FAST_DIGIT
-      driver = new FastDirectDriver(
-          dimmablePatterns, NUM_DIGITS, NUM_SUBFIELDS);
-    #elif DRIVER_MODE == DRIVER_MODE_SERIAL_FAST_DIGIT
-      driver = new FastSerialDriver(
-          dimmablePatterns, NUM_DIGITS, NUM_SUBFIELDS);
-    #elif DRIVER_MODE == DRIVER_MODE_SPI_FAST_DIGIT
-      driver = new FastSpiDriver(
-          dimmablePatterns, NUM_DIGITS, NUM_SUBFIELDS);
-    #endif
-  #else
-    #error Unsupported platform
+  #if LED_MATRIX_MODE == LED_MATRIX_MODE_PARIAL_SW_SPI \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_PARTIAL_HW_SPI \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_PARTIAL_SW_SPI_FAST \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_FULL_SW_SPI \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_FULL_HW_SPI \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_FULL_SW_SPI_FAST
+    spiAdapter.begin();
   #endif
-#endif
 
-  driver->configure();
-
-  // Create the Renderer.
-  pulseStyler = new PulseStyler(FRAMES_PER_SECOND, 2000);
-  blinkStyler = new BlinkStyler(FRAMES_PER_SECOND, 800);
-  styleTable = new StyleTable();
-  styleTable->setStyler(BLINK_STYLE, blinkStyler);
-  styleTable->setStyler(PULSE_STYLE, pulseStyler);
-
-  renderer = new Renderer(hardware, driver, styledPatterns, styleTable,
-      NUM_DIGITS, FRAMES_PER_SECOND, STATS_RESET_INTERVAL);
-  renderer->configure();
-
-#if WRITE_MODE == WRITE_MODE_HEX
-  hexWriter = new HexWriter(renderer);
-#elif WRITE_MODE == WRITE_MODE_CHAR
-  charWriter = new CharWriter(renderer);
-#elif WRITE_MODE == WRITE_MODE_STRING || WRITE_MODE == WRITE_MODE_SCROLL
-  charWriter = new CharWriter(renderer);
-  stringWriter = new StringWriter(charWriter);
-#elif WRITE_MODE == WRITE_MODE_CLOCK
-  clockWriter = new ClockWriter(renderer);
-#endif
+    ledMatrix.begin();
+    segmentDisplay.begin();
 
 #if USE_INTERRUPT == 1
   // set up Timer 2
   uint8_t timerCompareValue =
-      (long) F_CPU / 1024 / renderer->getFieldsPerSecond() - 1;
-  Serial.print(F("Timer 2, Compare A: "));
-  Serial.println(timerCompareValue);
+      (long) F_CPU / 1024 / segmentDisplay.getFieldsPerSecond() - 1;
+  if (ENABLE_SERIAL_DEBUG >= 1) {
+    Serial.print(F("Timer 2, Compare A: "));
+    Serial.println(timerCompareValue);
+  }
 
   noInterrupts();
   TCNT2  = 0;	// Initialize counter value to 0
@@ -261,98 +214,120 @@ void setupAceSegment() {
   interrupts();
 #endif
 }
-#endif
 
 //------------------------------------------------------------------
 // Configurations for AceSegmentDemo
 //------------------------------------------------------------------
 
-void singleStep() {
-  renderer->renderField();
-}
+const uint8_t DEMO_LOOP_MODE_AUTO = 0;
+const uint8_t DEMO_LOOP_MODE_PAUSED = 1;
+uint8_t demoLoopMode = DEMO_LOOP_MODE_AUTO;
 
-#if WRITE_MODE == WRITE_MODE_HEX
+const uint8_t DEMO_MODE_COUNT = 5;
+const uint8_t DEMO_MODE_CLOCK = 0;
+const uint8_t DEMO_MODE_HEX = 1;
+const uint8_t DEMO_MODE_CHAR = 2;
+const uint8_t DEMO_MODE_STRINGS = 3;
+const uint8_t DEMO_MODE_SCROLL = 4;
+
+// Demo mode.
+uint8_t demoMode = DEMO_MODE_HEX;
+
 void writeHexes() {
   static uint8_t c = 0;
 
-  uint8_t buffer[3];
-  buffer[0] = (c & 0xf0) >> 4;
-  buffer[1] = (c & 0x0f);
-  hexWriter->writeHexAt(0, buffer[0], StyledPattern::kStyleNormal);
-  hexWriter->writeHexAt(1, buffer[1], PULSE_STYLE);
-  hexWriter->writeHexAt(2, HexWriter::kMinus, StyledPattern::kStyleNormal);
-  hexWriter->writeHexAt(3, c, BLINK_STYLE);
+  uint8_t hexHigh = (c & 0xf0) >> 4;
+  uint8_t hexLow = (c & 0x0f);
+  hexWriter.writeHexAt(0, hexHigh);
+  hexWriter.writeHexAt(1, hexLow);
+  hexWriter.writeHexAt(2, HexWriter::kMinus);
+  hexWriter.writeHexAt(3, c);
 
-  Util::incrementMod(c, HexWriter::kNumCharacters);
+  if (c < HexWriter::kNumCharacters * 2) {
+    ace_common::incrementMod(c, HexWriter::kNumCharacters);
+  } else {
+    c = 0;
+    ace_common::incrementMod(demoMode, DEMO_MODE_COUNT);
+  }
 }
-#endif
 
-#if WRITE_MODE == WRITE_MODE_CLOCK
 void writeClock() {
   static uint8_t hh = 0;
   static uint8_t mm = 0;
 
-  clockWriter->writeClock(hh, mm);
+  clockWriter.writeClock(hh, mm);
 
-  Util::incrementMod(mm, (uint8_t)100);
+  ace_common::incrementMod(mm, (uint8_t)60);
   if (mm == 0) {
-    Util::incrementMod(hh, (uint8_t)100);
+    ace_common::incrementMod(hh, (uint8_t)60);
   }
 }
-#endif
 
-#if WRITE_MODE == WRITE_MODE_CHAR
 void writeChars() {
   static uint8_t c = 0;
 
-  char buffer[3];
-  buffer[0] = (c & 0xf0) >> 4;
-  buffer[1] = (c & 0x0f);
-  charWriter->writeCharAt(0, buffer[0], StyledPattern::kStyleNormal);
-  charWriter->writeCharAt(1, buffer[1], PULSE_STYLE);
-  charWriter->writeCharAt(2, '-', StyledPattern::kStyleNormal);
-  charWriter->writeCharAt(3, c, BLINK_STYLE);
+  uint8_t hexHigh = (c & 0xf0) >> 4;
+  uint8_t hexLow = (c & 0x0f);
+  hexWriter.writeHexAt(0, hexHigh);
+  hexWriter.writeHexAt(1, hexLow);
+  segmentDisplay.writeDecimalPointAt(1);
+  charWriter.writeCharAt(2, ' ');
+  charWriter.writeCharAt(3, c);
 
-  Util::incrementMod(c, CharWriter::kNumCharacters);
+  ace_common::incrementMod(c, CharWriter::kNumCharacters);
 }
-#endif
 
-#if WRITE_MODE == WRITE_MODE_STRING
 void writeStrings() {
   static const char* STRINGS[] = {
-    /*
     "0123",
     "1.123",
     "2.1 ",
     "3.2.3.4.",
     "4bc.d",
     ".1.2..3",
-    */
     "brian"
   };
-
   static const uint8_t NUM_STRINGS = sizeof(STRINGS) / sizeof(STRINGS[0]);
-
   static uint8_t i = 0;
 
-  stringWriter->writeStringAt(0, STRINGS[i]);
-  Util::incrementMod(i, NUM_STRINGS);
-}
-#endif
+  stringWriter.writeStringAt(0, STRINGS[i]);
 
-#if WRITE_MODE == WRITE_MODE_SCROLL
+  ace_common::incrementMod(i, NUM_STRINGS);
+}
 
 void scrollString(const char* s) {
   static uint8_t i = 0;
 
-  stringWriter->writeStringAt(0, &s[i], true /* padRight */);
-  Util::incrementMod(i, (uint8_t) strlen(s));
+  stringWriter.writeStringAt(0, &s[i], true /* padRight */);
+  ace_common::incrementMod(i, (uint8_t) strlen(s));
 }
 
-#endif
+/** Display the demo pattern selected by demoMode. */
+void displayDemo() {
+  if (demoMode == DEMO_MODE_CLOCK) {
+    writeClock();
+  } else if (demoMode == DEMO_MODE_HEX) {
+    writeHexes();
+  } else if (demoMode == DEMO_MODE_CHAR) {
+    writeChars();
+  } else if (demoMode == DEMO_MODE_STRINGS) {
+    writeStrings();
+  } else if (demoMode == DEMO_MODE_SCROLL) {
+    scrollString("   Angela is the best.");
+  }
+}
 
-void autoRender() {
+/** Go to the next demo */
+void nextDemo() {
+  ace_common::incrementMod(demoMode, DEMO_MODE_COUNT);
+  displayDemo();
+}
+
+/** Loop within a single demo. */
+void demoLoop() {
+  //static uint16_t iter = 0;
   static unsigned long lastUpdateTime = millis();
+
 #if PRINT_STATS == 1
   static unsigned long stopWatchStart = lastUpdateTime;
   static uint32_t loopCount = 0;
@@ -360,67 +335,155 @@ void autoRender() {
 #endif
 
   unsigned long now = millis();
-  if (now - lastUpdateTime > 1000) {
+  if (now - lastUpdateTime > 500) {
     lastUpdateTime = now;
+    if (demoLoopMode == DEMO_LOOP_MODE_AUTO) {
+      displayDemo();
+    }
 
-#if DRIVER_MODE > DRIVER_MODE_NONE
-  #if WRITE_MODE == WRITE_MODE_HEX
-    writeHexes();
-  #elif WRITE_MODE == WRITE_MODE_CHAR
-    writeChars();
-  #elif WRITE_MODE == WRITE_MODE_STRING
-    writeStrings();
-  #elif WRITE_MODE == WRITE_MODE_SCROLL
-    scrollString("   Angela is the best.");
-  #elif WRITE_MODE == WRITE_MODE_CLOCK
-    writeClock();
-  #endif
-#endif
+    /*
+    if (iter++ >= 100) {
+      ace_common::incrementMod(demoMode, DEMO_MODE_COUNT);
+      iter = 0;
+    }
+    */
   }
+}
 
 #if PRINT_STATS == 1
+void printStats() {
   // Print out statistics every N seconds.
   unsigned long elapsedTime = now - stopWatchStart;
   if (elapsedTime >= 2000) {
-  #if DRIVER_MODE > DRIVER_MODE_NONE
-    ace_segment::TimingStats stats = renderer->getTimingStats();
-  #else
-    ace_segment::TimingStats stats;
-  #endif
     uint32_t elapsedCount = stats.getCounter() - lastStatsCounter;
     lastStatsCounter = stats.getCounter();
     uint16_t renderDurationAverage = stats.getAvg();
     uint16_t renderDurationMin = stats.getMin();
     uint16_t renderDurationMax = stats.getMax();
 
-    Serial.print(F("loops: "));
-    Serial.print(loopCount);
-    Serial.print(F("; renders: "));
-    Serial.print(elapsedCount);
-    Serial.print(F("; t: "));
-    Serial.print(elapsedTime / 1000);
-    Serial.print(F("s; fields/s: "));
-    Serial.print((uint32_t) elapsedCount * 1000 / elapsedTime);
-    Serial.print(F("Hz; min: "));
-    Serial.print(renderDurationMin);
-    Serial.print(F("us; avg: "));
-    Serial.print(renderDurationAverage);
-    Serial.print(F("us; max: "));
-    Serial.print(renderDurationMax);
-    Serial.println(F("us"));
+    if (ENABLE_SERIAL_DEBUG >= 1) {
+      Serial.print(F("loops: "));
+      Serial.print(loopCount);
+      Serial.print(F("; renders: "));
+      Serial.print(elapsedCount);
+      Serial.print(F("; t: "));
+      Serial.print(elapsedTime / 1000);
+      Serial.print(F("s; fields/s: "));
+      Serial.print((uint32_t) elapsedCount * 1000 / elapsedTime);
+      Serial.print(F("Hz; min: "));
+      Serial.print(renderDurationMin);
+      Serial.print(F("us; avg: "));
+      Serial.print(renderDurationAverage);
+      Serial.print(F("us; max: "));
+      Serial.print(renderDurationMax);
+      Serial.println(F("us"));
+    }
 
     stopWatchStart = now;
     loopCount = 0;
   } else {
     loopCount++;
   }
+}
 #endif
 
-#if DRIVER_MODE > DRIVER_MODE_NONE
-#if USE_INTERRUPT == 0
-  renderer->renderFieldWhenReady();
-#endif
-#endif
+void singleStep() {
+  segmentDisplay.renderField();
+}
+
+//------------------------------------------------------------------
+// Configurations for AceButton
+//------------------------------------------------------------------
+
+const uint8_t RENDER_MODE_AUTO = 0;
+const uint8_t RENDER_MODE_PAUSED = 1;
+uint8_t renderMode = RENDER_MODE_AUTO;
+
+// Configuration for AceButton, to support Single-Step
+
+AceButton modeButton(MODE_BUTTON_PIN);
+AceButton changeButton(CHANGE_BUTTON_PIN);
+
+void handleEvent(AceButton* button, uint8_t eventType, uint8_t buttonState) {
+  (void) buttonState;
+
+  uint8_t pin = button->getPin();
+  if (pin == MODE_BUTTON_PIN) {
+    switch (eventType) {
+      case AceButton::kEventReleased:
+      case AceButton::kEventClicked:
+        if (demoLoopMode == DEMO_LOOP_MODE_AUTO) {
+          demoLoopMode = DEMO_LOOP_MODE_PAUSED;
+          if (ENABLE_SERIAL_DEBUG >= 1) {
+            Serial.println(F("handleEvent(): demo loop paused"));
+          }
+        } else if (demoLoopMode == DEMO_LOOP_MODE_PAUSED) {
+          if (ENABLE_SERIAL_DEBUG >= 1) {
+            Serial.println(F("handleEvent(): demo stepped"));
+          }
+          displayDemo();
+        }
+        break;
+
+      case AceButton::kEventLongPressed:
+        if (demoLoopMode == DEMO_LOOP_MODE_PAUSED) {
+          if (ENABLE_SERIAL_DEBUG >= 1) {
+            Serial.println(F("handleEvent(): demo loop enabled"));
+          }
+          demoLoopMode = DEMO_LOOP_MODE_AUTO;
+        }
+        break;
+
+      case AceButton::kEventDoubleClicked:
+        if (demoLoopMode == DEMO_LOOP_MODE_AUTO) {
+          if (ENABLE_SERIAL_DEBUG >= 1) {
+            Serial.println(F("handleEvent(): next demo"));
+          }
+          nextDemo();
+        }
+        break;
+    }
+  } else if (pin == CHANGE_BUTTON_PIN) {
+    switch (eventType) {
+      case AceButton::kEventReleased:
+      case AceButton::kEventClicked:
+        if (renderMode == RENDER_MODE_AUTO) {
+          renderMode = RENDER_MODE_PAUSED;
+          if (ENABLE_SERIAL_DEBUG >= 1) {
+            Serial.println(F("handleEvent(): paused"));
+          }
+        } else if (renderMode == RENDER_MODE_PAUSED) {
+          if (ENABLE_SERIAL_DEBUG >= 1) {
+            Serial.println(F("handleEvent(): stepping"));
+          }
+          singleStep();
+        }
+        break;
+
+      case AceButton::kEventLongPressed:
+        if (renderMode == RENDER_MODE_PAUSED) {
+          if (ENABLE_SERIAL_DEBUG >= 1) {
+            Serial.println(F("handleEvent(): switching to auto rendering"));
+          }
+          renderMode = RENDER_MODE_AUTO;
+        }
+        break;
+    }
+  }
+}
+
+void setupAceButton() {
+  pinMode(MODE_BUTTON_PIN, INPUT_PULLUP);
+  pinMode(CHANGE_BUTTON_PIN, INPUT_PULLUP);
+  ButtonConfig* config = ButtonConfig::getSystemButtonConfig();
+  config->setEventHandler(handleEvent);
+  config->setFeature(ButtonConfig::kFeatureLongPress);
+  config->setFeature(ButtonConfig::kFeatureSuppressAfterLongPress);
+  config->setFeature(ButtonConfig::kFeatureClick);
+  config->setFeature(ButtonConfig::kFeatureSuppressAfterClick);
+  config->setFeature(ButtonConfig::kFeatureDoubleClick);
+  config->setFeature(ButtonConfig::kFeatureSuppressAfterDoubleClick);
+  config->setFeature(ButtonConfig::kFeatureSuppressClickBeforeDoubleClick);
 }
 
 //-----------------------------------------------------------------------------
@@ -430,26 +493,33 @@ void setup() {
   delay(1000); // Wait for stability on some boards, otherwise garage on Serial
 #endif
 
-  Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
-  while (!Serial); // Wait until Serial is ready - Leonardo/Micro
-  Serial.println(F("setup(): begin"));
+  if (ENABLE_SERIAL_DEBUG >= 1) {
+    Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
+    while (!Serial); // Wait until Serial is ready - Leonardo/Micro
+    Serial.println(F("setup(): begin"));
+  }
 
   setupAceButton();
-
-#if DRIVER_MODE > DRIVER_MODE_NONE
   setupAceSegment();
-#endif
 
-  Serial.println(F("setup(): end"));
+  if (ENABLE_SERIAL_DEBUG >= 1) {
+    Serial.println(F("setup(): end"));
+  }
+
+  displayDemo();
 }
 
 void loop() {
-  if (loopMode == LOOP_MODE_STEP) {
-    singleStep();
-    loopMode = LOOP_MODE_PAUSE;
-  } else if (loopMode == LOOP_MODE_AUTO_RENDER) {
-    autoRender();
+  if (renderMode == RENDER_MODE_AUTO) {
+    #if USE_INTERRUPT == 0
+      segmentDisplay.renderFieldWhenReady();
+    #endif
   }
 
-  button.check();
+  if (demoLoopMode == DEMO_LOOP_MODE_AUTO) {
+    demoLoop();
+  }
+
+  modeButton.check();
+  changeButton.check();
 }
