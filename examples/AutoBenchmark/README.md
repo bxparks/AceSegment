@@ -13,6 +13,10 @@ configurations of the `LedMatrix` class:
 * `full_hw_spi`: group pins and segment pins connected to 74HC595 accessed
   through hardware SPI (`HwSpiAdapter`)
 
+It measures the time taken by `SegmentDisplay::displayCurrentField()` which
+renders a single digit (multiple fields make up a frame, a frame is the
+rendering of all digits on the display module).
+
 **Version**: AceSegment v0.4
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
