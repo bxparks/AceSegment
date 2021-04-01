@@ -59,7 +59,11 @@ const uint8_t NUM_SUBFIELDS = 1;
 const uint8_t NUM_DIGITS = 4;
 const uint8_t NUM_SEGMENTS = 8;
 
-#if defined(ARDUINO_ARCH_AVR)
+#if defined(EPOXY_DUINO)
+  // numbers don't matter
+  const uint8_t DIGIT_PINS[NUM_DIGITS] = {1, 2, 3, 4};
+  const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {5, 6, 7, 8, 9, 10, 11, 12};
+#elif defined(ARDUINO_ARCH_AVR)
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
   const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
 #elif defined(ARDUINO_ARCH_SAMD)
@@ -81,9 +85,9 @@ const uint8_t NUM_SEGMENTS = 8;
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {2, 3, 4, 5};
   const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {6, 7, 8, 9, 10, 11, 12, 13};
 #else
-  #warning Unknown hardware, using some defaults
+  #warning Unknown hardware, using defaults which may interfere with Serial
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {2, 3, 4, 5};
-  const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {2, 3, 4, 5, 6, 7, 8, 9};
+  const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {6, 7, 8, 9, 10, 11, 12, 13};
 #endif
 
 const uint8_t LATCH_PIN = 10; // ST_CP on 74HC595
