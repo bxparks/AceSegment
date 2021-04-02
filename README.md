@@ -5,9 +5,9 @@
 An adjustable, configurable, and extensible framework for rendering seven
 segment LED displays on Arduino platforms. Supported wiring confirguations
 include direct pin wiring to the microcontroller, or through a 74HC595
-serial-to-parallel converter access through software or hardware SPI.
+Shift Register that is accessed through software or hardware SPI.
 
-**Version**: 0.3.0+ (2021-03-29)
+**Version**: 0.4 (2021-03-29)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
@@ -38,6 +38,7 @@ serial-to-parallel converter access through software or hardware SPI.
         * [Rendering by Polling](#RenderingByPolling)
         * [Rendering using Interrupts](#RenderingUsingInterrupts)
     * [HexWriter](#HexWriter)
+    * [ClockWriter](#ClockWriter)
     * [CharWriter](#CharWriter)
     * [StringWriter](#StringWriter)
 * [Resource Consumption](#ResourceConsumption)
@@ -57,18 +58,19 @@ instead of through a specialized LED display driver chip, like
 the [MAX7219](https://www.maximintegrated.com/en/datasheet/index.mvp/id/1339)
 or the
 [MC14489B](http://cache.freescale.com/files/timing_interconnect_access/doc/inactive/MC14489B.pdf).
-The framework does support the 74HC595 serial-to-parallel chip which is a
+The framework does support the 74HC595 Shift Register chip which is a
 general purpose chip that helps reduce the GPIO pin usage.
 
 Here are the features supported by this framework:
+
 * multiplexing of segments at a selectable frame rate
 * common cathode or common anode configurations
 * resistors on segments or resistors on digits
 * LED display directly connected to the GPIO pins
-* LED display connected through a serial-to-parallel chip (74HC595)
+* LED display connected through a 74HC595 shift register chip
 * communication with the 74HC595 through
-    * `shiftOut()`
-    * hardware SPI
+    * software SPI (using `shiftOut()`)
+    * hardware SPI (using `<SPI.h>`)
 * transistors drivers to handle high currents
 
 The framework splits the responsibility of displaying LED digits into several
@@ -142,7 +144,7 @@ The following example sketches are provided:
   a program that performs CPU benchmarking of almost all of the various
   supported configurations of the framework
 
-<a name="LED Wiring"></a>
+<a name="LEDWiring"></a>
 ## LED Wiring
 
 AceSegment library supports the following wiring configurations:
@@ -211,11 +213,10 @@ depend on the lower-level classes:
       are access through an 74HC595 chip through SPI using the `SpiAdapter`.
     * `LedMatrixDualShiftRegister`: Both group and element pions are access
       through two 74HC595 chips through SPI using the `SpiAdapter` class.
-* `Renderer`: A class that knows how to display bit patterns of an array of
-  digits to the LEDs using the `LedMatrix` class.
-* `SegmentDisplay`: A class that stores bit patterns to a buffer, and
-  knows how and when to call the `Renderer` to render the frames and possible
-  fields of the frame.
+* `SegmentDisplay`
+    * A class that stores segment patterns to an internal buffer.
+    * Knows how and when to render the frames.
+    * Calls `LedMatrix` classes to send the patterns to the actual LED segments.
 * `HexWriter`: A class that converts hexadecimal numerals (0-F) to bit patterns
   to be printed by the `SegmentDisplay` class.
     * A few additional characters are supported: `kSpace`, `kMinus`, `kPeriod`
@@ -232,6 +233,42 @@ depend on the lower-level classes:
     * It tries to be smart about collapsing decimal point `.` characters into
       the native decimal point on a seven segment LED display.
 
+The dependency diagram looks something like this:
+
+```
+StringWriter
+     |
+     V
+ CharWriter ClockWriter  HexWriter
+           \     |     /
+            v    v    v
+             LedDisplay
+                 ^
+                 |
+                 +------+
+                        |
+                  SegmentDiplay
+                 /      |      \
+                /       |       `------------.
+               v        v                     v
+  LedMatrixDirect  LedMatrixSingleS.R.  LedMatrixDualS.R.
+              |         |      |      \ /     |
+               \        |      |       X      |
+                \       |      |      / \     |
+                 \      |      v     v   v    v
+                  \     | SwSpiAdapter  HwSpiAdapter
+                   \    |    /
+                    \   |   /
+                     v  v  v
+                    Hardware
+                        |
+                        v
+                  digitalWrite()
+                  shiftOut()
+                  millis()
+                  micros()
+```
+
 <a name="SettingResources"></a>
 ### Setting Up the Resources
 
@@ -240,16 +277,16 @@ A series of resources must be built up to finally create an instance of
 objects in the later stages depending on the objects created in the earlier
 stage:
 
-1. Segment pattern buffer array of type `uint8_t patterns[NUM_DIGITS]`.
 1. The `Hardware` object which provides access to the various pins.
-1. The `SpiAdapter` object which determines whether or not to use SPI. Needed
-   only by `LedMatrixSingleShiftRegister` and `LedMatrixDualShiftRegister`
-   classes.
-1. The `LedMatrix` object wrapswhich determine how the LEDs are wired.
-1. The `Renderer` object which wraps the `LedMatrix` object.
-1. The `SegmentDisplay` object wraps the `Renderer` object.
+1. The `SpiAdapter` object which determines to use software SPI or hardware
+   SPI. Needed only by `LedMatrixSingleShiftRegister` and
+   `LedMatrixDualShiftRegister` classes.
+1. The `LedMatrix` object determine how the LEDs are wired and how to
+   communicate to the LED segments.
+1. The `SegmentDisplay` object wraps a segment pattern buffer
+   and an LedMatrix object.
 1. The various `XxxWriter` classes which translate higher level characters and
-   strings into bit patterns used by `Renderer`.
+   strings into bit patterns used by `LedDisplay`.
 
 A typical resource creation code looks like this:
 
@@ -261,35 +298,26 @@ const uint8_t SEGMENT_PINS[8] = {8, 9, 10, 11, 12, 13, 14, 15};
 
 // The chain of resources.
 Hardware hardware;
-LedMatrixDirect ledMatrix(
-    &hardware,
+using LedMatrix = LedMatrixDirect<Hardware>;
+LedMatrix ledMatrix(
+    hardware,
     LedMatrix::kActiveLowPattern /*groupOnPattern*/,
     LedMatrix::kActiveLowPattern /*elementOnPattern*/,
     NUM_DIGITS,
     DIGIT_PINS,
     NUM_SEGMENTS,
     SEGMENT_PINS);
+SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
+    hardware, ledMatrix, FRAMES_PER_SECOND);
 
-uint8_t patterns[NUM_DIGITS];
-Renderer renderer(&ledMatrix, NUM_DIGITS, patterns);
-
-SegmentDisplay segmentDisplay(
-    &hardware,
-    &renderer,
-    FRAMES_PER_SECOND,
-    NUM_DIGITS,
-    patterns);
-
-HexWriter hexWriter(&segmentDisplay);
-ClockWriter clockWriter(&segmentDisplay);
-CharWriter charWriter(&segmentDisplay);
-StringWriter stringWriter(&charWriter);
+HexWriter hexWriter(segmentDisplay);
+ClockWriter clockWriter(segmentDisplay);
+CharWriter charWriter(segmentDisplay);
+StringWriter stringWriter(charWriter);
 ...
 
 void setupAceSegment() {
-  spiAdapter.spiBegin();
   ledMatrix.begin();
-  renderer.begin();
   segmentDisplay.begin();
 }
 
@@ -304,7 +332,6 @@ void setup() {
 
   Serial.println(F("setup(): end"));
 }
-
 ```
 
 <a name="ChoosingLedMatrix"></a>
@@ -341,7 +368,7 @@ segement. In contrast, if the D12 pin was connected directly to the LED, the
 digit pin would need to be set LOW to turn on the LED.
 
 ```
-MCU                     LED display
+MCU                      LED display (Common Cathode)
 +-----+                  +------------------------+
 |  D08|------ R ---------|a -------.              |
 |  D09|------ R ---------|b -------|--------.     |
@@ -376,7 +403,7 @@ pin directly to the microcontroller.
 
 The wiring for this configuration looks like this:
 ```
-MCU                     LED display
+MCU                      LED display (Common Cathode)
 +-----+                  +------------------------+
 |  D08|------ R ---------|a -------.              |
 |  D09|------ R ---------|b -------|--------.     |
@@ -426,7 +453,7 @@ void setupSegmentDisplay() {
 
 The wiring for this configuration looks like this:
 ```
-MCU                    LED display
+MCU                      LED display (Common Anode)
 +-----+                  +------------------------+
 |  D08|------ R ---------|a -------.              |
 |  D09|------ R ---------|b -------|--------.     |
@@ -451,16 +478,16 @@ case above, except that `kActiveHighPattern` is replaced with
 <a name="LedMatrixSingleShiftRegister"></a>
 #### Segments on 74HC595 Shift Register
 
-The segment pins can be placed on a 74HC595 serial-to-parallel converter
-chip that can be accessed through SPI. The caveat is that this chip can supply
-only 6 mA per pin (as opposed to 40 mA for an Arduino Nano for example). But it
-may be enough in some applications.
+The segment pins can be placed on a 74HC595 shift register chip that can be
+accessed through SPI. The caveat is that this chip can supply only 6 mA per pin
+(as opposed to 40 mA for an Arduino Nano for example). But it may be enough in
+some applications.
 
 We assume here that the registors are on the segment pins, and that we are using
 a common cathode LED display.
 
 ```
-MCU       74HC595             LED display
+MCU       74HC595             LED display (Common Cathode)
 +-----+   +---------+         +------------------------+
 |     |   |       Q0|--- R ---|a -------.              |
 |     |   |       Q1|--- R ---|b -------|--------.     |
@@ -520,7 +547,7 @@ In this wiring, both the segment pins and the digit pins are wired to
 two 74HC595 chips so that both sets of pins are set through SPI.
 
 ```
-MCU          74HC595             LED display
+MCU                 74HC595             LED display (Common Cathode)
 +--------+          +---------+         +------------------------+
 |        |          |       Q0|--- R ---|a -------.              |
 |        |          |       Q1|--- R ---|b -------|--------.     |
@@ -542,7 +569,7 @@ MCU          74HC595             LED display
 |        |          |       Q5|         |                        |
 |        |          |       Q6|         |                        |
 +--------+          |       Q7|         +------------------------+
-                    +---------+         
+                    +---------+
                     74HC595
 ```
 
@@ -612,8 +639,8 @@ initially. The `state` variable controls whether the decimal point should
 be turned on (default) or off (false).
 
 The `brightness` is an integer constant (0-255) associated with the digit. It
-requires the `SegmentDisplay` object to be configured to support PWM on the digit
-pins. Otherwise, the brightness is ignored.
+requires the `SegmentDisplay` object to be configured to support PWM on the
+digit pins. Otherwise, the brightness is ignored.
 
 <a name="GlobalBrightness"></a>
 #### Global Brightness
@@ -660,16 +687,17 @@ within a field, giving a total *field* rate of about 2000-4000Hz. That's abaout
 250-500 microseconds per field, which is surprisingly doable using an 8-bit
 processor like an Arduino UNO or Nano on an ATmega328 running at 16MHz.
 
-The `SegmentDisplay` and its subclasses do not know about *frames*, they only know
-about *fields*. The `SegmentDisplay` on the other hand, cares only about frames
-and does not know much of anything about fields. The only thing that the
+The `SegmentDisplay` and its subclasses do not know about *frames*, they only
+know about *fields*. The `SegmentDisplay` on the other hand, cares only about
+frames and does not know much of anything about fields. The only thing that the
 `SegmentDisplay` knows is how many fields there are in a frame and this
 information comes from the `SegmentDisplay::getFieldsPerFrame()` method.
 
 With the distinction between *frames* and *fields* explained, we can now explain
-how `SegmentDisplay::renderField()` works. The `SegmentDisplay` keeps an internal counter,
-and if the call occurs at a frame boundary, the `SegmentDisplay` calls to the
-`SegmentDisplay` which will draw the resulting bit pattern on the LED display.
+how `SegmentDisplay::renderField()` works. The `SegmentDisplay` keeps an
+internal counter, and if the call occurs at a frame boundary, the
+`SegmentDisplay` calls to the `SegmentDisplay` which will draw the resulting bit
+pattern on the LED display.
 
 The call to `SegmentDisplay::renderField()` simply passed along the call to
 `SegmentDisplay::displayCurrentField()`.
@@ -682,11 +710,12 @@ There are 2 methods to achieve this:
 <a name="RenderingByPolling"></a>
 #### Rendering By Polling
 
-For convenience, we provided one method, `SegmentDisplay::renderFieldWhenReady()` that
-actually knows the real clock, and can be polled repeated to generated the calls
-to `renderField()` at the right time. This is the easiest way to see something
-on the LED segments and will work at the early stages of a project. But any
-non-trivial project will want to use the interrupt method (explained below).
+For convenience, we provided one method,
+`SegmentDisplay::renderFieldWhenReady()` that actually knows the real clock, and
+can be polled repeated to generated the calls to `renderField()` at the right
+time. This is the easiest way to see something on the LED segments and will work
+at the early stages of a project. But any non-trivial project will want to use
+the interrupt method (explained below).
 
 The code looks like this:
 
