@@ -18,12 +18,12 @@ using namespace ace_button;
 
 #define LED_MATRIX_MODE_DIRECT 1
 #define LED_MATRIX_MODE_PARIAL_SW_SPI 2
-#define LED_MATRIX_MODE_PARTIAL_HW_SPI 3
-#define LED_MATRIX_MODE_FULL_SW_SPI 4
-#define LED_MATRIX_MODE_FULL_HW_SPI 5
+#define LED_MATRIX_MODE_SINGLE_HW_SPI 3
+#define LED_MATRIX_MODE_DUAL_SW_SPI 4
+#define LED_MATRIX_MODE_DUAL_HW_SPI 5
 #define LED_MATRIX_MODE_DIRECT_FAST 6
-#define LED_MATRIX_MODE_PARTIAL_SW_SPI_FAST 7
-#define LED_MATRIX_MODE_FULL_SW_SPI_FAST 8
+#define LED_MATRIX_MODE_SINGLE_SW_SPI_FAST 7
+#define LED_MATRIX_MODE_DUAL_SW_SPI_FAST 8
 
 // LedClock buttons can be configured to use either pins (2, 3) or (8, 9)
 // through DIP switches. On the Pro Micro, (2, 3) are used for I2C. The LED
@@ -37,14 +37,14 @@ const uint8_t CHANGE_BUTTON_PIN = 3;
 #elif defined(AUNITER_LED_CLOCK_DIRECT)
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT_FAST
-#elif defined(AUNITER_LED_CLOCK_PARTIAL)
-  //#define LED_MATRIX_MODE LED_MATRIX_MODE_PARTIAL_SW_SPI
-  //#define LED_MATRIX_MODE LED_MATRIX_MODE_PARTIAL_HW_SPI
-  #define LED_MATRIX_MODE LED_MATRIX_MODE_PARTIAL_SW_SPI_FAST
-#elif defined(AUNITER_LED_CLOCK_FULL)
-  //#define LED_MATRIX_MODE LED_MATRIX_MODE_FULL_SW_SPI
-  //#define LED_MATRIX_MODE LED_MATRIX_MODE_FULL_HW_SPI
-  #define LED_MATRIX_MODE LED_MATRIX_MODE_FULL_SW_SPI_FAST
+#elif defined(AUNITER_LED_CLOCK_SINGLE)
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_SW_SPI
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_HW_SPI
+  #define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_SW_SPI_FAST
+#elif defined(AUNITER_LED_CLOCK_DUAL)
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SW_SPI
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HW_SPI
+  #define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SW_SPI_FAST
 #else
   #error Unknown AUNITER environment
 #endif
@@ -105,7 +105,7 @@ Hardware hardware;
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_PARIAL_SW_SPI
   // Common Cathode, with transistors on Group pins
   SwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  using LedMatrix = LedMatrixPartialSpi<Hardware, SwSpiAdapter>;
+  using LedMatrix = LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>;
   LedMatrix ledMatrix(
       hardware,
       spiAdapter,
@@ -113,11 +113,11 @@ Hardware hardware;
       LedMatrix::kActiveHighPattern /*elementOnPattern*/,
       NUM_DIGITS,
       DIGIT_PINS):
-#elif LED_MATRIX_MODE == LED_MATRIX_MODE_PARTIAL_SW_SPI_FAST
+#elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SW_SPI_FAST
   // Common Cathode, with transistors on Group pins
   using SpiAdapter = SwSpiAdapterFast<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiAdapter spiAdapter;
-  using LedMatrix = LedMatrixPartialSpi<Hardware, SpiAdapter>;
+  using LedMatrix = LedMatrixSingleShiftRegister<Hardware, SpiAdapter>;
   LedMatrix ledMatrix(
       hardware,
       spiAdapter,
@@ -125,10 +125,10 @@ Hardware hardware;
       LedMatrix::kActiveHighPattern /*elementOnPattern*/,
       NUM_DIGITS,
       DIGIT_PINS);
-#elif LED_MATRIX_MODE == LED_MATRIX_MODE_PARTIAL_HW_SPI
+#elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HW_SPI
   // Common Cathode, with transistors on Group pins
   HwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  using LedMatrix = LedMatrixPartialSpi<Hardware, HwSpiAdapter>;
+  using LedMatrix = LedMatrixSingleShiftRegister<Hardware, HwSpiAdapter>;
   LedMatrix ledMatrix(
       hardware,
       spiAdapter,
@@ -136,27 +136,27 @@ Hardware hardware;
       LedMatrix::kActiveHighPattern /*elementOnPattern*/,
       NUM_DIGITS,
       DIGIT_PINS);
-#elif LED_MATRIX_MODE == LED_MATRIX_MODE_FULL_SW_SPI
+#elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SW_SPI
   // Common Anode, with transistors on Group pins
   SwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  using LedMatrix = LedMatrixFullSpi<SwSpiAdapter>;
+  using LedMatrix = LedMatrixDualShiftRegister<SwSpiAdapter>;
   LedMatrix ledMatrix(
       spiAdapter,
       LedMatrix::kActiveLowPattern /*groupOnPattern*/,
       LedMatrix::kActiveLowPattern /*elementOnPattern*/);
-#elif LED_MATRIX_MODE == LED_MATRIX_MODE_FULL_SW_SPI_FAST
+#elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SW_SPI_FAST
   // Common Anode, with transistors on Group pins
   using SpiAdapter = SwSpiAdapterFast<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiAdapter spiAdapter;
-  using LedMatrix = LedMatrixFullSpi<SpiAdapter>;
+  using LedMatrix = LedMatrixDualShiftRegister<SpiAdapter>;
   LedMatrix ledMatrix(
       spiAdapter,
       LedMatrix::kActiveLowPattern /*groupOnPattern*/,
       LedMatrix::kActiveLowPattern /*elementOnPattern*/);
-#elif LED_MATRIX_MODE == LED_MATRIX_MODE_FULL_HW_SPI
+#elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HW_SPI
   // Common Anode, with transistors on Group pins
   HwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  using LedMatrix = LedMatrixFullSpi<HwSpiAdapter>;
+  using LedMatrix = LedMatrixDualShiftRegister<HwSpiAdapter>;
   LedMatrix ledMatrix(
       spiAdapter,
       LedMatrix::kActiveLowPattern /*groupOnPattern*/,
@@ -183,11 +183,11 @@ ISR(TIMER2_COMPA_vect) {
 // Setup the various resources.
 void setupAceSegment() {
   #if LED_MATRIX_MODE == LED_MATRIX_MODE_PARIAL_SW_SPI \
-      || LED_MATRIX_MODE == LED_MATRIX_MODE_PARTIAL_HW_SPI \
-      || LED_MATRIX_MODE == LED_MATRIX_MODE_PARTIAL_SW_SPI_FAST \
-      || LED_MATRIX_MODE == LED_MATRIX_MODE_FULL_SW_SPI \
-      || LED_MATRIX_MODE == LED_MATRIX_MODE_FULL_HW_SPI \
-      || LED_MATRIX_MODE == LED_MATRIX_MODE_FULL_SW_SPI_FAST
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HW_SPI \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SW_SPI_FAST \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SW_SPI \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HW_SPI \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SW_SPI_FAST
     spiAdapter.begin();
   #endif
 

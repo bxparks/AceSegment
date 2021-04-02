@@ -27,11 +27,10 @@ serial-to-parallel converter access through software or hardware SPI.
     * [Setting Up the Resources](#SettingResources)
     * [Choosing the LedMatrix](#ChoosingLedMatrix)
         * [Resistors and Transistors](#ResistorsAndTransistors)
-        * [Pins Wired Directly](#LedMatrixDirectCommonCathode)
-        * [Pins Wired Directly 2](#LedMatrixDirectCommonAnode)
-        * [Segments On SPI](#LedMatrixPartialSpi)
-        * [Digits and Segments On SPI](#LedMatrixFullSpi)
-    * [Configuring the SegmentDisplay](#ConfiguringSegmentDisplay)
+        * [Pins Wired Directly, Common Cathode](#LedMatrixDirectCommonCathode)
+        * [Pins Wired Directly, Common Anode](#LedMatrixDirectCommonAnode)
+        * [Segments On 74HC595 Shift Register](#LedMatrixSingleShiftRegister)
+        * [Digits and Segments On Two Shift Registers](#LedMatrixDualShiftRegister)
     * [Using the SegmentDisplay](#UsingSegmentDisplay)
         * [Writing the Digit Bit Patterns](#DigitBitPatterns)
         * [Global Brightness](#GlobalBrightness)
@@ -207,10 +206,11 @@ depend on the lower-level classes:
 * `LedMatrix`: Various subclasses capture the wiring of the matrix of LEDs.
     * `LedMatrixDirect`: Group pins and element pins are directly accessed
       through the microcontroller pins.
-    * `LedMatrixPartialSpi`: Group pins are access directly, but element pins
+    * `LedMatrixSingleShiftRegister`: Group pins are access directly, but
+      element pins
       are access through an 74HC595 chip through SPI using the `SpiAdapter`.
-    * `LedMatrixFullSpi`: Both group and element pions are access through
-      two 74HC595 chips through SPI using the `SpiAdapter` class.
+    * `LedMatrixDualShiftRegister`: Both group and element pions are access
+      through two 74HC595 chips through SPI using the `SpiAdapter` class.
 * `Renderer`: A class that knows how to display bit patterns of an array of
   digits to the LEDs using the `LedMatrix` class.
 * `SegmentDisplay`: A class that stores bit patterns to a buffer, and
@@ -243,7 +243,8 @@ stage:
 1. Segment pattern buffer array of type `uint8_t patterns[NUM_DIGITS]`.
 1. The `Hardware` object which provides access to the various pins.
 1. The `SpiAdapter` object which determines whether or not to use SPI. Needed
-   only by `LedMatrixPartialSpi` and `LedMatrixFullSpi` classes.
+   only by `LedMatrixSingleShiftRegister` and `LedMatrixDualShiftRegister`
+   classes.
 1. The `LedMatrix` object wrapswhich determine how the LEDs are wired.
 1. The `Renderer` object which wraps the `LedMatrix` object.
 1. The `SegmentDisplay` object wraps the `Renderer` object.
@@ -370,10 +371,8 @@ above, then a PNP transistor would be used, with the emitter tied to Vcc. Again,
 the logic level on the D12 pin will become inverted compared to wiring the digit
 pin directly to the microcontroller.
 
-<a name="LedMatrixDirect"></a>
-#### Pins Wired Directly
-
-Resistors on Segments, Common Cathode
+<a name="LedMatrixDirectCommonCathode"></a>
+#### Pins Wired Directly, Common Cathode
 
 The wiring for this configuration looks like this:
 ```
@@ -401,24 +400,29 @@ The `LedMatrixDirect` constructor is:
 const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
 const uint8_t SEGMENT_PINS[8] = {8, 9, 10, 11, 12, 13, 14, 15};
 
-LedMatrixDirect ledMatrix(
-    &hardware,
+Hardware hardware;
+using LedMatrix = LedMatrixDirect<Hardware>;
+LedMatrix ledMatrix(
+    hardware,
     LedMatrix::kActiveHighPattern /*groupOnPattern*/,
     LedMatrix::kActiveHighPattern /*elementOnPattern*/,
     NUM_DIGITS,
     DIGIT_PINS,
     NUM_SEGMENTS,
     SEGMENT_PINS);
+SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
+    hardware, ledMatrix, FRAMES_PER_SECOND);
 
 ...
 
-ledMatrix.begin();
+void setupSegmentDisplay() {
+  ledMatrix.begin();
+  segmentDisplay.begin();
+}
 ```
 
-<a name="LedMatrixCommonAnode"></a>
-#### Pins Wired Directly 2
-
-Resistors on Segments, Common Anode
+<a name="LedMatrixDirectCommonAnode"></a>
+#### Pins Wired Directly, Common Anode
 
 The wiring for this configuration looks like this:
 ```
@@ -440,28 +444,12 @@ MCU                    LED display
 +-----+                  +------------------------+
 ```
 
-The `LedMatrixDirect` configuration is:
-```
-const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
-const uint8_t SEGMENT_PINS[8] = {8, 9, 10, 11, 12, 13, 14, 15};
+The `LedMatrixDirect` configuration is *exactly* the same as the Common Cathode
+case above, except that `kActiveHighPattern` is replaced with
+`kActiveLowPattern`.
 
-Hardware hardware;
-LedMatrixDirect ledMatrix(
-    &hardware,
-    LedMatrix::kActiveLowPattern /*groupOnPattern*/,
-    LedMatrix::kActiveLowPattern /*elementOnPattern*/,
-    NUM_DIGITS,
-    DIGIT_PINS,
-    NUM_SEGMENTS,
-    SEGMENT_PINS);
-
-...
-
-ledMatrix.begin();
-```
-
-<a name="LedMatrixPartialSpi"></a>
-#### Segments on SPI
+<a name="LedMatrixSingleShiftRegister"></a>
+#### Segments on 74HC595 Shift Register
 
 The segment pins can be placed on a 74HC595 serial-to-parallel converter
 chip that can be accessed through SPI. The caveat is that this chip can supply
@@ -491,7 +479,7 @@ MCU       74HC595             LED display
 +-----+                       +------------------------+
 ```
 
-The `LedMatrixPartial` configuration using software SPI is:
+The `LedMatrixSingleShiftRegister` configuration using software SPI is:
 
 ```C++
 const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
@@ -502,48 +490,31 @@ const uint8_t CLOCK_PIN = 13; // SH_CP on 74HC595
 // Common Cathode, with transistors on Group pins
 Hardware hardware;
 SwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-LedMatrixPartialSpi ledMatrix(
-    &hardware,
-    &spiAdapter,
+using LedMatrix = LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>;
+LedMatrix ledMatrix(
+    hardware,
+    spiAdapter,
     LedMatrix::kActiveHighPattern /*groupOnPattern*/,
     LedMatrix::kActiveHighPattern /*elementOnPattern*/,
     NUM_DIGITS,
     DIGIT_PINS):
+SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
+    hardware, ledMatrix, FRAMES_PER_SECOND);
 
 ...
 
-spiAdapter.begin();
-ledMatrix.begin();
+void setupSegmentDisplay() {
+  spiAdapter.begin();
+  ledMatrix.begin();
+  segmentDisplay.begin();
+}
 ```
 
-The `LedMatrixPartial` configuration using hardware SPI is exactly the
-same as above but with `HwSpiAdapter` replacing `SwSpiAdapter`:
+The `LedMatrixSingleShiftRegister` configuration using hardware SPI is *exactly*
+the same as above but with `HwSpiAdapter` replacing `SwSpiAdapter`.
 
-```C++
-const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
-const uint8_t LATCH_PIN = 10; // ST_CP on 74HC595
-const uint8_t DATA_PIN = 11; // DS on 74HC595
-const uint8_t CLOCK_PIN = 13; // SH_CP on 74HC595
-
-// Common Cathode, with transistors on Group pins
-Hardware hardware;
-HwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-LedMatrixPartialSpi ledMatrix(
-    &hardware,
-    &spiAdapter,
-    LedMatrix::kActiveHighPattern /*groupOnPattern*/,
-    LedMatrix::kActiveHighPattern /*elementOnPattern*/,
-    NUM_DIGITS,
-    DIGIT_PINS):
-
-...
-
-spiAdapter.begin();
-ledMatrix.begin();
-```
-
-<a name="LedMatrixFullSpi"></a>
-#### Digits and Segments on SPI
+<a name="LedMatrixDualShiftRegister"></a>
+#### Digits and Segments on Two Shift Registers
 
 In this wiring, both the segment pins and the digit pins are wired to
 two 74HC595 chips so that both sets of pins are set through SPI.
@@ -575,7 +546,8 @@ MCU          74HC595             LED display
                     74HC595
 ```
 
-The `LedMatrixFullSpi` configuration is the following:
+The `LedMatrixDualShiftRegister` configuration is the following. Let's use
+`HwSpiAdapter` this time:
 
 ```C++
 const uint8_t LATCH_PIN = 10; // ST_CP on 74HC595
@@ -583,55 +555,24 @@ const uint8_t DATA_PIN = 11; // DS on 74HC595
 const uint8_t CLOCK_PIN = 13; // SH_CP on 74HC595
 
 HwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-LedMatrixFullSpi ledMatrix(
-    &spiAdapter,
+using LedMatrix = LedMatrixSingleShiftRegister<Hardware, HwSpiAdapter>;
+LedMatrix ledMatrix(
+    spiAdapter,
     LedMatrix::kActiveHighPattern /*groupOnPattern*/,
     LedMatrix::kActiveHighPattern /*elementOnPattern*/);
-
+SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
+    hardware, ledMatrix, FRAMES_PER_SECOND);
 ...
 
-spiAdapter.begin();
-ledMatrix.begin();
-```
-
-<a name="ConfiguringRenderer"></a>
-### Configuring the Renderer
-
-The `Renderer` is dependent on the following resources:
-* `Hardware`
-* `LedMatrix`
-*  pattern buffer: `uint8_t patterns[NUM_DIGITS]`:
-
-```C++
-uint8_t patterns[8];
-Renderer renderer(&ledMatrix, NUM_DIGITS, patterns);
+void setupSegmentDisplay() {
+  spiAdapter.begin();
+  ledMatrix.begin();
+  segmentDisplay.begin();
+}
 
 ...
 
 renderer.begin();
-```
-
-<a name="ConfiguringSegmentDisplay"></a>
-### Configuring the SegmentDisplay
-
-The `SegmentDisplay` depends on the following:
-* `Hardware
-* `Renderer`
-*  pattern buffer: `uint8_t patterns[NUM_DIGITS]`:
-
-```C++
-const uint8_t NUM_DIGITS = 4;
-const uint16_t FRAMES_PER_SECOND = 60;
-SegmentDisplay segmentDisplay(
-    &hardware,
-    &renderer,
-    FRAMES_PER_SECOND,
-    NUM_DIGITS,
-    patterns);
-
-...
-
-segmentDisplay.begin();
 ```
 
 <a name="UsingSegmentDisplay"></a>
@@ -640,7 +581,7 @@ segmentDisplay.begin();
 <a name="DigitBitPatterns"></a>
 #### Writing Digit Bit Patterns
 
-The `Renderer` contains a number of methods to write the bit patterns of
+The `SegmentDisplay` contains a number of methods to write the bit patterns of
 the seven segment display:
 * `void writePatternAt(uint8_t digit, uint8_t pattern)`
 * `void writeDecimalPointAt(uint8_t digit, bool state = true)`
@@ -671,13 +612,13 @@ initially. The `state` variable controls whether the decimal point should
 be turned on (default) or off (false).
 
 The `brightness` is an integer constant (0-255) associated with the digit. It
-requires the `Renderer` object to be configured to support PWM on the digit
+requires the `SegmentDisplay` object to be configured to support PWM on the digit
 pins. Otherwise, the brightness is ignored.
 
 <a name="GlobalBrightness"></a>
 #### Global Brightness
 
-If the `Renderer` supports it, we can control the global brightness of the
+If the `SegmentDisplay` supports it, we can control the global brightness of the
 entire LED display using:
 
 ```
@@ -687,7 +628,8 @@ segmentDisplay->setBrightness(value);
 Note that the `value` is a fraction (0.0 - 1.0) represented in units of
 1/256. In other words, 3 means (3/256) and 255 means (255/256).
 
-The global brightness is enabled only if the `numSubFields` of the `Renderer`
+The global brightness is enabled only if the `numSubFields` of the
+`SegmentDisplay`
 was set to be `> 1`. For example, if it was set to `16`, then each digit is
 rendered 16 times within a single field, but modulated using pulse width
 modulation to control the width of that signal. The given digit will be "on"
@@ -706,7 +648,7 @@ explain a couple of terms that we borrowed from the field of
   LED display. Any changes in bit patterns or brightness of the digits happens
   through the rendering of multiple frames.
 * **Field**: A field is a partial rendering of a frame. If the current limiting
-  resistors are on the segments (recommended), then the `Renderer`
+  resistors are on the segments (recommended), then the `SegmentDisplay`
   multiplexes through the digits. Each rendering of the digit is a *field* and
   for a 4-digit display, there are 4 fields per frame.
 
@@ -718,25 +660,19 @@ within a field, giving a total *field* rate of about 2000-4000Hz. That's abaout
 250-500 microseconds per field, which is surprisingly doable using an 8-bit
 processor like an Arduino UNO or Nano on an ATmega328 running at 16MHz.
 
-The `Renderer` and its subclasses do not know about *frames*, they only know
+The `SegmentDisplay` and its subclasses do not know about *frames*, they only know
 about *fields*. The `SegmentDisplay` on the other hand, cares only about frames
 and does not know much of anything about fields. The only thing that the
 `SegmentDisplay` knows is how many fields there are in a frame and this
-information comes from the `Renderer::getFieldsPerFrame()` method.
+information comes from the `SegmentDisplay::getFieldsPerFrame()` method.
 
 With the distinction between *frames* and *fields* explained, we can now explain
-how `Renderer::renderField()` works. The `Renderer` keeps an internal counter,
+how `SegmentDisplay::renderField()` works. The `SegmentDisplay` keeps an internal counter,
 and if the call occurs at a frame boundary, the `SegmentDisplay` calls to the
-`Renderer` which will draw the resulting bit pattern on the LED display.
+`SegmentDisplay` which will draw the resulting bit pattern on the LED display.
 
 The call to `SegmentDisplay::renderField()` simply passed along the call to
-`Renderer::displayCurrentField()`.
-
-One more interesting property is that neither the `SegmentDisplay` or the
-`Renderer` is actually aware of the real clock (millis or micros). The only
-thing that marks the passage of time for these objects is the *frame* counter
-and the *field* counter. The AceSegment library leaves it up to the calling code
-to call `renderField()` at exactly the right time.
+`SegmentDisplay::displayCurrentField()`.
 
 There are 2 methods to achieve this:
 
@@ -746,7 +682,7 @@ There are 2 methods to achieve this:
 <a name="RenderingByPolling"></a>
 #### Rendering By Polling
 
-For convenience, we provided one method, `Renderer::renderFieldWhenReady()` that
+For convenience, we provided one method, `SegmentDisplay::renderFieldWhenReady()` that
 actually knows the real clock, and can be polled repeated to generated the calls
 to `renderField()` at the right time. This is the easiest way to see something
 on the LED segments and will work at the early stages of a project. But any
@@ -772,7 +708,7 @@ then the user will notice this problem as flickering of the LED segments.
 This is the recommended way of drawing the bit patterns to the LED display.
 
 The calling code sets up an interrupt service
-routine which calls `Renderer::renderField()` at exactly the periodic
+routine which calls `SegmentDisplay::renderField()` at exactly the periodic
 frequency needed to achieve the desired frames per second and fields
 per second.
 
@@ -905,9 +841,8 @@ Here are the sizes of the various classes on the 8-bit AVR microcontrollers
 * sizeof(TimingStats): 14
 * sizeof(Hardware): 2
 * sizeof(LedMatrixDirect): 14
-* sizeof(LedMatrixSplitSerial): 15
-* sizeof(LedMatrixSplitSpi): 15
-* sizeof(Renderer): 9
+* sizeof(LedMatrixSingleShiftRegister): 15
+* sizeof(LedMatrixDualShiftRegister): 15
 * sizeof(SegmentDisplay): 54
 * sizeof(HexWriter): 2
 * sizeof(ClockWriter): 3

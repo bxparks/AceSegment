@@ -35,7 +35,8 @@ LedMatrixDirect<TestableHardware> ledMatrixDirect(
 
 // Common Cathode, with transistors on Group pins
 TestableSpiAdapter spiAdapter;
-LedMatrixPartialSpi<TestableHardware, TestableSpiAdapter> ledMatrixPartialSpi(
+LedMatrixSingleShiftRegister<TestableHardware, TestableSpiAdapter>
+  ledMatrixSingleShiftRegister(
     hardware,
     spiAdapter,
     LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
@@ -44,7 +45,7 @@ LedMatrixPartialSpi<TestableHardware, TestableSpiAdapter> ledMatrixPartialSpi(
     DIGIT_PINS);
 
 // Common Cathode, with transistors on Group pins
-LedMatrixFullSpi<TestableSpiAdapter> ledMatrixFullSpi(
+LedMatrixDualShiftRegister<TestableSpiAdapter> ledMatrixDualShiftRegister(
     spiAdapter,
     LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
     LedMatrixBase::kActiveHighPattern /*elementOnPattern*/);
@@ -142,19 +143,19 @@ testF(LedMatrixDirectTest, drawElements) {
 }
 
 // ----------------------------------------------------------------------
-// Tests for LedMatrixPartialSpi.
+// Tests for LedMatrixSingleShiftRegister.
 // ----------------------------------------------------------------------
 
-class LedMatrixPartialSpiTest : public TestOnce {
+class LedMatrixSingleShiftRegisterTest : public TestOnce {
   protected:
     void setup() override {
-      ledMatrixPartialSpi.begin();
+      ledMatrixSingleShiftRegister.begin();
       hardware.mEventLog.clear();
     }
 };
 
-testF(LedMatrixPartialSpiTest, begin) {
-  ledMatrixPartialSpi.begin();
+testF(LedMatrixSingleShiftRegisterTest, begin) {
+  ledMatrixSingleShiftRegister.begin();
   assertEqual(8, hardware.mEventLog.getNumRecords());
   assertTrue(hardware.mEventLog.assertEvents(8,
       EventType::kPinMode, 0, OUTPUT,
@@ -167,8 +168,8 @@ testF(LedMatrixPartialSpiTest, begin) {
       EventType::kDigitalWrite, 3, LOW));
 }
 
-testF(LedMatrixPartialSpiTest, end) {
-  ledMatrixPartialSpi.end();
+testF(LedMatrixSingleShiftRegisterTest, end) {
+  ledMatrixSingleShiftRegister.end();
   assertEqual(4, hardware.mEventLog.getNumRecords());
   assertTrue(hardware.mEventLog.assertEvents(4,
       EventType::kPinMode, 0, INPUT,
@@ -178,22 +179,22 @@ testF(LedMatrixPartialSpiTest, end) {
 
 }
 
-testF(LedMatrixPartialSpiTest, enableGroup) {
-  ledMatrixPartialSpi.enableGroup(1);
+testF(LedMatrixSingleShiftRegisterTest, enableGroup) {
+  ledMatrixSingleShiftRegister.enableGroup(1);
   assertEqual(1, hardware.mEventLog.getNumRecords());
   assertTrue(hardware.mEventLog.assertEvents(1,
       EventType::kDigitalWrite, 1, HIGH));
 }
 
-testF(LedMatrixPartialSpiTest, disableGroup) {
-  ledMatrixPartialSpi.disableGroup(1);
+testF(LedMatrixSingleShiftRegisterTest, disableGroup) {
+  ledMatrixSingleShiftRegister.disableGroup(1);
   assertEqual(1, hardware.mEventLog.getNumRecords());
   assertTrue(hardware.mEventLog.assertEvents(1,
       EventType::kDigitalWrite, 1, LOW));
 }
 
-testF(LedMatrixPartialSpiTest, drawElements) {
-  ledMatrixPartialSpi.drawElements(0x55);
+testF(LedMatrixSingleShiftRegisterTest, drawElements) {
+  ledMatrixSingleShiftRegister.drawElements(0x55);
   assertEqual(1, spiAdapter.mEventLog.getNumRecords());
   assertTrue(spiAdapter.mEventLog.assertEvents(1,
       EventType::kSpiTransfer, 0x55
@@ -204,27 +205,27 @@ testF(LedMatrixPartialSpiTest, drawElements) {
 // Tests for LedMatrixSplitSpi.
 // ----------------------------------------------------------------------
 
-class LedMatrixFullSpiTest : public TestOnce {
+class LedMatrixDualShiftRegisterTest : public TestOnce {
   protected:
     void setup() override {
-      ledMatrixFullSpi.begin();
+      ledMatrixDualShiftRegister.begin();
       spiAdapter.mEventLog.clear();
     }
 };
 
-testF(LedMatrixFullSpiTest, begin) {
-  ledMatrixFullSpi.begin();
+testF(LedMatrixDualShiftRegisterTest, begin) {
+  ledMatrixDualShiftRegister.begin();
   assertEqual(0, spiAdapter.mEventLog.getNumRecords());
 }
 
-testF(LedMatrixFullSpiTest, end) {
-  ledMatrixFullSpi.end();
+testF(LedMatrixDualShiftRegisterTest, end) {
+  ledMatrixDualShiftRegister.end();
   assertEqual(0, spiAdapter.mEventLog.getNumRecords());
 }
 
-testF(LedMatrixFullSpiTest, enableGroup) {
-  ledMatrixFullSpi.mPrevElementPattern = 0x42;
-  ledMatrixFullSpi.enableGroup(1);
+testF(LedMatrixDualShiftRegisterTest, enableGroup) {
+  ledMatrixDualShiftRegister.mPrevElementPattern = 0x42;
+  ledMatrixDualShiftRegister.enableGroup(1);
 
   assertEqual(1, spiAdapter.mEventLog.getNumRecords());
   uint16_t expectedOutput = ((0x1 << 1) << 8) | 0x42;
@@ -232,8 +233,8 @@ testF(LedMatrixFullSpiTest, enableGroup) {
       EventType::kSpiTransfer16, expectedOutput));
 }
 
-testF(LedMatrixFullSpiTest, disableGroup) {
-  ledMatrixFullSpi.disableGroup(2);
+testF(LedMatrixDualShiftRegisterTest, disableGroup) {
+  ledMatrixDualShiftRegister.disableGroup(2);
 
   assertEqual(1, spiAdapter.mEventLog.getNumRecords());
   uint16_t expectedOutput = 0x0000;
@@ -241,8 +242,8 @@ testF(LedMatrixFullSpiTest, disableGroup) {
       EventType::kSpiTransfer16, expectedOutput));
 }
 
-testF(LedMatrixFullSpiTest, draw) {
-  ledMatrixFullSpi.draw(3, 0x55);
+testF(LedMatrixDualShiftRegisterTest, draw) {
+  ledMatrixDualShiftRegister.draw(3, 0x55);
 
   uint16_t expectedOutput = ((0x1 << 3) << 8) | 0x55;
   assertEqual(1, spiAdapter.mEventLog.getNumRecords());

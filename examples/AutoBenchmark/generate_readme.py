@@ -29,13 +29,13 @@ This program creates instances of `SegmentDisplay` using different
 configurations of the `LedMatrix` class:
 
 * `direct`: group and segment pins directly connected to MCU
-* `partial_sw_spi`: group pins connected directly to MCU, but segment pins
+* `single_sw_spi`: group pins connected directly to MCU, but segment pins
   connected to 74HC595 accessed through software SPI (`SwSpiAdapter`)
-* `partial_hw_spi`: group pins connected directly to MCU, but segment pins
+* `single_hw_spi`: group pins connected directly to MCU, but segment pins
   connected to 74HC595 accessed through hardware SPI (`HwSpiAdapter`)
-* `full_sw_spi`: group pins and segment pins connected to 74HC595 accessed
+* `dual_sw_spi`: group pins and segment pins connected to 74HC595 accessed
   through software SPI (`SwSpiAdapter`)
-* `full_hw_spi`: group pins and segment pins connected to 74HC595 accessed
+* `dual_hw_spi`: group pins and segment pins connected to 74HC595 accessed
   through hardware SPI (`HwSpiAdapter`)
 
 It measures the time taken by `SegmentDisplay::displayCurrentField()` which

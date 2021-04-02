@@ -39,7 +39,7 @@ class TestableLedDisplay : public LedDisplay {
       mPatterns[pos] = pattern;
     }
 
-    void setBrightnessAt(uint8_t pos, uint8_t brightness) override {}
+    void setBrightnessAt(uint8_t /*pos*/, uint8_t /*brightness*/) override {}
 
     void writeDecimalPointAt(uint8_t pos, bool state = true) override {
       if (pos >= NUM_DIGITS) return;
@@ -53,7 +53,7 @@ class TestableLedDisplay : public LedDisplay {
       mPatterns[pos] = pattern;
     }
 
-    void setGlobalBrightness(uint8_t brightness) override {}
+    void setGlobalBrightness(uint8_t /*brightness*/) override {}
 
     void clear() override {
       for (uint8_t i = 0; i < NUM_DIGITS + 1; ++i) {

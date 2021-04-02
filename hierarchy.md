@@ -7,111 +7,109 @@ to help create the right set of objects for the given LED wiring situtation.
 
 ## Hardware Abstraction
 
+A class that encapsulates the lowest level of access to the microcontroller's
+GPIO pins and internal timers:
+
 * Hardware Class
-    * virtual ~Hardware()
-    * virtual digitalWrite()
-    * virtual pinMode()
-    * virtual micros()
-    * virtual millis()
+    * digitalWrite()
+    * pinMode()
+    * micros()
+    * millis()
 
-* SpiAdapter
-    * virtual spiBegin()
-    * virtual spiEnd()
-    * virtual spiTransfer()
-    * virtual spiTransfer16()
-    * Two implementation classes:
-        * SwSpiAdapter
-        * HwSpiAdapter
+Most (all?) if the following classes will take the `Hardware` class as a C++
+template parameter. This allows us to inject a different hardware
+(`TestableHardware`) for unit testing purposes.
 
-## Wiring and LedMatrix Classes
+## Wiring
 
 **Wiring Types**
 
-* Split
-    * LedMatrixDirect (all pins direct to MCU)
-    * LedMatrixPartialSpi (element pins through 74HC575 via SPI, group pins
-* Merged
-    * LedMatrixFullSpi (all pins through 74HC575 via HwSPI)
+* Direct
+    * All LedMatrix segment and digit pins are directly connect to the the
+      microcontroller.
+    * The segment pins have current limiting resistors.
+    * There may transistors on the digit pins to enable higher current.
+    * Not all common Arduino microcontrollers have enough pins to support a
+      4-digit LED segment module.
+* Single 74HC595 Shift Register
+    * LED segment pins are hooked up to a 74HC575 shfit register,
+      which can be accessed through SPI (software or hardware)
+    * The digit pins are still directly connected to the microtroller. If there
+      are only 4 digits on the LED module, then only 4 pins are needed on the
+      MCU.
+    * There are current limiting resistors between the LED segment pins and the
+      shift register chip.
+    * There may be transistors on digit pins to provide extra current.
+* Dual 74HC595 Shift Register
+    * Segment pins are wired to one 74HC575 shift register.
+    * Digit [ins are wired to another 74HC575 shift register.
+    * The 2 shift registers are daisy chained, so that they can be
+      controlled at the same time using a single SPI transaction that sends
+      16-bits.
+    * The digit pins are assumed to be in the upper byte, the segment pins are
+      in the lower byte.
 
-**LedMatrix Class**
+## LedMatrix Class
 
-* Implements the 3 wiring combinations listed above.
-* The resistor determines which LEDs can be turned on at the same time.
-    * LEDs with resistors become "element"
-    * The other lines become "groups"
+The `LedMatrix` classes provide access to the LED diodes using one of the 3
+wiring configurations described above. There are 3 classes provided:
 
-## Driver Classes
+* LedMatrixDirect
+* LedMatrixSingleShiftRegister
+* LedMatrixDualShiftRegister
 
-* contains array of digit patterns to render (array provided externally)
-* knows how to transfer the bit patterns in DimmablePattern object to the
-    LED matrix.
-* keeps track of internal information to determine which field of which
-    frame to render to the LED segments
-* each call to `displayCurrentField()` display one field of a frame
-* methods
-    * configure(), finish()
-    * displayCurrentField()
-    * getFieldsPerFrame()
-    * isBrightnessSupported()
-    * setPattern()
-    * setBrightness()
-* subclasses
-    * SplitDigitDriver
-        * SplitDirectDigitDriver (uses LedMatrixSplitDirect)
-        * SplitSerialDigitDriver
-        * SplitSpiDigitDriver
-    * MergedDigitDriver
-        * MergedSerialDigitDriver
-        * MergedSpiDigitDriver
-    * SplitSegmentDriver (X - archived)
-    * MergedSegmentDriver (X - not implemented)
+These classes were originally design for a more general LED module, so they use
+slighlty more general terminologies. The digit pins are called "group" pins. And
+the segment pins are called "element" pins.
 
-## CompositeDrivers
+The 74HC595 shift registers are controlled using SPI (Serial Peripheral
+Interface). Most microcontrollers support either hardware SPI or software SPI.
+You can choose to use either modes, and the library provides 2 classes that
+allows this configuration:
 
-Composite classes combine the correct `LedMatrix` object with the matching
-`Driver` object. The composite object multiplely inherits from both `LedMatrix`
-and `Driver` class. The number of combinations are:
+* `SwSpiAdapter`
+    * Uses `digitalWrite()` function to manually write the correct signal at the
+      correct time. (Also called "big-banging").
+* `HwSpiAdapter`
+    * Uses the `SPI.h` library that is provided on most microcontrollers
+      using the Arduino platform.
 
-* (SplitDigitDriver) x LedMatrixDirect = 1
-* (SplitDigitDriver) x (LedMatrixPartialSpi (SW | HW)) = 2
-* (MergedDigitDriver) x (LedMatrixFullSpi (SW | HW)) = 2
-* Total: 1 + 2 + 2 = 5
-* classes
-    * SplitDirectDigitDriver
-        * LedMatrixDirect
-        * SplitDigitDriver
-        * (Resistors on segments, transistor on digits, all pins direct to MCU)
-    * SplitSerialDigitDriver -> PartialSwSpiDriver
-        * SplitDigitDriver
-        * LedMatrixPartialSpi (SW)
-        * (Resistors on segments, transistors on digits thru 74HC595 via SwSPI)
-    * SplitSpiDigitDriver -> PartialHwSpiDriver
-        * SplitDigitDriver
-        * LedMatrixPartialSpi (HW)
-        * (Resistors on segments, transistors on digits thru 74HC595 via HwSPI)
-    * MergedSerialDigitDriver -> FullSwSpiDriver
-        * MergedDigitDriver
-        * LedMatrixFullSpi (SW)
-        * (Resistors on segments, transistors on digits, all pins via SwSPI)
-    * MergedSpiDigitDriver -> FullHwSpiDriver
-        * MergedDigitDriver
-        * LedMatrixFullSpi (HW)
-        * (Resistors on segments, transistors on digits, all pins via HwSPI)
+Since the 74HC595 shift registers can be communicated using 2 different methods,
+there are 5 combinations possible:
 
-## Renderer
+* LedMatrixDirect
+* LedMatrixSingleShiftRegister + SwSpiAdapter
+* LedMatrixSingleShiftRegister + HwSpiAdapter
+* LedMatrixDualShiftRegister + SwSpiAdapter
+* LedMatrixDualShiftRegister + HwSpiAdapter
 
-Writes the `DimmablePattern` into the into the `Driver` class.
+## SegmentDisplay
 
-* `updateFrame()`
-    * -> `mDriver->setPattern(digit, pattern, brightness)`
-* deposes each frame into multiple fields, and calls the Driver for each field
-    * `renderFieldWhenReady()` - render by polling
+Writes the LED segment pattern for a digit to the LED module, using one of the
+`LedMatrix` classes. There are roughly 2 parts to the `SegmentDisplay` class:
+
+1) It implements the externally facing `LedDisplay` interface which has methods
+that allow LED segment patterns for each digit to be written into an internal
+pattern buffer.
+    * `writePatternAt(digit, pattern, brightness)`
+    * `writeBrightnessAt(digit, brightness)`
+    * `writeDecimalPointAt(digit, state)`
+2) It has rendering methods which multiplexes these segment patterns to the LED
+module at a configurable frame rate (e.g. 60 frames/second). Only one digit is
+activated at a precise moment in time, but when the frame rate is high enough,
+it as if the entire LED module is lit up.
     * `renderField()` - render immediately, called from ISR
-* `writePatternAt(digit, pattern, brightness)`
-* `writeBrightnessAt(digit, brightness)`
-* `writeDecimalPointAt(digit, state)`
+    * `renderFieldWhenReady()` - render by polling
+    * `displayCurrentField() - render the current digit (i.e. "field")
 
 ## Writers
+
+Writer classes provide mappings between characters, numbers or digits into
+specific LED segment patterns using an internal "font" table. These classes use
+the `LedDisplay` interface (implemented by `SegmentDisplay`), so in theory,
+other types of LED displays could be used by these Writer classes.
+
+This library currently provides 3 Writer classes:
 
 * `HexWriter(Renderer*)`
     * `writeHexAt()`
