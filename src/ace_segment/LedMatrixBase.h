@@ -62,6 +62,12 @@ namespace ace_segment {
  * kActiveHighPattern. However, if a driver transitor is placed on the group
  * pins to handle the higher current, then it inverts the logic on the group
  * pins, so groupOnPattern must be set to kActiveHighPattern.
+ *
+ * The groupOnPattern and elementPattern are compile-time constants so these
+ * parameters could be moved into the template parameters. When I did that, the
+ * flash size when down by only ~20 bytes on AVR, and ~40 bytes on an STM32. I
+ * decided to leave them as instance variables, because the decrease in
+ * readability of the code didn't seem worth 20 bytes.
  */
 class LedMatrixBase {
   public:
