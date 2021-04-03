@@ -8,13 +8,13 @@
 BEGIN {
   labels[0] = "baseline"
   labels[1] = "direct";
-  labels[2] = "partial_sw_spi";
-  labels[3] = "partial_hw_spi";
-  labels[4] = "full_sw_spi";
-  labels[5] = "full_hw_spi";
+  labels[2] = "single_sw_spi";
+  labels[3] = "single_hw_spi";
+  labels[4] = "dual_sw_spi";
+  labels[5] = "dual_hw_spi";
   labels[6] = "direct_fast";
-  labels[7] = "partial_sw_fast";
-  labels[8] = "full_sw_fast";
+  labels[7] = "single_sw_fast";
+  labels[8] = "dual_sw_fast";
   record_index = 0
 }
 {

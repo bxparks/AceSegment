@@ -18,12 +18,12 @@ using namespace ace_button;
 
 #define LED_MATRIX_MODE_DIRECT 1
 #define LED_MATRIX_MODE_PARIAL_SW_SPI 2
-#define LED_MATRIX_MODE_PARTIAL_HW_SPI 3
-#define LED_MATRIX_MODE_FULL_SW_SPI 4
-#define LED_MATRIX_MODE_FULL_HW_SPI 5
+#define LED_MATRIX_MODE_SINGLE_HW_SPI 3
+#define LED_MATRIX_MODE_DUAL_SW_SPI 4
+#define LED_MATRIX_MODE_DUAL_HW_SPI 5
 #define LED_MATRIX_MODE_DIRECT_FAST 6
-#define LED_MATRIX_MODE_PARTIAL_SW_SPI_FAST 7
-#define LED_MATRIX_MODE_FULL_SW_SPI_FAST 8
+#define LED_MATRIX_MODE_SINGLE_SW_SPI_FAST 7
+#define LED_MATRIX_MODE_DUAL_SW_SPI_FAST 8
 
 // LedClock buttons can be configured to use either pins (2, 3) or (8, 9)
 // through DIP switches. On the Pro Micro, (2, 3) are used for I2C. The LED
@@ -37,14 +37,14 @@ const uint8_t CHANGE_BUTTON_PIN = 3;
 #elif defined(AUNITER_LED_CLOCK_DIRECT)
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT_FAST
-#elif defined(AUNITER_LED_CLOCK_PARTIAL)
-  //#define LED_MATRIX_MODE LED_MATRIX_MODE_PARTIAL_SW_SPI
-  //#define LED_MATRIX_MODE LED_MATRIX_MODE_PARTIAL_HW_SPI
-  #define LED_MATRIX_MODE LED_MATRIX_MODE_PARTIAL_SW_SPI_FAST
-#elif defined(AUNITER_LED_CLOCK_FULL)
-  //#define LED_MATRIX_MODE LED_MATRIX_MODE_FULL_SW_SPI
-  //#define LED_MATRIX_MODE LED_MATRIX_MODE_FULL_HW_SPI
-  #define LED_MATRIX_MODE LED_MATRIX_MODE_FULL_SW_SPI_FAST
+#elif defined(AUNITER_LED_CLOCK_SINGLE)
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_SW_SPI
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_HW_SPI
+  #define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_SW_SPI_FAST
+#elif defined(AUNITER_LED_CLOCK_DUAL)
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SW_SPI
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HW_SPI
+  #define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SW_SPI_FAST
 #else
   #error Unknown AUNITER environment
 #endif
@@ -61,10 +61,13 @@ const uint8_t CHANGE_BUTTON_PIN = 3;
 // off will make the display as smooth as the interrupt version.
 #define PRINT_STATS 0
 
-// Transistors on the digits or segments which do NOT have the resistors.
-// Common Cathode or Anode
+// Total field/second = FRAMES_PER_SECOND * NUM_SUBFIELDS * NUM_DIGITS
+//      = 60 * 64 * 4 = 15360 fields/sec = 65 micros/field
+//
+// Fortunately, according to AutoBenchmark, the "fast" versions of LedMatrix can
+// render a single field in about 20-30 micros.
 const uint8_t FRAMES_PER_SECOND = 60;
-const uint8_t NUM_SUBFIELDS = 1;
+const uint8_t NUM_SUBFIELDS = 64;
 
 const uint8_t NUM_DIGITS = 4;
 const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
@@ -105,7 +108,7 @@ Hardware hardware;
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_PARIAL_SW_SPI
   // Common Cathode, with transistors on Group pins
   SwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  using LedMatrix = LedMatrixPartialSpi<Hardware, SwSpiAdapter>;
+  using LedMatrix = LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>;
   LedMatrix ledMatrix(
       hardware,
       spiAdapter,
@@ -113,11 +116,11 @@ Hardware hardware;
       LedMatrix::kActiveHighPattern /*elementOnPattern*/,
       NUM_DIGITS,
       DIGIT_PINS):
-#elif LED_MATRIX_MODE == LED_MATRIX_MODE_PARTIAL_SW_SPI_FAST
+#elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SW_SPI_FAST
   // Common Cathode, with transistors on Group pins
   using SpiAdapter = SwSpiAdapterFast<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiAdapter spiAdapter;
-  using LedMatrix = LedMatrixPartialSpi<Hardware, SpiAdapter>;
+  using LedMatrix = LedMatrixSingleShiftRegister<Hardware, SpiAdapter>;
   LedMatrix ledMatrix(
       hardware,
       spiAdapter,
@@ -125,10 +128,10 @@ Hardware hardware;
       LedMatrix::kActiveHighPattern /*elementOnPattern*/,
       NUM_DIGITS,
       DIGIT_PINS);
-#elif LED_MATRIX_MODE == LED_MATRIX_MODE_PARTIAL_HW_SPI
+#elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HW_SPI
   // Common Cathode, with transistors on Group pins
   HwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  using LedMatrix = LedMatrixPartialSpi<Hardware, HwSpiAdapter>;
+  using LedMatrix = LedMatrixSingleShiftRegister<Hardware, HwSpiAdapter>;
   LedMatrix ledMatrix(
       hardware,
       spiAdapter,
@@ -136,27 +139,27 @@ Hardware hardware;
       LedMatrix::kActiveHighPattern /*elementOnPattern*/,
       NUM_DIGITS,
       DIGIT_PINS);
-#elif LED_MATRIX_MODE == LED_MATRIX_MODE_FULL_SW_SPI
+#elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SW_SPI
   // Common Anode, with transistors on Group pins
   SwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  using LedMatrix = LedMatrixFullSpi<SwSpiAdapter>;
+  using LedMatrix = LedMatrixDualShiftRegister<SwSpiAdapter>;
   LedMatrix ledMatrix(
       spiAdapter,
       LedMatrix::kActiveLowPattern /*groupOnPattern*/,
       LedMatrix::kActiveLowPattern /*elementOnPattern*/);
-#elif LED_MATRIX_MODE == LED_MATRIX_MODE_FULL_SW_SPI_FAST
+#elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SW_SPI_FAST
   // Common Anode, with transistors on Group pins
   using SpiAdapter = SwSpiAdapterFast<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiAdapter spiAdapter;
-  using LedMatrix = LedMatrixFullSpi<SpiAdapter>;
+  using LedMatrix = LedMatrixDualShiftRegister<SpiAdapter>;
   LedMatrix ledMatrix(
       spiAdapter,
       LedMatrix::kActiveLowPattern /*groupOnPattern*/,
       LedMatrix::kActiveLowPattern /*elementOnPattern*/);
-#elif LED_MATRIX_MODE == LED_MATRIX_MODE_FULL_HW_SPI
+#elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HW_SPI
   // Common Anode, with transistors on Group pins
   HwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  using LedMatrix = LedMatrixFullSpi<HwSpiAdapter>;
+  using LedMatrix = LedMatrixDualShiftRegister<HwSpiAdapter>;
   LedMatrix ledMatrix(
       spiAdapter,
       LedMatrix::kActiveLowPattern /*groupOnPattern*/,
@@ -165,34 +168,33 @@ Hardware hardware;
   #error Unsupported LED_MATRIX_MODE
 #endif
 
-SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
+// Monochromatic
+SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, 1> segmentDisplay(
     hardware, ledMatrix, FRAMES_PER_SECOND);
+
+// 16 level of brightness, need field/second of 60*4*16 = 3840.
+SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+    segmentDisplayModulating(hardware, ledMatrix, FRAMES_PER_SECOND);
 
 HexWriter hexWriter(segmentDisplay);
 ClockWriter clockWriter(segmentDisplay);
 CharWriter charWriter(segmentDisplay);
 StringWriter stringWriter(charWriter);
 
-#if USE_INTERRUPT == 1
-// interrupt handler for timer 2
-ISR(TIMER2_COMPA_vect) {
-  segmentDisplay.renderField();
-}
-#endif
-
 // Setup the various resources.
 void setupAceSegment() {
   #if LED_MATRIX_MODE == LED_MATRIX_MODE_PARIAL_SW_SPI \
-      || LED_MATRIX_MODE == LED_MATRIX_MODE_PARTIAL_HW_SPI \
-      || LED_MATRIX_MODE == LED_MATRIX_MODE_PARTIAL_SW_SPI_FAST \
-      || LED_MATRIX_MODE == LED_MATRIX_MODE_FULL_SW_SPI \
-      || LED_MATRIX_MODE == LED_MATRIX_MODE_FULL_HW_SPI \
-      || LED_MATRIX_MODE == LED_MATRIX_MODE_FULL_SW_SPI_FAST
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HW_SPI \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SW_SPI_FAST \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SW_SPI \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HW_SPI \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SW_SPI_FAST
     spiAdapter.begin();
   #endif
 
     ledMatrix.begin();
     segmentDisplay.begin();
+    segmentDisplayModulating.begin();
 
 #if USE_INTERRUPT == 1
   // set up Timer 2
@@ -215,6 +217,13 @@ void setupAceSegment() {
 #endif
 }
 
+#if USE_INTERRUPT == 1
+// interrupt handler for timer 2
+ISR(TIMER2_COMPA_vect) {
+  renderField();
+}
+#endif
+
 //------------------------------------------------------------------
 // Configurations for AceSegmentDemo
 //------------------------------------------------------------------
@@ -223,15 +232,17 @@ const uint8_t DEMO_LOOP_MODE_AUTO = 0;
 const uint8_t DEMO_LOOP_MODE_PAUSED = 1;
 uint8_t demoLoopMode = DEMO_LOOP_MODE_AUTO;
 
-const uint8_t DEMO_MODE_COUNT = 5;
+const uint8_t DEMO_MODE_COUNT = 6;
 const uint8_t DEMO_MODE_CLOCK = 0;
 const uint8_t DEMO_MODE_HEX = 1;
 const uint8_t DEMO_MODE_CHAR = 2;
 const uint8_t DEMO_MODE_STRINGS = 3;
 const uint8_t DEMO_MODE_SCROLL = 4;
+const uint8_t DEMO_MODE_PULSE = 5;
 
 // Demo mode.
-uint8_t demoMode = DEMO_MODE_HEX;
+uint8_t prevDemoMode = DEMO_MODE_COUNT - 1;
+uint8_t demoMode = DEMO_MODE_CLOCK;
 
 void writeHexes() {
   static uint8_t c = 0;
@@ -243,12 +254,7 @@ void writeHexes() {
   hexWriter.writeHexAt(2, HexWriter::kMinus);
   hexWriter.writeHexAt(3, c);
 
-  if (c < HexWriter::kNumCharacters * 2) {
-    ace_common::incrementMod(c, HexWriter::kNumCharacters);
-  } else {
-    c = 0;
-    ace_common::incrementMod(demoMode, DEMO_MODE_COUNT);
-  }
+  ace_common::incrementMod(demoMode, DEMO_MODE_COUNT);
 }
 
 void writeClock() {
@@ -302,8 +308,42 @@ void scrollString(const char* s) {
   ace_common::incrementMod(i, (uint8_t) strlen(s));
 }
 
+void setupPulseDisplay() {
+  HexWriter hexWriter(segmentDisplayModulating);
+  hexWriter.writeHexAt(0, 1);
+  hexWriter.writeHexAt(1, 2);
+  hexWriter.writeHexAt(2, 3);
+  hexWriter.writeHexAt(3, 4);
+}
+
+void setBrightnesses(int i) {
+  static uint8_t levels[16] = {
+    16, 23, 32, 45, 64, 91, 128, 182,
+    255, 182, 128, 91, 64, 45, 32, 23
+  };
+  uint8_t brightness0 = levels[i&0xF];
+  uint8_t brightness1 = levels[(i+1)&0xF];
+  uint8_t brightness2 = levels[(i+2)&0xF];
+  uint8_t brightness3 = levels[(i+3)&0xF];
+  segmentDisplayModulating.setBrightnessAt(0, brightness0);
+  segmentDisplayModulating.setBrightnessAt(1, brightness2);
+  segmentDisplayModulating.setBrightnessAt(2, brightness1);
+  segmentDisplayModulating.setBrightnessAt(3, brightness3);
+}
+
+void pulseDisplay() {
+  static uint8_t i = 0;
+
+  if (prevDemoMode != demoMode) {
+    setupPulseDisplay();
+  }
+
+  i++;
+  setBrightnesses(i);
+}
+
 /** Display the demo pattern selected by demoMode. */
-void displayDemo() {
+void updateDemo() {
   if (demoMode == DEMO_MODE_CLOCK) {
     writeClock();
   } else if (demoMode == DEMO_MODE_HEX) {
@@ -314,13 +354,18 @@ void displayDemo() {
     writeStrings();
   } else if (demoMode == DEMO_MODE_SCROLL) {
     scrollString("   Angela is the best.");
+  } else if (demoMode == DEMO_MODE_PULSE) {
+    pulseDisplay();
   }
 }
 
 /** Go to the next demo */
 void nextDemo() {
+  prevDemoMode = demoMode;
   ace_common::incrementMod(demoMode, DEMO_MODE_COUNT);
-  displayDemo();
+  segmentDisplay.clear();
+  segmentDisplayModulating.clear();
+  updateDemo();
 }
 
 /** Loop within a single demo. */
@@ -334,11 +379,14 @@ void demoLoop() {
   static uint16_t lastStatsCounter = 0;
 #endif
 
+  unsigned long demoInternalStep = (demoMode == DEMO_MODE_PULSE)
+      ? 200
+      : 500;
   unsigned long now = millis();
-  if (now - lastUpdateTime > 500) {
+  if (now - lastUpdateTime > demoInternalStep) {
     lastUpdateTime = now;
     if (demoLoopMode == DEMO_LOOP_MODE_AUTO) {
-      displayDemo();
+      updateDemo();
     }
 
     /*
@@ -388,7 +436,15 @@ void printStats() {
 #endif
 
 void singleStep() {
-  segmentDisplay.renderField();
+  renderField();
+}
+
+void renderField() {
+  if (demoMode == DEMO_MODE_PULSE) {
+    segmentDisplayModulating.renderFieldWhenReady();
+  } else {
+    segmentDisplay.renderFieldWhenReady();
+  }
 }
 
 //------------------------------------------------------------------
@@ -421,7 +477,7 @@ void handleEvent(AceButton* button, uint8_t eventType, uint8_t buttonState) {
           if (ENABLE_SERIAL_DEBUG >= 1) {
             Serial.println(F("handleEvent(): demo stepped"));
           }
-          displayDemo();
+          updateDemo();
         }
         break;
 
@@ -506,13 +562,13 @@ void setup() {
     Serial.println(F("setup(): end"));
   }
 
-  displayDemo();
+  updateDemo();
 }
 
 void loop() {
   if (renderMode == RENDER_MODE_AUTO) {
     #if USE_INTERRUPT == 0
-      segmentDisplay.renderFieldWhenReady();
+      renderField();
     #endif
   }
 

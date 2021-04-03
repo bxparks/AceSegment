@@ -40,11 +40,11 @@ namespace ace_segment {
  *  * LedMatrixDirect
  *      * The group and element pins are directly attached to GPIO pins
  *        on the microcontroller.
- *  * LedMatrixPartialSpi
+ *  * LedMatrixSingleShiftRegister
  *      * The group pins are directly attached to GPIO pins.
- *      * The Segment pins are attached to an 74HC595 chip,
+ *      * The Segment pins are attached to one 74HC595 shift register chip,
  *        accessed through SPI (either software or hardware).
- *  * LedMatrixFullSpi
+ *  * LedMatrixDualShiftRegister
  *    * Both the Group and Element pins are controlled by 74HC595 chips
  *      using SPI (software or hardware).
  *

@@ -39,12 +39,20 @@ class Hardware {
   public:
     /** Write value to pin. */
     void digitalWrite(uint8_t pin, uint8_t value) const {
+    #if defined(ARDUINO_API_VERSION)
+      arduino::digitalWrite(pin, value);
+    #else
       ::digitalWrite(pin, value);
+    #endif
     }
 
     /** Set pin mode. */
     void pinMode(uint8_t pin, uint8_t mode) const {
+    #if defined(ARDUINO_API_VERSION)
+      arduino::pinMode(pin, mode);
+    #else
       ::pinMode(pin, mode);
+    #endif
     }
 
     /** Get the current micros  */

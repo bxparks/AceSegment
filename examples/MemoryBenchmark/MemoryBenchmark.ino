@@ -18,13 +18,13 @@
 // List of features of AceSegment that we want to gather memory usage numbers.
 #define FEATURE_BASELINE 0
 #define FEATURE_DIRECT 1
-#define FEATURE_PARTIAL_SW_SPI 2
-#define FEATURE_PARTIAL_HW_SPI 3
-#define FEATURE_FULL_SW_SPI 4
-#define FEATURE_FULL_HW_SPI 5
+#define FEATURE_SINGLE_SW_SPI 2
+#define FEATURE_SINGLE_HW_SPI 3
+#define FEATURE_DUAL_SW_SPI 4
+#define FEATURE_DUAL_HW_SPI 5
 #define FEATURE_DIRECT_FAST 6
-#define FEATURE_PARTIAL_SW_SPI_FAST 7
-#define FEATURE_FULL_SW_SPI_FAST 8
+#define FEATURE_SINGLE_SW_SPI_FAST 7
+#define FEATURE_DUAL_SW_SPI_FAST 8
 
 // A volatile integer to prevent the compiler from optimizing away the entire
 // program.
@@ -62,10 +62,10 @@ volatile int disableCompilerOptimization = 0;
         digitPins,
         NUM_SEGMENTS,
         segmentPins);
-  #elif FEATURE == FEATURE_PARTIAL_SW_SPI
+  #elif FEATURE == FEATURE_SINGLE_SW_SPI
     // Common Cathode, with transistors on Group pins
     SwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
-    using LedMatrix = LedMatrixPartialSpi<Hardware, SwSpiAdapter>;
+    using LedMatrix = LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>;
     LedMatrix ledMatrix(
         hardware,
         spiAdapter,
@@ -73,11 +73,11 @@ volatile int disableCompilerOptimization = 0;
         LedMatrix::kActiveHighPattern /*elementOnPattern*/,
         NUM_DIGITS,
         digitPins);
-  #elif FEATURE == FEATURE_PARTIAL_SW_SPI_FAST
+  #elif FEATURE == FEATURE_SINGLE_SW_SPI_FAST
     // Common Cathode, with transistors on Group pins
     using SpiAdapter = SwSpiAdapterFast<latchPin, dataPin, clockPin>;
     SpiAdapter spiAdapter;
-    using LedMatrix = LedMatrixPartialSpi<Hardware, SpiAdapter>;
+    using LedMatrix = LedMatrixSingleShiftRegister<Hardware, SpiAdapter>;
     LedMatrix ledMatrix(
         hardware,
         spiAdapter,
@@ -85,10 +85,10 @@ volatile int disableCompilerOptimization = 0;
         LedMatrix::kActiveHighPattern /*elementOnPattern*/,
         NUM_DIGITS,
         digitPins);
-  #elif FEATURE == FEATURE_PARTIAL_HW_SPI
+  #elif FEATURE == FEATURE_SINGLE_HW_SPI
     // Common Cathode, with transistors on Group pins
     HwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
-    using LedMatrix = LedMatrixPartialSpi<Hardware, HwSpiAdapter>;
+    using LedMatrix = LedMatrixSingleShiftRegister<Hardware, HwSpiAdapter>;
     LedMatrix ledMatrix(
         hardware,
         spiAdapter,
@@ -96,27 +96,27 @@ volatile int disableCompilerOptimization = 0;
         LedMatrix::kActiveHighPattern /*elementOnPattern*/,
         NUM_DIGITS,
         digitPins);
-  #elif FEATURE == FEATURE_FULL_SW_SPI
+  #elif FEATURE == FEATURE_DUAL_SW_SPI
     // Common Cathode, with transistors on Group pins
     SwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
-    using LedMatrix = LedMatrixFullSpi<SwSpiAdapter>;
+    using LedMatrix = LedMatrixDualShiftRegister<SwSpiAdapter>;
     LedMatrix ledMatrix(
         spiAdapter,
         LedMatrix::kActiveLowPattern /*groupOnPattern*/,
         LedMatrix::kActiveLowPattern /*elementOnPattern*/);
-  #elif FEATURE == FEATURE_FULL_SW_SPI_FAST
+  #elif FEATURE == FEATURE_DUAL_SW_SPI_FAST
     // Common Cathode, with transistors on Group pins
     using SpiAdapter = SwSpiAdapterFast<latchPin, dataPin, clockPin>;
     SpiAdapter spiAdapter;
-    using LedMatrix = LedMatrixFullSpi<SpiAdapter>;
+    using LedMatrix = LedMatrixDualShiftRegister<SpiAdapter>;
     LedMatrix ledMatrix(
         spiAdapter,
         LedMatrix::kActiveLowPattern /*groupOnPattern*/,
         LedMatrix::kActiveLowPattern /*elementOnPattern*/);
-  #elif FEATURE == FEATURE_FULL_HW_SPI
+  #elif FEATURE == FEATURE_DUAL_HW_SPI
     // Common Cathode, with transistors on Group pins
     HwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
-    using LedMatrix = LedMatrixFullSpi<HwSpiAdapter>;
+    using LedMatrix = LedMatrixDualShiftRegister<HwSpiAdapter>;
     LedMatrix ledMatrix(
         spiAdapter,
         LedMatrix::kActiveLowPattern /*groupOnPattern*/,
@@ -159,42 +159,42 @@ void setup() {
   segmentDisplay.writePatternAt(0, 0x3A);
   segmentDisplay.renderField();
 
-#elif FEATURE == FEATURE_PARTIAL_SW_SPI
+#elif FEATURE == FEATURE_SINGLE_SW_SPI
   spiAdapter.begin();
   ledMatrix.begin();
   segmentDisplay.begin();
   segmentDisplay.writePatternAt(0, 0x3A);
   segmentDisplay.renderField();
 
-#elif FEATURE == FEATURE_PARTIAL_SW_SPI_FAST
+#elif FEATURE == FEATURE_SINGLE_SW_SPI_FAST
   spiAdapter.begin();
   ledMatrix.begin();
   segmentDisplay.begin();
   segmentDisplay.writePatternAt(0, 0x3A);
   segmentDisplay.renderField();
 
-#elif FEATURE == FEATURE_PARTIAL_HW_SPI
+#elif FEATURE == FEATURE_SINGLE_HW_SPI
   spiAdapter.begin();
   ledMatrix.begin();
   segmentDisplay.begin();
   segmentDisplay.writePatternAt(0, 0x3A);
   segmentDisplay.renderField();
 
-#elif FEATURE == FEATURE_FULL_SW_SPI
+#elif FEATURE == FEATURE_DUAL_SW_SPI
   spiAdapter.begin();
   ledMatrix.begin();
   segmentDisplay.begin();
   segmentDisplay.writePatternAt(0, 0x3A);
   segmentDisplay.renderField();
 
-#elif FEATURE == FEATURE_FULL_SW_SPI_FAST
+#elif FEATURE == FEATURE_DUAL_SW_SPI_FAST
   spiAdapter.begin();
   ledMatrix.begin();
   segmentDisplay.begin();
   segmentDisplay.writePatternAt(0, 0x3A);
   segmentDisplay.renderField();
 
-#elif FEATURE == FEATURE_FULL_HW_SPI
+#elif FEATURE == FEATURE_DUAL_HW_SPI
   spiAdapter.begin();
   ledMatrix.begin();
   segmentDisplay.begin();

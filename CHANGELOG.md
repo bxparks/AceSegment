@@ -8,18 +8,21 @@
       most of my other libraries.
     * New, vastly simplified class hierarchy.
         * `Hardware`
-            * non-virtual, not polymorphic
-        * SpiAdapter (conceptual interface, does not actually
-            exist because we use C++ templates in the subclasses instead)
+            * low-level accessors to GPIO pins and timers
+        * SpiAdapter
             * `SwSpiAdapter`
-            * `HwSpiAdapter`.
-        * LedMatrix (conceptual interface, does not actually exist)
+            * `HwSpiAdapter`
+        * LedMatrix
             * `LedMatrixDirect`
-            * `LedMatrixPartialSpi`
-            * `LedMatrixFullSpi`
+            * `LedMatrixSingleShiftRegister`
+            * `LedMatrixDualShiftRegister`
         * `LedDisplay`
             * `SegmentDisplay`
-        * `HexWriter`, `ClockWriter`, `CharWriter`, `StringWriter`
+        * Writers
+            * `HexWriter`
+            * `ClockWriter`
+            * `CharWriter`
+            * `StringWriter`
         * Remove `Renderer` and `Driver` subclasses.
     * Remove inheritance, virtual destructors and methods
         * Almost all classes are templatized and do not have virtual functions
@@ -46,13 +49,13 @@
           specified using only 2 XOR bit masks, instead of asking 3 bools
           (common cathode or not, transitors on segments, transistors on
           digits).
-    * Support for `digitalWriteFast()`
-        * https://github.com/NicksonYap/digitalWriteFast, on AVR processors
-        * These fast functions require the pin number and output values to be
+    * Support `digitalWriteFast()` on AVR
+        * https://github.com/NicksonYap/digitalWriteFast
+        * These GPIO functions require the pin number and output values to be
           compile-time attempted to use code generation using Python scripts,
           but they were unmaintainable.
-        * Replace code generation with C++ templates which should be easier to
-          maintain.
+        * Replace code generation Python scripts with C++ templates which should
+          be easier to maintain.
         * Since these classes depend on an external library, the headers must be
           manually included:
             * `#include <ace_segment/fast/LedMatrixDirectFast.h>`

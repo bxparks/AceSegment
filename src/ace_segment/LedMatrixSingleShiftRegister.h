@@ -22,13 +22,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_LED_MATRIX_PARTIAL_SPI_H
-#define ACE_SEGMENT_LED_MATRIX_PARTIAL_SPI_H
+#ifndef ACE_SEGMENT_LED_MATRIX_SINGLE_SHIFT_REGISTER_H
+#define ACE_SEGMENT_LED_MATRIX_SINGLE_SHIFT_REGISTER_H
 
 #include <Arduino.h> // OUTPUT, INPUT
 #include "LedMatrixBase.h"
 
-class LedMatrixPartialSpiTest_drawElements;
+class LedMatrixSingleShiftRegisterTest_drawElements;
 
 namespace ace_segment {
 
@@ -47,9 +47,9 @@ namespace ace_segment {
  * @tparam SA class that provides SPI, either SwSpiAdapter or HwSpiAdapter
  */
 template<typename H, typename SA>
-class LedMatrixPartialSpi : public LedMatrixBase {
+class LedMatrixSingleShiftRegister : public LedMatrixBase {
   public:
-    LedMatrixPartialSpi(
+    LedMatrixSingleShiftRegister(
         const H& hardware,
         const SA& spiAdapter,
         uint8_t groupOnPattern,
@@ -110,7 +110,7 @@ class LedMatrixPartialSpi : public LedMatrixBase {
     }
 
   private:
-    friend class ::LedMatrixPartialSpiTest_drawElements;
+    friend class ::LedMatrixSingleShiftRegisterTest_drawElements;
 
     /** Send the pattern to the element pins. */
     void drawElements(uint8_t pattern) const {

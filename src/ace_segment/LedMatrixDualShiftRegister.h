@@ -22,28 +22,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_LED_MATRIX_FULL_SPI_H
-#define ACE_SEGMENT_LED_MATRIX_FULL_SPI_H
+#ifndef ACE_SEGMENT_LED_MATRIX_DUAL_SHIFT_REGISTER_H
+#define ACE_SEGMENT_LED_MATRIX_DUAL_SHIFT_REGISTER_H
 
 #include "LedMatrixBase.h"
 
-class LedMatrixFullSpiTest_draw;
-class LedMatrixFullSpiTest_enableGroup;
-class LedMatrixFullSpiTest_disableGroup;
+class LedMatrixDualShiftRegisterTest_draw;
+class LedMatrixDualShiftRegisterTest_enableGroup;
+class LedMatrixDualShiftRegisterTest_disableGroup;
 
 namespace ace_segment {
 
 /**
- * An LedMatrixBase that writes to both group and element pins via SPI. The
- * group pins are assumed to be connected to the most significant byte. The
+ * An LedMatrix that whose group pins are attached to one 74HC595 shift register
+ * and the element pins are attached to another shift register. The 2 shift
+ * registers are daisy chained so that they can be accessed in a serial transfer
+ * of 16-bits using hardware or software SPI.
+ *
+ * The group pins are assumed to be connected to the most significant byte. The
  * element pins are connected to the least signficiant byte.
  *
  * @tparam SA class providing SPI, either SwSpiAdapter or HwSpiAdapter
  */
 template<typename SA>
-class LedMatrixFullSpi: public LedMatrixBase {
+class LedMatrixDualShiftRegister: public LedMatrixBase {
   public:
-    LedMatrixFullSpi(
+    LedMatrixDualShiftRegister(
         const SA& spiAdapter,
         uint8_t groupOnPattern,
         uint8_t elementOnPattern
@@ -89,9 +93,9 @@ class LedMatrixFullSpi: public LedMatrixBase {
     }
 
   private:
-    friend class ::LedMatrixFullSpiTest_draw;
-    friend class ::LedMatrixFullSpiTest_enableGroup;
-    friend class ::LedMatrixFullSpiTest_disableGroup;
+    friend class ::LedMatrixDualShiftRegisterTest_draw;
+    friend class ::LedMatrixDualShiftRegisterTest_enableGroup;
+    friend class ::LedMatrixDualShiftRegisterTest_disableGroup;
 
     const SA& mSpiAdapter;
 
