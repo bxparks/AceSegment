@@ -326,8 +326,8 @@ void setBrightnesses(int i) {
   uint8_t brightness2 = levels[(i+2)&0xF];
   uint8_t brightness3 = levels[(i+3)&0xF];
   segmentDisplayModulating.setBrightnessAt(0, brightness0);
-  segmentDisplayModulating.setBrightnessAt(1, brightness2);
-  segmentDisplayModulating.setBrightnessAt(2, brightness1);
+  segmentDisplayModulating.setBrightnessAt(1, brightness1);
+  segmentDisplayModulating.setBrightnessAt(2, brightness2);
   segmentDisplayModulating.setBrightnessAt(3, brightness3);
 }
 
