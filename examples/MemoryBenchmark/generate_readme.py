@@ -123,6 +123,14 @@ before substantional refactoring in 2021.
   the `fast/LedMatrixDirectFast.h` and `fast/SwSpiAdapterFast.h` classes.
 * Total flash size saved is around 2kB for AVR, from (4 to 4.4) kB to (2 to 2.5)
   kB.
+* Reduce flash size by 828 bytes on AVR, 3kB on ESP8266, 5kB on ESP32 in commit
+  c5da272 which simplified the test classes under `src/ace_segment/testing/` so
+  that they no longer inherit from `TestOnce` classes in the `AUnit` library.
+  Apparently, just making a reference to AUnit causes the `Serial` instance of
+  the `HardwareSerial` class to be pulled in. The compiler/linker is not able to
+  detect that it is actually never used, so it keeps around the code for the
+  HardwareSerial class. (I will make a fix to AUnit so that the `HardwareSerial`
+  will not be pulled in by other libraries in the future.)
 
 ## Arduino Nano
 

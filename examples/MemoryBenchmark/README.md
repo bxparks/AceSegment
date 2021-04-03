@@ -99,6 +99,14 @@ before substantional refactoring in 2021.
   the `fast/LedMatrixDirectFast.h` and `fast/SwSpiAdapterFast.h` classes.
 * Total flash size saved is around 2kB for AVR, from (4 to 4.4) kB to (2 to 2.5)
   kB.
+* Reduce flash size by 828 bytes on AVR, 3kB on ESP8266, 5kB on ESP32 in commit
+  c5da272 which simplified the test classes under `src/ace_segment/testing/` so
+  that they no longer inherit from `TestOnce` classes in the `AUnit` library.
+  Apparently, just making a reference to AUnit causes the `Serial` instance of
+  the `HardwareSerial` class to be pulled in. The compiler/linker is not able to
+  detect that it is actually never used, so it keeps around the code for the
+  HardwareSerial class. (I will make a fix to AUnit so that the `HardwareSerial`
+  will not be pulled in by other libraries in the future.)
 
 ## Arduino Nano
 
@@ -112,14 +120,14 @@ before substantional refactoring in 2021.
 |---------------------------------+--------------+-------------|
 | baseline                        |    456/   11 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| direct                          |   2566/  252 |  2110/  241 |
-| single_sw_spi                   |   2572/  246 |  2116/  235 |
-| single_hw_spi                   |   2634/  247 |  2178/  236 |
-| dual_sw_spi                     |   2448/  237 |  1992/  226 |
-| dual_hw_spi                     |   2522/  238 |  2066/  227 |
-| direct_fast                     |   2296/  280 |  1840/  269 |
-| single_sw_fast                  |   2464/  244 |  2008/  233 |
-| dual_sw_fast                    |   2056/  235 |  1600/  224 |
+| direct                          |   1738/   77 |  1282/   66 |
+| single_sw_spi                   |   1744/   71 |  1288/   60 |
+| single_hw_spi                   |   1806/   72 |  1350/   61 |
+| dual_sw_spi                     |   1622/   62 |  1166/   51 |
+| dual_hw_spi                     |   1696/   63 |  1240/   52 |
+| direct_fast                     |   1468/  105 |  1012/   94 |
+| single_sw_fast                  |   1636/   69 |  1180/   58 |
+| dual_sw_fast                    |   1230/   60 |   774/   49 |
 +--------------------------------------------------------------+
 
 ```
@@ -139,11 +147,11 @@ before substantional refactoring in 2021.
 | direct                          |   4732/  217 |  1260/   66 |
 | single_sw_spi                   |   4740/  211 |  1268/   60 |
 | single_hw_spi                   |   4802/  212 |  1330/   61 |
-| dual_sw_spi                     |   4616/  202 |  1144/   51 |
-| dual_hw_spi                     |   4690/  203 |  1218/   52 |
+| dual_sw_spi                     |   4618/  202 |  1146/   51 |
+| dual_hw_spi                     |   4692/  203 |  1220/   52 |
 | direct_fast                     |   4348/  245 |   876/   94 |
 | single_sw_fast                  |   4632/  209 |  1160/   58 |
-| dual_sw_fast                    |   4108/  200 |   636/   49 |
+| dual_sw_fast                    |   4110/  200 |   638/   49 |
 +--------------------------------------------------------------+
 
 ```
@@ -181,11 +189,11 @@ before substantional refactoring in 2021.
 |---------------------------------+--------------+-------------|
 | baseline                        |  19136/ 3788 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| direct                          |  21648/ 4020 |  2512/  232 |
-| single_sw_spi                   |  21716/ 4024 |  2580/  236 |
-| single_hw_spi                   |  23456/ 4024 |  4320/  236 |
-| dual_sw_spi                     |  21616/ 4016 |  2480/  228 |
-| dual_hw_spi                     |  23404/ 4016 |  4268/  228 |
+| direct                          |  21640/ 4020 |  2504/  232 |
+| single_sw_spi                   |  21708/ 4024 |  2572/  236 |
+| single_hw_spi                   |  23448/ 4024 |  4312/  236 |
+| dual_sw_spi                     |  21608/ 4016 |  2472/  228 |
+| dual_hw_spi                     |  23396/ 4016 |  4260/  228 |
 +--------------------------------------------------------------+
 
 ```
@@ -202,11 +210,11 @@ before substantional refactoring in 2021.
 |---------------------------------+--------------+-------------|
 | baseline                        | 256700/26784 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| direct                          | 260920/26972 |  4220/  188 |
-| single_sw_spi                   | 261008/26980 |  4308/  196 |
-| single_hw_spi                   | 262112/26988 |  5412/  204 |
-| dual_sw_spi                     | 260876/26960 |  4176/  176 |
-| dual_hw_spi                     | 262060/26968 |  5360/  184 |
+| direct                          | 257908/26868 |  1208/   84 |
+| single_sw_spi                   | 257980/26868 |  1280/   84 |
+| single_hw_spi                   | 259084/26876 |  2384/   92 |
+| dual_sw_spi                     | 257864/26848 |  1164/   64 |
+| dual_hw_spi                     | 259048/26856 |  2348/   72 |
 +--------------------------------------------------------------+
 
 ```
@@ -223,11 +231,11 @@ before substantional refactoring in 2021.
 |---------------------------------+--------------+-------------|
 | baseline                        | 197730/13100 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| direct                          | 205976/13556 |  8246/  456 |
-| single_sw_spi                   | 206016/13556 |  8286/  456 |
-| single_hw_spi                   | 208308/13604 | 10578/  504 |
-| dual_sw_spi                     | 205884/13548 |  8154/  448 |
-| dual_hw_spi                     | 208252/13596 | 10522/  496 |
+| direct                          | 200716/13412 |  2986/  312 |
+| single_sw_spi                   | 200756/13412 |  3026/  312 |
+| single_hw_spi                   | 203048/13460 |  5318/  360 |
+| dual_sw_spi                     | 200628/13404 |  2898/  304 |
+| dual_hw_spi                     | 202996/13452 |  5266/  352 |
 +--------------------------------------------------------------+
 
 ```
@@ -248,8 +256,8 @@ before substantional refactoring in 2021.
 | direct                          |  12216/ 4208 |  4592/ 1160 |
 | single_sw_spi                   |  12248/ 4212 |  4624/ 1164 |
 | single_hw_spi                   |  13508/ 4268 |  5884/ 1220 |
-| dual_sw_spi                     |  12172/ 4204 |  4548/ 1156 |
-| dual_hw_spi                     |  13368/ 4260 |  5744/ 1212 |
+| dual_sw_spi                     |  12184/ 4204 |  4560/ 1156 |
+| dual_hw_spi                     |  13380/ 4260 |  5756/ 1212 |
 +--------------------------------------------------------------+
 
 ```
