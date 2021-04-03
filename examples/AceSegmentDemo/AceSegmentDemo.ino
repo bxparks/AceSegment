@@ -435,16 +435,16 @@ void printStats() {
 }
 #endif
 
-void singleStep() {
-  renderField();
-}
-
 void renderField() {
   if (demoMode == DEMO_MODE_PULSE) {
     segmentDisplayModulating.renderFieldWhenReady();
   } else {
     segmentDisplay.renderFieldWhenReady();
   }
+}
+
+void singleStep() {
+  renderField();
 }
 
 //------------------------------------------------------------------
