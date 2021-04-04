@@ -66,31 +66,31 @@ testF(LedMatrixDirectTest, begin) {
   ledMatrixDirect.begin();
   assertEqual(24, hardware.mEventLog.getNumRecords());
   assertTrue(hardware.mEventLog.assertEvents(24,
-      EventType::kPinMode, 0, OUTPUT,
-      EventType::kDigitalWrite, 0, LOW,
-      EventType::kPinMode, 1, OUTPUT,
-      EventType::kDigitalWrite, 1, LOW,
-      EventType::kPinMode, 2, OUTPUT,
-      EventType::kDigitalWrite, 2, LOW,
-      EventType::kPinMode, 3, OUTPUT,
-      EventType::kDigitalWrite, 3, LOW,
+      (int) EventType::kPinMode, 0, OUTPUT,
+      (int) EventType::kDigitalWrite, 0, LOW,
+      (int) EventType::kPinMode, 1, OUTPUT,
+      (int) EventType::kDigitalWrite, 1, LOW,
+      (int) EventType::kPinMode, 2, OUTPUT,
+      (int) EventType::kDigitalWrite, 2, LOW,
+      (int) EventType::kPinMode, 3, OUTPUT,
+      (int) EventType::kDigitalWrite, 3, LOW,
 
-      EventType::kPinMode, 4, OUTPUT,
-      EventType::kDigitalWrite, 4, LOW,
-      EventType::kPinMode, 5, OUTPUT,
-      EventType::kDigitalWrite, 5, LOW,
-      EventType::kPinMode, 6, OUTPUT,
-      EventType::kDigitalWrite, 6, LOW,
-      EventType::kPinMode, 7, OUTPUT,
-      EventType::kDigitalWrite, 7, LOW,
-      EventType::kPinMode, 8, OUTPUT,
-      EventType::kDigitalWrite, 8, LOW,
-      EventType::kPinMode, 9, OUTPUT,
-      EventType::kDigitalWrite, 9, LOW,
-      EventType::kPinMode, 10, OUTPUT,
-      EventType::kDigitalWrite, 10, LOW,
-      EventType::kPinMode, 11, OUTPUT,
-      EventType::kDigitalWrite, 11, LOW
+      (int) EventType::kPinMode, 4, OUTPUT,
+      (int) EventType::kDigitalWrite, 4, LOW,
+      (int) EventType::kPinMode, 5, OUTPUT,
+      (int) EventType::kDigitalWrite, 5, LOW,
+      (int) EventType::kPinMode, 6, OUTPUT,
+      (int) EventType::kDigitalWrite, 6, LOW,
+      (int) EventType::kPinMode, 7, OUTPUT,
+      (int) EventType::kDigitalWrite, 7, LOW,
+      (int) EventType::kPinMode, 8, OUTPUT,
+      (int) EventType::kDigitalWrite, 8, LOW,
+      (int) EventType::kPinMode, 9, OUTPUT,
+      (int) EventType::kDigitalWrite, 9, LOW,
+      (int) EventType::kPinMode, 10, OUTPUT,
+      (int) EventType::kDigitalWrite, 10, LOW,
+      (int) EventType::kPinMode, 11, OUTPUT,
+      (int) EventType::kDigitalWrite, 11, LOW
   ));
 }
 
@@ -98,18 +98,18 @@ testF(LedMatrixDirectTest, end) {
   ledMatrixDirect.end();
   assertEqual(12, hardware.mEventLog.getNumRecords());
   assertTrue(hardware.mEventLog.assertEvents(12,
-      EventType::kPinMode, 0, INPUT,
-      EventType::kPinMode, 1, INPUT,
-      EventType::kPinMode, 2, INPUT,
-      EventType::kPinMode, 3, INPUT,
-      EventType::kPinMode, 4, INPUT,
-      EventType::kPinMode, 5, INPUT,
-      EventType::kPinMode, 6, INPUT,
-      EventType::kPinMode, 7, INPUT,
-      EventType::kPinMode, 8, INPUT,
-      EventType::kPinMode, 9, INPUT,
-      EventType::kPinMode, 10, INPUT,
-      EventType::kPinMode, 11, INPUT
+      (int) EventType::kPinMode, 0, INPUT,
+      (int) EventType::kPinMode, 1, INPUT,
+      (int) EventType::kPinMode, 2, INPUT,
+      (int) EventType::kPinMode, 3, INPUT,
+      (int) EventType::kPinMode, 4, INPUT,
+      (int) EventType::kPinMode, 5, INPUT,
+      (int) EventType::kPinMode, 6, INPUT,
+      (int) EventType::kPinMode, 7, INPUT,
+      (int) EventType::kPinMode, 8, INPUT,
+      (int) EventType::kPinMode, 9, INPUT,
+      (int) EventType::kPinMode, 10, INPUT,
+      (int) EventType::kPinMode, 11, INPUT
   ));
 }
 
@@ -117,28 +117,28 @@ testF(LedMatrixDirectTest, enableGroup) {
   ledMatrixDirect.enableGroup(1);
   assertEqual(1, hardware.mEventLog.getNumRecords());
   assertTrue(hardware.mEventLog.assertEvents(1,
-      EventType::kDigitalWrite, 1, HIGH));
+      (int) EventType::kDigitalWrite, 1, HIGH));
 }
 
 testF(LedMatrixDirectTest, disableGroup) {
   ledMatrixDirect.disableGroup(1);
   assertEqual(1, hardware.mEventLog.getNumRecords());
   assertTrue(hardware.mEventLog.assertEvents(1,
-      EventType::kDigitalWrite, 1, LOW));
+      (int) EventType::kDigitalWrite, 1, LOW));
 }
 
 testF(LedMatrixDirectTest, drawElements) {
   ledMatrixDirect.drawElements(0x55);
   assertEqual(8, hardware.mEventLog.getNumRecords());
   assertTrue(hardware.mEventLog.assertEvents(8,
-      EventType::kDigitalWrite, 4, HIGH,
-      EventType::kDigitalWrite, 5, LOW,
-      EventType::kDigitalWrite, 6, HIGH,
-      EventType::kDigitalWrite, 7, LOW,
-      EventType::kDigitalWrite, 8, HIGH,
-      EventType::kDigitalWrite, 9, LOW,
-      EventType::kDigitalWrite, 10, HIGH,
-      EventType::kDigitalWrite, 11, LOW
+      (int) EventType::kDigitalWrite, 4, HIGH,
+      (int) EventType::kDigitalWrite, 5, LOW,
+      (int) EventType::kDigitalWrite, 6, HIGH,
+      (int) EventType::kDigitalWrite, 7, LOW,
+      (int) EventType::kDigitalWrite, 8, HIGH,
+      (int) EventType::kDigitalWrite, 9, LOW,
+      (int) EventType::kDigitalWrite, 10, HIGH,
+      (int) EventType::kDigitalWrite, 11, LOW
   ));
 }
 
@@ -158,24 +158,24 @@ testF(LedMatrixSingleShiftRegisterTest, begin) {
   ledMatrixSingleShiftRegister.begin();
   assertEqual(8, hardware.mEventLog.getNumRecords());
   assertTrue(hardware.mEventLog.assertEvents(8,
-      EventType::kPinMode, 0, OUTPUT,
-      EventType::kDigitalWrite, 0, LOW,
-      EventType::kPinMode, 1, OUTPUT,
-      EventType::kDigitalWrite, 1, LOW,
-      EventType::kPinMode, 2, OUTPUT,
-      EventType::kDigitalWrite, 2, LOW,
-      EventType::kPinMode, 3, OUTPUT,
-      EventType::kDigitalWrite, 3, LOW));
+      (int) EventType::kPinMode, 0, OUTPUT,
+      (int) EventType::kDigitalWrite, 0, LOW,
+      (int) EventType::kPinMode, 1, OUTPUT,
+      (int) EventType::kDigitalWrite, 1, LOW,
+      (int) EventType::kPinMode, 2, OUTPUT,
+      (int) EventType::kDigitalWrite, 2, LOW,
+      (int) EventType::kPinMode, 3, OUTPUT,
+      (int) EventType::kDigitalWrite, 3, LOW));
 }
 
 testF(LedMatrixSingleShiftRegisterTest, end) {
   ledMatrixSingleShiftRegister.end();
   assertEqual(4, hardware.mEventLog.getNumRecords());
   assertTrue(hardware.mEventLog.assertEvents(4,
-      EventType::kPinMode, 0, INPUT,
-      EventType::kPinMode, 1, INPUT,
-      EventType::kPinMode, 2, INPUT,
-      EventType::kPinMode, 3, INPUT));
+      (int) EventType::kPinMode, 0, INPUT,
+      (int) EventType::kPinMode, 1, INPUT,
+      (int) EventType::kPinMode, 2, INPUT,
+      (int) EventType::kPinMode, 3, INPUT));
 
 }
 
@@ -183,21 +183,21 @@ testF(LedMatrixSingleShiftRegisterTest, enableGroup) {
   ledMatrixSingleShiftRegister.enableGroup(1);
   assertEqual(1, hardware.mEventLog.getNumRecords());
   assertTrue(hardware.mEventLog.assertEvents(1,
-      EventType::kDigitalWrite, 1, HIGH));
+      (int) EventType::kDigitalWrite, 1, HIGH));
 }
 
 testF(LedMatrixSingleShiftRegisterTest, disableGroup) {
   ledMatrixSingleShiftRegister.disableGroup(1);
   assertEqual(1, hardware.mEventLog.getNumRecords());
   assertTrue(hardware.mEventLog.assertEvents(1,
-      EventType::kDigitalWrite, 1, LOW));
+      (int) EventType::kDigitalWrite, 1, LOW));
 }
 
 testF(LedMatrixSingleShiftRegisterTest, drawElements) {
   ledMatrixSingleShiftRegister.drawElements(0x55);
   assertEqual(1, spiAdapter.mEventLog.getNumRecords());
   assertTrue(spiAdapter.mEventLog.assertEvents(1,
-      EventType::kSpiTransfer, 0x55
+      (int) EventType::kSpiTransfer, 0x55
   ));
 }
 
@@ -230,7 +230,7 @@ testF(LedMatrixDualShiftRegisterTest, enableGroup) {
   assertEqual(1, spiAdapter.mEventLog.getNumRecords());
   uint16_t expectedOutput = ((0x1 << 1) << 8) | 0x42;
   assertTrue(spiAdapter.mEventLog.assertEvents(1,
-      EventType::kSpiTransfer16, expectedOutput));
+      (int) EventType::kSpiTransfer16, expectedOutput));
 }
 
 testF(LedMatrixDualShiftRegisterTest, disableGroup) {
@@ -239,7 +239,7 @@ testF(LedMatrixDualShiftRegisterTest, disableGroup) {
   assertEqual(1, spiAdapter.mEventLog.getNumRecords());
   uint16_t expectedOutput = 0x0000;
   assertTrue(spiAdapter.mEventLog.assertEvents(1,
-      EventType::kSpiTransfer16, expectedOutput));
+      (int) EventType::kSpiTransfer16, expectedOutput));
 }
 
 testF(LedMatrixDualShiftRegisterTest, draw) {
@@ -248,7 +248,7 @@ testF(LedMatrixDualShiftRegisterTest, draw) {
   uint16_t expectedOutput = ((0x1 << 3) << 8) | 0x55;
   assertEqual(1, spiAdapter.mEventLog.getNumRecords());
   assertTrue(spiAdapter.mEventLog.assertEvents(1,
-    EventType::kSpiTransfer16, expectedOutput
+    (int) EventType::kSpiTransfer16, expectedOutput
   ));
 }
 

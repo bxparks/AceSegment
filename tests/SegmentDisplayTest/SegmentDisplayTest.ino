@@ -52,36 +52,39 @@ testF(SegmentDisplayTest, displayCurrentField) {
   ledMatrix.mEventLog.clear();
   segmentDisplay.displayCurrentField();
   assertEqual(1, ledMatrix.mEventLog.getNumRecords());
+  // Cast to (int) required on 8-bit AVR processors (not sure why), something to
+  // do with the size of EventType, which is a uint8_t, which does not get
+  // automatically promoted?
   assertTrue(ledMatrix.mEventLog.assertEvents(
-      1, EventType::kLedMatrixDraw, 0, 0x00));
+      1, (int) EventType::kLedMatrixDraw, 0, 0x00));
 
   // display field 1
   ledMatrix.mEventLog.clear();
   segmentDisplay.displayCurrentField();
   assertEqual(1, ledMatrix.mEventLog.getNumRecords());
   assertTrue(ledMatrix.mEventLog.assertEvents(
-      1, EventType::kLedMatrixDraw, 1, 0x11));
+      1, (int) EventType::kLedMatrixDraw, 1, 0x11));
 
   // display field 2
   ledMatrix.mEventLog.clear();
   segmentDisplay.displayCurrentField();
   assertEqual(1, ledMatrix.mEventLog.getNumRecords());
   assertTrue(ledMatrix.mEventLog.assertEvents(
-      1, EventType::kLedMatrixDraw, 2, 0x22));
+      1, (int) EventType::kLedMatrixDraw, 2, 0x22));
 
   // display field 3
   ledMatrix.mEventLog.clear();
   segmentDisplay.displayCurrentField();
   assertEqual(1, ledMatrix.mEventLog.getNumRecords());
   assertTrue(ledMatrix.mEventLog.assertEvents(
-      1, EventType::kLedMatrixDraw, 3, 0x33));
+      1, (int) EventType::kLedMatrixDraw, 3, 0x33));
 
   // cycle back to field 0
   ledMatrix.mEventLog.clear();
   segmentDisplay.displayCurrentField();
   assertEqual(1, ledMatrix.mEventLog.getNumRecords());
   assertTrue(ledMatrix.mEventLog.assertEvents(
-      1, EventType::kLedMatrixDraw, 0, 0x00));
+      1, (int) EventType::kLedMatrixDraw, 0, 0x00));
 }
 
 //----------------------------------------------------------------------------
