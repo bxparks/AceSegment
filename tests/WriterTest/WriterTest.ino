@@ -47,6 +47,7 @@ testF(CharWriterTest, writeAt) {
 
 testF(CharWriterTest, writeAt_outOfBounds) {
   mPatterns[4] = 0;
+
   charWriter.writeCharAt(4, 'a');
   assertEqual(0, mPatterns[4]);
 }
@@ -136,13 +137,6 @@ class ClockWriterTest: public TestOnce {
     uint8_t* mPatterns;
 };
 
-testF(ClockWriterTest, toBcd) {
-  assertEqual(0x00, ClockWriter::toBcd(0));
-  assertEqual(0x42, ClockWriter::toBcd(42));
-  assertEqual(0x99, ClockWriter::toBcd(99));
-  assertEqual(0xFF, ClockWriter::toBcd(100));
-}
-
 testF(ClockWriterTest, writeCharAt) {
   clockWriter.writeCharAt(0, ClockWriter::kP);
   assertEqual(0b01110011, mPatterns[0]);
@@ -153,9 +147,9 @@ testF(ClockWriterTest, writeBcdAt) {
   assertEqual(0b00000110, mPatterns[0]);
   assertEqual(0b01011011, mPatterns[1]);
 
-  clockWriter.writeBcdAt(2, 0xAF);
-  assertEqual(0x0, mPatterns[2]);
-  assertEqual(0x0, mPatterns[3]);
+  clockWriter.writeBcdAt(2, 0x89);
+  assertEqual(0b01111111, mPatterns[2]);
+  assertEqual(0b01101111, mPatterns[3]);
 }
 
 testF(ClockWriterTest, writeDecimalAt) {
@@ -163,9 +157,9 @@ testF(ClockWriterTest, writeDecimalAt) {
   assertEqual(0b00000110, mPatterns[0]);
   assertEqual(0b01011011, mPatterns[1]);
 
-  clockWriter.writeDecimalAt(2, 100);
-  assertEqual(0x0, mPatterns[2]);
-  assertEqual(0x0, mPatterns[3]);
+  clockWriter.writeDecimalAt(2, 89);
+  assertEqual(0b01111111, mPatterns[2]);
+  assertEqual(0b01101111, mPatterns[3]);
 }
 
 testF(ClockWriterTest, writeBcdClock) {

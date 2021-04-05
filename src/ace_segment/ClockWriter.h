@@ -108,12 +108,6 @@ class ClockWriter {
       mLedDisplay.writeDecimalPointAt(mColonDigit, state);
     }
 
-    /**
-     * Convert decimal number into BCD (binary coded decimal).
-     * VisibleForTesting. TODO: Replace with ace_common::toBcd().
-     */
-    static uint8_t toBcd(uint8_t d);
-
   private:
     // Bit pattern map for hex characters.
     static const uint8_t kCharacterArray[];

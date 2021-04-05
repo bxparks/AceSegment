@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 #include <Arduino.h>
-#include <AceCommon.h> // decTooBcd()
+#include <AceCommon.h> // decToBcd()
 #include "ClockWriter.h"
 
 namespace ace_segment {
@@ -88,13 +88,13 @@ void ClockWriter::writeBcdAt(uint8_t pos, uint8_t bcd) {
 }
 
 void ClockWriter::writeDecimalAt(uint8_t pos, uint8_t d) {
-  uint8_t bcd = toBcd(d);
+  uint8_t bcd = ace_common::decToBcd(d);
   writeBcdAt(pos, bcd);
 }
 
 void ClockWriter::writeClock(uint8_t hh, uint8_t mm) {
-  uint8_t hhBcd = toBcd(hh);
-  uint8_t mmBcd = toBcd(mm);
+  uint8_t hhBcd = ace_common::decToBcd(hh);
+  uint8_t mmBcd = ace_common::decToBcd(mm);
   writeBcdClock(hhBcd, mmBcd);
   writeColon(true);
 }
@@ -103,13 +103,6 @@ void ClockWriter::writeBcdClock(uint8_t hhBcd, uint8_t mmBcd) {
   writeBcdAt(0, hhBcd);
   writeBcdAt(2, mmBcd);
   writeColon(true);
-}
-
-uint8_t ClockWriter::toBcd(uint8_t d) {
-  if (d >= 100) return 0xFF;
-  uint8_t h1 = d / 10;
-  uint8_t h0 = d - (h1 * 10);
-  return (h1 << 4) | h0;
 }
 
 }
