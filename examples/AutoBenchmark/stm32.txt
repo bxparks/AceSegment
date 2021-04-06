@@ -12,9 +12,14 @@ sizeof(ClockWriter): 8
 sizeof(CharWriter): 4
 sizeof(StringWriter): 4
 BENCHMARKS
-direct 14 15 20 1200
-single_sw_spi 31 32 37 1200
-single_hw_spi 40 40 46 1200
-dual_sw_spi 54 55 60 1200
-dual_hw_spi 40 40 45 1200
+direct 13 14 18 240
+direct(subfields) 1 3 19 3840
+single_sw_spi 30 30 35 240
+single_sw_spi(subfields) 1 4 49 3840
+single_hw_spi 40 40 45 240
+single_hw_spi(subfields) 1 6 63 3840
+dual_sw_spi 51 52 57 240
+dual_sw_spi(subfields) 1 7 77 3840
+dual_hw_spi 40 40 45 240
+dual_hw_spi(subfields) 1 6 64 3840
 END
