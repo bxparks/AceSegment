@@ -67,7 +67,13 @@ const uint8_t CHANGE_BUTTON_PIN = 3;
 // Fortunately, according to AutoBenchmark, the "fast" versions of LedMatrix can
 // render a single field in about 20-30 micros.
 const uint8_t FRAMES_PER_SECOND = 60;
-const uint8_t NUM_SUBFIELDS = 64;
+const uint8_t NUM_SUBFIELDS = 16;
+const uint8_t NUM_BRIGHTNESSES = 8;
+
+const uint8_t levels[NUM_BRIGHTNESSES] = {
+  1, 2, 4, 8,
+  15, 7, 3, 2
+};
 
 const uint8_t NUM_DIGITS = 4;
 const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
@@ -321,14 +327,10 @@ void setupPulseDisplay() {
 }
 
 void setBrightnesses(int i) {
-  static uint8_t levels[16] = {
-    16, 23, 32, 45, 64, 91, 128, 182,
-    255, 182, 128, 91, 64, 45, 32, 23
-  };
-  uint8_t brightness0 = levels[i&0xF];
-  uint8_t brightness1 = levels[(i+1)&0xF];
-  uint8_t brightness2 = levels[(i+2)&0xF];
-  uint8_t brightness3 = levels[(i+3)&0xF];
+  uint8_t brightness0 = levels[i % NUM_BRIGHTNESSES];
+  uint8_t brightness1 = levels[(i+1) % NUM_BRIGHTNESSES];
+  uint8_t brightness2 = levels[(i+2) % NUM_BRIGHTNESSES];
+  uint8_t brightness3 = levels[(i+3) % NUM_BRIGHTNESSES];
   segmentDisplayModulating.setBrightnessAt(0, brightness0);
   segmentDisplayModulating.setBrightnessAt(1, brightness1);
   segmentDisplayModulating.setBrightnessAt(2, brightness2);
