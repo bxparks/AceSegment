@@ -43,6 +43,9 @@ Shift Register that is accessed through software or hardware SPI.
     * [StringWriter](#StringWriter)
 * [Resource Consumption](#ResourceConsumption)
 * [System Requirements](#SystemRequirements)
+    * [Hardware](#Hardware)
+    * [Tool Chain](#ToolChain)
+    * [Operating System](#OperatingSystem)
 * [License](#License)
 * [Feedback and Support](#FeedbackAndSupport)
 * [Authors](#Authors)
@@ -82,7 +85,7 @@ components:
     * resistors on segments
     * transistors on digits or segments
     * using 74HC595 with `shiftOut()` or hardware SPI
-* The `Renderer` class knows how to render the array of digit patterns to
+* The `SegmentDisplay` class knows how to render the array of digit patterns to
   the LED module using multiplexing.
   digit to be associated with a particular brightness.
 * The `SegmentDisplay` knows how to display the bit patterns to a specific
@@ -93,15 +96,16 @@ The rendering of an array of bit patterns is split into 2 parts:
 * a *field* is a partial rendering of a single frame
 
 A frame rate of about 60Hz will be sufficient to prevent obvious flickering of
-the LED. Depending on the `Renderer` subclass, we could reasonably have between
-4 and 64 fields per frame (this is partially a user-selectable parameter),
-giving us a fields per second rate of 240Hz to 3840Hz.
+the LED. Depending on the configuration of the `SegmentDisplay` class, we could
+reasonably have between 4 and 64 fields per frame (this is partially a
+user-selectable parameter), giving us a fields per second rate of 240Hz to
+3840Hz.
 
-At the highest fields per second, a single field needs to be written in less
-than 260 microseconds. The AceSegment library is able to meet this timing
-requirement because `Renderer::renderCurrentField()` is able to render a single
-field with a maximum CPU time of 124 microseconds on a 16MHz ATmega328P
-microcontroller (Arduino UNO, Nano, Mini, etc).
+At 3840 fields per second, a single field needs to be written in less than 260
+microseconds. The AceSegment library is able to meet this timing requirement
+because `SegmentDisplay::renderFieldNow()` is able to render a single field with
+a maximum CPU time of 124 microseconds on a 16MHz ATmega328P microcontroller
+(Arduino UNO, Nano, Mini, etc).
 
 <a name="Installation"></a>
 ## Installation
@@ -249,24 +253,24 @@ StringWriter
                         |
                   SegmentDiplay
                  /      |      \
-                /       |       `------------.
-               v        v                     v
-  LedMatrixDirect  LedMatrixSingleS.R.  LedMatrixDualS.R.
-              |         |      |      \ /     |
-               \        |      |       X      |
-                \       |      |      / \     |
-                 \      |      v     v   v    v
-                  \     | SwSpiAdapter  HwSpiAdapter
-                   \    |    /
-                    \   |   /
-                     v  v  v
-                    Hardware
+                /       |       `-----------.
+               v        v                    v
+  LedMatrixDirect      LedMatrixSingleSR   LedMatrixDualSR
+LedMatrixDirectFast     |      |        \ /    |
+               \        |      |         X     |
+                \       |      |        / \    |
+                 \      |      v       v   v   v
+                  \     |   SwSpiAdapter   HwSpiAdapter
+                   \    | SwSpiAdapaterFast
+                    \   |    /
+                     v  v   v
+                     Hardware
                         |
                         v
-                  digitalWrite()
-                  shiftOut()
-                  millis()
-                  micros()
+                   digitalWrite()
+                   pinMode()
+                   millis()
+                   micros()
 ```
 
 <a name="SettingResources"></a>
@@ -596,10 +600,6 @@ void setupSegmentDisplay() {
   ledMatrix.begin();
   segmentDisplay.begin();
 }
-
-...
-
-renderer.begin();
 ```
 
 <a name="UsingSegmentDisplay"></a>
@@ -687,22 +687,13 @@ within a field, giving a total *field* rate of about 2000-4000Hz. That's abaout
 250-500 microseconds per field, which is surprisingly doable using an 8-bit
 processor like an Arduino UNO or Nano on an ATmega328 running at 16MHz.
 
-The `SegmentDisplay` and its subclasses do not know about *frames*, they only
-know about *fields*. The `SegmentDisplay` on the other hand, cares only about
-frames and does not know much of anything about fields. The only thing that the
-`SegmentDisplay` knows is how many fields there are in a frame and this
-information comes from the `SegmentDisplay::getFieldsPerFrame()` method.
+The primary unit of rendering in `SegmentDisplay` is a single field, implemented
+in `SegmentDisplay::renderFieldNow()`. The `SegmentDisplay` class keeps track of
+the current digit, the current frame, and the current field, and each successive
+call to `renderFieldNow()` sends the appropriate bit pattern to the LED module.
 
-With the distinction between *frames* and *fields* explained, we can now explain
-how `SegmentDisplay::renderField()` works. The `SegmentDisplay` keeps an
-internal counter, and if the call occurs at a frame boundary, the
-`SegmentDisplay` calls to the `SegmentDisplay` which will draw the resulting bit
-pattern on the LED display.
-
-The call to `SegmentDisplay::renderField()` simply passed along the call to
-`SegmentDisplay::displayCurrentField()`.
-
-There are 2 methods to achieve this:
+For a given requested frame rate, are 2 ways to render the fields at the correct
+time, and they are explained below:
 
 * Polling
 * Interrupts
@@ -710,12 +701,11 @@ There are 2 methods to achieve this:
 <a name="RenderingByPolling"></a>
 #### Rendering By Polling
 
-For convenience, we provided one method,
-`SegmentDisplay::renderFieldWhenReady()` that actually knows the real clock, and
-can be polled repeated to generated the calls to `renderField()` at the right
-time. This is the easiest way to see something on the LED segments and will work
-at the early stages of a project. But any non-trivial project will want to use
-the interrupt method (explained below).
+The `SegmentDisplay::renderFieldWhenReady()` is meant to be called at a
+frequency somewhat higher than that needed to sustain the actual frame rate. It
+keeps an internal variable containing the time (in `micros()`) of the previous
+rendering of the field. When the time is up, it calls `renderFieldNow()` and
+updates the internal clock to be ready for the next call.
 
 The code looks like this:
 
@@ -726,35 +716,35 @@ void loop() {
 ```
 
 The problem with using this method is that it's difficult to get much else done
-in the `loop()` method. We noted above that to get dimmable digits using PWM,
-then we need a field rate of 2000-4000 Hz or 250-500 microseconds per frame. If
-the `loop()` method executes anything else that affects the timing requirements,
-then the user will notice this problem as flickering of the LED segments.
+in the `loop()` method. If those other side things take up too much time, then
+the refreshing rate of the LED module will wander, and the eyes will notice
+flickering of the LED module.
+
+Using this polling method is the easiest way to get AceSegment working. But many
+non-trivial project will want to use the timer interrupt method to avoid the
+flickering problem.
 
 <a name="RenderingUsingInterrupts"></a>
 #### Rendering Using Interrupts
 
-This is the recommended way of drawing the bit patterns to the LED display.
-
-The calling code sets up an interrupt service
-routine which calls `SegmentDisplay::renderField()` at exactly the periodic
-frequency needed to achieve the desired frames per second and fields
-per second.
+The calling code sets up an interrupt service routine (ISR) which calls
+`SegmentDisplay::renderFieldNow()` at exactly the periodic frequency needed to
+achieve the desired frames per second and fields per second.
 
 Unfortunately, timer interrupts are not part of the Arduino API (probably
-because every microcontroller does interrupts in a slightly different way). For
-example, an ATmega328 (e.g. Arduino UNO, Nano, Mini), using an 8-bit timer on
-Timer 2 looks like this:
+because every microcontroller handles interrupts in a slightly different way).
+For example, an ATmega328 (e.g. Arduino UNO, Nano, Mini), using an 8-bit timer
+on Timer 2 looks like this:
 ```
 ISR(TIMER2_COMPA_vect) {
-  segmentDisplay.renderField();
+  segmentDisplay.renderFieldNow();
 }
 
 void setup() {
   ...
   // set up Timer 2
   uint8_t timerCompareValue =
-      (long) F_CPU / 1024 / renderer->getFieldsPerSecond() - 1;
+      (unsigned long) F_CPU / 1024 / segmentDisplay->getFieldsPerSecond() - 1;
   noInterrupts();
   TCNT2  = 0;	// Initialize counter value to 0
   TCCR2A = 0;
@@ -778,8 +768,8 @@ void loop() {
 While it is exciting to be able to write any bit patterns to the LED display,
 we often want to just write numerals to the LED display.
 The `HexWriter` converts an integer to the seven-segment bit patterns used by
-`Renderer`. On platforms that support it (ATmega and ESP8266), the bit mapping
-table is stored in flash memory to conserve static memory.
+`SegmentDisplay`. On platforms that support it (ATmega and ESP8266), the bit
+mapping table is stored in flash memory to conserve static memory.
 
 The class supports the following methods:
 * `void writeHexAt(uint8_t digit, uint8_t c)`
@@ -867,12 +857,16 @@ void scrollString(const char* s) {
 Here are the sizes of the various classes on the 8-bit AVR microcontrollers
 (Arduino Uno, Nano, etc):
 
-* sizeof(TimingStats): 14
-* sizeof(Hardware): 2
-* sizeof(LedMatrixDirect): 14
-* sizeof(LedMatrixSingleShiftRegister): 15
-* sizeof(LedMatrixDualShiftRegister): 15
-* sizeof(SegmentDisplay): 54
+* sizeof(Hardware): 1
+* sizeof(SwSpiAdapter): 3
+* sizeof(SwSpiAdapterFast<1,2,3>): 1
+* sizeof(HwSpiAdapter): 3
+* sizeof(LedMatrixDirect<Hardware>): 11
+* sizeof(LedMatrixDirectFast<0..3, 0..7>): 3
+* sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 10
+* sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 5
+* sizeof(LedDisplay): 3
+* sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 26
 * sizeof(HexWriter): 2
 * sizeof(ClockWriter): 3
 * sizeof(CharWriter): 2
@@ -884,78 +878,129 @@ For the most part, the user pays only for the feature that is being used. For
 example, if the `CharWriter` (which consumes 312 bytes of flash) is not used, it
 is not loaded into the program.
 
-Here are the flash and static memory consumptions for various options.
-Tested on `examples/AceSegmentDemo`:
+Here are the flash and static memory consumptions for various configurations
+on an Arduino Nano (ATmega328):
 
 ```
------------------+--------------+----------+--------+
-Configuration    | flash/static | Delta    | Delta  |
------------------+--------------+----------+--------|
-No AceSegment    | 2562/218     | 0/0      |        |
-                 |              |          |        |
-No Writers       | 7416/423     | 4854/205 | 0/0    |
-HexWriter        | 7616/426     | 5054/208 | 200/3  |
-CharWriter       | 7728/426     | 5166/208 | 312/3  |
-StringWriter     | 7800/434     | 5238/216 | 384/11 |
-                 |              |          |        |
-ModDigit/Direct  | 7416/423     | 4854/205 |        |
-ModDigit/Serial  | 7412/415     | 4840/197 |        |
-ModDigit/SPI     | 7412/415     | 4840/197 |        |
-Segment/Direct   | 7412/423     | 4840/205 |        |
-FastDirectDriver | 6714/407     | 4152/189 |        |
-FastSerialDriver | 6564/367     | 4002/149 |        |
-FastSpiDriver    | 6604/368     | 4042/150 |        |
------------------+--------------+----------+--------+
++--------------------------------------------------------------+
+| functionality                   |  flash/  ram |       delta |
+|---------------------------------+--------------+-------------|
+| baseline                        |    456/   11 |     0/    0 |
+|---------------------------------+--------------+-------------|
+| direct                          |   1600/   75 |  1144/   64 |
+| single_sw_spi                   |   1606/   69 |  1150/   58 |
+| single_hw_spi                   |   1668/   70 |  1212/   59 |
+| dual_sw_spi                     |   1490/   60 |  1034/   49 |
+| dual_hw_spi                     |   1564/   61 |  1108/   50 |
+|---------------------------------+--------------+-------------|
+| direct_fast                     |   1336/  103 |   880/   92 |
+| single_sw_fast                  |   1498/   67 |  1042/   56 |
+| dual_sw_fast                    |   1098/   58 |   642/   47 |
++--------------------------------------------------------------+
 ```
 
-To summarize:
+And here are the memory consumption numbers for an ESP8266:
 
-* `HexWriter` consumes an additional 200 bytes of flash
-* `CharWriter` consumes about 312 bytes of flash (most of that due to the
-  bit-pattern array for 128 ASCII characters)
-* `StringWriter` consumes about 384 bytes of flash (most of which is
-  `CharWriter`)
-
-So the AceSegment library consumes between 4000-5500 bytes of flash memory and
-between 200-300 bytes of static memory.
+```
++--------------------------------------------------------------+
+| functionality                   |  flash/  ram |       delta |
+|---------------------------------+--------------+-------------|
+| baseline                        | 256700/26784 |     0/    0 |
+|---------------------------------+--------------+-------------|
+| direct                          | 257828/26860 |  1128/   76 |
+| single_sw_spi                   | 257900/26868 |  1200/   84 |
+| single_hw_spi                   | 259004/26876 |  2304/   92 |
+| dual_sw_spi                     | 257768/26848 |  1068/   64 |
+| dual_hw_spi                     | 258968/26856 |  2268/   72 |
++--------------------------------------------------------------+
+```
 
 ### CPU Cycles
-
-The `Renderer` contains a `TimingStats` object which tracks the minimum,
-average, and maximum amount of time taken by a call to `renderField()` method.
-The stats object reset periodically, by default every 1200 calls to
-`renderField()` but can be changed.
 
 The benchmark numbers can be seen in
 [examples/AutoBenchmark](examples/AutoBenchmark).
 
+Here are the CPU numbers for an AVR processor:
+
+```
++---------------------------+-------------+---------+
+| LedMatrix type            | min/avg/max | samples |
+|---------------------------+-------------+---------|
+| direct                    |  60/ 64/ 80 | 1200    |
+| single_sw_spi             | 124/126/144 | 1200    |
+| single_hw_spi             |  28/ 31/ 48 | 1200    |
+| dual_sw_spi               | 212/215/244 | 1200    |
+| dual_hw_spi               |  20/ 23/ 32 | 1200    |
+|---------------------------+-------------+---------|
+| direct_fast               |  24/ 26/ 36 | 1200    |
+| single_sw_spi_fast        |  24/ 26/ 36 | 1200    |
+| dual_sw_spi_fast          |  20/ 23/ 32 | 1200    |
++---------------------------+-------------+---------+
+```
+
+Here are the CPU numbers for an ESP8266:
+
+```
++---------------------------+-------------+---------+
+| LedMatrix type            | min/avg/max | samples |
+|---------------------------+-------------+---------|
+| direct                    |  12/ 12/ 28 | 1200    |
+| single_sw_spi             |  28/ 29/ 43 | 1200    |
+| single_hw_spi             |  11/ 11/ 23 | 1200    |
+| dual_sw_spi               |  50/ 50/ 65 | 1200    |
+| dual_hw_spi               |  12/ 12/ 24 | 1200    |
++---------------------------+-------------+---------+
+```
+
 If we want to drive a 4 digit LED display at 60 frames per second, using a
 subfield modulation of 16 subfields per field, we get a field rate of 3.84 kHz,
-or 260 microseconds per field. We see in the table that all of the options had a
-maximum time of less than 260 microseconds required on a 16MHz ATmega328P
-processor,
-
-The `fast_driver.py` script generates C++ code (indicated by `fast` in the
-benchmarks) that is fast enough to allow pulse width modulation even on an 8MHz
-ATmega328P microcontroller powered at 3.3V.
+or 260 microseconds per field. We see from
+[examples/AutoBenchmark](examples/AutoBenchmark) that all hardware platforms are
+capable of providing a rendering time between fields of less than 260
+microseconds.
 
 <a name="SystemRequirements"></a>
 ## System Requirements
 
-This library was developed and tested using:
-* [Arduino IDE 1.8.5](https://www.arduino.cc/en/Main/Software)
-* [Teensyduino 1.41](https://www.pjrc.com/teensy/td_download.html)
+<a name="Hardware"></a>
+### Hardware
 
-I used MacOS 10.13.3 and Ubuntu Linux 17.10 for most of my development.
+The library is extensively tested on the following boards:
 
-The library has been tested on the following hardware:
+* Arduino Nano clone (16 MHz ATmega328P)
+* SparkFun Pro Micro clone (16 MHz ATmega32U4)
+* SAMD21 M0 Mini (48 MHz ARM Cortex-M0+)
+* STM32 Blue Pill (STM32F103C8, 72 MHz ARM Cortex-M3)
+* NodeMCU 1.0 (ESP-12E module, 80MHz ESP8266)
+* WeMos D1 Mini (ESP-12E module, 80 MHz ESP8266)
+* ESP32 dev board (ESP-WROOM-32 module, 240 MHz dual core Tensilica LX6)
+* Teensy 3.2 (72 MHz ARM Cortex-M4)
 
-* Arduino Nano clone (16 MHz ATmega328P) - fully tested
-* Arduino Pro Mini clone (16 MHz ATmega328P, 5V) - fully tested
-* Teensy LC (48 MHz ARM Cortex-M0+) - limited hardware testing
-* Arduino Pro Micro clone (16 MHz ATmega32U4, 5V) - limited software testing
-* Teensy 3.2 (48 MHz ARM Cortex-M0+) - verified compile
-* NodeMCU 1.0 clone (ESP-12E module, 80MHz ESP8266) - verified compile
+I will occasionally test on the following hardware as a sanity check:
+
+* Teensy LC (48 MHz ARM Cortex-M0+)
+* Mini Mega 2560 (Arduino Mega 2560 compatible, 16 MHz ATmega2560)
+
+<a name="ToolChain"></a>
+### Tool Chain
+
+* [Arduino IDE 1.8.13](https://www.arduino.cc/en/Main/Software)
+* [Arduino CLI 0.14.0](https://arduino.github.io/arduino-cli)
+* [Arduino AVR Boards 1.8.3](https://github.com/arduino/ArduinoCore-avr)
+* [Arduino SAMD Boards 1.8.9](https://github.com/arduino/ArduinoCore-samd)
+* [SparkFun AVR Boards 1.1.13](https://github.com/sparkfun/Arduino_Boards)
+* [SparkFun SAMD Boards 1.8.1](https://github.com/sparkfun/Arduino_Boards)
+* [STM32duino 1.9.0](https://github.com/stm32duino/Arduino_Core_STM32)
+* [ESP8266 Arduino 2.7.4](https://github.com/esp8266/Arduino)
+* [ESP32 Arduino 1.0.4](https://github.com/espressif/arduino-esp32)
+* [Teensydino 1.53](https://www.pjrc.com/teensy/td_download.html)
+
+<a name="OperatingSystem"></a>
+### Operating System
+
+I use Ubuntu 18.04 and 20.04 for the vast majority of my development. I expect
+that the library will work fine under MacOS and Windows, but I have not tested
+them.
 
 <a name="License"></a>
 ## License
