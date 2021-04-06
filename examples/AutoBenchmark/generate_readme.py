@@ -95,7 +95,38 @@ number of `TimingStats::update()` calls that were made.
 v0.4: Huge refactoring of core AceSegment classes. Rewrote AutoBenchmark
 to match similar programs in the AceButton, AceCrc and AceTime libraries.
 
-## Arduino Nano
+## Results
+
+The following tables show the number of microseconds taken by
+`SegmentDisplay::displayCurrentField()` which renders the 8 segments of a single
+LED digit. If the LED module has 4 digits, then `displayCurrentField()` must be
+called 4 times to render the light pattern of the entire LED module. The entire
+rendering is then called a frame.
+
+Most people can no longer see flickering of the display at about 60 frames a
+second. To achieve that, the `displayCurrentField()` method must be called 240
+times a second for a module with 4 digits, or every 4.17 milliseconds. The
+results below show that every processor, even the slowest AVR processor, is able
+to meet this threshhold.
+
+* For the `LedMatrixDirect` type, this involves turning off the previous digit,
+  sending the 8 bits for the current digit's 8 LED segments in a loop, then
+  turning on the current digit. The `digitalWrite()` function is called 10
+  times.
+* For the `LedMatrixSingleShiftRegister` type, the 8 LED segment bits are sent
+  using software SPI or hardware SPI. (Software SPI uses the `shiftOut()`
+  method, which is implemented using a loop of `digitalWrite()`.
+* For the `LedMatrixDualShiftRegister` type, the LED digit pins and the LED
+  segment pins are using conceptually a single SPI transaction. For software
+  SPI, this is implemented using 2 `shiftOut()` operations. For hardware SPI,
+  this uses a single `transfer16()` command.
+
+On AVR processors, the "fast" options are available using the
+[digitalWriteFast](https://github.com/NicksonYap/digitalWriteFast) library whose
+`digitalWriteFast()` functions can be up to 50X faster if the `pin` number and
+`value` parameters are compile-time constants.
+
+### Arduino Nano
 
 * 16MHz ATmega328P
 * Arduino IDE 1.8.13
@@ -106,7 +137,7 @@ to match similar programs in the AceButton, AceCrc and AceTime libraries.
 {nano_results}
 ```
 
-## Sparkfun Pro Micro
+### SparkFun Pro Micro
 
 * 16 MHz ATmega32U4
 * Arduino IDE 1.8.13
@@ -117,7 +148,7 @@ to match similar programs in the AceButton, AceCrc and AceTime libraries.
 {micro_results}
 ```
 
-## SAMD21 M0 Mini
+### SAMD21 M0 Mini
 
 * 48 MHz ARM Cortex-M0+
 * Arduino IDE 1.8.13
@@ -127,7 +158,7 @@ to match similar programs in the AceButton, AceCrc and AceTime libraries.
 {samd_results}
 ```
 
-## STM32
+### STM32
 
 * STM32 "Blue Pill", STM32F103C8, 72 MHz ARM Cortex-M3
 * Arduino IDE 1.8.13
@@ -137,7 +168,7 @@ to match similar programs in the AceButton, AceCrc and AceTime libraries.
 {stm32_results}
 ```
 
-## ESP8266
+### ESP8266
 
 * NodeMCU 1.0 clone, 80MHz ESP8266
 * Arduino IDE 1.8.13
@@ -147,7 +178,7 @@ to match similar programs in the AceButton, AceCrc and AceTime libraries.
 {esp8266_results}
 ```
 
-## ESP32
+### ESP32
 
 * ESP32-01 Dev Board, 240 MHz Tensilica LX6
 * Arduino IDE 1.8.13
@@ -157,7 +188,7 @@ to match similar programs in the AceButton, AceCrc and AceTime libraries.
 {esp32_results}
 ```
 
-## Teensy 3.2
+### Teensy 3.2
 
 * 96 MHz ARM Cortex-M4
 * Arduino IDE 1.8.13
