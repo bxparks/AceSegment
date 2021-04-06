@@ -13,7 +13,7 @@ configurations of the `LedMatrix` class:
 * `dual_hw_spi`: group pins and segment pins connected to 74HC595 accessed
   through hardware SPI (`HwSpiAdapter`)
 
-It measures the time taken by `SegmentDisplay::displayCurrentField()` which
+It measures the time taken by `SegmentDisplay::renderFieldNow()` which
 renders a single digit (multiple fields make up a frame, a frame is the
 rendering of all digits on the display module).
 
@@ -73,13 +73,13 @@ to match similar programs in the AceButton, AceCrc and AceTime libraries.
 ## Results
 
 The following tables show the number of microseconds taken by
-`SegmentDisplay::displayCurrentField()` which renders the 8 segments of a single
-LED digit. If the LED module has 4 digits, then `displayCurrentField()` must be
+`SegmentDisplay::renderFieldNow()` which renders the 8 segments of a single
+LED digit. If the LED module has 4 digits, then `renderFieldNow()` must be
 called 4 times to render the light pattern of the entire LED module. The entire
 rendering is then called a frame.
 
 Most people can no longer see flickering of the display at about 60 frames a
-second. To achieve that, the `displayCurrentField()` method must be called 240
+second. To achieve that, the `renderFieldNow()` method must be called 240
 times a second for a module with 4 digits, or every 4.17 milliseconds. The
 results below show that every processor, even the slowest AVR processor, is able
 to meet this threshhold.
@@ -119,7 +119,7 @@ sizeof(LedMatrixDirectFast<0..3, 0..7>): 3
 sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 10
 sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 5
 sizeof(LedDisplay): 3
-sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 28
+sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 26
 sizeof(HexWriter): 2
 sizeof(ClockWriter): 3
 sizeof(CharWriter): 2
@@ -129,14 +129,15 @@ CPU:
 +---------------------------+-------------+---------+
 | LedMatrix type            | min/avg/max | samples |
 |---------------------------+-------------+---------|
-| direct                    |  60/ 63/ 80 | 1200    |
-| single_sw_spi             | 124/127/144 | 1200    |
-| single_hw_spi             |  28/ 31/ 40 | 1200    |
+| direct                    |  60/ 64/ 80 | 1200    |
+| single_sw_spi             | 124/126/144 | 1200    |
+| single_hw_spi             |  28/ 31/ 48 | 1200    |
 | dual_sw_spi               | 212/215/244 | 1200    |
-| dual_hw_spi               |  20/ 22/ 32 | 1200    |
-| direct_fast               |  24/ 27/ 40 | 1200    |
-| single_sw_spi_fast        |  24/ 25/ 40 | 1200    |
-| dual_sw_spi_fast          |  20/ 24/ 32 | 1200    |
+| dual_hw_spi               |  20/ 23/ 32 | 1200    |
+|---------------------------+-------------+---------|
+| direct_fast               |  24/ 26/ 36 | 1200    |
+| single_sw_spi_fast        |  24/ 26/ 36 | 1200    |
+| dual_sw_spi_fast          |  20/ 23/ 32 | 1200    |
 +---------------------------+-------------+---------+
 
 ```
@@ -159,7 +160,7 @@ sizeof(LedMatrixDirectFast<0..3, 0..7>): 3
 sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 10
 sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 5
 sizeof(LedDisplay): 3
-sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 28
+sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 26
 sizeof(HexWriter): 2
 sizeof(ClockWriter): 3
 sizeof(CharWriter): 2
@@ -169,14 +170,15 @@ CPU:
 +---------------------------+-------------+---------+
 | LedMatrix type            | min/avg/max | samples |
 |---------------------------+-------------+---------|
-| direct                    |  64/ 68/ 84 | 1200    |
+| direct                    |  64/ 68/ 80 | 1200    |
 | single_sw_spi             | 124/128/140 | 1200    |
 | single_hw_spi             |  32/ 34/ 44 | 1200    |
 | dual_sw_spi               | 208/213/224 | 1200    |
-| dual_hw_spi               |  20/ 24/ 32 | 1200    |
-| direct_fast               |  24/ 26/ 40 | 1200    |
-| single_sw_spi_fast        |  24/ 27/ 36 | 1200    |
-| dual_sw_spi_fast          |  20/ 24/ 32 | 1200    |
+| dual_hw_spi               |  20/ 24/ 36 | 1200    |
+|---------------------------+-------------+---------|
+| direct_fast               |  24/ 27/ 40 | 1200    |
+| single_sw_spi_fast        |  24/ 27/ 40 | 1200    |
+| dual_sw_spi_fast          |  20/ 23/ 32 | 1200    |
 +---------------------------+-------------+---------+
 
 ```
@@ -196,7 +198,7 @@ sizeof(LedMatrixDirect<Hardware>): 20
 sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 20
 sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 12
 sizeof(LedDisplay): 8
-sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 40
+sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 36
 sizeof(HexWriter): 4
 sizeof(ClockWriter): 8
 sizeof(CharWriter): 4
@@ -206,11 +208,11 @@ CPU:
 +---------------------------+-------------+---------+
 | LedMatrix type            | min/avg/max | samples |
 |---------------------------+-------------+---------|
-| direct                    |  25/ 25/ 30 | 1200    |
+| direct                    |  24/ 24/ 29 | 1200    |
 | single_sw_spi             |  52/ 52/ 57 | 1200    |
 | single_hw_spi             |  23/ 23/ 28 | 1200    |
-| dual_sw_spi               |  87/ 88/ 93 | 1200    |
-| dual_hw_spi               |  22/ 22/ 26 | 1200    |
+| dual_sw_spi               |  88/ 89/ 94 | 1200    |
+| dual_hw_spi               |  22/ 22/ 27 | 1200    |
 +---------------------------+-------------+---------+
 
 ```
@@ -230,7 +232,7 @@ sizeof(LedMatrixDirect<Hardware>): 20
 sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 20
 sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 12
 sizeof(LedDisplay): 8
-sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 40
+sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 36
 sizeof(HexWriter): 4
 sizeof(ClockWriter): 8
 sizeof(CharWriter): 4
@@ -243,7 +245,7 @@ CPU:
 | direct                    |  14/ 15/ 20 | 1200    |
 | single_sw_spi             |  31/ 32/ 37 | 1200    |
 | single_hw_spi             |  40/ 40/ 46 | 1200    |
-| dual_sw_spi               |  54/ 54/ 60 | 1200    |
+| dual_sw_spi               |  54/ 55/ 60 | 1200    |
 | dual_hw_spi               |  40/ 40/ 45 | 1200    |
 +---------------------------+-------------+---------+
 
@@ -264,7 +266,7 @@ sizeof(LedMatrixDirect<Hardware>): 20
 sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 20
 sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 12
 sizeof(LedDisplay): 8
-sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 40
+sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 36
 sizeof(HexWriter): 4
 sizeof(ClockWriter): 8
 sizeof(CharWriter): 4
@@ -274,10 +276,10 @@ CPU:
 +---------------------------+-------------+---------+
 | LedMatrix type            | min/avg/max | samples |
 |---------------------------+-------------+---------|
-| direct                    |  12/ 12/ 32 | 1200    |
-| single_sw_spi             |  29/ 29/ 45 | 1200    |
-| single_hw_spi             |  11/ 11/ 27 | 1200    |
-| dual_sw_spi               |  50/ 50/ 64 | 1200    |
+| direct                    |  12/ 12/ 28 | 1200    |
+| single_sw_spi             |  28/ 29/ 43 | 1200    |
+| single_hw_spi             |  11/ 11/ 23 | 1200    |
+| dual_sw_spi               |  50/ 50/ 65 | 1200    |
 | dual_hw_spi               |  12/ 12/ 24 | 1200    |
 +---------------------------+-------------+---------+
 
@@ -298,7 +300,7 @@ sizeof(LedMatrixDirect<Hardware>): 20
 sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 20
 sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 12
 sizeof(LedDisplay): 8
-sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 40
+sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 36
 sizeof(HexWriter): 4
 sizeof(ClockWriter): 8
 sizeof(CharWriter): 4
@@ -309,9 +311,9 @@ CPU:
 | LedMatrix type            | min/avg/max | samples |
 |---------------------------+-------------+---------|
 | direct                    |   2/  2/ 11 | 1200    |
-| single_sw_spi             |   4/  4/ 13 | 1200    |
+| single_sw_spi             |   4/  4/  8 | 1200    |
 | single_hw_spi             |   9/  9/ 18 | 1200    |
-| dual_sw_spi               |   7/  7/ 16 | 1200    |
+| dual_sw_spi               |   7/  7/ 11 | 1200    |
 | dual_hw_spi               |   9/  9/ 18 | 1200    |
 +---------------------------+-------------+---------+
 
@@ -333,7 +335,7 @@ sizeof(LedMatrixDirect<Hardware>): 20
 sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 20
 sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 12
 sizeof(LedDisplay): 8
-sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 40
+sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 36
 sizeof(HexWriter): 4
 sizeof(ClockWriter): 8
 sizeof(CharWriter): 4
@@ -343,11 +345,11 @@ CPU:
 +---------------------------+-------------+---------+
 | LedMatrix type            | min/avg/max | samples |
 |---------------------------+-------------+---------|
-| direct                    |   5/  6/ 10 | 1200    |
+| direct                    |   6/  6/ 10 | 1200    |
 | single_sw_spi             |  10/ 10/ 14 | 1200    |
 | single_hw_spi             |   4/  4/  8 | 1200    |
 | dual_sw_spi               |  16/ 16/ 21 | 1200    |
-| dual_hw_spi               |   3/  3/  6 | 1200    |
+| dual_hw_spi               |   3/  3/  7 | 1200    |
 +---------------------------+-------------+---------+
 
 ```

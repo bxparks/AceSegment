@@ -6,15 +6,15 @@ sizeof(LedMatrixDirect<Hardware>): 20
 sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 20
 sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 12
 sizeof(LedDisplay): 8
-sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 40
+sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 36
 sizeof(HexWriter): 4
 sizeof(ClockWriter): 8
 sizeof(CharWriter): 4
 sizeof(StringWriter): 4
 BENCHMARKS
-direct 5 6 10 1200
+direct 6 6 10 1200
 single_sw_spi 10 10 14 1200
 single_hw_spi 4 4 8 1200
 dual_sw_spi 16 16 21 1200
-dual_hw_spi 3 3 6 1200
+dual_hw_spi 3 3 7 1200
 END
