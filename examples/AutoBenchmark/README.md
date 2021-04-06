@@ -119,7 +119,7 @@ sizeof(LedMatrixDirectFast<0..3, 0..7>): 3
 sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 10
 sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 5
 sizeof(LedDisplay): 3
-sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 26
+sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 25
 sizeof(HexWriter): 2
 sizeof(ClockWriter): 3
 sizeof(CharWriter): 2
@@ -129,23 +129,23 @@ CPU:
 +--------------------------------+-------------+---------+
 | LedMatrix type                 | min/avg/max | samples |
 |--------------------------------+-------------+---------|
-| direct                         |  60/ 65/ 80 |     240 |
-| direct(subfields)              |   4/ 13/ 80 |    3840 |
-| single_sw_spi                  | 124/129/152 |     240 |
-| single_sw_spi(subfields)       |   4/ 21/144 |    3840 |
-| single_hw_spi                  |  32/ 33/ 48 |     240 |
-| single_hw_spi(subfields)       |   4/  9/ 40 |    3840 |
-| dual_sw_spi                    | 212/216/244 |     240 |
+| direct                         |  60/ 66/ 80 |     240 |
+| direct(subfields)              |   4/ 13/ 72 |    3840 |
+| single_sw_spi                  | 124/129/148 |     240 |
+| single_sw_spi(subfields)       |   4/ 21/148 |    3840 |
+| single_hw_spi                  |  32/ 34/ 44 |     240 |
+| single_hw_spi(subfields)       |   4/  9/ 44 |    3840 |
+| dual_sw_spi                    | 212/216/240 |     240 |
 | dual_sw_spi(subfields)         |   4/ 32/240 |    3840 |
-| dual_hw_spi                    |  20/ 23/ 32 |     240 |
-| dual_hw_spi(subfields)         |   4/  8/ 32 |    3840 |
+| dual_hw_spi                    |  20/ 24/ 36 |     240 |
+| dual_hw_spi(subfields)         |   4/  8/ 28 |    3840 |
 |--------------------------------+-------------+---------|
-| direct_fast                    |  28/ 28/ 44 |     240 |
-| direct_fast(subfields)         |   4/  9/ 40 |    3840 |
-| single_sw_spi_fast             |  24/ 28/ 40 |     240 |
-| single_sw_spi_fast(sub)        |   4/  9/ 36 |    3840 |
-| dual_sw_spi_fast               |  20/ 24/ 36 |     240 |
-| dual_sw_spi_fast(sub)          |   4/  8/ 32 |    3840 |
+| direct_fast                    |  24/ 28/ 36 |     240 |
+| direct_fast(subfields)         |   4/  8/ 36 |    3840 |
+| single_sw_spi_fast             |  24/ 28/ 44 |     240 |
+| single_sw_spi_fast(subfields)  |   4/  8/ 36 |    3840 |
+| dual_sw_spi_fast               |  20/ 24/ 32 |     240 |
+| dual_sw_spi_fast(subfields)    |   4/  8/ 32 |    3840 |
 +--------------------------------+-------------+---------+
 
 ```
@@ -168,7 +168,7 @@ sizeof(LedMatrixDirectFast<0..3, 0..7>): 3
 sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 10
 sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 5
 sizeof(LedDisplay): 3
-sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 26
+sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 25
 sizeof(HexWriter): 2
 sizeof(ClockWriter): 3
 sizeof(CharWriter): 2
@@ -178,23 +178,23 @@ CPU:
 +--------------------------------+-------------+---------+
 | LedMatrix type                 | min/avg/max | samples |
 |--------------------------------+-------------+---------|
-| direct                         |  64/ 69/ 84 |     240 |
-| direct(subfields)              |   4/ 14/ 80 |    3840 |
-| single_sw_spi                  | 124/129/144 |     240 |
-| single_sw_spi(subfields)       |   4/ 21/140 |    3840 |
+| direct                         |  64/ 69/ 80 |     240 |
+| direct(subfields)              |   4/ 13/ 84 |    3840 |
+| single_sw_spi                  | 124/130/144 |     240 |
+| single_sw_spi(subfields)       |   4/ 21/144 |    3840 |
 | single_hw_spi                  |  32/ 36/ 44 |     240 |
-| single_hw_spi(subfields)       |   4/  9/ 48 |    3840 |
+| single_hw_spi(subfields)       |   4/  9/ 44 |    3840 |
 | dual_sw_spi                    | 208/214/228 |     240 |
-| dual_sw_spi(subfields)         |   4/ 32/228 |    3840 |
-| dual_hw_spi                    |  24/ 25/ 36 |     240 |
+| dual_sw_spi(subfields)         |   4/ 32/224 |    3840 |
+| dual_hw_spi                    |  24/ 25/ 32 |     240 |
 | dual_hw_spi(subfields)         |   4/  8/ 32 |    3840 |
 |--------------------------------+-------------+---------|
-| direct_fast                    |  28/ 28/ 40 |     240 |
-| direct_fast(subfields)         |   4/  9/ 36 |    3840 |
+| direct_fast                    |  28/ 28/ 36 |     240 |
+| direct_fast(subfields)         |   4/  8/ 36 |    3840 |
 | single_sw_spi_fast             |  24/ 29/ 40 |     240 |
-| single_sw_spi_fast(sub)        |   4/  9/ 40 |    3840 |
-| dual_sw_spi_fast               |  20/ 23/ 28 |     240 |
-| dual_sw_spi_fast(sub)          |   4/  8/ 40 |    3840 |
+| single_sw_spi_fast(subfields)  |   4/  8/ 40 |    3840 |
+| dual_sw_spi_fast               |  20/ 23/ 32 |     240 |
+| dual_sw_spi_fast(subfields)    |   4/  8/ 32 |    3840 |
 +--------------------------------+-------------+---------+
 
 ```
@@ -224,14 +224,14 @@ CPU:
 +--------------------------------+-------------+---------+
 | LedMatrix type                 | min/avg/max | samples |
 |--------------------------------+-------------+---------|
-| direct                         |  23/ 24/ 28 |     240 |
-| direct(subfields)              |   3/  5/ 29 |    3840 |
-| single_sw_spi                  |  52/ 53/ 58 |     240 |
-| single_sw_spi(subfields)       |   3/  8/ 59 |    3840 |
+| direct                         |  25/ 25/ 30 |     240 |
+| direct(subfields)              |   3/  5/ 30 |    3840 |
+| single_sw_spi                  |  52/ 53/ 57 |     240 |
+| single_sw_spi(subfields)       |   3/  7/ 58 |    3840 |
 | single_hw_spi                  |  24/ 24/ 28 |     240 |
-| single_hw_spi(subfields)       |   3/  5/ 29 |    3840 |
-| dual_sw_spi                    |  89/ 90/ 96 |     240 |
-| dual_sw_spi(subfields)         |   3/ 11/ 97 |    3840 |
+| single_hw_spi(subfields)       |   3/  5/ 28 |    3840 |
+| dual_sw_spi                    |  88/ 89/ 93 |     240 |
+| dual_sw_spi(subfields)         |   3/ 11/ 94 |    3840 |
 | dual_hw_spi                    |  22/ 22/ 26 |     240 |
 | dual_hw_spi(subfields)         |   3/  5/ 27 |    3840 |
 +--------------------------------+-------------+---------+
@@ -263,16 +263,16 @@ CPU:
 +--------------------------------+-------------+---------+
 | LedMatrix type                 | min/avg/max | samples |
 |--------------------------------+-------------+---------|
-| direct                         |  13/ 14/ 18 |     240 |
-| direct(subfields)              |   1/  3/ 19 |    3840 |
-| single_sw_spi                  |  30/ 30/ 35 |     240 |
-| single_sw_spi(subfields)       |   1/  4/ 49 |    3840 |
-| single_hw_spi                  |  40/ 40/ 45 |     240 |
-| single_hw_spi(subfields)       |   1/  6/ 63 |    3840 |
-| dual_sw_spi                    |  51/ 52/ 57 |     240 |
-| dual_sw_spi(subfields)         |   1/  7/ 77 |    3840 |
+| direct                         |  14/ 15/ 20 |     240 |
+| direct(subfields)              |   1/  3/ 39 |    3840 |
+| single_sw_spi                  |  31/ 32/ 37 |     240 |
+| single_sw_spi(subfields)       |   1/  5/ 55 |    3840 |
+| single_hw_spi                  |  40/ 41/ 46 |     240 |
+| single_hw_spi(subfields)       |   1/  6/ 65 |    3840 |
+| dual_sw_spi                    |  54/ 54/ 60 |     240 |
+| dual_sw_spi(subfields)         |   1/  7/ 65 |    3840 |
 | dual_hw_spi                    |  40/ 40/ 45 |     240 |
-| dual_hw_spi(subfields)         |   1/  6/ 64 |    3840 |
+| dual_hw_spi(subfields)         |   1/  6/ 65 |    3840 |
 +--------------------------------+-------------+---------+
 
 ```
@@ -302,15 +302,15 @@ CPU:
 +--------------------------------+-------------+---------+
 | LedMatrix type                 | min/avg/max | samples |
 |--------------------------------+-------------+---------|
-| direct                         |  12/ 12/ 41 |     240 |
-| direct(subfields)              |   1/  2/ 33 |    3840 |
-| single_sw_spi                  |  29/ 29/ 41 |     240 |
-| single_sw_spi(subfields)       |   1/  4/ 42 |    3840 |
-| single_hw_spi                  |  11/ 11/ 21 |     240 |
-| single_hw_spi(subfields)       |   1/  2/ 24 |    3840 |
+| direct                         |  12/ 12/ 48 |     240 |
+| direct(subfields)              |   0/  2/ 28 |    3840 |
+| single_sw_spi                  |  29/ 29/ 37 |     240 |
+| single_sw_spi(subfields)       |   0/  4/ 41 |    3840 |
+| single_hw_spi                  |  11/ 11/ 25 |     240 |
+| single_hw_spi(subfields)       |   0/  2/ 23 |    3840 |
 | dual_sw_spi                    |  50/ 50/ 58 |     240 |
-| dual_sw_spi(subfields)         |   1/  7/ 71 |    3840 |
-| dual_hw_spi                    |  12/ 12/ 20 |     240 |
+| dual_sw_spi(subfields)         |   1/  7/ 67 |    3840 |
+| dual_hw_spi                    |  12/ 12/ 28 |     240 |
 | dual_hw_spi(subfields)         |   1/  2/ 28 |    3840 |
 +--------------------------------+-------------+---------+
 
@@ -342,15 +342,15 @@ CPU:
 | LedMatrix type                 | min/avg/max | samples |
 |--------------------------------+-------------+---------|
 | direct                         |   2/  2/ 11 |     240 |
-| direct(subfields)              |   0/  1/ 11 |    3840 |
-| single_sw_spi                  |   4/  4/  8 |     240 |
+| direct(subfields)              |   0/  1/ 10 |    3840 |
+| single_sw_spi                  |   4/  4/ 12 |     240 |
 | single_sw_spi(subfields)       |   0/  1/ 13 |    3840 |
-| single_hw_spi                  |   9/  9/ 18 |     240 |
+| single_hw_spi                  |   9/  9/ 17 |     240 |
 | single_hw_spi(subfields)       |   0/  1/ 18 |    3840 |
-| dual_sw_spi                    |   7/  7/ 15 |     240 |
-| dual_sw_spi(subfields)         |   0/  1/ 15 |    3840 |
+| dual_sw_spi                    |   7/  7/ 11 |     240 |
+| dual_sw_spi(subfields)         |   0/  1/ 16 |    3840 |
 | dual_hw_spi                    |   9/  9/ 18 |     240 |
-| dual_hw_spi(subfields)         |   0/  1/ 17 |    3840 |
+| dual_hw_spi(subfields)         |   0/  1/ 18 |    3840 |
 +--------------------------------+-------------+---------+
 
 ```
@@ -382,15 +382,15 @@ CPU:
 | LedMatrix type                 | min/avg/max | samples |
 |--------------------------------+-------------+---------|
 | direct                         |   6/  6/ 10 |     240 |
-| direct(subfields)              |   1/  1/ 10 |    3840 |
+| direct(subfields)              |   0/  1/  8 |    3840 |
 | single_sw_spi                  |  10/ 10/ 13 |     240 |
-| single_sw_spi(subfields)       |   0/  2/ 14 |    3840 |
+| single_sw_spi(subfields)       |   0/  2/ 15 |    3840 |
 | single_hw_spi                  |   4/  4/  6 |     240 |
-| single_hw_spi(subfields)       |   1/  1/  7 |    3840 |
-| dual_sw_spi                    |  16/ 17/ 20 |     240 |
+| single_hw_spi(subfields)       |   0/  1/  6 |    3840 |
+| dual_sw_spi                    |  17/ 17/ 20 |     240 |
 | dual_sw_spi(subfields)         |   0/  2/ 21 |    3840 |
-| dual_hw_spi                    |   3/  3/  5 |     240 |
-| dual_hw_spi(subfields)         |   0/  1/  8 |    3840 |
+| dual_hw_spi                    |   3/  3/  6 |     240 |
+| dual_hw_spi(subfields)         |   0/  1/  7 |    3840 |
 +--------------------------------+-------------+---------+
 
 ```
