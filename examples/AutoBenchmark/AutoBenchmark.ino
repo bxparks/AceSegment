@@ -242,7 +242,7 @@ void runSingleShiftRegisterSwSpiFast() {
   segmentDisplay.begin();
   segmentDisplaySubfields.begin();
   runBenchmark("single_sw_spi_fast", segmentDisplay);
-  runBenchmark("single_sw_spi_fast(sub)", segmentDisplaySubfields);
+  runBenchmark("single_sw_spi_fast(subfields)", segmentDisplaySubfields);
   segmentDisplaySubfields.end();
   segmentDisplay.end();
   ledMatrix.end();
@@ -323,7 +323,7 @@ void runDualShiftRegisterSwSpiFast() {
   segmentDisplay.begin();
   segmentDisplaySubfields.begin();
   runBenchmark("dual_sw_spi_fast", segmentDisplay);
-  runBenchmark("dual_sw_spi_fast(sub)", segmentDisplaySubfields);
+  runBenchmark("dual_sw_spi_fast(subfields)", segmentDisplaySubfields);
   segmentDisplaySubfields.end();
   segmentDisplay.end();
   ledMatrix.end();
