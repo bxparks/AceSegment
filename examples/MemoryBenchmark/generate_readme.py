@@ -131,8 +131,23 @@ before substantional refactoring in 2021.
   detect that it is actually never used, so it keeps around the code for the
   HardwareSerial class. (I will make a fix to AUnit so that the `HardwareSerial`
   will not be pulled in by other libraries in the future.)
+* Reduce flash size by ~130 bytes on AVR and 70-80 bytes on 32-bit processors
+  by removing the pointer to `TimingStats` from `SegmentDisplay`. The pointer
+  causes the code for the `TimingStats` class to be pulled in, even if it is not
+  used.
 
-## Arduino Nano
+## Results
+
+The following shows the flash and static memory sizes of the `MemoryBenchmark`
+program that includes the resources needed to perform a
+`SegmentDisplay::renderFieldWhenReady()`. This includes:
+
+* `Hardware` (which is opimized away by the compiler)
+* `SwSpiAdapter` or `HwSpiAdapter`
+* `LedMatrixXxx`
+* `SegmentDisplay`
+
+### Arduino Nano
 
 * 16MHz ATmega328P
 * Arduino IDE 1.8.13
@@ -142,7 +157,7 @@ before substantional refactoring in 2021.
 {nano_results}
 ```
 
-## Sparkfun Pro Micro
+### Sparkfun Pro Micro
 
 * 16 MHz ATmega32U4
 * Arduino IDE 1.8.13
@@ -152,7 +167,7 @@ before substantional refactoring in 2021.
 {micro_results}
 ```
 
-## SAMD21 M0 Mini
+### SAMD21 M0 Mini
 
 * 48 MHz ARM Cortex-M0+
 * Arduino IDE 1.8.13
@@ -162,7 +177,7 @@ before substantional refactoring in 2021.
 {samd_results}
 ```
 
-## STM32 Blue Pill
+### STM32 Blue Pill
 
 * STM32F103C8, 72 MHz ARM Cortex-M3
 * Arduino IDE 1.8.13
@@ -172,7 +187,7 @@ before substantional refactoring in 2021.
 {stm32_results}
 ```
 
-## ESP8266
+### ESP8266
 
 * NodeMCU 1.0, 80MHz ESP8266
 * Arduino IDE 1.8.13
@@ -182,7 +197,7 @@ before substantional refactoring in 2021.
 {esp8266_results}
 ```
 
-## ESP32
+### ESP32
 
 * ESP32-01 Dev Board, 240 MHz Tensilica LX6
 * Arduino IDE 1.8.13
@@ -192,7 +207,7 @@ before substantional refactoring in 2021.
 {esp32_results}
 ```
 
-## Teensy 3.2
+### Teensy 3.2
 
 * 96 MHz ARM Cortex-M4
 * Arduino IDE 1.8.13

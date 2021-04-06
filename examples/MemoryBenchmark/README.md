@@ -107,8 +107,23 @@ before substantional refactoring in 2021.
   detect that it is actually never used, so it keeps around the code for the
   HardwareSerial class. (I will make a fix to AUnit so that the `HardwareSerial`
   will not be pulled in by other libraries in the future.)
+* Reduce flash size by ~130 bytes on AVR and 70-80 bytes on 32-bit processors
+  by removing the pointer to `TimingStats` from `SegmentDisplay`. The pointer
+  causes the code for the `TimingStats` class to be pulled in, even if it is not
+  used.
 
-## Arduino Nano
+## Results
+
+The following shows the flash and static memory sizes of the `MemoryBenchmark`
+program that includes the resources needed to perform a
+`SegmentDisplay::renderFieldWhenReady()`. This includes:
+
+* `Hardware` (which is opimized away by the compiler)
+* `SwSpiAdapter` or `HwSpiAdapter`
+* `LedMatrixXxx`
+* `SegmentDisplay`
+
+### Arduino Nano
 
 * 16MHz ATmega328P
 * Arduino IDE 1.8.13
@@ -120,19 +135,20 @@ before substantional refactoring in 2021.
 |---------------------------------+--------------+-------------|
 | baseline                        |    456/   11 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| direct                          |   1738/   77 |  1282/   66 |
-| single_sw_spi                   |   1744/   71 |  1288/   60 |
-| single_hw_spi                   |   1806/   72 |  1350/   61 |
-| dual_sw_spi                     |   1622/   62 |  1166/   51 |
-| dual_hw_spi                     |   1696/   63 |  1240/   52 |
-| direct_fast                     |   1468/  105 |  1012/   94 |
-| single_sw_fast                  |   1636/   69 |  1180/   58 |
-| dual_sw_fast                    |   1230/   60 |   774/   49 |
+| direct                          |   1600/   75 |  1144/   64 |
+| single_sw_spi                   |   1606/   69 |  1150/   58 |
+| single_hw_spi                   |   1668/   70 |  1212/   59 |
+| dual_sw_spi                     |   1490/   60 |  1034/   49 |
+| dual_hw_spi                     |   1564/   61 |  1108/   50 |
+|---------------------------------+--------------+-------------|
+| direct_fast                     |   1336/  103 |   880/   92 |
+| single_sw_fast                  |   1498/   67 |  1042/   56 |
+| dual_sw_fast                    |   1098/   58 |   642/   47 |
 +--------------------------------------------------------------+
 
 ```
 
-## Sparkfun Pro Micro
+### Sparkfun Pro Micro
 
 * 16 MHz ATmega32U4
 * Arduino IDE 1.8.13
@@ -144,19 +160,20 @@ before substantional refactoring in 2021.
 |---------------------------------+--------------+-------------|
 | baseline                        |   3472/  151 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| direct                          |   4732/  217 |  1260/   66 |
-| single_sw_spi                   |   4740/  211 |  1268/   60 |
-| single_hw_spi                   |   4802/  212 |  1330/   61 |
-| dual_sw_spi                     |   4618/  202 |  1146/   51 |
-| dual_hw_spi                     |   4692/  203 |  1220/   52 |
-| direct_fast                     |   4348/  245 |   876/   94 |
-| single_sw_fast                  |   4632/  209 |  1160/   58 |
-| dual_sw_fast                    |   4110/  200 |   638/   49 |
+| direct                          |   4594/  215 |  1122/   64 |
+| single_sw_spi                   |   4602/  209 |  1130/   58 |
+| single_hw_spi                   |   4664/  210 |  1192/   59 |
+| dual_sw_spi                     |   4486/  200 |  1014/   49 |
+| dual_hw_spi                     |   4560/  201 |  1088/   50 |
+|---------------------------------+--------------+-------------|
+| direct_fast                     |   4216/  243 |   744/   92 |
+| single_sw_fast                  |   4494/  207 |  1022/   56 |
+| dual_sw_fast                    |   3978/  198 |   506/   47 |
 +--------------------------------------------------------------+
 
 ```
 
-## SAMD21 M0 Mini
+### SAMD21 M0 Mini
 
 * 48 MHz ARM Cortex-M0+
 * Arduino IDE 1.8.13
@@ -168,16 +185,16 @@ before substantional refactoring in 2021.
 |---------------------------------+--------------+-------------|
 | baseline                        |  10064/    0 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| direct                          |  10928/    0 |   864/    0 |
-| single_sw_spi                   |  10984/    0 |   920/    0 |
-| single_hw_spi                   |  11432/    0 |  1368/    0 |
-| dual_sw_spi                     |  10872/    0 |   808/    0 |
-| dual_hw_spi                     |  11392/    0 |  1328/    0 |
+| direct                          |  10848/    0 |   784/    0 |
+| single_sw_spi                   |  10904/    0 |   840/    0 |
+| single_hw_spi                   |  11352/    0 |  1288/    0 |
+| dual_sw_spi                     |  10792/    0 |   728/    0 |
+| dual_hw_spi                     |  11312/    0 |  1248/    0 |
 +--------------------------------------------------------------+
 
 ```
 
-## STM32 Blue Pill
+### STM32 Blue Pill
 
 * STM32F103C8, 72 MHz ARM Cortex-M3
 * Arduino IDE 1.8.13
@@ -189,16 +206,16 @@ before substantional refactoring in 2021.
 |---------------------------------+--------------+-------------|
 | baseline                        |  19136/ 3788 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| direct                          |  21640/ 4020 |  2504/  232 |
-| single_sw_spi                   |  21708/ 4024 |  2572/  236 |
-| single_hw_spi                   |  23448/ 4024 |  4312/  236 |
-| dual_sw_spi                     |  21608/ 4016 |  2472/  228 |
-| dual_hw_spi                     |  23396/ 4016 |  4260/  228 |
+| direct                          |  21560/ 4016 |  2424/  228 |
+| single_sw_spi                   |  21628/ 4020 |  2492/  232 |
+| single_hw_spi                   |  23368/ 4020 |  4232/  232 |
+| dual_sw_spi                     |  21524/ 4012 |  2388/  224 |
+| dual_hw_spi                     |  23308/ 4012 |  4172/  224 |
 +--------------------------------------------------------------+
 
 ```
 
-## ESP8266
+### ESP8266
 
 * NodeMCU 1.0, 80MHz ESP8266
 * Arduino IDE 1.8.13
@@ -210,16 +227,16 @@ before substantional refactoring in 2021.
 |---------------------------------+--------------+-------------|
 | baseline                        | 256700/26784 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| direct                          | 257908/26868 |  1208/   84 |
-| single_sw_spi                   | 257980/26868 |  1280/   84 |
-| single_hw_spi                   | 259084/26876 |  2384/   92 |
-| dual_sw_spi                     | 257864/26848 |  1164/   64 |
-| dual_hw_spi                     | 259048/26856 |  2348/   72 |
+| direct                          | 257828/26860 |  1128/   76 |
+| single_sw_spi                   | 257900/26868 |  1200/   84 |
+| single_hw_spi                   | 259004/26876 |  2304/   92 |
+| dual_sw_spi                     | 257768/26848 |  1068/   64 |
+| dual_hw_spi                     | 258968/26856 |  2268/   72 |
 +--------------------------------------------------------------+
 
 ```
 
-## ESP32
+### ESP32
 
 * ESP32-01 Dev Board, 240 MHz Tensilica LX6
 * Arduino IDE 1.8.13
@@ -231,16 +248,16 @@ before substantional refactoring in 2021.
 |---------------------------------+--------------+-------------|
 | baseline                        | 197730/13100 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| direct                          | 200716/13412 |  2986/  312 |
-| single_sw_spi                   | 200756/13412 |  3026/  312 |
-| single_hw_spi                   | 203048/13460 |  5318/  360 |
-| dual_sw_spi                     | 200628/13404 |  2898/  304 |
-| dual_hw_spi                     | 202996/13452 |  5266/  352 |
+| direct                          | 200640/13412 |  2910/  312 |
+| single_sw_spi                   | 200684/13412 |  2954/  312 |
+| single_hw_spi                   | 202976/13460 |  5246/  360 |
+| dual_sw_spi                     | 200560/13404 |  2830/  304 |
+| dual_hw_spi                     | 202924/13452 |  5194/  352 |
 +--------------------------------------------------------------+
 
 ```
 
-## Teensy 3.2
+### Teensy 3.2
 
 * 96 MHz ARM Cortex-M4
 * Arduino IDE 1.8.13
@@ -253,11 +270,11 @@ before substantional refactoring in 2021.
 |---------------------------------+--------------+-------------|
 | baseline                        |   7624/ 3048 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| direct                          |  12216/ 4208 |  4592/ 1160 |
-| single_sw_spi                   |  12248/ 4212 |  4624/ 1164 |
-| single_hw_spi                   |  13508/ 4268 |  5884/ 1220 |
-| dual_sw_spi                     |  12184/ 4204 |  4560/ 1156 |
-| dual_hw_spi                     |  13380/ 4260 |  5756/ 1212 |
+| direct                          |  12020/ 4204 |  4396/ 1156 |
+| single_sw_spi                   |  12072/ 4208 |  4448/ 1160 |
+| single_hw_spi                   |  13308/ 4264 |  5684/ 1216 |
+| dual_sw_spi                     |  11996/ 4200 |  4372/ 1152 |
+| dual_hw_spi                     |  13200/ 4256 |  5576/ 1208 |
 +--------------------------------------------------------------+
 
 ```
