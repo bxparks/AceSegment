@@ -26,14 +26,12 @@ SOFTWARE.
 #define ACE_SEGMENT_SEGMENT_DISPLAY_H
 
 #include <stdint.h>
-#include <AceCommon.h> // TimingStats
+#include <AceCommon.h> // incrementMod()
 #include "LedDisplay.h"
 
 class SegmentDisplayTest_displayCurrentField;
 
 namespace ace_segment {
-
-using ace_common::TimingStats;
 
 /**
  * The user interface to the LED Segment display. Uses an implementation of
@@ -47,19 +45,19 @@ using ace_common::TimingStats;
  *
  * There are 2 ways to get the expected number of frames per second:
  *
- *  1) Call the renderField() an ISR, or
+ *  1) Call the renderFieldNow() in an ISR, or
  *  2) Call renderFieldWhenReady() polling method repeatedly from the global
- *    loop(), and an internal timing parameter will trigger a renderField() at
- *    the appropriate time.
+ *    loop(), and an internal timing parameter will trigger a renderFieldNow()
+ *    at the appropriate time.
  *
- * @tparam H class that provides access to the hardware pin and timing functions
+ * @tparam HW class that provides access to hardware pins and timing functions
  * @tparam LM LedMatrixBase class that provides access to LED segments
       (elements) organized by digit (group)
  * @tparam DIGITS number of LED digits
  * @tparam SUBFIELDS number of rendering fields per digit for PWM, normally 1,
  *   but set to greater than 1 to get number of brightness levels
  */
-template <typename H, typename LM, uint8_t DIGITS, uint8_t SUBFIELDS>
+template <typename HW, typename LM, uint8_t DIGITS, uint8_t SUBFIELDS>
 class SegmentDisplay : public LedDisplay {
 
   public:
@@ -75,18 +73,15 @@ class SegmentDisplay : public LedDisplay {
      * @param numDigits number of digits in the LED display
      * @param patterns array of segment pattern per digit, not nullable
      * @param brightnesses array of brightness for each digit (default: nullptr)
-     * @param timingStats instance of TimingStats (default: nullptr)
      */
     explicit SegmentDisplay(
-        const H& hardware,
+        const HW& hardware,
         const LM& ledMatrix,
-        uint8_t framesPerSecond,
-        TimingStats* timingStats = nullptr
+        uint8_t framesPerSecond
     ):
         LedDisplay(DIGITS),
         mHardware(hardware),
         mLedMatrix(ledMatrix),
-        mTimingStats(timingStats),
         mFramesPerSecond(framesPerSecond)
     {}
 
@@ -176,16 +171,14 @@ class SegmentDisplay : public LedDisplay {
      * method, so call this slightly more frequently than getFieldsPerSecond()
      * per second.
      *
-     * @return Returns true if renderField() was called and the field was
-     *    rendered. The flag can be used to optimize the polling of the
-     *    TimingStats instance. If the return value is false, there's no need to
-     *    check.
+     * @return Returns true if renderFieldNow() was called and the field was
+     *    rendered.
      */
     bool renderFieldWhenReady() {
       uint16_t now = mHardware.micros();
       uint16_t elapsedMicros = now - mLastRenderFieldMicros;
       if (elapsedMicros >= mMicrosPerField) {
-        renderField();
+        renderFieldNow();
         mLastRenderFieldMicros = now;
         return true;
       } else {
@@ -194,14 +187,22 @@ class SegmentDisplay : public LedDisplay {
     }
 
     /**
-     * Render the current field immediately. Designed to be called from a timer
-     * interrupt handler.
+     * Render the current field immediately. If modulation is off (i.e.
+     * SUBFIELDS == 1), then the field corresponds to the single digit. If
+     * modulation is enabled (SUBFIELDS > 1), then each digit is PWM modulated
+     * over SUBFIELDS number of renderings.
+     *
+     * This method is intended to be called directly from a timer interrupt
+     * handler.
      */
-    void renderField() {
-      uint16_t now = mHardware.micros();
-      displayCurrentField();
-      uint16_t duration = mHardware.micros() - now;
-      if (mTimingStats) mTimingStats->update(duration);
+    void renderFieldNow() {
+      if (mPreparedToSleep) return;
+
+      if (SUBFIELDS > 1) {
+        displayCurrentFieldModulated();
+      } else {
+        displayCurrentFieldPlain();
+      }
     }
 
     /**
@@ -222,20 +223,6 @@ class SegmentDisplay : public LedDisplay {
     // disable copy-constructor and assignment operator
     SegmentDisplay(const SegmentDisplay&) = delete;
     SegmentDisplay& operator=(const SegmentDisplay&) = delete;
-
-    /**
-     * Display the current field, usually just the current digit. If modulation
-     * is supported, then each digit is PWM modulated over SUBFIELDS.
-     */
-    void displayCurrentField() {
-      if (mPreparedToSleep) return;
-
-      if (SUBFIELDS > 1) {
-        displayCurrentFieldModulated();
-      } else {
-        displayCurrentFieldPlain();
-      }
-    }
 
     /** Display field normally without modulation. */
     void displayCurrentFieldPlain() {
@@ -280,7 +267,7 @@ class SegmentDisplay : public LedDisplay {
     // Ordered to save space on 32-bit processors.
 
     /** Indirection to the low level digitalWrite(), micros(). */
-    const H& mHardware;
+    const HW& mHardware;
 
     /** LedMatrixBase instance that knows how to set and unset LED segments. */
     const LM& mLedMatrix;
@@ -290,9 +277,6 @@ class SegmentDisplay : public LedDisplay {
 
     /** Brightness for each digit. Nullable. */
     uint8_t mBrightnesses[DIGITS];
-
-    /** Gather performance stats about renderField(). Nullable. */
-    TimingStats* const mTimingStats;
 
     //-----------------------------------------------------------------------
     // Variables needed to render frames and fields at a certain rate per
@@ -312,15 +296,15 @@ class SegmentDisplay : public LedDisplay {
     //-----------------------------------------------------------------------
 
     /**
-     * Within the displayCurrentField() method, mCurrentDigit is the current
+     * Within the renderFieldNow() method, mCurrentDigit is the current
      * digit that is being drawn. It is incremented to the next digit just
      * before returning from that method.
      */
     uint8_t mCurrentDigit;
 
     /**
-     * Within the displayCurrentField() method, the mPrevDigit is the digit
-     * that was displayed on the previous call to displayCurrentField(). It is
+     * Within the renderFieldNow() method, the mPrevDigit is the digit
+     * that was displayed on the previous call to renderFieldNow(). It is
      * set to the digit that was just displayed before returning. It will be
      * equal to mCurrentDigit when multiple fields are drawn for the same
      * digit.

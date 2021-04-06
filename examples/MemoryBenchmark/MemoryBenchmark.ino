@@ -151,55 +151,55 @@ void setup() {
   ledMatrix.begin();
   segmentDisplay.begin();
   segmentDisplay.writePatternAt(0, 0x3A);
-  segmentDisplay.renderField();
+  segmentDisplay.renderFieldNow();
 
 #elif FEATURE == FEATURE_DIRECT_FAST
   ledMatrix.begin();
   segmentDisplay.begin();
   segmentDisplay.writePatternAt(0, 0x3A);
-  segmentDisplay.renderField();
+  segmentDisplay.renderFieldNow();
 
 #elif FEATURE == FEATURE_SINGLE_SW_SPI
   spiAdapter.begin();
   ledMatrix.begin();
   segmentDisplay.begin();
   segmentDisplay.writePatternAt(0, 0x3A);
-  segmentDisplay.renderField();
+  segmentDisplay.renderFieldNow();
 
 #elif FEATURE == FEATURE_SINGLE_SW_SPI_FAST
   spiAdapter.begin();
   ledMatrix.begin();
   segmentDisplay.begin();
   segmentDisplay.writePatternAt(0, 0x3A);
-  segmentDisplay.renderField();
+  segmentDisplay.renderFieldNow();
 
 #elif FEATURE == FEATURE_SINGLE_HW_SPI
   spiAdapter.begin();
   ledMatrix.begin();
   segmentDisplay.begin();
   segmentDisplay.writePatternAt(0, 0x3A);
-  segmentDisplay.renderField();
+  segmentDisplay.renderFieldNow();
 
 #elif FEATURE == FEATURE_DUAL_SW_SPI
   spiAdapter.begin();
   ledMatrix.begin();
   segmentDisplay.begin();
   segmentDisplay.writePatternAt(0, 0x3A);
-  segmentDisplay.renderField();
+  segmentDisplay.renderFieldNow();
 
 #elif FEATURE == FEATURE_DUAL_SW_SPI_FAST
   spiAdapter.begin();
   ledMatrix.begin();
   segmentDisplay.begin();
   segmentDisplay.writePatternAt(0, 0x3A);
-  segmentDisplay.renderField();
+  segmentDisplay.renderFieldNow();
 
 #elif FEATURE == FEATURE_DUAL_HW_SPI
   spiAdapter.begin();
   ledMatrix.begin();
   segmentDisplay.begin();
   segmentDisplay.writePatternAt(0, 0x3A);
-  segmentDisplay.renderField();
+  segmentDisplay.renderFieldNow();
 
 #else
   #error Unknown FEATURE

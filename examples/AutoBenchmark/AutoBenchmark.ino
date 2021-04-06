@@ -24,15 +24,15 @@ SOFTWARE.
 
 /*
  * A sketch that generates the min/avg/max (in microsecondes) benchmarks of
- * SegmentDisplay::renderField() for various configurations of LedMatrix. The
+ * SegmentDisplay::renderFieldNow() for various configurations of LedMatrix. The
  * output is an space-separate list of numbers which can be fed into
  * `generate_table.awk` to extract a human-readable ASCII table that can be
  * pasted directly into the README.md file as a code block.
  *
- * Each DriverConfig configures the SegmentDisplay stack and all of its
- * dependencies. It calls SegmentDisplay::displayField() a number of times
- * (NUM_FIELD_SAMPLES is 1800), then retrieves the TimingStats from the
- * SegmentDisplay, and prints out the min/avg/max numbers.
+ * Each runXxx() function configures the SegmentDisplay object and all of its
+ * dependencies. It calls SegmentDisplay::renderFieldNow() a number of times
+ * (NUM_FIELD_SAMPLES is 1800), while measuring the duration of that function
+ * call. At the end of the sampling, it prints out the min/avg/max numbers.
  */
 
 #include <stdio.h>
@@ -128,13 +128,16 @@ void runBenchmark(const char* name, SD& segmentDisplay) {
   segmentDisplay.writePatternAt(0, 0x7F);
   segmentDisplay.writePatternAt(0, 0xFF);
 
+  timingStats.reset();
   for (uint16_t i = 0; i < NUM_FIELD_SAMPLES; i++) {
-    segmentDisplay.renderField();
+    uint16_t startMicros = micros();
+    segmentDisplay.renderFieldNow();
+    uint16_t endMicros = micros();
+    timingStats.update(endMicros - startMicros);
     yield();
   }
 
   printStats(name, timingStats);
-  timingStats.reset();
 }
 
 // Common Anode, with transistors on Group pins
@@ -149,7 +152,7 @@ void runDirect() {
       NUM_SEGMENTS,
       SEGMENT_PINS);
   SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
-      hardware, ledMatrix, FRAMES_PER_SECOND, &timingStats);
+      hardware, ledMatrix, FRAMES_PER_SECOND);
 
   ledMatrix.begin();
   segmentDisplay.begin();
@@ -168,7 +171,7 @@ void runDirectFast() {
       LedMatrix::kActiveLowPattern /*groupOnPattern*/,
       LedMatrix::kActiveLowPattern /*elementOnPattern*/);
   SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
-      hardware, ledMatrix, FRAMES_PER_SECOND, &timingStats);
+      hardware, ledMatrix, FRAMES_PER_SECOND);
 
   ledMatrix.begin();
   segmentDisplay.begin();
@@ -190,7 +193,7 @@ void runSingleShiftRegisterSwSpi() {
       NUM_DIGITS,
       DIGIT_PINS);
   SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
-      hardware, ledMatrix, FRAMES_PER_SECOND, &timingStats);
+      hardware, ledMatrix, FRAMES_PER_SECOND);
 
   spiAdapter.begin();
   ledMatrix.begin();
@@ -215,7 +218,7 @@ void runSingleShiftRegisterSwSpiFast() {
       NUM_DIGITS,
       DIGIT_PINS);
   SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
-      hardware, ledMatrix, FRAMES_PER_SECOND, &timingStats);
+      hardware, ledMatrix, FRAMES_PER_SECOND);
 
   spiAdapter.begin();
   ledMatrix.begin();
@@ -239,7 +242,7 @@ void runSingleShiftRegisterHwSpi() {
       NUM_DIGITS,
       DIGIT_PINS);
   SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
-      hardware, ledMatrix, FRAMES_PER_SECOND, &timingStats);
+      hardware, ledMatrix, FRAMES_PER_SECOND);
 
   spiAdapter.begin();
   ledMatrix.begin();
@@ -259,7 +262,7 @@ void runDualShiftRegisterSwSpi() {
       LedMatrix::kActiveLowPattern /*groupOnPattern*/,
       LedMatrix::kActiveLowPattern /*elementOnPattern*/);
   SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
-      hardware, ledMatrix, FRAMES_PER_SECOND, &timingStats);
+      hardware, ledMatrix, FRAMES_PER_SECOND);
 
   spiAdapter.begin();
   ledMatrix.begin();
@@ -281,7 +284,7 @@ void runDualShiftRegisterSwSpiFast() {
       LedMatrix::kActiveLowPattern /*groupOnPattern*/,
       LedMatrix::kActiveLowPattern /*elementOnPattern*/);
   SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
-      hardware, ledMatrix, FRAMES_PER_SECOND, &timingStats);
+      hardware, ledMatrix, FRAMES_PER_SECOND);
 
   spiAdapter.begin();
   ledMatrix.begin();
@@ -302,7 +305,7 @@ void runDualShiftRegisterHwSpi() {
       LedMatrix::kActiveLowPattern /*groupOnPattern*/,
       LedMatrix::kActiveLowPattern /*elementOnPattern*/);
   SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
-      hardware, ledMatrix, FRAMES_PER_SECOND, &timingStats);
+      hardware, ledMatrix, FRAMES_PER_SECOND);
 
   spiAdapter.begin();
   ledMatrix.begin();
