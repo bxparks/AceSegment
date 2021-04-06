@@ -98,9 +98,8 @@ pattern buffer.
 module at a configurable frame rate (e.g. 60 frames/second). Only one digit is
 activated at a precise moment in time, but when the frame rate is high enough,
 it as if the entire LED module is lit up.
-    * `renderField()` - render immediately, called from ISR
-    * `renderFieldWhenReady()` - render by polling
-    * `displayCurrentField() - render the current digit (i.e. "field")
+    * `renderFieldNow()` - render the current field immediately
+    * `renderFieldWhenReady()` - render the current field if the time is right
 
 ## Writers
 

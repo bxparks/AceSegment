@@ -40,6 +40,10 @@ END {
     labels[0], u[0]["flash"], u[0]["ram"], u[0]["d_flash"], u[0]["d_ram"])
   printf("|---------------------------------+--------------+-------------|\n")
   for (i = 1 ; i < NUM_ENTRIES; i++) {
+    if (labels[i] == "direct_fast") {
+      printf(\
+        "|---------------------------------+--------------+-------------|\n")
+    }
     printf("| %-31s | %6d/%5d | %5d/%5d |\n",
         labels[i], u[i]["flash"], u[i]["ram"], u[i]["d_flash"], u[i]["d_ram"])
   }

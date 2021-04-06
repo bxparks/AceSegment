@@ -220,7 +220,11 @@ void setupAceSegment() {
 #if USE_INTERRUPT == 1
 // interrupt handler for timer 2
 ISR(TIMER2_COMPA_vect) {
-  renderField();
+  if (demoMode == DEMO_MODE_PULSE) {
+    segmentDisplayModulating.renderFieldNow();
+  } else {
+    segmentDisplay.renderFieldNow();
+  }
 }
 #endif
 

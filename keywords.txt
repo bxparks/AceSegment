@@ -6,95 +6,80 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-TimingStats	KEYWORD1
 Hardware	KEYWORD1
-LedMatrix	KEYWORD1
-DimmablePattern	KEYWORD1
-Driver	KEYWORD1
-Renderer	KEYWORD1
+HwSpiAdapter	KEYWORD1
+SwSpiAdapter	KEYWORD1
+SwSpiAdapterFast	KEYWORD1
+LedMatrixBase	KEYWORD1
+LedMatrixDirect	KEYWORD1
+LedMatrixDirectFast	KEYWORD1
+LedMatrixSingleShiftRegister	KEYWORD1
+LedMatrixDualShiftRegister	KEYWORD1
+LedDisplay	KEYWORD1
+SegmentDisplay	KEYWORD1
 HexWriter	KEYWORD1
 ClockWriter	KEYWORD1
 CharWriter	KEYWORD1
 StringWriter	KEYWORD1
 
+
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
 
-# TimeingStats.h
-reset	KEYWORD2
-getMax	KEYWORD2
-getMin	KEYWORD2
-getAvg	KEYWORD2
-getExpDecayAvg	KEYWORD2
-getCount	KEYWORD2
-getCounter	KEYWORD2
-update	KEYWORD2
-
 # Hardware.h
 digitalWrite	KEYWORD2
 pinMode	KEYWORD2
-shiftOut	KEYWORD2
 micros	KEYWORD2
 millis	KEYWORD2
-spiBegin	KEYWORD2
-spiEnd	KEYWORD2
-spiTransfer	KEYWORD2
-spiTransfer16	KEYWORD2
+
+# SwSpiAdapter.h, HwSpiAdapter.h
+begin	KEYWORD2
+end	KEYWORD2
+transfer	KEYWORD2
+transfer16	KEYWORD2
 
 # LedMatrix.h
-configure	KEYWORD2
-finish	KEYWORD2
-setCathodeOnGroup	KEYWORD2
-setAnodeOnGroup	KEYWORD2
-invertGroupLevels	KEYWORD2
-configure	KEYWORD2
+begin	KEYWORD2
+end	KEYWORD2
+draw	KEYWORD2
+clear	KEYWORD2
 enableGroup	KEYWORD2
 disableGroup	KEYWORD2
-drawElements	KEYWORD2
 
-# Driver.h
-configure	KEYWORD2
-finish	KEYWORD2
-displayCurrentField	KEYWORD2
-isBrightnessSupported	KEYWORD2
-setPattern	KEYWORD2
-setBrightness	KEYWORD2
-
-# Renderer.h
-configure	KEYWORD2
+# SegmentDisplay
+begin	KEYWORD2
+end	KEYWORD2
 getNumDigits	KEYWORD2
 getFramesPerSecond	KEYWORD2
 getFieldsPerSecond	KEYWORD2
-writeBrightness	KEYWORD2
 writePatternAt	KEYWORD2
-writeBrightnessAt	KEYWORD2
 writeDecimalPointAt	KEYWORD2
-renderField	KEYWORD2
+setBrightnessAt	KEYWORD2
+setGlobalBrightness	KEYWORD2
+clear	KEYWORD2
+renderFieldNow	KEYWORD2
 renderFieldWhenReady	KEYWORD2
-getTimingStats	KEYWORD2
+prepareToSleep	KEYWORD2
+wakeFromSleep	KEYWORD2
 
 # HexWriter.h
-getNumDigits	KEYWORD2
 writeHexAt	KEYWORD2
-writeBrightnessAt	KEYWORD2
-writeDecimalPointAt	KEYWORD2
 
 # ClockWriter.h
-getNumDigits	KEYWORD2
-writeClock	KEYWORD2
-writeBcdClock	KEYWORD2
+writeDecimalAt	KEYWORD2
 writeCharAt	KEYWORD2
 writeColon	KEYWORD2
+writeClock	KEYWORD2
+writeBcdClock	KEYWORD2
 
 # CharWriter.h
-getNumDigits	KEYWORD2
 writeCharAt	KEYWORD2
-writeBrightnessAt	KEYWORD2
-writeDecimalPointAt	KEYWORD2
+getLedDisplay	KEYWORD2
 
 # StringWriter.
 writeStringAt	KEYWORD2
+getLedDisplay	KEYWORD2
 
 #######################################
 # Instances (KEYWORD2)
@@ -103,10 +88,6 @@ writeStringAt	KEYWORD2
 #######################################
 # Constants (LITERAL1)
 #######################################
-
-# DimmablePattern.h
-kOff	LITERAL1
-kOn	LITERAL1
 
 # HexWriter.h
 kNumCharacters	LITERAL1
