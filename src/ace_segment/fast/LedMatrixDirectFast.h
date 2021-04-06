@@ -32,16 +32,29 @@ SOFTWARE.
 #include <digitalWriteFast.h>
 #include "../LedMatrixBase.h"
 
+// Select OPTION_ARRAY to use an array of function pointers. Using an array
+// of function takes 27 microseconds for displayCurentField(), but 8 extra bytes
+// of flash, and 48 extra bytes of static RAM, compared to the SWITCH option.
+//
+// Select OPTION_SWITCH to use a switch statement. This is 30% slower for
+// displayCurentField(), 35 microseconds, but has smaller memory footprint).
+#define ACE_SEGMENT_LMDF_OPTION_ARRAY 0
+#define ACE_SEGMENT_LMDF_OPTION_SWITCH 1
+#if ! defined(ACE_SEGMENT_LMDF_OPTION)
+#define ACE_SEGMENT_LMDF_OPTION ACE_SEGMENT_LMDF_OPTION_ARRAY
+#endif
+
 namespace ace_segment {
 
+#if ACE_SEGMENT_LMDF_OPTION == ACE_SEGMENT_LMDF_OPTION_ARRAY
 typedef void (*DigitalWriter)(void);
+#endif
 
 /**
  * An LedMatrix whose group pins and element pins are wired directly to the MCU.
  * This version is optimized to use the `pinModeFast()` and `digitalWriteFast()`
  * functions from https://github.com/NicksonYap/digitalWriteFast.
  *
- * @tparam H class that provides access to the hardware pins
  * @tparam gX group pin numbers
  * @tparam eX element pin numbers
  */
@@ -137,18 +150,59 @@ class LedMatrixDirectFast : public LedMatrixBase {
     void writeElementPin(uint8_t element, uint8_t output) const {
       uint8_t actualOutput = (output ^ mElementXorMask) & 0x1;
       uint8_t index = element * 2 + actualOutput;
+
+    #if ACE_SEGMENT_LMDF_OPTION == ACE_SEGMENT_LMDF_OPTION_ARRAY
       DigitalWriter writer = kElementWriters[index];
       writer();
+
+    #else
+      switch (index) {
+        case  0: digitalWriteFast(e0, LOW); break;
+        case  1: digitalWriteFast(e0, HIGH); break;
+        case  2: digitalWriteFast(e1, LOW); break;
+        case  3: digitalWriteFast(e1, HIGH); break;
+        case  4: digitalWriteFast(e2, LOW); break;
+        case  5: digitalWriteFast(e2, HIGH); break;
+        case  6: digitalWriteFast(e3, LOW); break;
+        case  7: digitalWriteFast(e3, HIGH); break;
+        case  8: digitalWriteFast(e4, LOW); break;
+        case  9: digitalWriteFast(e4, HIGH); break;
+        case 10: digitalWriteFast(e5, LOW); break;
+        case 11: digitalWriteFast(e5, HIGH); break;
+        case 12: digitalWriteFast(e6, LOW); break;
+        case 13: digitalWriteFast(e6, HIGH); break;
+        case 14: digitalWriteFast(e7, LOW); break;
+        case 15: digitalWriteFast(e7, HIGH); break;
+        default: break;
+      }
+    #endif
     }
 
     /** Write bit 0 of output to group pin. */
     void writeGroupPin(uint8_t group, uint8_t output) const {
       uint8_t actualOutput = (output ^ mGroupXorMask) & 0x1;
       uint8_t index = group * 2 + actualOutput;
+
+    #if ACE_SEGMENT_LMDF_OPTION == ACE_SEGMENT_LMDF_OPTION_ARRAY
       DigitalWriter writer = kGroupWriters[index];
       writer();
+
+    #else
+      switch (index) {
+        case 0: digitalWriteFast(g0, LOW); break;
+        case 1: digitalWriteFast(g0, HIGH); break;
+        case 2: digitalWriteFast(g1, LOW); break;
+        case 3: digitalWriteFast(g1, HIGH); break;
+        case 4: digitalWriteFast(g2, LOW); break;
+        case 5: digitalWriteFast(g2, HIGH); break;
+        case 6: digitalWriteFast(g3, LOW); break;
+        case 7: digitalWriteFast(g3, HIGH); break;
+        default: break;
+      }
+    #endif
     }
 
+  #if ACE_SEGMENT_LMDF_OPTION == ACE_SEGMENT_LMDF_OPTION_ARRAY
     // DigitalWriter functions for writing element pins.
     static void digitalWriteFastElement0L() { digitalWriteFast(e0, LOW); }
     static void digitalWriteFastElement0H() { digitalWriteFast(e0, HIGH); }
@@ -176,14 +230,19 @@ class LedMatrixDirectFast : public LedMatrixBase {
     static void digitalWriteFastGroup2H() { digitalWriteFast(g2, HIGH); }
     static void digitalWriteFastGroup3L() { digitalWriteFast(g3, LOW); }
     static void digitalWriteFastGroup3H() { digitalWriteFast(g3, HIGH); }
+  #endif
 
   private:
+  #if ACE_SEGMENT_LMDF_OPTION == ACE_SEGMENT_LMDF_OPTION_ARRAY
     static const DigitalWriter kGroupWriters[2 * kNumGroups];
     static const DigitalWriter kElementWriters[2 * kNumElements];
+  #endif
 
     /** Store the previous group, to turn it off after moving to new group. */
     mutable uint8_t mPrevGroup = 0;
 };
+
+#if ACE_SEGMENT_LMDF_OPTION == ACE_SEGMENT_LMDF_OPTION_ARRAY
 
 template<
   uint8_t g0, uint8_t g1, uint8_t g2, uint8_t g3,
@@ -229,9 +288,11 @@ LedMatrixDirectFast<g0, g1, g2, g3, e0, e1, e2, e3, e4, e5, e6, e7>
   digitalWriteFastGroup3H,
 };
 
-}
-
 #endif
+
+} // ace_segment
+
+#endif // defined(ARDUINO_ARCH_AVR)
 
 #endif
 

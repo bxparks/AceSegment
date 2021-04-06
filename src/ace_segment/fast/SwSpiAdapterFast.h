@@ -73,7 +73,7 @@ class SwSpiAdapterFast {
       digitalWriteFast(latchPin, HIGH);
     }
 
-  void shiftOutFast(uint8_t output) const {
+  static void shiftOutFast(uint8_t output) {
     uint8_t mask = 0x80; // start with the MSB
     for (uint8_t i = 0; i < 8; i++)  {
       digitalWriteFast(clockPin, LOW);
