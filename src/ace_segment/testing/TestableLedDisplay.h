@@ -30,19 +30,39 @@ SOFTWARE.
 namespace ace_segment {
 namespace testing {
 
-template <uint8_t NUM_DIGITS>
+/**
+ * An implementation of LedDisplay for unit testing purposes.
+ * Implements most of the simple features of SegmentDisplay.
+ *
+ * @tparam DIGITS number of digits supported by this class
+ */
+template <uint8_t DIGITS>
 class TestableLedDisplay : public LedDisplay {
   public:
-    TestableLedDisplay() : LedDisplay(NUM_DIGITS) {}
+    TestableLedDisplay() : LedDisplay(DIGITS) {}
 
     virtual void writePatternAt(uint8_t pos, uint8_t pattern) override {
       mPatterns[pos] = pattern;
     }
 
-    void setBrightnessAt(uint8_t /*pos*/, uint8_t /*brightness*/) override {}
+    void writePatternsAt(uint8_t pos, const uint8_t patterns[],
+        uint8_t len) override {
+      for (uint8_t i = 0; i < len; i++) {
+        if (pos >= DIGITS) break;
+        mPatterns[pos++] = patterns[i];
+      }
+    }
+
+    void writePatternsAt_P(uint8_t pos, const uint8_t patterns[],
+        uint8_t len) override {
+      for (uint8_t i = 0; i < len; i++) {
+        if (pos >= DIGITS) break;
+        mPatterns[pos++] = pgm_read_byte(patterns + i);
+      }
+    }
 
     void writeDecimalPointAt(uint8_t pos, bool state = true) override {
-      if (pos >= NUM_DIGITS) return;
+      if (pos >= DIGITS) return;
 
       uint8_t pattern = mPatterns[pos];
       if (state) {
@@ -53,10 +73,12 @@ class TestableLedDisplay : public LedDisplay {
       mPatterns[pos] = pattern;
     }
 
+    void setBrightnessAt(uint8_t /*pos*/, uint8_t /*brightness*/) override {}
+
     void setGlobalBrightness(uint8_t /*brightness*/) override {}
 
     void clear() override {
-      for (uint8_t i = 0; i < NUM_DIGITS + 1; ++i) {
+      for (uint8_t i = 0; i < DIGITS + 1; ++i) {
         mPatterns[i] = 0;
       }
     }
@@ -64,7 +86,7 @@ class TestableLedDisplay : public LedDisplay {
     uint8_t* getPatterns() { return mPatterns; }
 
   private:
-    uint8_t mPatterns[NUM_DIGITS + 1];
+    uint8_t mPatterns[DIGITS + 1];
 };
 
 } // testing

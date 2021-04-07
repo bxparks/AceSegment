@@ -134,19 +134,19 @@ class SegmentDisplay : public LedDisplay {
       mPatterns[pos] = pattern;
     }
 
-    void writePatternsAt_P(uint8_t pos, const uint8_t patterns[],
-        uint8_t len) override {
-      for (uint8_t i = 0; i < len; i++) {
-        if (pos >= DIGITS) break;
-        mPatterns[pos++] = pgm_read_byte(patterns + i);
-      }
-    }
-
     void writePatternsAt(uint8_t pos, const uint8_t patterns[],
         uint8_t len) override {
       for (uint8_t i = 0; i < len; i++) {
         if (pos >= DIGITS) break;
         mPatterns[pos++] = patterns[i];
+      }
+    }
+
+    void writePatternsAt_P(uint8_t pos, const uint8_t patterns[],
+        uint8_t len) override {
+      for (uint8_t i = 0; i < len; i++) {
+        if (pos >= DIGITS) break;
+        mPatterns[pos++] = pgm_read_byte(patterns + i);
       }
     }
 
