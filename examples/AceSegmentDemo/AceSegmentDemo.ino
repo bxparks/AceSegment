@@ -242,7 +242,7 @@ const uint8_t DEMO_LOOP_MODE_AUTO = 0;
 const uint8_t DEMO_LOOP_MODE_PAUSED = 1;
 uint8_t demoLoopMode = DEMO_LOOP_MODE_AUTO;
 
-const uint8_t DEMO_MODE_COUNT = 7;
+const uint8_t DEMO_MODE_COUNT = 8;
 const uint8_t DEMO_MODE_CLOCK = 0;
 const uint8_t DEMO_MODE_HEX = 1;
 const uint8_t DEMO_MODE_CHAR = 2;
@@ -250,6 +250,7 @@ const uint8_t DEMO_MODE_STRINGS = 3;
 const uint8_t DEMO_MODE_SCROLL = 4;
 const uint8_t DEMO_MODE_PULSE = 5;
 const uint8_t DEMO_MODE_SPIN = 6;
+const uint8_t DEMO_MODE_SPIN_2 = 7;
 
 // Demo mode.
 uint8_t prevDemoMode = DEMO_MODE_COUNT - 1;
@@ -379,6 +380,27 @@ void spinDisplay() {
 
 //-----------------------------------------------------------------------------
 
+static const uint8_t NUM_SPIN_PATTERNS_2 = 6;
+
+const uint8_t SPIN_PATTERNS_2[NUM_SPIN_PATTERNS_2][4] PROGMEM = {
+  { 0x03, 0x03, 0x03, 0x03 },  // Frame 0
+  { 0x06, 0x06, 0x06, 0x06 },  // Frame 1
+  { 0x0c, 0x0c, 0x0c, 0x0c },  // Frame 2
+  { 0x18, 0x18, 0x18, 0x18 },  // Frame 3
+  { 0x30, 0x30, 0x30, 0x30 },  // Frame 4
+  { 0x21, 0x21, 0x21, 0x21 },  // Frame 5
+};
+
+void spinDisplay2() {
+  static uint8_t i = 0;
+  const uint8_t* patterns = SPIN_PATTERNS_2[i];
+  segmentDisplay.writePatternsAt_P(0, patterns, 4);
+
+  ace_common::incrementMod(i, NUM_SPIN_PATTERNS_2);
+}
+
+//-----------------------------------------------------------------------------
+
 /** Display the demo pattern selected by demoMode. */
 void updateDemo() {
   if (demoMode == DEMO_MODE_CLOCK) {
@@ -395,6 +417,8 @@ void updateDemo() {
     pulseDisplay();
   } else if (demoMode == DEMO_MODE_SPIN) {
     spinDisplay();
+  } else if (demoMode == DEMO_MODE_SPIN_2) {
+    spinDisplay2();
   }
 }
 
@@ -424,6 +448,7 @@ void demoLoop() {
       demoInternalDelay = 200;
       break;
     case DEMO_MODE_SPIN:
+    case DEMO_MODE_SPIN_2:
       demoInternalDelay = 70;
       break;
     default:
