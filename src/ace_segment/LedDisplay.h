@@ -50,6 +50,23 @@ class LedDisplay {
     virtual void writePatternAt(uint8_t pos, uint8_t pattern) = 0;
 
     /**
+     * Write the array of `patterns` of length `len`, starting at `pos`. If an
+     * element of patterns attempts to write to a digit beyond the last digit of
+     * the LED module, nothing happens.
+     */
+    virtual void writePatternsAt(uint8_t pos, const uint8_t patterns[],
+        uint8_t len) = 0;
+
+    /**
+     * Write the array of `patterns` of length `len`, which are stored in flash
+     * memory through PROGMEM, starting at `pos`. If an element of patterns
+     * attempts to write to a digit beyond the last digit of the LED module,
+     * nothing happens.
+     */
+    virtual void writePatternsAt_P(uint8_t pos, const uint8_t patterns[],
+        uint8_t len) = 0;
+
+    /**
      * Write the brightness for a given pos, leaving pattern unchanged.
      * The maximum brightness is determined by specifics of the subclass. For
      * SegmentDisplay, the maximum brightness is the value of `SUBFIELDS-1`

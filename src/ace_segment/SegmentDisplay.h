@@ -26,6 +26,7 @@ SOFTWARE.
 #define ACE_SEGMENT_SEGMENT_DISPLAY_H
 
 #include <stdint.h>
+#include <Arduino.h> // pgm_read_byte()
 #include <AceCommon.h> // incrementMod()
 #include "LedDisplay.h"
 
@@ -131,6 +132,22 @@ class SegmentDisplay : public LedDisplay {
     void writePatternAt(uint8_t pos, uint8_t pattern) override {
       if (pos >= DIGITS) return;
       mPatterns[pos] = pattern;
+    }
+
+    void writePatternsAt_P(uint8_t pos, const uint8_t patterns[],
+        uint8_t len) override {
+      for (uint8_t i = 0; i < len; i++) {
+        if (pos >= DIGITS) break;
+        mPatterns[pos++] = pgm_read_byte(patterns + i);
+      }
+    }
+
+    void writePatternsAt(uint8_t pos, const uint8_t patterns[],
+        uint8_t len) override {
+      for (uint8_t i = 0; i < len; i++) {
+        if (pos >= DIGITS) break;
+        mPatterns[pos++] = patterns[i];
+      }
     }
 
     /**

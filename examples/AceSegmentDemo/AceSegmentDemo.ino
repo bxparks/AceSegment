@@ -242,17 +242,20 @@ const uint8_t DEMO_LOOP_MODE_AUTO = 0;
 const uint8_t DEMO_LOOP_MODE_PAUSED = 1;
 uint8_t demoLoopMode = DEMO_LOOP_MODE_AUTO;
 
-const uint8_t DEMO_MODE_COUNT = 6;
+const uint8_t DEMO_MODE_COUNT = 7;
 const uint8_t DEMO_MODE_CLOCK = 0;
 const uint8_t DEMO_MODE_HEX = 1;
 const uint8_t DEMO_MODE_CHAR = 2;
 const uint8_t DEMO_MODE_STRINGS = 3;
 const uint8_t DEMO_MODE_SCROLL = 4;
 const uint8_t DEMO_MODE_PULSE = 5;
+const uint8_t DEMO_MODE_SPIN = 6;
 
 // Demo mode.
 uint8_t prevDemoMode = DEMO_MODE_COUNT - 1;
-uint8_t demoMode = DEMO_MODE_CLOCK;
+uint8_t demoMode = DEMO_MODE_SPIN;
+
+//-----------------------------------------------------------------------------
 
 void writeHexes() {
   static uint8_t c = 0;
@@ -267,6 +270,8 @@ void writeHexes() {
   ace_common::incrementMod(demoMode, DEMO_MODE_COUNT);
 }
 
+//-----------------------------------------------------------------------------
+
 void writeClock() {
   static uint8_t hh = 0;
   static uint8_t mm = 0;
@@ -278,6 +283,8 @@ void writeClock() {
     ace_common::incrementMod(hh, (uint8_t)60);
   }
 }
+
+//-----------------------------------------------------------------------------
 
 void writeChars() {
   static uint8_t c = 0;
@@ -292,6 +299,8 @@ void writeChars() {
 
   ace_common::incrementMod(c, CharWriter::kNumCharacters);
 }
+
+//-----------------------------------------------------------------------------
 
 void writeStrings() {
   static const char* STRINGS[] = {
@@ -317,6 +326,8 @@ void scrollString(const char* s) {
   stringWriter.writeStringAt(0, &s[i], true /* padRight */);
   ace_common::incrementMod(i, (uint8_t) strlen(s));
 }
+
+//-----------------------------------------------------------------------------
 
 void setupPulseDisplay() {
   HexWriter hexWriter(segmentDisplayModulating);
@@ -348,6 +359,26 @@ void pulseDisplay() {
   setBrightnesses(i);
 }
 
+//-----------------------------------------------------------------------------
+
+static const uint8_t NUM_SPIN_PATTERNS = 3;
+
+const uint8_t SPIN_PATTERNS[NUM_SPIN_PATTERNS][4] PROGMEM = {
+  { 0x10, 0x01, 0x08, 0x02 },  // Frame 0
+  { 0x20, 0x08, 0x01, 0x04 },  // Frame 1
+  { 0x09, 0x00, 0x00, 0x09 },  // Frame 2
+};
+
+void spinDisplay() {
+  static uint8_t i = 0;
+  const uint8_t* patterns = SPIN_PATTERNS[i];
+  segmentDisplay.writePatternsAt_P(0, patterns, 4);
+
+  ace_common::incrementMod(i, NUM_SPIN_PATTERNS);
+}
+
+//-----------------------------------------------------------------------------
+
 /** Display the demo pattern selected by demoMode. */
 void updateDemo() {
   if (demoMode == DEMO_MODE_CLOCK) {
@@ -362,6 +393,8 @@ void updateDemo() {
     scrollString("   Angela is the best.");
   } else if (demoMode == DEMO_MODE_PULSE) {
     pulseDisplay();
+  } else if (demoMode == DEMO_MODE_SPIN) {
+    spinDisplay();
   }
 }
 
@@ -385,11 +418,21 @@ void demoLoop() {
   static uint16_t lastStatsCounter = 0;
 #endif
 
-  unsigned long demoInternalStep = (demoMode == DEMO_MODE_PULSE)
-      ? 200
-      : 500;
+  unsigned long demoInternalDelay;
+  switch (demoMode) {
+    case DEMO_MODE_PULSE:
+      demoInternalDelay = 200;
+      break;
+    case DEMO_MODE_SPIN:
+      demoInternalDelay = 70;
+      break;
+    default:
+      demoInternalDelay = 500;
+      break;
+  }
+
   unsigned long now = millis();
-  if (now - lastUpdateTime > demoInternalStep) {
+  if (now - lastUpdateTime > demoInternalDelay) {
     lastUpdateTime = now;
     if (demoLoopMode == DEMO_LOOP_MODE_AUTO) {
       updateDemo();
@@ -403,43 +446,6 @@ void demoLoop() {
     */
   }
 }
-
-#if PRINT_STATS == 1
-void printStats() {
-  // Print out statistics every N seconds.
-  unsigned long elapsedTime = now - stopWatchStart;
-  if (elapsedTime >= 2000) {
-    uint32_t elapsedCount = stats.getCounter() - lastStatsCounter;
-    lastStatsCounter = stats.getCounter();
-    uint16_t renderDurationAverage = stats.getAvg();
-    uint16_t renderDurationMin = stats.getMin();
-    uint16_t renderDurationMax = stats.getMax();
-
-    if (ENABLE_SERIAL_DEBUG >= 1) {
-      Serial.print(F("loops: "));
-      Serial.print(loopCount);
-      Serial.print(F("; renders: "));
-      Serial.print(elapsedCount);
-      Serial.print(F("; t: "));
-      Serial.print(elapsedTime / 1000);
-      Serial.print(F("s; fields/s: "));
-      Serial.print((uint32_t) elapsedCount * 1000 / elapsedTime);
-      Serial.print(F("Hz; min: "));
-      Serial.print(renderDurationMin);
-      Serial.print(F("us; avg: "));
-      Serial.print(renderDurationAverage);
-      Serial.print(F("us; max: "));
-      Serial.print(renderDurationMax);
-      Serial.println(F("us"));
-    }
-
-    stopWatchStart = now;
-    loopCount = 0;
-  } else {
-    loopCount++;
-  }
-}
-#endif
 
 void renderField() {
   if (demoMode == DEMO_MODE_PULSE) {
