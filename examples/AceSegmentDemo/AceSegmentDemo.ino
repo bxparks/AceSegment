@@ -177,16 +177,16 @@ Hardware hardware;
 #endif
 
 // Monochromatic
-SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, 1> segmentDisplay(
+ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, 1> scanningDisplay(
     hardware, ledMatrix, FRAMES_PER_SECOND);
 
 // 16 level of brightness, need field/second of 60*4*16 = 3840.
-SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-    segmentDisplayModulating(hardware, ledMatrix, FRAMES_PER_SECOND);
+ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+    scanningDisplayModulating(hardware, ledMatrix, FRAMES_PER_SECOND);
 
-NumberWriter numberWriter(segmentDisplay);
-ClockWriter clockWriter(segmentDisplay);
-CharWriter charWriter(segmentDisplay);
+NumberWriter numberWriter(scanningDisplay);
+ClockWriter clockWriter(scanningDisplay);
+CharWriter charWriter(scanningDisplay);
 StringWriter stringWriter(charWriter);
 
 // Setup the various resources.
@@ -201,13 +201,13 @@ void setupAceSegment() {
   #endif
 
     ledMatrix.begin();
-    segmentDisplay.begin();
-    segmentDisplayModulating.begin();
+    scanningDisplay.begin();
+    scanningDisplayModulating.begin();
 
 #if USE_INTERRUPT == 1
   // set up Timer 2
   uint8_t timerCompareValue =
-      (long) F_CPU / 1024 / segmentDisplay.getFieldsPerSecond() - 1;
+      (long) F_CPU / 1024 / scanningDisplay.getFieldsPerSecond() - 1;
   if (ENABLE_SERIAL_DEBUG >= 1) {
     Serial.print(F("Timer 2, Compare A: "));
     Serial.println(timerCompareValue);
@@ -229,9 +229,9 @@ void setupAceSegment() {
 // interrupt handler for timer 2
 ISR(TIMER2_COMPA_vect) {
   if (demoMode == DEMO_MODE_PULSE) {
-    segmentDisplayModulating.renderFieldNow();
+    scanningDisplayModulating.renderFieldNow();
   } else {
-    segmentDisplay.renderFieldNow();
+    scanningDisplay.renderFieldNow();
   }
 }
 #endif
@@ -338,7 +338,7 @@ void scrollString(const char* s) {
 //-----------------------------------------------------------------------------
 
 void setupPulseDisplay() {
-  NumberWriter numberWriter(segmentDisplayModulating);
+  NumberWriter numberWriter(scanningDisplayModulating);
   numberWriter.writeHexCharAt(0, 1);
   numberWriter.writeHexCharAt(1, 2);
   numberWriter.writeHexCharAt(2, 3);
@@ -350,10 +350,10 @@ void setBrightnesses(int i) {
   uint8_t brightness1 = levels[(i+1) % NUM_BRIGHTNESSES];
   uint8_t brightness2 = levels[(i+2) % NUM_BRIGHTNESSES];
   uint8_t brightness3 = levels[(i+3) % NUM_BRIGHTNESSES];
-  segmentDisplayModulating.setBrightnessAt(0, brightness0);
-  segmentDisplayModulating.setBrightnessAt(1, brightness1);
-  segmentDisplayModulating.setBrightnessAt(2, brightness2);
-  segmentDisplayModulating.setBrightnessAt(3, brightness3);
+  scanningDisplayModulating.setBrightnessAt(0, brightness0);
+  scanningDisplayModulating.setBrightnessAt(1, brightness1);
+  scanningDisplayModulating.setBrightnessAt(2, brightness2);
+  scanningDisplayModulating.setBrightnessAt(3, brightness3);
 }
 
 void pulseDisplay() {
@@ -380,7 +380,7 @@ const uint8_t SPIN_PATTERNS[NUM_SPIN_PATTERNS][4] PROGMEM = {
 void spinDisplay() {
   static uint8_t i = 0;
   const uint8_t* patterns = SPIN_PATTERNS[i];
-  segmentDisplay.writePatternsAt_P(0, patterns, 4);
+  scanningDisplay.writePatternsAt_P(0, patterns, 4);
 
   incrementMod(i, NUM_SPIN_PATTERNS);
 }
@@ -401,7 +401,7 @@ const uint8_t SPIN_PATTERNS_2[NUM_SPIN_PATTERNS_2][4] PROGMEM = {
 void spinDisplay2() {
   static uint8_t i = 0;
   const uint8_t* patterns = SPIN_PATTERNS_2[i];
-  segmentDisplay.writePatternsAt_P(0, patterns, 4);
+  scanningDisplay.writePatternsAt_P(0, patterns, 4);
 
   incrementMod(i, NUM_SPIN_PATTERNS_2);
 }
@@ -435,8 +435,8 @@ void updateDemo() {
 void nextDemo() {
   prevDemoMode = demoMode;
   incrementMod(demoMode, DEMO_MODE_COUNT);
-  segmentDisplay.clear();
-  segmentDisplayModulating.clear();
+  scanningDisplay.clear();
+  scanningDisplayModulating.clear();
   updateDemo();
 }
 
@@ -471,9 +471,9 @@ void demoLoop() {
 
 void renderField() {
   if (demoMode == DEMO_MODE_PULSE) {
-    segmentDisplayModulating.renderFieldWhenReady();
+    scanningDisplayModulating.renderFieldWhenReady();
   } else {
-    segmentDisplay.renderFieldWhenReady();
+    scanningDisplay.renderFieldWhenReady();
   }
 }
 

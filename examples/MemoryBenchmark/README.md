@@ -80,15 +80,15 @@ before substantional refactoring in 2021.
   making the `LedMatrix` class into a better abstraction and unifying the API
   into a single `draw(group, elementPattern)` method.
 * Reduce flash by 20-50 bytes on AVR by merging `Renderer` into
-  `SegmentDisplay`.
+  `ScanningDisplay`.
 * Reduce flash by 100-200 bytes on AVR, SAMD21, STM32 and ESP8266 by
-  templatizing the `SegmentDisplay` on `NUM_DIGITS` and `NUM_SUBFIELDS`, and
-  merging `patterns` and `brightnesses` arrays directly into `SegmentDisplay`.
+  templatizing the `ScanningDisplay` on `NUM_DIGITS` and `NUM_SUBFIELDS`, and
+  merging `patterns` and `brightnesses` arrays directly into `ScanningDisplay`.
   Flash usage actually goes up by ~40 bytes on Teensy3.2, but it has enough
   flash memory.
 * Reduce flash by 300-350 bytes on AVR (~150 on SAMD, 150-500 bytes on STM32,
   ~250 bytes on ESP8266, 300-600 bytes on ESP32) by templatizing LedMatrix
-  and SegmentDisplay on `NUM_DIGITS`, `NUM_SUBFIELDS`, `Hardware` class,
+  and ScanningDisplay on `NUM_DIGITS`, `NUM_SUBFIELDS`, `Hardware` class,
   `SwSpiAdapter` and `HwSpiAdapter`.
 * Reduce flash by flattening the `LedMatrix` hierarchy into templatized
   classes, and removing virtual methods. Saves 250-300 bytes on AVR, 150-200 on
@@ -108,7 +108,7 @@ before substantional refactoring in 2021.
   HardwareSerial class. (I will make a fix to AUnit so that the `HardwareSerial`
   will not be pulled in by other libraries in the future.)
 * Reduce flash size by ~130 bytes on AVR and 70-80 bytes on 32-bit processors
-  by removing the pointer to `TimingStats` from `SegmentDisplay`. The pointer
+  by removing the pointer to `TimingStats` from `ScanningDisplay`. The pointer
   causes the code for the `TimingStats` class to be pulled in, even if it is not
   used.
 
@@ -116,12 +116,12 @@ before substantional refactoring in 2021.
 
 The following shows the flash and static memory sizes of the `MemoryBenchmark`
 program that includes the resources needed to perform a
-`SegmentDisplay::renderFieldWhenReady()`. This includes:
+`ScanningDisplay::renderFieldWhenReady()`. This includes:
 
 * `Hardware` (which is opimized away by the compiler)
 * `SwSpiAdapter` or `HwSpiAdapter`
 * `LedMatrixXxx`
-* `SegmentDisplay`
+* `ScanningDisplay`
 
 ### Arduino Nano
 

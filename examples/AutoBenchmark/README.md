@@ -1,6 +1,6 @@
 # AutoBenchmark
 
-This program creates instances of `SegmentDisplay` using different
+This program creates instances of `ScanningDisplay` using different
 configurations of the `LedMatrix` class:
 
 * `direct`: group and segment pins directly connected to MCU
@@ -13,7 +13,7 @@ configurations of the `LedMatrix` class:
 * `dual_hw_spi`: group pins and segment pins connected to 74HC595 accessed
   through hardware SPI (`HwSpiAdapter`)
 
-It measures the time taken by `SegmentDisplay::renderFieldNow()` which
+It measures the time taken by `ScanningDisplay::renderFieldNow()` which
 renders a single digit (multiple fields make up a frame, a frame is the
 rendering of all digits on the display module).
 
@@ -73,7 +73,7 @@ to match similar programs in the AceButton, AceCrc and AceTime libraries.
 ## Results
 
 The following tables show the number of microseconds taken by
-`SegmentDisplay::renderFieldNow()` which renders the 8 segments of a single
+`ScanningDisplay::renderFieldNow()` which renders the 8 segments of a single
 LED digit. If the LED module has 4 digits, then `renderFieldNow()` must be
 called 4 times to render the light pattern of the entire LED module. The entire
 rendering is then called a frame.
@@ -119,7 +119,7 @@ sizeof(LedMatrixDirectFast<0..3, 0..7>): 3
 sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 10
 sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 5
 sizeof(LedDisplay): 3
-sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 25
+sizeof(ScanningDisplay<Hardware, LedMatrixBase, 4, 1>): 25
 sizeof(NumberWriter): 2
 sizeof(ClockWriter): 3
 sizeof(CharWriter): 2
@@ -168,7 +168,7 @@ sizeof(LedMatrixDirectFast<0..3, 0..7>): 3
 sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 10
 sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 5
 sizeof(LedDisplay): 3
-sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 25
+sizeof(ScanningDisplay<Hardware, LedMatrixBase, 4, 1>): 25
 sizeof(NumberWriter): 2
 sizeof(ClockWriter): 3
 sizeof(CharWriter): 2
@@ -214,7 +214,7 @@ sizeof(LedMatrixDirect<Hardware>): 20
 sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 20
 sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 12
 sizeof(LedDisplay): 8
-sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 36
+sizeof(ScanningDisplay<Hardware, LedMatrixBase, 4, 1>): 36
 sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
 sizeof(CharWriter): 4
@@ -253,7 +253,7 @@ sizeof(LedMatrixDirect<Hardware>): 20
 sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 20
 sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 12
 sizeof(LedDisplay): 8
-sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 36
+sizeof(ScanningDisplay<Hardware, LedMatrixBase, 4, 1>): 36
 sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
 sizeof(CharWriter): 4
@@ -292,7 +292,7 @@ sizeof(LedMatrixDirect<Hardware>): 20
 sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 20
 sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 12
 sizeof(LedDisplay): 8
-sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 36
+sizeof(ScanningDisplay<Hardware, LedMatrixBase, 4, 1>): 36
 sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
 sizeof(CharWriter): 4
@@ -331,7 +331,7 @@ sizeof(LedMatrixDirect<Hardware>): 20
 sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 20
 sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 12
 sizeof(LedDisplay): 8
-sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 36
+sizeof(ScanningDisplay<Hardware, LedMatrixBase, 4, 1>): 36
 sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
 sizeof(CharWriter): 4
@@ -371,7 +371,7 @@ sizeof(LedMatrixDirect<Hardware>): 20
 sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 20
 sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 12
 sizeof(LedDisplay): 8
-sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 36
+sizeof(ScanningDisplay<Hardware, LedMatrixBase, 4, 1>): 36
 sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
 sizeof(CharWriter): 4

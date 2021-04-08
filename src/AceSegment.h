@@ -38,7 +38,7 @@ SOFTWARE.
 #include "ace_segment/LedMatrixDirect.h"
 #include "ace_segment/LedMatrixSingleShiftRegister.h"
 #include "ace_segment/LedMatrixDualShiftRegister.h"
-#include "ace_segment/SegmentDisplay.h"
+#include "ace_segment/ScanningDisplay.h"
 #include "ace_segment/NumberWriter.h"
 #include "ace_segment/ClockWriter.h"
 #include "ace_segment/CharWriter.h"

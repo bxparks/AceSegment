@@ -33,7 +33,7 @@ namespace ace_segment {
 /**
  * Class that provides a layer of indirection to various hardware pins and
  * timing class. A different Hardware class can be used as a template parameter
- * to SegmentDisplay.
+ * to ScanningDisplay.
  */
 class Hardware {
   public:

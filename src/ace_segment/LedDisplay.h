@@ -69,7 +69,7 @@ class LedDisplay {
     /**
      * Write the brightness for a given pos, leaving pattern unchanged.
      * The maximum brightness is determined by specifics of the subclass. For
-     * SegmentDisplay, the maximum brightness is the value of `SUBFIELDS-1`
+     * ScanningDisplay, the maximum brightness is the value of `SUBFIELDS-1`
      * template parameter.
      *
      * A subclass may not support the ability to control the brightness on a per

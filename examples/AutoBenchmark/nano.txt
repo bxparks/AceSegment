@@ -8,7 +8,7 @@ sizeof(LedMatrixDirectFast<0..3, 0..7>): 3
 sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 10
 sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 5
 sizeof(LedDisplay): 3
-sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 25
+sizeof(ScanningDisplay<Hardware, LedMatrixBase, 4, 1>): 25
 sizeof(NumberWriter): 2
 sizeof(ClockWriter): 3
 sizeof(CharWriter): 2

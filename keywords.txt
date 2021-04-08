@@ -16,7 +16,7 @@ LedMatrixDirectFast	KEYWORD1
 LedMatrixSingleShiftRegister	KEYWORD1
 LedMatrixDualShiftRegister	KEYWORD1
 LedDisplay	KEYWORD1
-SegmentDisplay	KEYWORD1
+ScanningDisplay	KEYWORD1
 NumberWriter	KEYWORD1
 ClockWriter	KEYWORD1
 CharWriter	KEYWORD1
@@ -47,7 +47,7 @@ clear	KEYWORD2
 enableGroup	KEYWORD2
 disableGroup	KEYWORD2
 
-# SegmentDisplay
+# ScanningDisplay
 begin	KEYWORD2
 end	KEYWORD2
 getNumDigits	KEYWORD2

@@ -22,8 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_FAKE_SEGMENT_DISPLAY_H
-#define ACE_SEGMENT_FAKE_SEGMENT_DISPLAY_H
+#ifndef ACE_SEGMENT_FAKE_SCANNING_DISPLAY_H
+#define ACE_SEGMENT_FAKE_SCANNING_DISPLAY_H
 
 #include <stdint.h>
 #include "../Renderer.h"
@@ -33,13 +33,13 @@ namespace ace_segment {
 namespace testing {
 
 /**
- * A fake version of SegmentDisplay for testing purposes. Previously called
+ * A fake version of ScanningDisplay for testing purposes. Previously called
  * "FakeRenderer".
  */
-class FakeSegmentDisplay: public SegmentDisplay {
+class FakeScanningDisplay: public ScanningDisplay {
   public:
-    FakeSegmentDisplay(DimmablePattern* dimmablePatterns, uint8_t numDigits)
-      : SegmentDisplay(
+    FakeScanningDisplay(DimmablePattern* dimmablePatterns, uint8_t numDigits)
+      : ScanningDisplay(
           nullptr /* hardware */,
           nullptr /* driver */,
           dimmablePatterns,

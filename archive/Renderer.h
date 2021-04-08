@@ -36,7 +36,7 @@ namespace ace_segment {
  * Multiplexing occurs by scanning through the digits. This class knows how to
  * render a single field of a frame, where a frame and field are defined below.
  * Interestingly, this classes does not know about the timing between successive
- * rendering of fields. This is provided by SegmentDisplay, either through
+ * rendering of fields. This is provided by ScanningDisplay, either through
  * polling or through an ISR.
  *
  * A single frame is the rendering of all digits of the LED module. If it has 4

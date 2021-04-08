@@ -17,7 +17,7 @@
             * `LedMatrixSingleShiftRegister`
             * `LedMatrixDualShiftRegister`
         * `LedDisplay`
-            * `SegmentDisplay`
+            * `ScanningDisplay`
         * Writers
             * `HexWriter`
             * `ClockWriter`
@@ -30,7 +30,7 @@
             functions. This is a high level function so the CPU and memory
             consumption should be minimal.
         * Remove virtual destructors for all clases, saving ~600 bytes on AVR.
-    * `SegmentDisplay`
+    * `ScanningDisplay`
         * Combines the previous `Driver` and `Renderer` classes into a single
           class, with templatized parameters.
         * Handles the allocation of the LED segment bit `patterns` array, using

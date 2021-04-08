@@ -32,7 +32,7 @@ namespace testing {
 
 /**
  * An implementation of LedDisplay for unit testing purposes.
- * Implements most of the simple features of SegmentDisplay.
+ * Implements most of the simple features of ScanningDisplay.
  *
  * @tparam DIGITS number of digits supported by this class
  */

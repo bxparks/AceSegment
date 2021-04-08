@@ -24,14 +24,14 @@ SOFTWARE.
 
 /*
  * A sketch that generates the min/avg/max (in microsecondes) benchmarks of
- * SegmentDisplay::renderFieldNow() for various configurations of LedMatrix. The
- * output is an space-separate list of numbers which can be fed into
+ * ScanningDisplay::renderFieldNow() for various configurations of LedMatrix.
+ * The output is an space-separate list of numbers which can be fed into
  * `generate_table.awk` to extract a human-readable ASCII table that can be
  * pasted directly into the README.md file as a code block.
  *
- * Each runXxx() function configures the SegmentDisplay object and all of its
- * dependencies. It calls SegmentDisplay::renderFieldNow() for the number of
- * times returned by `SegmentDisplay::getFieldsPerSecond()` so that the entire
+ * Each runXxx() function configures the ScanningDisplay object and all of its
+ * dependencies. It calls ScanningDisplay::renderFieldNow() for the number of
+ * times returned by `ScanningDisplay::getFieldsPerSecond()` so that the entire
  * frame is sampled. The duration of that function call in microseconds is
  * collected, then printed out with the min/avg/max numbers.
  */
@@ -120,18 +120,18 @@ static void printStats(
 TimingStats timingStats;
 
 template <typename SD>
-void runBenchmark(const char* name, SD& segmentDisplay) {
+void runBenchmark(const char* name, SD& scanningDisplay) {
 
-  segmentDisplay.writePatternAt(0, 0x13);
-  segmentDisplay.writePatternAt(0, 0x37);
-  segmentDisplay.writePatternAt(0, 0x7F);
-  segmentDisplay.writePatternAt(0, 0xFF);
+  scanningDisplay.writePatternAt(0, 0x13);
+  scanningDisplay.writePatternAt(0, 0x37);
+  scanningDisplay.writePatternAt(0, 0x7F);
+  scanningDisplay.writePatternAt(0, 0xFF);
 
-  uint16_t numSamples = segmentDisplay.getFieldsPerSecond();
+  uint16_t numSamples = scanningDisplay.getFieldsPerSecond();
   timingStats.reset();
   for (uint16_t i = 0; i < numSamples; i++) {
     uint16_t startMicros = micros();
-    segmentDisplay.renderFieldNow();
+    scanningDisplay.renderFieldNow();
     uint16_t endMicros = micros();
     timingStats.update(endMicros - startMicros);
     yield();
@@ -151,18 +151,18 @@ void runDirect() {
       DIGIT_PINS,
       NUM_SEGMENTS,
       SEGMENT_PINS);
-  SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, 1> segmentDisplay(
+  ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, 1> scanningDisplay(
       hardware, ledMatrix, FRAMES_PER_SECOND);
-  SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-      segmentDisplaySubfields( hardware, ledMatrix, FRAMES_PER_SECOND);
+  ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+      scanningDisplaySubfields( hardware, ledMatrix, FRAMES_PER_SECOND);
 
   ledMatrix.begin();
-  segmentDisplay.begin();
-  segmentDisplaySubfields.begin();
-  runBenchmark("direct", segmentDisplay);
-  runBenchmark("direct(subfields)", segmentDisplaySubfields);
-  segmentDisplaySubfields.end();
-  segmentDisplay.end();
+  scanningDisplay.begin();
+  scanningDisplaySubfields.begin();
+  runBenchmark("direct", scanningDisplay);
+  runBenchmark("direct(subfields)", scanningDisplaySubfields);
+  scanningDisplaySubfields.end();
+  scanningDisplay.end();
   ledMatrix.end();
 }
 
@@ -175,18 +175,18 @@ void runDirectFast() {
   LedMatrix ledMatrix(
       LedMatrix::kActiveLowPattern /*groupOnPattern*/,
       LedMatrix::kActiveLowPattern /*elementOnPattern*/);
-  SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, 1> segmentDisplay(
+  ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, 1> scanningDisplay(
       hardware, ledMatrix, FRAMES_PER_SECOND);
-  SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-      segmentDisplaySubfields(hardware, ledMatrix, FRAMES_PER_SECOND);
+  ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+      scanningDisplaySubfields(hardware, ledMatrix, FRAMES_PER_SECOND);
 
   ledMatrix.begin();
-  segmentDisplay.begin();
-  segmentDisplaySubfields.begin();
-  runBenchmark("direct_fast", segmentDisplay);
-  runBenchmark("direct_fast(subfields)", segmentDisplaySubfields);
-  segmentDisplaySubfields.end();
-  segmentDisplay.end();
+  scanningDisplay.begin();
+  scanningDisplaySubfields.begin();
+  runBenchmark("direct_fast", scanningDisplay);
+  runBenchmark("direct_fast(subfields)", scanningDisplaySubfields);
+  scanningDisplaySubfields.end();
+  scanningDisplay.end();
   ledMatrix.end();
 }
 #endif
@@ -202,19 +202,19 @@ void runSingleShiftRegisterSwSpi() {
       LedMatrix::kActiveHighPattern /*elementOnPattern*/,
       NUM_DIGITS,
       DIGIT_PINS);
-  SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, 1> segmentDisplay(
+  ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, 1> scanningDisplay(
       hardware, ledMatrix, FRAMES_PER_SECOND);
-  SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-      segmentDisplaySubfields(hardware, ledMatrix, FRAMES_PER_SECOND);
+  ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+      scanningDisplaySubfields(hardware, ledMatrix, FRAMES_PER_SECOND);
 
   spiAdapter.begin();
   ledMatrix.begin();
-  segmentDisplay.begin();
-  segmentDisplaySubfields.begin();
-  runBenchmark("single_sw_spi", segmentDisplay);
-  runBenchmark("single_sw_spi(subfields)", segmentDisplaySubfields);
-  segmentDisplaySubfields.end();
-  segmentDisplay.end();
+  scanningDisplay.begin();
+  scanningDisplaySubfields.begin();
+  runBenchmark("single_sw_spi", scanningDisplay);
+  runBenchmark("single_sw_spi(subfields)", scanningDisplaySubfields);
+  scanningDisplaySubfields.end();
+  scanningDisplay.end();
   ledMatrix.end();
   spiAdapter.end();
 }
@@ -232,19 +232,19 @@ void runSingleShiftRegisterSwSpiFast() {
       LedMatrix::kActiveHighPattern /*elementOnPattern*/,
       NUM_DIGITS,
       DIGIT_PINS);
-  SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, 1> segmentDisplay(
+  ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, 1> scanningDisplay(
       hardware, ledMatrix, FRAMES_PER_SECOND);
-  SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-      segmentDisplaySubfields(hardware, ledMatrix, FRAMES_PER_SECOND);
+  ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+      scanningDisplaySubfields(hardware, ledMatrix, FRAMES_PER_SECOND);
 
   spiAdapter.begin();
   ledMatrix.begin();
-  segmentDisplay.begin();
-  segmentDisplaySubfields.begin();
-  runBenchmark("single_sw_spi_fast", segmentDisplay);
-  runBenchmark("single_sw_spi_fast(subfields)", segmentDisplaySubfields);
-  segmentDisplaySubfields.end();
-  segmentDisplay.end();
+  scanningDisplay.begin();
+  scanningDisplaySubfields.begin();
+  runBenchmark("single_sw_spi_fast", scanningDisplay);
+  runBenchmark("single_sw_spi_fast(subfields)", scanningDisplaySubfields);
+  scanningDisplaySubfields.end();
+  scanningDisplay.end();
   ledMatrix.end();
   spiAdapter.end();
 }
@@ -261,19 +261,19 @@ void runSingleShiftRegisterHwSpi() {
       LedMatrix::kActiveHighPattern /*elementOnPattern*/,
       NUM_DIGITS,
       DIGIT_PINS);
-  SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, 1> segmentDisplay(
+  ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, 1> scanningDisplay(
       hardware, ledMatrix, FRAMES_PER_SECOND);
-  SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-      segmentDisplaySubfields(hardware, ledMatrix, FRAMES_PER_SECOND);
+  ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+      scanningDisplaySubfields(hardware, ledMatrix, FRAMES_PER_SECOND);
 
   spiAdapter.begin();
   ledMatrix.begin();
-  segmentDisplay.begin();
-  segmentDisplaySubfields.begin();
-  runBenchmark("single_hw_spi", segmentDisplay);
-  runBenchmark("single_hw_spi(subfields)", segmentDisplaySubfields);
-  segmentDisplaySubfields.end();
-  segmentDisplay.end();
+  scanningDisplay.begin();
+  scanningDisplaySubfields.begin();
+  runBenchmark("single_hw_spi", scanningDisplay);
+  runBenchmark("single_hw_spi(subfields)", scanningDisplaySubfields);
+  scanningDisplaySubfields.end();
+  scanningDisplay.end();
   ledMatrix.end();
   spiAdapter.end();
 }
@@ -286,19 +286,19 @@ void runDualShiftRegisterSwSpi() {
       spiAdapter,
       LedMatrix::kActiveLowPattern /*groupOnPattern*/,
       LedMatrix::kActiveLowPattern /*elementOnPattern*/);
-  SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, 1> segmentDisplay(
+  ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, 1> scanningDisplay(
       hardware, ledMatrix, FRAMES_PER_SECOND);
-  SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-      segmentDisplaySubfields(hardware, ledMatrix, FRAMES_PER_SECOND);
+  ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+      scanningDisplaySubfields(hardware, ledMatrix, FRAMES_PER_SECOND);
 
   spiAdapter.begin();
   ledMatrix.begin();
-  segmentDisplay.begin();
-  segmentDisplaySubfields.begin();
-  runBenchmark("dual_sw_spi", segmentDisplay);
-  runBenchmark("dual_sw_spi(subfields)", segmentDisplaySubfields);
-  segmentDisplaySubfields.end();
-  segmentDisplay.end();
+  scanningDisplay.begin();
+  scanningDisplaySubfields.begin();
+  runBenchmark("dual_sw_spi", scanningDisplay);
+  runBenchmark("dual_sw_spi(subfields)", scanningDisplaySubfields);
+  scanningDisplaySubfields.end();
+  scanningDisplay.end();
   ledMatrix.end();
   spiAdapter.end();
 }
@@ -313,19 +313,19 @@ void runDualShiftRegisterSwSpiFast() {
       spiAdapter,
       LedMatrix::kActiveLowPattern /*groupOnPattern*/,
       LedMatrix::kActiveLowPattern /*elementOnPattern*/);
-  SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, 1> segmentDisplay(
+  ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, 1> scanningDisplay(
       hardware, ledMatrix, FRAMES_PER_SECOND);
-  SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-      segmentDisplaySubfields(hardware, ledMatrix, FRAMES_PER_SECOND);
+  ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+      scanningDisplaySubfields(hardware, ledMatrix, FRAMES_PER_SECOND);
 
   spiAdapter.begin();
   ledMatrix.begin();
-  segmentDisplay.begin();
-  segmentDisplaySubfields.begin();
-  runBenchmark("dual_sw_spi_fast", segmentDisplay);
-  runBenchmark("dual_sw_spi_fast(subfields)", segmentDisplaySubfields);
-  segmentDisplaySubfields.end();
-  segmentDisplay.end();
+  scanningDisplay.begin();
+  scanningDisplaySubfields.begin();
+  runBenchmark("dual_sw_spi_fast", scanningDisplay);
+  runBenchmark("dual_sw_spi_fast(subfields)", scanningDisplaySubfields);
+  scanningDisplaySubfields.end();
+  scanningDisplay.end();
   ledMatrix.end();
   spiAdapter.end();
 }
@@ -339,19 +339,19 @@ void runDualShiftRegisterHwSpi() {
       spiAdapter,
       LedMatrix::kActiveLowPattern /*groupOnPattern*/,
       LedMatrix::kActiveLowPattern /*elementOnPattern*/);
-  SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, 1> segmentDisplay(
+  ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, 1> scanningDisplay(
       hardware, ledMatrix, FRAMES_PER_SECOND);
-  SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-      segmentDisplaySubfields(hardware, ledMatrix, FRAMES_PER_SECOND);
+  ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+      scanningDisplaySubfields(hardware, ledMatrix, FRAMES_PER_SECOND);
 
   spiAdapter.begin();
   ledMatrix.begin();
-  segmentDisplay.begin();
-  segmentDisplaySubfields.begin();
-  runBenchmark("dual_hw_spi", segmentDisplay);
-  runBenchmark("dual_hw_spi(subfields)", segmentDisplaySubfields);
-  segmentDisplaySubfields.end();
-  segmentDisplay.end();
+  scanningDisplay.begin();
+  scanningDisplaySubfields.begin();
+  runBenchmark("dual_hw_spi", scanningDisplay);
+  runBenchmark("dual_hw_spi(subfields)", scanningDisplaySubfields);
+  scanningDisplaySubfields.end();
+  scanningDisplay.end();
   ledMatrix.end();
   spiAdapter.end();
 }
@@ -409,9 +409,9 @@ void printSizeOf() {
   SERIAL_PORT_MONITOR.println(sizeof(LedDisplay));
 
   SERIAL_PORT_MONITOR.print(
-      F("sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): "));
+      F("sizeof(ScanningDisplay<Hardware, LedMatrixBase, 4, 1>): "));
   SERIAL_PORT_MONITOR.println(
-      sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>));
+      sizeof(ScanningDisplay<Hardware, LedMatrixBase, 4, 1>));
 
   SERIAL_PORT_MONITOR.print(F("sizeof(NumberWriter): "));
   SERIAL_PORT_MONITOR.println(sizeof(NumberWriter));
