@@ -86,19 +86,19 @@ void NumberWriter::writeHexCharsAt(uint8_t pos, const hexchar_t s[],
 }
 
 void NumberWriter::writeHexByteAt(uint8_t pos, uint8_t b) {
-  uint8_t n0 = (b & 0x0F); // low nibble
+  uint8_t low = (b & 0x0F);
   b >>= 4;
-  uint8_t n1 = (b & 0x0F); // high nibble
+  uint8_t high = (b & 0x0F);
 
-  writeHexCharInternalAt(pos++, n1);
-  writeHexCharInternalAt(pos++, n0);
+  writeHexCharInternalAt(pos++, high);
+  writeHexCharInternalAt(pos++, low);
 }
 
 void NumberWriter::writeHexWordAt(uint8_t pos, uint16_t w) {
-  uint8_t b0 = (w & 0xFF); // low byte
-  uint8_t b1 = (w >> 8) & 0xFF; // hight byte
-  writeHexByteAt(pos, b1);
-  writeHexByteAt(pos + 2, b0);
+  uint8_t low = (w & 0xFF);
+  uint8_t high = (w >> 8) & 0xFF;
+  writeHexByteAt(pos, high);
+  writeHexByteAt(pos + 2, low);
 }
 
 void NumberWriter::writeDecWordAt(
