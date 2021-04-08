@@ -120,7 +120,7 @@ sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 10
 sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 5
 sizeof(LedDisplay): 3
 sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 25
-sizeof(HexWriter): 2
+sizeof(NumberWriter): 2
 sizeof(ClockWriter): 3
 sizeof(CharWriter): 2
 sizeof(StringWriter): 2
@@ -131,21 +131,21 @@ CPU:
 |--------------------------------+-------------+---------|
 | direct                         |  60/ 66/ 80 |     240 |
 | direct(subfields)              |   4/ 13/ 72 |    3840 |
-| single_sw_spi                  | 124/129/148 |     240 |
-| single_sw_spi(subfields)       |   4/ 21/148 |    3840 |
+| single_sw_spi                  | 124/129/152 |     240 |
+| single_sw_spi(subfields)       |   4/ 21/144 |    3840 |
 | single_hw_spi                  |  32/ 34/ 44 |     240 |
 | single_hw_spi(subfields)       |   4/  9/ 44 |    3840 |
-| dual_sw_spi                    | 212/216/240 |     240 |
+| dual_sw_spi                    | 212/216/244 |     240 |
 | dual_sw_spi(subfields)         |   4/ 32/240 |    3840 |
 | dual_hw_spi                    |  20/ 24/ 36 |     240 |
-| dual_hw_spi(subfields)         |   4/  8/ 28 |    3840 |
+| dual_hw_spi(subfields)         |   4/  8/ 32 |    3840 |
 |--------------------------------+-------------+---------|
-| direct_fast                    |  24/ 28/ 36 |     240 |
-| direct_fast(subfields)         |   4/  8/ 36 |    3840 |
-| single_sw_spi_fast             |  24/ 28/ 44 |     240 |
-| single_sw_spi_fast(subfields)  |   4/  8/ 36 |    3840 |
-| dual_sw_spi_fast               |  20/ 24/ 32 |     240 |
-| dual_sw_spi_fast(subfields)    |   4/  8/ 32 |    3840 |
+| direct_fast                    |  28/ 28/ 36 |     240 |
+| direct_fast(subfields)         |   4/  8/ 44 |    3840 |
+| single_sw_spi_fast             |  24/ 28/ 40 |     240 |
+| single_sw_spi_fast(subfields)  |   4/  8/ 44 |    3840 |
+| dual_sw_spi_fast               |  20/ 24/ 40 |     240 |
+| dual_sw_spi_fast(subfields)    |   4/  8/ 36 |    3840 |
 +--------------------------------+-------------+---------+
 
 ```
@@ -169,7 +169,7 @@ sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 10
 sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 5
 sizeof(LedDisplay): 3
 sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 25
-sizeof(HexWriter): 2
+sizeof(NumberWriter): 2
 sizeof(ClockWriter): 3
 sizeof(CharWriter): 2
 sizeof(StringWriter): 2
@@ -215,7 +215,7 @@ sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 20
 sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 12
 sizeof(LedDisplay): 8
 sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 36
-sizeof(HexWriter): 4
+sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
 sizeof(CharWriter): 4
 sizeof(StringWriter): 4
@@ -254,7 +254,7 @@ sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 20
 sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 12
 sizeof(LedDisplay): 8
 sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 36
-sizeof(HexWriter): 4
+sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
 sizeof(CharWriter): 4
 sizeof(StringWriter): 4
@@ -293,7 +293,7 @@ sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 20
 sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 12
 sizeof(LedDisplay): 8
 sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 36
-sizeof(HexWriter): 4
+sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
 sizeof(CharWriter): 4
 sizeof(StringWriter): 4
@@ -332,7 +332,7 @@ sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 20
 sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 12
 sizeof(LedDisplay): 8
 sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 36
-sizeof(HexWriter): 4
+sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
 sizeof(CharWriter): 4
 sizeof(StringWriter): 4
@@ -372,7 +372,7 @@ sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 20
 sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 12
 sizeof(LedDisplay): 8
 sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 36
-sizeof(HexWriter): 4
+sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
 sizeof(CharWriter): 4
 sizeof(StringWriter): 4
