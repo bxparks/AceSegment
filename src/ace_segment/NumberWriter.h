@@ -109,11 +109,11 @@ class NumberWriter {
     NumberWriter(const NumberWriter&) = delete;
     NumberWriter& operator=(const NumberWriter&) = delete;
 
-    /**
-     * Similar to writeHexCharAt() without performing bounds check. Useful
-     * when we absolutely know that `c` is within bounds.
-     */
+    /** Similar to writeHexCharAt() without performing bounds check. */
     void writeHexCharInternalAt(uint8_t pos, hexchar_t c);
+
+    /** Similar to writeHexCharsAt() without performing bounds check. */
+    void writeHexCharsInternalAt(uint8_t pos, const hexchar_t s[], uint8_t len);
 
   private:
     /** Bit pattern map for hex characters. */

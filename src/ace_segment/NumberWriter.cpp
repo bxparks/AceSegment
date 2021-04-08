@@ -68,6 +68,13 @@ void NumberWriter::writeHexCharInternalAt(uint8_t pos, hexchar_t c) {
   mLedDisplay.writePatternAt(pos, pattern);
 }
 
+void NumberWriter::writeHexCharsInternalAt(uint8_t pos, const hexchar_t s[],
+    uint8_t len) {
+  for (uint8_t i = 0; i < len; ++i) {
+    writeHexCharInternalAt(pos++, s[i]);
+  }
+}
+
 void NumberWriter::writeHexCharAt(uint8_t pos, hexchar_t c) {
   writeHexCharInternalAt(pos, ((uint8_t) c < kNumHexChars) ? c : kSpace);
 }
@@ -105,26 +112,21 @@ void NumberWriter::writeDecWordAt(
   (void) pad;
   (void) boxSize;
 
-  hexchar_t c[5] = {0}; // c[0] is the lowest digit
+  hexchar_t c[5] = {0}; // c[4] is the least significant digit
   uint16_t m = n;
-  uint8_t digit = 0;
+  uint8_t digit = 5;
   while (true) {
     if (m < 10) {
-      c[digit] = m;
-      digit++;
+      c[--digit] = m;
       break;
     }
     uint16_t q = m / 10;
-    c[digit] = m - q * 10;
-    digit++;
+    c[--digit] = m - q * 10;
     m = q;
   }
-  // digit is the total number of digits
 
-  // print with no justification
-  while (digit--) {
-    writeHexCharInternalAt(pos++, c[digit]);
-  }
+  // digit points to the left most digit
+  writeHexCharsInternalAt(pos, &c[digit], 5 - digit);
 }
 
 } // ace_segment
