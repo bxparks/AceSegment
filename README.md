@@ -223,7 +223,7 @@ depend on the lower-level classes:
     * Calls `LedMatrix` classes to send the patterns to the actual LED segments.
 * `NumberWriter`: A class that converts hexadecimal numerals (0-F) to bit patterns
   to be printed by the `SegmentDisplay` class.
-    * A few additional characters are supported: `kSpace`, `kMinus`, `kPeriod`
+    * A few additional characters are supported: `kSpace`, `kMinus`
 * `ClockWriter`: A class that writes a clock string "hh:mm" to the
   `SegmentDisplay` class.
     * A few additional symbols are supported `kSpace`, `kMinus` and `kA` ("A"
@@ -784,7 +784,6 @@ character set supported by this class. The range of this character set is from
 
 * `NumberWriter::kSpace`
 * `NumberWriter::kMinus`
-* `NumberWriter::kPeriod`
 
 A `NumberWriter` consumes about 200 bytes of flash memory (TODO: reverify this).
 

@@ -33,7 +33,7 @@ namespace ace_segment {
 /**
  * The NumberWriter supports converting decimal and hexadecimal numbers to
  * segment patterns expected by LedDisplay. The character set includes 0 to F,
- * and a few other characters which should be self-explanatory: kSpace, kPeriod,
+ * and a few other characters which should be self-explanatory: kSpace and
  * kMinus.
  */
 class NumberWriter {
@@ -46,8 +46,7 @@ class NumberWriter {
      * addition, the character set adds few more characters for convenience:
      *
      *  * kSpace = 0x10 = space character
-     *  * kPeriod = 0x11 = period character
-     *  * kMinus = 0x12 = minus character
+     *  * kMinus = 0x11 = minus character
      *
      * The `hexchar_t` typedef is an alias for `uint8_t` and unfortunately, C++
      * will not prevent mixing a normal `char` or `uint8_t` with a `hexchar_t`.
@@ -62,11 +61,8 @@ class NumberWriter {
     /** A space character. */
     static const hexchar_t kSpace = 0x10;
 
-    /** A period character. */
-    static const hexchar_t kPeriod = 0x11;
-
     /** A minus character. */
-    static const hexchar_t kMinus = 0x12;
+    static const hexchar_t kMinus = 0x11;
 
     /** Constructor. */
     explicit NumberWriter(LedDisplay& ledDisplay) :

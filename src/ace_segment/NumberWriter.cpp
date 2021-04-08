@@ -60,7 +60,6 @@ const uint8_t NumberWriter::kCharacterArray[] PROGMEM = {
   0b01111001, /* E */
   0b01110001, /* F */
   0b00000000, /* (space) */
-  0b10000000, /* . */
   0b01000000, /* - */
 };
 

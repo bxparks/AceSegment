@@ -97,7 +97,6 @@ getLedDisplay	KEYWORD2
 # NumberWriter.h
 kNumCharacters	LITERAL1
 kSpace	LITERAL1
-kPeriod	LITERAL1
 kMinus	LITERAL1
 
 # ClockWriter.h
