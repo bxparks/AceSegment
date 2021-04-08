@@ -15,10 +15,11 @@ BEGIN {
   labels[6] = "direct_fast";
   labels[7] = "single_sw_fast";
   labels[8] = "dual_sw_fast";
-  labels[9] = "NumberWriter";
-  labels[10] = "ClockWriter";
-  labels[11] = "CharWriter";
-  labels[12] = "StringWriter";
+  labels[9] = "StubDisplay";
+  labels[10] = "NumberWriter+Stub";
+  labels[11] = "ClockWriter+Stub";
+  labels[12] = "CharWriter+Stub";
+  labels[13] = "StringWriter+Stub";
   record_index = 0
 }
 {
@@ -49,7 +50,7 @@ END {
     labels[0], u[0]["flash"], u[0]["ram"], u[0]["d_flash"], u[0]["d_ram"])
   printf("|---------------------------------+--------------+-------------|\n")
   for (i = 1 ; i < NUM_ENTRIES; i++) {
-    if (labels[i] == "direct_fast" || labels[i] == "NumberWriter") {
+    if (labels[i] == "direct_fast" || labels[i] == "StubDisplay") {
       printf(\
         "|---------------------------------+--------------+-------------|\n")
     }

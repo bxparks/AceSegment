@@ -146,6 +146,17 @@ program that includes the resources needed to perform a
 * `SwSpiAdapter` or `HwSpiAdapter`
 * `LedMatrixXxx`
 * `ScanningDisplay`
+* `NumberWriter`
+* `ClockWriter`
+* `CharWriter`
+* `StringWriter`
+
+The `StubDisplay` is a dummy subclass of `LedDisplay` needed to create the
+various Writers. To get a better flash consumption of the Writer classes, this
+stub class should be subtracted from the numbers below. (Ideally, the
+`generate_table.awk` script should do this automatically, but I'm trying to keep
+that script more general to avoid maintenance overhead when it is copied into
+other `MemoryBenchmark` programs.)
 
 ### Arduino Nano
 
