@@ -64,7 +64,6 @@ prepareToSleep	KEYWORD2
 wakeFromSleep	KEYWORD2
 
 # NumberWriter.h
-writeRawHexCharAt	KEYWORD2
 writeHexCharAt	KEYWORD2
 writeHexCharsAt	KEYWORD2
 writeHexByteAt	KEYWORD2

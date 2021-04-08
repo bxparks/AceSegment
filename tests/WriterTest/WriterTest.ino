@@ -103,20 +103,15 @@ class NumberWriterTest : public TestOnce {
     uint8_t* mPatterns;
 };
 
-testF(NumberWriterTest, writeRawHexCharAt) {
-  numberWriter.writeHexCharAt(0, 0);
-  assertEqual(0b00111111, mPatterns[0]);
-}
-
 testF(NumberWriterTest, writeHexCharAt) {
   numberWriter.writeHexCharAt(0, 0);
   assertEqual(0b00111111, mPatterns[0]);
 
   numberWriter.writeHexCharAt(1, 0);
-  ledDisplay.writeDecimalPointAt(1);
+  numberWriter.display().writeDecimalPointAt(1);
   assertEqual(0b00111111 | 0x80, mPatterns[1]);
 
-  ledDisplay.writeDecimalPointAt(1, false);
+  numberWriter.display().writeDecimalPointAt(1, false);
   assertEqual(0b00111111, mPatterns[1]);
 }
 
@@ -124,7 +119,7 @@ testF(NumberWriterTest, writeHexCharAt_outOfBounds) {
   mPatterns[4] = 0;
 
   numberWriter.writeHexCharAt(4, NumberWriter::kMinus);
-  ledDisplay.writeDecimalPointAt(4);
+  numberWriter.display().writeDecimalPointAt(4);
   assertEqual(0, mPatterns[4]);
 }
 

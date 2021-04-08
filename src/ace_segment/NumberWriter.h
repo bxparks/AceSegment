@@ -113,7 +113,7 @@ class NumberWriter {
      * Similar to writeHexCharAt() without performing bounds check. Useful
      * when we absolutely know that `c` is within bounds.
      */
-    void writeRawHexCharAt(uint8_t pos, hexchar_t c);
+    void writeHexCharInternalAt(uint8_t pos, hexchar_t c);
 
   private:
     /** Bit pattern map for hex characters. */

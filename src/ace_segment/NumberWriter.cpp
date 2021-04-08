@@ -66,7 +66,7 @@ const uint8_t NumberWriter::kCharacterArray[] PROGMEM = {
 const uint8_t NumberWriter::kNumCharacters =
     sizeof(kCharacterArray)/sizeof(kCharacterArray[0]);
 
-void NumberWriter::writeRawHexCharAt(uint8_t pos, hexchar_t c) {
+void NumberWriter::writeHexCharInternalAt(uint8_t pos, hexchar_t c) {
   uint8_t pattern = pgm_read_byte(&kCharacterArray[(uint8_t) c]);
   mLedDisplay.writePatternAt(pos, pattern);
 }
@@ -90,8 +90,8 @@ void NumberWriter::writeHexByteAt(uint8_t pos, uint8_t b) {
   b >>= 4;
   uint8_t n1 = (b & 0x0F); // high nibble
 
-  writeRawHexCharAt(pos++, n1);
-  writeRawHexCharAt(pos++, n0);
+  writeHexCharInternalAt(pos++, n1);
+  writeHexCharInternalAt(pos++, n0);
 }
 
 void NumberWriter::writeHexWordAt(uint8_t pos, uint16_t w) {
@@ -129,7 +129,7 @@ void NumberWriter::writeDecWordAt(
 
   // print with no justification
   while (digit--) {
-    writeRawHexCharAt(pos++, c[digit]);
+    writeHexCharInternalAt(pos++, c[digit]);
   }
 }
 
