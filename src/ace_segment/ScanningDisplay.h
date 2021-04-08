@@ -165,14 +165,11 @@ class ScanningDisplay : public LedDisplay {
     /**
      * @copyDoc
      *
-     * The maximum brightness should theorectically be exactly `SUBFIELDS`, but
-     * it is slightly cleaner to make `SUBFIELDS-1` behave as if it was the same
-     * 100% brightness as the value of `SUBFIELDS`. The minimum brightness is 0,
-     * which turns OFF the digit.
-     *
-     * For example, if `SUBFIELDS==16`, the the maximum brightness is 15 which
-     * turns ON the digit 100% of the time. The relative brightness of each
-     * brightness level is in units of 1/SUBFIELDS.
+     * The maximum brightness should is exactly `SUBFIELDS` which turns on the
+     * LED 100% of the time. The minimum brightness is 0, which turns OFF the
+     * digit. For example, if `SUBFIELDS==16`, the the maximum brightness is 16
+     * which turns ON the digit 100% of the time. The relative brightness of
+     * each brightness level is in units of 1/SUBFIELDS.
      *
      * The brightness scale is *not* normalized to [0,255]. A previous version
      * of this class tried to do that, but I found that this introduced
@@ -188,9 +185,7 @@ class ScanningDisplay : public LedDisplay {
     void setBrightnessAt(uint8_t pos, uint8_t brightness) override {
       if (SUBFIELDS > 1) {
         if (pos >= DIGITS) return;
-        mBrightnesses[pos] = (brightness >= SUBFIELDS)
-            ? SUBFIELDS - 1
-            : brightness;
+        mBrightnesses[pos] = (brightness >= SUBFIELDS) ? SUBFIELDS : brightness;
       }
     }
 
@@ -296,12 +291,17 @@ class ScanningDisplay : public LedDisplay {
       // Calculate the maximum subfield duration for current digit.
       const uint8_t brightness = mBrightnesses[mCurrentDigit];
 
-      // Implement pulse width modulation PWM.
-      // No matter how small the SUBFIELDS:
+      // Implement pulse width modulation PWM, using the following boundaries:
+      //
       // * If brightness == 0, then turn the digit OFF 100% of the time.
-      // * If brightness >= (SUBFIELDS - 1), turn the digit ON 100% of the time.
-      const uint8_t pattern = (brightness >= SUBFIELDS - 1
-              || mCurrentSubField < brightness)
+      // * If brightness >= SUBFIELDS, turn the digit ON 100% of the time.
+      //
+      // The mCurrentSubField is incremented modulo SUBFIELDS, so will always be
+      // in the range of [0, SUBFIELDS-1]. The brightness will always be <=
+      // SUBFIELDS, with the value of SUBFIELDS being 100% bright. So if we turn
+      // on the LED when (mCurrentSubField < brightness), we get the desired
+      // outcome.
+      const uint8_t pattern = (mCurrentSubField < brightness)
           ? mPatterns[mCurrentDigit]
           : 0;
 
