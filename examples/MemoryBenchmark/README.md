@@ -122,6 +122,17 @@ program that includes the resources needed to perform a
 * `SwSpiAdapter` or `HwSpiAdapter`
 * `LedMatrixXxx`
 * `ScanningDisplay`
+* `NumberWriter`
+* `ClockWriter`
+* `CharWriter`
+* `StringWriter`
+
+The `StubDisplay` is a dummy subclass of `LedDisplay` needed to create the
+various Writers. To get a better flash consumption of the Writer classes, this
+stub class should be subtracted from the numbers below. (Ideally, the
+`generate_table.awk` script should do this automatically, but I'm trying to keep
+that script more general to avoid maintenance overhead when it is copied into
+other `MemoryBenchmark` programs.)
 
 ### Arduino Nano
 
@@ -145,10 +156,11 @@ program that includes the resources needed to perform a
 | single_sw_fast                  |   1572/   70 |  1116/   59 |
 | dual_sw_fast                    |   1172/   61 |   716/   50 |
 |---------------------------------+--------------+-------------|
-| NumberWriter                    |    696/   34 |   240/   23 |
-| ClockWriter                     |    804/   35 |   348/   24 |
-| CharWriter                      |    778/   34 |   322/   23 |
-| StringWriter                    |    932/   48 |   476/   37 |
+| StubDisplay                     |    522/   11 |    66/    0 |
+| NumberWriter+Stub               |    696/   34 |   240/   23 |
+| ClockWriter+Stub                |    804/   35 |   348/   24 |
+| CharWriter+Stub                 |    778/   34 |   322/   23 |
+| StringWriter+Stub               |    932/   48 |   476/   37 |
 +--------------------------------------------------------------+
 
 ```
@@ -175,10 +187,11 @@ program that includes the resources needed to perform a
 | single_sw_fast                  |   4568/  210 |  1096/   59 |
 | dual_sw_fast                    |   4052/  201 |   580/   50 |
 |---------------------------------+--------------+-------------|
-| NumberWriter                    |   3652/  174 |   180/   23 |
-| ClockWriter                     |   3760/  175 |   288/   24 |
-| CharWriter                      |   3734/  174 |   262/   23 |
-| StringWriter                    |   3888/  188 |   416/   37 |
+| StubDisplay                     |   3536/  151 |    64/    0 |
+| NumberWriter+Stub               |   3652/  174 |   180/   23 |
+| ClockWriter+Stub                |   3760/  175 |   288/   24 |
+| CharWriter+Stub                 |   3734/  174 |   262/   23 |
+| StringWriter+Stub               |   3888/  188 |   416/   37 |
 +--------------------------------------------------------------+
 
 ```
@@ -205,10 +218,11 @@ program that includes the resources needed to perform a
 | single_sw_fast                  |     -1/   -1 |    -1/   -1 |
 | dual_sw_fast                    |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| NumberWriter                    |  10512/    0 |   448/    0 |
-| ClockWriter                     |  10592/    0 |   528/    0 |
-| CharWriter                      |  10536/    0 |   472/    0 |
-| StringWriter                    |  10696/    0 |   632/    0 |
+| StubDisplay                     |  10360/    0 |   296/    0 |
+| NumberWriter+Stub               |  10512/    0 |   448/    0 |
+| ClockWriter+Stub                |  10592/    0 |   528/    0 |
+| CharWriter+Stub                 |  10536/    0 |   472/    0 |
+| StringWriter+Stub               |  10696/    0 |   632/    0 |
 +--------------------------------------------------------------+
 
 ```
@@ -235,10 +249,11 @@ program that includes the resources needed to perform a
 | single_sw_fast                  |     -1/   -1 |    -1/   -1 |
 | dual_sw_fast                    |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| NumberWriter                    |  19504/ 3952 |   368/  164 |
-| ClockWriter                     |  19560/ 3956 |   424/  168 |
-| CharWriter                      |  19524/ 3952 |   388/  164 |
-| StringWriter                    |  19672/ 3956 |   536/  168 |
+| StubDisplay                     |  19352/ 3948 |   216/  160 |
+| NumberWriter+Stub               |  19504/ 3952 |   368/  164 |
+| ClockWriter+Stub                |  19560/ 3956 |   424/  168 |
+| CharWriter+Stub                 |  19524/ 3952 |   388/  164 |
+| StringWriter+Stub               |  19672/ 3956 |   536/  168 |
 +--------------------------------------------------------------+
 
 ```
@@ -265,10 +280,11 @@ program that includes the resources needed to perform a
 | single_sw_fast                  |     -1/   -1 |    -1/   -1 |
 | dual_sw_fast                    |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| NumberWriter                    | 257124/26792 |   424/    8 |
-| ClockWriter                     | 257252/26800 |   552/   16 |
-| CharWriter                      | 257108/26792 |   408/    8 |
-| StringWriter                    | 257312/26812 |   612/   28 |
+| StubDisplay                     | 256900/26792 |   200/    8 |
+| NumberWriter+Stub               | 257124/26792 |   424/    8 |
+| ClockWriter+Stub                | 257252/26800 |   552/   16 |
+| CharWriter+Stub                 | 257108/26792 |   408/    8 |
+| StringWriter+Stub               | 257312/26812 |   612/   28 |
 +--------------------------------------------------------------+
 
 ```
@@ -295,10 +311,11 @@ program that includes the resources needed to perform a
 | single_sw_fast                  |     -1/   -1 |    -1/   -1 |
 | dual_sw_fast                    |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| NumberWriter                    | 199650/13184 |  1920/   84 |
-| ClockWriter                     | 199726/13184 |  1996/   84 |
-| CharWriter                      | 199650/13184 |  1920/   84 |
-| StringWriter                    | 199798/13184 |  2068/   84 |
+| StubDisplay                     | 199426/13176 |  1696/   76 |
+| NumberWriter+Stub               | 199650/13184 |  1920/   84 |
+| ClockWriter+Stub                | 199726/13184 |  1996/   84 |
+| CharWriter+Stub                 | 199650/13184 |  1920/   84 |
+| StringWriter+Stub               | 199798/13184 |  2068/   84 |
 +--------------------------------------------------------------+
 
 ```
@@ -326,10 +343,11 @@ program that includes the resources needed to perform a
 | single_sw_fast                  |     -1/   -1 |    -1/   -1 |
 | dual_sw_fast                    |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| NumberWriter                    |  11132/ 4160 |  3508/ 1112 |
-| ClockWriter                     |  11176/ 4164 |  3552/ 1116 |
-| CharWriter                      |  11112/ 4160 |  3488/ 1112 |
-| StringWriter                    |  11284/ 4164 |  3660/ 1116 |
+| StubDisplay                     |  10940/ 4156 |  3316/ 1108 |
+| NumberWriter+Stub               |  11132/ 4160 |  3508/ 1112 |
+| ClockWriter+Stub                |  11176/ 4164 |  3552/ 1116 |
+| CharWriter+Stub                 |  11112/ 4160 |  3488/ 1112 |
+| StringWriter+Stub               |  11284/ 4164 |  3660/ 1116 |
 +--------------------------------------------------------------+
 
 ```
