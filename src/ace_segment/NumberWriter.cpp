@@ -42,7 +42,7 @@ namespace ace_segment {
 // Segment: DP G F E D C B A
 //    Bits: 7  6 5 4 3 2 1 0
 //
-const uint8_t NumberWriter::kCharacterArray[] PROGMEM = {
+const uint8_t NumberWriter::kHexCharPatterns[kNumHexChars] PROGMEM = {
   0b00111111, /* 0 */
   0b00000110, /* 1 */
   0b01011011, /* 2 */
@@ -63,19 +63,13 @@ const uint8_t NumberWriter::kCharacterArray[] PROGMEM = {
   0b01000000, /* - */
 };
 
-const uint8_t NumberWriter::kNumCharacters =
-    sizeof(kCharacterArray)/sizeof(kCharacterArray[0]);
-
 void NumberWriter::writeHexCharInternalAt(uint8_t pos, hexchar_t c) {
-  uint8_t pattern = pgm_read_byte(&kCharacterArray[(uint8_t) c]);
+  uint8_t pattern = pgm_read_byte(&kHexCharPatterns[(uint8_t) c]);
   mLedDisplay.writePatternAt(pos, pattern);
 }
 
 void NumberWriter::writeHexCharAt(uint8_t pos, hexchar_t c) {
-  uint8_t pattern = ((uint8_t) c < kNumCharacters)
-      ? pgm_read_byte(&kCharacterArray[(uint8_t) c])
-      : kSpace;
-  mLedDisplay.writePatternAt(pos, pattern);
+  writeHexCharInternalAt(pos, ((uint8_t) c < kNumHexChars) ? c : kSpace);
 }
 
 void NumberWriter::writeHexCharsAt(uint8_t pos, const hexchar_t s[],

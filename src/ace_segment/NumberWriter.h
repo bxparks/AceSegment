@@ -56,7 +56,7 @@ class NumberWriter {
     typedef uint8_t hexchar_t;
 
     /** Total number of characters in the HexCharacter set. */
-    static const uint8_t kNumCharacters;
+    static const uint8_t kNumHexChars = 18;
 
     /** A space character. */
     static const hexchar_t kSpace = 0x10;
@@ -76,7 +76,7 @@ class NumberWriter {
 
     /**
      * Write the hex character `c` at position `pos`. If `c` falls outside the
-     * valid range of the kCharacterArray set, a `kSpace` character is printed
+     * valid range of the kHexCharPatterns set, a `kSpace` character is printed
      * instead.
      */
     void writeHexCharAt(uint8_t pos, hexchar_t c);
@@ -117,7 +117,7 @@ class NumberWriter {
 
   private:
     /** Bit pattern map for hex characters. */
-    static const uint8_t kCharacterArray[];
+    static const uint8_t kHexCharPatterns[kNumHexChars];
 
     LedDisplay& mLedDisplay;
 };
