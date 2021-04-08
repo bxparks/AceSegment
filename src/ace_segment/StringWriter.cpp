@@ -28,7 +28,7 @@ SOFTWARE.
 namespace ace_segment {
 
 void StringWriter::writeStringAt(uint8_t digit, const char* s, bool padRight) {
-  LedDisplay& ledDisplay = mCharWriter.getLedDisplay();
+  LedDisplay& ledDisplay = mCharWriter.display();
   bool charWasWritten = false;
   uint8_t numDigits = ledDisplay.getNumDigits();
 

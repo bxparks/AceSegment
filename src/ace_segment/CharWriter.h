@@ -47,7 +47,7 @@ class CharWriter {
     void writeCharAt(uint8_t pos, char c);
 
     /** Get the underlying LedDisplay. */
-    LedDisplay& getLedDisplay() const {
+    LedDisplay& display() const {
       return mLedDisplay;
     }
 
