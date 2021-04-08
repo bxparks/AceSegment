@@ -11,12 +11,12 @@
 #  0 aa bb cc dd
 #  1 aa bb cc dd
 #  ...
-#  6 aa bb cc dd
+#  N aa bb cc dd
 
 set -eu
 
 PROGRAM_NAME='MemoryBenchmark.ino'
-NUM_FEATURES=5  # excluding FEATURE_BASELINE
+NUM_FEATURES=12  # excluding FEATURE_BASELINE
 
 # Assume that https://github.com/bxparks/AUniter is installed as a
 # sibling project to AceSegment.
@@ -55,22 +55,37 @@ function collect_for_board() {
         sed -i -e "s/#define FEATURE [0-9]*/#define FEATURE $feature/" \
             $PROGRAM_NAME
 
-        if ! ($AUNITER_CMD $AUNITER_FLAG verify $board $PROGRAM_NAME 2>&1) > \
+        if ($AUNITER_CMD $AUNITER_FLAG verify $board $PROGRAM_NAME 2>&1) > \
                 $auniter_out_file; then
+            extract_memory "$feature" "$result_file"
+
+        elif grep -q 'Sketch too big' $auniter_out_file; then
             # Ignore 'Sketch too big' condition, since we just want to
             # collect the flash and ram usage numbers.
-            if ! grep -q 'Sketch too big' $auniter_out_file; then
-                cat $auniter_out_file
-                exit 1
-            fi
+            extract_memory "$feature" "$result_file"
+
+        elif grep -q 'Unsupported FEATURE' $auniter_out_file; then
+            # Platform does not support this feature.
+            echo $feature -1 -1 -1 -1 >> $result_file
+
+        else
+            # Can't handle the error, so echo the output and exit the script.
+            cat $auniter_out_file
+            exit 1
         fi
-        flash=$(grep 'Sketch uses' $auniter_out_file |
-            awk '{print $3, $12}')
-        memory=$(grep 'Global variables' $auniter_out_file |
-            awk '{print $4, $18}')
-        echo $feature $flash $memory >> $result_file
     done
 
+}
+
+function extract_memory() {
+    local feature=$1
+    local result_file=$2
+
+    local flash=$(grep 'Sketch uses' $auniter_out_file |
+        awk '{print $3, $12}')
+    local memory=$(grep 'Global variables' $auniter_out_file |
+        awk '{print $4, $18}')
+    echo $feature $flash $memory >> $result_file
 }
 
 trap "cleanup" EXIT

@@ -25,6 +25,10 @@
 #define FEATURE_DIRECT_FAST 6
 #define FEATURE_SINGLE_SW_SPI_FAST 7
 #define FEATURE_DUAL_SW_SPI_FAST 8
+#define FEATURE_NUMBER_WRITER 9
+#define FEATURE_CLOCK_WRITER 10
+#define FEATURE_CHAR_WRITER 11
+#define FEATURE_STRING_WRITER 12
 
 // A volatile integer to prevent the compiler from optimizing away the entire
 // program.
@@ -41,13 +45,46 @@ volatile int disableCompilerOptimization = 0;
   const uint8_t NUM_SEGMENTS = 8;
   const uint8_t FRAMES_PER_SECOND = 60;
   const uint8_t NUM_SUBFIELDS = 1;
-  const bool COMMON_CATHODE = true;
-  const bool USE_TRANSISTORS = true;
-  const uint8_t latchPin = 10; // ST_CP on 74HC595
-  const uint8_t dataPin = MOSI; // DS on 74HC595
-  const uint8_t clockPin = SCK; // SH_CP on 74HC595
-  const uint8_t digitPins[NUM_DIGITS] = {4, 5, 6, 7};
-  const uint8_t segmentPins[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
+  const uint8_t LATCH_PIN = 10; // ST_CP on 74HC595
+  const uint8_t DATA_PIN = MOSI; // DS on 74HC595
+  const uint8_t CLOCK_PIN = SCK; // SH_CP on 74HC595
+  const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
+  const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
+
+  class StubLedDisplay : public LedDisplay {
+    public:
+      StubLedDisplay(): LedDisplay(NUM_DIGITS) {}
+
+      virtual void writePatternAt(uint8_t pos, uint8_t pattern) {
+        disableCompilerOptimization = pattern;
+      }
+
+      virtual void writePatternsAt(uint8_t pos, const uint8_t patterns[],
+          uint8_t len) {
+        disableCompilerOptimization = patterns[0];
+      }
+
+      virtual void writePatternsAt_P(uint8_t pos, const uint8_t patterns[],
+          uint8_t len) {
+        disableCompilerOptimization = patterns[0];
+      }
+
+      virtual void setBrightnessAt(uint8_t pos, uint8_t brightness) {
+        disableCompilerOptimization = brightness;
+      }
+
+      virtual void writeDecimalPointAt(uint8_t pos, bool state = true) {
+        disableCompilerOptimization = state;
+      }
+
+      virtual void setGlobalBrightness(uint8_t brightness) {
+        disableCompilerOptimization = brightness;
+      }
+
+      virtual void clear() {
+        disableCompilerOptimization = 0;
+      }
+  };
 
   Hardware hardware;
 
@@ -59,12 +96,15 @@ volatile int disableCompilerOptimization = 0;
         LedMatrix::kActiveLowPattern /*groupOnPattern*/,
         LedMatrix::kActiveLowPattern /*elementOnPattern*/,
         NUM_DIGITS,
-        digitPins,
+        DIGIT_PINS,
         NUM_SEGMENTS,
-        segmentPins);
+        SEGMENT_PINS);
+    ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+        scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
+
   #elif FEATURE == FEATURE_SINGLE_SW_SPI
     // Common Cathode, with transistors on Group pins
-    SwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
+    SwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
     using LedMatrix = LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>;
     LedMatrix ledMatrix(
         hardware,
@@ -72,10 +112,17 @@ volatile int disableCompilerOptimization = 0;
         LedMatrix::kActiveHighPattern /*groupOnPattern*/,
         LedMatrix::kActiveHighPattern /*elementOnPattern*/,
         NUM_DIGITS,
-        digitPins);
+        DIGIT_PINS);
+    ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+        scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
+
   #elif FEATURE == FEATURE_SINGLE_SW_SPI_FAST
+    #if ! defined(ARDUINO_ARCH_AVR)
+      #error Unsupported FEATURE on this platform
+    #endif
+
     // Common Cathode, with transistors on Group pins
-    using SpiAdapter = SwSpiAdapterFast<latchPin, dataPin, clockPin>;
+    using SpiAdapter = SwSpiAdapterFast<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiAdapter spiAdapter;
     using LedMatrix = LedMatrixSingleShiftRegister<Hardware, SpiAdapter>;
     LedMatrix ledMatrix(
@@ -84,10 +131,13 @@ volatile int disableCompilerOptimization = 0;
         LedMatrix::kActiveHighPattern /*groupOnPattern*/,
         LedMatrix::kActiveHighPattern /*elementOnPattern*/,
         NUM_DIGITS,
-        digitPins);
+        DIGIT_PINS);
+    ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+        scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
+
   #elif FEATURE == FEATURE_SINGLE_HW_SPI
     // Common Cathode, with transistors on Group pins
-    HwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
+    HwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
     using LedMatrix = LedMatrixSingleShiftRegister<Hardware, HwSpiAdapter>;
     LedMatrix ledMatrix(
         hardware,
@@ -95,33 +145,53 @@ volatile int disableCompilerOptimization = 0;
         LedMatrix::kActiveHighPattern /*groupOnPattern*/,
         LedMatrix::kActiveHighPattern /*elementOnPattern*/,
         NUM_DIGITS,
-        digitPins);
+        DIGIT_PINS);
+    ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+        scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
+
   #elif FEATURE == FEATURE_DUAL_SW_SPI
     // Common Cathode, with transistors on Group pins
-    SwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
+    SwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
     using LedMatrix = LedMatrixDualShiftRegister<SwSpiAdapter>;
     LedMatrix ledMatrix(
         spiAdapter,
         LedMatrix::kActiveLowPattern /*groupOnPattern*/,
         LedMatrix::kActiveLowPattern /*elementOnPattern*/);
+    ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+        scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
+
   #elif FEATURE == FEATURE_DUAL_SW_SPI_FAST
+    #if ! defined(ARDUINO_ARCH_AVR)
+      #error Unsupported FEATURE on this platform
+    #endif
+
     // Common Cathode, with transistors on Group pins
-    using SpiAdapter = SwSpiAdapterFast<latchPin, dataPin, clockPin>;
+    using SpiAdapter = SwSpiAdapterFast<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiAdapter spiAdapter;
     using LedMatrix = LedMatrixDualShiftRegister<SpiAdapter>;
     LedMatrix ledMatrix(
         spiAdapter,
         LedMatrix::kActiveLowPattern /*groupOnPattern*/,
         LedMatrix::kActiveLowPattern /*elementOnPattern*/);
+    ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+        scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
+
   #elif FEATURE == FEATURE_DUAL_HW_SPI
     // Common Cathode, with transistors on Group pins
-    HwSpiAdapter spiAdapter(latchPin, dataPin, clockPin);
+    HwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
     using LedMatrix = LedMatrixDualShiftRegister<HwSpiAdapter>;
     LedMatrix ledMatrix(
         spiAdapter,
         LedMatrix::kActiveLowPattern /*groupOnPattern*/,
         LedMatrix::kActiveLowPattern /*elementOnPattern*/);
+    ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+        scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
+
   #elif FEATURE == FEATURE_DIRECT_FAST
+    #if ! defined(ARDUINO_ARCH_AVR)
+      #error Unsupported FEATURE on this platform
+    #endif
+
     // Common Anode, with transitions on Group pins
     using LedMatrix = LedMatrixDirectFast<
       4, 5, 6, 7,
@@ -130,10 +200,27 @@ volatile int disableCompilerOptimization = 0;
     LedMatrix ledMatrix(
         LedMatrix::kActiveLowPattern /*groupOnPattern*/,
         LedMatrix::kActiveLowPattern /*elementOnPattern*/);
-  #endif
+    ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+        scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
 
-  ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-      scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
+  #elif FEATURE == FEATURE_NUMBER_WRITER
+    StubLedDisplay ledDisplay;
+    NumberWriter numberWriter(ledDisplay);
+
+  #elif FEATURE == FEATURE_CLOCK_WRITER
+    StubLedDisplay ledDisplay;
+    ClockWriter clockWriter(ledDisplay);
+
+  #elif FEATURE == FEATURE_CHAR_WRITER
+    StubLedDisplay ledDisplay;
+    CharWriter charWriter(ledDisplay);
+
+  #elif FEATURE == FEATURE_STRING_WRITER
+    StubLedDisplay ledDisplay;
+    CharWriter charWriter(ledDisplay);
+    StringWriter stringWriter(charWriter);
+
+  #endif
 #endif
 
 void setup() {
@@ -202,13 +289,27 @@ void setup() {
   scanningDisplay.renderFieldNow();
 
 #else
-  #error Unknown FEATURE
+  // No setup() needed for Writers.
+
 #endif
 
 }
 
 void loop() {
-#if FEATURE > FEATURE_BASELINE
+#if FEATURE > FEATURE_BASELINE && FEATURE < FEATURE_NUMBER_WRITER
   scanningDisplay.renderFieldWhenReady();
+
+#elif FEATURE == FEATURE_NUMBER_WRITER
+  numberWriter.writeDecWordAt(0, 42);
+
+#elif FEATURE == FEATURE_CLOCK_WRITER
+  clockWriter.writeClock(10, 45);
+
+#elif FEATURE == FEATURE_CHAR_WRITER
+  charWriter.writeCharAt(0, 'a');
+
+#elif FEATURE == FEATURE_STRING_WRITER
+  stringWriter.writeStringAt(0, "Hello World");
+
 #endif
 }

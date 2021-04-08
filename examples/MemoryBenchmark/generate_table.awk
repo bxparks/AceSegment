@@ -15,6 +15,10 @@ BEGIN {
   labels[6] = "direct_fast";
   labels[7] = "single_sw_fast";
   labels[8] = "dual_sw_fast";
+  labels[9] = "NumberWriter";
+  labels[10] = "ClockWriter";
+  labels[11] = "CharWriter";
+  labels[12] = "StringWriter";
   record_index = 0
 }
 {
@@ -29,8 +33,13 @@ END {
   base_flash = u[0]["flash"]
   base_ram = u[0]["ram"]
   for (i = 0; i < NUM_ENTRIES; i++) {
-    u[i]["d_flash"] = u[i]["flash"]- base_flash
-    u[i]["d_ram"] = u[i]["ram"]- base_ram
+    if (u[i]["flash"] != "-1") {
+      u[i]["d_flash"] = u[i]["flash"] - base_flash
+      u[i]["d_ram"] = u[i]["ram"] - base_ram
+    } else {
+      u[i]["d_flash"] = -1
+      u[i]["d_ram"] = -1
+    }
   }
 
   printf("+--------------------------------------------------------------+\n")
@@ -40,7 +49,7 @@ END {
     labels[0], u[0]["flash"], u[0]["ram"], u[0]["d_flash"], u[0]["d_ram"])
   printf("|---------------------------------+--------------+-------------|\n")
   for (i = 1 ; i < NUM_ENTRIES; i++) {
-    if (labels[i] == "direct_fast") {
+    if (labels[i] == "direct_fast" || labels[i] == "NumberWriter") {
       printf(\
         "|---------------------------------+--------------+-------------|\n")
     }
