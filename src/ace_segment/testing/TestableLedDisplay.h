@@ -42,6 +42,7 @@ class TestableLedDisplay : public LedDisplay {
     TestableLedDisplay() : LedDisplay(DIGITS) {}
 
     virtual void writePatternAt(uint8_t pos, uint8_t pattern) override {
+      if (pos >= DIGITS) return;
       mPatterns[pos] = pattern;
     }
 

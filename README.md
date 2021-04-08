@@ -37,7 +37,7 @@ Shift Register that is accessed through software or hardware SPI.
         * [Frames and Fields](#FramesAndFields)
         * [Rendering by Polling](#RenderingByPolling)
         * [Rendering using Interrupts](#RenderingUsingInterrupts)
-    * [HexWriter](#HexWriter)
+    * [NumberWriter](#NumberWriter)
     * [ClockWriter](#ClockWriter)
     * [CharWriter](#CharWriter)
     * [StringWriter](#StringWriter)
@@ -221,7 +221,7 @@ depend on the lower-level classes:
     * A class that stores segment patterns to an internal buffer.
     * Knows how and when to render the frames.
     * Calls `LedMatrix` classes to send the patterns to the actual LED segments.
-* `HexWriter`: A class that converts hexadecimal numerals (0-F) to bit patterns
+* `NumberWriter`: A class that converts hexadecimal numerals (0-F) to bit patterns
   to be printed by the `SegmentDisplay` class.
     * A few additional characters are supported: `kSpace`, `kMinus`, `kPeriod`
 * `ClockWriter`: A class that writes a clock string "hh:mm" to the
@@ -243,7 +243,7 @@ The dependency diagram looks something like this:
 StringWriter
      |
      V
- CharWriter ClockWriter  HexWriter
+ CharWriter ClockWriter  NumberWriter
            \     |     /
             v    v    v
              LedDisplay
@@ -314,7 +314,7 @@ LedMatrix ledMatrix(
 SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
     hardware, ledMatrix, FRAMES_PER_SECOND);
 
-HexWriter hexWriter(segmentDisplay);
+NumberWriter hexWriter(segmentDisplay);
 ClockWriter clockWriter(segmentDisplay);
 CharWriter charWriter(segmentDisplay);
 StringWriter stringWriter(charWriter);
@@ -762,26 +762,31 @@ void loop() {
 }
 ```
 
-<a name="HexWriter"></a>
-### HexWriter
+<a name="NumberWriter"></a>
+### NumberWriter
 
-While it is exciting to be able to write any bit patterns to the LED display,
-we often want to just write numerals to the LED display.
-The `HexWriter` converts an integer to the seven-segment bit patterns used by
-`SegmentDisplay`. On platforms that support it (ATmega and ESP8266), the bit
-mapping table is stored in flash memory to conserve static memory.
+While it is exciting to be able to write any bit patterns to the LED display, we
+often want to just write numbers to the LED display. The `NumberWriter` can
+print integers to the `SegmentDisplay` using decimal or hexadecimal formats. On
+platforms that support it (ATmega and ESP8266), the bit mapping table is stored
+in flash memory to conserve static memory.
 
 The class supports the following methods:
-* `void writeHexAt(uint8_t digit, uint8_t c)`
-* `void writeDecimalPointAt(uint8_t digit, bool state = true)`
 
-In addition to the numerals 0-15 (or 0x0-0xF), the class also supports these
-additional symbols:
-* `HexWriter::kSpace`
-* `HexWriter::kMinus`
-* `HexWriter::kPeriod`
+* `void writeHexCharAt(uint8_t pos, hexchar_t c)`
+* `void writeHexByteAt(uint8_t pos, uint8_t b)`
+* `void writeHexWordAt(uint8_t pos, uint16_t w)`
+* `void writeDecWordAt(uint8_t pos, uint16_t n)`
 
-A `HexWriter` consumes about 200 bytes of flash memory.
+The `hexchar_` type is an alias for `uint8_t`, semantically representing the
+character set supported by this class. The range of this character set is from
+`[0,15]` plus 3 additional symbols, so `[0,18]`:
+
+* `NumberWriter::kSpace`
+* `NumberWriter::kMinus`
+* `NumberWriter::kPeriod`
+
+A `NumberWriter` consumes about 200 bytes of flash memory (TODO: reverify this).
 
 <a name="ClockWriter"></a>
 ### ClockWriter
@@ -867,7 +872,7 @@ Here are the sizes of the various classes on the 8-bit AVR microcontrollers
 * sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 5
 * sizeof(LedDisplay): 3
 * sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 26
-* sizeof(HexWriter): 2
+* sizeof(NumberWriter): 2
 * sizeof(ClockWriter): 3
 * sizeof(CharWriter): 2
 * sizeof(StringWriter): 2

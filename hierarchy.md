@@ -108,16 +108,15 @@ specific LED segment patterns using an internal "font" table. These classes use
 the `LedDisplay` interface (implemented by `SegmentDisplay`), so in theory,
 other types of LED displays could be used by these Writer classes.
 
-This library currently provides 3 Writer classes:
+This library currently provides 4 Writer classes:
 
-* `HexWriter(Renderer*)`
-    * `writeHexAt()`
-    * `writeBrightnessAt()`
-    * `writeDecimalPointAt()`
+* `NumberWriter(Renderer*)`
+    * `writeHexCharAt()`
+    * `writeHexByteAt()`
+    * `writeHexWordAt()`
+    * `writeDecWordAt()`
 * `CharWriter(Renderer*)`
     * `writeCharAt()`
-    * `writeBrightnessAt()`
-    * `writeDecimalPointAt()`
 * `StringWriter(Renderer*)`
     * `writeStringAt()`
 * `ClockWriter(Renderer*)`

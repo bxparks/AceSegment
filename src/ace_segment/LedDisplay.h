@@ -34,7 +34,7 @@ namespace ace_segment {
  * Various 'Writer' classes provide additional functionality on top of this
  * interface:
  *
- *  * HexWriter: write hex digits
+ *  * NumberWriter: write numberse in decimal or hexadecimal format
  *  * ClockWriter: write strings of the form "HH:MM"
  *  * CharWriter: write ASCII characters in the range of 0-127
  *  * StringWriter: uses a CharWriter to write c-strings

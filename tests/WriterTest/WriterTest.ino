@@ -21,7 +21,7 @@ const uint8_t CUSTOM_BRIGHTNESS = 64;
 const uint8_t DIFFERENT_BRIGHTNESS = 32;
 
 TestableLedDisplay<NUM_DIGITS> ledDisplay;
-HexWriter hexWriter(ledDisplay);
+NumberWriter numberWriter(ledDisplay);
 ClockWriter clockWriter(ledDisplay);
 CharWriter charWriter(ledDisplay);
 StringWriter stringWriter(charWriter);
@@ -90,10 +90,10 @@ testF(StringWriterTest, writeStringAt) {
 }
 
 // ----------------------------------------------------------------------
-// Tests for HexWriter.
+// Tests for NumberWriter.
 // ----------------------------------------------------------------------
 
-class HexWriterTest : public TestOnce {
+class NumberWriterTest : public TestOnce {
   protected:
     void setup() override {
       ledDisplay.clear();
@@ -103,11 +103,16 @@ class HexWriterTest : public TestOnce {
     uint8_t* mPatterns;
 };
 
-testF(HexWriterTest, writeAt) {
-  hexWriter.writeHexAt(0, 0);
+testF(NumberWriterTest, writeRawHexCharAt) {
+  numberWriter.writeHexCharAt(0, 0);
+  assertEqual(0b00111111, mPatterns[0]);
+}
+
+testF(NumberWriterTest, writeHexCharAt) {
+  numberWriter.writeHexCharAt(0, 0);
   assertEqual(0b00111111, mPatterns[0]);
 
-  hexWriter.writeHexAt(1, 0);
+  numberWriter.writeHexCharAt(1, 0);
   ledDisplay.writeDecimalPointAt(1);
   assertEqual(0b00111111 | 0x80, mPatterns[1]);
 
@@ -115,12 +120,34 @@ testF(HexWriterTest, writeAt) {
   assertEqual(0b00111111, mPatterns[1]);
 }
 
-testF(HexWriterTest, writeAt_outOfBounds) {
+testF(NumberWriterTest, writeHexCharAt_outOfBounds) {
   mPatterns[4] = 0;
 
-  hexWriter.writeHexAt(4, HexWriter::kMinus);
+  numberWriter.writeHexCharAt(4, NumberWriter::kMinus);
   ledDisplay.writeDecimalPointAt(4);
   assertEqual(0, mPatterns[4]);
+}
+
+testF(NumberWriterTest, writeHexByteAt) {
+  numberWriter.writeHexByteAt(0, 0x1F);
+  assertEqual(0b00000110, mPatterns[0]);
+  assertEqual(0b01110001, mPatterns[1]);
+}
+
+testF(NumberWriterTest, writeHexWordAt) {
+  numberWriter.writeHexWordAt(0, 0x1FF1);
+  assertEqual(0b00000110, mPatterns[0]);
+  assertEqual(0b01110001, mPatterns[1]);
+  assertEqual(0b01110001, mPatterns[2]);
+  assertEqual(0b00000110, mPatterns[3]);
+}
+
+testF(NumberWriterTest, writeDecWordAt) {
+  numberWriter.writeDecWordAt(0, 1234);
+  assertEqual(0b00000110, mPatterns[0]);
+  assertEqual(0b01011011, mPatterns[1]);
+  assertEqual(0b01001111, mPatterns[2]);
+  assertEqual(0b01100110, mPatterns[3]);
 }
 
 // ----------------------------------------------------------------------

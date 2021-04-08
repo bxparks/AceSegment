@@ -5,6 +5,8 @@
 #include <ace_segment/fast/LedMatrixDirectFast.h>
 #include <ace_segment/fast/SwSpiAdapterFast.h>
 
+using ace_common::incrementMod;
+
 //------------------------------------------------------------------
 // Hardware configuration.
 //------------------------------------------------------------------
@@ -182,7 +184,7 @@ SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, 1> segmentDisplay(
 SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
     segmentDisplayModulating(hardware, ledMatrix, FRAMES_PER_SECOND);
 
-HexWriter hexWriter(segmentDisplay);
+NumberWriter numberWriter(segmentDisplay);
 ClockWriter clockWriter(segmentDisplay);
 CharWriter charWriter(segmentDisplay);
 StringWriter stringWriter(charWriter);
@@ -238,37 +240,46 @@ ISR(TIMER2_COMPA_vect) {
 // Configurations for AceSegmentDemo
 //------------------------------------------------------------------
 
+// State of loop, whether paused or not.
 const uint8_t DEMO_LOOP_MODE_AUTO = 0;
 const uint8_t DEMO_LOOP_MODE_PAUSED = 1;
 uint8_t demoLoopMode = DEMO_LOOP_MODE_AUTO;
 
-const uint8_t DEMO_MODE_COUNT = 8;
+// Selection of demo.
 const uint8_t DEMO_MODE_CLOCK = 0;
-const uint8_t DEMO_MODE_HEX = 1;
-const uint8_t DEMO_MODE_CHAR = 2;
-const uint8_t DEMO_MODE_STRINGS = 3;
-const uint8_t DEMO_MODE_SCROLL = 4;
-const uint8_t DEMO_MODE_PULSE = 5;
-const uint8_t DEMO_MODE_SPIN = 6;
-const uint8_t DEMO_MODE_SPIN_2 = 7;
-
-// Demo mode.
+const uint8_t DEMO_MODE_HEX_NUMBERS = 1;
+const uint8_t DEMO_MODE_DEC_NUMBERS = 2;
+const uint8_t DEMO_MODE_CHAR = 3;
+const uint8_t DEMO_MODE_STRINGS = 4;
+const uint8_t DEMO_MODE_SCROLL = 5;
+const uint8_t DEMO_MODE_PULSE = 6;
+const uint8_t DEMO_MODE_SPIN = 7;
+const uint8_t DEMO_MODE_SPIN_2 = 8;
+const uint8_t DEMO_MODE_COUNT = 9;
 uint8_t prevDemoMode = DEMO_MODE_COUNT - 1;
 uint8_t demoMode = DEMO_MODE_SPIN;
 
+static const uint16_t DEMO_INTERNAL_DELAY[DEMO_MODE_COUNT] = {
+  100, 10, 10, 200, 500, 500, 200, 100, 100
+};
+
+
 //-----------------------------------------------------------------------------
 
-void writeHexes() {
-  static uint8_t c = 0;
+void writeHexNumbers() {
+  static uint16_t w = 0;
 
-  uint8_t hexHigh = (c & 0xf0) >> 4;
-  uint8_t hexLow = (c & 0x0f);
-  hexWriter.writeHexAt(0, hexHigh);
-  hexWriter.writeHexAt(1, hexLow);
-  hexWriter.writeHexAt(2, HexWriter::kMinus);
-  hexWriter.writeHexAt(3, c);
+  numberWriter.writeHexWordAt(0, w);
+  w++;
+}
 
-  ace_common::incrementMod(demoMode, DEMO_MODE_COUNT);
+//-----------------------------------------------------------------------------
+
+void writeDecNumbers() {
+  static uint16_t w = 0;
+
+  numberWriter.writeDecWordAt(0, w);
+  incrementMod(w, (uint16_t) 10000);
 }
 
 //-----------------------------------------------------------------------------
@@ -279,26 +290,22 @@ void writeClock() {
 
   clockWriter.writeClock(hh, mm);
 
-  ace_common::incrementMod(mm, (uint8_t)60);
+  incrementMod(mm, (uint8_t)60);
   if (mm == 0) {
-    ace_common::incrementMod(hh, (uint8_t)60);
+    incrementMod(hh, (uint8_t)60);
   }
 }
 
 //-----------------------------------------------------------------------------
 
 void writeChars() {
-  static uint8_t c = 0;
+  static uint8_t b = 0;
 
-  uint8_t hexHigh = (c & 0xf0) >> 4;
-  uint8_t hexLow = (c & 0x0f);
-  hexWriter.writeHexAt(0, hexHigh);
-  hexWriter.writeHexAt(1, hexLow);
-  segmentDisplay.writeDecimalPointAt(1);
-  charWriter.writeCharAt(2, ' ');
-  charWriter.writeCharAt(3, c);
+  numberWriter.writeHexByteAt(0, b);
+  charWriter.writeCharAt(2, '-');
+  charWriter.writeCharAt(3, b);
 
-  ace_common::incrementMod(c, CharWriter::kNumCharacters);
+  incrementMod(b, CharWriter::kNumCharacters);
 }
 
 //-----------------------------------------------------------------------------
@@ -318,24 +325,24 @@ void writeStrings() {
 
   stringWriter.writeStringAt(0, STRINGS[i]);
 
-  ace_common::incrementMod(i, NUM_STRINGS);
+  incrementMod(i, NUM_STRINGS);
 }
 
 void scrollString(const char* s) {
   static uint8_t i = 0;
 
   stringWriter.writeStringAt(0, &s[i], true /* padRight */);
-  ace_common::incrementMod(i, (uint8_t) strlen(s));
+  incrementMod(i, (uint8_t) strlen(s));
 }
 
 //-----------------------------------------------------------------------------
 
 void setupPulseDisplay() {
-  HexWriter hexWriter(segmentDisplayModulating);
-  hexWriter.writeHexAt(0, 1);
-  hexWriter.writeHexAt(1, 2);
-  hexWriter.writeHexAt(2, 3);
-  hexWriter.writeHexAt(3, 4);
+  NumberWriter numberWriter(segmentDisplayModulating);
+  numberWriter.writeHexCharAt(0, 1);
+  numberWriter.writeHexCharAt(1, 2);
+  numberWriter.writeHexCharAt(2, 3);
+  numberWriter.writeHexCharAt(3, 4);
 }
 
 void setBrightnesses(int i) {
@@ -375,7 +382,7 @@ void spinDisplay() {
   const uint8_t* patterns = SPIN_PATTERNS[i];
   segmentDisplay.writePatternsAt_P(0, patterns, 4);
 
-  ace_common::incrementMod(i, NUM_SPIN_PATTERNS);
+  incrementMod(i, NUM_SPIN_PATTERNS);
 }
 
 //-----------------------------------------------------------------------------
@@ -396,7 +403,7 @@ void spinDisplay2() {
   const uint8_t* patterns = SPIN_PATTERNS_2[i];
   segmentDisplay.writePatternsAt_P(0, patterns, 4);
 
-  ace_common::incrementMod(i, NUM_SPIN_PATTERNS_2);
+  incrementMod(i, NUM_SPIN_PATTERNS_2);
 }
 
 //-----------------------------------------------------------------------------
@@ -405,8 +412,10 @@ void spinDisplay2() {
 void updateDemo() {
   if (demoMode == DEMO_MODE_CLOCK) {
     writeClock();
-  } else if (demoMode == DEMO_MODE_HEX) {
-    writeHexes();
+  } else if (demoMode == DEMO_MODE_HEX_NUMBERS) {
+    writeHexNumbers();
+  } else if (demoMode == DEMO_MODE_DEC_NUMBERS) {
+    writeDecNumbers();
   } else if (demoMode == DEMO_MODE_CHAR) {
     writeChars();
   } else if (demoMode == DEMO_MODE_STRINGS) {
@@ -425,7 +434,7 @@ void updateDemo() {
 /** Go to the next demo */
 void nextDemo() {
   prevDemoMode = demoMode;
-  ace_common::incrementMod(demoMode, DEMO_MODE_COUNT);
+  incrementMod(demoMode, DEMO_MODE_COUNT);
   segmentDisplay.clear();
   segmentDisplayModulating.clear();
   updateDemo();
@@ -442,19 +451,7 @@ void demoLoop() {
   static uint16_t lastStatsCounter = 0;
 #endif
 
-  unsigned long demoInternalDelay;
-  switch (demoMode) {
-    case DEMO_MODE_PULSE:
-      demoInternalDelay = 200;
-      break;
-    case DEMO_MODE_SPIN:
-    case DEMO_MODE_SPIN_2:
-      demoInternalDelay = 70;
-      break;
-    default:
-      demoInternalDelay = 500;
-      break;
-  }
+  uint16_t demoInternalDelay = DEMO_INTERNAL_DELAY[demoMode];
 
   unsigned long now = millis();
   if (now - lastUpdateTime > demoInternalDelay) {
@@ -465,7 +462,7 @@ void demoLoop() {
 
     /*
     if (iter++ >= 100) {
-      ace_common::incrementMod(demoMode, DEMO_MODE_COUNT);
+      incrementMod(demoMode, DEMO_MODE_COUNT);
       iter = 0;
     }
     */

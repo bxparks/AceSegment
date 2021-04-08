@@ -413,8 +413,8 @@ void printSizeOf() {
   SERIAL_PORT_MONITOR.println(
       sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>));
 
-  SERIAL_PORT_MONITOR.print(F("sizeof(HexWriter): "));
-  SERIAL_PORT_MONITOR.println(sizeof(HexWriter));
+  SERIAL_PORT_MONITOR.print(F("sizeof(NumberWriter): "));
+  SERIAL_PORT_MONITOR.println(sizeof(NumberWriter));
 
   SERIAL_PORT_MONITOR.print(F("sizeof(ClockWriter): "));
   SERIAL_PORT_MONITOR.println(sizeof(ClockWriter));
