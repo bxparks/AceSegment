@@ -248,19 +248,29 @@ uint8_t demoLoopMode = DEMO_LOOP_MODE_AUTO;
 // Selection of demo.
 const uint8_t DEMO_MODE_CLOCK = 0;
 const uint8_t DEMO_MODE_HEX_NUMBERS = 1;
-const uint8_t DEMO_MODE_DEC_NUMBERS = 2;
-const uint8_t DEMO_MODE_CHAR = 3;
-const uint8_t DEMO_MODE_STRINGS = 4;
-const uint8_t DEMO_MODE_SCROLL = 5;
-const uint8_t DEMO_MODE_PULSE = 6;
-const uint8_t DEMO_MODE_SPIN = 7;
-const uint8_t DEMO_MODE_SPIN_2 = 8;
-const uint8_t DEMO_MODE_COUNT = 9;
+const uint8_t DEMO_MODE_UNSIGNED_DEC_NUMBERS = 2;
+const uint8_t DEMO_MODE_SIGNED_DEC_NUMBERS = 3;
+const uint8_t DEMO_MODE_CHAR = 4;
+const uint8_t DEMO_MODE_STRINGS = 5;
+const uint8_t DEMO_MODE_SCROLL = 6;
+const uint8_t DEMO_MODE_PULSE = 7;
+const uint8_t DEMO_MODE_SPIN = 8;
+const uint8_t DEMO_MODE_SPIN_2 = 9;
+const uint8_t DEMO_MODE_COUNT = 10;
 uint8_t prevDemoMode = DEMO_MODE_COUNT - 1;
-uint8_t demoMode = DEMO_MODE_SPIN;
+uint8_t demoMode = DEMO_MODE_UNSIGNED_DEC_NUMBERS;
 
 static const uint16_t DEMO_INTERNAL_DELAY[DEMO_MODE_COUNT] = {
-  100, 10, 10, 200, 500, 500, 200, 100, 100
+  100, // DEMO_MODE_CLOCK
+  10, // DEMO_MODE_HEX_NUMBERS
+  10, // DEMO_MODE_UNSIGNED_DEC_NUMBERS
+  10, // DEMO_MODE_SIGNED_DEC_NUMBERS
+  200, // DEMO_MODE_CHAR
+  500, // DEMO_MODE_STRINGS
+  500, // DEMO_MODE_SCROLL
+  200, // DEMO_MODE_PULSE
+  100, // DEMO_MODE_SPIN
+  100, // DEMO_MODE_SPIN2
 };
 
 
@@ -275,11 +285,21 @@ void writeHexNumbers() {
 
 //-----------------------------------------------------------------------------
 
-void writeDecNumbers() {
+void writeUnsignedDecNumbers() {
   static uint16_t w = 0;
 
-  numberWriter.writeDecWordAt(0, w);
+  numberWriter.writeUnsignedDecimalAt(0, w);
   incrementMod(w, (uint16_t) 10000);
+}
+
+//-----------------------------------------------------------------------------
+
+void writeSignedDecNumbers() {
+  static int16_t w = -999;
+
+  numberWriter.writeSignedDecimalAt(0, w);
+  w++;
+  if (w > 999) w = -999;
 }
 
 //-----------------------------------------------------------------------------
@@ -414,8 +434,10 @@ void updateDemo() {
     writeClock();
   } else if (demoMode == DEMO_MODE_HEX_NUMBERS) {
     writeHexNumbers();
-  } else if (demoMode == DEMO_MODE_DEC_NUMBERS) {
-    writeDecNumbers();
+  } else if (demoMode == DEMO_MODE_UNSIGNED_DEC_NUMBERS) {
+    writeUnsignedDecNumbers();
+  } else if (demoMode == DEMO_MODE_SIGNED_DEC_NUMBERS) {
+    writeSignedDecNumbers();
   } else if (demoMode == DEMO_MODE_CHAR) {
     writeChars();
   } else if (demoMode == DEMO_MODE_STRINGS) {
