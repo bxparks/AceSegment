@@ -25,10 +25,11 @@
 #define FEATURE_DIRECT_FAST 6
 #define FEATURE_SINGLE_SW_SPI_FAST 7
 #define FEATURE_DUAL_SW_SPI_FAST 8
-#define FEATURE_NUMBER_WRITER 9
-#define FEATURE_CLOCK_WRITER 10
-#define FEATURE_CHAR_WRITER 11
-#define FEATURE_STRING_WRITER 12
+#define FEATURE_STUB_LED_DISPLAY 9
+#define FEATURE_NUMBER_WRITER 10
+#define FEATURE_CLOCK_WRITER 11
+#define FEATURE_CHAR_WRITER 12
+#define FEATURE_STRING_WRITER 13
 
 // A volatile integer to prevent the compiler from optimizing away the entire
 // program.
@@ -51,9 +52,9 @@ volatile int disableCompilerOptimization = 0;
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
   const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
 
-  class StubLedDisplay : public LedDisplay {
+  class StubDisplay : public LedDisplay {
     public:
-      StubLedDisplay(): LedDisplay(NUM_DIGITS) {}
+      StubDisplay(): LedDisplay(NUM_DIGITS) {}
 
       virtual void writePatternAt(uint8_t pos, uint8_t pattern) {
         disableCompilerOptimization = pattern;
@@ -203,20 +204,23 @@ volatile int disableCompilerOptimization = 0;
     ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
         scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
 
+  #elif FEATURE == FEATURE_STUB_LED_DISPLAY
+    StubDisplay ledDisplay;
+
   #elif FEATURE == FEATURE_NUMBER_WRITER
-    StubLedDisplay ledDisplay;
+    StubDisplay ledDisplay;
     NumberWriter numberWriter(ledDisplay);
 
   #elif FEATURE == FEATURE_CLOCK_WRITER
-    StubLedDisplay ledDisplay;
+    StubDisplay ledDisplay;
     ClockWriter clockWriter(ledDisplay);
 
   #elif FEATURE == FEATURE_CHAR_WRITER
-    StubLedDisplay ledDisplay;
+    StubDisplay ledDisplay;
     CharWriter charWriter(ledDisplay);
 
   #elif FEATURE == FEATURE_STRING_WRITER
-    StubLedDisplay ledDisplay;
+    StubDisplay ledDisplay;
     CharWriter charWriter(ledDisplay);
     StringWriter stringWriter(charWriter);
 
@@ -296,8 +300,11 @@ void setup() {
 }
 
 void loop() {
-#if FEATURE > FEATURE_BASELINE && FEATURE < FEATURE_NUMBER_WRITER
+#if FEATURE > FEATURE_BASELINE && FEATURE < FEATURE_STUB_LED_DISPLAY
   scanningDisplay.renderFieldWhenReady();
+
+#elif FEATURE == FEATURE_STUB_LED_DISPLAY
+  ledDisplay.writePatternAt(0, 0xff);
 
 #elif FEATURE == FEATURE_NUMBER_WRITER
   numberWriter.writeDecWordAt(0, 42);
