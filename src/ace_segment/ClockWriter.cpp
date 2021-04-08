@@ -39,7 +39,7 @@ namespace ace_segment {
 //       GGG         666
 //      E   C  H    4   2  7
 //      E   C       4   2
-//       DDD  H     333  7
+//       DDD  H      333  7
 //
 // Segment: H G F E D C B A
 //    Bits: 7 6 5 4 3 2 1 0

@@ -22,13 +22,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "SegmentDisplay.h"
 #include "StringWriter.h"
 
 namespace ace_segment {
 
 void StringWriter::writeStringAt(uint8_t digit, const char* s, bool padRight) {
-  LedDisplay& ledDisplay = mCharWriter.getLedDisplay();
+  LedDisplay& ledDisplay = mCharWriter.display();
   bool charWasWritten = false;
   uint8_t numDigits = ledDisplay.getNumDigits();
 

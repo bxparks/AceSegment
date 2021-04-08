@@ -1,5 +1,5 @@
 /*
- * A program which compiles in different SegmentDisplay objects configured with
+ * A program which compiles in different ScanningDisplay objects configured with
  * using different LED configurations to determine the flash and static memory
  * sizes from the output of the compiler. Set the FEATURE macro to various
  * integer to compile different algorithms.
@@ -132,8 +132,8 @@ volatile int disableCompilerOptimization = 0;
         LedMatrix::kActiveLowPattern /*elementOnPattern*/);
   #endif
 
-  SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
-      hardware, ledMatrix, FRAMES_PER_SECOND);
+  ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+      scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
 #endif
 
 void setup() {
@@ -142,64 +142,64 @@ void setup() {
 
 // In the following, I used to grab the output of patterns[] and write to
 // disableCompilerOptimization to prevent the compiler from optimizing away the
-// entire program. But after templating SegmentDisplay, pattterns is no longer
-// accessible. But it does not matter because I realized that SegmentDisplay
+// entire program. But after templating ScanningDisplay, pattterns is no longer
+// accessible. But it does not matter because I realized that ScanningDisplay
 // performs a digitalWrite(), which has the same effect of disabling
 // optimizations.
 
 #elif FEATURE == FEATURE_DIRECT
   ledMatrix.begin();
-  segmentDisplay.begin();
-  segmentDisplay.writePatternAt(0, 0x3A);
-  segmentDisplay.renderFieldNow();
+  scanningDisplay.begin();
+  scanningDisplay.writePatternAt(0, 0x3A);
+  scanningDisplay.renderFieldNow();
 
 #elif FEATURE == FEATURE_DIRECT_FAST
   ledMatrix.begin();
-  segmentDisplay.begin();
-  segmentDisplay.writePatternAt(0, 0x3A);
-  segmentDisplay.renderFieldNow();
+  scanningDisplay.begin();
+  scanningDisplay.writePatternAt(0, 0x3A);
+  scanningDisplay.renderFieldNow();
 
 #elif FEATURE == FEATURE_SINGLE_SW_SPI
   spiAdapter.begin();
   ledMatrix.begin();
-  segmentDisplay.begin();
-  segmentDisplay.writePatternAt(0, 0x3A);
-  segmentDisplay.renderFieldNow();
+  scanningDisplay.begin();
+  scanningDisplay.writePatternAt(0, 0x3A);
+  scanningDisplay.renderFieldNow();
 
 #elif FEATURE == FEATURE_SINGLE_SW_SPI_FAST
   spiAdapter.begin();
   ledMatrix.begin();
-  segmentDisplay.begin();
-  segmentDisplay.writePatternAt(0, 0x3A);
-  segmentDisplay.renderFieldNow();
+  scanningDisplay.begin();
+  scanningDisplay.writePatternAt(0, 0x3A);
+  scanningDisplay.renderFieldNow();
 
 #elif FEATURE == FEATURE_SINGLE_HW_SPI
   spiAdapter.begin();
   ledMatrix.begin();
-  segmentDisplay.begin();
-  segmentDisplay.writePatternAt(0, 0x3A);
-  segmentDisplay.renderFieldNow();
+  scanningDisplay.begin();
+  scanningDisplay.writePatternAt(0, 0x3A);
+  scanningDisplay.renderFieldNow();
 
 #elif FEATURE == FEATURE_DUAL_SW_SPI
   spiAdapter.begin();
   ledMatrix.begin();
-  segmentDisplay.begin();
-  segmentDisplay.writePatternAt(0, 0x3A);
-  segmentDisplay.renderFieldNow();
+  scanningDisplay.begin();
+  scanningDisplay.writePatternAt(0, 0x3A);
+  scanningDisplay.renderFieldNow();
 
 #elif FEATURE == FEATURE_DUAL_SW_SPI_FAST
   spiAdapter.begin();
   ledMatrix.begin();
-  segmentDisplay.begin();
-  segmentDisplay.writePatternAt(0, 0x3A);
-  segmentDisplay.renderFieldNow();
+  scanningDisplay.begin();
+  scanningDisplay.writePatternAt(0, 0x3A);
+  scanningDisplay.renderFieldNow();
 
 #elif FEATURE == FEATURE_DUAL_HW_SPI
   spiAdapter.begin();
   ledMatrix.begin();
-  segmentDisplay.begin();
-  segmentDisplay.writePatternAt(0, 0x3A);
-  segmentDisplay.renderFieldNow();
+  scanningDisplay.begin();
+  scanningDisplay.writePatternAt(0, 0x3A);
+  scanningDisplay.renderFieldNow();
 
 #else
   #error Unknown FEATURE
@@ -209,6 +209,6 @@ void setup() {
 
 void loop() {
 #if FEATURE > FEATURE_BASELINE
-  segmentDisplay.renderFieldWhenReady();
+  scanningDisplay.renderFieldWhenReady();
 #endif
 }

@@ -22,21 +22,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_SEGMENT_DISPLAY_H
-#define ACE_SEGMENT_SEGMENT_DISPLAY_H
+#ifndef ACE_SEGMENT_SCANNING_DISPLAY_H
+#define ACE_SEGMENT_SCANNING_DISPLAY_H
 
 #include <stdint.h>
 #include <Arduino.h> // pgm_read_byte()
 #include <AceCommon.h> // incrementMod()
 #include "LedDisplay.h"
 
-class SegmentDisplayTest_displayCurrentField;
+class ScanningDisplayTest_displayCurrentField;
 
 namespace ace_segment {
 
 /**
- * The user interface to the LED Segment display. Uses an implementation of
- * the LedMatrixBase class to multiplex the LED segments on the digits.
+ * An implementation of `LedDisplay` for display modules which do not have
+ * hardware controller chips, so they require the microcontroller to perform the
+ * multiplexed scanning across the digits. The matrix wiring of the segment and
+ * digit pins allow only a single digit to be turned on at any given time, so
+ * multiplexing across all the digits quickly (e.g. 60 Hz) gives the appearance
+ * of activating all the digits at the same time. For LED modules with a
+ * hardware controller (e.g. TM1637), the controller chip performs the
+ * multiplexing. Note that a 74HC595 Shift Register chip does *not* perform the
+ * multiplexing, it only provides a conversion from serial to parallel output.
+ *
+ * This class depends on one of the implementations of the `LedMatrixBase` class
+ * to multiplex the LED segments on the digits, and potentially  one of the of
+ * `SwSpiAdapter` or `HwSpiAdapter` classes if a 74HC595 shift register chip is
+ * used.
  *
  * A frame is divided into fields. A field is a partial rendering of a frame.
  * Normally, the one digit corresponds to one field. However if brightness
@@ -56,10 +68,10 @@ namespace ace_segment {
       (elements) organized by digit (group)
  * @tparam DIGITS number of LED digits
  * @tparam SUBFIELDS number of rendering fields per digit for PWM, normally 1,
- *   but set to greater than 1 to get number of brightness levels
+ *   but set to greater than 1 to get intermediate brightness levels
  */
 template <typename HW, typename LM, uint8_t DIGITS, uint8_t SUBFIELDS>
-class SegmentDisplay : public LedDisplay {
+class ScanningDisplay : public LedDisplay {
 
   public:
     /**
@@ -73,7 +85,7 @@ class SegmentDisplay : public LedDisplay {
      * @param patterns array of segment pattern per digit, not nullable
      * @param brightnesses array of brightness for each digit (default: nullptr)
      */
-    explicit SegmentDisplay(
+    explicit ScanningDisplay(
         const HW& hardware,
         const LM& ledMatrix,
         uint8_t framesPerSecond
@@ -265,11 +277,11 @@ class SegmentDisplay : public LedDisplay {
     void wakeFromSleep() { mPreparedToSleep = false; }
 
   private:
-    friend class ::SegmentDisplayTest_displayCurrentField;
+    friend class ::ScanningDisplayTest_displayCurrentField;
 
     // disable copy-constructor and assignment operator
-    SegmentDisplay(const SegmentDisplay&) = delete;
-    SegmentDisplay& operator=(const SegmentDisplay&) = delete;
+    ScanningDisplay(const ScanningDisplay&) = delete;
+    ScanningDisplay& operator=(const ScanningDisplay&) = delete;
 
     /** Display field normally without modulation. */
     void displayCurrentFieldPlain() {

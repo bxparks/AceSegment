@@ -34,7 +34,7 @@ namespace ace_segment {
  * Various 'Writer' classes provide additional functionality on top of this
  * interface:
  *
- *  * HexWriter: write hex digits
+ *  * NumberWriter: write numberse in decimal or hexadecimal format
  *  * ClockWriter: write strings of the form "HH:MM"
  *  * CharWriter: write ASCII characters in the range of 0-127
  *  * StringWriter: uses a CharWriter to write c-strings
@@ -69,7 +69,7 @@ class LedDisplay {
     /**
      * Write the brightness for a given pos, leaving pattern unchanged.
      * The maximum brightness is determined by specifics of the subclass. For
-     * SegmentDisplay, the maximum brightness is the value of `SUBFIELDS-1`
+     * ScanningDisplay, the maximum brightness is the value of `SUBFIELDS-1`
      * template parameter.
      *
      * A subclass may not support the ability to control the brightness on a per

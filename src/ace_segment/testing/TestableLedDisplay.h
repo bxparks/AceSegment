@@ -32,7 +32,7 @@ namespace testing {
 
 /**
  * An implementation of LedDisplay for unit testing purposes.
- * Implements most of the simple features of SegmentDisplay.
+ * Implements most of the simple features of ScanningDisplay.
  *
  * @tparam DIGITS number of digits supported by this class
  */
@@ -42,6 +42,7 @@ class TestableLedDisplay : public LedDisplay {
     TestableLedDisplay() : LedDisplay(DIGITS) {}
 
     virtual void writePatternAt(uint8_t pos, uint8_t pattern) override {
+      if (pos >= DIGITS) return;
       mPatterns[pos] = pattern;
     }
 

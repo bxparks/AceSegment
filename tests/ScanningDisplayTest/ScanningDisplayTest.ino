@@ -1,4 +1,4 @@
-#line 2 "SegmentDisplayTest.ino"
+#line 2 "ScanningDisplayTest.ino"
 
 /*
  * MIT License
@@ -26,31 +26,31 @@ const int8_t NUM_SUB_FIELDS = 1;
 TestableHardware hardware;
 TestableLedMatrix ledMatrix;
 
-SegmentDisplay<TestableHardware, TestableLedMatrix, NUM_DIGITS, NUM_SUB_FIELDS>
-  segmentDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
+ScanningDisplay<TestableHardware, TestableLedMatrix, NUM_DIGITS, NUM_SUB_FIELDS>
+  scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
 
 // ----------------------------------------------------------------------
 // Tests for SplitDigitDriver w/ LedMatrixDirect
 // ----------------------------------------------------------------------
 
-class SegmentDisplayTest: public TestOnce {
+class ScanningDisplayTest: public TestOnce {
   protected:
     void setup() override {
-      segmentDisplay.begin();
+      scanningDisplay.begin();
       hardware.mEventLog.clear();
       ledMatrix.mEventLog.clear();
     }
 };
 
-testF(SegmentDisplayTest, renderFieldNow) {
-  segmentDisplay.writePatternAt(0, 0x00);
-  segmentDisplay.writePatternAt(1, 0x11);
-  segmentDisplay.writePatternAt(2, 0x22);
-  segmentDisplay.writePatternAt(3, 0x33);
+testF(ScanningDisplayTest, renderFieldNow) {
+  scanningDisplay.writePatternAt(0, 0x00);
+  scanningDisplay.writePatternAt(1, 0x11);
+  scanningDisplay.writePatternAt(2, 0x22);
+  scanningDisplay.writePatternAt(3, 0x33);
 
   // display field 0
   ledMatrix.mEventLog.clear();
-  segmentDisplay.renderFieldNow();
+  scanningDisplay.renderFieldNow();
   assertEqual(1, ledMatrix.mEventLog.getNumRecords());
   // Cast to (int) required on 8-bit AVR processors (not sure why), something to
   // do with the size of EventType, which is a uint8_t, which does not get
@@ -60,28 +60,28 @@ testF(SegmentDisplayTest, renderFieldNow) {
 
   // display field 1
   ledMatrix.mEventLog.clear();
-  segmentDisplay.renderFieldNow();
+  scanningDisplay.renderFieldNow();
   assertEqual(1, ledMatrix.mEventLog.getNumRecords());
   assertTrue(ledMatrix.mEventLog.assertEvents(
       1, (int) EventType::kLedMatrixDraw, 1, 0x11));
 
   // display field 2
   ledMatrix.mEventLog.clear();
-  segmentDisplay.renderFieldNow();
+  scanningDisplay.renderFieldNow();
   assertEqual(1, ledMatrix.mEventLog.getNumRecords());
   assertTrue(ledMatrix.mEventLog.assertEvents(
       1, (int) EventType::kLedMatrixDraw, 2, 0x22));
 
   // display field 3
   ledMatrix.mEventLog.clear();
-  segmentDisplay.renderFieldNow();
+  scanningDisplay.renderFieldNow();
   assertEqual(1, ledMatrix.mEventLog.getNumRecords());
   assertTrue(ledMatrix.mEventLog.assertEvents(
       1, (int) EventType::kLedMatrixDraw, 3, 0x33));
 
   // cycle back to field 0
   ledMatrix.mEventLog.clear();
-  segmentDisplay.renderFieldNow();
+  scanningDisplay.renderFieldNow();
   assertEqual(1, ledMatrix.mEventLog.getNumRecords());
   assertTrue(ledMatrix.mEventLog.assertEvents(
       1, (int) EventType::kLedMatrixDraw, 0, 0x00));

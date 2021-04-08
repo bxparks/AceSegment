@@ -31,13 +31,13 @@ Shift Register that is accessed through software or hardware SPI.
         * [Pins Wired Directly, Common Anode](#LedMatrixDirectCommonAnode)
         * [Segments On 74HC595 Shift Register](#LedMatrixSingleShiftRegister)
         * [Digits and Segments On Two Shift Registers](#LedMatrixDualShiftRegister)
-    * [Using the SegmentDisplay](#UsingSegmentDisplay)
+    * [Using the ScanningDisplay](#UsingScanningDisplay)
         * [Writing the Digit Bit Patterns](#DigitBitPatterns)
         * [Global Brightness](#GlobalBrightness)
         * [Frames and Fields](#FramesAndFields)
         * [Rendering by Polling](#RenderingByPolling)
         * [Rendering using Interrupts](#RenderingUsingInterrupts)
-    * [HexWriter](#HexWriter)
+    * [NumberWriter](#NumberWriter)
     * [ClockWriter](#ClockWriter)
     * [CharWriter](#CharWriter)
     * [StringWriter](#StringWriter)
@@ -85,10 +85,10 @@ components:
     * resistors on segments
     * transistors on digits or segments
     * using 74HC595 with `shiftOut()` or hardware SPI
-* The `SegmentDisplay` class knows how to render the array of digit patterns to
+* The `ScanningDisplay` class knows how to render the array of digit patterns to
   the LED module using multiplexing.
   digit to be associated with a particular brightness.
-* The `SegmentDisplay` knows how to display the bit patterns to a specific
+* The `ScanningDisplay` knows how to display the bit patterns to a specific
   physical wiring of an LED display.
 
 The rendering of an array of bit patterns is split into 2 parts:
@@ -96,16 +96,16 @@ The rendering of an array of bit patterns is split into 2 parts:
 * a *field* is a partial rendering of a single frame
 
 A frame rate of about 60Hz will be sufficient to prevent obvious flickering of
-the LED. Depending on the configuration of the `SegmentDisplay` class, we could
+the LED. Depending on the configuration of the `ScanningDisplay` class, we could
 reasonably have between 4 and 64 fields per frame (this is partially a
 user-selectable parameter), giving us a fields per second rate of 240Hz to
 3840Hz.
 
 At 3840 fields per second, a single field needs to be written in less than 260
 microseconds. The AceSegment library is able to meet this timing requirement
-because `SegmentDisplay::renderFieldNow()` is able to render a single field with
-a maximum CPU time of 124 microseconds on a 16MHz ATmega328P microcontroller
-(Arduino UNO, Nano, Mini, etc).
+because `ScanningDisplay::renderFieldNow()` is able to render a single field
+with a maximum CPU time of 124 microseconds on a 16MHz ATmega328P
+microcontroller (Arduino UNO, Nano, Mini, etc).
 
 <a name="Installation"></a>
 ## Installation
@@ -203,47 +203,74 @@ Here are the classes in the library which will be most useful to the
 end-users, listed roughly from low-level to higher-level classes which often
 depend on the lower-level classes:
 
-* `Hardware`: A class that hold hardware dependent methods (such as
-  `digitalWrite()`).
-* `SpiAdapter`: A thin-wrapper class to indicate whether we are using
-  software or hardware SPI.
-    * `SwSpiAdapter`: Software SPI using `shiftOut()`
-    * `HwSpiAdapter`: Native hardware SPI.
+* `Hardware`
+    * A thin class that hold hardware dependent functions (such as
+      `digitalWrite()`). The compiler optimizes away the entire object, so that
+      resulting code is as-if the underlying hardware functions were called
+      directly.
+    * Can be swapped out with `TestableHardware` for testing.
+* SpiAdapter
+    * Thin-wrapper classes to indicate whether we are using software or hardware
+      SPI. There are 3 implementations:
+    * `SwSpiAdapter`
+        * Software SPI using `shiftOut()`
+    * `HwSpiAdapter`
+        * Native hardware SPI.
+    * `SwSpiAdapterFast`
+        * Software SPI using `digitalWriteFast()` on AVR processors
 * `LedMatrix`: Various subclasses capture the wiring of the matrix of LEDs.
-    * `LedMatrixDirect`: Group pins and element pins are directly accessed
-      through the microcontroller pins.
-    * `LedMatrixSingleShiftRegister`: Group pins are access directly, but
-      element pins
-      are access through an 74HC595 chip through SPI using the `SpiAdapter`.
-    * `LedMatrixDualShiftRegister`: Both group and element pions are access
-      through two 74HC595 chips through SPI using the `SpiAdapter` class.
-* `SegmentDisplay`
-    * A class that stores segment patterns to an internal buffer.
-    * Knows how and when to render the frames.
-    * Calls `LedMatrix` classes to send the patterns to the actual LED segments.
-* `HexWriter`: A class that converts hexadecimal numerals (0-F) to bit patterns
-  to be printed by the `SegmentDisplay` class.
-    * A few additional characters are supported: `kSpace`, `kMinus`, `kPeriod`
-* `ClockWriter`: A class that writes a clock string "hh:mm" to the
-  `SegmentDisplay` class.
-    * A few additional symbols are supported `kSpace`, `kMinus` and `kA` ("A"
-      for AM) and `kP` ("P" for PM).
-* `CharWriter`: A class that convert an ASCII character represented by a `char`
-  (code 0-127) to a bit pattern used by `SegmentDriver` class.
-    * Not all ASCII characters can be rendered on a seven segment display
-      legibly but the `CharWriter` tries its best.
-* `StringWriter`: A class that prints strings of `char` to a `CharWriter`,
-  which in turns prints to `SegmentDisplay`.
-    * It tries to be smart about collapsing decimal point `.` characters into
-      the native decimal point on a seven segment LED display.
+    * `LedMatrixDirect`
+        * Group pins and element pins are directly accessed through the
+          microcontroller pins.
+    * `LedMatrixDirectFast`
+        * Same as `LedMatrixDirect` but using `digitalWriteFast()` on AVR
+          processors
+    * `LedMatrixSingleShiftRegister`
+        * Group pins are access directly, but element pins are access through an
+          74HC595 chip through SPI using one of SpiAdapter classes
+    * `LedMatrixDualShiftRegister`
+        * Both group and element pions are access through two 74HC595 chips
+          through SPI using one of the SpiAdapter classes
+* `LedDisplay`
+    * Base class interface between Writer classes and the actual LED segment
+      display module
+    * `ScanningDisplay`
+        * An implementation of `LedDisplay` for LED segment modules which do not
+          have a hardware controller, and must be multiplexed across multiple
+          digits by the host microcontroller
+        * Uses the `LedMatrix` classes to send the segment patterns to the
+          actual LED module
+* Writers
+    * Helper classes built on top of the `LedDisplay` which provide higher-level
+      interface to the LED module, such as printing numbers, time (hh:mm),
+      and ASCII characters
+    * `NumberWriter`
+        * A class that writes integers in decimal or hexadecimal format by the
+          `ScanningDisplay` class.
+        * A few additional characters are supported: `kSpace`, `kMinus`
+    * `ClockWriter`
+        * A class that writes a clock string "hh:mm" to the `ScanningDisplay`
+          class.
+        * A few additional symbols are supported: `kSpace`, `kMinus` and `kA`
+          ("A" for AM) and `kP` ("P" for PM).
+    * `CharWriter`
+        * A class that convert an ASCII character represented by a `char` (code
+          0-127) to a bit pattern used by `SegmentDriver` class.
+        * Not all ASCII characters can be rendered on a seven segment display
+          legibly but the `CharWriter` tries its best.
+    * `StringWriter`
+        * A class that prints strings of `char` to a `CharWriter`, which in
+          turns prints to `ScanningDisplay`.
+        * It tries to be smart about collapsing decimal point `.` characters
+          into the native decimal point on a seven segment LED display.
 
-The dependency diagram looks something like this:
+The dependency diagram among these classes looks something like this:
 
 ```
 StringWriter
      |
      V
- CharWriter ClockWriter  HexWriter
+ CharWriter ClockWriter  NumberWriter
            \     |     /
             v    v    v
              LedDisplay
@@ -251,7 +278,7 @@ StringWriter
                  |
                  +------+
                         |
-                  SegmentDiplay
+                  ScanningDiplay
                  /      |      \
                 /       |       `-----------.
                v        v                    v
@@ -277,19 +304,19 @@ LedMatrixDirectFast     |      |        \ /    |
 ### Setting Up the Resources
 
 A series of resources must be built up to finally create an instance of
-`SegmentDisplay`. The resource creation occurs in roughly 5 stages, with the
+`ScanningDisplay`. The resource creation occurs in roughly 5 stages, with the
 objects in the later stages depending on the objects created in the earlier
 stage:
 
 1. The `Hardware` object which provides access to the various pins.
-1. The `SpiAdapter` object which determines to use software SPI or hardware
-   SPI. Needed only by `LedMatrixSingleShiftRegister` and
+1. The SpiAdapter object determines whether software SPI or hardware SPI is
+   used. Needed only by `LedMatrixSingleShiftRegister` and
    `LedMatrixDualShiftRegister` classes.
-1. The `LedMatrix` object determine how the LEDs are wired and how to
+1. The LedMatrix object determine how the LEDs are wired and how to
    communicate to the LED segments.
-1. The `SegmentDisplay` object wraps a segment pattern buffer
-   and an LedMatrix object.
-1. The various `XxxWriter` classes which translate higher level characters and
+1. The `ScanningDisplay` object wraps a segment pattern buffer and an LedMatrix
+   object.
+1. The various Writer classes which translate higher level characters and
    strings into bit patterns used by `LedDisplay`.
 
 A typical resource creation code looks like this:
@@ -311,18 +338,18 @@ LedMatrix ledMatrix(
     DIGIT_PINS,
     NUM_SEGMENTS,
     SEGMENT_PINS);
-SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
+ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> scanningDisplay(
     hardware, ledMatrix, FRAMES_PER_SECOND);
 
-HexWriter hexWriter(segmentDisplay);
-ClockWriter clockWriter(segmentDisplay);
-CharWriter charWriter(segmentDisplay);
+NumberWriter hexWriter(scanningDisplay);
+ClockWriter clockWriter(scanningDisplay);
+CharWriter charWriter(scanningDisplay);
 StringWriter stringWriter(charWriter);
 ...
 
 void setupAceSegment() {
   ledMatrix.begin();
-  segmentDisplay.begin();
+  scanningDisplay.begin();
 }
 
 void setup() {
@@ -441,14 +468,14 @@ LedMatrix ledMatrix(
     DIGIT_PINS,
     NUM_SEGMENTS,
     SEGMENT_PINS);
-SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
+ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> scanningDisplay(
     hardware, ledMatrix, FRAMES_PER_SECOND);
 
 ...
 
-void setupSegmentDisplay() {
+void setupScanningDisplay() {
   ledMatrix.begin();
-  segmentDisplay.begin();
+  scanningDisplay.begin();
 }
 ```
 
@@ -529,15 +556,15 @@ LedMatrix ledMatrix(
     LedMatrix::kActiveHighPattern /*elementOnPattern*/,
     NUM_DIGITS,
     DIGIT_PINS):
-SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
+ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> scanningDisplay(
     hardware, ledMatrix, FRAMES_PER_SECOND);
 
 ...
 
-void setupSegmentDisplay() {
+void setupScanningDisplay() {
   spiAdapter.begin();
   ledMatrix.begin();
-  segmentDisplay.begin();
+  scanningDisplay.begin();
 }
 ```
 
@@ -591,33 +618,34 @@ LedMatrix ledMatrix(
     spiAdapter,
     LedMatrix::kActiveHighPattern /*groupOnPattern*/,
     LedMatrix::kActiveHighPattern /*elementOnPattern*/);
-SegmentDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> segmentDisplay(
+ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> scanningDisplay(
     hardware, ledMatrix, FRAMES_PER_SECOND);
 ...
 
-void setupSegmentDisplay() {
+void setupScanningDisplay() {
   spiAdapter.begin();
   ledMatrix.begin();
-  segmentDisplay.begin();
+  scanningDisplay.begin();
 }
 ```
 
-<a name="UsingSegmentDisplay"></a>
-### Using the SegmentDisplay
+<a name="UsingScanningDisplay"></a>
+### Using the ScanningDisplay
 
 <a name="DigitBitPatterns"></a>
 #### Writing Digit Bit Patterns
 
-The `SegmentDisplay` contains a number of methods to write the bit patterns of
+The `ScanningDisplay` contains a number of methods to write the bit patterns of
 the seven segment display:
-* `void writePatternAt(uint8_t digit, uint8_t pattern)`
-* `void writeDecimalPointAt(uint8_t digit, bool state = true)`
-* `void setBrightnessAt(uint8_t digit, uint8_t brightness)`
+* `void writePatternAt(uint8_t pos, uint8_t pattern)`
+* `void writeDecimalPointAt(uint8_t pos, bool state = true)`
+* `void setBrightnessAt(uint8_t pos, uint8_t brightness)`
 
-The `digit` is the index into the `DimmablePattern` array, from `0` to
-`NUM_DIGITS-1`. The `pattern` is an 8-bit integer which maps to the LED segments
-using the usual convention for a seven-segment LED ('a' is the least significant
-bit 0, decimal point 'dp' is the most seignificant bit 7):
+The `pos` is the index into the LED digit array, from `0` to `NUM_DIGITS-1`
+where `0` represents the left-most digit. The `pattern` is an 8-bit integer
+which maps to the LED segments using the usual convention for a seven-segment
+LED ('a' is the least significant bit 0, decimal point 'dp' is the most
+seignificant bit 7):
 ```
 7-segment map:
       aaa       000
@@ -639,34 +667,33 @@ initially. The `state` variable controls whether the decimal point should
 be turned on (default) or off (false).
 
 The `brightness` is an integer constant (0-255) associated with the digit. It
-requires the `SegmentDisplay` object to be configured to support PWM on the
+requires the `ScanningDisplay` object to be configured to support PWM on the
 digit pins. Otherwise, the brightness is ignored.
 
 <a name="GlobalBrightness"></a>
 #### Global Brightness
 
-If the `SegmentDisplay` supports it, we can control the global brightness of the
-entire LED display using:
+If the `ScanningDisplay` supports it, we can control the global brightness of
+the entire LED display using:
 
 ```
-segmentDisplay->setBrightness(value);
+scanningDisplay->setBrightness(value);
 ```
 
-Note that the `value` is a fraction (0.0 - 1.0) represented in units of
-1/256. In other words, 3 means (3/256) and 255 means (255/256).
+Note that the `value` is an integer from `[0, NUM_DIGITS]`, and represents the
+brightness of the display, where 0 means OFF and `NUM_DIGITS` means 100% ON.
 
-The global brightness is enabled only if the `numSubFields` of the
-`SegmentDisplay`
-was set to be `> 1`. For example, if it was set to `16`, then each digit is
-rendered 16 times within a single field, but modulated using pulse width
-modulation to control the width of that signal. The given digit will be "on"
-only a fraction of the full interval of the single field rendering and will
+The global brightness is enabled only if the `NUM_SUBFIELDS` of the
+`ScanningDisplay` was set to be `> 1`. For example, if it was set to `16`, then
+each digit is rendered 16 times within a single field, but modulated using pulse
+width modulation to control the width of that signal. The given digit will be
+"on" only a fraction of the full interval of the single field rendering and will
 appear dimmer to the human eye.
 
 <a name="FramesAndFields"></a>
 #### Frames and Fields
 
-To understand how to the `SegmentDisplay` supports brightness, we first need to
+To understand how to the `ScanningDisplay` supports brightness, we first need to
 explain a couple of terms that we borrowed from the field of
 [video processing](https://en.wikipedia.org/wiki/Field_(video)):
 
@@ -675,7 +702,7 @@ explain a couple of terms that we borrowed from the field of
   LED display. Any changes in bit patterns or brightness of the digits happens
   through the rendering of multiple frames.
 * **Field**: A field is a partial rendering of a frame. If the current limiting
-  resistors are on the segments (recommended), then the `SegmentDisplay`
+  resistors are on the segments (recommended), then the `ScanningDisplay`
   multiplexes through the digits. Each rendering of the digit is a *field* and
   for a 4-digit display, there are 4 fields per frame.
 
@@ -687,10 +714,11 @@ within a field, giving a total *field* rate of about 2000-4000Hz. That's abaout
 250-500 microseconds per field, which is surprisingly doable using an 8-bit
 processor like an Arduino UNO or Nano on an ATmega328 running at 16MHz.
 
-The primary unit of rendering in `SegmentDisplay` is a single field, implemented
-in `SegmentDisplay::renderFieldNow()`. The `SegmentDisplay` class keeps track of
-the current digit, the current frame, and the current field, and each successive
-call to `renderFieldNow()` sends the appropriate bit pattern to the LED module.
+The primary unit of rendering in `ScanningDisplay` is a single field,
+implemented in `ScanningDisplay::renderFieldNow()`. The `ScanningDisplay` class
+keeps track of the current digit, the current frame, and the current field, and
+each successive call to `renderFieldNow()` sends the appropriate bit pattern to
+the LED module.
 
 For a given requested frame rate, are 2 ways to render the fields at the correct
 time, and they are explained below:
@@ -701,7 +729,7 @@ time, and they are explained below:
 <a name="RenderingByPolling"></a>
 #### Rendering By Polling
 
-The `SegmentDisplay::renderFieldWhenReady()` is meant to be called at a
+The `ScanningDisplay::renderFieldWhenReady()` is meant to be called at a
 frequency somewhat higher than that needed to sustain the actual frame rate. It
 keeps an internal variable containing the time (in `micros()`) of the previous
 rendering of the field. When the time is up, it calls `renderFieldNow()` and
@@ -711,7 +739,7 @@ The code looks like this:
 
 ```
 void loop() {
-  segmentDisplay.renderFieldWhenReady();
+  scanningDisplay.renderFieldWhenReady();
 }
 ```
 
@@ -728,7 +756,7 @@ flickering problem.
 #### Rendering Using Interrupts
 
 The calling code sets up an interrupt service routine (ISR) which calls
-`SegmentDisplay::renderFieldNow()` at exactly the periodic frequency needed to
+`ScanningDisplay::renderFieldNow()` at exactly the periodic frequency needed to
 achieve the desired frames per second and fields per second.
 
 Unfortunately, timer interrupts are not part of the Arduino API (probably
@@ -737,14 +765,14 @@ For example, an ATmega328 (e.g. Arduino UNO, Nano, Mini), using an 8-bit timer
 on Timer 2 looks like this:
 ```
 ISR(TIMER2_COMPA_vect) {
-  segmentDisplay.renderFieldNow();
+  scanningDisplay.renderFieldNow();
 }
 
 void setup() {
   ...
   // set up Timer 2
   uint8_t timerCompareValue =
-      (unsigned long) F_CPU / 1024 / segmentDisplay->getFieldsPerSecond() - 1;
+      (unsigned long) F_CPU / 1024 / scanningDisplay->getFieldsPerSecond() - 1;
   noInterrupts();
   TCNT2  = 0;	// Initialize counter value to 0
   TCCR2A = 0;
@@ -762,26 +790,33 @@ void loop() {
 }
 ```
 
-<a name="HexWriter"></a>
-### HexWriter
+<a name="NumberWriter"></a>
+### NumberWriter
 
-While it is exciting to be able to write any bit patterns to the LED display,
-we often want to just write numerals to the LED display.
-The `HexWriter` converts an integer to the seven-segment bit patterns used by
-`SegmentDisplay`. On platforms that support it (ATmega and ESP8266), the bit
-mapping table is stored in flash memory to conserve static memory.
+While it is exciting to be able to write any bit patterns to the LED display, we
+often want to just write numbers to the LED display. The `NumberWriter` can
+print integers to the `ScanningDisplay` using decimal or hexadecimal formats. On
+platforms that support it (ATmega and ESP8266), the bit mapping table is stored
+in flash memory to conserve static memory.
 
 The class supports the following methods:
-* `void writeHexAt(uint8_t digit, uint8_t c)`
-* `void writeDecimalPointAt(uint8_t digit, bool state = true)`
 
-In addition to the numerals 0-15 (or 0x0-0xF), the class also supports these
-additional symbols:
-* `HexWriter::kSpace`
-* `HexWriter::kMinus`
-* `HexWriter::kPeriod`
+* `void writeHexCharAt(uint8_t pos, hexchar_t c)`
+* `void writeHexByteAt(uint8_t pos, uint8_t b)`
+* `void writeHexWordAt(uint8_t pos, uint16_t w)`
+* `void writeDecWordAt(uint8_t pos, uint16_t n)`
+* `LedDisplay& display()`
 
-A `HexWriter` consumes about 200 bytes of flash memory.
+The `hexchar_t` type semantically represents the character set supported by this
+class. It is implemented as an alias for `uint8_t`, which unfortunately means
+that the C++ compiler will not warn about mixing this type with another
+`uint8_t`. The range of this character set is from `[0,15]` plus 2 additional
+symbols, so `[0,17]`:
+
+* `NumberWriter::kSpace`
+* `NumberWriter::kMinus`
+
+A `NumberWriter` consumes about 200 bytes of flash memory (TODO: reverify this).
 
 <a name="ClockWriter"></a>
 ### ClockWriter
@@ -791,38 +826,42 @@ decimal point with the colon symbol ":" between the 2 digits on either side so
 that it can display a time in the format "hh:mm".
 
 The class supports the following methods:
+
+* `LedDisplay& display()`
 * `void writeClock(uint8_t hh, uint8_t mm)`
 * `void writeBcdClock(uint8_t hh, uint8_t mm)` - Binary Coded Decimal
 * `void writeColon(bool state = true)`
-* `void writeCharAt(uint8_t digit, uint8_t c)`
+* `void writeCharAt(uint8_t pos, uint8_t c)`
 
 A `ClockWriter` consumes about (_TBD_) bytes of flash memory.
 
 <a name="CharWriter"></a>
 ### CharWriter
 
-It is possible to represent many of the ASCII (0-127) characters on a
-seven-segment LED display, although some of the characters will necessarily
+It is possible to represent many of the ASCII characters in the range `[0,127]`
+on a seven-segment LED display, although some of the characters will necessarily
 be crude given the limited number of segments. The `CharWriter` contains a
 [mapping of ASCII](https://github.com/dmadison/LED-Segment-ASCII) characters
-(0-127) to seven-segment bit patterns. On platforms that support it (ATmega and
-ESP8266), the bit mapping table is stored in flash memory to conserve static
+to seven-segment bit patterns. On platforms that support it (ATmega and
+ESP8266), the bit pattern array is stored in flash memory to conserve static
 memory.
 
 The class supports the following methods:
-* `void writeCharAt(uint8_t digit, char c)`
-* `void writeDecimalPointAt(uint8_t digit, bool state = true)`
 
-A `CharWriter` consumes about 300 bytes of flash memory.
+* `LedDisplay& display()`
+* `void writeCharAt(uint8_t pos, char c)`
+
+A `CharWriter` consumes about 300 bytes of flash memory. (TODO: reverify this).
 
 <a name="StringWriter"></a>
 ### StringWriter
 
 A `StringWriter` is a class that builds on top of the `CharWriter`. It knows how
 to write entirely strings into the LED display. It provides the following
-method:
+methods:
 
-* `void writeStringAt(uint8_t digit, const char* s, bool padRight = false)`
+* `LedDisplay& display()`
+* `void writeStringAt(uint8_t pos, const char* s, bool padRight = false)`
 
 The implementation of this method is straightforward except for the handling of
 a decimal point. A seven segment LED digit contains a small LED for the decimal
@@ -866,8 +905,8 @@ Here are the sizes of the various classes on the 8-bit AVR microcontrollers
 * sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 10
 * sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 5
 * sizeof(LedDisplay): 3
-* sizeof(SegmentDisplay<Hardware, LedMatrixBase, 4, 1>): 26
-* sizeof(HexWriter): 2
+* sizeof(ScanningDisplay<Hardware, LedMatrixBase, 4, 1>): 26
+* sizeof(NumberWriter): 2
 * sizeof(ClockWriter): 3
 * sizeof(CharWriter): 2
 * sizeof(StringWriter): 2

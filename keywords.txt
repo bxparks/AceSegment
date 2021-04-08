@@ -16,12 +16,12 @@ LedMatrixDirectFast	KEYWORD1
 LedMatrixSingleShiftRegister	KEYWORD1
 LedMatrixDualShiftRegister	KEYWORD1
 LedDisplay	KEYWORD1
-SegmentDisplay	KEYWORD1
-HexWriter	KEYWORD1
+ScanningDisplay	KEYWORD1
+NumberWriter	KEYWORD1
 ClockWriter	KEYWORD1
 CharWriter	KEYWORD1
 StringWriter	KEYWORD1
-
+hexchar_t	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
@@ -47,7 +47,7 @@ clear	KEYWORD2
 enableGroup	KEYWORD2
 disableGroup	KEYWORD2
 
-# SegmentDisplay
+# ScanningDisplay
 begin	KEYWORD2
 end	KEYWORD2
 getNumDigits	KEYWORD2
@@ -63,8 +63,12 @@ renderFieldWhenReady	KEYWORD2
 prepareToSleep	KEYWORD2
 wakeFromSleep	KEYWORD2
 
-# HexWriter.h
-writeHexAt	KEYWORD2
+# NumberWriter.h
+writeHexCharAt	KEYWORD2
+writeHexCharsAt	KEYWORD2
+writeHexByteAt	KEYWORD2
+writeHexWordAt	KEYWORD2
+writeDecWordAt	KEYWORD2
 
 # ClockWriter.h
 writeDecimalAt	KEYWORD2
@@ -89,13 +93,12 @@ getLedDisplay	KEYWORD2
 # Constants (LITERAL1)
 #######################################
 
-# HexWriter.h
+# NumberWriter.h
 kNumCharacters	LITERAL1
 kSpace	LITERAL1
-kPeriod	LITERAL1
 kMinus	LITERAL1
 
-# HexWriter.h
+# ClockWriter.h
 kNumCharacters	LITERAL1
 kSpace	LITERAL1
 kMinus	LITERAL1

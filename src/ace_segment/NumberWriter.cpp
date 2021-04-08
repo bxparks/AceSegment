@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 #include <Arduino.h>
-#include "HexWriter.h"
+#include "NumberWriter.h"
 
 namespace ace_segment {
 
@@ -42,7 +42,7 @@ namespace ace_segment {
 // Segment: DP G F E D C B A
 //    Bits: 7  6 5 4 3 2 1 0
 //
-const uint8_t HexWriter::kCharacterArray[] PROGMEM = {
+const uint8_t NumberWriter::kHexCharPatterns[kNumHexChars] PROGMEM = {
   0b00111111, /* 0 */
   0b00000110, /* 1 */
   0b01011011, /* 2 */
@@ -60,19 +60,71 @@ const uint8_t HexWriter::kCharacterArray[] PROGMEM = {
   0b01111001, /* E */
   0b01110001, /* F */
   0b00000000, /* (space) */
-  0b10000000, /* . */
   0b01000000, /* - */
 };
 
-const uint8_t HexWriter::kNumCharacters =
-    sizeof(kCharacterArray)/sizeof(kCharacterArray[0]);
-
-void HexWriter::writeHexAt(uint8_t digit, uint8_t c) {
-  if (digit >= mLedDisplay.getNumDigits()) return;
-  uint8_t pattern = ((uint8_t) c < kNumCharacters)
-      ? pgm_read_byte(&kCharacterArray[(uint8_t) c])
-      : kMinus; // out of range
-  mLedDisplay.writePatternAt(digit, pattern);
+void NumberWriter::writeHexCharInternalAt(uint8_t pos, hexchar_t c) {
+  uint8_t pattern = pgm_read_byte(&kHexCharPatterns[(uint8_t) c]);
+  mLedDisplay.writePatternAt(pos, pattern);
 }
 
+void NumberWriter::writeHexCharAt(uint8_t pos, hexchar_t c) {
+  writeHexCharInternalAt(pos, ((uint8_t) c < kNumHexChars) ? c : kSpace);
 }
+
+void NumberWriter::writeHexCharsAt(uint8_t pos, const hexchar_t s[],
+    uint8_t len) {
+  for (uint8_t i = 0; i < len; ++i) {
+    writeHexCharAt(pos++, s[i]);
+  }
+}
+
+void NumberWriter::writeHexByteAt(uint8_t pos, uint8_t b) {
+  uint8_t low = (b & 0x0F);
+  b >>= 4;
+  uint8_t high = (b & 0x0F);
+
+  writeHexCharInternalAt(pos++, high);
+  writeHexCharInternalAt(pos++, low);
+}
+
+void NumberWriter::writeHexWordAt(uint8_t pos, uint16_t w) {
+  uint8_t low = (w & 0xFF);
+  uint8_t high = (w >> 8) & 0xFF;
+  writeHexByteAt(pos, high);
+  writeHexByteAt(pos + 2, low);
+}
+
+void NumberWriter::writeDecWordAt(
+    uint8_t pos,
+    uint16_t n,
+    hexchar_t pad,
+    int8_t boxSize) {
+
+  // TODO: Implement 'pad' and 'boxSize'
+  (void) pad;
+  (void) boxSize;
+
+  hexchar_t c[5] = {0}; // c[0] is the lowest digit
+  uint16_t m = n;
+  uint8_t digit = 0;
+  while (true) {
+    if (m < 10) {
+      c[digit] = m;
+      digit++;
+      break;
+    }
+    uint16_t q = m / 10;
+    c[digit] = m - q * 10;
+    digit++;
+    m = q;
+  }
+  // digit is the total number of digits
+
+  // print with no justification
+  while (digit--) {
+    writeHexCharInternalAt(pos++, c[digit]);
+  }
+}
+
+} // ace_segment

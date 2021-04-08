@@ -83,10 +83,10 @@ there are 5 combinations possible:
 * LedMatrixDualShiftRegister + SwSpiAdapter
 * LedMatrixDualShiftRegister + HwSpiAdapter
 
-## SegmentDisplay
+## ScanningDisplay
 
 Writes the LED segment pattern for a digit to the LED module, using one of the
-`LedMatrix` classes. There are roughly 2 parts to the `SegmentDisplay` class:
+`LedMatrix` classes. There are roughly 2 parts to the `ScanningDisplay` class:
 
 1) It implements the externally facing `LedDisplay` interface which has methods
 that allow LED segment patterns for each digit to be written into an internal
@@ -105,19 +105,18 @@ it as if the entire LED module is lit up.
 
 Writer classes provide mappings between characters, numbers or digits into
 specific LED segment patterns using an internal "font" table. These classes use
-the `LedDisplay` interface (implemented by `SegmentDisplay`), so in theory,
+the `LedDisplay` interface (implemented by `ScanningDisplay`), so in theory,
 other types of LED displays could be used by these Writer classes.
 
-This library currently provides 3 Writer classes:
+This library currently provides 4 Writer classes:
 
-* `HexWriter(Renderer*)`
-    * `writeHexAt()`
-    * `writeBrightnessAt()`
-    * `writeDecimalPointAt()`
+* `NumberWriter(Renderer*)`
+    * `writeHexCharAt()`
+    * `writeHexByteAt()`
+    * `writeHexWordAt()`
+    * `writeDecWordAt()`
 * `CharWriter(Renderer*)`
     * `writeCharAt()`
-    * `writeBrightnessAt()`
-    * `writeDecimalPointAt()`
 * `StringWriter(Renderer*)`
     * `writeStringAt()`
 * `ClockWriter(Renderer*)`

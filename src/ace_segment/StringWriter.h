@@ -42,6 +42,11 @@ class StringWriter {
         mCharWriter(charWriter)
     {}
 
+    /** Get the underlying LedDisplay. */
+    LedDisplay& display() const {
+      return mCharWriter.display();
+    }
+
     /**
      * Write the string beginning at the specified position, filling up to
      * numDigits.
@@ -52,11 +57,6 @@ class StringWriter {
      *  characters in 's'
      */
     void writeStringAt(uint8_t pos, const char* s, bool padRight = false);
-
-    /** Get the underlying LedDisplay. */
-    LedDisplay& getLedDisplay() const {
-      return mCharWriter.getLedDisplay();
-    }
 
   private:
     // disable copy-constructor and assignment operator

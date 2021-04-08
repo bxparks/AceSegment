@@ -70,7 +70,7 @@ class ClockWriter {
     {}
 
     /** Get the underlying LedDisplay. */
-    LedDisplay& getLedDisplay() const {
+    LedDisplay& display() const {
       return mLedDisplay;
     }
 
