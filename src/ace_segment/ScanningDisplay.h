@@ -321,25 +321,27 @@ class ScanningDisplay : public LedDisplay {
   private:
     // Ordered to save space on 32-bit processors.
 
-    /** Indirection to the low level digitalWrite(), micros(). */
+    /** Indirection to the digitalWrite(), micros() hardware functions. */
     const HW& mHardware;
 
     /** LedMatrixBase instance that knows how to set and unset LED segments. */
     const LM& mLedMatrix;
 
-    /** Pattern for each digit. Not nullable. */
+    /** Pattern for each digit. */
     uint8_t mPatterns[DIGITS];
 
-    /** Brightness for each digit. Nullable. */
+    /** Brightness for each digit. Unused if SUBFIELDS <= 1. */
     uint8_t mBrightnesses[DIGITS];
 
     //-----------------------------------------------------------------------
-    // Variables needed to render frames and fields at a certain rate per
-    // second.
+    // Variables needed by renderFieldWhenReady() to render frames and fields at
+    // a certain rate per second.
     //-----------------------------------------------------------------------
 
-    // variables to support renderFieldWhenReady()
+    /** Number of micros between 2 successive calls to renderFieldNow(). */
     uint16_t mMicrosPerField;
+
+    /** Timestamp in micros of the last call to renderFieldNow(). */
     uint16_t mLastRenderFieldMicros;
 
     /** Number of full frames (all digits) rendered per second. */
