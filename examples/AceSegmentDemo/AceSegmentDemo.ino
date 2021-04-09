@@ -27,26 +27,36 @@ using namespace ace_button;
 #define LED_MATRIX_MODE_SINGLE_SW_SPI_FAST 7
 #define LED_MATRIX_MODE_DUAL_SW_SPI_FAST 8
 
-// LedClock buttons can be configured to use either pins (2, 3) or (8, 9)
-// through DIP switches. On the Pro Micro, (2, 3) are used for I2C. The LED
-// Module using Direct Digit Pins are wired to use (8, 9), so we must use (2,
-// 3) with that LED Module.
-const uint8_t MODE_BUTTON_PIN = 2;
-const uint8_t CHANGE_BUTTON_PIN = 3;
-
+// LedClock buttons are now hardwared to A2 and A3, instead of being configured
+// with dip switches to either (2,3) or (8,9). Since (2,3) are used by I2C, and
+// LED_MATRIX_MODE_DIRECT uses (8,9) pins for two of the LED segments/digits,
+// the only spare pins are A2 and A3. All other digital pins are taken.
+// Fortunately, the ATmega32U4 allows all analog pins to be used as digital
+// pins.
+//
+// For EpoxyDuino, the actual numbers don't matter, so let's set them to (2,3)
+// since I'm not sure if A2 and A3 are defined.
 #if defined(EPOXY_DUINO)
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
+  const uint8_t MODE_BUTTON_PIN = 2;
+  const uint8_t CHANGE_BUTTON_PIN = 3;
 #elif defined(AUNITER_LED_CLOCK_DIRECT)
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT_FAST
+  const uint8_t MODE_BUTTON_PIN = A2;
+  const uint8_t CHANGE_BUTTON_PIN = A3;
 #elif defined(AUNITER_LED_CLOCK_SINGLE)
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_SW_SPI
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_HW_SPI
   #define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_SW_SPI_FAST
+  const uint8_t MODE_BUTTON_PIN = A2;
+  const uint8_t CHANGE_BUTTON_PIN = A3;
 #elif defined(AUNITER_LED_CLOCK_DUAL)
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SW_SPI
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HW_SPI
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SW_SPI_FAST
+  const uint8_t MODE_BUTTON_PIN = A2;
+  const uint8_t CHANGE_BUTTON_PIN = A3;
 #else
   #error Unknown AUNITER environment
 #endif
@@ -57,11 +67,6 @@ const uint8_t CHANGE_BUTTON_PIN = 3;
 
 // Use polling or interrupt.
 #define USE_INTERRUPT 0
-
-// Print Stats. If USE_INTERRUPT is 0 (so using renderWhenReady()), writing to
-// Serial can cause the display to flicker due to timing jitters. Turning stats
-// off will make the display as smooth as the interrupt version.
-#define PRINT_STATS 0
 
 // Total field/second = FRAMES_PER_SECOND * NUM_SUBFIELDS * NUM_DIGITS
 //      = 60 * 64 * 4 = 15360 fields/sec = 65 micros/field
@@ -467,12 +472,6 @@ void nextDemo() {
 void demoLoop() {
   //static uint16_t iter = 0;
   static unsigned long lastUpdateTime = millis();
-
-#if PRINT_STATS == 1
-  static unsigned long stopWatchStart = lastUpdateTime;
-  static uint32_t loopCount = 0;
-  static uint16_t lastStatsCounter = 0;
-#endif
 
   uint16_t demoInternalDelay = DEMO_INTERNAL_DELAY[demoMode];
 
