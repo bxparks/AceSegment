@@ -119,7 +119,6 @@ class NumberWriter {
      *    * 0 means no boxing, printing from left
      *    * > 0 means right justified inside box
      *    * < 0 means left justified inside box
-     * @param padChar left-pad character, hexchar_t (default: kCharSpace)
      *
      * @return number of characters actually written, even if the characters
      *    bled over the end of the LED segments
@@ -127,15 +126,13 @@ class NumberWriter {
     uint8_t writeUnsignedDecimalAt(
         uint8_t pos,
         uint16_t num,
-        int8_t boxSize = 0,
-        hexchar_t padChar = kCharSpace);
+        int8_t boxSize = 0);
 
     /** Same as writeUnsignedDecimalAt() but prepends a '-' sign if negative. */
     uint8_t writeSignedDecimalAt(
         uint8_t pos,
         int16_t num,
-        int8_t boxSize = 0,
-        hexchar_t padChar = kCharSpace);
+        int8_t boxSize = 0);
 
     /**
      * Clear the display from `pos` to the end. Useful after calling
@@ -169,14 +166,12 @@ class NumberWriter {
      * position `pos`.
      *
      * @param boxSize if negative, left justified; if postive, right justified
-     * @param padChar left-pad character, hexchar_t, so usually 0 or kCharSpace
      */
     uint8_t writeHexCharsInsideBoxAt(
         uint8_t pos,
         const hexchar_t s[],
         uint8_t len,
-        int8_t boxSize,
-        hexchar_t padChar);
+        int8_t boxSize);
 
     /**
      * Convert the integer num to an array of HexChar in the provided buf, with
