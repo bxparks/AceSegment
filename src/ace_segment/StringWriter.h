@@ -38,27 +38,32 @@ namespace ace_segment {
 class StringWriter {
   public:
     /** Constructor. */
-    explicit StringWriter(CharWriter* charWriter):
+    explicit StringWriter(CharWriter& charWriter):
         mCharWriter(charWriter)
     {}
+
+    /** Get the underlying LedDisplay. */
+    LedDisplay& display() const {
+      return mCharWriter.display();
+    }
 
     /**
      * Write the string beginning at the specified position, filling up to
      * numDigits.
      *
-     * @param digit starting digit position, 0 on the left
+     * @param pos starting digit position, 0 on the left
      * @param s string to be rendered
      * @param padRight fill the right side with empty spaces if we run out of
      *  characters in 's'
      */
-    void writeStringAt(uint8_t digit, const char* s, bool padRight = false);
+    void writeStringAt(uint8_t pos, const char* s, bool padRight = false);
 
   private:
     // disable copy-constructor and assignment operator
     StringWriter(const StringWriter&) = delete;
     StringWriter& operator=(const StringWriter&) = delete;
 
-    CharWriter* const mCharWriter;
+    CharWriter& mCharWriter;
 };
 
 }

@@ -1,10 +1,7 @@
 var searchData=
 [
-  ['digitalwrite',['digitalWrite',['../classace__segment_1_1Hardware.html#a6a0afa1ca729e820ef2d822bfeb64d02',1,'ace_segment::Hardware']]],
-  ['digitdriver',['DigitDriver',['../classace__segment_1_1DigitDriver.html',1,'ace_segment::DigitDriver'],['../classace__segment_1_1DigitDriver.html#afec2d0670889cc44b3d9eeb9e583dbad',1,'ace_segment::DigitDriver::DigitDriver()']]],
-  ['digitpatterntype',['DigitPatternType',['../classace__segment_1_1Driver.html#a116d1569c86b24020e1ed5462d270eef',1,'ace_segment::Driver']]],
-  ['dimmablepattern',['DimmablePattern',['../classace__segment_1_1DimmablePattern.html',1,'ace_segment']]],
-  ['displaycurrentfield',['displayCurrentField',['../classace__segment_1_1DigitDriver.html#a6afa0a1a4f60cbe770d80e89bb80718e',1,'ace_segment::DigitDriver::displayCurrentField()'],['../classace__segment_1_1Driver.html#a2f7b1e5b1ce5beeff9b9e1d30368d2f4',1,'ace_segment::Driver::displayCurrentField()'],['../classace__segment_1_1ModulatingDigitDriver.html#abb0ae9078712fad0cb4350a3885a53a1',1,'ace_segment::ModulatingDigitDriver::displayCurrentField()'],['../classace__segment_1_1SegmentDriver.html#abe0415978d1d5d6f70f53a9087fc6f03',1,'ace_segment::SegmentDriver::displayCurrentField()']]],
-  ['driver',['Driver',['../classace__segment_1_1Driver.html',1,'ace_segment::Driver'],['../classace__segment_1_1Driver.html#a74ef7c76a7cf7476dd549c911161dbff',1,'ace_segment::Driver::Driver()']]],
-  ['driverbuilder',['DriverBuilder',['../classace__segment_1_1DriverBuilder.html',1,'ace_segment']]]
+  ['digitalwrite_6',['digitalWrite',['../classace__segment_1_1Hardware.html#a70c4de3d109c84b434a08a8d921ab164',1,'ace_segment::Hardware']]],
+  ['disablegroup_7',['disableGroup',['../classace__segment_1_1LedMatrixBase.html#a392418ec3a4e763920e21acc763e8848',1,'ace_segment::LedMatrixBase']]],
+  ['display_8',['display',['../classace__segment_1_1CharWriter.html#a040fedebff2340e6a7435de64ececf91',1,'ace_segment::CharWriter::display()'],['../classace__segment_1_1ClockWriter.html#ae94575a04a919a06149f778f1b3fca30',1,'ace_segment::ClockWriter::display()'],['../classace__segment_1_1NumberWriter.html#a3c57c816ce39986bbc508eddb2e0ac3c',1,'ace_segment::NumberWriter::display()'],['../classace__segment_1_1StringWriter.html#a4bb5339f4f67bd406366684ed1fae2ed',1,'ace_segment::StringWriter::display()']]],
+  ['draw_9',['draw',['../classace__segment_1_1LedMatrixBase.html#ad9d2bc50b50ab4b2c16c1ef53b3397d2',1,'ace_segment::LedMatrixBase::draw()'],['../classace__segment_1_1LedMatrixDualShiftRegister.html#ae5306fb89d5db7b817a4c923c00a3fd4',1,'ace_segment::LedMatrixDualShiftRegister::draw()']]]
 ];

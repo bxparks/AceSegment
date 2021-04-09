@@ -23,7 +23,6 @@ SOFTWARE.
 */
 
 #include <Arduino.h>
-#include "StyledPattern.h"
 #include "CharWriter.h"
 
 namespace ace_segment {
@@ -177,20 +176,12 @@ const uint8_t CharWriter::kCharacterArray[] PROGMEM = {
      UNKNOWN, /* (del) */
 };
 
-void CharWriter::writeCharAt(uint8_t digit, char c, uint8_t style) {
-  if (digit >= getNumDigits()) return;
+void CharWriter::writeCharAt(uint8_t pos, char c) {
+  if (pos >= mLedDisplay.getNumDigits()) return;
   uint8_t pattern = ((uint8_t) c < kNumCharacters)
       ? pgm_read_byte(&kCharacterArray[(uint8_t) c])
       : UNKNOWN;
-  mRenderer->writePatternAt(digit, pattern, style);
-}
-
-void CharWriter::writeCharAt(uint8_t digit, char c) {
-  if (digit >= getNumDigits()) return;
-  uint8_t pattern = ((uint8_t) c < kNumCharacters)
-      ? pgm_read_byte(&kCharacterArray[(uint8_t) c])
-      : UNKNOWN;
-  mRenderer->writePatternAt(digit, pattern);
+  mLedDisplay.writePatternAt(pos, pattern);
 }
 
 }

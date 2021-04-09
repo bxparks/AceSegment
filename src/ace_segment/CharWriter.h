@@ -26,43 +26,29 @@ SOFTWARE.
 #define ACE_SEGMENT_CHAR_WRITER_H
 
 #include <stdint.h>
-#include "StyledPattern.h"
-#include "Renderer.h"
+#include "LedDisplay.h"
 
 namespace ace_segment {
 
 /**
  * The CharWriter supports mapping of ASCII (0 - 127) characters to segment
- * patterns supported by Renderer.
+ * patterns supported by LedDisplay.
  */
 class CharWriter {
   public:
     static const uint8_t kNumCharacters = 128;
 
     /** Constructor. */
-    explicit CharWriter(Renderer* renderer):
-        mRenderer(renderer)
+    explicit CharWriter(LedDisplay& ledDisplay):
+        mLedDisplay(ledDisplay)
     {}
 
-    /** Get the number of digits. */
-    uint8_t getNumDigits() { return mRenderer->getNumDigits(); }
-
     /** Write the character at the specified position. */
-    void writeCharAt(uint8_t digit, char c);
+    void writeCharAt(uint8_t pos, char c);
 
-    /** Write the character at the specified position. */
-    void writeCharAt(uint8_t digit, char c, uint8_t style);
-
-    /** Write the style for a given digit, leaving character unchanged. */
-    void writeStyleAt(uint8_t digit, uint8_t style) {
-      if (digit >= getNumDigits()) return;
-      mRenderer->writeStyleAt(digit, style);
-    }
-
-    /** Write the decimal point at digit. */
-    void writeDecimalPointAt(uint8_t digit, bool state = true) {
-      if (digit >= getNumDigits()) return;
-      mRenderer->writeDecimalPointAt(digit, state);
+    /** Get the underlying LedDisplay. */
+    LedDisplay& display() const {
+      return mLedDisplay;
     }
 
   private:
@@ -73,7 +59,7 @@ class CharWriter {
     CharWriter(const CharWriter&) = delete;
     CharWriter& operator=(const CharWriter&) = delete;
 
-    Renderer* const mRenderer;
+    LedDisplay& mLedDisplay;
 };
 
 }

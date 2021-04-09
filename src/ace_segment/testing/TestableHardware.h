@@ -25,122 +25,38 @@ SOFTWARE.
 #ifndef ACE_SEGMENT_TESTABLE_HARDWARE_H
 #define ACE_SEGMENT_TESTABLE_HARDWARE_H
 
-#include "../Hardware.h"
+#include "EventLog.h"
 
 namespace ace_segment {
 namespace testing {
 
-/** A record of one Hardware event. */
-class Event {
+class TestableHardware {
   public:
-    static const uint8_t kTypeDigitalWrite = 0;
-    static const uint8_t kTypePinMode = 1;
-    static const uint8_t kTypeShiftOut = 2;
-    static const uint8_t kTypeSpiBegin = 3;
-    static const uint8_t kTypeSpiTransfer = 4;
-    static const uint8_t kTypeSpiEnd = 5;
+    explicit TestableHardware() {}
 
-    uint8_t type; // arg0
-    uint8_t arg1;
-    uint8_t arg2;
-    uint8_t arg3;
-    uint8_t arg4;
-};
+    unsigned long micros() const { return mMicros; }
 
-class TestableHardware: public Hardware {
-  public:
-    explicit TestableHardware():
-      mNumRecords(0)
-    {}
+    unsigned long millis() const { return mMillis; }
 
-    virtual ~TestableHardware() {}
-
-    virtual unsigned long micros() override { return mMicros; }
-
-    virtual unsigned long millis() override { return mMillis; }
-
-    virtual void pinMode(uint8_t pin, uint8_t mode) override {
-      if (mNumRecords < kMaxRecords) {
-        Event& event = mEvents[mNumRecords];
-        event.type = Event::kTypePinMode;
-        event.arg1 = pin;
-        event.arg2 = mode;
-        mNumRecords++;
-      }
+    void pinMode(uint8_t pin, uint8_t mode) const {
+      mEventLog.addPinMode(pin, mode);
     }
 
-    virtual void digitalWrite(uint8_t pin, uint8_t value) override {
-      if (mNumRecords < kMaxRecords) {
-        Event& event = mEvents[mNumRecords];
-        event.type = Event::kTypeDigitalWrite;
-        event.arg1 = pin;
-        event.arg2 = value;
-        mNumRecords++;
-      }
+    void digitalWrite(uint8_t pin, uint8_t value) const {
+      mEventLog.addDigitalWrite(pin, value);
     }
 
-    virtual void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder,
-        uint8_t value) override {
-      if (mNumRecords < kMaxRecords) {
-        Event& event = mEvents[mNumRecords];
-        event.type = Event::kTypeShiftOut;
-        event.arg1 = dataPin;
-        event.arg2 = clockPin;
-        event.arg3 = bitOrder;
-        event.arg4 = value;
-        mNumRecords++;
-      }
-    }
-
-    virtual void spiBegin() override {
-      if (mNumRecords < kMaxRecords) {
-        Event& event = mEvents[mNumRecords];
-        event.type = Event::kTypeSpiBegin;
-        mNumRecords++;
-      }
-    }
-
-    virtual void spiEnd() override {
-      if (mNumRecords < kMaxRecords) {
-        Event& event = mEvents[mNumRecords];
-        event.type = Event::kTypeSpiEnd;
-        mNumRecords++;
-      }
-    }
-
-    virtual void spiTransfer(uint8_t value) override {
-      if (mNumRecords < kMaxRecords) {
-        Event& event = mEvents[mNumRecords];
-        event.type = Event::kTypeSpiTransfer;
-        event.arg1 = value;
-        mNumRecords++;
-      }
-    }
-
-    // test routines
+    // methods to set what this object returns
 
     void setMicros(unsigned long micros) { mMicros = micros; }
 
     void setMillis(unsigned long millis) { mMillis = millis; }
 
-    void clear() { mNumRecords = 0; }
-
-    uint8_t getNumRecords() { return mNumRecords; }
-
-    Event& getEvent(int i) { return mEvents[i]; }
-
-  private:
-    static const int kMaxRecords = 32;
-
-    // Disable copy-constructor and assignment operator
-    TestableHardware(const TestableHardware&) = delete;
-    TestableHardware& operator=(const TestableHardware&) = delete;
-
+  public:
     unsigned long mMillis;
     unsigned long mMicros;
 
-    Event mEvents[kMaxRecords];
-    uint8_t mNumRecords;
+    mutable EventLog mEventLog;
 };
 
 } // namespace testing

@@ -1,0 +1,354 @@
+# Memory Benchmark
+
+The `MemoryBenchmark.ino` compiles example code snippets using the various
+CRC algorithms. The `FEATURE` macro flag controls which feature is
+compiled. The `collect.sh` edits this `FEATURE` flag programmatically, then runs
+the Arduino IDE compiler on the program, and extracts the flash and static
+memory usage into a text file (e.g. `nano.txt`).
+
+The numbers shown below should be considered to be rough estimates. It is often
+difficult to separate out the code size of the library from the overhead imposed
+by the runtime environment of the processor. For example, it often seems like
+the ESP8266 allocates flash memory in blocks of a certain quantity, so the
+calculated flash size can jump around in unexpected ways.
+
+**Version**: AceSegment v0.4
+
+**DO NOT EDIT**: This file was auto-generated using `make README.md`.
+
+## How to Generate
+
+This requires the [AUniter](https://github.com/bxparks/AUniter) script
+to execute the Arduino IDE programmatically.
+
+The `Makefile` has rules for several microcontrollers:
+
+```
+$ make benchmarks
+```
+produces the following files:
+
+```
+nano.txt
+micro.txt
+samd.txt
+stm32.txt
+esp8266.txt
+esp32.txt
+teensy32.txt
+```
+
+The `generate_table.awk` program reads one of `*.txt` files and prints out an
+ASCII table that can be directly embedded into this README.md file. For example
+the following command produces the table in the Nano section below:
+
+```
+$ ./generate_table.awk < nano.txt
+```
+
+Fortunately, we no longer need to run `generate_table.awk` for each `*.txt`
+file. The process has been automated using the `generate_readme.py` script which
+will be invoked by the following command:
+```
+$ make README.md
+```
+
+## Algorithms
+
+* 0 `baseline`: program does (almost) nothing
+* 1 `direct`: segment and digit pins are wired directly
+* 2 `split_sw_spi`: segment pins wired directly, digit pins through SW SPI
+* 3 `split_hw_spi`: segment pins wired directly, digit pins through HW SPI
+* 4 `merged_sw_spi`: segment and digit pins both controlled through SW SPI
+* 5 `merged_hw_spi`: segment and digit pins both controlled through HW SPI
+
+## Library Size Changes
+
+**v0.3**
+
+* Initial MemoryBenchmark using the old v0.3 implementation from 2018,
+before substantional refactoring in 2021.
+
+**v0.4**
+
+* Reduce flash size from 4.0-4.4kB by about 200-500 bytes on AVR by
+  simplifying `LedMatrix` class hierarchy by extracting out the `SpiAdapter`
+  class to handle both hardware and software SPI, instead of calling
+  `shiftOut()` directly.
+* Reduce flash size from 3.8-4.2kB down 800-1000 bytes on AVR by
+  simplifying the `Driver` class hierarchy into a single `Renderer` class, by
+  making the `LedMatrix` class into a better abstraction and unifying the API
+  into a single `draw(group, elementPattern)` method.
+* Reduce flash by 20-50 bytes on AVR by merging `Renderer` into
+  `ScanningDisplay`.
+* Reduce flash by 100-200 bytes on AVR, SAMD21, STM32 and ESP8266 by
+  templatizing the `ScanningDisplay` on `NUM_DIGITS` and `NUM_SUBFIELDS`, and
+  merging `patterns` and `brightnesses` arrays directly into `ScanningDisplay`.
+  Flash usage actually goes up by ~40 bytes on Teensy3.2, but it has enough
+  flash memory.
+* Reduce flash by 300-350 bytes on AVR (~150 on SAMD, 150-500 bytes on STM32,
+  ~250 bytes on ESP8266, 300-600 bytes on ESP32) by templatizing LedMatrix
+  and ScanningDisplay on `NUM_DIGITS`, `NUM_SUBFIELDS`, `Hardware` class,
+  `SwSpiAdapter` and `HwSpiAdapter`.
+* Reduce flash by flattening the `LedMatrix` hierarchy into templatized
+  classes, and removing virtual methods. Saves 250-300 bytes on AVR, 150-200 on
+  SAMD, 150-300 on STM32, 200-300 on ESP8266, 300-1300 bytes on ESP32, 800-1300
+  bytes on Teensy 3.2.
+* Reduce flash by 250-400 bytes on AVR by providing ability to use
+  `digitalWriteFast()` (https://github.com/NicksonYap/digitalWriteFast) using
+  the `fast/LedMatrixDirectFast.h` and `fast/SwSpiAdapterFast.h` classes.
+* Total flash size saved is around 2kB for AVR, from (4 to 4.4) kB to (2 to 2.5)
+  kB.
+* Reduce flash size by 828 bytes on AVR, 3kB on ESP8266, 5kB on ESP32 in commit
+  c5da272 which simplified the test classes under `src/ace_segment/testing/` so
+  that they no longer inherit from `TestOnce` classes in the `AUnit` library.
+  Apparently, just making a reference to AUnit causes the `Serial` instance of
+  the `HardwareSerial` class to be pulled in. The compiler/linker is not able to
+  detect that it is actually never used, so it keeps around the code for the
+  HardwareSerial class. (I will make a fix to AUnit so that the `HardwareSerial`
+  will not be pulled in by other libraries in the future.)
+* Reduce flash size by ~130 bytes on AVR and 70-80 bytes on 32-bit processors
+  by removing the pointer to `TimingStats` from `ScanningDisplay`. The pointer
+  causes the code for the `TimingStats` class to be pulled in, even if it is not
+  used.
+
+## Results
+
+The following shows the flash and static memory sizes of the `MemoryBenchmark`
+program that includes the resources needed to perform a
+`ScanningDisplay::renderFieldWhenReady()`. This includes:
+
+* `Hardware` (which is opimized away by the compiler)
+* `SwSpiAdapter` or `HwSpiAdapter`
+* `LedMatrixXxx`
+* `ScanningDisplay`
+* `NumberWriter`
+* `ClockWriter`
+* `CharWriter`
+* `StringWriter`
+
+The `StubDisplay` is a dummy subclass of `LedDisplay` needed to create the
+various Writers. To get a better flash consumption of the Writer classes, this
+stub class should be subtracted from the numbers below. (Ideally, the
+`generate_table.awk` script should do this automatically, but I'm trying to keep
+that script more general to avoid maintenance overhead when it is copied into
+other `MemoryBenchmark` programs.)
+
+### Arduino Nano
+
+* 16MHz ATmega328P
+* Arduino IDE 1.8.13
+* Arduino AVR Boards 1.8.3
+
+```
++--------------------------------------------------------------+
+| functionality                   |  flash/  ram |       delta |
+|---------------------------------+--------------+-------------|
+| baseline                        |    456/   11 |     0/    0 |
+|---------------------------------+--------------+-------------|
+| direct                          |   1674/   78 |  1218/   67 |
+| single_sw_spi                   |   1680/   72 |  1224/   61 |
+| single_hw_spi                   |   1742/   73 |  1286/   62 |
+| dual_sw_spi                     |   1564/   63 |  1108/   52 |
+| dual_hw_spi                     |   1638/   64 |  1182/   53 |
+|---------------------------------+--------------+-------------|
+| direct_fast                     |   1410/  106 |   954/   95 |
+| single_sw_fast                  |   1572/   70 |  1116/   59 |
+| dual_sw_fast                    |   1172/   61 |   716/   50 |
+|---------------------------------+--------------+-------------|
+| StubDisplay                     |    522/   11 |    66/    0 |
+| NumberWriter+Stub               |    678/   34 |   222/   23 |
+| ClockWriter+Stub                |    778/   35 |   322/   24 |
+| CharWriter+Stub                 |    778/   34 |   322/   23 |
+| StringWriter+Stub               |    926/   42 |   470/   31 |
++--------------------------------------------------------------+
+
+```
+
+### Sparkfun Pro Micro
+
+* 16 MHz ATmega32U4
+* Arduino IDE 1.8.13
+* SparkFun AVR Boards 1.1.13
+
+```
++--------------------------------------------------------------+
+| functionality                   |  flash/  ram |       delta |
+|---------------------------------+--------------+-------------|
+| baseline                        |   3472/  151 |     0/    0 |
+|---------------------------------+--------------+-------------|
+| direct                          |   4668/  218 |  1196/   67 |
+| single_sw_spi                   |   4676/  212 |  1204/   61 |
+| single_hw_spi                   |   4738/  213 |  1266/   62 |
+| dual_sw_spi                     |   4560/  203 |  1088/   52 |
+| dual_hw_spi                     |   4634/  204 |  1162/   53 |
+|---------------------------------+--------------+-------------|
+| direct_fast                     |   4290/  246 |   818/   95 |
+| single_sw_fast                  |   4568/  210 |  1096/   59 |
+| dual_sw_fast                    |   4052/  201 |   580/   50 |
+|---------------------------------+--------------+-------------|
+| StubDisplay                     |   3536/  151 |    64/    0 |
+| NumberWriter+Stub               |   3634/  174 |   162/   23 |
+| ClockWriter+Stub                |   3734/  175 |   262/   24 |
+| CharWriter+Stub                 |   3734/  174 |   262/   23 |
+| StringWriter+Stub               |   3882/  182 |   410/   31 |
++--------------------------------------------------------------+
+
+```
+
+### SAMD21 M0 Mini
+
+* 48 MHz ARM Cortex-M0+
+* Arduino IDE 1.8.13
+* Sparkfun SAMD Core 1.8.1
+
+```
++--------------------------------------------------------------+
+| functionality                   |  flash/  ram |       delta |
+|---------------------------------+--------------+-------------|
+| baseline                        |  10064/    0 |     0/    0 |
+|---------------------------------+--------------+-------------|
+| direct                          |  10912/    0 |   848/    0 |
+| single_sw_spi                   |  10968/    0 |   904/    0 |
+| single_hw_spi                   |  11416/    0 |  1352/    0 |
+| dual_sw_spi                     |  10856/    0 |   792/    0 |
+| dual_hw_spi                     |  11376/    0 |  1312/    0 |
+|---------------------------------+--------------+-------------|
+| direct_fast                     |     -1/   -1 |    -1/   -1 |
+| single_sw_fast                  |     -1/   -1 |    -1/   -1 |
+| dual_sw_fast                    |     -1/   -1 |    -1/   -1 |
+|---------------------------------+--------------+-------------|
+| StubDisplay                     |  10360/    0 |   296/    0 |
+| NumberWriter+Stub               |  10688/    0 |   624/    0 |
+| ClockWriter+Stub                |  10464/    0 |   400/    0 |
+| CharWriter+Stub                 |  10536/    0 |   472/    0 |
+| StringWriter+Stub               |  10688/    0 |   624/    0 |
++--------------------------------------------------------------+
+
+```
+
+### STM32 Blue Pill
+
+* STM32F103C8, 72 MHz ARM Cortex-M3
+* Arduino IDE 1.8.13
+* STM32duino 1.9.0
+
+```
++--------------------------------------------------------------+
+| functionality                   |  flash/  ram |       delta |
+|---------------------------------+--------------+-------------|
+| baseline                        |  19136/ 3788 |     0/    0 |
+|---------------------------------+--------------+-------------|
+| direct                          |  21644/ 4016 |  2508/  228 |
+| single_sw_spi                   |  21708/ 4020 |  2572/  232 |
+| single_hw_spi                   |  23448/ 4020 |  4312/  232 |
+| dual_sw_spi                     |  21604/ 4012 |  2468/  224 |
+| dual_hw_spi                     |  23388/ 4012 |  4252/  224 |
+|---------------------------------+--------------+-------------|
+| direct_fast                     |     -1/   -1 |    -1/   -1 |
+| single_sw_fast                  |     -1/   -1 |    -1/   -1 |
+| dual_sw_fast                    |     -1/   -1 |    -1/   -1 |
+|---------------------------------+--------------+-------------|
+| StubDisplay                     |  19352/ 3948 |   216/  160 |
+| NumberWriter+Stub               |  19628/ 3952 |   492/  164 |
+| ClockWriter+Stub                |  19480/ 3956 |   344/  168 |
+| CharWriter+Stub                 |  19524/ 3952 |   388/  164 |
+| StringWriter+Stub               |  19668/ 3956 |   532/  168 |
++--------------------------------------------------------------+
+
+```
+
+### ESP8266
+
+* NodeMCU 1.0, 80MHz ESP8266
+* Arduino IDE 1.8.13
+* ESP8266 Boards 2.7.4
+
+```
++--------------------------------------------------------------+
+| functionality                   |  flash/  ram |       delta |
+|---------------------------------+--------------+-------------|
+| baseline                        | 256700/26784 |     0/    0 |
+|---------------------------------+--------------+-------------|
+| direct                          | 257924/26860 |  1224/   76 |
+| single_sw_spi                   | 258012/26868 |  1312/   84 |
+| single_hw_spi                   | 259116/26876 |  2416/   92 |
+| dual_sw_spi                     | 257864/26848 |  1164/   64 |
+| dual_hw_spi                     | 259064/26856 |  2364/   72 |
+|---------------------------------+--------------+-------------|
+| direct_fast                     |     -1/   -1 |    -1/   -1 |
+| single_sw_fast                  |     -1/   -1 |    -1/   -1 |
+| dual_sw_fast                    |     -1/   -1 |    -1/   -1 |
+|---------------------------------+--------------+-------------|
+| StubDisplay                     | 256900/26792 |   200/    8 |
+| NumberWriter+Stub               | 257396/26792 |   696/    8 |
+| ClockWriter+Stub                | 257140/26800 |   440/   16 |
+| CharWriter+Stub                 | 257108/26792 |   408/    8 |
+| StringWriter+Stub               | 257308/26816 |   608/   32 |
++--------------------------------------------------------------+
+
+```
+
+### ESP32
+
+* ESP32-01 Dev Board, 240 MHz Tensilica LX6
+* Arduino IDE 1.8.13
+* ESP32 Boards 1.0.4
+
+```
++--------------------------------------------------------------+
+| functionality                   |  flash/  ram |       delta |
+|---------------------------------+--------------+-------------|
+| baseline                        | 197730/13100 |     0/    0 |
+|---------------------------------+--------------+-------------|
+| direct                          | 200604/13396 |  2874/  296 |
+| single_sw_spi                   | 200664/13396 |  2934/  296 |
+| single_hw_spi                   | 202956/13444 |  5226/  344 |
+| dual_sw_spi                     | 200532/13388 |  2802/  288 |
+| dual_hw_spi                     | 202896/13436 |  5166/  336 |
+|---------------------------------+--------------+-------------|
+| direct_fast                     |     -1/   -1 |    -1/   -1 |
+| single_sw_fast                  |     -1/   -1 |    -1/   -1 |
+| dual_sw_fast                    |     -1/   -1 |    -1/   -1 |
+|---------------------------------+--------------+-------------|
+| StubDisplay                     | 199210/13168 |  1480/   68 |
+| NumberWriter+Stub               | 199586/13176 |  1856/   76 |
+| ClockWriter+Stub                | 199450/13176 |  1720/   76 |
+| CharWriter+Stub                 | 199434/13176 |  1704/   76 |
+| StringWriter+Stub               | 199582/13176 |  1852/   76 |
++--------------------------------------------------------------+
+
+```
+
+### Teensy 3.2
+
+* 96 MHz ARM Cortex-M4
+* Arduino IDE 1.8.13
+* Teensyduino 1.53
+* Compiler options: "Faster"
+
+```
++--------------------------------------------------------------+
+| functionality                   |  flash/  ram |       delta |
+|---------------------------------+--------------+-------------|
+| baseline                        |   7624/ 3048 |     0/    0 |
+|---------------------------------+--------------+-------------|
+| direct                          |  12112/ 4204 |  4488/ 1156 |
+| single_sw_spi                   |  12164/ 4208 |  4540/ 1160 |
+| single_hw_spi                   |  13404/ 4264 |  5780/ 1216 |
+| dual_sw_spi                     |  12088/ 4200 |  4464/ 1152 |
+| dual_hw_spi                     |  13292/ 4256 |  5668/ 1208 |
+|---------------------------------+--------------+-------------|
+| direct_fast                     |     -1/   -1 |    -1/   -1 |
+| single_sw_fast                  |     -1/   -1 |    -1/   -1 |
+| dual_sw_fast                    |     -1/   -1 |    -1/   -1 |
+|---------------------------------+--------------+-------------|
+| StubDisplay                     |  10940/ 4156 |  3316/ 1108 |
+| NumberWriter+Stub               |  11344/ 4160 |  3720/ 1112 |
+| ClockWriter+Stub                |  11068/ 4164 |  3444/ 1116 |
+| CharWriter+Stub                 |  11112/ 4160 |  3488/ 1112 |
+| StringWriter+Stub               |  11280/ 4164 |  3656/ 1116 |
++--------------------------------------------------------------+
+
+```
+

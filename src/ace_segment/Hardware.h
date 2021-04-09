@@ -27,65 +27,43 @@ SOFTWARE.
 
 #include <stdint.h>
 #include <Arduino.h>
-#include <SPI.h>
 
 namespace ace_segment {
 
+/**
+ * Class that provides a layer of indirection to various hardware pins and
+ * timing class. A different Hardware class can be used as a template parameter
+ * to ScanningDisplay.
+ */
 class Hardware {
   public:
-    /** Constructor. */
-    Hardware() {}
-
-    /** Destructor. */
-    virtual ~Hardware() {}
-
     /** Write value to pin. */
-    virtual void digitalWrite(uint8_t pin, uint8_t value) {
+    void digitalWrite(uint8_t pin, uint8_t value) const {
+    #if defined(ARDUINO_API_VERSION)
+      arduino::digitalWrite(pin, value);
+    #else
       ::digitalWrite(pin, value);
+    #endif
     }
 
     /** Set pin mode. */
-    virtual void pinMode(uint8_t pin, uint8_t mode) {
+    void pinMode(uint8_t pin, uint8_t mode) const {
+    #if defined(ARDUINO_API_VERSION)
+      arduino::pinMode(pin, mode);
+    #else
       ::pinMode(pin, mode);
-    }
-
-    /** Shift out. */
-    virtual void shiftOut(uint8_t dataPin, uint8_t clockPin, uint8_t bitOrder,
-        uint8_t value) {
-      ::shiftOut(dataPin, clockPin, bitOrder, value);
+    #endif
     }
 
     /** Get the current micros  */
-    virtual unsigned long micros() {
+    unsigned long micros() const {
       return ::micros();
     }
 
     /** Get the current millis  */
-    virtual unsigned long millis() {
+    unsigned long millis() const {
       return ::millis();
     }
-
-    /** Begin SPI. */
-    virtual void spiBegin() {
-      SPI.begin();
-    }
-
-    /** End SPI. */
-    virtual void spiEnd() {
-      SPI.end();
-    }
-
-    /** Send byte through SPI. */
-    virtual void spiTransfer(uint8_t value) {
-      SPI.beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
-      SPI.transfer(value);
-      SPI.endTransaction();
-    }
-
-  private:
-    // disable copy-constructor and assignment operator
-    Hardware(const Hardware&) = delete;
-    Hardware& operator=(const Hardware&) = delete;
 };
 
 }

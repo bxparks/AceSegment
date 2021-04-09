@@ -1,59 +1,264 @@
 #line 2 "LedMatrixTest.ino"
 
 /*
-MIT License
-
-Copyright (c) 2018 Brian T. Park
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
+ * MIT License
+ * Copyright (c) 2021 Brian T. Park
+ */
 
 #include <stdarg.h>
-#include <AUnit.h>
+#include <Arduino.h>
+#include <AUnitVerbose.h>
 #include <AceSegment.h>
-#include <ace_segment/LedMatrixDirect.h>
-#include <ace_segment/LedMatrixSerial.h>
-#include <ace_segment/LedMatrixSpi.h>
 #include <ace_segment/testing/TestableHardware.h>
-#include <ace_segment/testing/BaseHardwareTest.h>
+#include <ace_segment/testing/TestableSpiAdapter.h>
 
-using namespace aunit;
+using aunit::TestRunner;
+using aunit::TestOnce;
 using namespace ace_segment;
 using namespace ace_segment::testing;
 
-const int8_t DIGIT_ON = LOW;
-const int8_t DIGIT_OFF = HIGH;
-const int8_t SEGMENT_ON = HIGH;
-const int8_t SEGMENT_OFF = LOW;
-
 const int8_t NUM_DIGITS = 4;
 const int8_t NUM_SEGMENTS = 8;
-const uint16_t FRAMES_PER_SECOND = 60;
-const int8_t NUM_SUB_FIELDS = 3;
-const uint8_t digitPins[NUM_DIGITS] = {0, 1, 2, 3};
-const uint8_t segmentPins[8] = {4, 5, 6, 7, 8, 9, 10, 11};
-const uint8_t latchPin = 12;
-const uint8_t dataPin = 13;
-const uint8_t clockPin = 14;
+const uint8_t DIGIT_PINS[NUM_DIGITS] = {0, 1, 2, 3};
+const uint8_t SEGMENT_PINS[8] = {4, 5, 6, 7, 8, 9, 10, 11};
+
+// Common Cathode, with transistors on Group pins
+TestableHardware hardware;
+LedMatrixDirect<TestableHardware> ledMatrixDirect(
+    hardware,
+    LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
+    LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
+    NUM_DIGITS,
+    DIGIT_PINS,
+    NUM_SEGMENTS,
+    SEGMENT_PINS);
+
+// Common Cathode, with transistors on Group pins
+TestableSpiAdapter spiAdapter;
+LedMatrixSingleShiftRegister<TestableHardware, TestableSpiAdapter>
+  ledMatrixSingleShiftRegister(
+    hardware,
+    spiAdapter,
+    LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
+    LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
+    NUM_DIGITS,
+    DIGIT_PINS);
+
+// Common Cathode, with transistors on Group pins
+LedMatrixDualShiftRegister<TestableSpiAdapter> ledMatrixDualShiftRegister(
+    spiAdapter,
+    LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
+    LedMatrixBase::kActiveHighPattern /*elementOnPattern*/);
+
+// ----------------------------------------------------------------------
+// Tests for LedMatrixSplitDirect.
+// ----------------------------------------------------------------------
+
+class LedMatrixDirectTest : public TestOnce {
+  protected:
+    void setup() override {
+      ledMatrixDirect.begin();
+      hardware.mEventLog.clear();
+    }
+};
+
+testF(LedMatrixDirectTest, begin) {
+  ledMatrixDirect.begin();
+  assertEqual(24, hardware.mEventLog.getNumRecords());
+  assertTrue(hardware.mEventLog.assertEvents(24,
+      (int) EventType::kPinMode, 0, OUTPUT,
+      (int) EventType::kDigitalWrite, 0, LOW,
+      (int) EventType::kPinMode, 1, OUTPUT,
+      (int) EventType::kDigitalWrite, 1, LOW,
+      (int) EventType::kPinMode, 2, OUTPUT,
+      (int) EventType::kDigitalWrite, 2, LOW,
+      (int) EventType::kPinMode, 3, OUTPUT,
+      (int) EventType::kDigitalWrite, 3, LOW,
+
+      (int) EventType::kPinMode, 4, OUTPUT,
+      (int) EventType::kDigitalWrite, 4, LOW,
+      (int) EventType::kPinMode, 5, OUTPUT,
+      (int) EventType::kDigitalWrite, 5, LOW,
+      (int) EventType::kPinMode, 6, OUTPUT,
+      (int) EventType::kDigitalWrite, 6, LOW,
+      (int) EventType::kPinMode, 7, OUTPUT,
+      (int) EventType::kDigitalWrite, 7, LOW,
+      (int) EventType::kPinMode, 8, OUTPUT,
+      (int) EventType::kDigitalWrite, 8, LOW,
+      (int) EventType::kPinMode, 9, OUTPUT,
+      (int) EventType::kDigitalWrite, 9, LOW,
+      (int) EventType::kPinMode, 10, OUTPUT,
+      (int) EventType::kDigitalWrite, 10, LOW,
+      (int) EventType::kPinMode, 11, OUTPUT,
+      (int) EventType::kDigitalWrite, 11, LOW
+  ));
+}
+
+testF(LedMatrixDirectTest, end) {
+  ledMatrixDirect.end();
+  assertEqual(12, hardware.mEventLog.getNumRecords());
+  assertTrue(hardware.mEventLog.assertEvents(12,
+      (int) EventType::kPinMode, 0, INPUT,
+      (int) EventType::kPinMode, 1, INPUT,
+      (int) EventType::kPinMode, 2, INPUT,
+      (int) EventType::kPinMode, 3, INPUT,
+      (int) EventType::kPinMode, 4, INPUT,
+      (int) EventType::kPinMode, 5, INPUT,
+      (int) EventType::kPinMode, 6, INPUT,
+      (int) EventType::kPinMode, 7, INPUT,
+      (int) EventType::kPinMode, 8, INPUT,
+      (int) EventType::kPinMode, 9, INPUT,
+      (int) EventType::kPinMode, 10, INPUT,
+      (int) EventType::kPinMode, 11, INPUT
+  ));
+}
+
+testF(LedMatrixDirectTest, enableGroup) {
+  ledMatrixDirect.enableGroup(1);
+  assertEqual(1, hardware.mEventLog.getNumRecords());
+  assertTrue(hardware.mEventLog.assertEvents(1,
+      (int) EventType::kDigitalWrite, 1, HIGH));
+}
+
+testF(LedMatrixDirectTest, disableGroup) {
+  ledMatrixDirect.disableGroup(1);
+  assertEqual(1, hardware.mEventLog.getNumRecords());
+  assertTrue(hardware.mEventLog.assertEvents(1,
+      (int) EventType::kDigitalWrite, 1, LOW));
+}
+
+testF(LedMatrixDirectTest, drawElements) {
+  ledMatrixDirect.drawElements(0x55);
+  assertEqual(8, hardware.mEventLog.getNumRecords());
+  assertTrue(hardware.mEventLog.assertEvents(8,
+      (int) EventType::kDigitalWrite, 4, HIGH,
+      (int) EventType::kDigitalWrite, 5, LOW,
+      (int) EventType::kDigitalWrite, 6, HIGH,
+      (int) EventType::kDigitalWrite, 7, LOW,
+      (int) EventType::kDigitalWrite, 8, HIGH,
+      (int) EventType::kDigitalWrite, 9, LOW,
+      (int) EventType::kDigitalWrite, 10, HIGH,
+      (int) EventType::kDigitalWrite, 11, LOW
+  ));
+}
+
+// ----------------------------------------------------------------------
+// Tests for LedMatrixSingleShiftRegister.
+// ----------------------------------------------------------------------
+
+class LedMatrixSingleShiftRegisterTest : public TestOnce {
+  protected:
+    void setup() override {
+      ledMatrixSingleShiftRegister.begin();
+      hardware.mEventLog.clear();
+    }
+};
+
+testF(LedMatrixSingleShiftRegisterTest, begin) {
+  ledMatrixSingleShiftRegister.begin();
+  assertEqual(8, hardware.mEventLog.getNumRecords());
+  assertTrue(hardware.mEventLog.assertEvents(8,
+      (int) EventType::kPinMode, 0, OUTPUT,
+      (int) EventType::kDigitalWrite, 0, LOW,
+      (int) EventType::kPinMode, 1, OUTPUT,
+      (int) EventType::kDigitalWrite, 1, LOW,
+      (int) EventType::kPinMode, 2, OUTPUT,
+      (int) EventType::kDigitalWrite, 2, LOW,
+      (int) EventType::kPinMode, 3, OUTPUT,
+      (int) EventType::kDigitalWrite, 3, LOW));
+}
+
+testF(LedMatrixSingleShiftRegisterTest, end) {
+  ledMatrixSingleShiftRegister.end();
+  assertEqual(4, hardware.mEventLog.getNumRecords());
+  assertTrue(hardware.mEventLog.assertEvents(4,
+      (int) EventType::kPinMode, 0, INPUT,
+      (int) EventType::kPinMode, 1, INPUT,
+      (int) EventType::kPinMode, 2, INPUT,
+      (int) EventType::kPinMode, 3, INPUT));
+
+}
+
+testF(LedMatrixSingleShiftRegisterTest, enableGroup) {
+  ledMatrixSingleShiftRegister.enableGroup(1);
+  assertEqual(1, hardware.mEventLog.getNumRecords());
+  assertTrue(hardware.mEventLog.assertEvents(1,
+      (int) EventType::kDigitalWrite, 1, HIGH));
+}
+
+testF(LedMatrixSingleShiftRegisterTest, disableGroup) {
+  ledMatrixSingleShiftRegister.disableGroup(1);
+  assertEqual(1, hardware.mEventLog.getNumRecords());
+  assertTrue(hardware.mEventLog.assertEvents(1,
+      (int) EventType::kDigitalWrite, 1, LOW));
+}
+
+testF(LedMatrixSingleShiftRegisterTest, drawElements) {
+  ledMatrixSingleShiftRegister.drawElements(0x55);
+  assertEqual(1, spiAdapter.mEventLog.getNumRecords());
+  assertTrue(spiAdapter.mEventLog.assertEvents(1,
+      (int) EventType::kSpiTransfer, 0x55
+  ));
+}
+
+// ----------------------------------------------------------------------
+// Tests for LedMatrixSplitSpi.
+// ----------------------------------------------------------------------
+
+class LedMatrixDualShiftRegisterTest : public TestOnce {
+  protected:
+    void setup() override {
+      ledMatrixDualShiftRegister.begin();
+      spiAdapter.mEventLog.clear();
+    }
+};
+
+testF(LedMatrixDualShiftRegisterTest, begin) {
+  ledMatrixDualShiftRegister.begin();
+  assertEqual(0, spiAdapter.mEventLog.getNumRecords());
+}
+
+testF(LedMatrixDualShiftRegisterTest, end) {
+  ledMatrixDualShiftRegister.end();
+  assertEqual(0, spiAdapter.mEventLog.getNumRecords());
+}
+
+testF(LedMatrixDualShiftRegisterTest, enableGroup) {
+  ledMatrixDualShiftRegister.mPrevElementPattern = 0x42;
+  ledMatrixDualShiftRegister.enableGroup(1);
+
+  assertEqual(1, spiAdapter.mEventLog.getNumRecords());
+  uint16_t expectedOutput = ((0x1 << 1) << 8) | 0x42;
+  assertTrue(spiAdapter.mEventLog.assertEvents(1,
+      (int) EventType::kSpiTransfer16, expectedOutput));
+}
+
+testF(LedMatrixDualShiftRegisterTest, disableGroup) {
+  ledMatrixDualShiftRegister.disableGroup(2);
+
+  assertEqual(1, spiAdapter.mEventLog.getNumRecords());
+  uint16_t expectedOutput = 0x0000;
+  assertTrue(spiAdapter.mEventLog.assertEvents(1,
+      (int) EventType::kSpiTransfer16, expectedOutput));
+}
+
+testF(LedMatrixDualShiftRegisterTest, draw) {
+  ledMatrixDualShiftRegister.draw(3, 0x55);
+
+  uint16_t expectedOutput = ((0x1 << 3) << 8) | 0x55;
+  assertEqual(1, spiAdapter.mEventLog.getNumRecords());
+  assertTrue(spiAdapter.mEventLog.assertEvents(1,
+    (int) EventType::kSpiTransfer16, expectedOutput
+  ));
+}
+
+//-----------------------------------------------------------------------------
 
 void setup() {
+#if ! defined(EPOXY_DUINO)
   delay(1000); // Wait for stability on some boards, otherwise garage on Serial
+#endif
+
   Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
   while (!Serial); // Wait until Serial is ready - Leonardo/Micro
 }
@@ -61,253 +266,3 @@ void setup() {
 void loop() {
   TestRunner::run();
 }
-
-// ----------------------------------------------------------------------
-// Tests for LedMatrixDirect.
-// ----------------------------------------------------------------------
-
-class LedMatrixDirectTest: public BaseHardwareTest {
-  protected:
-    virtual void setup() override {
-      BaseHardwareTest::setup();
-      mLedMatrix = new LedMatrixDirect(
-          mHardware, NUM_DIGITS, NUM_SEGMENTS);
-      mLedMatrix->setGroupPins(digitPins);
-      mLedMatrix->setElementPins(segmentPins);
-      mLedMatrix->setCathodeOnGroup();
-
-      mLedMatrix->configure();
-      mHardware->clear();
-    }
-
-    virtual void teardown() override {
-      delete mLedMatrix;
-      BaseHardwareTest::teardown();
-    }
-
-    LedMatrixDirect* mLedMatrix;
-};
-
-testF(LedMatrixDirectTest, configure) {
-  mLedMatrix->configure();
-  assertEvents(24,
-      Event::kTypePinMode, 0, OUTPUT,
-      Event::kTypeDigitalWrite, 0, HIGH,
-      Event::kTypePinMode, 1, OUTPUT,
-      Event::kTypeDigitalWrite, 1, HIGH,
-      Event::kTypePinMode, 2, OUTPUT,
-      Event::kTypeDigitalWrite, 2, HIGH,
-      Event::kTypePinMode, 3, OUTPUT,
-      Event::kTypeDigitalWrite, 3, HIGH,
-      Event::kTypePinMode, 4, OUTPUT,
-      Event::kTypeDigitalWrite, 4, LOW,
-      Event::kTypePinMode, 5, OUTPUT,
-      Event::kTypeDigitalWrite, 5, LOW,
-      Event::kTypePinMode, 6, OUTPUT,
-      Event::kTypeDigitalWrite, 6, LOW,
-      Event::kTypePinMode, 7, OUTPUT,
-      Event::kTypeDigitalWrite, 7, LOW,
-      Event::kTypePinMode, 8, OUTPUT,
-      Event::kTypeDigitalWrite, 8, LOW,
-      Event::kTypePinMode, 9, OUTPUT,
-      Event::kTypeDigitalWrite, 9, LOW,
-      Event::kTypePinMode, 10, OUTPUT,
-      Event::kTypeDigitalWrite, 10, LOW,
-      Event::kTypePinMode, 11, OUTPUT,
-      Event::kTypeDigitalWrite, 11, LOW);
-
-  mHardware->clear();
-  mLedMatrix->finish();
-  assertEvents(12,
-      Event::kTypePinMode, 0, INPUT,
-      Event::kTypePinMode, 1, INPUT,
-      Event::kTypePinMode, 2, INPUT,
-      Event::kTypePinMode, 3, INPUT,
-      Event::kTypePinMode, 4, INPUT,
-      Event::kTypePinMode, 5, INPUT,
-      Event::kTypePinMode, 6, INPUT,
-      Event::kTypePinMode, 7, INPUT,
-      Event::kTypePinMode, 8, INPUT,
-      Event::kTypePinMode, 9, INPUT,
-      Event::kTypePinMode, 10, INPUT,
-      Event::kTypePinMode, 11, INPUT);
-}
-
-testF(LedMatrixDirectTest, enableGroup) {
-  mLedMatrix->enableGroup(1);
-  assertEvents(1,
-      Event::kTypeDigitalWrite, 1, LOW);
-}
-
-testF(LedMatrixDirectTest, disableGroup) {
-  mLedMatrix->disableGroup(1);
-  assertEvents(1,
-      Event::kTypeDigitalWrite, 1, HIGH);
-}
-
-testF(LedMatrixDirectTest, drawElements) {
-  mLedMatrix->drawElements(0x55);
-  assertEvents(8,
-      Event::kTypeDigitalWrite, 4, HIGH,
-      Event::kTypeDigitalWrite, 5, LOW,
-      Event::kTypeDigitalWrite, 6, HIGH,
-      Event::kTypeDigitalWrite, 7, LOW,
-      Event::kTypeDigitalWrite, 8, HIGH,
-      Event::kTypeDigitalWrite, 9, LOW,
-      Event::kTypeDigitalWrite, 10, HIGH,
-      Event::kTypeDigitalWrite, 11, LOW
-  );
-}
-
-// ----------------------------------------------------------------------
-// Tests for LedMatrixSerial.
-// ----------------------------------------------------------------------
-
-class LedMatrixSerialTest: public BaseHardwareTest {
-  protected:
-    virtual void setup() override {
-      BaseHardwareTest::setup();
-      mLedMatrix = new LedMatrixSerial(
-          mHardware, NUM_DIGITS, NUM_SEGMENTS);
-      mLedMatrix->setGroupPins(digitPins);
-      mLedMatrix->setElementPins(latchPin, dataPin, clockPin);
-      mLedMatrix->setCathodeOnGroup();
-
-      mLedMatrix->configure();
-      mHardware->clear();
-    }
-
-    virtual void teardown() override {
-      delete mLedMatrix;
-      BaseHardwareTest::teardown();
-    }
-
-    LedMatrixSerial* mLedMatrix;
-};
-
-testF(LedMatrixSerialTest, configure) {
-  mLedMatrix->configure();
-  assertEvents(11,
-      Event::kTypePinMode, latchPin, OUTPUT,
-      Event::kTypePinMode, dataPin, OUTPUT,
-      Event::kTypePinMode, clockPin, OUTPUT,
-
-      Event::kTypePinMode, 0, OUTPUT,
-      Event::kTypeDigitalWrite, 0, HIGH,
-      Event::kTypePinMode, 1, OUTPUT,
-      Event::kTypeDigitalWrite, 1, HIGH,
-      Event::kTypePinMode, 2, OUTPUT,
-      Event::kTypeDigitalWrite, 2, HIGH,
-      Event::kTypePinMode, 3, OUTPUT,
-      Event::kTypeDigitalWrite, 3, HIGH);
-
-  mHardware->clear();
-  mLedMatrix->finish();
-  assertEvents(7,
-      Event::kTypePinMode, latchPin, INPUT,
-      Event::kTypePinMode, dataPin, INPUT,
-      Event::kTypePinMode, clockPin, INPUT,
-      Event::kTypePinMode, 0, INPUT,
-      Event::kTypePinMode, 1, INPUT,
-      Event::kTypePinMode, 2, INPUT,
-      Event::kTypePinMode, 3, INPUT);
-
-}
-
-testF(LedMatrixSerialTest, enableGroup) {
-  mLedMatrix->enableGroup(1);
-  assertEvents(1,
-      Event::kTypeDigitalWrite, 1, LOW);
-}
-
-testF(LedMatrixSerialTest, disableGroup) {
-  mLedMatrix->disableGroup(1);
-  assertEvents(1,
-      Event::kTypeDigitalWrite, 1, HIGH);
-}
-
-testF(LedMatrixSerialTest, drawElements) {
-  mLedMatrix->drawElements(0x55);
-  assertEvents(3,
-      Event::kTypeDigitalWrite, latchPin, LOW,
-      Event::kTypeShiftOut, dataPin, clockPin, MSBFIRST, 0x55,
-      Event::kTypeDigitalWrite, latchPin, HIGH
-  );
-}
-
-// ----------------------------------------------------------------------
-// Tests for LedMatrixSpi.
-// ----------------------------------------------------------------------
-
-class LedMatrixSpiTest: public BaseHardwareTest {
-  protected:
-    virtual void setup() override {
-      BaseHardwareTest::setup();
-      mLedMatrix = new LedMatrixSpi(
-          mHardware, NUM_DIGITS, NUM_SEGMENTS);
-      mLedMatrix->setGroupPins(digitPins);
-      mLedMatrix->setElementPins(latchPin, dataPin, clockPin);
-      mLedMatrix->setCathodeOnGroup();
-
-      mLedMatrix->configure();
-      mHardware->clear();
-    }
-
-    virtual void teardown() override {
-      delete mLedMatrix;
-      BaseHardwareTest::teardown();
-    }
-
-    LedMatrixSpi* mLedMatrix;
-};
-
-testF(LedMatrixSpiTest, configure) {
-  mLedMatrix->configure();
-  assertEvents(12,
-      Event::kTypePinMode, latchPin, OUTPUT,
-      Event::kTypePinMode, dataPin, OUTPUT,
-      Event::kTypePinMode, clockPin, OUTPUT,
-      Event::kTypePinMode, 0, OUTPUT,
-      Event::kTypeDigitalWrite, 0, HIGH,
-      Event::kTypePinMode, 1, OUTPUT,
-      Event::kTypeDigitalWrite, 1, HIGH,
-      Event::kTypePinMode, 2, OUTPUT,
-      Event::kTypeDigitalWrite, 2, HIGH,
-      Event::kTypePinMode, 3, OUTPUT,
-      Event::kTypeDigitalWrite, 3, HIGH,
-      Event::kTypeSpiBegin);
-
-  mHardware->clear();
-  mLedMatrix->finish();
-  assertEvents(8,
-      Event::kTypeSpiEnd,
-      Event::kTypePinMode, latchPin, INPUT,
-      Event::kTypePinMode, dataPin, INPUT,
-      Event::kTypePinMode, clockPin, INPUT,
-      Event::kTypePinMode, 0, INPUT,
-      Event::kTypePinMode, 1, INPUT,
-      Event::kTypePinMode, 2, INPUT,
-      Event::kTypePinMode, 3, INPUT);
-}
-
-testF(LedMatrixSpiTest, enableGroup) {
-  mLedMatrix->enableGroup(1);
-  assertEvents(1,
-      Event::kTypeDigitalWrite, 1, LOW);
-}
-
-testF(LedMatrixSpiTest, disableGroup) {
-  mLedMatrix->disableGroup(1);
-  assertEvents(1,
-      Event::kTypeDigitalWrite, 1, HIGH);
-}
-
-testF(LedMatrixSpiTest, drawElements) {
-  mLedMatrix->drawElements(0x55);
-  assertEvents(3,
-      Event::kTypeDigitalWrite, latchPin, LOW,
-      Event::kTypeSpiTransfer, 0x55,
-      Event::kTypeDigitalWrite, latchPin, HIGH
-  );
-}
-

@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['micros',['micros',['../classace__segment_1_1Hardware.html#a577bbefb50970431da768e99e8765798',1,'ace_segment::Hardware']]],
-  ['millis',['millis',['../classace__segment_1_1Hardware.html#a967adfe2fb7acb7eecca011e34a4a690',1,'ace_segment::Hardware']]],
-  ['modulatingdigitdriver',['ModulatingDigitDriver',['../classace__segment_1_1ModulatingDigitDriver.html#a72a575e2a9eba38e1e05d43a1d957704',1,'ace_segment::ModulatingDigitDriver']]]
+  ['pinmode_95',['pinMode',['../classace__segment_1_1Hardware.html#a4b7fd68c76b1091a0686d673a05eecd2',1,'ace_segment::Hardware']]],
+  ['preparetosleep_96',['prepareToSleep',['../classace__segment_1_1ScanningDisplay.html#af00d6c084cded6d3161806f5fa577260',1,'ace_segment::ScanningDisplay']]]
 ];

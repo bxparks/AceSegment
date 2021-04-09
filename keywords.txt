@@ -1,129 +1,94 @@
 #######################################
-# Syntax Coloring Map for AUnit library
+# Syntax Coloring Map for AceSegment library
 #######################################
 
 #######################################
 # Datatypes (KEYWORD1)
 #######################################
 
-TimingStats	KEYWORD1
 Hardware	KEYWORD1
-LedMatrix	KEYWORD1
-DimmablePattern	KEYWORD1
-Driver	KEYWORD1
-DriverBuilder	KEYWORD1
-Styler	KEYWORD1
-BlinkStyler	KEYWORD1
-PulseStyler	KEYWORD1
-StyledPattern	KEYWORD1
-Renderer	KEYWORD1
-RendererBuilder	KEYWORD1
-HexWriter	KEYWORD1
+HwSpiAdapter	KEYWORD1
+SwSpiAdapter	KEYWORD1
+SwSpiAdapterFast	KEYWORD1
+LedMatrixBase	KEYWORD1
+LedMatrixDirect	KEYWORD1
+LedMatrixDirectFast	KEYWORD1
+LedMatrixSingleShiftRegister	KEYWORD1
+LedMatrixDualShiftRegister	KEYWORD1
+LedDisplay	KEYWORD1
+ScanningDisplay	KEYWORD1
+NumberWriter	KEYWORD1
+ClockWriter	KEYWORD1
 CharWriter	KEYWORD1
 StringWriter	KEYWORD1
+hexchar_t	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
 
-# TimeingStats.h
-reset	KEYWORD2
-getMax	KEYWORD2
-getMin	KEYWORD2
-getAvg	KEYWORD2
-getExpDecayAvg	KEYWORD2
-getCount	KEYWORD2
-getCounter	KEYWORD2
-update	KEYWORD2
-
 # Hardware.h
 digitalWrite	KEYWORD2
 pinMode	KEYWORD2
-shiftOut	KEYWORD2
 micros	KEYWORD2
 millis	KEYWORD2
-spiBegin	KEYWORD2
-spiEnd	KEYWORD2
-spiTransfer	KEYWORD2
+
+# SwSpiAdapter.h, HwSpiAdapter.h
+begin	KEYWORD2
+end	KEYWORD2
+transfer	KEYWORD2
+transfer16	KEYWORD2
 
 # LedMatrix.h
-configure	KEYWORD2
-finish	KEYWORD2
-setCathodeOnGroup	KEYWORD2
-setAnodeOnGroup	KEYWORD2
-invertGroupLevels	KEYWORD2
-configure	KEYWORD2
+begin	KEYWORD2
+end	KEYWORD2
+draw	KEYWORD2
+clear	KEYWORD2
 enableGroup	KEYWORD2
 disableGroup	KEYWORD2
-drawElements	KEYWORD2
 
-# Driver.h
-configure	KEYWORD2
-finish	KEYWORD2
-displayCurrentField	KEYWORD2
-isBrightnessSupported	KEYWORD2
-setPattern	KEYWORD2
-setBrightness	KEYWORD2
-
-# Styler.h
-configure	KEYWORD2
-apply	KEYWORD2
-requiresBrightness	KEYWORD2
-
-# Renderer.h
-configure	KEYWORD2
+# ScanningDisplay
+begin	KEYWORD2
+end	KEYWORD2
 getNumDigits	KEYWORD2
 getFramesPerSecond	KEYWORD2
 getFieldsPerSecond	KEYWORD2
-writeBrightness	KEYWORD2
 writePatternAt	KEYWORD2
-writeStyleAt	KEYWORD2
 writeDecimalPointAt	KEYWORD2
-renderField	KEYWORD2
+setBrightnessAt	KEYWORD2
+setGlobalBrightness	KEYWORD2
+clear	KEYWORD2
+renderFieldNow	KEYWORD2
 renderFieldWhenReady	KEYWORD2
-getTimingStats	KEYWORD2
-getStyledDigit	KEYWORD2
-calcBlinkStateForFrame	KEYWORD2
-calcPulseFractionForFrame	KEYWORD2
-calcBlinkStateForFrame	KEYWORD2
-calcPulseFractionForFrame	KEYWORD2
-calcBrightness	KEYWORD2
+prepareToSleep	KEYWORD2
+wakeFromSleep	KEYWORD2
 
-# HexWriter.h
-getNumDigits	KEYWORD2
-writeHexAt	KEYWORD2
-writeStyleAt	KEYWORD2
-writeDecimalPointAt	KEYWORD2
+# NumberWriter.h
+writeHexCharAt	KEYWORD2
+writeHexCharsAt	KEYWORD2
+writeHexByteAt	KEYWORD2
+writeHexWordAt	KEYWORD2
+writeUnsignedDecimalAt	KEYWORD2
+writeSignedDecimalAt	KEYWORD2
+clearToEnd	KEYWORD2
+display	KEYWORD2
+
+# ClockWriter.h
+writeCharAt	KEYWORD2
+writeBcd2At	KEYWORD2
+writeDec2At	KEYWORD2
+writeDec4At	KEYWORD2
+writeHourMinute	KEYWORD2
+writeColon	KEYWORD2
+display	KEYWORD2
 
 # CharWriter.h
-getNumDigits	KEYWORD2
 writeCharAt	KEYWORD2
-writeStyleAt	KEYWORD2
-writeDecimalPointAt	KEYWORD2
+display	KEYWORD2
 
 # StringWriter.
 writeStringAt	KEYWORD2
-
-# DriverBuilder.h
-setNumDigits	KEYWORD2
-setNumSegments	KEYWORD2
-setCommonAnode	KEYWORD2
-setCommonCathode	KEYWORD2
-setResistorsOnDigits	KEYWORD2
-setResistorsOnSegments	KEYWORD2
-setDigitPins	KEYWORD2
-setSegmentDirectPins	KEYWORD2
-setSegmentSerialPins	KEYWORD2
-setSegmentSpiPins	KEYWORD2
-setDimmablePatterns	KEYWORD2
-useModulatingDriver	KEYWORD2
-build	KEYWORD2
-
-# RendererBuilder.h
-setFramesPerSecond	KEYWORD2
-setStatsResetInterval	KEYWORD2
-setStyler	KEYWORD2
-build	KEYWORD2
+display	KEYWORD2
 
 #######################################
 # Instances (KEYWORD2)
@@ -133,21 +98,17 @@ build	KEYWORD2
 # Constants (LITERAL1)
 #######################################
 
-# DimmablePattern.h
-kOff	LITERAL1
-kOn	LITERAL1
-
-# StyledPattern.h
-kStyleNormal	LITERAL1
-
-# Renderer.h
-kNumStyles	LITERAL1
-
-# HexWriter.h
+# NumberWriter.h
 kNumCharacters	LITERAL1
-kSpace	LITERAL1
-kPeriod	LITERAL1
-kMinus	LITERAL1
+kCharSpace	LITERAL1
+kCharMinus	LITERAL1
+
+# ClockWriter.h
+kCharSpace	LITERAL1
+kCharMinus	LITERAL1
+kPatternA	LITERAL1
+kPatternP	LITERAL1
+kPatternDegree	LITERAL1
 
 # CharWriter.h
 kNumCharacters	LITERAL1

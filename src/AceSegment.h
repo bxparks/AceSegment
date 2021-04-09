@@ -32,21 +32,20 @@ SOFTWARE.
 #ifndef ACE_SEGMENT_ACE_SEGMENT_H
 #define ACE_SEGMENT_ACE_SEGMENT_H
 
-#include "ace_segment/Util.h"
 #include "ace_segment/Hardware.h"
-#include "ace_segment/DimmablePattern.h"
-#include "ace_segment/Driver.h"
-#include "ace_segment/DriverBuilder.h"
-#include "ace_segment/StyledPattern.h"
-#include "ace_segment/BlinkStyler.h"
-#include "ace_segment/PulseStyler.h"
-#include "ace_segment/Renderer.h"
-#include "ace_segment/RendererBuilder.h"
+#include "ace_segment/SwSpiAdapter.h"
+#include "ace_segment/HwSpiAdapter.h"
+#include "ace_segment/LedMatrixDirect.h"
+#include "ace_segment/LedMatrixSingleShiftRegister.h"
+#include "ace_segment/LedMatrixDualShiftRegister.h"
+#include "ace_segment/ScanningDisplay.h"
+#include "ace_segment/NumberWriter.h"
+#include "ace_segment/ClockWriter.h"
 #include "ace_segment/CharWriter.h"
-#include "ace_segment/HexWriter.h"
 #include "ace_segment/StringWriter.h"
 
 // Version format: xxyyzz == "xx.yy.zz"
-#define ACE_SEGMENT_VERSION 000300
+#define ACE_SEGMENT_VERSION 400
+#define ACE_SEGMENT_VERSION_STRING "0.4"
 
 #endif

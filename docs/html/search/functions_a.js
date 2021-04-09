@@ -1,8 +1,7 @@
 var searchData=
 [
-  ['renderer',['Renderer',['../classace__segment_1_1Renderer.html#aa24085df1e1dd25aa2ebbfc7cc3799a4',1,'ace_segment::Renderer']]],
-  ['rendererbuilder',['RendererBuilder',['../classace__segment_1_1RendererBuilder.html#a1291df29962387e2b83a41c68647d267',1,'ace_segment::RendererBuilder']]],
-  ['renderfield',['renderField',['../classace__segment_1_1Renderer.html#af86c917c7b7e64f788289b7c679c3285',1,'ace_segment::Renderer']]],
-  ['renderfieldwhenready',['renderFieldWhenReady',['../classace__segment_1_1Renderer.html#a3388f24dfb5049c3a511b31aa0805a63',1,'ace_segment::Renderer']]],
-  ['requiresbrightness',['requiresBrightness',['../classace__segment_1_1BlinkStyler.html#a0e70719b3aeff9f3ad52995877abe319',1,'ace_segment::BlinkStyler::requiresBrightness()'],['../classace__segment_1_1PulseStyler.html#a2cd90d3251ec31b19d0180068560c9c5',1,'ace_segment::PulseStyler::requiresBrightness()'],['../classace__segment_1_1Styler.html#ac6af18ad88071ddea5bf18d1232106d9',1,'ace_segment::Styler::requiresBrightness()']]]
+  ['scanningdisplay_99',['ScanningDisplay',['../classace__segment_1_1ScanningDisplay.html#a305f5f73be623475ad4d8d39c0a780d0',1,'ace_segment::ScanningDisplay']]],
+  ['setbrightnessat_100',['setBrightnessAt',['../classace__segment_1_1LedDisplay.html#ab8cdbdeb458ed2c9ae8d8656ead3e7b8',1,'ace_segment::LedDisplay::setBrightnessAt()'],['../classace__segment_1_1ScanningDisplay.html#a7057d9e7cc8dc489fd7d2599441efba7',1,'ace_segment::ScanningDisplay::setBrightnessAt()']]],
+  ['setglobalbrightness_101',['setGlobalBrightness',['../classace__segment_1_1LedDisplay.html#af1a17006b07949cbe859684b235bcb84',1,'ace_segment::LedDisplay::setGlobalBrightness()'],['../classace__segment_1_1ScanningDisplay.html#a51b9707f89d323d481feea9ae94d6029',1,'ace_segment::ScanningDisplay::setGlobalBrightness()']]],
+  ['stringwriter_102',['StringWriter',['../classace__segment_1_1StringWriter.html#af63058f8d90de08fa54c725d2c9f92b5',1,'ace_segment::StringWriter']]]
 ];

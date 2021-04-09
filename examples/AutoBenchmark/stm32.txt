@@ -1,0 +1,25 @@
+SIZEOF
+sizeof(Hardware): 1
+sizeof(SwSpiAdapter): 3
+sizeof(HwSpiAdapter): 3
+sizeof(LedMatrixDirect<Hardware>): 20
+sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 20
+sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 12
+sizeof(LedDisplay): 8
+sizeof(ScanningDisplay<Hardware, LedMatrixBase, 4, 1>): 36
+sizeof(NumberWriter): 4
+sizeof(ClockWriter): 8
+sizeof(CharWriter): 4
+sizeof(StringWriter): 4
+BENCHMARKS
+direct 14 15 20 240
+direct(subfields) 1 3 39 3840
+single_sw_spi 31 32 37 240
+single_sw_spi(subfields) 1 5 55 3840
+single_hw_spi 40 41 46 240
+single_hw_spi(subfields) 1 6 65 3840
+dual_sw_spi 54 54 60 240
+dual_sw_spi(subfields) 1 7 65 3840
+dual_hw_spi 40 40 45 240
+dual_hw_spi(subfields) 1 6 65 3840
+END
