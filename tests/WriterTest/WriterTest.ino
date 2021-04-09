@@ -193,53 +193,52 @@ class ClockWriterTest: public TestOnce {
     uint8_t* mPatterns;
 };
 
-testF(ClockWriterTest, writeCharAt) {
-  clockWriter.writeCharAt(0, ClockWriter::kP);
-  assertEqual(0b01110011, mPatterns[0]);
-}
-
-testF(ClockWriterTest, writeBcdAt) {
-  clockWriter.writeBcdAt(0, 0x12);
+testF(ClockWriterTest, writeBcd2At) {
+  clockWriter.writeBcd2At(0, 0x12);
   assertEqual(0b00000110, mPatterns[0]);
   assertEqual(0b01011011, mPatterns[1]);
 
-  clockWriter.writeBcdAt(2, 0x89);
-  assertEqual(0b01111111, mPatterns[2]);
-  assertEqual(0b01101111, mPatterns[3]);
+  clockWriter.writeBcd2At(2, 0x34);
+  assertEqual(0b01001111, mPatterns[2]);
+  assertEqual(0b01100110, mPatterns[3]);
 }
 
-testF(ClockWriterTest, writeDecimalAt) {
-  clockWriter.writeDecimalAt(0, 12);
+testF(ClockWriterTest, writeDec2At) {
+  clockWriter.writeDec2At(0, 12);
   assertEqual(0b00000110, mPatterns[0]);
   assertEqual(0b01011011, mPatterns[1]);
 
-  clockWriter.writeDecimalAt(2, 89);
-  assertEqual(0b01111111, mPatterns[2]);
-  assertEqual(0b01101111, mPatterns[3]);
+  clockWriter.writeDec2At(2, 34);
+  assertEqual(0b01001111, mPatterns[2]);
+  assertEqual(0b01100110, mPatterns[3]);
 }
 
-testF(ClockWriterTest, writeBcdClock) {
-  clockWriter.writeBcdClock(0x12, 0x30);
+testF(ClockWriterTest, writeDec4At) {
+  clockWriter.writeDec4At(0, 1234);
   assertEqual(0b00000110, mPatterns[0]);
-  assertEqual(0b01011011 | 0x80, mPatterns[1]);
+  assertEqual(0b01011011, mPatterns[1]);
   assertEqual(0b01001111, mPatterns[2]);
-  assertEqual(0b00111111, mPatterns[3]);
-}
-
-testF(ClockWriterTest, writeClock) {
-  clockWriter.writeClock(12, 30);
-  assertEqual(0b00000110, mPatterns[0]);
-  assertEqual(0b01011011 | 0x80, mPatterns[1]);
-  assertEqual(0b01001111, mPatterns[2]);
-  assertEqual(0b00111111, mPatterns[3]);
+  assertEqual(0b01100110, mPatterns[3]);
 }
 
 testF(ClockWriterTest, writeColon) {
-  clockWriter.writeClock(12, 30); // colon on by default
-  assertEqual(0b01011011 | 0x80, mPatterns[1]);
+  clockWriter.writeDec2At(0, 12);
+  clockWriter.writeDec2At(2, 34);
 
-  clockWriter.writeColon(false); // turns it off
+  // no colon by default
   assertEqual(0b01011011, mPatterns[1]);
+
+  // turn on colon
+  clockWriter.writeColon(true); // turns it on
+  assertEqual(0b01011011 | 0x80, mPatterns[1]);
+}
+
+testF(ClockWriterTest, writeHourMinute) {
+  clockWriter.writeHourMinute(12, 34);
+  assertEqual(0b00000110, mPatterns[0]);
+  assertEqual(0b01011011 | 0x80, mPatterns[1]); // colon on by default
+  assertEqual(0b01001111, mPatterns[2]);
+  assertEqual(0b01100110, mPatterns[3]);
 }
 
 //-----------------------------------------------------------------------------

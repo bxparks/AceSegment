@@ -56,25 +56,25 @@ volatile int disableCompilerOptimization = 0;
     public:
       StubDisplay(): LedDisplay(NUM_DIGITS) {}
 
-      virtual void writePatternAt(uint8_t pos, uint8_t pattern) {
+      virtual void writePatternAt(uint8_t /*pos*/, uint8_t pattern) {
         disableCompilerOptimization = pattern;
       }
 
-      virtual void writePatternsAt(uint8_t pos, const uint8_t patterns[],
-          uint8_t len) {
+      virtual void writePatternsAt(uint8_t /*pos*/, const uint8_t patterns[],
+          uint8_t /*len*/) {
         disableCompilerOptimization = patterns[0];
       }
 
-      virtual void writePatternsAt_P(uint8_t pos, const uint8_t patterns[],
-          uint8_t len) {
+      virtual void writePatternsAt_P(uint8_t /*pos*/, const uint8_t patterns[],
+          uint8_t /*len*/) {
         disableCompilerOptimization = patterns[0];
       }
 
-      virtual void setBrightnessAt(uint8_t pos, uint8_t brightness) {
+      virtual void setBrightnessAt(uint8_t /*pos*/, uint8_t brightness) {
         disableCompilerOptimization = brightness;
       }
 
-      virtual void writeDecimalPointAt(uint8_t pos, bool state = true) {
+      virtual void writeDecimalPointAt(uint8_t /*pos*/, bool state = true) {
         disableCompilerOptimization = state;
       }
 
@@ -307,16 +307,16 @@ void loop() {
   ledDisplay.writePatternAt(0, 0xff);
 
 #elif FEATURE == FEATURE_NUMBER_WRITER
-  numberWriter.writeDecWordAt(0, 42);
+  numberWriter.writeUnsignedDecimalAt(0, 42);
 
 #elif FEATURE == FEATURE_CLOCK_WRITER
-  clockWriter.writeClock(10, 45);
+  clockWriter.writeHourMinute(10, 45);
 
 #elif FEATURE == FEATURE_CHAR_WRITER
   charWriter.writeCharAt(0, 'a');
 
 #elif FEATURE == FEATURE_STRING_WRITER
-  stringWriter.writeStringAt(0, "Hello World");
+  stringWriter.writeStringAt(0, "Hello");
 
 #endif
 }

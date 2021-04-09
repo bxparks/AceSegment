@@ -27,77 +27,104 @@ SOFTWARE.
 
 #include <stdint.h>
 #include "LedDisplay.h"
+#include "NumberWriter.h"
 
 namespace ace_segment {
 
 /**
- * The ClockWriter writes "hh:mm" to the LedDisplay. A few other characters
- * are supported: kSpace, kMinus, kA ("A" for AM) and kP ("P" for "PM").
+ * The ClockWriter writes "hh:mm" and "yyyy" to the LedDisplay. A few other
+ * characters are supported.
  */
 class ClockWriter {
   public:
-    /** Total number of characters in the character set. */
-    static const uint8_t kNumCharacters;
+    using hexchar_t = NumberWriter::hexchar_t;
 
     /** Blank digit. */
-    static const uint8_t kSpace = 10;
+    static const hexchar_t kSpace = NumberWriter::kSpace;
 
     /** A minus ("-") sign. */
-    static const uint8_t kMinus = 11;
-
-    /** The "P" character for "PM". */
-    static const uint8_t kA = 12;
+    static const hexchar_t kMinus = NumberWriter::kMinus;
 
     /** The "A" character for "AM". */
-    static const uint8_t kP = 13;
+    static const uint8_t kPatternA = 0b01110111;
 
-    /** The superscript degrees symbol for temperature degrees. */
-    static const uint8_t kDegrees = 14;
+    /** The "P" character for "PM". */
+    static const uint8_t kPatternP = 0b01110011;
+
+    /** The superscript degree symbol for temperature. */
+    static const uint8_t kPatternDegree = 0b01100011;
 
     /**
      * Constructor.
      *
+     * @param ledDisplay instance of LedDisplay
      * @param colonDigit The digit which has the colon (":") character,
-     * mapped to bit 7 (i.e. 'H' segment). In a stadard 4 digit clock display,
-     * this is digit 1 (counting from the left, 0-based).
+     *    mapped to bit 7 (i.e. 'H' segment). In many 4-digit LED clock
+     *    display modules, this is digit 1 (counting from the left, 0-based,
+     *    so the second digit from the left).
      */
     explicit ClockWriter(
         LedDisplay& ledDisplay,
         uint8_t colonDigit = 1
     ) :
-        mLedDisplay(ledDisplay),
+        mNumberWriter(ledDisplay),
         mColonDigit(colonDigit)
     {}
 
     /** Get the underlying LedDisplay. */
     LedDisplay& display() const {
-      return mLedDisplay;
+      return mNumberWriter.display();
     }
 
     /**
-     * Write the character at the specified position. Write a space if
-     * the character is undefined.
+     * Write a 2-digit BCD number at position, which involves just printing the
+     * number as a hexadecimal number. For example, 0x12 is printed as "12", but
+     * 0x1A is printed as "1 ".
      */
-    void writeCharAt(uint8_t pos, uint8_t c);
+    void writeBcd2At(uint8_t pos, uint8_t bcd) {
+      uint8_t high = (bcd & 0xF0) >> 4;
+      uint8_t low = (bcd & 0x0F);
+      if (high > 9) high = kSpace;
+      if (low > 9) low = kSpace;
+      mNumberWriter.writeHexCharAt(pos++, high);
+      mNumberWriter.writeHexCharAt(pos++, low);
+    }
 
     /**
-     * Write a 2-digit BCD number at position. If one of the hex digits
-     * is greater than 9, then print " " (1 space). E.g. 0x12 is printed as
-     * "12", but 0x1A is printed as "1 ".
+     * Write a 2-digit decimal number at position digit, right justified. If the
+     * number is greater than 100, then print "  " (2 spaces). Useful for day,
+     * hour, minute, seconds.
      */
-    void writeBcdAt(uint8_t pos, uint8_t bcd);
+    void writeDec2At(uint8_t pos, uint8_t d) {
+      if (d >= 100) {
+        mNumberWriter.writeHexCharAt(pos++, kSpace);
+        mNumberWriter.writeHexCharAt(pos++, kSpace);
+      } else {
+        uint8_t bcd = ace_common::decToBcd(d);
+        writeBcd2At(pos, bcd);
+      }
+    }
 
     /**
-     * Write a 2-digit decimal number at position digit. If the number is
-     * greater than 100, then print "  " (2 spaces).
+     * Write the 4 digit decimal number at pos, right justified, padded with a
+     * '0' character. Useful for year.
      */
-    void writeDecimalAt(uint8_t pos, uint8_t d);
+    void writeDec4At(uint8_t pos, uint16_t dd) {
+      uint8_t high = dd / 100;
+      uint8_t low = dd - high * 100;
+      writeDec2At(pos, high);
+      writeDec2At(pos + 2, low);
+    }
 
-    /** Write "hh:mm". */
-    void writeClock(uint8_t hh, uint8_t mm);
-
-    /** Write "hh:mm", with hh and mm in Binary Coded Decimal (BCD) format. */
-    void writeBcdClock(uint8_t hhBcd, uint8_t mmBcd);
+    /**
+     * Write the hour and minutes, and the colon in one-shot, assuming the LED
+     * module is a 4-digit clock module. This is a convenience function.
+     */
+    void writeHourMinute(uint8_t hh, uint8_t mm) {
+      writeDec2At(0, hh);
+      writeDec2At(2, mm);
+      writeColon();
+    }
 
     /**
      * Write the colon symbol between 'hh' and 'mm'.
@@ -105,21 +132,18 @@ class ClockWriter {
      * @param state Set to false to turn off the colon.
      */
     void writeColon(bool state = true) {
-      mLedDisplay.writeDecimalPointAt(mColonDigit, state);
+      display().writeDecimalPointAt(mColonDigit, state);
     }
 
   private:
-    // Bit pattern map for hex characters.
-    static const uint8_t kCharacterArray[];
-
     // disable copy-constructor and assignment operator
     ClockWriter(const ClockWriter&) = delete;
     ClockWriter& operator=(const ClockWriter&) = delete;
 
-    LedDisplay& mLedDisplay;
+    NumberWriter mNumberWriter;
     uint8_t const mColonDigit;
 };
 
-}
+} // ace_segment
 
 #endif
