@@ -145,12 +145,28 @@ testF(NumberWriterTest, writeUnsignedDecimalAt) {
   assertEqual(0b01100110, mPatterns[3]);
 }
 
+testF(NumberWriterTest, writeUnsignedDecimalAt_boxed) {
+  numberWriter.writeUnsignedDecimalAt(0, 34, 4);
+  assertEqual(0b00000000, mPatterns[0]);
+  assertEqual(0b00000000, mPatterns[1]);
+  assertEqual(0b01001111, mPatterns[2]);
+  assertEqual(0b01100110, mPatterns[3]);
+}
+
 testF(NumberWriterTest, writeSignedDecimalAt) {
   numberWriter.writeSignedDecimalAt(0, -234);
   assertEqual(0b01000000, mPatterns[0]);
   assertEqual(0b01011011, mPatterns[1]);
   assertEqual(0b01001111, mPatterns[2]);
   assertEqual(0b01100110, mPatterns[3]);
+}
+
+testF(NumberWriterTest, writeSignedDecimalAt_boxed) {
+  numberWriter.writeSignedDecimalAt(0, -12, 4);
+  assertEqual(0b00000000, mPatterns[0]);
+  assertEqual(0b01000000, mPatterns[1]);
+  assertEqual(0b00000110, mPatterns[2]);
+  assertEqual(0b01011011, mPatterns[3]);
 }
 
 // ----------------------------------------------------------------------

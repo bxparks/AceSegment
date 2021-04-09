@@ -71,29 +71,19 @@ void NumberWriter::writeHexCharInternalAt(uint8_t pos, hexchar_t c) {
 void NumberWriter::writeUnsignedDecimalAt(
     uint8_t pos,
     uint16_t num,
-    hexchar_t pad,
     int8_t boxSize) {
-
-  // TODO: Implement 'pad' and 'boxSize'
-  (void) pad;
-  (void) boxSize;
 
   const uint8_t bufSize = 5;
   hexchar_t buf[bufSize];
   uint8_t start = toDecimal(num, buf, bufSize);
 
-  writeHexCharsInternalAt(pos, &buf[start], bufSize - start);
+  writeHexCharsInsideBoxAt(pos, &buf[start], bufSize - start, boxSize);
 }
 
 void NumberWriter::writeSignedDecimalAt(
     uint8_t pos,
     int16_t num,
-    hexchar_t pad,
     int8_t boxSize) {
-
-  // TODO: Implement 'pad' and 'boxSize'
-  (void) pad;
-  (void) boxSize;
 
   // Even -32768 turns into +32768, which is exactly what we want
   bool negative = num < 0;
@@ -102,11 +92,11 @@ void NumberWriter::writeSignedDecimalAt(
   const uint8_t bufSize = 6;
   hexchar_t buf[bufSize];
   uint8_t start = toDecimal(absNum, buf, bufSize);
-
   if (negative) {
     buf[--start] = kMinus;
   }
-  writeHexCharsInternalAt(pos, &buf[start], bufSize - start);
+
+  writeHexCharsInsideBoxAt(pos, &buf[start], bufSize - start, boxSize);
 }
 
 } // ace_segment

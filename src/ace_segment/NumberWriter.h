@@ -113,18 +113,19 @@ class NumberWriter {
      *
      * @param pos start position of the number
      * @param num unsigned decimal number, 0-65535
-     * @param pad left padding character (default: kSpace)
-     * @param boxSize size of box; 0 means no boxing; < 0 means left justified
-     *    inside |boxSize|; > 0 means right justified inside |boxSize| (this is
-     *    meant to be similar to the "%-5d" or "%5d" specifier to the printf()
-     *    function)
+     * @param pad left padding character, either 0 or kSpace (default: kSpace)
+     * @param boxSize size of box. This is meant to be similar to the "%-5d" or
+     *    "%5d" specifier to the printf() function)
+     *    * 0 means no boxing, printing from left
+     *    * > 0 means right justified inside box
+     *    * < 0 means left justified inside box
      */
     void writeUnsignedDecimalAt(uint8_t pos, uint16_t num,
-        hexchar_t pad = kSpace, int8_t boxSize = 0);
+        int8_t boxSize = 0);
 
     /** Same as writeUnsignedDecimalAt() but prepends a '-' sign if negative. */
     void writeSignedDecimalAt(uint8_t pos, int16_t num,
-        hexchar_t pad = kSpace, int8_t boxSize = 0);
+        int8_t boxSize = 0);
 
   private:
     // disable copy-constructor and assignment operator
@@ -139,6 +140,36 @@ class NumberWriter {
         uint8_t len) {
       for (uint8_t i = 0; i < len; ++i) {
         writeHexCharInternalAt(pos++, s[i]);
+      }
+    }
+
+    /**
+     * Print the hex characters in `s` inside a box of size `boxSize` at
+     * position `pos`.
+     *
+     * @param boxSize if negative, left justified; if postive, right justified
+     */
+    void writeHexCharsInsideBoxAt(uint8_t pos, const hexchar_t s[], uint8_t len,
+        int8_t boxSize) {
+      uint8_t absBoxSize = (boxSize < 0) ? -boxSize : boxSize;
+
+      // if the box is too small, print normally
+      if (len >= absBoxSize) {
+        writeHexCharsInternalAt(pos, s, len);
+        return;
+      }
+
+      // Print either left justified or right justified insize box
+      uint8_t padSize = absBoxSize - len;
+      if (boxSize < 0) {
+        // left justified
+        writeHexCharsInternalAt(pos, s, len);
+        pos += len;
+        while (padSize--) writeHexCharInternalAt(pos++, kSpace);
+      } else {
+        // right justified
+        while (padSize--) writeHexCharInternalAt(pos++, kSpace);
+        writeHexCharsInternalAt(pos, s, len);
       }
     }
 

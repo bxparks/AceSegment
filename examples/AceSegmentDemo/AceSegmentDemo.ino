@@ -288,8 +288,8 @@ void writeHexNumbers() {
 void writeUnsignedDecNumbers() {
   static uint16_t w = 0;
 
-  numberWriter.writeUnsignedDecimalAt(0, w);
-  incrementMod(w, (uint16_t) 10000);
+  numberWriter.writeUnsignedDecimalAt(0, w, -3);
+  incrementMod(w, (uint16_t) 2000);
 }
 
 //-----------------------------------------------------------------------------
@@ -297,7 +297,7 @@ void writeUnsignedDecNumbers() {
 void writeSignedDecNumbers() {
   static int16_t w = -999;
 
-  numberWriter.writeSignedDecimalAt(0, w);
+  numberWriter.writeSignedDecimalAt(0, w, 4);
   w++;
   if (w > 999) w = -999;
 }
