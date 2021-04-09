@@ -71,21 +71,24 @@ writeHexWordAt	KEYWORD2
 writeUnsignedDecimalAt	KEYWORD2
 writeSignedDecimalAt	KEYWORD2
 clearToEnd	KEYWORD2
+display	KEYWORD2
 
 # ClockWriter.h
-writeDecimalAt	KEYWORD2
 writeCharAt	KEYWORD2
+writeBcd2At	KEYWORD2
+writeDec2At	KEYWORD2
+writeDec4At	KEYWORD2
+writeHourMinute	KEYWORD2
 writeColon	KEYWORD2
-writeClock	KEYWORD2
-writeBcdClock	KEYWORD2
+display	KEYWORD2
 
 # CharWriter.h
 writeCharAt	KEYWORD2
-getLedDisplay	KEYWORD2
+display	KEYWORD2
 
 # StringWriter.
 writeStringAt	KEYWORD2
-getLedDisplay	KEYWORD2
+display	KEYWORD2
 
 #######################################
 # Instances (KEYWORD2)
@@ -97,16 +100,15 @@ getLedDisplay	KEYWORD2
 
 # NumberWriter.h
 kNumCharacters	LITERAL1
-kSpace	LITERAL1
-kMinus	LITERAL1
+kCharSpace	LITERAL1
+kCharMinus	LITERAL1
 
 # ClockWriter.h
-kNumCharacters	LITERAL1
-kSpace	LITERAL1
-kMinus	LITERAL1
-kA	LITERAL1
-kP	LITERAL1
-kDegrees	LITERAL1
+kCharSpace	LITERAL1
+kCharMinus	LITERAL1
+kPatternA	LITERAL1
+kPatternP	LITERAL1
+kPatternDegree	LITERAL1
 
 # CharWriter.h
 kNumCharacters	LITERAL1

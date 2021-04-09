@@ -7,7 +7,7 @@ segment LED displays on Arduino platforms. Supported wiring confirguations
 include direct pin wiring to the microcontroller, or through a 74HC595
 Shift Register that is accessed through software or hardware SPI.
 
-**Version**: 0.4 (2021-03-29)
+**Version**: 0.4 (2021-04-09)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
@@ -245,14 +245,13 @@ depend on the lower-level classes:
       interface to the LED module, such as printing numbers, time (hh:mm),
       and ASCII characters
     * `NumberWriter`
-        * A class that writes integers in decimal or hexadecimal format by the
-          `ScanningDisplay` class.
-        * A few additional characters are supported: `kSpace`, `kMinus`
+        * A class that writes integers in decimal or hexadecimal format to the
+          `LedDisplay`.
+        * A few additional characters are supported: `kCharSpace`, `kCharMinus`
     * `ClockWriter`
-        * A class that writes a clock string "hh:mm" to the `ScanningDisplay`
-          class.
-        * A few additional symbols are supported: `kSpace`, `kMinus` and `kA`
-          ("A" for AM) and `kP` ("P" for PM).
+        * A class that writes a clock string "hh:mm" to `LedDisplay`.
+        * A few additional symbols are supported: `kCharSpace`, `kCharMinus` and
+          `kPatternA` ("A" for AM) and `kPatternP` ("P" for PM).
     * `CharWriter`
         * A class that convert an ASCII character represented by a `char` (code
           0-127) to a bit pattern used by `SegmentDriver` class.
@@ -260,7 +259,7 @@ depend on the lower-level classes:
           legibly but the `CharWriter` tries its best.
     * `StringWriter`
         * A class that prints strings of `char` to a `CharWriter`, which in
-          turns prints to `ScanningDisplay`.
+          turns, prints to the `LedDisplay`.
         * It tries to be smart about collapsing decimal point `.` characters
           into the native decimal point on a seven segment LED display.
 
@@ -322,10 +321,11 @@ stage:
 A typical resource creation code looks like this:
 
 ```C++
-const uint16_t FRAMES_PER_SECOND = 60;
 const uint8_t NUM_DIGITS = 4;
+const uint8_t NUM_SEGMENTS = 8;
 const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
-const uint8_t SEGMENT_PINS[8] = {8, 9, 10, 11, 12, 13, 14, 15};
+const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 11, 12, 13, 14, 15};
+const uint16_t FRAMES_PER_SECOND = 60;
 
 // The chain of resources.
 Hardware hardware;
@@ -338,7 +338,7 @@ LedMatrix ledMatrix(
     DIGIT_PINS,
     NUM_SEGMENTS,
     SEGMENT_PINS);
-ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> scanningDisplay(
+ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS> scanningDisplay(
     hardware, ledMatrix, FRAMES_PER_SECOND);
 
 NumberWriter hexWriter(scanningDisplay);
@@ -455,8 +455,11 @@ MCU                      LED display (Common Cathode)
 The `LedMatrixDirect` constructor is:
 
 ```C++
+const uint8_t NUM_DIGITS = 4;
+const uint8_t NUM_SEGMENTS = 8;
 const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
-const uint8_t SEGMENT_PINS[8] = {8, 9, 10, 11, 12, 13, 14, 15};
+const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 11, 12, 13, 14, 15};
+const uint16_t FRAMES_PER_SECOND = 60;
 
 Hardware hardware;
 using LedMatrix = LedMatrixDirect<Hardware>;
@@ -468,7 +471,7 @@ LedMatrix ledMatrix(
     DIGIT_PINS,
     NUM_SEGMENTS,
     SEGMENT_PINS);
-ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> scanningDisplay(
+ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS> scanningDisplay(
     hardware, ledMatrix, FRAMES_PER_SECOND);
 
 ...
@@ -540,10 +543,12 @@ MCU          74HC595             LED display (Common Cathode)
 The `LedMatrixSingleShiftRegister` configuration using software SPI is:
 
 ```C++
+const uint8_t NUM_DIGITS = 4;
 const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
 const uint8_t LATCH_PIN = 10; // ST_CP on 74HC595
 const uint8_t DATA_PIN = 11; // DS on 74HC595
 const uint8_t CLOCK_PIN = 13; // SH_CP on 74HC595
+const uint16_t FRAMES_PER_SECOND = 60;
 
 // Common Cathode, with transistors on Group pins
 Hardware hardware;
@@ -556,7 +561,7 @@ LedMatrix ledMatrix(
     LedMatrix::kActiveHighPattern /*elementOnPattern*/,
     NUM_DIGITS,
     DIGIT_PINS):
-ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> scanningDisplay(
+ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS> scanningDisplay(
     hardware, ledMatrix, FRAMES_PER_SECOND);
 
 ...
@@ -607,9 +612,11 @@ The `LedMatrixDualShiftRegister` configuration is the following. Let's use
 `HwSpiAdapter` this time:
 
 ```C++
+const uint8_t NUM_DIGITS = 4;
 const uint8_t LATCH_PIN = 10; // ST_CP on 74HC595
 const uint8_t DATA_PIN = 11; // DS on 74HC595
 const uint8_t CLOCK_PIN = 13; // SH_CP on 74HC595
+const uint16_t FRAMES_PER_SECOND = 60;
 
 HwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
 using LedMatrix = LedMatrixSingleShiftRegister<Hardware, HwSpiAdapter>;
@@ -617,7 +624,7 @@ LedMatrix ledMatrix(
     spiAdapter,
     LedMatrix::kActiveHighPattern /*groupOnPattern*/,
     LedMatrix::kActiveHighPattern /*elementOnPattern*/);
-ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> scanningDisplay(
+ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS> scanningDisplay(
     hardware, ledMatrix, FRAMES_PER_SECOND);
 ...
 
@@ -682,12 +689,33 @@ scanningDisplay->setBrightness(value);
 Note that the `value` is an integer from `[0, NUM_DIGITS]`, and represents the
 brightness of the display, where 0 means OFF and `NUM_DIGITS` means 100% ON.
 
-The global brightness is enabled only if the `NUM_SUBFIELDS` of the
-`ScanningDisplay` was set to be `> 1`. For example, if it was set to `16`, then
-each digit is rendered 16 times within a single field, but modulated using pulse
+The global brightness is enabled only if the `NUM_SUBFIELDS` template parameter
+of the `ScanningDisplay` was set to be `> 1`. By default, this is set to 1. For
+example, this creates a `ScanningDisplay` using hardware SPI, setting the
+`NUM_SUBFIELDS` to be 16:
+
+```
+const uint8_t NUM_DIGITS = 4;
+const uint8_t LATCH_PIN = 10; // ST_CP on 74HC595
+const uint8_t DATA_PIN = 11; // DS on 74HC595
+const uint8_t CLOCK_PIN = 13; // SH_CP on 74HC595
+const uint16_t FRAMES_PER_SECOND = 60;
+const uint8_t NUM_SUBFIELDS = 16;
+
+HwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+using LedMatrix = LedMatrixSingleShiftRegister<Hardware, HwSpiAdapter>;
+LedMatrix ledMatrix(
+    spiAdapter,
+    LedMatrix::kActiveHighPattern /*groupOnPattern*/,
+    LedMatrix::kActiveHighPattern /*elementOnPattern*/);
+ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> scanningDisplay(
+    hardware, ledMatrix, FRAMES_PER_SECOND);
+```
+
+Each digit is rendered 16 times within a single field, and modulated using pulse
 width modulation to control the width of that signal. The given digit will be
-"on" only a fraction of the full interval of the single field rendering and will
-appear dimmer to the human eye.
+on only a fraction of the full interval of the entire rendering of the  field
+and will appear dimmer to the human eye.
 
 <a name="FramesAndFields"></a>
 #### Frames and Fields
@@ -800,11 +828,12 @@ in flash memory to conserve static memory.
 
 The class supports the following methods:
 
+* `LedDisplay& display()`
 * `void writeHexCharAt(uint8_t pos, hexchar_t c)`
 * `void writeHexByteAt(uint8_t pos, uint8_t b)`
 * `void writeHexWordAt(uint8_t pos, uint16_t w)`
-* `void writeDecWordAt(uint8_t pos, uint16_t n)`
-* `LedDisplay& display()`
+* `void writeUnsignedDecimalAt(uint8_t pos, uint16_t num, int8_t boxSize = 0)`
+* `void writeSignedDecimalAt(uint8_t pos, int16_t num, int8_t boxSize = 0)`
 
 The `hexchar_t` type semantically represents the character set supported by this
 class. It is implemented as an alias for `uint8_t`, which unfortunately means
@@ -812,10 +841,10 @@ that the C++ compiler will not warn about mixing this type with another
 `uint8_t`. The range of this character set is from `[0,15]` plus 2 additional
 symbols, so `[0,17]`:
 
-* `NumberWriter::kSpace`
-* `NumberWriter::kMinus`
+* `NumberWriter::kCharSpace`
+* `NumberWriter::kCharMinus`
 
-A `NumberWriter` consumes about 200 bytes of flash memory (TODO: reverify this).
+A `NumberWriter` consumes about 100 bytes of flash memory on an AVR.
 
 <a name="ClockWriter"></a>
 ### ClockWriter
@@ -827,12 +856,14 @@ that it can display a time in the format "hh:mm".
 The class supports the following methods:
 
 * `LedDisplay& display()`
-* `void writeClock(uint8_t hh, uint8_t mm)`
-* `void writeBcdClock(uint8_t hh, uint8_t mm)` - Binary Coded Decimal
+* `void writeCharAt(uint8_t pos, hexchar_t c)`
+* `void writeBcd2At(uint8_t pos, uint8_t bcd);
+* `void writeDec2At(uint8_t pos, uint8_t d);
+* `void writeDec4At(uint8_t pos, uint16_t dd);
+* `void writeHourMinute(uint8_t hh, uint8_t mm)`
 * `void writeColon(bool state = true)`
-* `void writeCharAt(uint8_t pos, uint8_t c)`
 
-A `ClockWriter` consumes about (_TBD_) bytes of flash memory.
+A `ClockWriter` consumes about 200 bytes of flash memory on an AVR.
 
 <a name="CharWriter"></a>
 ### CharWriter
@@ -850,7 +881,7 @@ The class supports the following methods:
 * `LedDisplay& display()`
 * `void writeCharAt(uint8_t pos, char c)`
 
-A `CharWriter` consumes about 300 bytes of flash memory. (TODO: reverify this).
+A `CharWriter` consumes about 200 bytes of flash memory on an AVR.
 
 <a name="StringWriter"></a>
 ### StringWriter
@@ -883,9 +914,10 @@ void scrollString(const char* s) {
 }
 ```
 
-(TODO: Maybe move this code fragment into the StringWriter class.) A
-`StringWriter` consumes about 384 bytes of flash memory, mostly because it uses
-`CharWriter`.
+(TODO: Maybe move this code fragment into the StringWriter class.)
+
+A `StringWriter` consumes about 350 bytes of flash memory, mostly because it
+uses `CharWriter`.
 
 <a name="ResourceConsumption"></a>
 ## Resource Consumption
@@ -925,15 +957,21 @@ on an Arduino Nano (ATmega328):
 |---------------------------------+--------------+-------------|
 | baseline                        |    456/   11 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| direct                          |   1600/   75 |  1144/   64 |
-| single_sw_spi                   |   1606/   69 |  1150/   58 |
-| single_hw_spi                   |   1668/   70 |  1212/   59 |
-| dual_sw_spi                     |   1490/   60 |  1034/   49 |
-| dual_hw_spi                     |   1564/   61 |  1108/   50 |
+| direct                          |   1674/   78 |  1218/   67 |
+| single_sw_spi                   |   1680/   72 |  1224/   61 |
+| single_hw_spi                   |   1742/   73 |  1286/   62 |
+| dual_sw_spi                     |   1564/   63 |  1108/   52 |
+| dual_hw_spi                     |   1638/   64 |  1182/   53 |
 |---------------------------------+--------------+-------------|
-| direct_fast                     |   1336/  103 |   880/   92 |
-| single_sw_fast                  |   1498/   67 |  1042/   56 |
-| dual_sw_fast                    |   1098/   58 |   642/   47 |
+| direct_fast                     |   1410/  106 |   954/   95 |
+| single_sw_fast                  |   1572/   70 |  1116/   59 |
+| dual_sw_fast                    |   1172/   61 |   716/   50 |
+|---------------------------------+--------------+-------------|
+| StubDisplay                     |    522/   11 |    66/    0 |
+| NumberWriter+Stub               |    678/   34 |   222/   23 |
+| ClockWriter+Stub                |    778/   35 |   322/   24 |
+| CharWriter+Stub                 |    778/   34 |   322/   23 |
+| StringWriter+Stub               |    926/   42 |   470/   31 |
 +--------------------------------------------------------------+
 ```
 
@@ -945,11 +983,21 @@ And here are the memory consumption numbers for an ESP8266:
 |---------------------------------+--------------+-------------|
 | baseline                        | 256700/26784 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| direct                          | 257828/26860 |  1128/   76 |
-| single_sw_spi                   | 257900/26868 |  1200/   84 |
-| single_hw_spi                   | 259004/26876 |  2304/   92 |
-| dual_sw_spi                     | 257768/26848 |  1068/   64 |
-| dual_hw_spi                     | 258968/26856 |  2268/   72 |
+| direct                          | 257924/26860 |  1224/   76 |
+| single_sw_spi                   | 258012/26868 |  1312/   84 |
+| single_hw_spi                   | 259116/26876 |  2416/   92 |
+| dual_sw_spi                     | 257864/26848 |  1164/   64 |
+| dual_hw_spi                     | 259064/26856 |  2364/   72 |
+|---------------------------------+--------------+-------------|
+| direct_fast                     |     -1/   -1 |    -1/   -1 |
+| single_sw_fast                  |     -1/   -1 |    -1/   -1 |
+| dual_sw_fast                    |     -1/   -1 |    -1/   -1 |
+|---------------------------------+--------------+-------------|
+| StubDisplay                     | 256900/26792 |   200/    8 |
+| NumberWriter+Stub               | 257396/26792 |   696/    8 |
+| ClockWriter+Stub                | 257140/26800 |   440/   16 |
+| CharWriter+Stub                 | 257108/26792 |   408/    8 |
+| StringWriter+Stub               | 257308/26816 |   608/   32 |
 +--------------------------------------------------------------+
 ```
 
@@ -960,35 +1008,55 @@ The benchmark numbers can be seen in
 
 Here are the CPU numbers for an AVR processor:
 
+`+--------------------------------+-------------+---------+
+| LedMatrix type                 | min/avg/max | samples |
+|--------------------------------+-------------+---------|
+| direct                         |  60/ 66/ 80 |     240 |
+| direct(subfields)              |   4/ 13/ 72 |    3840 |
+| single_sw_spi                  | 124/129/152 |     240 |
+| single_sw_spi(subfields)       |   4/ 21/144 |    3840 |
+| single_hw_spi                  |  32/ 34/ 44 |     240 |
+| single_hw_spi(subfields)       |   4/  9/ 44 |    3840 |
+| dual_sw_spi                    | 212/216/244 |     240 |
+| dual_sw_spi(subfields)         |   4/ 32/240 |    3840 |
+| dual_hw_spi                    |  20/ 24/ 36 |     240 |
+| dual_hw_spi(subfields)         |   4/  8/ 32 |    3840 |
+|--------------------------------+-------------+---------|
+| direct_fast                    |  28/ 28/ 36 |     240 |
+| direct_fast(subfields)         |   4/  8/ 44 |    3840 |
+| single_sw_spi_fast             |  24/ 28/ 40 |     240 |
+| single_sw_spi_fast(subfields)  |   4/  8/ 44 |    3840 |
+| dual_sw_spi_fast               |  20/ 24/ 40 |     240 |
+| dual_sw_spi_fast(subfields)    |   4/  8/ 36 |    3840 |
++--------------------------------+-------------+---------+
 ```
-+---------------------------+-------------+---------+
-| LedMatrix type            | min/avg/max | samples |
-|---------------------------+-------------+---------|
-| direct                    |  60/ 64/ 80 | 1200    |
-| single_sw_spi             | 124/126/144 | 1200    |
-| single_hw_spi             |  28/ 31/ 48 | 1200    |
-| dual_sw_spi               | 212/215/244 | 1200    |
-| dual_hw_spi               |  20/ 23/ 32 | 1200    |
-|---------------------------+-------------+---------|
-| direct_fast               |  24/ 26/ 36 | 1200    |
-| single_sw_spi_fast        |  24/ 26/ 36 | 1200    |
-| dual_sw_spi_fast          |  20/ 23/ 32 | 1200    |
-+---------------------------+-------------+---------+
-```
+
+What is amazing is that if you use `digitalWriteFast()`, the software SPI is
+just as fast as hardware SPI, **and** consumes 500 bytes of less flash memory
+space.
 
 Here are the CPU numbers for an ESP8266:
 
 ```
-+---------------------------+-------------+---------+
-| LedMatrix type            | min/avg/max | samples |
-|---------------------------+-------------+---------|
-| direct                    |  12/ 12/ 28 | 1200    |
-| single_sw_spi             |  28/ 29/ 43 | 1200    |
-| single_hw_spi             |  11/ 11/ 23 | 1200    |
-| dual_sw_spi               |  50/ 50/ 65 | 1200    |
-| dual_hw_spi               |  12/ 12/ 24 | 1200    |
-+---------------------------+-------------+---------+
++--------------------------------+-------------+---------+
+| LedMatrix type                 | min/avg/max | samples |
+|--------------------------------+-------------+---------|
+| direct                         |  12/ 12/ 48 |     240 |
+| direct(subfields)              |   0/  2/ 28 |    3840 |
+| single_sw_spi                  |  29/ 29/ 37 |     240 |
+| single_sw_spi(subfields)       |   0/  4/ 41 |    3840 |
+| single_hw_spi                  |  11/ 11/ 25 |     240 |
+| single_hw_spi(subfields)       |   0/  2/ 23 |    3840 |
+| dual_sw_spi                    |  50/ 50/ 58 |     240 |
+| dual_sw_spi(subfields)         |   1/  7/ 67 |    3840 |
+| dual_hw_spi                    |  12/ 12/ 28 |     240 |
+| dual_hw_spi(subfields)         |   1/  2/ 28 |    3840 |
++--------------------------------+-------------+---------+
 ```
+
+On the ESP8266, the hardware SPI is about 4X after, but it does consume 1200
+bytes for flash space. But on the ESP8266 flash memory is usually not a concern,
+so it seems to make sense to use hardware SPI on the ESP8266.
 
 If we want to drive a 4 digit LED display at 60 frames per second, using a
 subfield modulation of 16 subfields per field, we get a field rate of 3.84 kHz,
