@@ -119,12 +119,15 @@ class NumberWriter {
      *    * 0 means no boxing, printing from left
      *    * > 0 means right justified inside box
      *    * < 0 means left justified inside box
+     *
+     * @return number of characters actually written, including characters
+     *    outside the end of the LED segments
      */
-    void writeUnsignedDecimalAt(uint8_t pos, uint16_t num,
+    uint8_t writeUnsignedDecimalAt(uint8_t pos, uint16_t num,
         int8_t boxSize = 0);
 
     /** Same as writeUnsignedDecimalAt() but prepends a '-' sign if negative. */
-    void writeSignedDecimalAt(uint8_t pos, int16_t num,
+    uint8_t writeSignedDecimalAt(uint8_t pos, int16_t num,
         int8_t boxSize = 0);
 
   private:
@@ -149,29 +152,8 @@ class NumberWriter {
      *
      * @param boxSize if negative, left justified; if postive, right justified
      */
-    void writeHexCharsInsideBoxAt(uint8_t pos, const hexchar_t s[], uint8_t len,
-        int8_t boxSize) {
-      uint8_t absBoxSize = (boxSize < 0) ? -boxSize : boxSize;
-
-      // if the box is too small, print normally
-      if (len >= absBoxSize) {
-        writeHexCharsInternalAt(pos, s, len);
-        return;
-      }
-
-      // Print either left justified or right justified insize box
-      uint8_t padSize = absBoxSize - len;
-      if (boxSize < 0) {
-        // left justified
-        writeHexCharsInternalAt(pos, s, len);
-        pos += len;
-        while (padSize--) writeHexCharInternalAt(pos++, kSpace);
-      } else {
-        // right justified
-        while (padSize--) writeHexCharInternalAt(pos++, kSpace);
-        writeHexCharsInternalAt(pos, s, len);
-      }
-    }
+    uint8_t writeHexCharsInsideBoxAt(
+        uint8_t pos, const hexchar_t s[], uint8_t len, int8_t boxSize);
 
     /**
      * Convert the integer num to an array of HexChar in the provided buf, with

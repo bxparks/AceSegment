@@ -138,31 +138,41 @@ testF(NumberWriterTest, writeHexWordAt) {
 }
 
 testF(NumberWriterTest, writeUnsignedDecimalAt) {
-  numberWriter.writeUnsignedDecimalAt(0, 1234);
+  uint8_t written = numberWriter.writeUnsignedDecimalAt(0, 123);
+  assertEqual(3, written);
   assertEqual(0b00000110, mPatterns[0]);
   assertEqual(0b01011011, mPatterns[1]);
   assertEqual(0b01001111, mPatterns[2]);
-  assertEqual(0b01100110, mPatterns[3]);
+
+  // Even if it off the end, the return value is the number of character that
+  // would have been written if the LED module was long enough.
+  written = numberWriter.writeUnsignedDecimalAt(3, 123);
+  assertEqual(3, written);
 }
 
 testF(NumberWriterTest, writeUnsignedDecimalAt_boxed) {
-  numberWriter.writeUnsignedDecimalAt(0, 34, 4);
+  uint8_t written = numberWriter.writeUnsignedDecimalAt(0, 34, 4);
+  assertEqual(4, written);
   assertEqual(0b00000000, mPatterns[0]);
   assertEqual(0b00000000, mPatterns[1]);
   assertEqual(0b01001111, mPatterns[2]);
   assertEqual(0b01100110, mPatterns[3]);
+
+  written = numberWriter.writeUnsignedDecimalAt(0, 34, 2);
+  assertEqual(2, written);
 }
 
 testF(NumberWriterTest, writeSignedDecimalAt) {
-  numberWriter.writeSignedDecimalAt(0, -234);
+  uint8_t written = numberWriter.writeSignedDecimalAt(0, -23);
+  assertEqual(3, written);
   assertEqual(0b01000000, mPatterns[0]);
   assertEqual(0b01011011, mPatterns[1]);
   assertEqual(0b01001111, mPatterns[2]);
-  assertEqual(0b01100110, mPatterns[3]);
 }
 
 testF(NumberWriterTest, writeSignedDecimalAt_boxed) {
-  numberWriter.writeSignedDecimalAt(0, -12, 4);
+  uint8_t written = numberWriter.writeSignedDecimalAt(0, -12, 4);
+  assertEqual(4, written);
   assertEqual(0b00000000, mPatterns[0]);
   assertEqual(0b01000000, mPatterns[1]);
   assertEqual(0b00000110, mPatterns[2]);

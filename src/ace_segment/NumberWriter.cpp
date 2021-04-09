@@ -68,7 +68,7 @@ void NumberWriter::writeHexCharInternalAt(uint8_t pos, hexchar_t c) {
   mLedDisplay.writePatternAt(pos, pattern);
 }
 
-void NumberWriter::writeUnsignedDecimalAt(
+uint8_t NumberWriter::writeUnsignedDecimalAt(
     uint8_t pos,
     uint16_t num,
     int8_t boxSize) {
@@ -77,10 +77,10 @@ void NumberWriter::writeUnsignedDecimalAt(
   hexchar_t buf[bufSize];
   uint8_t start = toDecimal(num, buf, bufSize);
 
-  writeHexCharsInsideBoxAt(pos, &buf[start], bufSize - start, boxSize);
+  return writeHexCharsInsideBoxAt(pos, &buf[start], bufSize - start, boxSize);
 }
 
-void NumberWriter::writeSignedDecimalAt(
+uint8_t NumberWriter::writeSignedDecimalAt(
     uint8_t pos,
     int16_t num,
     int8_t boxSize) {
@@ -96,7 +96,34 @@ void NumberWriter::writeSignedDecimalAt(
     buf[--start] = kMinus;
   }
 
-  writeHexCharsInsideBoxAt(pos, &buf[start], bufSize - start, boxSize);
+  return writeHexCharsInsideBoxAt(pos, &buf[start], bufSize - start, boxSize);
+}
+
+uint8_t NumberWriter::writeHexCharsInsideBoxAt(
+    uint8_t pos, const hexchar_t s[], uint8_t len, int8_t boxSize) {
+
+  uint8_t absBoxSize = (boxSize < 0) ? -boxSize : boxSize;
+
+  // if the box is too small, print normally
+  if (len >= absBoxSize) {
+    writeHexCharsInternalAt(pos, s, len);
+    return len;
+  }
+
+  // Print either left justified or right justified insize box
+  uint8_t padSize = absBoxSize - len;
+  if (boxSize < 0) {
+    // left justified
+    writeHexCharsInternalAt(pos, s, len);
+    pos += len;
+    while (padSize--) writeHexCharInternalAt(pos++, kSpace);
+  } else {
+    // right justified
+    while (padSize--) writeHexCharInternalAt(pos++, kSpace);
+    writeHexCharsInternalAt(pos, s, len);
+  }
+
+  return absBoxSize;
 }
 
 } // ace_segment
