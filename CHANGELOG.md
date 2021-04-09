@@ -1,8 +1,20 @@
 # Changelog
 
 * Unreleased
-    * Add Makefiles to run tests and compile examples using EpoxyDuino.
-    * Add GitHub workflow continuous integration.
+* 0.4 (2021-04-09)
+    * A complete refactoring of the previous v0.3 version, which I could not
+      understand anymore.
+        * Made things faster, smaller, easier to understand, more extensible,
+          and hopefully easier to maintain.
+        * Remove inheritance, virtual destructors and methods
+        * Almost all classes are templatized and do not have virtual functions
+        * Exception is `LedDisplay` which is the base interface virtual
+            functions. This is a high level function so the CPU and memory
+            consumption should be minimal.
+        * Remove virtual destructors for all clases, saving ~600 bytes on AVR.
+    * Build process
+        * Add Makefiles to run tests and compile examples using EpoxyDuino.
+        * Add GitHub workflow continuous integration.
     * Add `examples/MemoryBenchmark` and `examples/AutoBenchmark` programs
       to capture memory usages and CPU benchmarks, following the pattern for
       most of my other libraries.
@@ -19,28 +31,11 @@
         * `LedDisplay`
             * `ScanningDisplay`
         * Writers
-            * `HexWriter`
+            * `NumberWriter`
             * `ClockWriter`
             * `CharWriter`
             * `StringWriter`
         * Remove `Renderer` and `Driver` subclasses.
-    * Remove inheritance, virtual destructors and methods
-        * Almost all classes are templatized and do not have virtual functions
-        * Exception is `LedDisplay` which is the base interface virtual
-            functions. This is a high level function so the CPU and memory
-            consumption should be minimal.
-        * Remove virtual destructors for all clases, saving ~600 bytes on AVR.
-    * `ScanningDisplay`
-        * Combines the previous `Driver` and `Renderer` classes into a single
-          class, with templatized parameters.
-        * Handles the allocation of the LED segment bit `patterns` array, using
-          template parameters to determine the size. No heap allocation
-          performed.
-    * Writer classes
-        * All Writer classes (HexWriter, ClockWriter, CharWriter and
-          StringWriter) classes refererence just the `LedDisplay` interface.
-        * We can adapt other LED modules, using other chips, in this hierarchy
-          if neededed, so that the Writer classes can be reused.
     * LedMatrix wiring
         * `LedMatrix` classes are 100% templatized, they no longer form
           a class hierarchy, nor use any virtual functions. This is important
@@ -49,6 +44,19 @@
           specified using only 2 XOR bit masks, instead of asking 3 bools
           (common cathode or not, transitors on segments, transistors on
           digits).
+    * `ScanningDisplay`
+        * Combines the previous `Driver` and `Renderer` classes into a single
+          class, with templatized parameters.
+        * Handles the allocation of the LED segment bit `patterns` array, using
+          template parameters to determine the size. No heap allocation
+          performed.
+    * Writer classes
+        * All Writer classes (NumberWriter, ClockWriter, CharWriter and
+          StringWriter) classes refererence just the `LedDisplay` interface.
+        * Renamed `HexWriter` to more general `NumberWriter`.
+        * Implement generic `NumberWriter::writeUnsignedDecimalAt()` and
+          `writeSignedDecimalAt()` methods, with support for negative and
+          positive `boxSize` to get left or right justification within the box.
     * Support `digitalWriteFast()` on AVR
         * https://github.com/NicksonYap/digitalWriteFast
         * These GPIO functions require the pin number and output values to be
@@ -61,14 +69,14 @@
             * `#include <ace_segment/fast/LedMatrixDirectFast.h>`
             * `#include <ace_segment/fast/SwSpiAdapterFast.h>`
     * Resource consumption
-        * Save 50-60% on flash consumption on AVR by 50-60%, from 4-4.3 kB down
-          to 1.6-2.1 kB.
-        * CPU benchmarks down to ~20 microseconds using hardware SPI or
+        * Reduce flash consumption on AVR by 70-80%, from 4-4.3 kB down
+          to 700-1200 bytes.
+        * CPU benchmarks down to ~20 microseconds per each call to
+          `renderFieldNow()`, using hardware SPI, or software SPI using
           `digitalWriteFast()` on AVR processors
         * Single digit microseconds on ESP32 and Teensy 3.2.
     * Brightness control using pulse width modulation (PWM)
         * The brightness of each digit is controlled independently as before.
-        * Not tested as of this writing.
     * Removed features
         * Blinking digits removed, can be implemented from the outside.
         * Pulsating digits removed, can be implemented from outside.
