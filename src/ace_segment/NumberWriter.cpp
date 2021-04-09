@@ -77,7 +77,8 @@ uint8_t NumberWriter::writeUnsignedDecimalAt(
   hexchar_t buf[bufSize];
   uint8_t start = toDecimal(num, buf, bufSize);
 
-  return writeHexCharsInsideBoxAt(pos, &buf[start], bufSize - start, boxSize);
+  return writeHexCharsInsideBoxAt(
+      pos, &buf[start], bufSize - start, boxSize);
 }
 
 uint8_t NumberWriter::writeSignedDecimalAt(
@@ -93,14 +94,18 @@ uint8_t NumberWriter::writeSignedDecimalAt(
   hexchar_t buf[bufSize];
   uint8_t start = toDecimal(absNum, buf, bufSize);
   if (negative) {
-    buf[--start] = kMinus;
+    buf[--start] = kCharMinus;
   }
 
-  return writeHexCharsInsideBoxAt(pos, &buf[start], bufSize - start, boxSize);
+  return writeHexCharsInsideBoxAt(
+      pos, &buf[start], bufSize - start, boxSize);
 }
 
 uint8_t NumberWriter::writeHexCharsInsideBoxAt(
-    uint8_t pos, const hexchar_t s[], uint8_t len, int8_t boxSize) {
+    uint8_t pos,
+    const hexchar_t s[],
+    uint8_t len,
+    int8_t boxSize) {
 
   uint8_t absBoxSize = (boxSize < 0) ? -boxSize : boxSize;
 
@@ -116,10 +121,10 @@ uint8_t NumberWriter::writeHexCharsInsideBoxAt(
     // left justified
     writeInternalHexCharsAt(pos, s, len);
     pos += len;
-    while (padSize--) writeInternalHexCharAt(pos++, kSpace);
+    while (padSize--) writeInternalHexCharAt(pos++, kCharSpace);
   } else {
     // right justified
-    while (padSize--) writeInternalHexCharAt(pos++, kSpace);
+    while (padSize--) writeInternalHexCharAt(pos++, kCharSpace);
     writeInternalHexCharsAt(pos, s, len);
   }
 
