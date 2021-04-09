@@ -1,5 +1,21 @@
 var searchData=
 [
-  ['usemodulatingdriver',['useModulatingDriver',['../classace__segment_1_1DriverBuilder.html#a8303f5066da98e26189047d5623ce64b',1,'ace_segment::DriverBuilder']]],
-  ['util',['Util',['../classace__segment_1_1Util.html',1,'ace_segment']]]
+  ['wakefromsleep_45',['wakeFromSleep',['../classace__segment_1_1ScanningDisplay.html#a5cf21f6ef4a68b400b3e2c3130443635',1,'ace_segment::ScanningDisplay']]],
+  ['writebcd2at_46',['writeBcd2At',['../classace__segment_1_1ClockWriter.html#afc4dd796b50deda456b4319134a47030',1,'ace_segment::ClockWriter']]],
+  ['writecharat_47',['writeCharAt',['../classace__segment_1_1CharWriter.html#a99a411fbfb2fb6abf42fcd5149222cf7',1,'ace_segment::CharWriter::writeCharAt()'],['../classace__segment_1_1ClockWriter.html#a38a81ddc4dae8fa1a0367b53950da5ed',1,'ace_segment::ClockWriter::writeCharAt()']]],
+  ['writecolon_48',['writeColon',['../classace__segment_1_1ClockWriter.html#a096853e66769296fd48242fc2fe343a5',1,'ace_segment::ClockWriter']]],
+  ['writedec2at_49',['writeDec2At',['../classace__segment_1_1ClockWriter.html#a2c2fc024c85fc9519395470dd4b74232',1,'ace_segment::ClockWriter']]],
+  ['writedec4at_50',['writeDec4At',['../classace__segment_1_1ClockWriter.html#a5c742e5c5f0110b49b8e72f8d5ede5b5',1,'ace_segment::ClockWriter']]],
+  ['writedecimalpointat_51',['writeDecimalPointAt',['../classace__segment_1_1LedDisplay.html#a0f339305ac7432fbfb4e38b9599dcaae',1,'ace_segment::LedDisplay::writeDecimalPointAt()'],['../classace__segment_1_1ScanningDisplay.html#acb67a747588d5e77be374e543f5e148a',1,'ace_segment::ScanningDisplay::writeDecimalPointAt()']]],
+  ['writehexbyteat_52',['writeHexByteAt',['../classace__segment_1_1NumberWriter.html#a51927f150ecf2d51c3788a9eb5107c3f',1,'ace_segment::NumberWriter']]],
+  ['writehexcharat_53',['writeHexCharAt',['../classace__segment_1_1NumberWriter.html#a7a0faa29a22763770d3f36c85a487108',1,'ace_segment::NumberWriter']]],
+  ['writehexcharsat_54',['writeHexCharsAt',['../classace__segment_1_1NumberWriter.html#aa89235b426fe683f327ed8bc30934e1d',1,'ace_segment::NumberWriter']]],
+  ['writehexwordat_55',['writeHexWordAt',['../classace__segment_1_1NumberWriter.html#a0c2a8d50b26a2d4d218e71af0bc84890',1,'ace_segment::NumberWriter']]],
+  ['writehourminute_56',['writeHourMinute',['../classace__segment_1_1ClockWriter.html#a22fe4aa56a8881fdf7d12de3e077cc0a',1,'ace_segment::ClockWriter']]],
+  ['writepatternat_57',['writePatternAt',['../classace__segment_1_1LedDisplay.html#a7739b860133bab0e924b57ed0c55d0bd',1,'ace_segment::LedDisplay::writePatternAt()'],['../classace__segment_1_1ScanningDisplay.html#a43d69c95d835d9b02c0f7e80064f7fe2',1,'ace_segment::ScanningDisplay::writePatternAt()']]],
+  ['writepatternsat_58',['writePatternsAt',['../classace__segment_1_1LedDisplay.html#a33592c6357d17837836307eb2f88fdf0',1,'ace_segment::LedDisplay::writePatternsAt()'],['../classace__segment_1_1ScanningDisplay.html#a09d79c60fcd579e24d20d662979bc6d0',1,'ace_segment::ScanningDisplay::writePatternsAt()']]],
+  ['writepatternsat_5fp_59',['writePatternsAt_P',['../classace__segment_1_1LedDisplay.html#aaf92e9b380ea432a532b51383c76ffa4',1,'ace_segment::LedDisplay::writePatternsAt_P()'],['../classace__segment_1_1ScanningDisplay.html#a50e3b78e1e8fd020958ee2deb177fef6',1,'ace_segment::ScanningDisplay::writePatternsAt_P()']]],
+  ['writesigneddecimalat_60',['writeSignedDecimalAt',['../classace__segment_1_1NumberWriter.html#a69b7ab86dea585c95e5547e231827b12',1,'ace_segment::NumberWriter']]],
+  ['writestringat_61',['writeStringAt',['../classace__segment_1_1StringWriter.html#adedde0122089d0f754758013c4a12d42',1,'ace_segment::StringWriter']]],
+  ['writeunsigneddecimalat_62',['writeUnsignedDecimalAt',['../classace__segment_1_1NumberWriter.html#a5e663f325225b40b51c3669d82add022',1,'ace_segment::NumberWriter']]]
 ];

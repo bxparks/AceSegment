@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['hardware',['Hardware',['../classace__segment_1_1Hardware.html#a37dcfdef3fd2e016a79da7b4dc9db727',1,'ace_segment::Hardware']]],
-  ['hexwriter',['HexWriter',['../classace__segment_1_1HexWriter.html#af43d83f92cee41c078276dd7ac86f91f',1,'ace_segment::HexWriter']]]
+  ['micros_92',['micros',['../classace__segment_1_1Hardware.html#a4b7dea04208c5c5e26c0eecc80446919',1,'ace_segment::Hardware']]],
+  ['millis_93',['millis',['../classace__segment_1_1Hardware.html#ab47c069174be081648408c656438f5a9',1,'ace_segment::Hardware']]]
 ];

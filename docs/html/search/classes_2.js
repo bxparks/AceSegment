@@ -1,7 +1,8 @@
 var searchData=
 [
-  ['digitdriver',['DigitDriver',['../classace__segment_1_1DigitDriver.html',1,'ace_segment']]],
-  ['dimmablepattern',['DimmablePattern',['../classace__segment_1_1DimmablePattern.html',1,'ace_segment']]],
-  ['driver',['Driver',['../classace__segment_1_1Driver.html',1,'ace_segment']]],
-  ['driverbuilder',['DriverBuilder',['../classace__segment_1_1DriverBuilder.html',1,'ace_segment']]]
+  ['leddisplay_67',['LedDisplay',['../classace__segment_1_1LedDisplay.html',1,'ace_segment']]],
+  ['ledmatrixbase_68',['LedMatrixBase',['../classace__segment_1_1LedMatrixBase.html',1,'ace_segment']]],
+  ['ledmatrixdirect_69',['LedMatrixDirect',['../classace__segment_1_1LedMatrixDirect.html',1,'ace_segment']]],
+  ['ledmatrixdualshiftregister_70',['LedMatrixDualShiftRegister',['../classace__segment_1_1LedMatrixDualShiftRegister.html',1,'ace_segment']]],
+  ['ledmatrixsingleshiftregister_71',['LedMatrixSingleShiftRegister',['../classace__segment_1_1LedMatrixSingleShiftRegister.html',1,'ace_segment']]]
 ];

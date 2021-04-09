@@ -1,5 +1,0 @@
-<map id="ace_segment::Driver" name="ace_segment::Driver">
-<area shape="rect" id="node2" href="$classace__segment_1_1DigitDriver.html" title="A Driver that assumes that the resistors are on the segments so the multiplexing occurs by scanning t..." alt="" coords="19,80,190,107"/>
-<area shape="rect" id="node4" href="$classace__segment_1_1SegmentDriver.html" title="A Driver that assumes that the resistors are on the digits so the multiplexing occurs by scanning thr..." alt="" coords="214,80,409,107"/>
-<area shape="rect" id="node3" href="$classace__segment_1_1ModulatingDigitDriver.html" title="ace_segment::ModulatingDigit\lDriver" alt="" coords="5,155,204,196"/>
-</map>

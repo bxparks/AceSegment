@@ -1,7 +1,0 @@
-<map id="ace_segment::ModulatingDigitDriver" name="ace_segment::ModulatingDigitDriver">
-<area shape="rect" id="node2" href="$classace__segment_1_1DigitDriver.html" title="A Driver that assumes that the resistors are on the segments so the multiplexing occurs by scanning t..." alt="" coords="115,260,286,287"/>
-<area shape="rect" id="node3" href="$classace__segment_1_1Driver.html" title="Base class of drivers which knows how to transfer the bit patterns stored in the array of DimmablePat..." alt="" coords="129,184,272,211"/>
-<area shape="rect" id="node4" href="$classace__segment_1_1DimmablePattern.html" title="ace_segment::DimmablePattern" alt="" coords="5,95,215,121"/>
-<area shape="rect" id="node5" href="$classace__segment_1_1LedMatrix.html" title="Class that represents the abstraction of a particular LED display wiring. " alt="" coords="239,95,405,121"/>
-<area shape="rect" id="node6" href="$classace__segment_1_1Hardware.html" title="ace_segment::Hardware" alt="" coords="240,5,404,32"/>
-</map>

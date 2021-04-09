@@ -1,0 +1,6 @@
+<map id="ace_segment::LedMatrixBase" name="ace_segment::LedMatrixBase">
+<area shape="rect" id="node1" title="Class that represents the abstraction of a particular LED display wiring, and knows how to turn off a..." alt="" coords="5,64,220,91"/>
+<area shape="rect" id="node2" href="$classace__segment_1_1LedMatrixDirect.html" title="An LedMatrixBase that whose group pins and element pins are wired directly to the MCU." alt="" coords="268,5,529,32"/>
+<area shape="rect" id="node3" href="$classace__segment_1_1LedMatrixDualShiftRegister.html" title="An LedMatrix that whose group pins are attached to one 74HC595 shift register and the element pins ar..." alt="" coords="293,57,505,98"/>
+<area shape="rect" id="node4" href="$classace__segment_1_1LedMatrixSingleShiftRegister.html" title="An implementation of LedMatrixBase with an 74HC595 Serial&#45;To&#45;Parallel converter chip on the segment p..." alt="" coords="287,122,510,163"/>
+</map>

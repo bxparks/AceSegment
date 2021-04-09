@@ -1,3 +1,4 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classace__segment_1_1Hardware.html" title="ace_segment::Hardware" alt="" coords="5,5,169,32"/>
+<area shape="rect" id="node1" href="$classace__segment_1_1LedDisplay.html" title="General interface for writing LED segment patterns to the LED display module." alt="" coords="5,13,195,39"/>
+<area shape="rect" id="node2" href="$classace__segment_1_1ScanningDisplay.html" title="An implementation of LedDisplay for display modules which do not have hardware controller chips,..." alt="" coords="243,5,477,47"/>
 </map>

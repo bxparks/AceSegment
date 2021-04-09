@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['hardware',['Hardware',['../classace__segment_1_1Hardware.html',1,'ace_segment']]],
-  ['hexwriter',['HexWriter',['../classace__segment_1_1HexWriter.html',1,'ace_segment']]]
+  ['numberwriter_72',['NumberWriter',['../classace__segment_1_1NumberWriter.html',1,'ace_segment']]]
 ];

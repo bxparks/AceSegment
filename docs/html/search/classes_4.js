@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['ledmatrix',['LedMatrix',['../classace__segment_1_1LedMatrix.html',1,'ace_segment']]],
-  ['ledmatrixdirect',['LedMatrixDirect',['../classace__segment_1_1LedMatrixDirect.html',1,'ace_segment']]],
-  ['ledmatrixserial',['LedMatrixSerial',['../classace__segment_1_1LedMatrixSerial.html',1,'ace_segment']]],
-  ['ledmatrixspi',['LedMatrixSpi',['../classace__segment_1_1LedMatrixSpi.html',1,'ace_segment']]]
+  ['scanningdisplay_73',['ScanningDisplay',['../classace__segment_1_1ScanningDisplay.html',1,'ace_segment']]],
+  ['stringwriter_74',['StringWriter',['../classace__segment_1_1StringWriter.html',1,'ace_segment']]],
+  ['swspiadapter_75',['SwSpiAdapter',['../classace__segment_1_1SwSpiAdapter.html',1,'ace_segment']]]
 ];

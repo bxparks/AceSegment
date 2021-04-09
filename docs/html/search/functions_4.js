@@ -1,4 +1,7 @@
 var searchData=
 [
-  ['finish',['finish',['../classace__segment_1_1Driver.html#ae690798a1ee25ad0a50e5d1285e48813',1,'ace_segment::Driver::finish()'],['../classace__segment_1_1LedMatrix.html#a3f975ba8b22e88857b89984ba08675f4',1,'ace_segment::LedMatrix::finish()'],['../classace__segment_1_1LedMatrixDirect.html#a847eb3598badb44ab6c25fc210ea4f24',1,'ace_segment::LedMatrixDirect::finish()'],['../classace__segment_1_1LedMatrixSerial.html#a3fda7bf3225f8b174cbff1789e91c613',1,'ace_segment::LedMatrixSerial::finish()'],['../classace__segment_1_1LedMatrixSpi.html#aad716cd26d076f817dfcb415f702d3d7',1,'ace_segment::LedMatrixSpi::finish()']]]
+  ['getfieldsperframe_87',['getFieldsPerFrame',['../classace__segment_1_1ScanningDisplay.html#a989b0087fdb591f4e35ae15317067d2a',1,'ace_segment::ScanningDisplay']]],
+  ['getfieldspersecond_88',['getFieldsPerSecond',['../classace__segment_1_1ScanningDisplay.html#aa21e88f28f9544fa6fa9aab13475dd0a',1,'ace_segment::ScanningDisplay']]],
+  ['getframespersecond_89',['getFramesPerSecond',['../classace__segment_1_1ScanningDisplay.html#a0debd78bbf4fa97327c8e4c0166c3cb5',1,'ace_segment::ScanningDisplay']]],
+  ['getnumdigits_90',['getNumDigits',['../classace__segment_1_1LedDisplay.html#a9aef98e79c8f2b95d93938c8d4d4fcc8',1,'ace_segment::LedDisplay::getNumDigits()'],['../classace__segment_1_1ScanningDisplay.html#a949b1944965cf0751ff85a398df4e8db',1,'ace_segment::ScanningDisplay::getNumDigits()']]]
 ];

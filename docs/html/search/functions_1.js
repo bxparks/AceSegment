@@ -1,4 +1,7 @@
 var searchData=
 [
-  ['build',['build',['../classace__segment_1_1RendererBuilder.html#acc76950294a29bac11b29ce5a8ad9a28',1,'ace_segment::RendererBuilder']]]
+  ['charwriter_77',['CharWriter',['../classace__segment_1_1CharWriter.html#a9643e7e815b01e0559b11d6c39da9873',1,'ace_segment::CharWriter']]],
+  ['clear_78',['clear',['../classace__segment_1_1LedDisplay.html#ac0e3a7ed16c3fb6ee044bf6b2789eaff',1,'ace_segment::LedDisplay::clear()'],['../classace__segment_1_1LedMatrixBase.html#aa5fb153442f0504f93461b9d9f6f9a3e',1,'ace_segment::LedMatrixBase::clear()'],['../classace__segment_1_1ScanningDisplay.html#a3dc5ca0a1a9b1b42f353769fc33d6973',1,'ace_segment::ScanningDisplay::clear()']]],
+  ['cleartoend_79',['clearToEnd',['../classace__segment_1_1NumberWriter.html#ae842af42786cc9bd078f5a40d0f7c6ca',1,'ace_segment::NumberWriter']]],
+  ['clockwriter_80',['ClockWriter',['../classace__segment_1_1ClockWriter.html#a504ea19a36214a365ee6ad0f55233c4f',1,'ace_segment::ClockWriter']]]
 ];

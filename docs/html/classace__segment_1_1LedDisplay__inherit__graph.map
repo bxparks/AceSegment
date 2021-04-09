@@ -1,0 +1,4 @@
+<map id="ace_segment::LedDisplay" name="ace_segment::LedDisplay">
+<area shape="rect" id="node1" title="General interface for writing LED segment patterns to the LED display module." alt="" coords="28,5,217,32"/>
+<area shape="rect" id="node2" href="$classace__segment_1_1ScanningDisplay.html" title="An implementation of LedDisplay for display modules which do not have hardware controller chips,..." alt="" coords="5,80,240,121"/>
+</map>
