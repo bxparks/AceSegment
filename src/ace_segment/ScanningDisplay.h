@@ -164,7 +164,7 @@ class ScanningDisplay : public LedDisplay {
     }
 
     /**
-     * @copyDoc
+     * @copydoc
      *
      * The maximum brightness should is exactly `SUBFIELDS` which turns on the
      * LED 100% of the time. The minimum brightness is 0, which turns OFF the
@@ -202,7 +202,7 @@ class ScanningDisplay : public LedDisplay {
     }
 
     /**
-     * @copyDoc
+     * @copydoc
      *
      * See the documentation for setBrightnessAt() for information about the
      * range of values of `brightness` and how it is interpreted.
