@@ -63,7 +63,7 @@ const uint8_t NumberWriter::kHexCharPatterns[kNumHexChars] PROGMEM = {
   0b01000000, /* - */
 };
 
-void NumberWriter::writeHexCharInternalAt(uint8_t pos, hexchar_t c) {
+void NumberWriter::writeInternalHexCharAt(uint8_t pos, hexchar_t c) {
   uint8_t pattern = pgm_read_byte(&kHexCharPatterns[(uint8_t) c]);
   mLedDisplay.writePatternAt(pos, pattern);
 }
@@ -106,7 +106,7 @@ uint8_t NumberWriter::writeHexCharsInsideBoxAt(
 
   // if the box is too small, print normally
   if (len >= absBoxSize) {
-    writeHexCharsInternalAt(pos, s, len);
+    writeInternalHexCharsAt(pos, s, len);
     return len;
   }
 
@@ -114,13 +114,13 @@ uint8_t NumberWriter::writeHexCharsInsideBoxAt(
   uint8_t padSize = absBoxSize - len;
   if (boxSize < 0) {
     // left justified
-    writeHexCharsInternalAt(pos, s, len);
+    writeInternalHexCharsAt(pos, s, len);
     pos += len;
-    while (padSize--) writeHexCharInternalAt(pos++, kSpace);
+    while (padSize--) writeInternalHexCharAt(pos++, kSpace);
   } else {
     // right justified
-    while (padSize--) writeHexCharInternalAt(pos++, kSpace);
-    writeHexCharsInternalAt(pos, s, len);
+    while (padSize--) writeInternalHexCharAt(pos++, kSpace);
+    writeInternalHexCharsAt(pos, s, len);
   }
 
   return absBoxSize;

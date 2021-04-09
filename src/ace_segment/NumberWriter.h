@@ -80,7 +80,7 @@ class NumberWriter {
      * instead.
      */
     void writeHexCharAt(uint8_t pos, hexchar_t c) {
-      writeHexCharInternalAt(pos, ((uint8_t) c < kNumHexChars) ? c : kSpace);
+      writeInternalHexCharAt(pos, ((uint8_t) c < kNumHexChars) ? c : kSpace);
     }
 
     /** Write the `len` hex characters given by `s` starting at `pos`. */
@@ -96,8 +96,8 @@ class NumberWriter {
       b >>= 4;
       uint8_t high = (b & 0x0F);
 
-      writeHexCharInternalAt(pos++, high);
-      writeHexCharInternalAt(pos++, low);
+      writeInternalHexCharAt(pos++, high);
+      writeInternalHexCharAt(pos++, low);
     }
 
     /** Write the 4 digit (16-bit) hexadecimal word at pos. */
@@ -137,7 +137,7 @@ class NumberWriter {
      */
     void clearToEnd(uint8_t pos) {
       for (uint8_t i = pos; i < mLedDisplay.getNumDigits(); ++i) {
-        writeHexCharInternalAt(i, kSpace);
+        writeInternalHexCharAt(i, kSpace);
       }
     }
 
@@ -147,13 +147,13 @@ class NumberWriter {
     NumberWriter& operator=(const NumberWriter&) = delete;
 
     /** Similar to writeHexCharAt() without performing bounds check. */
-    void writeHexCharInternalAt(uint8_t pos, hexchar_t c);
+    void writeInternalHexCharAt(uint8_t pos, hexchar_t c);
 
     /** Similar to writeHexCharsAt() without performing bounds check. */
-    void writeHexCharsInternalAt(uint8_t pos, const hexchar_t s[],
+    void writeInternalHexCharsAt(uint8_t pos, const hexchar_t s[],
         uint8_t len) {
       for (uint8_t i = 0; i < len; ++i) {
-        writeHexCharInternalAt(pos++, s[i]);
+        writeInternalHexCharAt(pos++, s[i]);
       }
     }
 
