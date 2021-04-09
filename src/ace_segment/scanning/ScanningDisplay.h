@@ -28,7 +28,7 @@ SOFTWARE.
 #include <stdint.h>
 #include <Arduino.h> // pgm_read_byte()
 #include <AceCommon.h> // incrementMod()
-#include "LedDisplay.h"
+#include "../LedDisplay.h"
 
 class ScanningDisplayTest_displayCurrentField;
 
