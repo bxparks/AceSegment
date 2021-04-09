@@ -76,6 +76,11 @@ class ClockWriter {
       return mNumberWriter.display();
     }
 
+    /** Write the hexchar_t 'c' at 'pos'. */
+    void writeCharAt(uint8_t pos, hexchar_t c) {
+      mNumberWriter.writeHexCharAt(pos, c);
+    }
+
     /**
      * Write a 2-digit BCD number at position, which involves just printing the
      * number as a hexadecimal number. For example, 0x12 is printed as "12", but
