@@ -177,7 +177,7 @@ Hardware hardware;
 #endif
 
 // Monochromatic
-ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, 1> scanningDisplay(
+ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS> scanningDisplay(
     hardware, ledMatrix, FRAMES_PER_SECOND);
 
 // 16 level of brightness, need field/second of 60*4*16 = 3840.

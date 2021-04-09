@@ -67,10 +67,11 @@ namespace ace_segment {
  * @tparam LM LedMatrixBase class that provides access to LED segments
       (elements) organized by digit (group)
  * @tparam DIGITS number of LED digits
- * @tparam SUBFIELDS number of rendering fields per digit for PWM, normally 1,
- *   but set to greater than 1 to get intermediate brightness levels
+ * @tparam SUBFIELDS number of subfields for each digit to get brightness
+ *    control using PWM. The default is 1, but can be set to greater than 1 to
+ *    get brightness control.
  */
-template <typename HW, typename LM, uint8_t DIGITS, uint8_t SUBFIELDS>
+template <typename HW, typename LM, uint8_t DIGITS, uint8_t SUBFIELDS = 1>
 class ScanningDisplay : public LedDisplay {
 
   public:
