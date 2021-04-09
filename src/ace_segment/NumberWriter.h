@@ -130,6 +130,17 @@ class NumberWriter {
     uint8_t writeSignedDecimalAt(uint8_t pos, int16_t num,
         int8_t boxSize = 0);
 
+    /**
+     * Clear the display from `pos` to the end. Useful after calling
+     * writeSignedDecimalAt() and writeUnsignedDecimalAt() which prints a
+     * variable number of digits.
+     */
+    void clearToEnd(uint8_t pos) {
+      for (uint8_t i = pos; i < mLedDisplay.getNumDigits(); ++i) {
+        writeHexCharInternalAt(i, kSpace);
+      }
+    }
+
   private:
     // disable copy-constructor and assignment operator
     NumberWriter(const NumberWriter&) = delete;

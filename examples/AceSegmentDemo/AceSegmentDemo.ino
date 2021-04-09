@@ -288,7 +288,8 @@ void writeHexNumbers() {
 void writeUnsignedDecNumbers() {
   static uint16_t w = 0;
 
-  numberWriter.writeUnsignedDecimalAt(0, w, -3);
+  uint8_t written = numberWriter.writeUnsignedDecimalAt(0, w, -3);
+  numberWriter.clearToEnd(written);
   incrementMod(w, (uint16_t) 2000);
 }
 
