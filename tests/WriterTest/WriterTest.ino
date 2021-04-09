@@ -118,7 +118,7 @@ testF(NumberWriterTest, writeHexCharAt) {
 testF(NumberWriterTest, writeHexCharAt_outOfBounds) {
   mPatterns[4] = 0;
 
-  numberWriter.writeHexCharAt(4, NumberWriter::kMinus);
+  numberWriter.writeHexCharAt(4, NumberWriter::kCharMinus);
   numberWriter.display().writeDecimalPointAt(4);
   assertEqual(0, mPatterns[4]);
 }

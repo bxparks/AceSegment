@@ -33,8 +33,8 @@ namespace ace_segment {
 /**
  * The NumberWriter supports converting decimal and hexadecimal numbers to
  * segment patterns expected by LedDisplay. The character set includes 0 to F,
- * and a few other characters which should be self-explanatory: kSpace and
- * kMinus.
+ * and a few other characters which should be self-explanatory: kCharSpace and
+ * kCharMinus.
  */
 class NumberWriter {
   public:
@@ -45,8 +45,8 @@ class NumberWriter {
      * that starts with 0 and goes up to 0xF to support hexadecimal digits. In
      * addition, the character set adds few more characters for convenience:
      *
-     *  * kSpace = 0x10 = space character
-     *  * kMinus = 0x11 = minus character
+     *  * kCharSpace = 0x10 = space character
+     *  * kCharMinus = 0x11 = minus character
      *
      * The `hexchar_t` typedef is an alias for `uint8_t` and unfortunately, C++
      * will not prevent mixing a normal `char` or `uint8_t` with a `hexchar_t`.
@@ -59,10 +59,10 @@ class NumberWriter {
     static const uint8_t kNumHexChars = 18;
 
     /** A space character. */
-    static const hexchar_t kSpace = 0x10;
+    static const hexchar_t kCharSpace = 0x10;
 
     /** A minus character. */
-    static const hexchar_t kMinus = 0x11;
+    static const hexchar_t kCharMinus = 0x11;
 
     /** Constructor. */
     explicit NumberWriter(LedDisplay& ledDisplay) :
@@ -76,11 +76,12 @@ class NumberWriter {
 
     /**
      * Write the hex character `c` at position `pos`. If `c` falls outside the
-     * valid range of the kHexCharPatterns set, a `kSpace` character is printed
-     * instead.
+     * valid range of the kHexCharPatterns set, a `kCharSpace` character is
+     * printed instead.
      */
     void writeHexCharAt(uint8_t pos, hexchar_t c) {
-      writeInternalHexCharAt(pos, ((uint8_t) c < kNumHexChars) ? c : kSpace);
+      writeInternalHexCharAt(
+          pos, ((uint8_t) c < kNumHexChars) ? c : kCharSpace);
     }
 
     /** Write the `len` hex characters given by `s` starting at `pos`. */
@@ -118,7 +119,7 @@ class NumberWriter {
      *    * 0 means no boxing, printing from left
      *    * > 0 means right justified inside box
      *    * < 0 means left justified inside box
-     * @param padChar left-pad character, hexchar_t (default: kSpace)
+     * @param padChar left-pad character, hexchar_t (default: kCharSpace)
      *
      * @return number of characters actually written, even if the characters
      *    bled over the end of the LED segments
@@ -127,14 +128,14 @@ class NumberWriter {
         uint8_t pos,
         uint16_t num,
         int8_t boxSize = 0,
-        hexchar_t padChar = kSpace);
+        hexchar_t padChar = kCharSpace);
 
     /** Same as writeUnsignedDecimalAt() but prepends a '-' sign if negative. */
     uint8_t writeSignedDecimalAt(
         uint8_t pos,
         int16_t num,
         int8_t boxSize = 0,
-        hexchar_t padChar = kSpace);
+        hexchar_t padChar = kCharSpace);
 
     /**
      * Clear the display from `pos` to the end. Useful after calling
@@ -143,7 +144,7 @@ class NumberWriter {
      */
     void clearToEnd(uint8_t pos) {
       for (uint8_t i = pos; i < mLedDisplay.getNumDigits(); ++i) {
-        writeInternalHexCharAt(i, kSpace);
+        writeInternalHexCharAt(i, kCharSpace);
       }
     }
 
@@ -168,7 +169,7 @@ class NumberWriter {
      * position `pos`.
      *
      * @param boxSize if negative, left justified; if postive, right justified
-     * @param padChar left-pad character, hexchar_t, so usually 0 or kSpace
+     * @param padChar left-pad character, hexchar_t, so usually 0 or kCharSpace
      */
     uint8_t writeHexCharsInsideBoxAt(
         uint8_t pos,

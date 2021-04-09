@@ -96,7 +96,7 @@ uint8_t NumberWriter::writeSignedDecimalAt(
   hexchar_t buf[bufSize];
   uint8_t start = toDecimal(absNum, buf, bufSize);
   if (negative) {
-    buf[--start] = kMinus;
+    buf[--start] = kCharMinus;
   }
 
   return writeHexCharsInsideBoxAt(

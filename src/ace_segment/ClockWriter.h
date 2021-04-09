@@ -40,10 +40,10 @@ class ClockWriter {
     using hexchar_t = NumberWriter::hexchar_t;
 
     /** Blank digit. */
-    static const hexchar_t kSpace = NumberWriter::kSpace;
+    static const hexchar_t kCharSpace = NumberWriter::kCharSpace;
 
     /** A minus ("-") sign. */
-    static const hexchar_t kMinus = NumberWriter::kMinus;
+    static const hexchar_t kCharMinus = NumberWriter::kCharMinus;
 
     /** The "A" character for "AM". */
     static const uint8_t kPatternA = 0b01110111;
@@ -84,8 +84,8 @@ class ClockWriter {
     void writeBcd2At(uint8_t pos, uint8_t bcd) {
       uint8_t high = (bcd & 0xF0) >> 4;
       uint8_t low = (bcd & 0x0F);
-      if (high > 9) high = kSpace;
-      if (low > 9) low = kSpace;
+      if (high > 9) high = kCharSpace;
+      if (low > 9) low = kCharSpace;
       mNumberWriter.writeHexCharAt(pos++, high);
       mNumberWriter.writeHexCharAt(pos++, low);
     }
@@ -97,8 +97,8 @@ class ClockWriter {
      */
     void writeDec2At(uint8_t pos, uint8_t d) {
       if (d >= 100) {
-        mNumberWriter.writeHexCharAt(pos++, kSpace);
-        mNumberWriter.writeHexCharAt(pos++, kSpace);
+        mNumberWriter.writeHexCharAt(pos++, kCharSpace);
+        mNumberWriter.writeHexCharAt(pos++, kCharSpace);
       } else {
         uint8_t bcd = ace_common::decToBcd(d);
         writeBcd2At(pos, bcd);
