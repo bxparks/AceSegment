@@ -68,7 +68,9 @@ writeHexCharAt	KEYWORD2
 writeHexCharsAt	KEYWORD2
 writeHexByteAt	KEYWORD2
 writeHexWordAt	KEYWORD2
-writeDecWordAt	KEYWORD2
+writeUnsignedDecimalAt	KEYWORD2
+writeSignedDecimalAt	KEYWORD2
+clearToEnd	KEYWORD2
 
 # ClockWriter.h
 writeDecimalAt	KEYWORD2

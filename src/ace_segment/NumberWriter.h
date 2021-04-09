@@ -113,22 +113,21 @@ class NumberWriter {
      *
      * @param pos start position of the number
      * @param num unsigned decimal number, 0-65535
-     * @param pad left padding character, either 0 or kSpace (default: kSpace)
      * @param boxSize size of box. This is meant to be similar to the "%-5d" or
      *    "%5d" specifier to the printf() function)
      *    * 0 means no boxing, printing from left
      *    * > 0 means right justified inside box
      *    * < 0 means left justified inside box
      *
-     * @return number of characters actually written, including characters
-     *    outside the end of the LED segments
+     * @return number of characters actually written, even if the characters
+     *    bled over the end of the LED segments
      */
-    uint8_t writeUnsignedDecimalAt(uint8_t pos, uint16_t num,
-        int8_t boxSize = 0);
+    uint8_t writeUnsignedDecimalAt(
+        uint8_t pos, uint16_t num, int8_t boxSize = 0);
 
     /** Same as writeUnsignedDecimalAt() but prepends a '-' sign if negative. */
-    uint8_t writeSignedDecimalAt(uint8_t pos, int16_t num,
-        int8_t boxSize = 0);
+    uint8_t writeSignedDecimalAt(
+        uint8_t pos, int16_t num, int8_t boxSize = 0);
 
     /**
      * Clear the display from `pos` to the end. Useful after calling
