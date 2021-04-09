@@ -63,68 +63,67 @@ const uint8_t NumberWriter::kHexCharPatterns[kNumHexChars] PROGMEM = {
   0b01000000, /* - */
 };
 
-void NumberWriter::writeHexCharInternalAt(uint8_t pos, hexchar_t c) {
+void NumberWriter::writeInternalHexCharAt(uint8_t pos, hexchar_t c) {
   uint8_t pattern = pgm_read_byte(&kHexCharPatterns[(uint8_t) c]);
   mLedDisplay.writePatternAt(pos, pattern);
 }
 
-void NumberWriter::writeHexCharAt(uint8_t pos, hexchar_t c) {
-  writeHexCharInternalAt(pos, ((uint8_t) c < kNumHexChars) ? c : kSpace);
-}
-
-void NumberWriter::writeHexCharsAt(uint8_t pos, const hexchar_t s[],
-    uint8_t len) {
-  for (uint8_t i = 0; i < len; ++i) {
-    writeHexCharAt(pos++, s[i]);
-  }
-}
-
-void NumberWriter::writeHexByteAt(uint8_t pos, uint8_t b) {
-  uint8_t low = (b & 0x0F);
-  b >>= 4;
-  uint8_t high = (b & 0x0F);
-
-  writeHexCharInternalAt(pos++, high);
-  writeHexCharInternalAt(pos++, low);
-}
-
-void NumberWriter::writeHexWordAt(uint8_t pos, uint16_t w) {
-  uint8_t low = (w & 0xFF);
-  uint8_t high = (w >> 8) & 0xFF;
-  writeHexByteAt(pos, high);
-  writeHexByteAt(pos + 2, low);
-}
-
-void NumberWriter::writeDecWordAt(
+uint8_t NumberWriter::writeUnsignedDecimalAt(
     uint8_t pos,
-    uint16_t n,
-    hexchar_t pad,
+    uint16_t num,
     int8_t boxSize) {
 
-  // TODO: Implement 'pad' and 'boxSize'
-  (void) pad;
-  (void) boxSize;
+  const uint8_t bufSize = 5;
+  hexchar_t buf[bufSize];
+  uint8_t start = toDecimal(num, buf, bufSize);
 
-  hexchar_t c[5] = {0}; // c[0] is the lowest digit
-  uint16_t m = n;
-  uint8_t digit = 0;
-  while (true) {
-    if (m < 10) {
-      c[digit] = m;
-      digit++;
-      break;
-    }
-    uint16_t q = m / 10;
-    c[digit] = m - q * 10;
-    digit++;
-    m = q;
-  }
-  // digit is the total number of digits
+  return writeHexCharsInsideBoxAt(pos, &buf[start], bufSize - start, boxSize);
+}
 
-  // print with no justification
-  while (digit--) {
-    writeHexCharInternalAt(pos++, c[digit]);
+uint8_t NumberWriter::writeSignedDecimalAt(
+    uint8_t pos,
+    int16_t num,
+    int8_t boxSize) {
+
+  // Even -32768 turns into +32768, which is exactly what we want
+  bool negative = num < 0;
+  uint16_t absNum = negative ? -num : num;
+
+  const uint8_t bufSize = 6;
+  hexchar_t buf[bufSize];
+  uint8_t start = toDecimal(absNum, buf, bufSize);
+  if (negative) {
+    buf[--start] = kMinus;
   }
+
+  return writeHexCharsInsideBoxAt(pos, &buf[start], bufSize - start, boxSize);
+}
+
+uint8_t NumberWriter::writeHexCharsInsideBoxAt(
+    uint8_t pos, const hexchar_t s[], uint8_t len, int8_t boxSize) {
+
+  uint8_t absBoxSize = (boxSize < 0) ? -boxSize : boxSize;
+
+  // if the box is too small, print normally
+  if (len >= absBoxSize) {
+    writeInternalHexCharsAt(pos, s, len);
+    return len;
+  }
+
+  // Print either left justified or right justified insize box
+  uint8_t padSize = absBoxSize - len;
+  if (boxSize < 0) {
+    // left justified
+    writeInternalHexCharsAt(pos, s, len);
+    pos += len;
+    while (padSize--) writeInternalHexCharAt(pos++, kSpace);
+  } else {
+    // right justified
+    while (padSize--) writeInternalHexCharAt(pos++, kSpace);
+    writeInternalHexCharsAt(pos, s, len);
+  }
+
+  return absBoxSize;
 }
 
 } // ace_segment
