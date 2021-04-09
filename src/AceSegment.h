@@ -39,10 +39,10 @@ SOFTWARE.
 #include "ace_segment/LedMatrixSingleShiftRegister.h"
 #include "ace_segment/LedMatrixDualShiftRegister.h"
 #include "ace_segment/ScanningDisplay.h"
-#include "ace_segment/NumberWriter.h"
-#include "ace_segment/ClockWriter.h"
-#include "ace_segment/CharWriter.h"
-#include "ace_segment/StringWriter.h"
+#include "ace_segment/writer/NumberWriter.h"
+#include "ace_segment/writer/ClockWriter.h"
+#include "ace_segment/writer/CharWriter.h"
+#include "ace_segment/writer/StringWriter.h"
 
 // Version format: xxyyzz == "xx.yy.zz"
 #define ACE_SEGMENT_VERSION 400

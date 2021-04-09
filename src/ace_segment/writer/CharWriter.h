@@ -26,7 +26,7 @@ SOFTWARE.
 #define ACE_SEGMENT_CHAR_WRITER_H
 
 #include <stdint.h>
-#include "LedDisplay.h"
+#include "../LedDisplay.h"
 
 namespace ace_segment {
 
