@@ -30,7 +30,7 @@ SOFTWARE.
 #include <stdint.h>
 #include <Arduino.h> // OUTPUT, INPUT
 #include <digitalWriteFast.h>
-#include "../LedMatrixBase.h"
+#include "../scanning/LedMatrixBase.h"
 
 // Select OPTION_ARRAY to use an array of function pointers. Using an array
 // of function takes 27 microseconds for displayCurentField(), but 8 extra bytes
