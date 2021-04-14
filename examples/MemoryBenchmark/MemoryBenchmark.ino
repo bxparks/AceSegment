@@ -56,34 +56,17 @@ volatile int disableCompilerOptimization = 0;
     public:
       StubDisplay(): LedDisplay(NUM_DIGITS) {}
 
-      virtual void writePatternAt(uint8_t /*pos*/, uint8_t pattern) {
+      void writePatternAt(uint8_t /*pos*/, uint8_t pattern) override {
         disableCompilerOptimization = pattern;
       }
 
-      virtual void writePatternsAt(uint8_t /*pos*/, const uint8_t patterns[],
-          uint8_t /*len*/) {
-        disableCompilerOptimization = patterns[0];
-      }
-
-      virtual void writePatternsAt_P(uint8_t /*pos*/, const uint8_t patterns[],
-          uint8_t /*len*/) {
-        disableCompilerOptimization = patterns[0];
-      }
-
-      virtual void setBrightnessAt(uint8_t /*pos*/, uint8_t brightness) {
-        disableCompilerOptimization = brightness;
-      }
-
-      virtual void writeDecimalPointAt(uint8_t /*pos*/, bool state = true) {
+      void writeDecimalPointAt(uint8_t /*pos*/, bool state = true)
+          override {
         disableCompilerOptimization = state;
       }
 
-      virtual void setGlobalBrightness(uint8_t brightness) {
+      void setBrightness(uint8_t brightness) override {
         disableCompilerOptimization = brightness;
-      }
-
-      virtual void clear() {
-        disableCompilerOptimization = 0;
       }
   };
 

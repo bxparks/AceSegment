@@ -46,22 +46,6 @@ class TestableLedDisplay : public LedDisplay {
       mPatterns[pos] = pattern;
     }
 
-    void writePatternsAt(uint8_t pos, const uint8_t patterns[],
-        uint8_t len) override {
-      for (uint8_t i = 0; i < len; i++) {
-        if (pos >= DIGITS) break;
-        mPatterns[pos++] = patterns[i];
-      }
-    }
-
-    void writePatternsAt_P(uint8_t pos, const uint8_t patterns[],
-        uint8_t len) override {
-      for (uint8_t i = 0; i < len; i++) {
-        if (pos >= DIGITS) break;
-        mPatterns[pos++] = pgm_read_byte(patterns + i);
-      }
-    }
-
     void writeDecimalPointAt(uint8_t pos, bool state = true) override {
       if (pos >= DIGITS) return;
 
@@ -74,15 +58,7 @@ class TestableLedDisplay : public LedDisplay {
       mPatterns[pos] = pattern;
     }
 
-    void setBrightnessAt(uint8_t /*pos*/, uint8_t /*brightness*/) override {}
-
-    void setGlobalBrightness(uint8_t /*brightness*/) override {}
-
-    void clear() override {
-      for (uint8_t i = 0; i < DIGITS + 1; ++i) {
-        mPatterns[i] = 0;
-      }
-    }
+    void setBrightness(uint8_t /*brightness*/) override {}
 
     uint8_t* getPatterns() { return mPatterns; }
 

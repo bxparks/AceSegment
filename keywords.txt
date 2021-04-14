@@ -47,17 +47,21 @@ clear	KEYWORD2
 enableGroup	KEYWORD2
 disableGroup	KEYWORD2
 
+# LedDisplay.h
+writePatternAt	KEYWORD2
+writePatternsAt	KEYWORD2
+writePatternsAt_P	KEYWORD2
+setBrightness	KEYWORD2
+clear	KEYWORD2
+getNumDigits	KEYWORD2
+
 # ScanningDisplay
 begin	KEYWORD2
 end	KEYWORD2
-getNumDigits	KEYWORD2
 getFramesPerSecond	KEYWORD2
 getFieldsPerSecond	KEYWORD2
-writePatternAt	KEYWORD2
 writeDecimalPointAt	KEYWORD2
 setBrightnessAt	KEYWORD2
-setGlobalBrightness	KEYWORD2
-clear	KEYWORD2
 renderFieldNow	KEYWORD2
 renderFieldWhenReady	KEYWORD2
 prepareToSleep	KEYWORD2
