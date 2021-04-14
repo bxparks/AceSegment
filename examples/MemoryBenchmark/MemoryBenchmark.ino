@@ -124,7 +124,7 @@ volatile int disableCompilerOptimization = 0;
         scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
 
   #elif FEATURE == FEATURE_SINGLE_SW_SPI_FAST
-    #if ! defined(ARDUINO_ARCH_AVR)
+    #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
       #error Unsupported FEATURE on this platform
     #endif
 
@@ -168,7 +168,7 @@ volatile int disableCompilerOptimization = 0;
         scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
 
   #elif FEATURE == FEATURE_DUAL_SW_SPI_FAST
-    #if ! defined(ARDUINO_ARCH_AVR)
+    #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
       #error Unsupported FEATURE on this platform
     #endif
 
@@ -195,7 +195,7 @@ volatile int disableCompilerOptimization = 0;
         scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
 
   #elif FEATURE == FEATURE_DIRECT_FAST
-    #if ! defined(ARDUINO_ARCH_AVR)
+    #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
       #error Unsupported FEATURE on this platform
     #endif
 

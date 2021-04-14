@@ -13,13 +13,7 @@ using ace_segment::Tm1637Driver;
 #define TM16137_DRIVER_TYPE_FAST 1
 #define TM16137_DRIVER_TYPE TM16137_DRIVER_TYPE_FAST
 
-#if defined(EPOXY_DUINO) && TM16137_DRIVER_TYPE == TM16137_DRIVER_TYPE_FAST
-  #warning Tm1637DriverFast not supported, using regular Tm1637Driver
-  #undef TM16137_DRIVER_TYPE
-  #define TM16137_DRIVER_TYPE TM16137_DRIVER_TYPE_NORMAL
-#endif
-
-#if TM16137_DRIVER_TYPE == TM16137_DRIVER_TYPE_FAST && defined(ARDUINO_ARCH_AVR)
+#if TM16137_DRIVER_TYPE == TM16137_DRIVER_TYPE_FAST
   #include <ace_segment/tm1637/Tm1637DriverFast.h> // Tm1637DriverFast
   using ace_segment::Tm1637DriverFast;
 #endif
