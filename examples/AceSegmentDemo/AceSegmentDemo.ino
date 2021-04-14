@@ -18,6 +18,10 @@ using ace_common::incrementMod;
 using namespace ace_segment;
 using namespace ace_button;
 
+#define LED_DISPLAY_TYPE_SCANNING 0
+#define LED_DISPLAY_TYPE_TM1637 1
+
+#define LED_MATRIX_MODE_NONE 0
 #define LED_MATRIX_MODE_DIRECT 1
 #define LED_MATRIX_MODE_PARIAL_SW_SPI 2
 #define LED_MATRIX_MODE_SINGLE_HW_SPI 3
@@ -37,26 +41,40 @@ using namespace ace_button;
 // For EpoxyDuino, the actual numbers don't matter, so let's set them to (2,3)
 // since I'm not sure if A2 and A3 are defined.
 #if defined(EPOXY_DUINO)
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
   const uint8_t MODE_BUTTON_PIN = 2;
   const uint8_t CHANGE_BUTTON_PIN = 3;
+
 #elif defined(AUNITER_LED_CLOCK_DIRECT)
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT_FAST
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
+
 #elif defined(AUNITER_LED_CLOCK_SINGLE)
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_SW_SPI
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_HW_SPI
   #define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_SW_SPI_FAST
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
+
 #elif defined(AUNITER_LED_CLOCK_DUAL)
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SW_SPI
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HW_SPI
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SW_SPI_FAST
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
+
+#elif defined(AUNITER_LED_CLOCK_TM1637)
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_TM1637
+  #define LED_MATRIX_MODE LED_MATRIX_MODE_NONE
+  const uint8_t MODE_BUTTON_PIN = A2;
+  const uint8_t CHANGE_BUTTON_PIN = A3;
+
 #else
   #error Unknown AUNITER environment
 #endif
@@ -93,6 +111,11 @@ const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
   const uint8_t LATCH_PIN = 10; // ST_CP on 74HC595
   const uint8_t DATA_PIN = MOSI; // DS on 74HC595
   const uint8_t CLOCK_PIN = SCK; // SH_CP on 74HC595
+#endif
+
+#if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_TM1637
+  const uint8_t CLK_PIN = 16;
+  const uint8_t DIO_PIN = 10;
 #endif
 
 // The chain of resources.
@@ -177,21 +200,33 @@ Hardware hardware;
       spiAdapter,
       LedMatrix::kActiveLowPattern /*groupOnPattern*/,
       LedMatrix::kActiveLowPattern /*elementOnPattern*/);
+
+#elif LED_MATRIX_MODE == LED_MATRIX_MODE_NONE
+  // Do nothing
+
 #else
   #error Unsupported LED_MATRIX_MODE
 #endif
 
-// Monochromatic
-ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS> scanningDisplay(
-    hardware, ledMatrix, FRAMES_PER_SECOND);
+#if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_SCANNING
+  // Monochromatic
+  ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS> display(
+      hardware, ledMatrix, FRAMES_PER_SECOND);
 
-// 16 level of brightness, need field/second of 60*4*16 = 3840.
-ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-    scanningDisplayModulating(hardware, ledMatrix, FRAMES_PER_SECOND);
+  // 16 level of brightness, need field/second of 60*4*16 = 3840.
+  ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+      scanningDisplayModulating(hardware, ledMatrix, FRAMES_PER_SECOND);
 
-NumberWriter numberWriter(scanningDisplay);
-ClockWriter clockWriter(scanningDisplay);
-CharWriter charWriter(scanningDisplay);
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_TM1637
+  Tm1637Display<4> display(CLK_PIN, DIO_PIN);
+
+#else
+  #error Unknown LED_DISPLAY_TYPE
+#endif
+
+NumberWriter numberWriter(display);
+ClockWriter clockWriter(display);
+CharWriter charWriter(display);
 StringWriter stringWriter(charWriter);
 
 // Setup the various resources.
@@ -205,14 +240,23 @@ void setupAceSegment() {
     spiAdapter.begin();
   #endif
 
+  #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_TM1637
+    display.begin();
+  #else
     ledMatrix.begin();
-    scanningDisplay.begin();
+    display.begin();
     scanningDisplayModulating.begin();
+  #endif
 
 #if USE_INTERRUPT == 1
+  setupInterupt(display.getFieldsPerSecond());
+#endif
+}
+
+#if USE_INTERRUPT == 1
+void setupInterupt(uint16_t fieldsPerSecond) {
   // set up Timer 2
-  uint8_t timerCompareValue =
-      (long) F_CPU / 1024 / scanningDisplay.getFieldsPerSecond() - 1;
+  uint8_t timerCompareValue = (long) F_CPU / 1024 / fieldsPerSecond - 1;
   if (ENABLE_SERIAL_DEBUG >= 1) {
     Serial.print(F("Timer 2, Compare A: "));
     Serial.println(timerCompareValue);
@@ -227,8 +271,8 @@ void setupAceSegment() {
   TIMSK2 |= bit(OCIE2A); // interrupt on Compare A Match
   OCR2A =  timerCompareValue;
   interrupts();
-#endif
 }
+#endif
 
 #if USE_INTERRUPT == 1
 // interrupt handler for timer 2
@@ -236,7 +280,7 @@ ISR(TIMER2_COMPA_vect) {
   if (demoMode == DEMO_MODE_PULSE) {
     scanningDisplayModulating.renderFieldNow();
   } else {
-    scanningDisplay.renderFieldNow();
+    display.renderFieldNow();
   }
 }
 #endif
@@ -363,6 +407,8 @@ void scrollString(const char* s) {
 
 //-----------------------------------------------------------------------------
 
+#if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_SCANNING
+
 void setupPulseDisplay() {
   NumberWriter numberWriter(scanningDisplayModulating);
   numberWriter.writeHexCharAt(0, 1);
@@ -393,6 +439,8 @@ void pulseDisplay() {
   setBrightnesses(i);
 }
 
+#endif
+
 //-----------------------------------------------------------------------------
 
 static const uint8_t NUM_SPIN_PATTERNS = 3;
@@ -406,7 +454,7 @@ const uint8_t SPIN_PATTERNS[NUM_SPIN_PATTERNS][4] PROGMEM = {
 void spinDisplay() {
   static uint8_t i = 0;
   const uint8_t* patterns = SPIN_PATTERNS[i];
-  scanningDisplay.writePatternsAt_P(0, patterns, 4);
+  display.writePatternsAt_P(0, patterns, 4);
 
   incrementMod(i, NUM_SPIN_PATTERNS);
 }
@@ -427,7 +475,7 @@ const uint8_t SPIN_PATTERNS_2[NUM_SPIN_PATTERNS_2][4] PROGMEM = {
 void spinDisplay2() {
   static uint8_t i = 0;
   const uint8_t* patterns = SPIN_PATTERNS_2[i];
-  scanningDisplay.writePatternsAt_P(0, patterns, 4);
+  display.writePatternsAt_P(0, patterns, 4);
 
   incrementMod(i, NUM_SPIN_PATTERNS_2);
 }
@@ -450,8 +498,10 @@ void updateDemo() {
     writeStrings();
   } else if (demoMode == DEMO_MODE_SCROLL) {
     scrollString("   Angela is the best.");
+#if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_SCANNING
   } else if (demoMode == DEMO_MODE_PULSE) {
     pulseDisplay();
+#endif
   } else if (demoMode == DEMO_MODE_SPIN) {
     spinDisplay();
   } else if (demoMode == DEMO_MODE_SPIN_2) {
@@ -463,8 +513,15 @@ void updateDemo() {
 void nextDemo() {
   prevDemoMode = demoMode;
   incrementMod(demoMode, DEMO_MODE_COUNT);
-  scanningDisplay.clear();
-  scanningDisplayModulating.clear();
+  if (demoMode == DEMO_MODE_PULSE) {
+    incrementMod(demoMode, DEMO_MODE_COUNT);
+  }
+
+  display.clear();
+  #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_SCANNING
+    scanningDisplayModulating.clear();
+  #endif
+
   updateDemo();
 }
 
@@ -492,11 +549,16 @@ void demoLoop() {
 }
 
 void renderField() {
-  if (demoMode == DEMO_MODE_PULSE) {
-    scanningDisplayModulating.renderFieldWhenReady();
-  } else {
-    scanningDisplay.renderFieldWhenReady();
-  }
+  #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_SCANNING
+    if (demoMode == DEMO_MODE_PULSE) {
+      scanningDisplayModulating.renderFieldWhenReady();
+    } else {
+      display.renderFieldWhenReady();
+    }
+  #else
+    display.flush();
+    //display.flushIncremental();
+  #endif
 }
 
 void singleStep() {

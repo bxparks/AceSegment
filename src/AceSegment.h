@@ -43,6 +43,7 @@ SOFTWARE.
 #include "ace_segment/writer/ClockWriter.h"
 #include "ace_segment/writer/CharWriter.h"
 #include "ace_segment/writer/StringWriter.h"
+#include "ace_segment/tm1637/Tm1637Display.h"
 
 // Version format: xxyyzz == "xx.yy.zz"
 #define ACE_SEGMENT_VERSION 400
