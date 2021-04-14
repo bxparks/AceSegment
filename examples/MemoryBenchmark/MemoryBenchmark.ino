@@ -26,11 +26,12 @@
 #define FEATURE_SINGLE_SW_SPI_FAST 7
 #define FEATURE_DUAL_SW_SPI_FAST 8
 #define FEATURE_TM1637_DISPLAY 9
-#define FEATURE_STUB_DISPLAY 10
-#define FEATURE_NUMBER_WRITER 11
-#define FEATURE_CLOCK_WRITER 12
-#define FEATURE_CHAR_WRITER 13
-#define FEATURE_STRING_WRITER 14
+#define FEATURE_TM1637_DISPLAY_FAST 10
+#define FEATURE_STUB_DISPLAY 11
+#define FEATURE_NUMBER_WRITER 12
+#define FEATURE_CLOCK_WRITER 13
+#define FEATURE_CHAR_WRITER 14
+#define FEATURE_STRING_WRITER 15
 
 // A volatile integer to prevent the compiler from optimizing away the entire
 // program.
@@ -40,6 +41,7 @@ volatile int disableCompilerOptimization = 0;
   #include <AceSegment.h>
   #include <ace_segment/fast/LedMatrixDirectFast.h>
   #include <ace_segment/fast/SwSpiAdapterFast.h>
+  #include <ace_segment/tm1637/Tm1637DriverFast.h>
   using namespace ace_segment;
 
   // Common to all FEATURES
@@ -69,13 +71,13 @@ volatile int disableCompilerOptimization = 0;
         disableCompilerOptimization = pattern;
       }
 
-      void writePatternsAt(uint8_t pos, const uint8_t patterns[],
-          uint8_t len) override {
+      void writePatternsAt(uint8_t /*pos*/, const uint8_t patterns[],
+          uint8_t /*len*/) override {
         disableCompilerOptimization = patterns[0];
       }
 
-      void writePatternsAt_P(uint8_t pos, const uint8_t patterns[],
-          uint8_t len) override {
+      void writePatternsAt_P(uint8_t /*pos*/, const uint8_t patterns[],
+          uint8_t /*len*/) override {
         disableCompilerOptimization = pgm_read_byte(patterns);
       }
 
@@ -211,7 +213,17 @@ volatile int disableCompilerOptimization = 0;
         scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
 
   #elif FEATURE == FEATURE_TM1637_DISPLAY
-    Tm1637Display<NUM_DIGITS> ledDisplay(CLK_PIN, DIO_PIN);
+    Tm1637Driver driver(CLK_PIN, DIO_PIN);
+    Tm1637Display<Tm1637Driver, NUM_DIGITS> ledDisplay(driver);
+
+  #elif FEATURE == FEATURE_TM1637_DISPLAY_FAST
+    #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
+      #error Unsupported FEATURE on this platform
+    #endif
+
+    using TmDriverFast = Tm1637DriverFast<CLK_PIN, DIO_PIN>;
+    TmDriverFast driver;
+    Tm1637Display<TmDriverFast, NUM_DIGITS> ledDisplay(driver);
 
   #elif FEATURE == FEATURE_STUB_DISPLAY
     StubDisplay ledDisplay;
@@ -288,6 +300,9 @@ void setup() {
 #elif FEATURE == FEATURE_TM1637_DISPLAY
   ledDisplay.begin();
 
+#elif FEATURE == FEATURE_TM1637_DISPLAY_FAST
+  ledDisplay.begin();
+
 #else
   // No setup() needed for Writers.
 
@@ -300,6 +315,10 @@ void loop() {
   scanningDisplay.renderFieldWhenReady();
 
 #elif FEATURE == FEATURE_TM1637_DISPLAY
+  ledDisplay.writePatternAt(0, 0xff);
+  ledDisplay.flush();
+
+#elif FEATURE == FEATURE_TM1637_DISPLAY_FAST
   ledDisplay.writePatternAt(0, 0xff);
   ledDisplay.flush();
 

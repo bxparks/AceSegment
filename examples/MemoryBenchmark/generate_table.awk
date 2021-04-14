@@ -15,12 +15,13 @@ BEGIN {
   labels[6] = "ScanningDisplay(direct_fast)";
   labels[7] = "ScanningDisplay(single_sw_fast)";
   labels[8] = "ScanningDisplay(dual_sw_fast)";
-  labels[9] = "Tm1637Display";
-  labels[10] = "StubDisplay";
-  labels[11] = "NumberWriter+Stub";
-  labels[12] = "ClockWriter+Stub";
-  labels[13] = "CharWriter+Stub";
-  labels[14] = "StringWriter+Stub";
+  labels[9] = "Tm1637Display(Normal)";
+  labels[10] = "Tm1637Display(Fast)";
+  labels[11] = "StubDisplay";
+  labels[12] = "NumberWriter+Stub";
+  labels[13] = "ClockWriter+Stub";
+  labels[14] = "CharWriter+Stub";
+  labels[15] = "StringWriter+Stub";
   record_index = 0
 }
 {
@@ -52,7 +53,7 @@ END {
   printf("|---------------------------------+--------------+-------------|\n")
   for (i = 1 ; i < NUM_ENTRIES; i++) {
     if (labels[i] ~ /direct_fast/ \
-        || labels[i] ~ /Tm1637Display/ \
+        || labels[i] ~ /Tm1637Display\(Normal\)/ \
         || labels[i] == "StubDisplay") {
       printf(\
         "|---------------------------------+--------------+-------------|\n")
