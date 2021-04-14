@@ -136,6 +136,14 @@ before substantional refactoring in 2021.
   causes the code for the `TimingStats` class to be pulled in, even if it is not
   used.
 
+**v0.5**
+
+* Slight increase in memory usage (20-30 bytes) on some processors (AVR,
+  ESP8266, ESP8266), but slight decrease on others (STM32, Teensy), I think the
+  changes are due to some removal/addition of some methods in `LedDisplay`.
+* Add memory usage for `Tm1637Display`. Seems to consume something in between
+  similar to the `ScanningDisplay` w/ SW SPI and `ScanningDisplay` with HW SPI.
+
 ## Results
 
 The following shows the flash and static memory sizes of the `MemoryBenchmark`

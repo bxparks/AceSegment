@@ -25,11 +25,12 @@
 #define FEATURE_DIRECT_FAST 6
 #define FEATURE_SINGLE_SW_SPI_FAST 7
 #define FEATURE_DUAL_SW_SPI_FAST 8
-#define FEATURE_STUB_LED_DISPLAY 9
-#define FEATURE_NUMBER_WRITER 10
-#define FEATURE_CLOCK_WRITER 11
-#define FEATURE_CHAR_WRITER 12
-#define FEATURE_STRING_WRITER 13
+#define FEATURE_TM1637_DISPLAY 9
+#define FEATURE_STUB_DISPLAY 10
+#define FEATURE_NUMBER_WRITER 11
+#define FEATURE_CLOCK_WRITER 12
+#define FEATURE_CHAR_WRITER 13
+#define FEATURE_STRING_WRITER 14
 
 // A volatile integer to prevent the compiler from optimizing away the entire
 // program.
@@ -46,11 +47,19 @@ volatile int disableCompilerOptimization = 0;
   const uint8_t NUM_SEGMENTS = 8;
   const uint8_t FRAMES_PER_SECOND = 60;
   const uint8_t NUM_SUBFIELDS = 1;
+
+  // Direct
+  const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
+  const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
+
+  // 74HC595
   const uint8_t LATCH_PIN = 10; // ST_CP on 74HC595
   const uint8_t DATA_PIN = MOSI; // DS on 74HC595
   const uint8_t CLOCK_PIN = SCK; // SH_CP on 74HC595
-  const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
-  const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
+
+  // TM1637
+  const uint8_t CLK_PIN = 16;
+  const uint8_t DIO_PIN = 10;
 
   class StubDisplay : public LedDisplay {
     public:
@@ -60,6 +69,16 @@ volatile int disableCompilerOptimization = 0;
         disableCompilerOptimization = pattern;
       }
 
+      void writePatternsAt(uint8_t pos, const uint8_t patterns[],
+          uint8_t len) override {
+        disableCompilerOptimization = patterns[0];
+      }
+
+      void writePatternsAt_P(uint8_t pos, const uint8_t patterns[],
+          uint8_t len) override {
+        disableCompilerOptimization = pgm_read_byte(patterns);
+      }
+
       void writeDecimalPointAt(uint8_t /*pos*/, bool state = true)
           override {
         disableCompilerOptimization = state;
@@ -67,6 +86,10 @@ volatile int disableCompilerOptimization = 0;
 
       void setBrightness(uint8_t brightness) override {
         disableCompilerOptimization = brightness;
+      }
+
+      void clear() override {
+        disableCompilerOptimization = 0;
       }
   };
 
@@ -187,7 +210,10 @@ volatile int disableCompilerOptimization = 0;
     ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
         scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
 
-  #elif FEATURE == FEATURE_STUB_LED_DISPLAY
+  #elif FEATURE == FEATURE_TM1637_DISPLAY
+    Tm1637Display<NUM_DIGITS> ledDisplay(CLK_PIN, DIO_PIN);
+
+  #elif FEATURE == FEATURE_STUB_DISPLAY
     StubDisplay ledDisplay;
 
   #elif FEATURE == FEATURE_NUMBER_WRITER
@@ -216,77 +242,68 @@ void setup() {
 
 // In the following, I used to grab the output of patterns[] and write to
 // disableCompilerOptimization to prevent the compiler from optimizing away the
-// entire program. But after templating ScanningDisplay, pattterns is no longer
-// accessible. But it does not matter because I realized that ScanningDisplay
-// performs a digitalWrite(), which has the same effect of disabling
-// optimizations.
+// entire program. But after templatizing ScanningDisplay, pattterns variable is
+// no longer accessible. But it does not matter because I realized that
+// ScanningDisplay performs a digitalWrite(), which has the same effect of
+// disabling optimizations.
 
 #elif FEATURE == FEATURE_DIRECT
   ledMatrix.begin();
   scanningDisplay.begin();
-  scanningDisplay.writePatternAt(0, 0x3A);
-  scanningDisplay.renderFieldNow();
 
 #elif FEATURE == FEATURE_DIRECT_FAST
   ledMatrix.begin();
   scanningDisplay.begin();
-  scanningDisplay.writePatternAt(0, 0x3A);
-  scanningDisplay.renderFieldNow();
 
 #elif FEATURE == FEATURE_SINGLE_SW_SPI
   spiAdapter.begin();
   ledMatrix.begin();
   scanningDisplay.begin();
-  scanningDisplay.writePatternAt(0, 0x3A);
-  scanningDisplay.renderFieldNow();
 
 #elif FEATURE == FEATURE_SINGLE_SW_SPI_FAST
   spiAdapter.begin();
   ledMatrix.begin();
   scanningDisplay.begin();
-  scanningDisplay.writePatternAt(0, 0x3A);
-  scanningDisplay.renderFieldNow();
 
 #elif FEATURE == FEATURE_SINGLE_HW_SPI
   spiAdapter.begin();
   ledMatrix.begin();
   scanningDisplay.begin();
-  scanningDisplay.writePatternAt(0, 0x3A);
-  scanningDisplay.renderFieldNow();
 
 #elif FEATURE == FEATURE_DUAL_SW_SPI
   spiAdapter.begin();
   ledMatrix.begin();
   scanningDisplay.begin();
-  scanningDisplay.writePatternAt(0, 0x3A);
-  scanningDisplay.renderFieldNow();
 
 #elif FEATURE == FEATURE_DUAL_SW_SPI_FAST
   spiAdapter.begin();
   ledMatrix.begin();
   scanningDisplay.begin();
-  scanningDisplay.writePatternAt(0, 0x3A);
-  scanningDisplay.renderFieldNow();
 
 #elif FEATURE == FEATURE_DUAL_HW_SPI
   spiAdapter.begin();
   ledMatrix.begin();
   scanningDisplay.begin();
-  scanningDisplay.writePatternAt(0, 0x3A);
-  scanningDisplay.renderFieldNow();
+
+#elif FEATURE == FEATURE_TM1637_DISPLAY
+  ledDisplay.begin();
 
 #else
   // No setup() needed for Writers.
 
 #endif
-
 }
 
 void loop() {
-#if FEATURE > FEATURE_BASELINE && FEATURE < FEATURE_STUB_LED_DISPLAY
+#if FEATURE > FEATURE_BASELINE && FEATURE < FEATURE_TM1637_DISPLAY
+  scanningDisplay.writePatternAt(0, 0x3A);
   scanningDisplay.renderFieldWhenReady();
 
-#elif FEATURE == FEATURE_STUB_LED_DISPLAY
+#elif FEATURE == FEATURE_TM1637_DISPLAY
+  ledDisplay.writePatternAt(0, 0xff);
+  ledDisplay.flush();
+
+#elif FEATURE == FEATURE_STUB_DISPLAY
   ledDisplay.writePatternAt(0, 0xff);
 
 #elif FEATURE == FEATURE_NUMBER_WRITER
