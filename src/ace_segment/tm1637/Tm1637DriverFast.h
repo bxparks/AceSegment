@@ -36,29 +36,37 @@ SOFTWARE.
 namespace ace_segment {
 
 /**
-  * In theory, the chip should be able to handle fairly small delays, like
-  * 250 kHz or 4 microseconds. But Many TM1637 LED Modules from eBay
-  * apparently uses a low value pullup resistor, coupled with high valued
-  * capacitor, so the rise time of the signal on these lines are slow. A
-  * value of 50 microseconds does not work on my LED Modules, but 100 does
-  * work.
-  */
-static const uint16_t kDefaultTm1637DelayMicros = 100;
-
-/**
  * Exactly the same as Tm1637Driver except that this uses the `digitalWriteFast`
  * library on AVR processors. Normally, the digitalWriteFast library is used to
- * get faster speeds over `digitalWrite()` and `pinMode()` functions. However,
- * for the purposes of this library, speed is not the important factor. However,
- * the `digitalWriteFast` functions consume less flash memory, and that's the
- * main advantage.
+ * get faster speeds over `digitalWrite()` and `pinMode()` functions. But speed
+ * of the `digitalWrite()` functions is not the limiting factor in this library
+ * because every bit flip is followed by a `delayMicroseconds()` which is far
+ * longer than the CPU cycle savings from `digitalWritFast()`.
+ *
+ * The reason that you may want to use `digitalWriteFast` library is because it
+ * consumes far less flash memory than normal `digitalWrite()`. The benchmarks
+ * in MemoryBenchmark shows that using this `Tm1637DriverFast` instead of
+ * `Tm1637Driver` saves 650-770 bytes of flash on an AVR processor.
+ *
+ * Word of caution though, there is a use-case where you may want to still use
+ * the normal `Tm1637Driver`. If your application uses more than one TM1637 LED
+ * Module, you will need to create multiple instances of the `Tm1637Display`.
+ * But note that the pin numbers of this class must be a compile-time constants,
+ * so different pins means that a different template class is generated. Since
+ * `Tm1637Display` class takes a `Tm1637DriverFast` as a template argument, each
+ * LED Module generate a new template instance of the `Tm1637Display` class.
+ *
+ * In the case of multiple LED modules, it may actually be more efficient to use
+ * the non-fast `Tm1637Driver`, because you will generate only a single template
+ * instantiation. There will be multiple instances of that class, but only a
+ * single class.
  *
  * This class is stateless. It is thread-safe.
  */
 template <
-    uint8_t clockPin,
-    uint8_t dioPin,
-    uint16_t delayMicros = kDefaultTm1637DelayMicros
+    uint8_t CLOCK_PIN,
+    uint8_t DIO_PIN,
+    uint16_t DELAY_MICROS
 >
 class Tm1637DriverFast {
   public:
@@ -70,8 +78,8 @@ class Tm1637DriverFast {
       // end of the line pulling LOW. Instead, we go into INPUT mode to let the
       // line to HIGH through the pullup resistor, then go to OUTPUT mode only
       // to pull down.
-      digitalWriteFast(clockPin, LOW);
-      digitalWriteFast(dioPin, LOW);
+      digitalWriteFast(CLOCK_PIN, LOW);
+      digitalWriteFast(DIO_PIN, LOW);
 
       // Begin with both lines at HIGH.
       clockHigh();
@@ -112,9 +120,9 @@ class Tm1637DriverFast {
 
       // Device places the ACK/NACK bit upon the falling edge of the 8th CLK,
       // which happens in the loop above.
-      pinModeFast(dioPin, INPUT);
+      pinModeFast(DIO_PIN, INPUT);
       bitDelay();
-      uint8_t ack = digitalReadFast(dioPin);
+      uint8_t ack = digitalReadFast(DIO_PIN);
 
       // Device releases DIO upon falling edge of the 9th CLK.
       clockHigh();
@@ -123,15 +131,15 @@ class Tm1637DriverFast {
     }
 
   private:
-    void bitDelay() const { delayMicroseconds(delayMicros); }
+    void bitDelay() const { delayMicroseconds(DELAY_MICROS); }
 
-    void clockHigh() const { pinModeFast(clockPin, INPUT); bitDelay(); }
+    void clockHigh() const { pinModeFast(CLOCK_PIN, INPUT); bitDelay(); }
 
-    void clockLow() const { pinModeFast(clockPin, OUTPUT); bitDelay(); }
+    void clockLow() const { pinModeFast(CLOCK_PIN, OUTPUT); bitDelay(); }
 
-    void dataHigh() const { pinModeFast(dioPin, INPUT); bitDelay(); }
+    void dataHigh() const { pinModeFast(DIO_PIN, INPUT); bitDelay(); }
 
-    void dataLow() const { pinModeFast(dioPin, OUTPUT); bitDelay(); }
+    void dataLow() const { pinModeFast(DIO_PIN, OUTPUT); bitDelay(); }
 };
 
 } // ace_segment

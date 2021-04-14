@@ -32,6 +32,16 @@ SOFTWARE.
 namespace ace_segment {
 
 /**
+ * In theory, the chip should be able to handle fairly small delays, like
+ * 250 kHz or 4 microseconds. But Many TM1637 LED Modules from eBay
+ * apparently uses a low value pullup resistor, coupled with high valued
+ * capacitor, so the rise time of the signal on these lines are slow. A
+ * value of 50 microseconds does not work on my LED Modules, but 100 does
+ * work.
+ */
+static const uint16_t kDefaultTm1637DelayMicros = 100;
+
+/**
  * An implementation of LedDisplay that works with 7-segment LED modules
  * using the TM1637 chip.
  *

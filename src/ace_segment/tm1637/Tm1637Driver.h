@@ -63,24 +63,15 @@ namespace ace_segment {
  */
 class Tm1637Driver {
   public:
-    /**
-     * In theory, the chip should be able to handle fairly small delays, like
-     * 250 kHz or 4 microseconds. But Many TM1637 LED Modules from eBay
-     * apparently uses a low value pullup resistor, coupled with high valued
-     * capacitor, so the rise time of the signal on these lines are slow. A
-     * value of 50 microseconds does not work on my LED Modules, but 100 does
-     * work.
-     */
-    static const uint16_t kDefaultDelayMicros = 100;
-
     explicit Tm1637Driver(
         uint8_t clockPin,
         uint8_t dioPin,
-        uint16_t delayMicros = kDefaultDelayMicros
+        uint16_t delayMicros
     ) :
-      mClockPin(clockPin),
-      mDioPin(dioPin),
-      mDelayMicros(delayMicros) {}
+        mClockPin(clockPin),
+        mDioPin(dioPin),
+        mDelayMicros(delayMicros)
+    {}
 
     void begin() const {
       // These are open-drain lines, with a pull-up resistor. We must not drive

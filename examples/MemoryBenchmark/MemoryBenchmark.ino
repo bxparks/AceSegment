@@ -62,6 +62,7 @@ volatile int disableCompilerOptimization = 0;
   // TM1637
   const uint8_t CLK_PIN = 16;
   const uint8_t DIO_PIN = 10;
+  const uint16_t BIT_DELAY = 100;
 
   class StubDisplay : public LedDisplay {
     public:
@@ -213,17 +214,18 @@ volatile int disableCompilerOptimization = 0;
         scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
 
   #elif FEATURE == FEATURE_TM1637_DISPLAY
-    Tm1637Driver driver(CLK_PIN, DIO_PIN);
-    Tm1637Display<Tm1637Driver, NUM_DIGITS> ledDisplay(driver);
+    using Driver = Tm1637Driver;
+    Driver driver(CLK_PIN, DIO_PIN, BIT_DELAY);
+    Tm1637Display<Driver, NUM_DIGITS> ledDisplay(driver);
 
   #elif FEATURE == FEATURE_TM1637_DISPLAY_FAST
     #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
       #error Unsupported FEATURE on this platform
     #endif
 
-    using TmDriverFast = Tm1637DriverFast<CLK_PIN, DIO_PIN>;
-    TmDriverFast driver;
-    Tm1637Display<TmDriverFast, NUM_DIGITS> ledDisplay(driver);
+    using Driver = Tm1637DriverFast<CLK_PIN, DIO_PIN, BIT_DELAY>;
+    Driver driver;
+    Tm1637Display<Driver, NUM_DIGITS> ledDisplay(driver);
 
   #elif FEATURE == FEATURE_STUB_DISPLAY
     StubDisplay ledDisplay;
