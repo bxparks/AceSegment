@@ -26,7 +26,6 @@ SOFTWARE.
 #define ACE_SEGMENT_SCANNING_DISPLAY_H
 
 #include <stdint.h>
-#include <Arduino.h> // pgm_read_byte()
 #include <AceCommon.h> // incrementMod()
 #include "../LedDisplay.h"
 
@@ -117,7 +116,7 @@ class ScanningDisplay : public LedDisplay {
       // Set initial patterns and global brightness.
       mLedMatrix.clear();
       if (SUBFIELDS > 1) {
-        setGlobalBrightness(SUBFIELDS / 2); // half brightness
+        setBrightness(SUBFIELDS / 2); // half brightness
       }
 
       // Sleep mode support.
@@ -147,24 +146,21 @@ class ScanningDisplay : public LedDisplay {
       mPatterns[pos] = pattern;
     }
 
-    void writePatternsAt(uint8_t pos, const uint8_t patterns[],
-        uint8_t len) override {
-      for (uint8_t i = 0; i < len; i++) {
-        if (pos >= DIGITS) break;
-        mPatterns[pos++] = patterns[i];
+    void writeDecimalPointAt(uint8_t pos, bool state = true) override {
+      if (pos >= DIGITS) return;
+      uint8_t pattern = mPatterns[pos];
+      if (state) {
+        pattern |= 0x80;
+      } else {
+        pattern &= ~0x80;
       }
-    }
-
-    void writePatternsAt_P(uint8_t pos, const uint8_t patterns[],
-        uint8_t len) override {
-      for (uint8_t i = 0; i < len; i++) {
-        if (pos >= DIGITS) break;
-        mPatterns[pos++] = pgm_read_byte(patterns + i);
-      }
+      mPatterns[pos] = pattern;
     }
 
     /**
-     * @copydoc
+     * Set the brightness for a given pos, leaving pattern unchanged.
+     * Not all implementation of `LedClass` can support brightness for each
+     * digit, so this is implemented at the ScanningDisplay class.
      *
      * The maximum brightness should is exactly `SUBFIELDS` which turns on the
      * LED 100% of the time. The minimum brightness is 0, which turns OFF the
@@ -183,22 +179,11 @@ class ScanningDisplay : public LedDisplay {
      * in these raw units. The side benefit of using raw brightness values is
      * that it makes displayCurrentFieldModulated() easier to implement.
      */
-    void setBrightnessAt(uint8_t pos, uint8_t brightness) override {
+    void setBrightnessAt(uint8_t pos, uint8_t brightness) {
       if (SUBFIELDS > 1) {
         if (pos >= DIGITS) return;
         mBrightnesses[pos] = (brightness >= SUBFIELDS) ? SUBFIELDS : brightness;
       }
-    }
-
-    void writeDecimalPointAt(uint8_t pos, bool state = true) override {
-      if (pos >= DIGITS) return;
-      uint8_t pattern = mPatterns[pos];
-      if (state) {
-        pattern |= 0x80;
-      } else {
-        pattern &= ~0x80;
-      }
-      mPatterns[pos] = pattern;
     }
 
     /**
@@ -207,7 +192,7 @@ class ScanningDisplay : public LedDisplay {
      * See the documentation for setBrightnessAt() for information about the
      * range of values of `brightness` and how it is interpreted.
      */
-    void setGlobalBrightness(uint8_t brightness) override {
+    void setBrightness(uint8_t brightness) override {
       if (SUBFIELDS > 1) {
         for (uint8_t i = 0; i < DIGITS; i++) {
           setBrightnessAt(i, brightness);

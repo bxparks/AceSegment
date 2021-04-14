@@ -25,6 +25,7 @@ SOFTWARE.
 #ifndef ACE_SEGMENT_LED_DISPLAY_H
 #define ACE_SEGMENT_LED_DISPLAY_H
 
+#include <Arduino.h> // pgm_read_byte()
 #include <stdint.h>
 
 namespace ace_segment {
@@ -53,30 +54,35 @@ class LedDisplay {
      * Write the array of `patterns` of length `len`, starting at `pos`. If an
      * element of patterns attempts to write to a digit beyond the last digit of
      * the LED module, nothing happens.
+     *
+     * The default implementation calls writePatternAt(), which should be
+     * sufficient in most cases. Subclasses can override if needed.
      */
     virtual void writePatternsAt(uint8_t pos, const uint8_t patterns[],
-        uint8_t len) = 0;
+        uint8_t len) {
+      for (uint8_t i = 0; i < len; i++) {
+        if (pos >= mNumDigits) break;
+        writePatternAt(pos++, patterns[i]);
+      }
+    }
 
     /**
      * Write the array of `patterns` of length `len`, which are stored in flash
      * memory through PROGMEM, starting at `pos`. If an element of patterns
      * attempts to write to a digit beyond the last digit of the LED module,
      * nothing happens.
+     *
+     * The default implementation calls writePatternAt(), which should be
+     * sufficient in most cases. Subclasses can override if needed.
      */
     virtual void writePatternsAt_P(uint8_t pos, const uint8_t patterns[],
-        uint8_t len) = 0;
-
-    /**
-     * Write the brightness for a given pos, leaving pattern unchanged.
-     * The maximum brightness is determined by specifics of the subclass. For
-     * ScanningDisplay, the maximum brightness is the value of `SUBFIELDS-1`
-     * template parameter.
-     *
-     * A subclass may not support the ability to control the brightness on a per
-     * digit basis. In that case, this method does nothing. If the pos is out of
-     * bounds, the method also does nothing.
-     */
-    virtual void setBrightnessAt(uint8_t pos, uint8_t brightness) = 0;
+        uint8_t len) {
+      for (uint8_t i = 0; i < len; i++) {
+        if (pos >= mNumDigits) break;
+        uint8_t pattern = pgm_read_byte(patterns + i);
+        writePatternAt(pos++, pattern);
+      }
+    }
 
     /**
      * Write the decimal point for the pos. Clock LED modules will attach the
@@ -85,15 +91,21 @@ class LedDisplay {
     virtual void writeDecimalPointAt(uint8_t pos, bool state = true) = 0;
 
     /**
-     * Set global brightness of all digits, with the brightness value expressed
-     * as a fraction of 256. In other words, 255 is brightest (default); 0
-     * represents off, and 1 is 1/256 of full brightness. If the specific
-     * subclass does not support brightness, this method does nothing.
+     * Set global brightness of all digits. Different subclasses will interpret
+     * the brightness integer value differently.
      */
-    virtual void setGlobalBrightness(uint8_t brightness) = 0;
+    virtual void setBrightness(uint8_t brightness) = 0;
 
-    /** Clear all digits to blank pattern. */
-    virtual void clear() = 0;
+    /**
+     * Clear all digits to blank pattern. The default implementation writes a
+     * `0` into each digit using writePatternAt(). Subclasses can override if
+     * needed.
+     */
+    virtual void clear() {
+      for (uint8_t i = 0; i < mNumDigits + 1; ++i) {
+        writePatternAt(i, 0);
+      }
+    }
 
     /** Return the number of digits supported by this display instance. */
     uint8_t getNumDigits() const { return mNumDigits; }
