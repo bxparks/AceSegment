@@ -28,23 +28,22 @@ SOFTWARE.
 #include <Arduino.h>
 #include <AceCommon.h> // incrementMod()
 #include "../LedDisplay.h"
-#include "Tm1637Driver.h"
 
 namespace ace_segment {
 
-template <uint8_t DIGITS>
+/**
+ * An implementation of LedDisplay that works with 7-segment LED modules
+ * using the TM1637 chip.
+ *
+ * @tparam DRIVER driver class, either Tm1637Driver or Tm1637DriverFast
+ * @tparam DIGITS number of digits in the LED module (usually 4 or 6)
+ */
+template <typename DRIVER, uint8_t DIGITS>
 class Tm1637Display : public LedDisplay {
   public:
-    static const uint16_t kDefaultDelayMicros =
-        Tm1637Driver::kDefaultDelayMicros;
-
-    explicit Tm1637Display(
-        uint8_t clockPin,
-        uint8_t dioPin,
-        uint16_t delayMicros = kDefaultDelayMicros
-    ) :
+    explicit Tm1637Display(const DRIVER& driver) :
         LedDisplay(DIGITS),
-        mDriver(clockPin, dioPin, delayMicros)
+        mDriver(driver)
     {}
 
     /** Return the number of digits supported by this display instance. */
@@ -182,7 +181,7 @@ class Tm1637Display : public LedDisplay {
     // A TM1637 can have a maximum of 6 DIGITS, so we are safe.
     static uint8_t const kBrightnessDirtyBit = DIGITS;
 
-    Tm1637Driver const mDriver;
+    const DRIVER& mDriver;
     uint8_t mIsDirty; // bit array
     uint8_t mBrightness; // maps to dirty bit 7
     uint8_t mFlushStage; // [0, DIGITS], DIGITS for brightness update
