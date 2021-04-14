@@ -119,6 +119,9 @@ before substantional refactoring in 2021.
   changes are due to some removal/addition of some methods in `LedDisplay`.
 * Add memory usage for `Tm1637Display`. Seems to consume something in between
   similar to the `ScanningDisplay` w/ SW SPI and `ScanningDisplay` with HW SPI.
+* Add memory usage for `Tm1637Display` using `Tm1637DriverFast` which uses
+  `digitalWriteFast` library for AVR processors. Saves 662 - 776 bytes of flash
+  on AVR processors compared to `Tm1637Display` using normal `Tm1637Driver`.
 
 ## Results
 
@@ -164,7 +167,8 @@ other `MemoryBenchmark` programs.)
 | ScanningDisplay(single_sw_fast) |   1616/   68 |  1160/   57 |
 | ScanningDisplay(dual_sw_fast)   |   1226/   59 |   770/   48 |
 |---------------------------------+--------------+-------------|
-| Tm1637Display                   |   1672/   41 |  1216/   30 |
+| Tm1637Display(Normal)           |   1814/   43 |  1358/   32 |
+| Tm1637Display(Fast)             |   1152/   40 |   696/   29 |
 |---------------------------------+--------------+-------------|
 | StubDisplay                     |    538/   11 |    82/    0 |
 | NumberWriter+Stub               |    692/   32 |   236/   21 |
@@ -197,7 +201,8 @@ other `MemoryBenchmark` programs.)
 | ScanningDisplay(single_sw_fast) |   4612/  208 |  1140/   57 |
 | ScanningDisplay(dual_sw_fast)   |   4106/  199 |   634/   48 |
 |---------------------------------+--------------+-------------|
-| Tm1637Display                   |   4742/  181 |  1270/   30 |
+| Tm1637Display(Normal)           |   4884/  183 |  1412/   32 |
+| Tm1637Display(Fast)             |   4108/  180 |   636/   29 |
 |---------------------------------+--------------+-------------|
 | StubDisplay                     |   3552/  151 |    80/    0 |
 | NumberWriter+Stub               |   3648/  172 |   176/   21 |
@@ -230,7 +235,8 @@ other `MemoryBenchmark` programs.)
 | ScanningDisplay(single_sw_fast) |     -1/   -1 |    -1/   -1 |
 | ScanningDisplay(dual_sw_fast)   |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Tm1637Display                   |  10952/    0 |   888/    0 |
+| Tm1637Display(Normal)           |  10944/    0 |   880/    0 |
+| Tm1637Display(Fast)             |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | StubDisplay                     |  10336/    0 |   272/    0 |
 | NumberWriter+Stub               |  10664/    0 |   600/    0 |
@@ -263,7 +269,8 @@ other `MemoryBenchmark` programs.)
 | ScanningDisplay(single_sw_fast) |     -1/   -1 |    -1/   -1 |
 | ScanningDisplay(dual_sw_fast)   |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Tm1637Display                   |  21756/ 3976 |  2620/  188 |
+| Tm1637Display(Normal)           |  21748/ 3980 |  2612/  192 |
+| Tm1637Display(Fast)             |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | StubDisplay                     |  19336/ 3948 |   200/  160 |
 | NumberWriter+Stub               |  19612/ 3952 |   476/  164 |
@@ -296,7 +303,8 @@ other `MemoryBenchmark` programs.)
 | ScanningDisplay(single_sw_fast) |     -1/   -1 |    -1/   -1 |
 | ScanningDisplay(dual_sw_fast)   |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Tm1637Display                   | 258200/26816 |  1500/   32 |
+| Tm1637Display(Normal)           | 258168/26816 |  1468/   32 |
+| Tm1637Display(Fast)             |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | StubDisplay                     | 256884/26792 |   184/    8 |
 | NumberWriter+Stub               | 257380/26792 |   680/    8 |
@@ -329,7 +337,8 @@ other `MemoryBenchmark` programs.)
 | ScanningDisplay(single_sw_fast) |     -1/   -1 |    -1/   -1 |
 | ScanningDisplay(dual_sw_fast)   |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Tm1637Display                   | 200940/13364 |  3210/  264 |
+| Tm1637Display(Normal)           | 200908/13364 |  3178/  264 |
+| Tm1637Display(Fast)             |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | StubDisplay                     | 199298/13176 |  1568/   76 |
 | NumberWriter+Stub               | 199674/13184 |  1944/   84 |
@@ -363,7 +372,8 @@ other `MemoryBenchmark` programs.)
 | ScanningDisplay(single_sw_fast) |     -1/   -1 |    -1/   -1 |
 | ScanningDisplay(dual_sw_fast)   |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Tm1637Display                   |  12672/ 4164 |  5048/ 1116 |
+| Tm1637Display(Normal)           |  12684/ 4168 |  5060/ 1120 |
+| Tm1637Display(Fast)             |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | StubDisplay                     |  10924/ 4156 |  3300/ 1108 |
 | NumberWriter+Stub               |  11328/ 4160 |  3704/ 1112 |
