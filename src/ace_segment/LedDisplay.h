@@ -25,8 +25,8 @@ SOFTWARE.
 #ifndef ACE_SEGMENT_LED_DISPLAY_H
 #define ACE_SEGMENT_LED_DISPLAY_H
 
-#include <Arduino.h> // pgm_read_byte()
 #include <stdint.h>
+#include <Arduino.h> // pgm_read_byte()
 
 namespace ace_segment {
 
@@ -42,6 +42,16 @@ namespace ace_segment {
  */
 class LedDisplay {
   public:
+    /**
+     * Constructor.
+     *
+     * @param numDigits number of digits in the LED module; this value is
+     *    returned by getNumDigits(). The value is usually a compile-time
+     *    constant, so it is faster/cheaper to just use the constant value.
+     *    However, sometimes your code needs this value but it has only a
+     *    reference/pointer to the LedDisplay (or one of its subclasses). Then
+     *    getNumDigits() can be used.
+     */
     LedDisplay(uint8_t numDigits) : mNumDigits(numDigits) {}
 
     /**
