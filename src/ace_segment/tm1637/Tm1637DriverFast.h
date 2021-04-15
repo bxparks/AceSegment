@@ -31,7 +31,6 @@ SOFTWARE.
 
 #include <stdint.h>
 #include <Arduino.h>
-#include <digitalWriteFast.h>
 
 namespace ace_segment {
 

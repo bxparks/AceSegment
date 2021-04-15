@@ -2,8 +2,10 @@
 #include <AceButton.h>
 #include <AceCommon.h> // incrementMod()
 #include <AceSegment.h>
-#include <ace_segment/fast/LedMatrixDirectFast.h>
-#include <ace_segment/fast/SwSpiAdapterFast.h>
+#include <digitalWriteFast.h>
+#include <ace_segment/hw/SwSpiAdapterFast.h>
+#include <ace_segment/scanning/LedMatrixDirectFast.h>
+#include <ace_segment/tm1637/Tm1637DriverFast.h>
 
 using ace_common::incrementMod;
 

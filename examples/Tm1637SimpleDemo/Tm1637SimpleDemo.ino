@@ -14,6 +14,7 @@ using ace_segment::Tm1637Driver;
 #define TM16137_DRIVER_TYPE TM16137_DRIVER_TYPE_FAST
 
 #if TM16137_DRIVER_TYPE == TM16137_DRIVER_TYPE_FAST
+  #include <digitalWriteFast.h>
   #include <ace_segment/tm1637/Tm1637DriverFast.h> // Tm1637DriverFast
   using ace_segment::Tm1637DriverFast;
 #endif
