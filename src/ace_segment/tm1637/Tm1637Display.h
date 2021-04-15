@@ -28,35 +28,49 @@ SOFTWARE.
 #include <Arduino.h>
 #include <AceCommon.h> // incrementMod()
 #include "../LedDisplay.h"
-#include "Tm1637Driver.h"
 
 namespace ace_segment {
 
-template <uint8_t DIGITS>
+/**
+ * In theory, the chip should be able to handle fairly small delays, like
+ * 250 kHz or 4 microseconds. But Many TM1637 LED Modules from eBay
+ * apparently uses a low value pullup resistor, coupled with high valued
+ * capacitor, so the rise time of the signal on these lines are slow. A
+ * value of 50 microseconds does not work on my LED Modules, but 100 does
+ * work.
+ */
+static const uint16_t kDefaultTm1637DelayMicros = 100;
+
+/**
+ * An implementation of LedDisplay that works with 7-segment LED modules
+ * using the TM1637 chip.
+ *
+ * @tparam DRIVER driver class, either Tm1637Driver or Tm1637DriverFast
+ * @tparam DIGITS number of digits in the LED module (usually 4 or 6)
+ */
+template <typename DRIVER, uint8_t DIGITS>
 class Tm1637Display : public LedDisplay {
   public:
-    static const uint16_t kDefaultDelayMicros =
-        Tm1637Driver::kDefaultDelayMicros;
-
-    explicit Tm1637Display(
-        uint8_t clockPin,
-        uint8_t dioPin,
-        uint16_t delayMicros = kDefaultDelayMicros
-    ) :
+    explicit Tm1637Display(const DRIVER& driver) :
         LedDisplay(DIGITS),
-        mDriver(clockPin, dioPin, delayMicros)
+        mDriver(driver)
     {}
 
     /** Return the number of digits supported by this display instance. */
     uint8_t getNumDigits() const { return DIGITS; }
 
+    /**
+     * Initialize the object. The Tm1637 driver must be initialized separately.
+     */
     void begin() {
-      mDriver.begin();
       memset(mPatterns, 0, DIGITS);
       mBrightness = kBrightnessCmd | kBrightnessLevelOn | 0x7;
-      mIsDirty = 0xFF;
+      mIsDirty = 0xFF; // force initial values are sent to LED module
       mFlushStage = 0;
     }
+
+    /** Signal end of usage. Currently does nothing. */
+    void end() {}
 
     void writePatternAt(uint8_t pos, uint8_t pattern) override {
       if (pos >= DIGITS) return;
@@ -82,6 +96,10 @@ class Tm1637Display : public LedDisplay {
       setDirtyBit(kBrightnessDirtyBit);
     }
 
+    /**
+     * Turn off the entire display. The brightness is not affected so when it is
+     * turned back on, the previous brightness will be used.
+     */
     void setDisplayOn(bool on = true) {
       if (on) {
         mBrightness |= kBrightnessLevelOn;
@@ -117,10 +135,15 @@ class Tm1637Display : public LedDisplay {
     }
 
     /**
-     * Use the mFlushStage and the mIsDirty bit array to update only the part
-     * that needs updating. If the entire display needs to be updated, then it
-     * is about 50% slower 30 ms, versus 22 ms for flush(). Using 100 micro
-     * delay, I see the following durations:
+     * Update only a single digit or the brightness. This method must be called
+     * (DIGITS + 1) times to update the digits of entire module, including the
+     * brightness which is updated using a separate step. Uses the mFlushStage
+     * and the mIsDirty bit array to update only the part that needs updating.
+     * This method should be used if the processor cannot be blocked for the
+     * entire duration of the flush() method (e.g. on the ESP8266, which will
+     * cause a WDT reset when it is blocked for more than 20-40 ms).
+     *
+     * Using 100 micro delay, I see the following durations:
      *
      * 1) If brightness is checked and updated on every iteration, I get
      * 'min/avg/max:4/494/13780', so a maximum of 14 ms, which is still a little
@@ -131,6 +154,11 @@ class Tm1637Display : public LedDisplay {
      * the latency. The side effect is a slightly flicker when the display and
      * brightness changes at the same time, because this incrementally updating
      * function makes those changes in 2 steps.
+     *
+     * The incremental flushing must use fixed addressing mode to write specific
+     * digits, which adds extra commands to the wire protocol to the LED module.
+     * If this algorithm is used to send all the digits in one-shot, then this
+     * method is about 50% slower (30 ms), compared to flush() (22 ms).
      */
     void flushIncremental() {
       if (isDirtyBit(mFlushStage)) {
@@ -182,9 +210,9 @@ class Tm1637Display : public LedDisplay {
     // A TM1637 can have a maximum of 6 DIGITS, so we are safe.
     static uint8_t const kBrightnessDirtyBit = DIGITS;
 
-    Tm1637Driver const mDriver;
-    uint8_t mIsDirty; // bit array
+    const DRIVER& mDriver;
     uint8_t mBrightness; // maps to dirty bit 7
+    uint8_t mIsDirty; // bit array
     uint8_t mFlushStage; // [0, DIGITS], DIGITS for brightness update
     uint8_t mPatterns[DIGITS]; // maps to dirty bits 0-5
 };

@@ -26,11 +26,12 @@
 #define FEATURE_SINGLE_SW_SPI_FAST 7
 #define FEATURE_DUAL_SW_SPI_FAST 8
 #define FEATURE_TM1637_DISPLAY 9
-#define FEATURE_STUB_DISPLAY 10
-#define FEATURE_NUMBER_WRITER 11
-#define FEATURE_CLOCK_WRITER 12
-#define FEATURE_CHAR_WRITER 13
-#define FEATURE_STRING_WRITER 14
+#define FEATURE_TM1637_DISPLAY_FAST 10
+#define FEATURE_STUB_DISPLAY 11
+#define FEATURE_NUMBER_WRITER 12
+#define FEATURE_CLOCK_WRITER 13
+#define FEATURE_CHAR_WRITER 14
+#define FEATURE_STRING_WRITER 15
 
 // A volatile integer to prevent the compiler from optimizing away the entire
 // program.
@@ -38,8 +39,10 @@ volatile int disableCompilerOptimization = 0;
 
 #if FEATURE > FEATURE_BASELINE
   #include <AceSegment.h>
-  #include <ace_segment/fast/LedMatrixDirectFast.h>
-  #include <ace_segment/fast/SwSpiAdapterFast.h>
+  #include <digitalWriteFast.h>
+  #include <ace_segment/hw/SwSpiAdapterFast.h>
+  #include <ace_segment/scanning/LedMatrixDirectFast.h>
+  #include <ace_segment/tm1637/Tm1637DriverFast.h>
   using namespace ace_segment;
 
   // Common to all FEATURES
@@ -60,6 +63,7 @@ volatile int disableCompilerOptimization = 0;
   // TM1637
   const uint8_t CLK_PIN = 16;
   const uint8_t DIO_PIN = 10;
+  const uint16_t BIT_DELAY = 100;
 
   class StubDisplay : public LedDisplay {
     public:
@@ -69,13 +73,13 @@ volatile int disableCompilerOptimization = 0;
         disableCompilerOptimization = pattern;
       }
 
-      void writePatternsAt(uint8_t pos, const uint8_t patterns[],
-          uint8_t len) override {
+      void writePatternsAt(uint8_t /*pos*/, const uint8_t patterns[],
+          uint8_t /*len*/) override {
         disableCompilerOptimization = patterns[0];
       }
 
-      void writePatternsAt_P(uint8_t pos, const uint8_t patterns[],
-          uint8_t len) override {
+      void writePatternsAt_P(uint8_t /*pos*/, const uint8_t patterns[],
+          uint8_t /*len*/) override {
         disableCompilerOptimization = pgm_read_byte(patterns);
       }
 
@@ -124,7 +128,7 @@ volatile int disableCompilerOptimization = 0;
         scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
 
   #elif FEATURE == FEATURE_SINGLE_SW_SPI_FAST
-    #if ! defined(ARDUINO_ARCH_AVR)
+    #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
       #error Unsupported FEATURE on this platform
     #endif
 
@@ -168,7 +172,7 @@ volatile int disableCompilerOptimization = 0;
         scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
 
   #elif FEATURE == FEATURE_DUAL_SW_SPI_FAST
-    #if ! defined(ARDUINO_ARCH_AVR)
+    #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
       #error Unsupported FEATURE on this platform
     #endif
 
@@ -195,7 +199,7 @@ volatile int disableCompilerOptimization = 0;
         scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
 
   #elif FEATURE == FEATURE_DIRECT_FAST
-    #if ! defined(ARDUINO_ARCH_AVR)
+    #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
       #error Unsupported FEATURE on this platform
     #endif
 
@@ -211,7 +215,18 @@ volatile int disableCompilerOptimization = 0;
         scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
 
   #elif FEATURE == FEATURE_TM1637_DISPLAY
-    Tm1637Display<NUM_DIGITS> ledDisplay(CLK_PIN, DIO_PIN);
+    using Driver = Tm1637Driver;
+    Driver driver(CLK_PIN, DIO_PIN, BIT_DELAY);
+    Tm1637Display<Driver, NUM_DIGITS> ledDisplay(driver);
+
+  #elif FEATURE == FEATURE_TM1637_DISPLAY_FAST
+    #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
+      #error Unsupported FEATURE on this platform
+    #endif
+
+    using Driver = Tm1637DriverFast<CLK_PIN, DIO_PIN, BIT_DELAY>;
+    Driver driver;
+    Tm1637Display<Driver, NUM_DIGITS> ledDisplay(driver);
 
   #elif FEATURE == FEATURE_STUB_DISPLAY
     StubDisplay ledDisplay;
@@ -286,6 +301,11 @@ void setup() {
   scanningDisplay.begin();
 
 #elif FEATURE == FEATURE_TM1637_DISPLAY
+  driver.begin();
+  ledDisplay.begin();
+
+#elif FEATURE == FEATURE_TM1637_DISPLAY_FAST
+  driver.begin();
   ledDisplay.begin();
 
 #else
@@ -300,6 +320,10 @@ void loop() {
   scanningDisplay.renderFieldWhenReady();
 
 #elif FEATURE == FEATURE_TM1637_DISPLAY
+  ledDisplay.writePatternAt(0, 0xff);
+  ledDisplay.flush();
+
+#elif FEATURE == FEATURE_TM1637_DISPLAY_FAST
   ledDisplay.writePatternAt(0, 0xff);
   ledDisplay.flush();
 

@@ -143,6 +143,9 @@ before substantional refactoring in 2021.
   changes are due to some removal/addition of some methods in `LedDisplay`.
 * Add memory usage for `Tm1637Display`. Seems to consume something in between
   similar to the `ScanningDisplay` w/ SW SPI and `ScanningDisplay` with HW SPI.
+* Add memory usage for `Tm1637Display` using `Tm1637DriverFast` which uses
+  `digitalWriteFast` library for AVR processors. Saves 662 - 776 bytes of flash
+  on AVR processors compared to `Tm1637Display` using normal `Tm1637Driver`.
 
 ## Results
 

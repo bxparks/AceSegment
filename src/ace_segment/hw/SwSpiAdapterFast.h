@@ -25,11 +25,12 @@ SOFTWARE.
 #ifndef ACE_SEGMENT_SW_SPI_ADAPTER_FAST_H
 #define ACE_SEGMENT_SW_SPI_ADAPTER_FAST_H
 
-#if defined(ARDUINO_ARCH_AVR)
+// This header file requires the digitalWriteFast library on AVR, or the
+// EpoxyMockDigitalWriteFast library on EpoxyDuino.
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 
 #include <stdint.h>
 #include <Arduino.h> // OUTPUT
-#include <digitalWriteFast.h>
 
 namespace ace_segment {
 

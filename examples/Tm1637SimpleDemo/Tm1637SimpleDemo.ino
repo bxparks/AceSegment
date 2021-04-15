@@ -6,6 +6,18 @@ using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
 using ace_segment::Tm1637Display;
+using ace_segment::Tm1637Driver;
+
+// Select driver version, either normal digitalWrite() or digitalWriteFast()
+#define TM16137_DRIVER_TYPE_NORMAL 0
+#define TM16137_DRIVER_TYPE_FAST 1
+#define TM16137_DRIVER_TYPE TM16137_DRIVER_TYPE_FAST
+
+#if TM16137_DRIVER_TYPE == TM16137_DRIVER_TYPE_FAST
+  #include <digitalWriteFast.h>
+  #include <ace_segment/tm1637/Tm1637DriverFast.h> // Tm1637DriverFast
+  using ace_segment::Tm1637DriverFast;
+#endif
 
 //#if ! defined(AUNITER_LED_CLOCK_TM1637)
 //#error Compatible only with env:ledclock_tm1636 configuration.
@@ -21,12 +33,22 @@ const uint8_t PATTERNS[4] = {
   0b01100110, // 4
 };
 
-// Takes about 12 ms to send 4 digits at 50 us delay, but does not work.
-// Takes about 17 ms to send 4 digits at 75 us delay.
-// Takes about 22 ms to send 4 digits at 100 us delay.
-// Takes about 43 ms to send 4 digits at 200 us delay.
-const uint16_t bitDelay = 100;
-Tm1637Display<4> display(CLK_PIN, DIO_PIN, bitDelay);
+// For a Tm1637Driver (non-fast), time to send 4 digits:
+// * 12 ms at 50 us delay, but does not work.
+// * 17 ms at 75 us delay.
+// * 22 ms at 100 us delay.
+// * 43 ms at 200 us delay.
+constexpr uint16_t BIT_DELAY = 100;
+
+#if TM16137_DRIVER_TYPE == TM16137_DRIVER_TYPE_NORMAL
+  using Driver = Tm1637Driver;
+  Driver driver(CLK_PIN, DIO_PIN, BIT_DELAY);
+  Tm1637Display<Driver, 4> display(driver);
+#else
+  using Driver = Tm1637DriverFast<CLK_PIN, DIO_PIN, BIT_DELAY>;
+  Driver driver;
+  Tm1637Display<Driver, 4> display(driver);
+#endif
 
 TimingStats stats;
 
@@ -40,11 +62,14 @@ void setup() {
   while (!Serial);
 #endif
 
+  driver.begin();
   display.begin();
 }
 
 #if 0
 
+// This version of loop() uses the Tm1636Display.flush() method to update all
+// digits in a single dump to the LED module, taking ~22ms per call.
 void loop() {
   // Update the display
   uint8_t j = digitIndex;
@@ -74,6 +99,8 @@ void loop() {
 
 #else
 
+// This version of loop() uses the Tm1636Display.flushIncremental() method to
+// update only a single digit per call, taking only ~10 ms at 100 us delay.
 void loop() {
   static uint16_t prevChangeMillis = millis();
   static uint16_t prevFlushMillis = millis();

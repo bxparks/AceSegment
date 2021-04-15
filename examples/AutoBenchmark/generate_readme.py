@@ -53,6 +53,11 @@ This program depends on the following libraries:
 * [AceCommon](https://github.com/bxparks/AceCommon)
 * [AceSegment](https://github.com/bxparks/AceButton)
 
+On AVR processors, the following library is required to run the
+`digitalWriteFast()` versions of the low-level drivers:
+
+* [digitalWriteFast](https://github.com/NicksonYap/digitalWriteFast)
+
 ## How to Generate
 
 This requires the [AUniter](https://github.com/bxparks/AUniter) script
@@ -95,13 +100,23 @@ number of `TimingStats::update()` calls that were made.
 v0.4: Huge refactoring of core AceSegment classes. Rewrote AutoBenchmark
 to match similar programs in the AceButton, AceCrc and AceTime libraries.
 
+v0.5: Add benchmarks for `Tm1637Display`. The CPU time is mostly determined by
+the calls to `delayMicroseconds()`, which is required to meet the electrical
+characteristics of the LED module.
+
 ## Results
 
-The following tables show the number of microseconds taken by
-`ScanningDisplay::renderFieldNow()` which renders the 8 segments of a single
-LED digit. If the LED module has 4 digits, then `renderFieldNow()` must be
-called 4 times to render the light pattern of the entire LED module. The entire
-rendering is then called a frame.
+The following tables show the number of microseconds taken by:
+
+* `ScanningDisplay::renderFieldNow()`
+    * renders the 8 segments of a single LED digit. If the LED module has 4
+      digits, then `renderFieldNow()` must be called 4 times to render the light
+      pattern of the entire LED module. The entire rendering is then called a
+      frame.
+* `Tm1637Display::flush()`
+    * sends all digits in the buffer to the TM1637 LED module using the I2C-like
+      protocol
+    * a bitDelay of 100 microseconds is used
 
 Most people can no longer see flickering of the display at about 60 frames a
 second. To achieve that, the `renderFieldNow()` method must be called 240
@@ -125,6 +140,9 @@ On AVR processors, the "fast" options are available using the
 [digitalWriteFast](https://github.com/NicksonYap/digitalWriteFast) library whose
 `digitalWriteFast()` functions can be up to 50X faster if the `pin` number and
 `value` parameters are compile-time constants.
+
+The `digitalWriteFast` library is useful to create the `Tm1637DriverFast` class,
+because it consumes 600-700 fewer bytes of flash memory.
 
 ### Arduino Nano
 

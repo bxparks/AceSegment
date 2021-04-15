@@ -22,56 +22,54 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_TM1637_DRIVER_H
-#define ACE_SEGMENT_TM1637_DRIVER_H
+#ifndef ACE_SEGMENT_TM1637_DRIVER_FAST_H
+#define ACE_SEGMENT_TM1637_DRIVER_FAST_H
 
+// This header file requires the digitalWriteFast library on AVR, or the
+// EpoxyMockDigitalWriteFast library on EpoxyDuino.
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+
+#include <stdint.h>
 #include <Arduino.h>
 
 namespace ace_segment {
 
 /**
- * Class that knows how to communicate with a TM1637 chip. It uses a 2-wire
- * (Clock and a bidirectional DIO) protocol that is similar to I2C electrically.
- * Both the Clock and Data pins are open-drain which means a single transitor on
- * either the master or slave can pull the line LOW, but a pull-up resisotr is
- * required to set the line HIGH. Because these are open-drain, we must make
- * sure that the microcontroller does *not* actively drive these lines HIGH,
- * otherwise, the output pin of the MCU at 5V (HIGH) becomes directly connected
- * to the 0V (LOW) of the transistor on the device pulling it LOW, with no
- * current limiting resistor. Either of MCU or the device can become damaged. To
- * set the line HIGH or LOW, we set the output level to LOW, then use the
- * pinMode() function to either INPUT (to get a HIGH value) or OUTPUT (to get a
- * LOW value).
+ * Exactly the same as Tm1637Driver except that this uses the `digitalWriteFast`
+ * library on AVR processors. Normally, the digitalWriteFast library is used to
+ * get faster speeds over `digitalWrite()` and `pinMode()` functions. But speed
+ * of the `digitalWrite()` functions is not the limiting factor in this library
+ * because every bit flip is followed by a `delayMicroseconds()` which is far
+ * longer than the CPU cycle savings from `digitalWritFast()`.
  *
- * The logical protocol of the TM1637 is similar to I2C in the following ways:
+ * The reason that you may want to use `digitalWriteFast` library is because it
+ * consumes far less flash memory than normal `digitalWrite()`. The benchmarks
+ * in MemoryBenchmark shows that using this `Tm1637DriverFast` instead of
+ * `Tm1637Driver` saves 650-770 bytes of flash on an AVR processor.
  *
- *    * The start and stop conditions are the same.
- *    * Data transfer happens on the rising edge of the CLK signal.
- *    * The slave sends back a one-bit ACK/NACK after the 8th bit of the CLK.
+ * Word of caution though, there is a use-case where you may want to still use
+ * the normal `Tm1637Driver`. If your application uses more than one TM1637 LED
+ * Module, you will need to create multiple instances of the `Tm1637Display`.
+ * But note that the pin numbers of this class must be a compile-time constants,
+ * so different pins means that a different template class is generated. Since
+ * `Tm1637Display` class takes a `Tm1637DriverFast` as a template argument, each
+ * LED Module generate a new template instance of the `Tm1637Display` class.
  *
- * The difference is:
- *
- *    * There is no I2C address byte, so only a single TM1637 device can be on
- *      the bus.
- *    * The first byte sent to the TM1637 is a command byte.
- *
- * Since the protocol does not match I2C, we cannot use the hardware I2C
- * capabilities of the microcontroller, so we have to implement a software
- * version of this protocol.
+ * In the case of multiple LED modules, it may actually be more efficient to use
+ * the non-fast `Tm1637Driver`, because you will generate only a single template
+ * instantiation. There will be multiple instances of that class, but only a
+ * single class.
  *
  * This class is stateless. It is thread-safe.
  */
-class Tm1637Driver {
+template <
+    uint8_t CLOCK_PIN,
+    uint8_t DIO_PIN,
+    uint16_t DELAY_MICROS
+>
+class Tm1637DriverFast {
   public:
-    explicit Tm1637Driver(
-        uint8_t clockPin,
-        uint8_t dioPin,
-        uint16_t delayMicros
-    ) :
-        mClockPin(clockPin),
-        mDioPin(dioPin),
-        mDelayMicros(delayMicros)
-    {}
+    explicit Tm1637DriverFast() = default;
 
     /** Initialize the GPIO pins. */
     void begin() const {
@@ -80,8 +78,8 @@ class Tm1637Driver {
       // end of the line pulling LOW. Instead, we go into INPUT mode to let the
       // line to HIGH through the pullup resistor, then go to OUTPUT mode only
       // to pull down.
-      digitalWrite(mClockPin, LOW);
-      digitalWrite(mDioPin, LOW);
+      digitalWriteFast(CLOCK_PIN, LOW);
+      digitalWriteFast(DIO_PIN, LOW);
 
       // Begin with both lines at HIGH.
       clockHigh();
@@ -89,7 +87,7 @@ class Tm1637Driver {
     }
 
     /** Set pins to INPUT mode. */
-    void end() {
+    void end() const {
       clockHigh();
       dataHigh();
     }
@@ -128,9 +126,9 @@ class Tm1637Driver {
 
       // Device places the ACK/NACK bit upon the falling edge of the 8th CLK,
       // which happens in the loop above.
-      pinMode(mDioPin, INPUT);
+      pinModeFast(DIO_PIN, INPUT);
       bitDelay();
-      uint8_t ack = digitalRead(mDioPin);
+      uint8_t ack = digitalReadFast(DIO_PIN);
 
       // Device releases DIO upon falling edge of the 9th CLK.
       clockHigh();
@@ -139,22 +137,19 @@ class Tm1637Driver {
     }
 
   private:
-    void bitDelay() const { delayMicroseconds(mDelayMicros); }
+    void bitDelay() const { delayMicroseconds(DELAY_MICROS); }
 
-    void clockHigh() const { pinMode(mClockPin, INPUT); bitDelay(); }
+    void clockHigh() const { pinModeFast(CLOCK_PIN, INPUT); bitDelay(); }
 
-    void clockLow() const { pinMode(mClockPin, OUTPUT); bitDelay(); }
+    void clockLow() const { pinModeFast(CLOCK_PIN, OUTPUT); bitDelay(); }
 
-    void dataHigh() const { pinMode(mDioPin, INPUT); bitDelay(); }
+    void dataHigh() const { pinModeFast(DIO_PIN, INPUT); bitDelay(); }
 
-    void dataLow() const { pinMode(mDioPin, OUTPUT); bitDelay(); }
-
-  private:
-    uint8_t const mClockPin;
-    uint8_t const mDioPin;
-    uint16_t const mDelayMicros;
+    void dataLow() const { pinModeFast(DIO_PIN, OUTPUT); bitDelay(); }
 };
 
 } // ace_segment
+
+#endif // defined(ARDUINO_ARCH_AVR)
 
 #endif

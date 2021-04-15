@@ -25,12 +25,13 @@ SOFTWARE.
 #ifndef ACE_SEGMENT_LED_MATRIX_DIRECT_FAST_H
 #define ACE_SEGMENT_LED_MATRIX_DIRECT_FAST_H
 
-#if defined(ARDUINO_ARCH_AVR)
+// This header file requires the digitalWriteFast library on AVR, or the
+// EpoxyMockDigitalWriteFast library on EpoxyDuino.
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 
 #include <stdint.h>
 #include <Arduino.h> // OUTPUT, INPUT
-#include <digitalWriteFast.h>
-#include "../scanning/LedMatrixBase.h"
+#include "LedMatrixBase.h"
 
 // Select OPTION_ARRAY to use an array of function pointers. Using an array
 // of function takes 27 microseconds for displayCurentField(), but 8 extra bytes
