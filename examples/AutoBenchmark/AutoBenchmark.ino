@@ -444,9 +444,12 @@ void runTm1637DisplayNormal() {
   using Driver = Tm1637Driver;
   Driver driver(CLK_PIN, DIO_PIN, BIT_DELAY);
   Tm1637Display<Driver, NUM_DIGITS> ledDisplay(driver);
-  ledDisplay.begin();
 
+  driver.begin();
+  ledDisplay.begin();
   runTm1637Benchmark("Tm1637(Normal)", ledDisplay);
+  ledDisplay.end();
+  driver.end();
 }
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
@@ -455,9 +458,12 @@ void runTm1637DisplayFast() {
   using Driver = Tm1637DriverFast<CLK_PIN, DIO_PIN, BIT_DELAY>;
   Driver driver;
   Tm1637Display<Driver, NUM_DIGITS> ledDisplay(driver);
-  ledDisplay.begin();
 
+  driver.begin();
+  ledDisplay.begin();
   runTm1637Benchmark("Tm1637(Fast)", ledDisplay);
+  ledDisplay.end();
+  driver.end();
 }
 #endif
 

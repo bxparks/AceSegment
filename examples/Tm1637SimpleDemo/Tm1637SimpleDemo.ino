@@ -61,6 +61,7 @@ void setup() {
   while (!Serial);
 #endif
 
+  driver.begin();
   display.begin();
 }
 

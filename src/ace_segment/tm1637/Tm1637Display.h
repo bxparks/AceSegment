@@ -59,13 +59,18 @@ class Tm1637Display : public LedDisplay {
     /** Return the number of digits supported by this display instance. */
     uint8_t getNumDigits() const { return DIGITS; }
 
+    /**
+     * Initialize the object. The Tm1637 driver must be initialized separately.
+     */
     void begin() {
-      mDriver.begin();
       memset(mPatterns, 0, DIGITS);
       mBrightness = kBrightnessCmd | kBrightnessLevelOn | 0x7;
-      mIsDirty = 0xFF;
+      mIsDirty = 0xFF; // force initial values are sent to LED module
       mFlushStage = 0;
     }
+
+    /** Signal end of usage. Currently does nothing. */
+    void end() {}
 
     void writePatternAt(uint8_t pos, uint8_t pattern) override {
       if (pos >= DIGITS) return;
@@ -91,6 +96,10 @@ class Tm1637Display : public LedDisplay {
       setDirtyBit(kBrightnessDirtyBit);
     }
 
+    /**
+     * Turn off the entire display. The brightness is not affected so when it is
+     * turned back on, the previous brightness will be used.
+     */
     void setDisplayOn(bool on = true) {
       if (on) {
         mBrightness |= kBrightnessLevelOn;
@@ -126,10 +135,15 @@ class Tm1637Display : public LedDisplay {
     }
 
     /**
-     * Use the mFlushStage and the mIsDirty bit array to update only the part
-     * that needs updating. If the entire display needs to be updated, then it
-     * is about 50% slower 30 ms, versus 22 ms for flush(). Using 100 micro
-     * delay, I see the following durations:
+     * Update only a single digit or the brightness. This method must be called
+     * (DIGITS + 1) times to update the digits of entire module, including the
+     * brightness which is updated using a separate step. Uses the mFlushStage
+     * and the mIsDirty bit array to update only the part that needs updating.
+     * This method should be used if the processor cannot be blocked for the
+     * entire duration of the flush() method (e.g. on the ESP8266, which will
+     * cause a WDT reset when it is blocked for more than 20-40 ms).
+     *
+     * Using 100 micro delay, I see the following durations:
      *
      * 1) If brightness is checked and updated on every iteration, I get
      * 'min/avg/max:4/494/13780', so a maximum of 14 ms, which is still a little
@@ -140,6 +154,11 @@ class Tm1637Display : public LedDisplay {
      * the latency. The side effect is a slightly flicker when the display and
      * brightness changes at the same time, because this incrementally updating
      * function makes those changes in 2 steps.
+     *
+     * The incremental flushing must use fixed addressing mode to write specific
+     * digits, which adds extra commands to the wire protocol to the LED module.
+     * If this algorithm is used to send all the digits in one-shot, then this
+     * method is about 50% slower (30 ms), compared to flush() (22 ms).
      */
     void flushIncremental() {
       if (isDirtyBit(mFlushStage)) {
@@ -192,8 +211,8 @@ class Tm1637Display : public LedDisplay {
     static uint8_t const kBrightnessDirtyBit = DIGITS;
 
     const DRIVER& mDriver;
-    uint8_t mIsDirty; // bit array
     uint8_t mBrightness; // maps to dirty bit 7
+    uint8_t mIsDirty; // bit array
     uint8_t mFlushStage; // [0, DIGITS], DIGITS for brightness update
     uint8_t mPatterns[DIGITS]; // maps to dirty bits 0-5
 };

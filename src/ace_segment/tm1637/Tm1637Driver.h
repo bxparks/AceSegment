@@ -73,6 +73,7 @@ class Tm1637Driver {
         mDelayMicros(delayMicros)
     {}
 
+    /** Initialize the GPIO pins. */
     void begin() const {
       // These are open-drain lines, with a pull-up resistor. We must not drive
       // them HIGH actively since that could damage the transitor at the other
@@ -83,6 +84,12 @@ class Tm1637Driver {
       digitalWrite(mDioPin, LOW);
 
       // Begin with both lines at HIGH.
+      clockHigh();
+      dataHigh();
+    }
+
+    /** Set pins to INPUT mode. */
+    void end() {
       clockHigh();
       dataHigh();
     }

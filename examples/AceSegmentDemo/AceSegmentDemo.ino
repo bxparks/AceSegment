@@ -116,6 +116,7 @@ const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
 #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_TM1637
   const uint8_t CLK_PIN = 16;
   const uint8_t DIO_PIN = 10;
+  const uint16_t BIT_DELAY = 100;
 #endif
 
 // The chain of resources.
@@ -209,16 +210,18 @@ Hardware hardware;
 #endif
 
 #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_SCANNING
-  // Monochromatic
+  // 1-bit brightness
   ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS> display(
       hardware, ledMatrix, FRAMES_PER_SECOND);
 
-  // 16 level of brightness, need field/second of 60*4*16 = 3840.
+  // 16 levels of brightness, need render-fields/second of 60*4*16 = 3840.
   ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
       scanningDisplayModulating(hardware, ledMatrix, FRAMES_PER_SECOND);
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_TM1637
-  Tm1637Display<4> display(CLK_PIN, DIO_PIN);
+  using TmDriver = Tm1637Driver;
+  TmDriver driver(CLK_PIN, DIO_PIN, BIT_DELAY);
+  Tm1637Display<TmDriver, 4> display(driver);
 
 #else
   #error Unknown LED_DISPLAY_TYPE
@@ -231,6 +234,10 @@ StringWriter stringWriter(charWriter);
 
 // Setup the various resources.
 void setupAceSegment() {
+#if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_TM1637
+  driver.begin();
+  display.begin();
+#else
   #if LED_MATRIX_MODE == LED_MATRIX_MODE_PARIAL_SW_SPI \
       || LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HW_SPI \
       || LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SW_SPI_FAST \
@@ -240,13 +247,10 @@ void setupAceSegment() {
     spiAdapter.begin();
   #endif
 
-  #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_TM1637
-    display.begin();
-  #else
-    ledMatrix.begin();
-    display.begin();
-    scanningDisplayModulating.begin();
-  #endif
+  ledMatrix.begin();
+  display.begin();
+  scanningDisplayModulating.begin();
+#endif
 
 #if USE_INTERRUPT == 1
   setupInterupt(display.getFieldsPerSecond());

@@ -300,9 +300,11 @@ void setup() {
   scanningDisplay.begin();
 
 #elif FEATURE == FEATURE_TM1637_DISPLAY
+  driver.begin();
   ledDisplay.begin();
 
 #elif FEATURE == FEATURE_TM1637_DISPLAY_FAST
+  driver.begin();
   ledDisplay.begin();
 
 #else
