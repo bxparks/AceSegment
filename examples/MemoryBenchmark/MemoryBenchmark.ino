@@ -30,8 +30,9 @@
 #define FEATURE_STUB_DISPLAY 11
 #define FEATURE_NUMBER_WRITER 12
 #define FEATURE_CLOCK_WRITER 13
-#define FEATURE_CHAR_WRITER 14
-#define FEATURE_STRING_WRITER 15
+#define FEATURE_TEMPERATURE_WRITER 14
+#define FEATURE_CHAR_WRITER 15
+#define FEATURE_STRING_WRITER 16
 
 // A volatile integer to prevent the compiler from optimizing away the entire
 // program.
@@ -39,10 +40,12 @@ volatile int disableCompilerOptimization = 0;
 
 #if FEATURE > FEATURE_BASELINE
   #include <AceSegment.h>
-  #include <digitalWriteFast.h>
-  #include <ace_segment/hw/SwSpiAdapterFast.h>
-  #include <ace_segment/scanning/LedMatrixDirectFast.h>
-  #include <ace_segment/tm1637/Tm1637DriverFast.h>
+  #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+    #include <digitalWriteFast.h>
+    #include <ace_segment/hw/SwSpiAdapterFast.h>
+    #include <ace_segment/scanning/LedMatrixDirectFast.h>
+    #include <ace_segment/tm1637/Tm1637DriverFast.h>
+  #endif
   using namespace ace_segment;
 
   // Common to all FEATURES
@@ -239,6 +242,10 @@ volatile int disableCompilerOptimization = 0;
     StubDisplay ledDisplay;
     ClockWriter clockWriter(ledDisplay);
 
+  #elif FEATURE == FEATURE_TEMPERATURE_WRITER
+    StubDisplay ledDisplay;
+    TemperatureWriter temperatureWriter(ledDisplay);
+
   #elif FEATURE == FEATURE_CHAR_WRITER
     StubDisplay ledDisplay;
     CharWriter charWriter(ledDisplay);
@@ -335,6 +342,9 @@ void loop() {
 
 #elif FEATURE == FEATURE_CLOCK_WRITER
   clockWriter.writeHourMinute(10, 45);
+
+#elif FEATURE == FEATURE_TEMPERATURE_WRITER
+  temperatureWriter.writeTempDegCAt(0, 22 /*temp*/, 4 /*boxSize*/);
 
 #elif FEATURE == FEATURE_CHAR_WRITER
   charWriter.writeCharAt(0, 'a');
