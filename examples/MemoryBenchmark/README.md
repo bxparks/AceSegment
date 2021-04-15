@@ -173,6 +173,7 @@ other `MemoryBenchmark` programs.)
 | StubDisplay                     |    538/   11 |    82/    0 |
 | NumberWriter+Stub               |    692/   32 |   236/   21 |
 | ClockWriter+Stub                |    792/   33 |   336/   22 |
+| TemperatureWriter+Stub          |    810/   32 |   354/   21 |
 | CharWriter+Stub                 |    792/   32 |   336/   21 |
 | StringWriter+Stub               |    940/   40 |   484/   29 |
 +--------------------------------------------------------------+
@@ -207,6 +208,7 @@ other `MemoryBenchmark` programs.)
 | StubDisplay                     |   3552/  151 |    80/    0 |
 | NumberWriter+Stub               |   3648/  172 |   176/   21 |
 | ClockWriter+Stub                |   3748/  173 |   276/   22 |
+| TemperatureWriter+Stub          |   3766/  172 |   294/   21 |
 | CharWriter+Stub                 |   3748/  172 |   276/   21 |
 | StringWriter+Stub               |   3896/  180 |   424/   29 |
 +--------------------------------------------------------------+
@@ -235,12 +237,13 @@ other `MemoryBenchmark` programs.)
 | ScanningDisplay(single_sw_fast) |     -1/   -1 |    -1/   -1 |
 | ScanningDisplay(dual_sw_fast)   |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Tm1637Display(Normal)           |  10944/    0 |   880/    0 |
+| Tm1637Display(Normal)           |  10952/    0 |   888/    0 |
 | Tm1637Display(Fast)             |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | StubDisplay                     |  10336/    0 |   272/    0 |
 | NumberWriter+Stub               |  10664/    0 |   600/    0 |
 | ClockWriter+Stub                |  10448/    0 |   384/    0 |
+| TemperatureWriter+Stub          |  10720/    0 |   656/    0 |
 | CharWriter+Stub                 |  10520/    0 |   456/    0 |
 | StringWriter+Stub               |  10664/    0 |   600/    0 |
 +--------------------------------------------------------------+
@@ -269,12 +272,13 @@ other `MemoryBenchmark` programs.)
 | ScanningDisplay(single_sw_fast) |     -1/   -1 |    -1/   -1 |
 | ScanningDisplay(dual_sw_fast)   |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Tm1637Display(Normal)           |  21748/ 3980 |  2612/  192 |
+| Tm1637Display(Normal)           |  21752/ 3980 |  2616/  192 |
 | Tm1637Display(Fast)             |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | StubDisplay                     |  19336/ 3948 |   200/  160 |
 | NumberWriter+Stub               |  19612/ 3952 |   476/  164 |
 | ClockWriter+Stub                |  19464/ 3956 |   328/  168 |
+| TemperatureWriter+Stub          |  19688/ 3952 |   552/  164 |
 | CharWriter+Stub                 |  19508/ 3952 |   372/  164 |
 | StringWriter+Stub               |  19652/ 3956 |   516/  168 |
 +--------------------------------------------------------------+
@@ -309,6 +313,7 @@ other `MemoryBenchmark` programs.)
 | StubDisplay                     | 256884/26792 |   184/    8 |
 | NumberWriter+Stub               | 257380/26792 |   680/    8 |
 | ClockWriter+Stub                | 257140/26800 |   440/   16 |
+| TemperatureWriter+Stub          | 257460/26792 |   760/    8 |
 | CharWriter+Stub                 | 257092/26792 |   392/    8 |
 | StringWriter+Stub               | 257292/26816 |   592/   32 |
 +--------------------------------------------------------------+
@@ -343,6 +348,7 @@ other `MemoryBenchmark` programs.)
 | StubDisplay                     | 199298/13176 |  1568/   76 |
 | NumberWriter+Stub               | 199674/13184 |  1944/   84 |
 | ClockWriter+Stub                | 199538/13184 |  1808/   84 |
+| TemperatureWriter+Stub          | 199750/13184 |  2020/   84 |
 | CharWriter+Stub                 | 199506/13184 |  1776/   84 |
 | StringWriter+Stub               | 199670/13184 |  1940/   84 |
 +--------------------------------------------------------------+
@@ -372,12 +378,13 @@ other `MemoryBenchmark` programs.)
 | ScanningDisplay(single_sw_fast) |     -1/   -1 |    -1/   -1 |
 | ScanningDisplay(dual_sw_fast)   |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Tm1637Display(Normal)           |  12684/ 4168 |  5060/ 1120 |
+| Tm1637Display(Normal)           |  12688/ 4168 |  5064/ 1120 |
 | Tm1637Display(Fast)             |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | StubDisplay                     |  10924/ 4156 |  3300/ 1108 |
 | NumberWriter+Stub               |  11328/ 4160 |  3704/ 1112 |
 | ClockWriter+Stub                |  11052/ 4164 |  3428/ 1116 |
+| TemperatureWriter+Stub          |  11460/ 4160 |  3836/ 1112 |
 | CharWriter+Stub                 |  11096/ 4160 |  3472/ 1112 |
 | StringWriter+Stub               |  11264/ 4164 |  3640/ 1116 |
 +--------------------------------------------------------------+
