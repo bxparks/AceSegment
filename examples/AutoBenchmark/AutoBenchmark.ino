@@ -42,6 +42,7 @@ SOFTWARE.
 #include <AceSegment.h>
 #include <ace_segment/fast/LedMatrixDirectFast.h>
 #include <ace_segment/fast/SwSpiAdapterFast.h>
+#include <ace_segment/tm1637/Tm1637DriverFast.h>
 
 using namespace ace_segment;
 using ace_common::TimingStats;
@@ -64,33 +65,82 @@ const uint8_t NUM_SEGMENTS = 8;
   // numbers don't matter
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {1, 2, 3, 4};
   const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {5, 6, 7, 8, 9, 10, 11, 12};
+
+  // TM1637
+  const uint8_t CLK_PIN = 1;
+  const uint8_t DIO_PIN = 2;
+  const uint16_t BIT_DELAY = 100;
+
 #elif defined(ARDUINO_ARCH_AVR)
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
   const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
+
+  // TM1637
+  const uint8_t CLK_PIN = 4;
+  const uint8_t DIO_PIN = 5;
+  const uint16_t BIT_DELAY = 100;
+
 #elif defined(ARDUINO_ARCH_SAMD)
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {2, 3, 4, 5};
   const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {6, 7, 8, 9, 10, 11, 12, 13};
+
+  // TM1637
+  const uint8_t CLK_PIN = 2;
+  const uint8_t DIO_PIN = 3;
+  const uint16_t BIT_DELAY = 100;
+
 #elif defined(ARDUINO_ARCH_STM32)
   // I think this is the F1, because there exists a ARDUINO_ARCH_STM32F4
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {2, 3, 4, 5};
   const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {6, 7, 8, 9, 10, 11, 12, 13};
+
+  // TM1637
+  const uint8_t CLK_PIN = 2;
+  const uint8_t DIO_PIN = 3;
+  const uint16_t BIT_DELAY = 100;
+
 #elif defined(ESP8266)
   // Don't have enough pins so reuse some.
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {D4, D5, D4, D5};
   const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {D6, D7, D6, D7, D6, D7, D6, D7};
+
+  // TM1637
+  const uint8_t CLK_PIN = D4;
+  const uint8_t DIO_PIN = D5;
+  const uint16_t BIT_DELAY = 100;
+
 #elif defined(ESP32)
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {21, 22, 23, 24};
   const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {12, 13, 14, 15, 16, 17, 18, 19};
+
+  // TM1637
+  const uint8_t CLK_PIN = 21;
+  const uint8_t DIO_PIN = 22;
+  const uint16_t BIT_DELAY = 100;
+
 #elif defined(TEENSYDUINO)
   // Teensy 3.2
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {2, 3, 4, 5};
   const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {6, 7, 8, 9, 10, 11, 12, 13};
+
+  // TM1637
+  const uint8_t CLK_PIN = 2;
+  const uint8_t DIO_PIN = 3;
+  const uint16_t BIT_DELAY = 100;
+
 #else
   #warning Unknown hardware, using defaults which may interfere with Serial
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {2, 3, 4, 5};
   const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {6, 7, 8, 9, 10, 11, 12, 13};
+
+  // TM1637
+  const uint8_t CLK_PIN = 2;
+  const uint8_t DIO_PIN = 3;
+  const uint16_t BIT_DELAY = 100;
+
 #endif
 
+  // 74HC595
 const uint8_t LATCH_PIN = 10; // ST_CP on 74HC595
 const uint8_t DATA_PIN = MOSI; // DS on 74HC595
 const uint8_t CLOCK_PIN = SCK; // SH_CP on 74HC595
@@ -120,7 +170,7 @@ static void printStats(
 TimingStats timingStats;
 
 template <typename SD>
-void runBenchmark(const char* name, SD& scanningDisplay) {
+void runScanningBenchmark(const char* name, SD& scanningDisplay) {
 
   scanningDisplay.writePatternAt(0, 0x13);
   scanningDisplay.writePatternAt(0, 0x37);
@@ -159,14 +209,16 @@ void runDirect() {
   ledMatrix.begin();
   scanningDisplay.begin();
   scanningDisplaySubfields.begin();
-  runBenchmark("direct", scanningDisplay);
-  runBenchmark("direct(subfields)", scanningDisplaySubfields);
+  runScanningBenchmark("Scanning(direct)",
+      scanningDisplay);
+  runScanningBenchmark("Scanning(direct,subfields)",
+      scanningDisplaySubfields);
   scanningDisplaySubfields.end();
   scanningDisplay.end();
   ledMatrix.end();
 }
 
-#if defined(ARDUINO_ARCH_AVR)
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 // Common Anode, with transistors on Group pins
 void runDirectFast() {
   using LedMatrix = LedMatrixDirectFast<
@@ -183,8 +235,10 @@ void runDirectFast() {
   ledMatrix.begin();
   scanningDisplay.begin();
   scanningDisplaySubfields.begin();
-  runBenchmark("direct_fast", scanningDisplay);
-  runBenchmark("direct_fast(subfields)", scanningDisplaySubfields);
+  runScanningBenchmark("Scanning(direct_fast)",
+      scanningDisplay);
+  runScanningBenchmark("Scanning(direct_fast,subfields)",
+      scanningDisplaySubfields);
   scanningDisplaySubfields.end();
   scanningDisplay.end();
   ledMatrix.end();
@@ -211,8 +265,10 @@ void runSingleShiftRegisterSwSpi() {
   ledMatrix.begin();
   scanningDisplay.begin();
   scanningDisplaySubfields.begin();
-  runBenchmark("single_sw_spi", scanningDisplay);
-  runBenchmark("single_sw_spi(subfields)", scanningDisplaySubfields);
+  runScanningBenchmark("Scanning(single_sw_spi)",
+      scanningDisplay);
+  runScanningBenchmark("Scanning(single_sw_spi,subfields)",
+      scanningDisplaySubfields);
   scanningDisplaySubfields.end();
   scanningDisplay.end();
   ledMatrix.end();
@@ -220,7 +276,7 @@ void runSingleShiftRegisterSwSpi() {
 }
 
 // Common Cathode, with transistors on Group pins
-#if defined(ARDUINO_ARCH_AVR)
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 void runSingleShiftRegisterSwSpiFast() {
   using SpiAdapter = SwSpiAdapterFast<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiAdapter spiAdapter;
@@ -241,8 +297,10 @@ void runSingleShiftRegisterSwSpiFast() {
   ledMatrix.begin();
   scanningDisplay.begin();
   scanningDisplaySubfields.begin();
-  runBenchmark("single_sw_spi_fast", scanningDisplay);
-  runBenchmark("single_sw_spi_fast(subfields)", scanningDisplaySubfields);
+  runScanningBenchmark("Scanning(single_sw_spi_fast)",
+      scanningDisplay);
+  runScanningBenchmark("Scanning(single_sw_spi_fast,subfields)",
+      scanningDisplaySubfields);
   scanningDisplaySubfields.end();
   scanningDisplay.end();
   ledMatrix.end();
@@ -270,8 +328,10 @@ void runSingleShiftRegisterHwSpi() {
   ledMatrix.begin();
   scanningDisplay.begin();
   scanningDisplaySubfields.begin();
-  runBenchmark("single_hw_spi", scanningDisplay);
-  runBenchmark("single_hw_spi(subfields)", scanningDisplaySubfields);
+  runScanningBenchmark("Scanning(single_hw_spi)",
+      scanningDisplay);
+  runScanningBenchmark("Scanning(single_hw_spi,subfields)",
+      scanningDisplaySubfields);
   scanningDisplaySubfields.end();
   scanningDisplay.end();
   ledMatrix.end();
@@ -295,8 +355,9 @@ void runDualShiftRegisterSwSpi() {
   ledMatrix.begin();
   scanningDisplay.begin();
   scanningDisplaySubfields.begin();
-  runBenchmark("dual_sw_spi", scanningDisplay);
-  runBenchmark("dual_sw_spi(subfields)", scanningDisplaySubfields);
+  runScanningBenchmark("Scanning(dual_sw_spi)", scanningDisplay);
+  runScanningBenchmark("Scanning(dual_sw_spi,subfields)",
+      scanningDisplaySubfields);
   scanningDisplaySubfields.end();
   scanningDisplay.end();
   ledMatrix.end();
@@ -304,7 +365,7 @@ void runDualShiftRegisterSwSpi() {
 }
 
 // Common Anode, with transistors on Group pins
-#if defined(ARDUINO_ARCH_AVR)
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 void runDualShiftRegisterSwSpiFast() {
   using SpiAdapter = SwSpiAdapterFast<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiAdapter spiAdapter;
@@ -322,8 +383,9 @@ void runDualShiftRegisterSwSpiFast() {
   ledMatrix.begin();
   scanningDisplay.begin();
   scanningDisplaySubfields.begin();
-  runBenchmark("dual_sw_spi_fast", scanningDisplay);
-  runBenchmark("dual_sw_spi_fast(subfields)", scanningDisplaySubfields);
+  runScanningBenchmark("Scanning(dual_sw_spi_fast)", scanningDisplay);
+  runScanningBenchmark("Scanning(dual_sw_spi_fast,subfields)",
+      scanningDisplaySubfields);
   scanningDisplaySubfields.end();
   scanningDisplay.end();
   ledMatrix.end();
@@ -348,13 +410,56 @@ void runDualShiftRegisterHwSpi() {
   ledMatrix.begin();
   scanningDisplay.begin();
   scanningDisplaySubfields.begin();
-  runBenchmark("dual_hw_spi", scanningDisplay);
-  runBenchmark("dual_hw_spi(subfields)", scanningDisplaySubfields);
+  runScanningBenchmark("Scanning(dual_hw_spi)", scanningDisplay);
+  runScanningBenchmark("Scanning(dual_hw_spi,subfields)",
+      scanningDisplaySubfields);
   scanningDisplaySubfields.end();
   scanningDisplay.end();
   ledMatrix.end();
   spiAdapter.end();
 }
+
+template <typename TD>
+void runTm1637Benchmark(const char* name, TD& ledDisplay) {
+  ledDisplay.writePatternAt(0, 0x13);
+  ledDisplay.writePatternAt(0, 0x37);
+  ledDisplay.writePatternAt(0, 0x7F);
+  ledDisplay.writePatternAt(0, 0xFF);
+
+  timingStats.reset();
+  const uint16_t numSamples = 20;
+  for (uint16_t i = 0; i < numSamples; ++i) {
+    uint16_t startMicros = micros();
+    ledDisplay.flush();
+    uint16_t endMicros = micros();
+    timingStats.update(endMicros - startMicros);
+    yield();
+  }
+
+  printStats(name, timingStats, numSamples);
+}
+
+// Tm1637Display(Normal)
+void runTm1637DisplayNormal() {
+  using Driver = Tm1637Driver;
+  Driver driver(CLK_PIN, DIO_PIN, BIT_DELAY);
+  Tm1637Display<Driver, NUM_DIGITS> ledDisplay(driver);
+  ledDisplay.begin();
+
+  runTm1637Benchmark("Tm1637(Normal)", ledDisplay);
+}
+
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+// Tm1637Display(Fast)
+void runTm1637DisplayFast() {
+  using Driver = Tm1637DriverFast<CLK_PIN, DIO_PIN, BIT_DELAY>;
+  Driver driver;
+  Tm1637Display<Driver, NUM_DIGITS> ledDisplay(driver);
+  ledDisplay.begin();
+
+  runTm1637Benchmark("Tm1637(Fast)", ledDisplay);
+}
+#endif
 
 void runBenchmarks() {
   runDirect();
@@ -363,10 +468,16 @@ void runBenchmarks() {
   runDualShiftRegisterSwSpi();
   runDualShiftRegisterHwSpi();
 
-#if defined(ARDUINO_ARCH_AVR)
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
   runDirectFast();
   runSingleShiftRegisterSwSpiFast();
   runDualShiftRegisterSwSpiFast();
+#endif
+
+  runTm1637DisplayNormal();
+
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+  runTm1637DisplayFast();
 #endif
 }
 
@@ -377,7 +488,7 @@ void printSizeOf() {
   SERIAL_PORT_MONITOR.print(F("sizeof(SwSpiAdapter): "));
   SERIAL_PORT_MONITOR.println(sizeof(SwSpiAdapter));
 
-#if defined(ARDUINO_ARCH_AVR)
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
   SERIAL_PORT_MONITOR.print(F("sizeof(SwSpiAdapterFast<1,2,3>): "));
   SERIAL_PORT_MONITOR.println(sizeof(SwSpiAdapterFast<1,2,3>));
 #endif
@@ -388,7 +499,7 @@ void printSizeOf() {
   SERIAL_PORT_MONITOR.print(F("sizeof(LedMatrixDirect<Hardware>): "));
   SERIAL_PORT_MONITOR.println(sizeof(LedMatrixDirect<Hardware>));
 
-#if defined(ARDUINO_ARCH_AVR)
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
   SERIAL_PORT_MONITOR.print(F("sizeof(LedMatrixDirectFast<0..3, 0..7>): "));
   SERIAL_PORT_MONITOR.println(sizeof(LedMatrixDirectFast<
       2, 3, 4, 5,
@@ -412,6 +523,9 @@ void printSizeOf() {
       F("sizeof(ScanningDisplay<Hardware, LedMatrixBase, 4, 1>): "));
   SERIAL_PORT_MONITOR.println(
       sizeof(ScanningDisplay<Hardware, LedMatrixBase, 4, 1>));
+
+  SERIAL_PORT_MONITOR.print(F("sizeof(Tm1637Display<Tm1637Driver, 4>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(Tm1637Display<Tm1637Driver, 4>));
 
   SERIAL_PORT_MONITOR.print(F("sizeof(NumberWriter): "));
   SERIAL_PORT_MONITOR.println(sizeof(NumberWriter));
