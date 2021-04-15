@@ -231,6 +231,7 @@ Hardware hardware;
 
 NumberWriter numberWriter(display);
 ClockWriter clockWriter(display);
+TemperatureWriter temperatureWriter(display);
 CharWriter charWriter(display);
 StringWriter stringWriter(charWriter);
 
@@ -301,25 +302,29 @@ const uint8_t DEMO_LOOP_MODE_PAUSED = 1;
 uint8_t demoLoopMode = DEMO_LOOP_MODE_AUTO;
 
 // Selection of demo.
-const uint8_t DEMO_MODE_CLOCK = 0;
-const uint8_t DEMO_MODE_HEX_NUMBERS = 1;
+const uint8_t DEMO_MODE_HEX_NUMBERS = 0;
+const uint8_t DEMO_MODE_CLOCK = 1;
 const uint8_t DEMO_MODE_UNSIGNED_DEC_NUMBERS = 2;
 const uint8_t DEMO_MODE_SIGNED_DEC_NUMBERS = 3;
-const uint8_t DEMO_MODE_CHAR = 4;
-const uint8_t DEMO_MODE_STRINGS = 5;
-const uint8_t DEMO_MODE_SCROLL = 6;
-const uint8_t DEMO_MODE_PULSE = 7;
-const uint8_t DEMO_MODE_SPIN = 8;
-const uint8_t DEMO_MODE_SPIN_2 = 9;
-const uint8_t DEMO_MODE_COUNT = 10;
-uint8_t prevDemoMode = DEMO_MODE_COUNT - 1;
-uint8_t demoMode = DEMO_MODE_UNSIGNED_DEC_NUMBERS;
+const uint8_t DEMO_MODE_TEMPERATURE_C = 4;
+const uint8_t DEMO_MODE_TEMPERATURE_F = 5;
+const uint8_t DEMO_MODE_CHAR = 6;
+const uint8_t DEMO_MODE_STRINGS = 7;
+const uint8_t DEMO_MODE_SCROLL = 8;
+const uint8_t DEMO_MODE_PULSE = 9;
+const uint8_t DEMO_MODE_SPIN = 10;
+const uint8_t DEMO_MODE_SPIN_2 = 11;
+const uint8_t DEMO_MODE_COUNT = 12;
+uint8_t demoMode = DEMO_MODE_TEMPERATURE_C;
+uint8_t prevDemoMode = demoMode - 1;
 
 static const uint16_t DEMO_INTERNAL_DELAY[DEMO_MODE_COUNT] = {
-  100, // DEMO_MODE_CLOCK
   10, // DEMO_MODE_HEX_NUMBERS
+  20, // DEMO_MODE_CLOCK
   10, // DEMO_MODE_UNSIGNED_DEC_NUMBERS
   10, // DEMO_MODE_SIGNED_DEC_NUMBERS
+  100, // DEMO_MODE_TEMPERATURE_C
+  100, // DEMO_MODE_TEMPERATURE_F
   200, // DEMO_MODE_CHAR
   500, // DEMO_MODE_STRINGS
   500, // DEMO_MODE_SCROLL
@@ -360,6 +365,26 @@ void writeSignedDecNumbers() {
 
 //-----------------------------------------------------------------------------
 
+void writeTemperatureC() {
+  static int16_t w = -9;
+
+  temperatureWriter.writeTempDegCAt(0, w, 4);
+  w++;
+  if (w > 99) w = -9;
+}
+
+//-----------------------------------------------------------------------------
+
+void writeTemperatureF() {
+  static int16_t w = -9;
+
+  temperatureWriter.writeTempDegFAt(0, w, 4);
+  w++;
+  if (w > 99) w = -9;
+}
+
+//-----------------------------------------------------------------------------
+
 void writeClock() {
   static uint8_t hh = 0;
   static uint8_t mm = 0;
@@ -392,7 +417,7 @@ void writeStrings() {
     "1.123",
     "2.1 ",
     "3.2.3.4.",
-    "4bc.d",
+    "a.b.c.d",
     ".1.2..3",
     "brian"
   };
@@ -490,14 +515,18 @@ void spinDisplay2() {
 
 /** Display the demo pattern selected by demoMode. */
 void updateDemo() {
-  if (demoMode == DEMO_MODE_CLOCK) {
-    writeClock();
-  } else if (demoMode == DEMO_MODE_HEX_NUMBERS) {
+  if (demoMode == DEMO_MODE_HEX_NUMBERS) {
     writeHexNumbers();
+  } else if (demoMode == DEMO_MODE_CLOCK) {
+    writeClock();
   } else if (demoMode == DEMO_MODE_UNSIGNED_DEC_NUMBERS) {
     writeUnsignedDecNumbers();
   } else if (demoMode == DEMO_MODE_SIGNED_DEC_NUMBERS) {
     writeSignedDecNumbers();
+  } else if (demoMode == DEMO_MODE_TEMPERATURE_C) {
+    writeTemperatureC();
+  } else if (demoMode == DEMO_MODE_TEMPERATURE_F) {
+    writeTemperatureF();
   } else if (demoMode == DEMO_MODE_CHAR) {
     writeChars();
   } else if (demoMode == DEMO_MODE_STRINGS) {

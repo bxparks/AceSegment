@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2018 Brian T. Park
+Copyright (c) 2021 Brian T. Park
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -115,7 +115,7 @@ class NumberWriter {
      * @param pos start position of the number
      * @param num unsigned decimal number, 0-65535
      * @param boxSize size of box. This is meant to be similar to the "%-5d" or
-     *    "%5d" specifier to the printf() function)
+     *    "%5d" specifier to the printf() function
      *    * 0 means no boxing, printing from left
      *    * > 0 means right justified inside box
      *    * < 0 means left justified inside box

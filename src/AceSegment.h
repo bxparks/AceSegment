@@ -39,12 +39,13 @@ SOFTWARE.
 #include "ace_segment/scanning/LedMatrixSingleShiftRegister.h"
 #include "ace_segment/scanning/LedMatrixDualShiftRegister.h"
 #include "ace_segment/scanning/ScanningDisplay.h"
-#include "ace_segment/writer/NumberWriter.h"
-#include "ace_segment/writer/ClockWriter.h"
-#include "ace_segment/writer/CharWriter.h"
-#include "ace_segment/writer/StringWriter.h"
 #include "ace_segment/tm1637/Tm1637Driver.h"
 #include "ace_segment/tm1637/Tm1637Display.h"
+#include "ace_segment/writer/NumberWriter.h"
+#include "ace_segment/writer/ClockWriter.h"
+#include "ace_segment/writer/TemperatureWriter.h"
+#include "ace_segment/writer/CharWriter.h"
+#include "ace_segment/writer/StringWriter.h"
 
 // Version format: xxyyzz == "xx.yy.zz"
 #define ACE_SEGMENT_VERSION 400

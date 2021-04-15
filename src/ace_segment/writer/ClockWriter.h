@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2018 Brian T. Park
+Copyright (c) 2021 Brian T. Park
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -50,9 +50,6 @@ class ClockWriter {
 
     /** The "P" character for "PM". */
     static const uint8_t kPatternP = 0b01110011;
-
-    /** The superscript degree symbol for temperature. */
-    static const uint8_t kPatternDegree = 0b01100011;
 
     /**
      * Constructor.

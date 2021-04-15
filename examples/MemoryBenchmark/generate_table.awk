@@ -20,8 +20,9 @@ BEGIN {
   labels[11] = "StubDisplay";
   labels[12] = "NumberWriter+Stub";
   labels[13] = "ClockWriter+Stub";
-  labels[14] = "CharWriter+Stub";
-  labels[15] = "StringWriter+Stub";
+  labels[14] = "TemperatureWriter+Stub";
+  labels[15] = "CharWriter+Stub";
+  labels[16] = "StringWriter+Stub";
   record_index = 0
 }
 {
