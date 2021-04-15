@@ -115,7 +115,7 @@ uint8_t NumberWriter::writeHexCharsInsideBoxAt(
     return len;
   }
 
-  // Print either left justified or right justified insize box
+  // Print either left justified or right justified inside box
   uint8_t padSize = absBoxSize - len;
   if (boxSize < 0) {
     // left justified

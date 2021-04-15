@@ -23,6 +23,7 @@ const uint8_t DIFFERENT_BRIGHTNESS = 32;
 TestableLedDisplay<NUM_DIGITS> ledDisplay;
 NumberWriter numberWriter(ledDisplay);
 ClockWriter clockWriter(ledDisplay);
+TemperatureWriter temperatureWriter(ledDisplay);
 CharWriter charWriter(ledDisplay);
 StringWriter stringWriter(charWriter);
 
@@ -239,6 +240,55 @@ testF(ClockWriterTest, writeHourMinute) {
   assertEqual(0b01011011 | 0x80, mPatterns[1]); // colon on by default
   assertEqual(0b01001111, mPatterns[2]);
   assertEqual(0b01100110, mPatterns[3]);
+}
+
+// ----------------------------------------------------------------------
+// Tests for TemperatureWriter.
+// ----------------------------------------------------------------------
+
+class TemperatureWriterTest: public TestOnce {
+  protected:
+    void setup() override {
+      ledDisplay.clear();
+      mPatterns = ledDisplay.getPatterns();
+    }
+
+    uint8_t* mPatterns;
+};
+
+testF(TemperatureWriterTest, writeTempDegAt) {
+  uint8_t written = temperatureWriter.writeTempDegAt(0, -9);
+  assertEqual(3, written);
+  assertEqual(0b01000000, mPatterns[0]); // -
+  assertEqual(0b01101111, mPatterns[1]); // 9
+  assertEqual(0b01100011, mPatterns[2]); // deg
+
+  written = temperatureWriter.writeTempDegAt(0, -9 /*temp*/, 4 /*boxSize*/);
+  assertEqual(4, written);
+  assertEqual(0b00000000, mPatterns[0]); // space
+  assertEqual(0b01000000, mPatterns[1]); // -
+  assertEqual(0b01101111, mPatterns[2]); // 9
+  assertEqual(0b01100011, mPatterns[3]); // deg
+}
+
+testF(TemperatureWriterTest, writeTempDegCAt) {
+  uint8_t written = temperatureWriter.writeTempDegCAt(
+      0, -9 /*temp*/, 4 /*boxSize*/);
+  assertEqual(4, written);
+  assertEqual(0b01000000, mPatterns[0]); // -
+  assertEqual(0b01101111, mPatterns[1]); // 9
+  assertEqual(0b01100011, mPatterns[2]); // deg
+  assertEqual(0b00111001, mPatterns[3]); // C
+}
+
+testF(TemperatureWriterTest, writeTempDegFAt) {
+  uint8_t written = temperatureWriter.writeTempDegFAt(
+      0, -9 /*temp*/, 4 /*boxSize*/);
+  assertEqual(4, written);
+  assertEqual(0b01000000, mPatterns[0]); // -
+  assertEqual(0b01101111, mPatterns[1]); // 9
+  assertEqual(0b01100011, mPatterns[2]); // deg
+  assertEqual(0b01110001, mPatterns[3]); // F
 }
 
 //-----------------------------------------------------------------------------
