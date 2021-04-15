@@ -3,6 +3,7 @@
 * Unreleased
     * Add `Tm1637Display` class to support LED modules using the TM1637 chip.
     * Simplify `LedDisplay` base class API.
+    * Add `TemperatureWriter`.
 * 0.4 (2021-04-09)
     * A complete refactoring of the previous v0.3 version, which I could not
       understand anymore.
