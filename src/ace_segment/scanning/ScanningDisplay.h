@@ -118,9 +118,6 @@ class ScanningDisplay : public LedDisplay {
       if (SUBFIELDS > 1) {
         setBrightness(SUBFIELDS / 2); // half brightness
       }
-
-      // Sleep mode support.
-      mPreparedToSleep = false;
     }
 
 
@@ -210,26 +207,12 @@ class ScanningDisplay : public LedDisplay {
      * handler.
      */
     void renderFieldNow() {
-      if (mPreparedToSleep) return;
-
       if (SUBFIELDS > 1) {
         displayCurrentFieldModulated();
       } else {
         displayCurrentFieldPlain();
       }
     }
-
-    /**
-     * Prepare to go to sleep by clearing the frame, and setting a flag so that
-     * it doesn't turn itself back on through an interrupt.
-     */
-    void prepareToSleep() {
-      mPreparedToSleep = true;
-      mLedMatrix.clear();
-    }
-
-    /** Wake up from sleep. */
-    void wakeFromSleep() { mPreparedToSleep = false; }
 
   protected:
     void setPatternAt(uint8_t pos, uint8_t pattern) override {
@@ -349,13 +332,6 @@ class ScanningDisplay : public LedDisplay {
      * pattern is the same as the previous pattern.
      */
     uint8_t mPattern;
-
-    //-----------------------------------------------------------------------
-    // Variables to support low power sleeping on the MCU.
-    //-----------------------------------------------------------------------
-
-    /** Set to true just before going to sleep. */
-    volatile bool mPreparedToSleep;
 };
 
 }
