@@ -27,8 +27,8 @@ using namespace ace_segment;
 //#error Compatible only with env:ledclock_tm1636 configuration.
 //#endif
 
-const uint8_t CLK_PIN = 16;
-const uint8_t DIO_PIN = 10;
+const uint8_t CLK_PIN = 10;
+const uint8_t DIO_PIN = 9;
 
 #if defined(AUNITER_LED_CLOCK_TM1637) || defined(EPOXY_DUINO)
   const uint8_t NUM_DIGITS = 4;
