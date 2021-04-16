@@ -95,6 +95,10 @@ class Tm1637Display : public LedDisplay {
     /** Signal end of usage. Currently does nothing. */
     void end() {}
 
+    //-----------------------------------------------------------------------
+    // Methods related to brightness control.
+    //-----------------------------------------------------------------------
+
     void setBrightness(uint8_t brightness) override {
       mBrightness = (mBrightness & ~0x7) | (brightness & 0x7);
       setDirtyBit(kBrightnessDirtyBit);
@@ -112,6 +116,10 @@ class Tm1637Display : public LedDisplay {
       }
       setDirtyBit(kBrightnessDirtyBit);
     }
+
+    //-----------------------------------------------------------------------
+    // Methods related to rendering.
+    //-----------------------------------------------------------------------
 
     /**
      * Send segment patterns of all digits, plus the brightness information to
@@ -213,6 +221,7 @@ class Tm1637Display : public LedDisplay {
       return mIsDirty & (0x1 << bit);
     }
 
+    /** Convert a logical position into the physical position. */
     uint8_t remap(uint8_t pos) {
       return mRemapArray ? mRemapArray[pos] : pos;
     }

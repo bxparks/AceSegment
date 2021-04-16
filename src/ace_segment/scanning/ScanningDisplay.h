@@ -127,16 +127,9 @@ class ScanningDisplay : public LedDisplay {
     /** Get the number of digits. */
     uint8_t getNumDigits() const { return DIGITS; }
 
-    /** Return the requested frames per second. */
-    uint16_t getFramesPerSecond() const { return mFramesPerSecond; }
-
-    /** Return the fields per second. */
-    uint16_t getFieldsPerSecond() const {
-      return mFramesPerSecond * getFieldsPerFrame();
-    }
-
-    /** Total fields per frame across all digits. */
-    uint16_t getFieldsPerFrame() const { return DIGITS * SUBFIELDS; }
+    //-----------------------------------------------------------------------
+    // Methods related to brightness control.
+    //-----------------------------------------------------------------------
 
     /**
      * Set the brightness for a given pos, leaving pattern unchanged.
@@ -176,6 +169,21 @@ class ScanningDisplay : public LedDisplay {
         setBrightnessAt(i, brightness);
       }
     }
+
+    //-----------------------------------------------------------------------
+    // Methods related to rendering.
+    //-----------------------------------------------------------------------
+
+    /** Return the requested frames per second. */
+    uint16_t getFramesPerSecond() const { return mFramesPerSecond; }
+
+    /** Return the fields per second. */
+    uint16_t getFieldsPerSecond() const {
+      return mFramesPerSecond * getFieldsPerFrame();
+    }
+
+    /** Total fields per frame across all digits. */
+    uint16_t getFieldsPerFrame() const { return DIGITS * SUBFIELDS; }
 
     /**
      * Display one field of a frame when the time is right. This is a polling
