@@ -35,6 +35,7 @@ SOFTWARE.
 #include "ace_segment/hw/Hardware.h"
 #include "ace_segment/hw/SwSpiAdapter.h"
 #include "ace_segment/hw/HwSpiAdapter.h"
+#include "ace_segment/LedDisplay.h"
 #include "ace_segment/scanning/LedMatrixDirect.h"
 #include "ace_segment/scanning/LedMatrixSingleShiftRegister.h"
 #include "ace_segment/scanning/LedMatrixDualShiftRegister.h"

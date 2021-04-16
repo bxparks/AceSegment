@@ -42,6 +42,22 @@ namespace ace_segment {
 static const uint16_t kDefaultTm1637DelayMicros = 100;
 
 /**
+ * Many (if not all) of the 6-digit LED modules on eBay and Amazon using the
+ * TM1637 chip have their digits incorrectly ordered. Not sure why the did that
+ * since their 4-digit LED modules follow the natural order. This array remaps
+ * the digit position to the correct order expected by this library where digit
+ * 0 is on the left, and digit 5 is on the far right.
+ *
+ * You can create your own remap array to handle other LED modules with
+ * different physical ordering compared to the logical ordering.
+ *
+ * Pass this array into the Tm1637Display::begin() method.
+ */
+static const uint8_t kSixDigitRemapArray[6] = {
+  2, 1, 0, 5, 4, 3
+};
+
+/**
  * An implementation of LedDisplay that works with 7-segment LED modules
  * using the TM1637 chip.
  *
@@ -53,7 +69,8 @@ class Tm1637Display : public LedDisplay {
   public:
     explicit Tm1637Display(const DRIVER& driver) :
         LedDisplay(DIGITS),
-        mDriver(driver)
+        mDriver(driver),
+        mRemapArray(nullptr)
     {}
 
     /** Return the number of digits supported by this display instance. */
@@ -61,35 +78,26 @@ class Tm1637Display : public LedDisplay {
 
     /**
      * Initialize the object. The Tm1637 driver must be initialized separately.
+     *
+     * @param remapArray optional array of positions to handle LED modules whose
+     *    digit ordering is physically different than the logical ordering
+     *    (where digit 0 is on the left, and digit (DIGITS-1) is on the far
+     *    right).
      */
-    void begin() {
+    void begin(const uint8_t* remapArray = nullptr) {
       memset(mPatterns, 0, DIGITS);
       mBrightness = kBrightnessCmd | kBrightnessLevelOn | 0x7;
       mIsDirty = 0xFF; // force initial values are sent to LED module
       mFlushStage = 0;
+      mRemapArray = remapArray;
     }
 
     /** Signal end of usage. Currently does nothing. */
     void end() {}
 
-    void writePatternAt(uint8_t pos, uint8_t pattern) override {
-      if (pos >= DIGITS) return;
-      mPatterns[pos] = pattern;
-      setDirtyBit(pos);
-    }
-
-    void writeDecimalPointAt(uint8_t pos, bool state = true) override {
-      if (pos >= DIGITS) return;
-      uint8_t pattern = mPatterns[pos];
-      if (state) {
-        pattern |= 0x80;
-      } else {
-        pattern &= ~0x80;
-      }
-      mPatterns[pos] = pattern;
-
-      setDirtyBit(pos);
-    }
+    //-----------------------------------------------------------------------
+    // Methods related to brightness control.
+    //-----------------------------------------------------------------------
 
     void setBrightness(uint8_t brightness) override {
       mBrightness = (mBrightness & ~0x7) | (brightness & 0x7);
@@ -108,6 +116,10 @@ class Tm1637Display : public LedDisplay {
       }
       setDirtyBit(kBrightnessDirtyBit);
     }
+
+    //-----------------------------------------------------------------------
+    // Methods related to rendering.
+    //-----------------------------------------------------------------------
 
     /**
      * Send segment patterns of all digits, plus the brightness information to
@@ -184,6 +196,18 @@ class Tm1637Display : public LedDisplay {
       ace_common::incrementMod(mFlushStage, (uint8_t) (DIGITS + 1));
     }
 
+  protected:
+    void setPatternAt(uint8_t pos, uint8_t pattern) override {
+      uint8_t actualPos = remap(pos);
+      mPatterns[actualPos] = pattern;
+      setDirtyBit(actualPos);
+    }
+
+    uint8_t getPatternAt(uint8_t pos) override {
+      uint8_t actualPos = remap(pos);
+      return mPatterns[actualPos];
+    }
+
   private:
     void setDirtyBit(uint8_t bit) {
       mIsDirty |= (0x1 << bit);
@@ -195,6 +219,11 @@ class Tm1637Display : public LedDisplay {
 
     bool isDirtyBit(uint8_t bit) {
       return mIsDirty & (0x1 << bit);
+    }
+
+    /** Convert a logical position into the physical position. */
+    uint8_t remap(uint8_t pos) {
+      return mRemapArray ? mRemapArray[pos] : pos;
     }
 
   private:
@@ -215,6 +244,7 @@ class Tm1637Display : public LedDisplay {
     uint8_t mIsDirty; // bit array
     uint8_t mFlushStage; // [0, DIGITS], DIGITS for brightness update
     uint8_t mPatterns[DIGITS]; // maps to dirty bits 0-5
+    const uint8_t* mRemapArray;
 };
 
 

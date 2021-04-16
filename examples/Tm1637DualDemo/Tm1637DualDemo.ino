@@ -1,6 +1,12 @@
 /*
- * A simple demo of a single TM1637 LED module, with the digits 0-3 to 0-5
- * scrolling to the left every second.
+ * Demo of 2 x TM1637 LED modules, sharing a common CLK but using 2 different
+ * DIO pins.
+ *
+ * Results: Works great except at high levels of brightness, there is a
+ * noticeable flicker of the LEDs. My guess is that the LEDs are drawing more
+ * current than the Arduino MCU can provide stably, so the voltage fluctuates. I
+ * think the solution is to wire the LED Modules directly to the USB 5V, instead
+ * of being powered through the Arduino Vcc.
  */
 
 #include <Arduino.h>
@@ -12,25 +18,11 @@ using ace_common::incrementModOffset;
 using ace_common::TimingStats;
 using namespace ace_segment;
 
-// Select driver version, either normal digitalWrite() or digitalWriteFast()
-#define TM16137_DRIVER_TYPE_NORMAL 0
-#define TM16137_DRIVER_TYPE_FAST 1
-#define TM16137_DRIVER_TYPE TM16137_DRIVER_TYPE_FAST
-
-#if TM16137_DRIVER_TYPE == TM16137_DRIVER_TYPE_FAST
-  #include <digitalWriteFast.h>
-  #include <ace_segment/tm1637/Tm1637DriverFast.h> // Tm1637DriverFast
-  using ace_segment::Tm1637DriverFast;
-#endif
-
-//#if ! defined(AUNITER_LED_CLOCK_TM1637)
-//#error Compatible only with env:ledclock_tm1636 configuration.
-//#endif
-
 const uint8_t CLK_PIN = 16;
-const uint8_t DIO_PIN = 10;
+const uint8_t DIO1_PIN = 8;
+const uint8_t DIO2_PIN = 10;
 
-#if defined(AUNITER_LED_CLOCK_TM1637) || defined(EPOXY_DUINO)
+#if defined(AUNITER_LED_CLOCK_TM1637_DUAL) || defined(EPOXY_DUINO)
   const uint8_t NUM_DIGITS = 4;
   const uint8_t PATTERNS[NUM_DIGITS] = {
     0b00111111, // 0
@@ -38,37 +30,25 @@ const uint8_t DIO_PIN = 10;
     0b01011011, // 2
     0b01001111, // 3
   };
-#elif defined(AUNITER_LED_CLOCK_TM1637_6)
-  const uint8_t NUM_DIGITS = 6;
-  const uint8_t PATTERNS[NUM_DIGITS] = {
-    0b00111111, // 0
-    0b00000110, // 1
-    0b01011011, // 2
-    0b01001111, // 3
-    0b01100110, // 4
-    0b01101101, // 5
-  };
 #else
   #error Unknown AUNITER environment
 #endif
 
-// For a Tm1637Driver (non-fast), time to send 4 digits:
+// For a Tm1637Driver (non-fast), time to send 4 digits using flush():
+//
 // * 12 ms at 50 us delay, but does not work.
 // * 17 ms at 75 us delay.
 // * 22 ms at 100 us delay.
 // * 43 ms at 200 us delay.
+//
+// Using flushIncremental() is about 1/2 these numbers.
 constexpr uint16_t BIT_DELAY = 100;
 
-#if TM16137_DRIVER_TYPE == TM16137_DRIVER_TYPE_NORMAL
-  using Driver = Tm1637Driver;
-  Driver driver(CLK_PIN, DIO_PIN, BIT_DELAY);
-#elif TM16137_DRIVER_TYPE == TM16137_DRIVER_TYPE_FAST
-  using Driver = Tm1637DriverFast<CLK_PIN, DIO_PIN, BIT_DELAY>;
-  Driver driver;
-#else
-  #error Unknown TM16137_DRIVER_TYPE
-#endif
-Tm1637Display<Driver, NUM_DIGITS> display(driver);
+using Driver = Tm1637Driver;
+Driver driver1(CLK_PIN, DIO1_PIN, BIT_DELAY);
+Driver driver2(CLK_PIN, DIO2_PIN, BIT_DELAY);
+Tm1637Display<Driver, NUM_DIGITS> display1(driver1);
+Tm1637Display<Driver, NUM_DIGITS> display2(driver2);
 
 TimingStats stats;
 
@@ -77,18 +57,16 @@ uint8_t brightness = 1;
 
 void setup() {
   delay(1000);
+
 #if ENABLE_SERIAL_DEBUG >= 1
   Serial.begin(115200);
   while (!Serial);
 #endif
 
-  driver.begin();
-
-#if defined(AUNITER_LED_CLOCK_TM1637)
-  display.begin();
-#elif defined(AUNITER_LED_CLOCK_TM1637_6)
-  display.begin(kSixDigitRemapArray);
-#endif
+  driver1.begin();
+  driver2.begin();
+  display1.begin();
+  display2.begin();
 }
 
 #if 0
@@ -98,19 +76,25 @@ void setup() {
 void loop() {
   // Update the display
   uint8_t j = digitIndex;
+  uint8_t k = j;
+  incrementMod(k, (uint8_t) NUM_DIGITS);
   for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
-    display.setPatternAt(i, PATTERNS[j]);
+    display1.writePatternAt(i, PATTERNS[j]);
+    display2.writePatternAt(i, PATTERNS[k]);
     incrementMod(j, (uint8_t) NUM_DIGITS);
+    incrementMod(k, (uint8_t) NUM_DIGITS);
   }
   incrementMod(digitIndex, (uint8_t) NUM_DIGITS);
 
   // Update the brightness
-  display.setBrightness(brightness);
+  display1.setBrightness(brightness);
+  display2.setBrightness(brightness);
   incrementModOffset(brightness, (uint8_t) 7, (uint8_t) 1);
 
   // Flush the change to the LED Module, and measure the time.
   uint16_t startMicros = micros();
-  display.flush();
+  display1.flush();
+  display2.flush();
   uint16_t elapsedMicros = (uint16_t) micros() - startMicros;
   stats.update(elapsedMicros);
 
@@ -138,16 +122,23 @@ void loop() {
 
     // Update the display
     uint8_t j = digitIndex;
+    uint8_t k = j;
+    incrementMod(k, (uint8_t) NUM_DIGITS);
     for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
-      display.writePatternAt(i, PATTERNS[j]);
-      // Write a decimal point every other
-      display.writeDecimalPointAt(i, j & 0x1);
+      display1.writePatternAt(i, PATTERNS[j]);
+      display2.writePatternAt(i, PATTERNS[k]);
+
+      // Write a decimal point every other digit.
+      display1.writeDecimalPointAt(i, j & 0x1);
+      display2.writeDecimalPointAt(i, k & 0x1);
       incrementMod(j, (uint8_t) NUM_DIGITS);
+      incrementMod(k, (uint8_t) NUM_DIGITS);
     }
     incrementMod(digitIndex, (uint8_t) NUM_DIGITS);
 
     // Update the brightness
-    display.setBrightness(brightness);
+    display1.setBrightness(brightness);
+    display2.setBrightness(brightness);
     incrementModOffset(brightness, (uint8_t) 7, (uint8_t) 1);
   }
 
@@ -157,7 +148,8 @@ void loop() {
 
     // Flush incrementally, and measure the time.
     uint16_t startMicros = micros();
-    display.flushIncremental();
+    display1.flushIncremental();
+    display2.flushIncremental();
     uint16_t elapsedMicros = (uint16_t) micros() - startMicros;
     stats.update(elapsedMicros);
   }

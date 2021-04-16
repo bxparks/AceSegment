@@ -118,9 +118,6 @@ class ScanningDisplay : public LedDisplay {
       if (SUBFIELDS > 1) {
         setBrightness(SUBFIELDS / 2); // half brightness
       }
-
-      // Sleep mode support.
-      mPreparedToSleep = false;
     }
 
 
@@ -130,32 +127,9 @@ class ScanningDisplay : public LedDisplay {
     /** Get the number of digits. */
     uint8_t getNumDigits() const { return DIGITS; }
 
-    /** Return the requested frames per second. */
-    uint16_t getFramesPerSecond() const { return mFramesPerSecond; }
-
-    /** Return the fields per second. */
-    uint16_t getFieldsPerSecond() const {
-      return mFramesPerSecond * getFieldsPerFrame();
-    }
-
-    /** Total fields per frame across all digits. */
-    uint16_t getFieldsPerFrame() const { return DIGITS * SUBFIELDS; }
-
-    void writePatternAt(uint8_t pos, uint8_t pattern) override {
-      if (pos >= DIGITS) return;
-      mPatterns[pos] = pattern;
-    }
-
-    void writeDecimalPointAt(uint8_t pos, bool state = true) override {
-      if (pos >= DIGITS) return;
-      uint8_t pattern = mPatterns[pos];
-      if (state) {
-        pattern |= 0x80;
-      } else {
-        pattern &= ~0x80;
-      }
-      mPatterns[pos] = pattern;
-    }
+    //-----------------------------------------------------------------------
+    // Methods related to brightness control.
+    //-----------------------------------------------------------------------
 
     /**
      * Set the brightness for a given pos, leaving pattern unchanged.
@@ -180,10 +154,8 @@ class ScanningDisplay : public LedDisplay {
      * that it makes displayCurrentFieldModulated() easier to implement.
      */
     void setBrightnessAt(uint8_t pos, uint8_t brightness) {
-      if (SUBFIELDS > 1) {
-        if (pos >= DIGITS) return;
-        mBrightnesses[pos] = (brightness >= SUBFIELDS) ? SUBFIELDS : brightness;
-      }
+      if (pos >= DIGITS) return;
+      mBrightnesses[pos] = (brightness >= SUBFIELDS) ? SUBFIELDS : brightness;
     }
 
     /**
@@ -193,18 +165,25 @@ class ScanningDisplay : public LedDisplay {
      * range of values of `brightness` and how it is interpreted.
      */
     void setBrightness(uint8_t brightness) override {
-      if (SUBFIELDS > 1) {
-        for (uint8_t i = 0; i < DIGITS; i++) {
-          setBrightnessAt(i, brightness);
-        }
+      for (uint8_t i = 0; i < DIGITS; i++) {
+        setBrightnessAt(i, brightness);
       }
     }
 
-    void clear() override {
-      for (uint8_t i = 0; i < DIGITS; i++) {
-        mPatterns[i] = 0;
-      }
+    //-----------------------------------------------------------------------
+    // Methods related to rendering.
+    //-----------------------------------------------------------------------
+
+    /** Return the requested frames per second. */
+    uint16_t getFramesPerSecond() const { return mFramesPerSecond; }
+
+    /** Return the fields per second. */
+    uint16_t getFieldsPerSecond() const {
+      return mFramesPerSecond * getFieldsPerFrame();
     }
+
+    /** Total fields per frame across all digits. */
+    uint16_t getFieldsPerFrame() const { return DIGITS * SUBFIELDS; }
 
     /**
      * Display one field of a frame when the time is right. This is a polling
@@ -236,8 +215,6 @@ class ScanningDisplay : public LedDisplay {
      * handler.
      */
     void renderFieldNow() {
-      if (mPreparedToSleep) return;
-
       if (SUBFIELDS > 1) {
         displayCurrentFieldModulated();
       } else {
@@ -245,17 +222,14 @@ class ScanningDisplay : public LedDisplay {
       }
     }
 
-    /**
-     * Prepare to go to sleep by clearing the frame, and setting a flag so that
-     * it doesn't turn itself back on through an interrupt.
-     */
-    void prepareToSleep() {
-      mPreparedToSleep = true;
-      mLedMatrix.clear();
+  protected:
+    void setPatternAt(uint8_t pos, uint8_t pattern) override {
+      mPatterns[pos] = pattern;
     }
 
-    /** Wake up from sleep. */
-    void wakeFromSleep() { mPreparedToSleep = false; }
+    uint8_t getPatternAt(uint8_t pos) override {
+      return mPatterns[pos];
+    }
 
   private:
     friend class ::ScanningDisplayTest_displayCurrentField;
@@ -366,13 +340,6 @@ class ScanningDisplay : public LedDisplay {
      * pattern is the same as the previous pattern.
      */
     uint8_t mPattern;
-
-    //-----------------------------------------------------------------------
-    // Variables to support low power sleeping on the MCU.
-    //-----------------------------------------------------------------------
-
-    /** Set to true just before going to sleep. */
-    volatile bool mPreparedToSleep;
 };
 
 }

@@ -58,7 +58,10 @@ class LedDisplay {
      * Write the pattern for a given pos. If the pos is out of bounds, the
      * method does nothing.
      */
-    virtual void writePatternAt(uint8_t pos, uint8_t pattern) = 0;
+    void writePatternAt(uint8_t pos, uint8_t pattern) {
+      if (pos >= mNumDigits) return;
+      setPatternAt(pos, pattern);
+    }
 
     /**
      * Write the array of `patterns` of length `len`, starting at `pos`. If an
@@ -68,11 +71,10 @@ class LedDisplay {
      * The default implementation calls writePatternAt(), which should be
      * sufficient in most cases. Subclasses can override if needed.
      */
-    virtual void writePatternsAt(uint8_t pos, const uint8_t patterns[],
-        uint8_t len) {
+    void writePatternsAt(uint8_t pos, const uint8_t patterns[], uint8_t len) {
       for (uint8_t i = 0; i < len; i++) {
         if (pos >= mNumDigits) break;
-        writePatternAt(pos++, patterns[i]);
+        setPatternAt(pos++, patterns[i]);
       }
     }
 
@@ -85,12 +87,11 @@ class LedDisplay {
      * The default implementation calls writePatternAt(), which should be
      * sufficient in most cases. Subclasses can override if needed.
      */
-    virtual void writePatternsAt_P(uint8_t pos, const uint8_t patterns[],
-        uint8_t len) {
+    void writePatternsAt_P(uint8_t pos, const uint8_t patterns[], uint8_t len) {
       for (uint8_t i = 0; i < len; i++) {
         if (pos >= mNumDigits) break;
         uint8_t pattern = pgm_read_byte(patterns + i);
-        writePatternAt(pos++, pattern);
+        setPatternAt(pos++, pattern);
       }
     }
 
@@ -98,7 +99,16 @@ class LedDisplay {
      * Write the decimal point for the pos. Clock LED modules will attach the
      * colon segment to one of the decimal points.
      */
-    virtual void writeDecimalPointAt(uint8_t pos, bool state = true) = 0;
+    void writeDecimalPointAt(uint8_t pos, bool state = true) {
+      if (pos >= mNumDigits) return;
+      uint8_t pattern = getPatternAt(pos);
+      if (state) {
+        pattern |= 0x80;
+      } else {
+        pattern &= ~0x80;
+      }
+      setPatternAt(pos, pattern);
+    }
 
     /**
      * Set global brightness of all digits. Different subclasses will interpret
@@ -111,14 +121,21 @@ class LedDisplay {
      * `0` into each digit using writePatternAt(). Subclasses can override if
      * needed.
      */
-    virtual void clear() {
-      for (uint8_t i = 0; i < mNumDigits + 1; ++i) {
-        writePatternAt(i, 0);
+    void clear() {
+      for (uint8_t i = 0; i < mNumDigits; ++i) {
+        setPatternAt(i, 0);
       }
     }
 
     /** Return the number of digits supported by this display instance. */
     uint8_t getNumDigits() const { return mNumDigits; }
+
+  protected:
+    /** Set the led digit pattern at position pos. */
+    virtual void setPatternAt(uint8_t pos, uint8_t pattern) = 0;
+
+    /** Get the led digit pattern at position pos. */
+    virtual uint8_t getPatternAt(uint8_t pos) = 0;
 
   private:
     uint8_t const mNumDigits;
