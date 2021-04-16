@@ -135,6 +135,16 @@ class NumberWriter {
         int8_t boxSize = 0);
 
     /**
+     * Write the 2 digit decimal number at pos. This method always writes 2
+     * characters. The padding is always a space, so 9 is printed as " 9" not
+     * "09". If num >= 100, then this prints "99".
+     *
+     * This method is meant to be a lighter version of writeUnsignedDecimalAt()
+     * when only 2 digits are needed. Seems to save about 110 bytes of flash.
+     */
+    void writeUnsignedDecimal2At(uint8_t pos, uint8_t num);
+
+    /**
      * Clear the display from `pos` to the end. Useful after calling
      * writeSignedDecimalAt() and writeUnsignedDecimalAt() which prints a
      * variable number of digits.

@@ -131,4 +131,16 @@ uint8_t NumberWriter::writeHexCharsInsideBoxAt(
   return absBoxSize;
 }
 
+void NumberWriter::writeUnsignedDecimal2At(uint8_t pos, uint8_t num) {
+  if (num >= 100) {
+    writeHexCharAt(pos++, 9);
+    writeHexCharAt(pos++, 9);
+  } else {
+    uint8_t high = num / 10;
+    uint8_t low = num - high * 10;
+    writeHexCharAt(pos++, (high == 0) ? kCharSpace : high);
+    writeHexCharAt(pos++, low);
+  }
+}
+
 } // ace_segment
