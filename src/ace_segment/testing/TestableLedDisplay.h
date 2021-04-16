@@ -41,29 +41,21 @@ class TestableLedDisplay : public LedDisplay {
   public:
     TestableLedDisplay() : LedDisplay(DIGITS) {}
 
-    virtual void writePatternAt(uint8_t pos, uint8_t pattern) override {
-      if (pos >= DIGITS) return;
-      mPatterns[pos] = pattern;
-    }
-
-    void writeDecimalPointAt(uint8_t pos, bool state = true) override {
-      if (pos >= DIGITS) return;
-
-      uint8_t pattern = mPatterns[pos];
-      if (state) {
-        pattern |= 0x80;
-      } else {
-        pattern &= ~0x80;
-      }
-      mPatterns[pos] = pattern;
-    }
-
     void setBrightness(uint8_t /*brightness*/) override {}
 
     uint8_t* getPatterns() { return mPatterns; }
 
+  protected:
+    void setPatternAt(uint8_t pos, uint8_t pattern) override {
+      mPatterns[pos] = pattern;
+    }
+
+    uint8_t getPatternAt(uint8_t pos) override {
+      return mPatterns[pos];
+    }
+
   private:
-    uint8_t mPatterns[DIGITS + 1];
+    uint8_t mPatterns[DIGITS + 1]; // + 1 to test overflow
 };
 
 } // testing

@@ -141,22 +141,6 @@ class ScanningDisplay : public LedDisplay {
     /** Total fields per frame across all digits. */
     uint16_t getFieldsPerFrame() const { return DIGITS * SUBFIELDS; }
 
-    void writePatternAt(uint8_t pos, uint8_t pattern) override {
-      if (pos >= DIGITS) return;
-      mPatterns[pos] = pattern;
-    }
-
-    void writeDecimalPointAt(uint8_t pos, bool state = true) override {
-      if (pos >= DIGITS) return;
-      uint8_t pattern = mPatterns[pos];
-      if (state) {
-        pattern |= 0x80;
-      } else {
-        pattern &= ~0x80;
-      }
-      mPatterns[pos] = pattern;
-    }
-
     /**
      * Set the brightness for a given pos, leaving pattern unchanged.
      * Not all implementation of `LedClass` can support brightness for each
@@ -180,10 +164,8 @@ class ScanningDisplay : public LedDisplay {
      * that it makes displayCurrentFieldModulated() easier to implement.
      */
     void setBrightnessAt(uint8_t pos, uint8_t brightness) {
-      if (SUBFIELDS > 1) {
-        if (pos >= DIGITS) return;
-        mBrightnesses[pos] = (brightness >= SUBFIELDS) ? SUBFIELDS : brightness;
-      }
+      if (pos >= DIGITS) return;
+      mBrightnesses[pos] = (brightness >= SUBFIELDS) ? SUBFIELDS : brightness;
     }
 
     /**
@@ -193,16 +175,8 @@ class ScanningDisplay : public LedDisplay {
      * range of values of `brightness` and how it is interpreted.
      */
     void setBrightness(uint8_t brightness) override {
-      if (SUBFIELDS > 1) {
-        for (uint8_t i = 0; i < DIGITS; i++) {
-          setBrightnessAt(i, brightness);
-        }
-      }
-    }
-
-    void clear() override {
       for (uint8_t i = 0; i < DIGITS; i++) {
-        mPatterns[i] = 0;
+        setBrightnessAt(i, brightness);
       }
     }
 
@@ -256,6 +230,15 @@ class ScanningDisplay : public LedDisplay {
 
     /** Wake up from sleep. */
     void wakeFromSleep() { mPreparedToSleep = false; }
+
+  protected:
+    void setPatternAt(uint8_t pos, uint8_t pattern) override {
+      mPatterns[pos] = pattern;
+    }
+
+    uint8_t getPatternAt(uint8_t pos) override {
+      return mPatterns[pos];
+    }
 
   private:
     friend class ::ScanningDisplayTest_displayCurrentField;

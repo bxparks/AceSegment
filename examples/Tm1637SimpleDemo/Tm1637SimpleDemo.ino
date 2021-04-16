@@ -5,8 +5,7 @@
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
-using ace_segment::Tm1637Display;
-using ace_segment::Tm1637Driver;
+using namespace ace_segment;
 
 // Select driver version, either normal digitalWrite() or digitalWriteFast()
 #define TM16137_DRIVER_TYPE_NORMAL 0
@@ -26,12 +25,27 @@ using ace_segment::Tm1637Driver;
 const uint8_t CLK_PIN = 16;
 const uint8_t DIO_PIN = 10;
 
-const uint8_t PATTERNS[4] = {
-  0b00000110, // 1
-  0b01011011, // 2
-  0b01001111, // 3
-  0b01100110, // 4
-};
+#if defined(AUNITER_LED_CLOCK_TM1637) || defined(EPOXY_DUINO)
+  const uint8_t NUM_DIGITS = 4;
+  const uint8_t PATTERNS[NUM_DIGITS] = {
+    0b00111111, // 0
+    0b00000110, // 1
+    0b01011011, // 2
+    0b01001111, // 3
+  };
+#elif defined(AUNITER_LED_CLOCK_TM1637_6)
+  const uint8_t NUM_DIGITS = 6;
+  const uint8_t PATTERNS[NUM_DIGITS] = {
+    0b00111111, // 0
+    0b00000110, // 1
+    0b01011011, // 2
+    0b01001111, // 3
+    0b01100110, // 4
+    0b01101101, // 5
+  };
+#else
+  #error Unknown AUNITER environment
+#endif
 
 // For a Tm1637Driver (non-fast), time to send 4 digits:
 // * 12 ms at 50 us delay, but does not work.
@@ -43,12 +57,13 @@ constexpr uint16_t BIT_DELAY = 100;
 #if TM16137_DRIVER_TYPE == TM16137_DRIVER_TYPE_NORMAL
   using Driver = Tm1637Driver;
   Driver driver(CLK_PIN, DIO_PIN, BIT_DELAY);
-  Tm1637Display<Driver, 4> display(driver);
-#else
+#elif TM16137_DRIVER_TYPE == TM16137_DRIVER_TYPE_FAST
   using Driver = Tm1637DriverFast<CLK_PIN, DIO_PIN, BIT_DELAY>;
   Driver driver;
-  Tm1637Display<Driver, 4> display(driver);
+#else
+  #error Unknown TM16137_DRIVER_TYPE
 #endif
+Tm1637Display<Driver, NUM_DIGITS> display(driver);
 
 TimingStats stats;
 
@@ -63,7 +78,12 @@ void setup() {
 #endif
 
   driver.begin();
+
+#if defined(AUNITER_LED_CLOCK_TM1637)
   display.begin();
+#elif defined(AUNITER_LED_CLOCK_TM1637_6)
+  display.begin(kSixDigitRemapArray);
+#endif
 }
 
 #if 0
@@ -73,11 +93,11 @@ void setup() {
 void loop() {
   // Update the display
   uint8_t j = digitIndex;
-  for (uint8_t i = 0; i < 4; ++i) {
+  for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
     display.setPatternAt(i, PATTERNS[j]);
-    incrementMod(j, (uint8_t) 4);
+    incrementMod(j, (uint8_t) NUM_DIGITS);
   }
-  incrementMod(digitIndex, (uint8_t) 4);
+  incrementMod(digitIndex, (uint8_t) NUM_DIGITS);
 
   // Update the brightness
   display.setBrightness(brightness);
@@ -113,11 +133,13 @@ void loop() {
 
     // Update the display
     uint8_t j = digitIndex;
-    for (uint8_t i = 0; i < 4; ++i) {
+    for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
       display.writePatternAt(i, PATTERNS[j]);
-      incrementMod(j, (uint8_t) 4);
+      // Write a decimal point every other
+      display.writeDecimalPointAt(i, j & 0x1);
+      incrementMod(j, (uint8_t) NUM_DIGITS);
     }
-    incrementMod(digitIndex, (uint8_t) 4);
+    incrementMod(digitIndex, (uint8_t) NUM_DIGITS);
 
     // Update the brightness
     display.setBrightness(brightness);
