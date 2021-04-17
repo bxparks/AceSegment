@@ -37,10 +37,10 @@ namespace ace_segment {
  * An LedMatrixBase that whose group pins and element pins are wired directly to
  * the MCU.
  *
- * @tparam GPI (optional) class that provides access to the GPIO pins, default
- *    is GpioInterface
+ * @tparam GPIOI (optional) class that provides access to the GPIO pins, default
+ *    is GpioInterface (note: 'GPI' is already taken on ESP8266)
  */
-template<typename GPI = GpioInterface>
+template<typename GPIOI = GpioInterface>
 class LedMatrixDirect : public LedMatrixBase {
   public:
     LedMatrixDirect(
@@ -63,16 +63,16 @@ class LedMatrixDirect : public LedMatrixBase {
       uint8_t output = (0x00 ^ mGroupXorMask) & 0x1;
       for (uint8_t group = 0; group < mNumGroups; group++) {
         uint8_t pin = mGroupPins[group];
-        GPI::pinMode(pin, OUTPUT);
-        GPI::digitalWrite(pin, output);
+        GPIOI::pinMode(pin, OUTPUT);
+        GPIOI::digitalWrite(pin, output);
       }
 
       // Set pins to OUTPUT mode but set LEDs to OFF.
       output = (0x00 ^ mElementXorMask) & 0x1;
       for (uint8_t element = 0; element < mNumElements; element++) {
         uint8_t elementPin = mElementPins[element];
-        GPI::pinMode(elementPin, OUTPUT);
-        GPI::digitalWrite(elementPin, output);
+        GPIOI::pinMode(elementPin, OUTPUT);
+        GPIOI::digitalWrite(elementPin, output);
       }
     }
 
@@ -80,13 +80,13 @@ class LedMatrixDirect : public LedMatrixBase {
       // Set pins to INPUT mode.
       for (uint8_t group = 0; group < mNumGroups; group++) {
         uint8_t pin = mGroupPins[group];
-        GPI::pinMode(pin, INPUT);
+        GPIOI::pinMode(pin, INPUT);
       }
 
       // Set pins to INPUT mode.
       for (uint8_t element = 0; element < mNumElements; element++) {
         uint8_t elementPin = mElementPins[element];
-        GPI::pinMode(elementPin, INPUT);
+        GPIOI::pinMode(elementPin, INPUT);
       }
     }
 
@@ -131,13 +131,13 @@ class LedMatrixDirect : public LedMatrixBase {
     /** Write bit 0 of output to the element pin. */
     void writeElementPin(uint8_t element, uint8_t output) const {
       uint8_t elementPin = mElementPins[element];
-      GPI::digitalWrite(elementPin, (output ^ mElementXorMask) & 0x1);
+      GPIOI::digitalWrite(elementPin, (output ^ mElementXorMask) & 0x1);
     }
 
     /** Write bit 0 of output to group pin. */
     void writeGroupPin(uint8_t group, uint8_t output) const {
       uint8_t groupPin = mGroupPins[group];
-      GPI::digitalWrite(groupPin, (output ^ mGroupXorMask) & 0x1);
+      GPIOI::digitalWrite(groupPin, (output ^ mGroupXorMask) & 0x1);
     }
 
   private:
