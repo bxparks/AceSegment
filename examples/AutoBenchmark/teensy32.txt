@@ -1,27 +1,26 @@
 SIZEOF
-sizeof(Hardware): 1
 sizeof(SwSpiAdapter): 3
 sizeof(HwSpiAdapter): 3
-sizeof(LedMatrixDirect<Hardware>): 20
-sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 20
+sizeof(LedMatrixDirect<>): 16
+sizeof(LedMatrixSingleShiftRegister<SwSpiAdapter>): 16
 sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 12
-sizeof(LedDisplay): 8
-sizeof(ScanningDisplay<Hardware, LedMatrixBase, 4, 1>): 36
-sizeof(Tm1637Display<Tm1637Driver, 4>): 24
+sizeof(LedDisplay): 4
+sizeof(ScanningModule<LedMatrixBase, 4, 1>): 32
+sizeof(Tm1637Module<Tm1637Driver, 4>): 24
 sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
 sizeof(CharWriter): 4
 sizeof(StringWriter): 4
 BENCHMARKS
-Scanning(direct) 6 6 10 240
+Scanning(direct) 5 5 8 240
 Scanning(direct,subfields) 0 1 7 3840
-Scanning(single_sw_spi) 10 10 12 240
-Scanning(single_sw_spi,subfields) 0 1 14 3840
-Scanning(single_hw_spi) 4 4 7 240
-Scanning(single_hw_spi,subfields) 0 1 5 3840
-Scanning(dual_sw_spi) 16 16 21 240
-Scanning(dual_sw_spi,subfields) 0 2 21 3840
-Scanning(dual_hw_spi) 3 3 6 240
-Scanning(dual_hw_spi,subfields) 0 1 7 3840
-Tm1637(Normal) 21152 21153 21158 20
+Scanning(single,sw_spi) 9 9 12 240
+Scanning(single,sw_spi,subfields) 0 1 12 3840
+Scanning(single,hw_spi) 3 3 4 240
+Scanning(single,hw_spi,subfields) 0 1 6 3840
+Scanning(dual,sw_spi) 16 16 19 240
+Scanning(dual,sw_spi,subfields) 0 1 19 3840
+Scanning(dual,hw_spi) 3 3 5 240
+Scanning(dual,hw_spi,subfields) 0 0 6 3840
+Tm1637(Normal) 21143 21143 21148 20
 END

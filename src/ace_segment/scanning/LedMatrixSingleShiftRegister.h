@@ -45,10 +45,10 @@ namespace ace_segment {
  *   clockPin/D13/SCK -- SH_CP (Phillips) / SRCK (TI) / Pin 11 (rising)
  *
  * @tparam SA class that provides SPI, either SwSpiAdapter or HwSpiAdapter
- * @tparam GPI (optional) class that provides access to GPIO functions, default
- *    GpioInterface
+ * @tparam GPIOI (optional) class that provides access to GPIO functions,
+ *    default GpioInterface (note: 'GPIOI' is already taken on ESP8266)
  */
-template<typename SA, typename GPI = GpioInterface>
+template<typename SA, typename GPIOI = GpioInterface>
 class LedMatrixSingleShiftRegister : public LedMatrixBase {
   public:
     LedMatrixSingleShiftRegister(
@@ -69,8 +69,8 @@ class LedMatrixSingleShiftRegister : public LedMatrixBase {
       uint8_t output = (0x00 ^ mGroupXorMask) & 0x1;
       for (uint8_t group = 0; group < mNumGroups; group++) {
         uint8_t pin = mGroupPins[group];
-        GPI::pinMode(pin, OUTPUT);
-        GPI::digitalWrite(pin, output);
+        GPIOI::pinMode(pin, OUTPUT);
+        GPIOI::digitalWrite(pin, output);
       }
     }
 
@@ -78,7 +78,7 @@ class LedMatrixSingleShiftRegister : public LedMatrixBase {
       // Set pins to INPUT mode.
       for (uint8_t group = 0; group < mNumGroups; group++) {
         uint8_t pin = mGroupPins[group];
-        GPI::pinMode(pin, INPUT);
+        GPIOI::pinMode(pin, INPUT);
       }
     }
 
@@ -121,7 +121,7 @@ class LedMatrixSingleShiftRegister : public LedMatrixBase {
     /** Write bit 0 of output to group pin. */
     void writeGroupPin(uint8_t group, uint8_t output) const {
       uint8_t groupPin = mGroupPins[group];
-      GPI::digitalWrite(groupPin, (output ^ mGroupXorMask) & 0x1);
+      GPIOI::digitalWrite(groupPin, (output ^ mGroupXorMask) & 0x1);
     }
 
   private:

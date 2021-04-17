@@ -151,6 +151,10 @@ before substantional refactoring in 2021.
   non-virtual, then funneling these methods through just 2 lower-level virtual
   methods: `setPatternAt()` and `getPatternAt()`. It also made the
   implementation of `Tm1637Module` position remapping easier.
+* Extracting `LedModule` from `LedDisplay` saves 10-40 bytes on AVR for
+  `ScanningModule` and `Tm1637Module`, but add about that many bytes for various
+  Writer classes (probably because they have to go though one additional layer
+  of indirect, through the `LedModule`). So overall, I think it's a wash.
 
 ## Results
 
