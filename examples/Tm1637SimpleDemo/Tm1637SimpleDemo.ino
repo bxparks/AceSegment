@@ -68,7 +68,14 @@ constexpr uint16_t BIT_DELAY = 100;
 #else
   #error Unknown TM16137_DRIVER_TYPE
 #endif
-Tm1637Module<Driver, NUM_DIGITS> tm1637Module(driver);
+
+#if defined(AUNITER_LED_CLOCK_TM1637) || defined(EPOXY_DUINO)
+  const uint8_t* const remapArray = nullptr;
+#elif defined(AUNITER_LED_CLOCK_TM1637_6)
+  const uint8_t* const remapArray = ace_segment::kSixDigitRemapArray;
+#endif
+
+Tm1637Module<Driver, NUM_DIGITS> tm1637Module(driver, remapArray);
 LedDisplay display(tm1637Module);
 
 TimingStats stats;
@@ -84,12 +91,7 @@ void setup() {
 #endif
 
   driver.begin();
-
-#if defined(AUNITER_LED_CLOCK_TM1637) || defined(EPOXY_DUINO)
   tm1637Module.begin();
-#elif defined(AUNITER_LED_CLOCK_TM1637_6)
-  tm1637Module.begin(ace_segment::kSixDigitRemapArray);
-#endif
 }
 
 #if 0
