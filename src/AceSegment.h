@@ -34,8 +34,8 @@ SOFTWARE.
 
 #include "ace_segment/hw/ClockInterface.h"
 #include "ace_segment/hw/GpioInterface.h"
-#include "ace_segment/hw/SwSpiAdapter.h"
-#include "ace_segment/hw/HwSpiAdapter.h"
+#include "ace_segment/hw/SwSpiInterface.h"
+#include "ace_segment/hw/HwSpiInterface.h"
 #include "ace_segment/scanning/LedMatrixDirect.h"
 #include "ace_segment/scanning/LedMatrixSingleShiftRegister.h"
 #include "ace_segment/scanning/LedMatrixDualShiftRegister.h"

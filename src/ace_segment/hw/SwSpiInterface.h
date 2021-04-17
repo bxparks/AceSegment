@@ -31,9 +31,9 @@ SOFTWARE.
 namespace ace_segment {
 
 /** Software SPI using shiftOut(). */
-class SwSpiAdapter {
+class SwSpiInterface {
   public:
-    SwSpiAdapter(
+    SwSpiInterface(
         uint8_t latchPin,
         uint8_t dataPin,
         uint8_t clockPin

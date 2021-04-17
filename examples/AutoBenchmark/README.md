@@ -1,23 +1,23 @@
 # AutoBenchmark
 
-This program creates instances of `ScanningDisplay` using different
+This program creates instances of `ScanningModule` using different
 configurations of the `LedMatrix` class:
 
 * `direct`: group and segment pins directly connected to MCU
 * `single_sw_spi`: group pins connected directly to MCU, but segment pins
-  connected to 74HC595 accessed through software SPI (`SwSpiAdapter`)
+  connected to 74HC595 accessed through software SPI (`SwSpiInterface`)
 * `single_hw_spi`: group pins connected directly to MCU, but segment pins
-  connected to 74HC595 accessed through hardware SPI (`HwSpiAdapter`)
+  connected to 74HC595 accessed through hardware SPI (`HwSpiInterface`)
 * `dual_sw_spi`: group pins and segment pins connected to 74HC595 accessed
-  through software SPI (`SwSpiAdapter`)
+  through software SPI (`SwSpiInterface`)
 * `dual_hw_spi`: group pins and segment pins connected to 74HC595 accessed
-  through hardware SPI (`HwSpiAdapter`)
+  through hardware SPI (`HwSpiInterface`)
 
-It measures the time taken by `ScanningDisplay::renderFieldNow()` which
+It measures the time taken by `ScanningModule::renderFieldNow()` which
 renders a single digit (multiple fields make up a frame, a frame is the
 rendering of all digits on the display module).
 
-**Version**: AceSegment v0.4
+**Version**: AceSegment v0.4+
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -83,7 +83,7 @@ characteristics of the LED module.
 
 The following tables show the number of microseconds taken by:
 
-* `ScanningDisplay::renderFieldNow()`
+* `ScanningModule::renderFieldNow()`
     * renders the 8 segments of a single LED digit. If the LED module has 4
       digits, then `renderFieldNow()` must be called 4 times to render the light
       pattern of the entire LED module. The entire rendering is then called a
@@ -128,13 +128,13 @@ because it consumes 600-700 fewer bytes of flash memory.
 
 ```
 Sizes of Objects:
-sizeof(SwSpiAdapter): 3
-sizeof(SwSpiAdapterFast<1,2,3>): 1
-sizeof(HwSpiAdapter): 3
+sizeof(SwSpiInterface): 3
+sizeof(FastSwSpiInterface<1,2,3>): 1
+sizeof(HwSpiInterface): 3
 sizeof(LedMatrixDirect<>): 9
 sizeof(LedMatrixDirectFast<0..3, 0..7>): 3
-sizeof(LedMatrixSingleShiftRegister<SwSpiAdapter>): 8
-sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 5
+sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 8
+sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 5
 sizeof(LedDisplay): 2
 sizeof(ScanningModule<LedMatrixBase, 4, 1>): 22
 sizeof(Tm1637Module<Tm1637Driver, 4>): 14
@@ -147,23 +147,22 @@ CPU:
 +----------------------------------------+-------------------+---------+
 | LedDisplay Operation                   |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Scanning(direct)                       |    72/   76/   88 |     240 |
-| Scanning(direct,subfields)             |     4/   12/   84 |    3840 |
-| Scanning(single,sw_spi)                |   156/  159/  180 |     240 |
-| Scanning(single,sw_spi,subfields)      |     4/   19/  176 |    3840 |
-| Scanning(single,hw_spi)                |    36/   38/   52 |     240 |
-| Scanning(single,hw_spi,subfields)      |     4/    8/   48 |    3840 |
-| Scanning(dual,sw_spi)                  |   264/  268/  296 |     240 |
-| Scanning(dual,sw_spi,subfields)        |     4/   30/  300 |    3840 |
-| Scanning(dual,hw_spi)                  |    24/   25/   36 |     240 |
-| Scanning(dual,hw_spi,subfields)        |     4/    7/   36 |    3840 |
-|----------------------------------------+-------------------+---------|
-| Scanning(direct_fast)                  |    24/   28/   44 |     240 |
-| Scanning(direct_fast,subfields)        |     4/    7/   36 |    3840 |
-| Scanning(single,sw_spi_fast)           |    28/   30/   44 |     240 |
-| Scanning(single,sw_spi_fast,subfields) |     4/    7/   40 |    3840 |
-| Scanning(dual,sw_spi_fast)             |    20/   24/   36 |     240 |
-| Scanning(dual,sw_spi_fast,subfields)   |     4/    7/   32 |    3840 |
+| Scanning(Direct)                       |    72/   76/   88 |     240 |
+| Scanning(Direct,subfields)             |     4/   12/   84 |    3840 |
+| Scanning(Single,SwSpi)                 |   156/  159/  180 |     240 |
+| Scanning(Single,SwSpi,subfields)       |     4/   19/  176 |    3840 |
+| Scanning(Single,HwSpi)                 |    36/   38/   52 |     240 |
+| Scanning(Single,HwSpi,subfields)       |     4/    8/   48 |    3840 |
+| Scanning(Dual,SwSpi)                   |   264/  268/  296 |     240 |
+| Scanning(Dual,SwSpi,subfields)         |     4/   30/  300 |    3840 |
+| Scanning(Dual,HwSpi)                   |    24/   25/   36 |     240 |
+| Scanning(Dual,HwSpi,subfields)         |     4/    7/   36 |    3840 |
+| Scanning(DirectFast)                   |    24/   28/   44 |     240 |
+| Scanning(DirectFast,subfields)         |     4/    7/   36 |    3840 |
+| Scanning(Single,FastSwSpi)             |    28/   30/   44 |     240 |
+| Scanning(Single,FastSwSpi,subfields)   |     4/    7/   40 |    3840 |
+| Scanning(Dual,FastSwSpi)               |    20/   24/   36 |     240 |
+| Scanning(Dual,FastSwSpi,subfields)     |     4/    7/   32 |    3840 |
 |----------------------------------------+-------------------+---------|
 | Tm1637(Normal)                         | 22304/22326/22600 |      20 |
 | Tm1637(Fast)                           | 21056/21069/21208 |      20 |
@@ -180,13 +179,13 @@ CPU:
 
 ```
 Sizes of Objects:
-sizeof(SwSpiAdapter): 3
-sizeof(SwSpiAdapterFast<1,2,3>): 1
-sizeof(HwSpiAdapter): 3
+sizeof(SwSpiInterface): 3
+sizeof(FastSwSpiInterface<1,2,3>): 1
+sizeof(HwSpiInterface): 3
 sizeof(LedMatrixDirect<>): 9
 sizeof(LedMatrixDirectFast<0..3, 0..7>): 3
-sizeof(LedMatrixSingleShiftRegister<SwSpiAdapter>): 8
-sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 5
+sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 8
+sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 5
 sizeof(LedDisplay): 2
 sizeof(ScanningModule<LedMatrixBase, 4, 1>): 22
 sizeof(Tm1637Module<Tm1637Driver, 4>): 14
@@ -199,26 +198,25 @@ CPU:
 +----------------------------------------+-------------------+---------+
 | LedDisplay Operation                   |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Scanning(direct)                       |    72/   78/   92 |     240 |
-| Scanning(direct,subfields)             |     4/   14/   92 |    3840 |
-| Scanning(single,sw_spi)                |   148/  152/  164 |     240 |
-| Scanning(single,sw_spi,subfields)      |     4/   23/  164 |    3840 |
-| Scanning(single,hw_spi)                |    36/   40/   48 |     240 |
-| Scanning(single,hw_spi,subfields)      |     4/    9/   52 |    3840 |
-| Scanning(dual,sw_spi)                  |   248/  252/  264 |     240 |
-| Scanning(dual,sw_spi,subfields)        |     4/   36/  264 |    3840 |
-| Scanning(dual,hw_spi)                  |    24/   26/   36 |     240 |
-| Scanning(dual,hw_spi,subfields)        |     4/    8/   36 |    3840 |
-|----------------------------------------+-------------------+---------|
-| Scanning(direct_fast)                  |    24/   28/   36 |     240 |
-| Scanning(direct_fast,subfields)        |     4/    8/   36 |    3840 |
-| Scanning(single,sw_spi_fast)           |    28/   31/   40 |     240 |
-| Scanning(single,sw_spi_fast,subfields) |     4/    8/   40 |    3840 |
-| Scanning(dual,sw_spi_fast)             |    20/   23/   32 |     240 |
-| Scanning(dual,sw_spi_fast,subfields)   |     4/    8/   36 |    3840 |
+| Scanning(Direct)                       |    72/   78/   92 |     240 |
+| Scanning(Direct,subfields)             |     4/   14/   92 |    3840 |
+| Scanning(Single,SwSpi)                 |   148/  152/  164 |     240 |
+| Scanning(Single,SwSpi,subfields)       |     4/   23/  164 |    3840 |
+| Scanning(Single,HwSpi)                 |    36/   40/   48 |     240 |
+| Scanning(Single,HwSpi,subfields)       |     4/    9/   52 |    3840 |
+| Scanning(Dual,SwSpi)                   |   248/  252/  264 |     240 |
+| Scanning(Dual,SwSpi,subfields)         |     4/   36/  264 |    3840 |
+| Scanning(Dual,HwSpi)                   |    24/   26/   36 |     240 |
+| Scanning(Dual,HwSpi,subfields)         |     4/    8/   36 |    3840 |
+| Scanning(DirectFast)                   |    24/   28/   36 |     240 |
+| Scanning(DirectFast,subfields)         |     4/    8/   36 |    3840 |
+| Scanning(Single,FastSwSpi)             |    28/   31/   40 |     240 |
+| Scanning(Single,FastSwSpi,subfields)   |     4/    8/   40 |    3840 |
+| Scanning(Dual,FastSwSpi)               |    20/   23/   32 |     240 |
+| Scanning(Dual,FastSwSpi,subfields)     |     4/    8/   36 |    3840 |
 |----------------------------------------+-------------------+---------|
 | Tm1637(Normal)                         | 22428/22435/22448 |      20 |
-| Tm1637(Fast)                           | 21164/21173/21188 |      20 |
+| Tm1637(FasT)                           | 21164/21173/21188 |      20 |
 +----------------------------------------+-------------------+---------+
 
 ```
@@ -231,11 +229,11 @@ CPU:
 
 ```
 Sizes of Objects:
-sizeof(SwSpiAdapter): 3
-sizeof(HwSpiAdapter): 3
+sizeof(SwSpiInterface): 3
+sizeof(HwSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
-sizeof(LedMatrixSingleShiftRegister<SwSpiAdapter>): 16
-sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 12
+sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 16
+sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 12
 sizeof(LedDisplay): 4
 sizeof(ScanningModule<LedMatrixBase, 4, 1>): 32
 sizeof(Tm1637Module<Tm1637Driver, 4>): 24
@@ -248,16 +246,16 @@ CPU:
 +----------------------------------------+-------------------+---------+
 | LedDisplay Operation                   |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Scanning(direct)                       |    24/   24/   29 |     240 |
-| Scanning(direct,subfields)             |     2/    4/   29 |    3840 |
-| Scanning(single,sw_spi)                |    51/   52/   57 |     240 |
-| Scanning(single,sw_spi,subfields)      |     2/    7/   58 |    3840 |
-| Scanning(single,hw_spi)                |    23/   24/   28 |     240 |
-| Scanning(single,hw_spi,subfields)      |     2/    4/   28 |    3840 |
-| Scanning(dual,sw_spi)                  |    87/   88/   93 |     240 |
-| Scanning(dual,sw_spi,subfields)        |     2/   10/   93 |    3840 |
-| Scanning(dual,hw_spi)                  |    21/   22/   26 |     240 |
-| Scanning(dual,hw_spi,subfields)        |     2/    4/   26 |    3840 |
+| Scanning(Direct)                       |    24/   24/   29 |     240 |
+| Scanning(Direct,subfields)             |     2/    4/   29 |    3840 |
+| Scanning(Single,SwSpi)                 |    51/   52/   57 |     240 |
+| Scanning(Single,SwSpi,subfields)       |     2/    7/   58 |    3840 |
+| Scanning(Single,HwSpi)                 |    23/   24/   28 |     240 |
+| Scanning(Single,HwSpi,subfields)       |     2/    4/   28 |    3840 |
+| Scanning(Dual,SwSpi)                   |    87/   88/   93 |     240 |
+| Scanning(Dual,SwSpi,subfields)         |     2/   10/   93 |    3840 |
+| Scanning(Dual,HwSpi)                   |    21/   22/   26 |     240 |
+| Scanning(Dual,HwSpi,subfields)         |     2/    4/   26 |    3840 |
 |----------------------------------------+-------------------+---------|
 | Tm1637(Normal)                         | 22229/22231/22238 |      20 |
 +----------------------------------------+-------------------+---------+
@@ -272,11 +270,11 @@ CPU:
 
 ```
 Sizes of Objects:
-sizeof(SwSpiAdapter): 3
-sizeof(HwSpiAdapter): 3
+sizeof(SwSpiInterface): 3
+sizeof(HwSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
-sizeof(LedMatrixSingleShiftRegister<SwSpiAdapter>): 16
-sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 12
+sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 16
+sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 12
 sizeof(LedDisplay): 4
 sizeof(ScanningModule<LedMatrixBase, 4, 1>): 32
 sizeof(Tm1637Module<Tm1637Driver, 4>): 24
@@ -289,16 +287,16 @@ CPU:
 +----------------------------------------+-------------------+---------+
 | LedDisplay Operation                   |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Scanning(direct)                       |    14/   14/   19 |     240 |
-| Scanning(direct,subfields)             |     1/    2/   39 |    3840 |
-| Scanning(single,sw_spi)                |    30/   31/   36 |     240 |
-| Scanning(single,sw_spi,subfields)      |     1/    3/   53 |    3840 |
-| Scanning(single,hw_spi)                |    40/   40/   45 |     240 |
-| Scanning(single,hw_spi,subfields)      |     1/    4/   51 |    3840 |
-| Scanning(dual,sw_spi)                  |    52/   52/   57 |     240 |
-| Scanning(dual,sw_spi,subfields)        |     1/    7/   77 |    3840 |
-| Scanning(dual,hw_spi)                  |    39/   40/   45 |     240 |
-| Scanning(dual,hw_spi,subfields)        |     1/    5/   63 |    3840 |
+| Scanning(Direct)                       |    14/   14/   19 |     240 |
+| Scanning(Direct,subfields)             |     1/    2/   39 |    3840 |
+| Scanning(Single,SwSpi)                 |    30/   31/   36 |     240 |
+| Scanning(Single,SwSpi,subfields)       |     1/    3/   53 |    3840 |
+| Scanning(Single,HwSpi)                 |    40/   40/   45 |     240 |
+| Scanning(Single,HwSpi,subfields)       |     1/    4/   51 |    3840 |
+| Scanning(Dual,SwSpi)                   |    52/   52/   57 |     240 |
+| Scanning(Dual,SwSpi,subfields)         |     1/    7/   77 |    3840 |
+| Scanning(Dual,HwSpi)                   |    39/   40/   45 |     240 |
+| Scanning(Dual,HwSpi,subfields)         |     1/    5/   63 |    3840 |
 |----------------------------------------+-------------------+---------|
 | Tm1637(Normal)                         | 22371/22375/22381 |      20 |
 +----------------------------------------+-------------------+---------+
@@ -313,11 +311,11 @@ CPU:
 
 ```
 Sizes of Objects:
-sizeof(SwSpiAdapter): 3
-sizeof(HwSpiAdapter): 3
+sizeof(SwSpiInterface): 3
+sizeof(HwSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
-sizeof(LedMatrixSingleShiftRegister<SwSpiAdapter>): 16
-sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 12
+sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 16
+sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 12
 sizeof(LedDisplay): 4
 sizeof(ScanningModule<LedMatrixBase, 4, 1>): 32
 sizeof(Tm1637Module<Tm1637Driver, 4>): 24
@@ -330,16 +328,16 @@ CPU:
 +----------------------------------------+-------------------+---------+
 | LedDisplay Operation                   |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Scanning(direct)                       |    12/   12/   28 |     240 |
-| Scanning(direct,subfields)             |     0/    2/   24 |    3840 |
-| Scanning(single,sw_spi)                |    29/   29/   40 |     240 |
-| Scanning(single,sw_spi,subfields)      |     0/    4/   41 |    3840 |
-| Scanning(single,hw_spi)                |    11/   11/   33 |     240 |
-| Scanning(single,hw_spi,subfields)      |     0/    2/   27 |    3840 |
-| Scanning(dual,sw_spi)                  |    50/   50/   59 |     240 |
-| Scanning(dual,sw_spi,subfields)        |     0/    7/   67 |    3840 |
-| Scanning(dual,hw_spi)                  |    12/   12/   20 |     240 |
-| Scanning(dual,hw_spi,subfields)        |     0/    2/   32 |    3840 |
+| Scanning(Direct)                       |    12/   12/   28 |     240 |
+| Scanning(Direct,subfields)             |     0/    2/   24 |    3840 |
+| Scanning(Single,SwSpi)                 |    29/   29/   40 |     240 |
+| Scanning(Single,SwSpi,subfields)       |     0/    4/   41 |    3840 |
+| Scanning(Single,HwSpi)                 |    11/   11/   33 |     240 |
+| Scanning(Single,HwSpi,subfields)       |     0/    2/   27 |    3840 |
+| Scanning(Dual,SwSpi)                   |    50/   50/   59 |     240 |
+| Scanning(Dual,SwSpi,subfields)         |     0/    7/   67 |    3840 |
+| Scanning(Dual,HwSpi)                   |    12/   12/   20 |     240 |
+| Scanning(Dual,HwSpi,subfields)         |     0/    2/   32 |    3840 |
 |----------------------------------------+-------------------+---------|
 | Tm1637(Normal)                         | 21493/21503/21537 |      20 |
 +----------------------------------------+-------------------+---------+
@@ -354,11 +352,11 @@ CPU:
 
 ```
 Sizes of Objects:
-sizeof(SwSpiAdapter): 3
-sizeof(HwSpiAdapter): 3
+sizeof(SwSpiInterface): 3
+sizeof(HwSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
-sizeof(LedMatrixSingleShiftRegister<SwSpiAdapter>): 16
-sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 12
+sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 16
+sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 12
 sizeof(LedDisplay): 4
 sizeof(ScanningModule<LedMatrixBase, 4, 1>): 32
 sizeof(Tm1637Module<Tm1637Driver, 4>): 24
@@ -371,16 +369,16 @@ CPU:
 +----------------------------------------+-------------------+---------+
 | LedDisplay Operation                   |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Scanning(direct)                       |     2/    2/   11 |     240 |
-| Scanning(direct,subfields)             |     0/    1/    9 |    3840 |
-| Scanning(single,sw_spi)                |     4/    4/    7 |     240 |
-| Scanning(single,sw_spi,subfields)      |     0/    1/   12 |    3840 |
-| Scanning(single,hw_spi)                |     9/    9/   18 |     240 |
-| Scanning(single,hw_spi,subfields)      |     0/    1/   18 |    3840 |
-| Scanning(dual,sw_spi)                  |     7/    7/   15 |     240 |
-| Scanning(dual,sw_spi,subfields)        |     0/    1/   15 |    3840 |
-| Scanning(dual,hw_spi)                  |     9/    9/   14 |     240 |
-| Scanning(dual,hw_spi,subfields)        |     0/    1/   18 |    3840 |
+| Scanning(Direct)                       |     2/    2/   11 |     240 |
+| Scanning(Direct,subfields)             |     0/    1/    9 |    3840 |
+| Scanning(Single,SwSpi)                 |     4/    4/    7 |     240 |
+| Scanning(Single,SwSpi,subfields)       |     0/    1/   12 |    3840 |
+| Scanning(Single,HwSpi)                 |     9/    9/   18 |     240 |
+| Scanning(Single,HwSpi,subfields)       |     0/    1/   18 |    3840 |
+| Scanning(Dual,SwSpi)                   |     7/    7/   15 |     240 |
+| Scanning(Dual,SwSpi,subfields)         |     0/    1/   15 |    3840 |
+| Scanning(Dual,HwSpi)                   |     9/    9/   14 |     240 |
+| Scanning(Dual,HwSpi,subfields)         |     0/    1/   18 |    3840 |
 |----------------------------------------+-------------------+---------|
 | Tm1637(Normal)                         | 21227/21238/21245 |      20 |
 +----------------------------------------+-------------------+---------+
@@ -396,11 +394,11 @@ CPU:
 
 ```
 Sizes of Objects:
-sizeof(SwSpiAdapter): 3
-sizeof(HwSpiAdapter): 3
+sizeof(SwSpiInterface): 3
+sizeof(HwSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
-sizeof(LedMatrixSingleShiftRegister<SwSpiAdapter>): 16
-sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 12
+sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 16
+sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 12
 sizeof(LedDisplay): 4
 sizeof(ScanningModule<LedMatrixBase, 4, 1>): 32
 sizeof(Tm1637Module<Tm1637Driver, 4>): 24
@@ -413,16 +411,16 @@ CPU:
 +----------------------------------------+-------------------+---------+
 | LedDisplay Operation                   |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Scanning(direct)                       |     5/    5/    8 |     240 |
-| Scanning(direct,subfields)             |     0/    1/    7 |    3840 |
-| Scanning(single,sw_spi)                |     9/    9/   12 |     240 |
-| Scanning(single,sw_spi,subfields)      |     0/    1/   12 |    3840 |
-| Scanning(single,hw_spi)                |     3/    3/    4 |     240 |
-| Scanning(single,hw_spi,subfields)      |     0/    1/    6 |    3840 |
-| Scanning(dual,sw_spi)                  |    16/   16/   19 |     240 |
-| Scanning(dual,sw_spi,subfields)        |     0/    1/   19 |    3840 |
-| Scanning(dual,hw_spi)                  |     3/    3/    5 |     240 |
-| Scanning(dual,hw_spi,subfields)        |     0/    0/    6 |    3840 |
+| Scanning(Direct)                       |     5/    5/    8 |     240 |
+| Scanning(Direct,subfields)             |     0/    1/    7 |    3840 |
+| Scanning(Single,SwSpi)                 |     9/    9/   12 |     240 |
+| Scanning(Single,SwSpi,subfields)       |     0/    1/   12 |    3840 |
+| Scanning(Single,HwSpi)                 |     3/    3/    4 |     240 |
+| Scanning(Single,HwSpi,subfields)       |     0/    1/    6 |    3840 |
+| Scanning(Dual,SwSpi)                   |    16/   16/   19 |     240 |
+| Scanning(Dual,SwSpi,subfields)         |     0/    1/   19 |    3840 |
+| Scanning(Dual,HwSpi)                   |     3/    3/    5 |     240 |
+| Scanning(Dual,HwSpi,subfields)         |     0/    0/    6 |    3840 |
 |----------------------------------------+-------------------+---------|
 | Tm1637(Normal)                         | 21143/21143/21148 |      20 |
 +----------------------------------------+-------------------+---------+

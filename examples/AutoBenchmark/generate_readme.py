@@ -25,24 +25,24 @@ teensy32_results = check_output(
 print(f"""\
 # AutoBenchmark
 
-This program creates instances of `ScanningDisplay` using different
+This program creates instances of `ScanningModule` using different
 configurations of the `LedMatrix` class:
 
 * `direct`: group and segment pins directly connected to MCU
 * `single_sw_spi`: group pins connected directly to MCU, but segment pins
-  connected to 74HC595 accessed through software SPI (`SwSpiAdapter`)
+  connected to 74HC595 accessed through software SPI (`SwSpiInterface`)
 * `single_hw_spi`: group pins connected directly to MCU, but segment pins
-  connected to 74HC595 accessed through hardware SPI (`HwSpiAdapter`)
+  connected to 74HC595 accessed through hardware SPI (`HwSpiInterface`)
 * `dual_sw_spi`: group pins and segment pins connected to 74HC595 accessed
-  through software SPI (`SwSpiAdapter`)
+  through software SPI (`SwSpiInterface`)
 * `dual_hw_spi`: group pins and segment pins connected to 74HC595 accessed
-  through hardware SPI (`HwSpiAdapter`)
+  through hardware SPI (`HwSpiInterface`)
 
-It measures the time taken by `ScanningDisplay::renderFieldNow()` which
+It measures the time taken by `ScanningModule::renderFieldNow()` which
 renders a single digit (multiple fields make up a frame, a frame is the
 rendering of all digits on the display module).
 
-**Version**: AceSegment v0.4
+**Version**: AceSegment v0.4+
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -108,7 +108,7 @@ characteristics of the LED module.
 
 The following tables show the number of microseconds taken by:
 
-* `ScanningDisplay::renderFieldNow()`
+* `ScanningModule::renderFieldNow()`
     * renders the 8 segments of a single LED digit. If the LED module has 4
       digits, then `renderFieldNow()` must be called 4 times to render the light
       pattern of the entire LED module. The entire rendering is then called a
