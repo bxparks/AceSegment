@@ -84,7 +84,7 @@ Here are the features supported by this framework:
 The framework splits the responsibility of displaying LED digits into several
 components:
 
-* The `SpiAdapter` is a thin wrapper around either a software SPI or hardware
+* The `SpiInterface` is a thin wrapper around either a software SPI or hardware
   SPI.
 * The `LedMatrix` knows how to enable or disable LED segments on various digit
   groups. Different subclasses the `LedMatrix` are provided to support:
@@ -209,14 +209,14 @@ Here are the classes in the library which will be most useful to the
 end-users, listed roughly from low-level to higher-level classes which often
 depend on the lower-level classes:
 
-* SpiAdapter
+* SpiInterface
     * Thin-wrapper classes to indicate whether we are using software or hardware
       SPI. There are 3 implementations:
-    * `SwSpiAdapter`
+    * `SwSpiInterface`
         * Software SPI using `shiftOut()`
-    * `HwSpiAdapter`
+    * `HwSpiInterface`
         * Native hardware SPI.
-    * `SwSpiAdapterFast`
+    * `FastSwSpiInterface`
         * Software SPI using `digitalWriteFast()` on AVR processors
 * `LedMatrix`: Various subclasses capture the wiring of the matrix of LEDs.
     * `LedMatrixDirect`
@@ -227,10 +227,10 @@ depend on the lower-level classes:
           processors
     * `LedMatrixSingleShiftRegister`
         * Group pins are access directly, but element pins are access through an
-          74HC595 chip through SPI using one of SpiAdapter classes
+          74HC595 chip through SPI using one of SpiInterface classes
     * `LedMatrixDualShiftRegister`
         * Both group and element pions are access through two 74HC595 chips
-          through SPI using one of the SpiAdapter classes
+          through SPI using one of the SpiInterface classes
 * `LedModule`
     * Base interface for all hardware dependent implementation of a
       seven-segment LED module.
@@ -305,9 +305,9 @@ The dependency diagram among these classes looks something like this:
 LedMatrixDirectFast               \             /
                                    \           /
                                     v         v
-                                   SwSpiAdapter
-                                   HwSpiAdapter
-                                   SwSpiAdapterFast
+                                   SwSpiInterface
+                                   HwSpiInterface
+                                   FastSwSpiInterface
 ```
 
 <a name="SettingUpScanningModule"></a>
@@ -318,7 +318,7 @@ A series of resources must be built up to finally create an instance of
 is used, and the resource creation occurs in roughly 5 stages, with the objects
 in the later stages depending on the objects created in the earlier stage:
 
-1. The SpiAdapter object determines whether software SPI or hardware SPI is
+1. The SpiInterface object determines whether software SPI or hardware SPI is
    used. Needed only by `LedMatrixSingleShiftRegister` and
    `LedMatrixDualShiftRegister` classes.
 1. The LedMatrix object determine how the LEDs are wired and how to
@@ -560,10 +560,10 @@ const uint8_t CLOCK_PIN = 13; // SH_CP on 74HC595
 const uint16_t FRAMES_PER_SECOND = 60;
 
 // Common Cathode, with transistors on Group pins
-SwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-using LedMatrix = LedMatrixSingleShiftRegister<SwSpiAdapter>;
+SwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+using LedMatrix = LedMatrixSingleShiftRegister<SwSpiInterface>;
 LedMatrix ledMatrix(
-    spiAdapter,
+    spiInterface,
     LedMatrix::kActiveHighPattern /*groupOnPattern*/,
     LedMatrix::kActiveHighPattern /*elementOnPattern*/,
     NUM_DIGITS,
@@ -574,14 +574,14 @@ LedDisplay ledDisplay(scanningModule);
 ...
 
 void setupScanningModule() {
-  spiAdapter.begin();
+  spiInterface.begin();
   ledMatrix.begin();
   scanningModule.begin();
 }
 ```
 
 The `LedMatrixSingleShiftRegister` configuration using hardware SPI is *exactly*
-the same as above but with `HwSpiAdapter` replacing `SwSpiAdapter`.
+the same as above but with `HwSpiInterface` replacing `SwSpiInterface`.
 
 <a name="LedMatrixDualShiftRegister"></a>
 #### Digits and Segments on Two Shift Registers
@@ -616,7 +616,7 @@ MCU                 74HC595             LED display (Common Cathode)
 ```
 
 The `LedMatrixDualShiftRegister` configuration is the following. Let's use
-`HwSpiAdapter` this time:
+`HwSpiInterface` this time:
 
 ```C++
 const uint8_t NUM_DIGITS = 4;
@@ -625,10 +625,10 @@ const uint8_t DATA_PIN = 11; // DS on 74HC595
 const uint8_t CLOCK_PIN = 13; // SH_CP on 74HC595
 const uint16_t FRAMES_PER_SECOND = 60;
 
-HwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-using LedMatrix = LedMatrixSingleShiftRegister<HwSpiAdapter>;
+HwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+using LedMatrix = LedMatrixSingleShiftRegister<HwSpiInterface>;
 LedMatrix ledMatrix(
-    spiAdapter,
+    spiInterface,
     LedMatrix::kActiveHighPattern /*groupOnPattern*/,
     LedMatrix::kActiveHighPattern /*elementOnPattern*/);
 ScanningModule<LedMatrix, NUM_DIGITS> scanningModule(
@@ -637,7 +637,7 @@ LedDisplay ledDisplay(scanningModule);
 ...
 
 void setupScanningModule() {
-  spiAdapter.begin();
+  spiInterface.begin();
   ledMatrix.begin();
   scanningModule.begin();
 }
@@ -710,10 +710,10 @@ const uint8_t CLOCK_PIN = 13; // SH_CP on 74HC595
 const uint16_t FRAMES_PER_SECOND = 60;
 const uint8_t NUM_SUBFIELDS = 16;
 
-HwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-using LedMatrix = LedMatrixSingleShiftRegister<HwSpiAdapter>;
+HwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+using LedMatrix = LedMatrixSingleShiftRegister<HwSpiInterface>;
 LedMatrix ledMatrix(
-    spiAdapter,
+    spiInterface,
     LedMatrix::kActiveHighPattern /*groupOnPattern*/,
     LedMatrix::kActiveHighPattern /*elementOnPattern*/);
 ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
@@ -962,8 +962,8 @@ I have written versions of some lower-level classes to take advantage of
 
 * `scanning/LedMatrixDirectFast.h`
     * Variant of `LedMatrixDirect` using `digitalWriteFast()`
-* `hw/SwSpiAdapterFast.h`
-    * Variant of `SwSpiAdapter.h` using  `digitalWriteFast()`
+* `hw/FastSwSpiInterface.h`
+    * Variant of `SwSpiInterface.h` using  `digitalWriteFast()`
 * `tm1637/Tm1637DriverFast.h`
     * Variant of `Tm1637Driver.h` using `digitalWriteFast()`
 
@@ -975,7 +975,7 @@ need to include these headers manually, like this:
 ```C++
 #include <AceSegment.h> // do this first
 #include <digitalWriteFast.h> // from 3rd party library
-#include <ace_segment/hw/SwSpiAdapterFast.h>
+#include <ace_segment/hw/FastSwSpiInterface.h>
 #include <ace_segment/scanning/LedMatrixDirectFast.h>
 #include <ace_segment/tm1637/Tm1637DriverFast.h>
 ```
@@ -988,13 +988,13 @@ need to include these headers manually, like this:
 Here are the sizes of the various classes on the 8-bit AVR microcontrollers
 (Arduino Uno, Nano, etc):
 
-* sizeof(SwSpiAdapter): 3
-* sizeof(SwSpiAdapterFast<1,2,3>): 1
-* sizeof(HwSpiAdapter): 3
+* sizeof(SwSpiInterface): 3
+* sizeof(FastSwSpiInterface<1,2,3>): 1
+* sizeof(HwSpiInterface): 3
 * sizeof(LedMatrixDirect<>): 11
 * sizeof(LedMatrixDirectFast<0..3, 0..7>): 3
-* sizeof(LedMatrixSingleShiftRegister<SwSpiAdapter>): 10
-* sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 5
+* sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 10
+* sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 5
 * sizeof(LedDisplay): 3
 * sizeof(ScanningModule<LedMatrixBase, 4, 1>): 25
 * sizeof(Tm1637Display<Tm1637Driver, 4>): 12
