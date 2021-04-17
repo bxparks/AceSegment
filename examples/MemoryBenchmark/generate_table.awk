@@ -7,16 +7,16 @@
 
 BEGIN {
   labels[0] = "baseline"
-  labels[1] = "ScanningModule(direct)";
-  labels[2] = "ScanningModule(single_sw_spi)";
-  labels[3] = "ScanningModule(single_hw_spi)";
-  labels[4] = "ScanningModule(dual_sw_spi)";
-  labels[5] = "ScanningModule(dual_hw_spi)";
-  labels[6] = "ScanningModule(direct_fast)";
-  labels[7] = "ScanningModule(single_sw_fast)";
-  labels[8] = "ScanningModule(dual_sw_fast)";
-  labels[9] = "Tm1637Module(Normal)";
-  labels[10] = "Tm1637Module(Fast)";
+  labels[1] = "Scanning(Direct)";
+  labels[2] = "Scanning(Single,SwSpi)";
+  labels[3] = "Scanning(Single,HwSpi)";
+  labels[4] = "Scanning(Dual,SwSpi)";
+  labels[5] = "Scanning(Dual,HwSpi)";
+  labels[6] = "Scanning(DirectFast)";
+  labels[7] = "Scanning(Single,FastSwSpi)";
+  labels[8] = "Scanning(Dual,FastSwSpi)";
+  labels[9] = "Tm1637(Normal)";
+  labels[10] = "Tm1637(Fast)";
   labels[11] = "StubModule+LedDisplay";
   labels[12] = "NumberWriter+Stub";
   labels[13] = "ClockWriter+Stub";
