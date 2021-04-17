@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2018 Brian T. Park
+Copyright (c) 2021 Brian T. Park
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,44 +22,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_TESTABLE_HARDWARE_H
-#define ACE_SEGMENT_TESTABLE_HARDWARE_H
+#ifndef ACE_SEGMENT_TESTABLE_GPIO_INTERFACE_H
+#define ACE_SEGMENT_TESTABLE_GPIO_INTERFACE_H
 
 #include "EventLog.h"
 
 namespace ace_segment {
 namespace testing {
 
-class TestableHardware {
+class TestableGpioInterface {
   public:
-    explicit TestableHardware() {}
-
-    unsigned long micros() const { return mMicros; }
-
-    unsigned long millis() const { return mMillis; }
-
-    void pinMode(uint8_t pin, uint8_t mode) const {
-      mEventLog.addPinMode(pin, mode);
+    static void pinMode(uint8_t pin, uint8_t mode) {
+      sEventLog.addPinMode(pin, mode);
     }
 
-    void digitalWrite(uint8_t pin, uint8_t value) const {
-      mEventLog.addDigitalWrite(pin, value);
+    static void digitalWrite(uint8_t pin, uint8_t value) {
+      sEventLog.addDigitalWrite(pin, value);
     }
 
-    // methods to set what this object returns
-
-    void setMicros(unsigned long micros) { mMicros = micros; }
-
-    void setMillis(unsigned long millis) { mMillis = millis; }
-
   public:
-    unsigned long mMillis;
-    unsigned long mMicros;
-
-    mutable EventLog mEventLog;
+    static EventLog sEventLog;
 };
 
-} // namespace testing
-} // namespace ace_segment
+}
+}
+
 
 #endif

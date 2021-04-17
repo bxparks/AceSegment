@@ -6,7 +6,6 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-Hardware	KEYWORD1
 HwSpiAdapter	KEYWORD1
 SwSpiAdapter	KEYWORD1
 SwSpiAdapterFast	KEYWORD1
@@ -26,12 +25,6 @@ hexchar_t	KEYWORD1
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
-
-# Hardware.h
-digitalWrite	KEYWORD2
-pinMode	KEYWORD2
-micros	KEYWORD2
-millis	KEYWORD2
 
 # SwSpiAdapter.h, HwSpiAdapter.h
 begin	KEYWORD2

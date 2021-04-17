@@ -112,8 +112,8 @@ before substantional refactoring in 2021.
   flash memory.
 * Reduce flash by 300-350 bytes on AVR (~150 on SAMD, 150-500 bytes on STM32,
   ~250 bytes on ESP8266, 300-600 bytes on ESP32) by templatizing LedMatrix
-  and ScanningDisplay on `NUM_DIGITS`, `NUM_SUBFIELDS`, `Hardware` class,
-  `SwSpiAdapter` and `HwSpiAdapter`.
+  and ScanningDisplay on `NUM_DIGITS`, `NUM_SUBFIELDS`, `SwSpiAdapter` and
+  `HwSpiAdapter`.
 * Reduce flash by flattening the `LedMatrix` hierarchy into templatized
   classes, and removing virtual methods. Saves 250-300 bytes on AVR, 150-200 on
   SAMD, 150-300 on STM32, 200-300 on ESP8266, 300-1300 bytes on ESP32, 800-1300
@@ -158,12 +158,13 @@ The following shows the flash and static memory sizes of the `MemoryBenchmark`
 program that includes the resources needed to perform a
 `ScanningDisplay::renderFieldWhenReady()`. This includes:
 
-* `Hardware` (which is opimized away by the compiler)
+* `ClockInterface`, `GpioInterface` (which are opimized away by the compiler)
 * `SwSpiAdapter` or `HwSpiAdapter`
 * `LedMatrixXxx`
 * `ScanningDisplay`
 * `NumberWriter`
 * `ClockWriter`
+* `TemperatureWriter`
 * `CharWriter`
 * `StringWriter`
 

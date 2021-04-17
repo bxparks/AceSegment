@@ -32,7 +32,8 @@ SOFTWARE.
 #ifndef ACE_SEGMENT_ACE_SEGMENT_H
 #define ACE_SEGMENT_ACE_SEGMENT_H
 
-#include "ace_segment/hw/Hardware.h"
+#include "ace_segment/hw/ClockInterface.h"
+#include "ace_segment/hw/GpioInterface.h"
 #include "ace_segment/hw/SwSpiAdapter.h"
 #include "ace_segment/hw/HwSpiAdapter.h"
 #include "ace_segment/LedDisplay.h"

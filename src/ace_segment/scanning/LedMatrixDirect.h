@@ -26,6 +26,7 @@ SOFTWARE.
 #define ACE_SEGMENT_LED_MATRIX_DIRECT_H
 
 #include <Arduino.h> // OUTPUT, INPUT
+#include "../hw/GpioInterface.h"
 #include "LedMatrixBase.h"
 
 class LedMatrixDirectTest_drawElements;
@@ -36,13 +37,13 @@ namespace ace_segment {
  * An LedMatrixBase that whose group pins and element pins are wired directly to
  * the MCU.
  *
- * @tparam H class that provides access to the hardware pins
+ * @tparam GPI (optional) class that provides access to the GPIO pins, default
+ *    is GpioInterface
  */
-template<typename H>
+template<typename GPI = GpioInterface>
 class LedMatrixDirect : public LedMatrixBase {
   public:
     LedMatrixDirect(
-        const H& hardware,
         uint8_t groupOnPattern,
         uint8_t elementOnPattern,
         uint8_t numGroups,
@@ -51,7 +52,6 @@ class LedMatrixDirect : public LedMatrixBase {
         const uint8_t* elementPins
     ) :
         LedMatrixBase(groupOnPattern, elementOnPattern),
-        mHardware(hardware),
         mGroupPins(groupPins),
         mElementPins(elementPins),
         mNumGroups(numGroups),
@@ -63,16 +63,16 @@ class LedMatrixDirect : public LedMatrixBase {
       uint8_t output = (0x00 ^ mGroupXorMask) & 0x1;
       for (uint8_t group = 0; group < mNumGroups; group++) {
         uint8_t pin = mGroupPins[group];
-        mHardware.pinMode(pin, OUTPUT);
-        mHardware.digitalWrite(pin, output);
+        GPI::pinMode(pin, OUTPUT);
+        GPI::digitalWrite(pin, output);
       }
 
       // Set pins to OUTPUT mode but set LEDs to OFF.
       output = (0x00 ^ mElementXorMask) & 0x1;
       for (uint8_t element = 0; element < mNumElements; element++) {
         uint8_t elementPin = mElementPins[element];
-        mHardware.pinMode(elementPin, OUTPUT);
-        mHardware.digitalWrite(elementPin, output);
+        GPI::pinMode(elementPin, OUTPUT);
+        GPI::digitalWrite(elementPin, output);
       }
     }
 
@@ -80,13 +80,13 @@ class LedMatrixDirect : public LedMatrixBase {
       // Set pins to INPUT mode.
       for (uint8_t group = 0; group < mNumGroups; group++) {
         uint8_t pin = mGroupPins[group];
-        mHardware.pinMode(pin, INPUT);
+        GPI::pinMode(pin, INPUT);
       }
 
       // Set pins to INPUT mode.
       for (uint8_t element = 0; element < mNumElements; element++) {
         uint8_t elementPin = mElementPins[element];
-        mHardware.pinMode(elementPin, INPUT);
+        GPI::pinMode(elementPin, INPUT);
       }
     }
 
@@ -131,17 +131,16 @@ class LedMatrixDirect : public LedMatrixBase {
     /** Write bit 0 of output to the element pin. */
     void writeElementPin(uint8_t element, uint8_t output) const {
       uint8_t elementPin = mElementPins[element];
-      mHardware.digitalWrite(elementPin, (output ^ mElementXorMask) & 0x1);
+      GPI::digitalWrite(elementPin, (output ^ mElementXorMask) & 0x1);
     }
 
     /** Write bit 0 of output to group pin. */
     void writeGroupPin(uint8_t group, uint8_t output) const {
       uint8_t groupPin = mGroupPins[group];
-      mHardware.digitalWrite(groupPin, (output ^ mGroupXorMask) & 0x1);
+      GPI::digitalWrite(groupPin, (output ^ mGroupXorMask) & 0x1);
     }
 
   private:
-    const H& mHardware;
     const uint8_t* const mGroupPins;
     const uint8_t* const mElementPins;
     uint8_t const mNumGroups;

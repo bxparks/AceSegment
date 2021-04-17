@@ -209,12 +209,6 @@ Here are the classes in the library which will be most useful to the
 end-users, listed roughly from low-level to higher-level classes which often
 depend on the lower-level classes:
 
-* `Hardware`
-    * A thin class that hold hardware dependent functions (such as
-      `digitalWrite()`). The compiler optimizes away the entire object, so that
-      resulting code is as-if the underlying hardware functions were called
-      directly.
-    * Can be swapped out with `TestableHardware` for testing.
 * SpiAdapter
     * Thin-wrapper classes to indicate whether we are using software or hardware
       SPI. There are 3 implementations:
@@ -275,37 +269,34 @@ depend on the lower-level classes:
 The dependency diagram among these classes looks something like this:
 
 ```
-                StringWriter    ClockWriter  TemperatureWriter
-                     |              \           /
-                     V               v         v
-                  CharWriter         NumberWriter
-                          \            /
-                           v          v
-                            LedDisplay
-                                ^
-                                |
-                       +--------+-----------------------------+
-                       |                                      |
-                ScanningDiplay                            Tm1637Display
-                  /    |      \                               |
-            .----.     |       .----------.                   v
-           v           v                   v              Tm1637Driver
-  LedMatrixDirect     LedMatrixSingleSR   LedMatrixDualSR
-LedMatrixDirectFast    |      |        \ /    |
-              \        |      |         X     |
-               \       |      |        / \    |
-                \      |      v       v   v   v
-                 \     |   SwSpiAdapter   HwSpiAdapter
-                  \    | SwSpiAdapaterFast
-                   \   |    /
-                    v  v   v
-                    Hardware
-                       |
-                       v
-                  digitalWrite()
-                  pinMode()
-                  millis()
-                  micros()
+   StringWriter    ClockWriter  TemperatureWriter
+        |              \           /
+        V               v         v
+     CharWriter         NumberWriter
+             \            /
+              v          v
+               LedDisplay
+                   ^
+                   |
+          +--------+--------+
+          |                 |
+   ScanningDiplay       Tm1637Display
+                            |
+                            v
+                        Tm1637Driver
+
+
+                 ScanningDiplay
+                 /      |     \
+                /       |      .-------------.
+               v        v                     v
+  LedMatrixDirect   LedMatrixSingleSftRgtr LedMatrixDualShiftRegister
+LedMatrixDirectFast               \             /
+                                   \           /
+                                    v         v
+                                   SwSpiAdapter
+                                   HwSpiAdapter
+                                   SwSpiAdapterFast
 ```
 
 <a name="SettingResources"></a>
@@ -316,7 +307,6 @@ A series of resources must be built up to finally create an instance of
 objects in the later stages depending on the objects created in the earlier
 stage:
 
-1. The `Hardware` object which provides access to the various pins.
 1. The SpiAdapter object determines whether software SPI or hardware SPI is
    used. Needed only by `LedMatrixSingleShiftRegister` and
    `LedMatrixDualShiftRegister` classes.
@@ -337,18 +327,16 @@ const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 11, 12, 13, 14, 15};
 const uint16_t FRAMES_PER_SECOND = 60;
 
 // The chain of resources.
-Hardware hardware;
-using LedMatrix = LedMatrixDirect<Hardware>;
+using LedMatrix = LedMatrixDirect<>;
 LedMatrix ledMatrix(
-    hardware,
     LedMatrix::kActiveLowPattern /*groupOnPattern*/,
     LedMatrix::kActiveLowPattern /*elementOnPattern*/,
     NUM_DIGITS,
     DIGIT_PINS,
     NUM_SEGMENTS,
     SEGMENT_PINS);
-ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS> scanningDisplay(
-    hardware, ledMatrix, FRAMES_PER_SECOND);
+ScanningDisplay<LedMatrix, NUM_DIGITS> scanningDisplay(
+    ledMatrix, FRAMES_PER_SECOND);
 
 NumberWriter hexWriter(scanningDisplay);
 ClockWriter clockWriter(scanningDisplay);
@@ -470,18 +458,16 @@ const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
 const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 11, 12, 13, 14, 15};
 const uint16_t FRAMES_PER_SECOND = 60;
 
-Hardware hardware;
-using LedMatrix = LedMatrixDirect<Hardware>;
+using LedMatrix = LedMatrixDirect<>;
 LedMatrix ledMatrix(
-    hardware,
     LedMatrix::kActiveHighPattern /*groupOnPattern*/,
     LedMatrix::kActiveHighPattern /*elementOnPattern*/,
     NUM_DIGITS,
     DIGIT_PINS,
     NUM_SEGMENTS,
     SEGMENT_PINS);
-ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS> scanningDisplay(
-    hardware, ledMatrix, FRAMES_PER_SECOND);
+ScanningDisplay<LedMatrix, NUM_DIGITS> scanningDisplay(
+    ledMatrix, FRAMES_PER_SECOND);
 
 ...
 
@@ -560,18 +546,16 @@ const uint8_t CLOCK_PIN = 13; // SH_CP on 74HC595
 const uint16_t FRAMES_PER_SECOND = 60;
 
 // Common Cathode, with transistors on Group pins
-Hardware hardware;
 SwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-using LedMatrix = LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>;
+using LedMatrix = LedMatrixSingleShiftRegister<SwSpiAdapter>;
 LedMatrix ledMatrix(
-    hardware,
     spiAdapter,
     LedMatrix::kActiveHighPattern /*groupOnPattern*/,
     LedMatrix::kActiveHighPattern /*elementOnPattern*/,
     NUM_DIGITS,
     DIGIT_PINS):
-ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS> scanningDisplay(
-    hardware, ledMatrix, FRAMES_PER_SECOND);
+ScanningDisplay<LedMatrix, NUM_DIGITS> scanningDisplay(
+    ledMatrix, FRAMES_PER_SECOND);
 
 ...
 
@@ -628,13 +612,13 @@ const uint8_t CLOCK_PIN = 13; // SH_CP on 74HC595
 const uint16_t FRAMES_PER_SECOND = 60;
 
 HwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-using LedMatrix = LedMatrixSingleShiftRegister<Hardware, HwSpiAdapter>;
+using LedMatrix = LedMatrixSingleShiftRegister<HwSpiAdapter>;
 LedMatrix ledMatrix(
     spiAdapter,
     LedMatrix::kActiveHighPattern /*groupOnPattern*/,
     LedMatrix::kActiveHighPattern /*elementOnPattern*/);
-ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS> scanningDisplay(
-    hardware, ledMatrix, FRAMES_PER_SECOND);
+ScanningDisplay<LedMatrix, NUM_DIGITS> scanningDisplay(
+    ledMatrix, FRAMES_PER_SECOND);
 ...
 
 void setupScanningDisplay() {
@@ -712,13 +696,13 @@ const uint16_t FRAMES_PER_SECOND = 60;
 const uint8_t NUM_SUBFIELDS = 16;
 
 HwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-using LedMatrix = LedMatrixSingleShiftRegister<Hardware, HwSpiAdapter>;
+using LedMatrix = LedMatrixSingleShiftRegister<HwSpiAdapter>;
 LedMatrix ledMatrix(
     spiAdapter,
     LedMatrix::kActiveHighPattern /*groupOnPattern*/,
     LedMatrix::kActiveHighPattern /*elementOnPattern*/);
-ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> scanningDisplay(
-    hardware, ledMatrix, FRAMES_PER_SECOND);
+ScanningDisplay<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> scanningDisplay(
+    ledMatrix, FRAMES_PER_SECOND);
 ```
 
 Each digit is rendered 16 times within a single field, and modulated using pulse
@@ -988,16 +972,15 @@ need to include these headers manually, like this:
 Here are the sizes of the various classes on the 8-bit AVR microcontrollers
 (Arduino Uno, Nano, etc):
 
-* sizeof(Hardware): 1
 * sizeof(SwSpiAdapter): 3
 * sizeof(SwSpiAdapterFast<1,2,3>): 1
 * sizeof(HwSpiAdapter): 3
-* sizeof(LedMatrixDirect<Hardware>): 11
+* sizeof(LedMatrixDirect<>): 11
 * sizeof(LedMatrixDirectFast<0..3, 0..7>): 3
-* sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 10
+* sizeof(LedMatrixSingleShiftRegister<SwSpiAdapter>): 10
 * sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 5
 * sizeof(LedDisplay): 3
-* sizeof(ScanningDisplay<Hardware, LedMatrixBase, 4, 1>): 25
+* sizeof(ScanningDisplay<LedMatrixBase, 4, 1>): 25
 * sizeof(Tm1637Display<Tm1637Driver, 4>): 12
 * sizeof(NumberWriter): 2
 * sizeof(ClockWriter): 3

@@ -10,7 +10,7 @@
 #include <AUnitVerbose.h>
 #include <AceSegment.h>
 #include <ace_segment/testing/EventLog.h>
-#include <ace_segment/testing/TestableHardware.h>
+#include <ace_segment/testing/TestableClockInterface.h>
 #include <ace_segment/testing/TestableLedMatrix.h>
 
 using aunit::TestRunner;
@@ -23,11 +23,14 @@ const int8_t NUM_SEGMENTS = 8;
 const uint16_t FRAMES_PER_SECOND = 60;
 const int8_t NUM_SUB_FIELDS = 1;
 
-TestableHardware hardware;
 TestableLedMatrix ledMatrix;
 
-ScanningDisplay<TestableHardware, TestableLedMatrix, NUM_DIGITS, NUM_SUB_FIELDS>
-  scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
+ScanningDisplay<
+    TestableLedMatrix,
+    NUM_DIGITS,
+    NUM_SUB_FIELDS,
+    TestableClockInterface
+> scanningDisplay(ledMatrix, FRAMES_PER_SECOND);
 
 // ----------------------------------------------------------------------
 // Tests for SplitDigitDriver w/ LedMatrixDirect
@@ -37,7 +40,7 @@ class ScanningDisplayTest: public TestOnce {
   protected:
     void setup() override {
       scanningDisplay.begin();
-      hardware.mEventLog.clear();
+      TestableClockInterface::sEventLog.clear();
       ledMatrix.mEventLog.clear();
     }
 };

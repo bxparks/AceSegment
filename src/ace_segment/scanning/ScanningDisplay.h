@@ -62,22 +62,26 @@ namespace ace_segment {
  *    loop(), and an internal timing parameter will trigger a renderFieldNow()
  *    at the appropriate time.
  *
- * @tparam HW class that provides access to hardware pins and timing functions
  * @tparam LM LedMatrixBase class that provides access to LED segments
       (elements) organized by digit (group)
  * @tparam DIGITS number of LED digits
  * @tparam SUBFIELDS number of subfields for each digit to get brightness
  *    control using PWM. The default is 1, but can be set to greater than 1 to
  *    get brightness control.
+ * @tparam CI class that provides access to Arduino clock functions (millis()
+ *    and micros()). The default is ClockInterface.
  */
-template <typename HW, typename LM, uint8_t DIGITS, uint8_t SUBFIELDS = 1>
+template <
+    typename LM,
+    uint8_t DIGITS,
+    uint8_t SUBFIELDS = 1,
+    typename CI = ClockInterface>
 class ScanningDisplay : public LedDisplay {
 
   public:
     /**
      * Constructor.
      *
-     * @param hardware pointer to an instance of Hardware. Required.
      * @param ledMatrix instance of LedMatrixBase that understanding the wiring
      * @param framesPerSecond the rate at which all digits of the LED display
      *    will be refreshed
@@ -86,12 +90,10 @@ class ScanningDisplay : public LedDisplay {
      * @param brightnesses array of brightness for each digit (default: nullptr)
      */
     explicit ScanningDisplay(
-        const HW& hardware,
         const LM& ledMatrix,
         uint8_t framesPerSecond
     ):
         LedDisplay(DIGITS),
-        mHardware(hardware),
         mLedMatrix(ledMatrix),
         mFramesPerSecond(framesPerSecond)
     {}
@@ -105,7 +107,7 @@ class ScanningDisplay : public LedDisplay {
     void begin() {
       // Set up durations for the renderFieldWhenReady() polling function.
       mMicrosPerField = (uint32_t) 1000000UL / getFieldsPerSecond();
-      mLastRenderFieldMicros = mHardware.micros();
+      mLastRenderFieldMicros = CI::micros();
 
       // Initialize variables needed for multiplexing.
       mCurrentDigit = 0;
@@ -194,7 +196,7 @@ class ScanningDisplay : public LedDisplay {
      *    rendered.
      */
     bool renderFieldWhenReady() {
-      uint16_t now = mHardware.micros();
+      uint16_t now = CI::micros();
       uint16_t elapsedMicros = now - mLastRenderFieldMicros;
       if (elapsedMicros >= mMicrosPerField) {
         renderFieldNow();
@@ -280,9 +282,6 @@ class ScanningDisplay : public LedDisplay {
 
   private:
     // Ordered to save space on 32-bit processors.
-
-    /** Indirection to the digitalWrite(), micros() hardware functions. */
-    const HW& mHardware;
 
     /** LedMatrixBase instance that knows how to set and unset LED segments. */
     const LM& mLedMatrix;

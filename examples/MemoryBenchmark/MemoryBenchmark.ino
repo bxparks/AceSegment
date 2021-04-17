@@ -85,35 +85,31 @@ volatile int disableCompilerOptimization = 0;
       }
   };
 
-  Hardware hardware;
-
   #if FEATURE == FEATURE_DIRECT
     // Common Anode, with transitions on Group pins
-    using LedMatrix = LedMatrixDirect<Hardware>;
+    using LedMatrix = LedMatrixDirect<>;
     LedMatrix ledMatrix(
-        hardware,
         LedMatrix::kActiveLowPattern /*groupOnPattern*/,
         LedMatrix::kActiveLowPattern /*elementOnPattern*/,
         NUM_DIGITS,
         DIGIT_PINS,
         NUM_SEGMENTS,
         SEGMENT_PINS);
-    ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-        scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
+    ScanningDisplay<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+        scanningDisplay(ledMatrix, FRAMES_PER_SECOND);
 
   #elif FEATURE == FEATURE_SINGLE_SW_SPI
     // Common Cathode, with transistors on Group pins
     SwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-    using LedMatrix = LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>;
+    using LedMatrix = LedMatrixSingleShiftRegister<SwSpiAdapter>;
     LedMatrix ledMatrix(
-        hardware,
         spiAdapter,
         LedMatrix::kActiveHighPattern /*groupOnPattern*/,
         LedMatrix::kActiveHighPattern /*elementOnPattern*/,
         NUM_DIGITS,
         DIGIT_PINS);
-    ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-        scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
+    ScanningDisplay<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+        scanningDisplay(ledMatrix, FRAMES_PER_SECOND);
 
   #elif FEATURE == FEATURE_SINGLE_SW_SPI_FAST
     #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
@@ -123,30 +119,28 @@ volatile int disableCompilerOptimization = 0;
     // Common Cathode, with transistors on Group pins
     using SpiAdapter = SwSpiAdapterFast<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiAdapter spiAdapter;
-    using LedMatrix = LedMatrixSingleShiftRegister<Hardware, SpiAdapter>;
+    using LedMatrix = LedMatrixSingleShiftRegister<SpiAdapter>;
     LedMatrix ledMatrix(
-        hardware,
         spiAdapter,
         LedMatrix::kActiveHighPattern /*groupOnPattern*/,
         LedMatrix::kActiveHighPattern /*elementOnPattern*/,
         NUM_DIGITS,
         DIGIT_PINS);
-    ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-        scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
+    ScanningDisplay<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+        scanningDisplay(ledMatrix, FRAMES_PER_SECOND);
 
   #elif FEATURE == FEATURE_SINGLE_HW_SPI
     // Common Cathode, with transistors on Group pins
     HwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-    using LedMatrix = LedMatrixSingleShiftRegister<Hardware, HwSpiAdapter>;
+    using LedMatrix = LedMatrixSingleShiftRegister<HwSpiAdapter>;
     LedMatrix ledMatrix(
-        hardware,
         spiAdapter,
         LedMatrix::kActiveHighPattern /*groupOnPattern*/,
         LedMatrix::kActiveHighPattern /*elementOnPattern*/,
         NUM_DIGITS,
         DIGIT_PINS);
-    ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-        scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
+    ScanningDisplay<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+        scanningDisplay(ledMatrix, FRAMES_PER_SECOND);
 
   #elif FEATURE == FEATURE_DUAL_SW_SPI
     // Common Cathode, with transistors on Group pins
@@ -156,8 +150,8 @@ volatile int disableCompilerOptimization = 0;
         spiAdapter,
         LedMatrix::kActiveLowPattern /*groupOnPattern*/,
         LedMatrix::kActiveLowPattern /*elementOnPattern*/);
-    ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-        scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
+    ScanningDisplay<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+        scanningDisplay(ledMatrix, FRAMES_PER_SECOND);
 
   #elif FEATURE == FEATURE_DUAL_SW_SPI_FAST
     #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
@@ -172,8 +166,8 @@ volatile int disableCompilerOptimization = 0;
         spiAdapter,
         LedMatrix::kActiveLowPattern /*groupOnPattern*/,
         LedMatrix::kActiveLowPattern /*elementOnPattern*/);
-    ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-        scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
+    ScanningDisplay<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+        scanningDisplay(ledMatrix, FRAMES_PER_SECOND);
 
   #elif FEATURE == FEATURE_DUAL_HW_SPI
     // Common Cathode, with transistors on Group pins
@@ -183,8 +177,8 @@ volatile int disableCompilerOptimization = 0;
         spiAdapter,
         LedMatrix::kActiveLowPattern /*groupOnPattern*/,
         LedMatrix::kActiveLowPattern /*elementOnPattern*/);
-    ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-        scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
+    ScanningDisplay<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+        scanningDisplay(ledMatrix, FRAMES_PER_SECOND);
 
   #elif FEATURE == FEATURE_DIRECT_FAST
     #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
@@ -199,8 +193,8 @@ volatile int disableCompilerOptimization = 0;
     LedMatrix ledMatrix(
         LedMatrix::kActiveLowPattern /*groupOnPattern*/,
         LedMatrix::kActiveLowPattern /*elementOnPattern*/);
-    ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-        scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
+    ScanningDisplay<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+        scanningDisplay(ledMatrix, FRAMES_PER_SECOND);
 
   #elif FEATURE == FEATURE_TM1637_DISPLAY
     using Driver = Tm1637Driver;

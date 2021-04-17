@@ -2,10 +2,13 @@
 #include <AceButton.h>
 #include <AceCommon.h> // incrementMod()
 #include <AceSegment.h>
+
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 #include <digitalWriteFast.h>
 #include <ace_segment/hw/SwSpiAdapterFast.h>
 #include <ace_segment/scanning/LedMatrixDirectFast.h>
 #include <ace_segment/tm1637/Tm1637DriverFast.h>
+#endif
 
 using ace_common::incrementMod;
 
@@ -122,13 +125,10 @@ const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
 #endif
 
 // The chain of resources.
-Hardware hardware;
-
 #if LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT
   // Common Anode, with transitions on Group pins
-  using LedMatrix = LedMatrixDirect<Hardware>;
+  using LedMatrix = LedMatrixDirect<>;
   LedMatrix ledMatrix(
-      hardware,
       LedMatrix::kActiveLowPattern /*groupOnPattern*/,
       LedMatrix::kActiveLowPattern /*elementOnPattern*/,
       NUM_DIGITS,
@@ -147,9 +147,8 @@ Hardware hardware;
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_PARIAL_SW_SPI
   // Common Cathode, with transistors on Group pins
   SwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  using LedMatrix = LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>;
+  using LedMatrix = LedMatrixSingleShiftRegister<SwSpiAdapter>;
   LedMatrix ledMatrix(
-      hardware,
       spiAdapter,
       LedMatrix::kActiveHighPattern /*groupOnPattern*/,
       LedMatrix::kActiveHighPattern /*elementOnPattern*/,
@@ -159,9 +158,8 @@ Hardware hardware;
   // Common Cathode, with transistors on Group pins
   using SpiAdapter = SwSpiAdapterFast<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiAdapter spiAdapter;
-  using LedMatrix = LedMatrixSingleShiftRegister<Hardware, SpiAdapter>;
+  using LedMatrix = LedMatrixSingleShiftRegister<SpiAdapter>;
   LedMatrix ledMatrix(
-      hardware,
       spiAdapter,
       LedMatrix::kActiveHighPattern /*groupOnPattern*/,
       LedMatrix::kActiveHighPattern /*elementOnPattern*/,
@@ -170,9 +168,8 @@ Hardware hardware;
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HW_SPI
   // Common Cathode, with transistors on Group pins
   HwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  using LedMatrix = LedMatrixSingleShiftRegister<Hardware, HwSpiAdapter>;
+  using LedMatrix = LedMatrixSingleShiftRegister<HwSpiAdapter>;
   LedMatrix ledMatrix(
-      hardware,
       spiAdapter,
       LedMatrix::kActiveHighPattern /*groupOnPattern*/,
       LedMatrix::kActiveHighPattern /*elementOnPattern*/,
@@ -213,12 +210,12 @@ Hardware hardware;
 
 #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_SCANNING
   // 1-bit brightness
-  ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS> display(
-      hardware, ledMatrix, FRAMES_PER_SECOND);
+  ScanningDisplay<LedMatrix, NUM_DIGITS> display(
+      ledMatrix, FRAMES_PER_SECOND);
 
   // 16 levels of brightness, need render-fields/second of 60*4*16 = 3840.
-  ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-      scanningDisplayModulating(hardware, ledMatrix, FRAMES_PER_SECOND);
+  ScanningDisplay<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+      scanningDisplayModulating(ledMatrix, FRAMES_PER_SECOND);
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_TM1637
   using TmDriver = Tm1637Driver;
