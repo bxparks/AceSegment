@@ -96,7 +96,7 @@ before substantional refactoring in 2021.
 **v0.4**
 
 * Reduce flash size from 4.0-4.4kB by about 200-500 bytes on AVR by
-  simplifying `LedMatrix` class hierarchy by extracting out the `SpiAdapter`
+  simplifying `LedMatrix` class hierarchy by extracting out the `SpiInterface`
   class to handle both hardware and software SPI, instead of calling
   `shiftOut()` directly.
 * Reduce flash size from 3.8-4.2kB down 800-1000 bytes on AVR by
@@ -112,15 +112,15 @@ before substantional refactoring in 2021.
   flash memory.
 * Reduce flash by 300-350 bytes on AVR (~150 on SAMD, 150-500 bytes on STM32,
   ~250 bytes on ESP8266, 300-600 bytes on ESP32) by templatizing LedMatrix
-  and ScanningModule on `NUM_DIGITS`, `NUM_SUBFIELDS`, `SwSpiAdapter` and
-  `HwSpiAdapter`.
+  and ScanningModule on `NUM_DIGITS`, `NUM_SUBFIELDS`, `SwSpiInterface` and
+  `HwSpiInterface`.
 * Reduce flash by flattening the `LedMatrix` hierarchy into templatized
   classes, and removing virtual methods. Saves 250-300 bytes on AVR, 150-200 on
   SAMD, 150-300 on STM32, 200-300 on ESP8266, 300-1300 bytes on ESP32, 800-1300
   bytes on Teensy 3.2.
 * Reduce flash by 250-400 bytes on AVR by providing ability to use
   `digitalWriteFast()` (https://github.com/NicksonYap/digitalWriteFast) using
-  the `fast/LedMatrixDirectFast.h` and `fast/SwSpiAdapterFast.h` classes.
+  the `fast/LedMatrixDirectFast.h` and `fast/FastSwSpiInterface.h` classes.
 * Total flash size saved is around 2kB for AVR, from (4 to 4.4) kB to (2 to 2.5)
   kB.
 * Reduce flash size by 828 bytes on AVR, 3kB on ESP8266, 5kB on ESP32 in commit
@@ -163,7 +163,7 @@ program that includes the resources needed to perform a
 `ScanningModule::renderFieldWhenReady()`. This includes:
 
 * `ClockInterface`, `GpioInterface` (which are opimized away by the compiler)
-* `SwSpiAdapter` or `HwSpiAdapter`
+* `SwSpiInterface` or `HwSpiInterface`
 * `LedMatrixXxx`
 * `ScanningModule`
 * `NumberWriter`

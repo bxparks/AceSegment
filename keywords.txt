@@ -6,9 +6,9 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-HwSpiAdapter	KEYWORD1
-SwSpiAdapter	KEYWORD1
-SwSpiAdapterFast	KEYWORD1
+HwSpiInterface	KEYWORD1
+SwSpiInterface	KEYWORD1
+FastSwSpiInterface	KEYWORD1
 LedMatrixBase	KEYWORD1
 LedMatrixDirect	KEYWORD1
 LedMatrixDirectFast	KEYWORD1
@@ -26,7 +26,7 @@ hexchar_t	KEYWORD1
 # Methods and Functions (KEYWORD2)
 #######################################
 
-# SwSpiAdapter.h, HwSpiAdapter.h
+# SwSpiInterface.h, HwSpiInterface.h
 begin	KEYWORD2
 end	KEYWORD2
 transfer	KEYWORD2

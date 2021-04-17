@@ -22,7 +22,7 @@ ace_segment/
        /            \
       v              v
     hw/              fast/
-      Hardware.h       SwSpiAdapterFast.h
-      SwSpiAdapter.h   LedMatrixDirectFast.h
-      HwSpiAdapter.h
+      Hardware.h       FastSwSpiInterface.h
+      SwSpiInterface.h   LedMatrixDirectFast.h
+      HwSpiInterface.h
 ```

@@ -22,8 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_HW_SPI_ADAPTER_H
-#define ACE_SEGMENT_HW_SPI_ADAPTER_H
+#ifndef ACE_SEGMENT_HW_SPI_INTERFACE_H
+#define ACE_SEGMENT_HW_SPI_INTERFACE_H
 
 #include <stdint.h>
 #include <Arduino.h>
@@ -32,9 +32,9 @@ SOFTWARE.
 namespace ace_segment {
 
 /** Hardware SPI. */
-class HwSpiAdapter {
+class HwSpiInterface {
   public:
-    HwSpiAdapter(
+    HwSpiInterface(
         uint8_t latchPin,
         uint8_t dataPin,
         uint8_t clockPin

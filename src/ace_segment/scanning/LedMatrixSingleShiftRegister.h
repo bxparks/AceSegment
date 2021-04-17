@@ -44,22 +44,22 @@ namespace ace_segment {
  *   dataPin/D11/MOSI -- DS (Phillips) / SER (TI) / Pin 14
  *   clockPin/D13/SCK -- SH_CP (Phillips) / SRCK (TI) / Pin 11 (rising)
  *
- * @tparam SA class that provides SPI, either SwSpiAdapter or HwSpiAdapter
- * @tparam GPIOI (optional) class that provides access to GPIO functions,
- *    default GpioInterface (note: 'GPIOI' is already taken on ESP8266)
+ * @tparam SPII interface to SPI, either SwSpiInterface or HwSpiInterface
+ * @tparam GPIOI (optional) interface to GPIO functions,
+ *    default GpioInterface (note: 'GPI' is already taken on ESP8266)
  */
-template<typename SA, typename GPIOI = GpioInterface>
+template<typename SPII, typename GPIOI = GpioInterface>
 class LedMatrixSingleShiftRegister : public LedMatrixBase {
   public:
     LedMatrixSingleShiftRegister(
-        const SA& spiAdapter,
+        const SPII& spiInterface,
         uint8_t groupOnPattern,
         uint8_t elementOnPattern,
         uint8_t numGroups,
         const uint8_t* groupPins
     ) :
         LedMatrixBase(groupOnPattern, elementOnPattern),
-        mSpiAdapter(spiAdapter),
+        mSpiInterface(spiInterface),
         mGroupPins(groupPins),
         mNumGroups(numGroups)
     {}
@@ -115,7 +115,7 @@ class LedMatrixSingleShiftRegister : public LedMatrixBase {
     /** Send the pattern to the element pins. */
     void drawElements(uint8_t pattern) const {
       uint8_t actualPattern = pattern ^ mElementXorMask;
-      mSpiAdapter.transfer(actualPattern);
+      mSpiInterface.transfer(actualPattern);
     }
 
     /** Write bit 0 of output to group pin. */
@@ -125,7 +125,7 @@ class LedMatrixSingleShiftRegister : public LedMatrixBase {
     }
 
   private:
-    const SA& mSpiAdapter;
+    const SPII& mSpiInterface;
     const uint8_t* const mGroupPins;
     uint8_t const mNumGroups;
 

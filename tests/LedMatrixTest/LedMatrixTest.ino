@@ -11,7 +11,7 @@
 #include <AceSegment.h>
 #include <ace_segment/testing/TestableClockInterface.h>
 #include <ace_segment/testing/TestableGpioInterface.h>
-#include <ace_segment/testing/TestableSpiAdapter.h>
+#include <ace_segment/testing/TestableSpiInterface.h>
 
 using aunit::TestRunner;
 using aunit::TestOnce;
@@ -33,18 +33,18 @@ LedMatrixDirect<TestableGpioInterface> ledMatrixDirect(
     SEGMENT_PINS);
 
 // Common Cathode, with transistors on Group pins
-TestableSpiAdapter spiAdapter;
-LedMatrixSingleShiftRegister<TestableSpiAdapter, TestableGpioInterface>
+TestableSpiInterface spiInterface;
+LedMatrixSingleShiftRegister<TestableSpiInterface, TestableGpioInterface>
   ledMatrixSingleShiftRegister(
-    spiAdapter,
+    spiInterface,
     LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
     LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
     NUM_DIGITS,
     DIGIT_PINS);
 
 // Common Cathode, with transistors on Group pins
-LedMatrixDualShiftRegister<TestableSpiAdapter> ledMatrixDualShiftRegister(
-    spiAdapter,
+LedMatrixDualShiftRegister<TestableSpiInterface> ledMatrixDualShiftRegister(
+    spiInterface,
     LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
     LedMatrixBase::kActiveHighPattern /*elementOnPattern*/);
 
@@ -193,8 +193,8 @@ testF(LedMatrixSingleShiftRegisterTest, disableGroup) {
 
 testF(LedMatrixSingleShiftRegisterTest, drawElements) {
   ledMatrixSingleShiftRegister.drawElements(0x55);
-  assertEqual(1, spiAdapter.mEventLog.getNumRecords());
-  assertTrue(spiAdapter.mEventLog.assertEvents(1,
+  assertEqual(1, spiInterface.mEventLog.getNumRecords());
+  assertTrue(spiInterface.mEventLog.assertEvents(1,
       (int) EventType::kSpiTransfer, 0x55
   ));
 }
@@ -207,36 +207,36 @@ class LedMatrixDualShiftRegisterTest : public TestOnce {
   protected:
     void setup() override {
       ledMatrixDualShiftRegister.begin();
-      spiAdapter.mEventLog.clear();
+      spiInterface.mEventLog.clear();
     }
 };
 
 testF(LedMatrixDualShiftRegisterTest, begin) {
   ledMatrixDualShiftRegister.begin();
-  assertEqual(0, spiAdapter.mEventLog.getNumRecords());
+  assertEqual(0, spiInterface.mEventLog.getNumRecords());
 }
 
 testF(LedMatrixDualShiftRegisterTest, end) {
   ledMatrixDualShiftRegister.end();
-  assertEqual(0, spiAdapter.mEventLog.getNumRecords());
+  assertEqual(0, spiInterface.mEventLog.getNumRecords());
 }
 
 testF(LedMatrixDualShiftRegisterTest, enableGroup) {
   ledMatrixDualShiftRegister.mPrevElementPattern = 0x42;
   ledMatrixDualShiftRegister.enableGroup(1);
 
-  assertEqual(1, spiAdapter.mEventLog.getNumRecords());
+  assertEqual(1, spiInterface.mEventLog.getNumRecords());
   uint16_t expectedOutput = ((0x1 << 1) << 8) | 0x42;
-  assertTrue(spiAdapter.mEventLog.assertEvents(1,
+  assertTrue(spiInterface.mEventLog.assertEvents(1,
       (int) EventType::kSpiTransfer16, expectedOutput));
 }
 
 testF(LedMatrixDualShiftRegisterTest, disableGroup) {
   ledMatrixDualShiftRegister.disableGroup(2);
 
-  assertEqual(1, spiAdapter.mEventLog.getNumRecords());
+  assertEqual(1, spiInterface.mEventLog.getNumRecords());
   uint16_t expectedOutput = 0x0000;
-  assertTrue(spiAdapter.mEventLog.assertEvents(1,
+  assertTrue(spiInterface.mEventLog.assertEvents(1,
       (int) EventType::kSpiTransfer16, expectedOutput));
 }
 
@@ -244,8 +244,8 @@ testF(LedMatrixDualShiftRegisterTest, draw) {
   ledMatrixDualShiftRegister.draw(3, 0x55);
 
   uint16_t expectedOutput = ((0x1 << 3) << 8) | 0x55;
-  assertEqual(1, spiAdapter.mEventLog.getNumRecords());
-  assertTrue(spiAdapter.mEventLog.assertEvents(1,
+  assertEqual(1, spiInterface.mEventLog.getNumRecords());
+  assertTrue(spiInterface.mEventLog.assertEvents(1,
     (int) EventType::kSpiTransfer16, expectedOutput
   ));
 }

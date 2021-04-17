@@ -6,7 +6,7 @@
 namespace ace_segment {
 namespace testing {
 
-class TestableSpiAdapter {
+class TestableSpiInterface {
   public:
     void begin() const {
       mEventLog.addSpiBegin();

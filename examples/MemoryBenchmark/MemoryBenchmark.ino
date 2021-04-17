@@ -42,7 +42,7 @@ volatile int disableCompilerOptimization = 0;
   #include <AceSegment.h>
   #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
     #include <digitalWriteFast.h>
-    #include <ace_segment/hw/SwSpiAdapterFast.h>
+    #include <ace_segment/hw/FastSwSpiInterface.h>
     #include <ace_segment/scanning/LedMatrixDirectFast.h>
     #include <ace_segment/tm1637/Tm1637DriverFast.h>
   #endif
@@ -100,10 +100,10 @@ volatile int disableCompilerOptimization = 0;
 
   #elif FEATURE == FEATURE_SINGLE_SW_SPI
     // Common Cathode, with transistors on Group pins
-    SwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-    using LedMatrix = LedMatrixSingleShiftRegister<SwSpiAdapter>;
+    SwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    using LedMatrix = LedMatrixSingleShiftRegister<SwSpiInterface>;
     LedMatrix ledMatrix(
-        spiAdapter,
+        spiInterface,
         LedMatrix::kActiveHighPattern /*groupOnPattern*/,
         LedMatrix::kActiveHighPattern /*elementOnPattern*/,
         NUM_DIGITS,
@@ -117,11 +117,11 @@ volatile int disableCompilerOptimization = 0;
     #endif
 
     // Common Cathode, with transistors on Group pins
-    using SpiAdapter = SwSpiAdapterFast<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
-    SpiAdapter spiAdapter;
-    using LedMatrix = LedMatrixSingleShiftRegister<SpiAdapter>;
+    using SpiInterface = FastSwSpiInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    SpiInterface spiInterface;
+    using LedMatrix = LedMatrixSingleShiftRegister<SpiInterface>;
     LedMatrix ledMatrix(
-        spiAdapter,
+        spiInterface,
         LedMatrix::kActiveHighPattern /*groupOnPattern*/,
         LedMatrix::kActiveHighPattern /*elementOnPattern*/,
         NUM_DIGITS,
@@ -131,10 +131,10 @@ volatile int disableCompilerOptimization = 0;
 
   #elif FEATURE == FEATURE_SINGLE_HW_SPI
     // Common Cathode, with transistors on Group pins
-    HwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-    using LedMatrix = LedMatrixSingleShiftRegister<HwSpiAdapter>;
+    HwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    using LedMatrix = LedMatrixSingleShiftRegister<HwSpiInterface>;
     LedMatrix ledMatrix(
-        spiAdapter,
+        spiInterface,
         LedMatrix::kActiveHighPattern /*groupOnPattern*/,
         LedMatrix::kActiveHighPattern /*elementOnPattern*/,
         NUM_DIGITS,
@@ -144,10 +144,10 @@ volatile int disableCompilerOptimization = 0;
 
   #elif FEATURE == FEATURE_DUAL_SW_SPI
     // Common Cathode, with transistors on Group pins
-    SwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-    using LedMatrix = LedMatrixDualShiftRegister<SwSpiAdapter>;
+    SwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    using LedMatrix = LedMatrixDualShiftRegister<SwSpiInterface>;
     LedMatrix ledMatrix(
-        spiAdapter,
+        spiInterface,
         LedMatrix::kActiveLowPattern /*groupOnPattern*/,
         LedMatrix::kActiveLowPattern /*elementOnPattern*/);
     ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
@@ -159,11 +159,11 @@ volatile int disableCompilerOptimization = 0;
     #endif
 
     // Common Cathode, with transistors on Group pins
-    using SpiAdapter = SwSpiAdapterFast<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
-    SpiAdapter spiAdapter;
-    using LedMatrix = LedMatrixDualShiftRegister<SpiAdapter>;
+    using SpiInterface = FastSwSpiInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    SpiInterface spiInterface;
+    using LedMatrix = LedMatrixDualShiftRegister<SpiInterface>;
     LedMatrix ledMatrix(
-        spiAdapter,
+        spiInterface,
         LedMatrix::kActiveLowPattern /*groupOnPattern*/,
         LedMatrix::kActiveLowPattern /*elementOnPattern*/);
     ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
@@ -171,10 +171,10 @@ volatile int disableCompilerOptimization = 0;
 
   #elif FEATURE == FEATURE_DUAL_HW_SPI
     // Common Cathode, with transistors on Group pins
-    HwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-    using LedMatrix = LedMatrixDualShiftRegister<HwSpiAdapter>;
+    HwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    using LedMatrix = LedMatrixDualShiftRegister<HwSpiInterface>;
     LedMatrix ledMatrix(
-        spiAdapter,
+        spiInterface,
         LedMatrix::kActiveLowPattern /*groupOnPattern*/,
         LedMatrix::kActiveLowPattern /*elementOnPattern*/);
     ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
@@ -263,32 +263,32 @@ void setup() {
   scanningModule.begin();
 
 #elif FEATURE == FEATURE_SINGLE_SW_SPI
-  spiAdapter.begin();
+  spiInterface.begin();
   ledMatrix.begin();
   scanningModule.begin();
 
 #elif FEATURE == FEATURE_SINGLE_SW_SPI_FAST
-  spiAdapter.begin();
+  spiInterface.begin();
   ledMatrix.begin();
   scanningModule.begin();
 
 #elif FEATURE == FEATURE_SINGLE_HW_SPI
-  spiAdapter.begin();
+  spiInterface.begin();
   ledMatrix.begin();
   scanningModule.begin();
 
 #elif FEATURE == FEATURE_DUAL_SW_SPI
-  spiAdapter.begin();
+  spiInterface.begin();
   ledMatrix.begin();
   scanningModule.begin();
 
 #elif FEATURE == FEATURE_DUAL_SW_SPI_FAST
-  spiAdapter.begin();
+  spiInterface.begin();
   ledMatrix.begin();
   scanningModule.begin();
 
 #elif FEATURE == FEATURE_DUAL_HW_SPI
-  spiAdapter.begin();
+  spiInterface.begin();
   ledMatrix.begin();
   scanningModule.begin();
 
