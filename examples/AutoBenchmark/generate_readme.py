@@ -141,8 +141,8 @@ On AVR processors, the "fast" options are available using the
 `digitalWriteFast()` functions can be up to 50X faster if the `pin` number and
 `value` parameters are compile-time constants.
 
-The `digitalWriteFast` library is useful to create the `Tm1637DriverFast` class,
-because it consumes 600-700 fewer bytes of flash memory.
+The `digitalWriteFast` library is useful to create the `FastSwWireInterface`
+class, because it consumes 600-700 fewer bytes of flash memory.
 
 ### Arduino Nano
 

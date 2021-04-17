@@ -22,8 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_TM1637_DRIVER_H
-#define ACE_SEGMENT_TM1637_DRIVER_H
+#ifndef ACE_SEGMENT_SW_WIRE_INTERFACE_H
+#define ACE_SEGMENT_SW_WIRE_INTERFACE_H
 
 #include <Arduino.h>
 
@@ -61,9 +61,9 @@ namespace ace_segment {
  *
  * This class is stateless. It is thread-safe.
  */
-class Tm1637Driver {
+class SwWireInterface {
   public:
-    explicit Tm1637Driver(
+    explicit SwWireInterface(
         uint8_t clockPin,
         uint8_t dioPin,
         uint16_t delayMicros

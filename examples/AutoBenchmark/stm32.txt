@@ -6,7 +6,7 @@ sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 16
 sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 12
 sizeof(LedDisplay): 4
 sizeof(ScanningModule<LedMatrixBase, 4, 1>): 32
-sizeof(Tm1637Module<Tm1637Driver, 4>): 24
+sizeof(Tm1637Module<SwWireInterface, 4>): 24
 sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
 sizeof(CharWriter): 4

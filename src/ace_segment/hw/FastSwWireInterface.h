@@ -22,8 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_TM1637_DRIVER_FAST_H
-#define ACE_SEGMENT_TM1637_DRIVER_FAST_H
+#ifndef ACE_SEGMENT_FAST_SW_WIRE_INTERFACE_H
+#define ACE_SEGMENT_FAST_SW_WIRE_INTERFACE_H
 
 // This header file requires the digitalWriteFast library on AVR, or the
 // EpoxyMockDigitalWriteFast library on EpoxyDuino.
@@ -35,30 +35,31 @@ SOFTWARE.
 namespace ace_segment {
 
 /**
- * Exactly the same as Tm1637Driver except that this uses the `digitalWriteFast`
- * library on AVR processors. Normally, the digitalWriteFast library is used to
- * get faster speeds over `digitalWrite()` and `pinMode()` functions. But speed
- * of the `digitalWrite()` functions is not the limiting factor in this library
- * because every bit flip is followed by a `delayMicroseconds()` which is far
- * longer than the CPU cycle savings from `digitalWritFast()`.
+ * Exactly the same as SwWireInterface except that this uses the
+ * `digitalWriteFast` library on AVR processors. Normally, the digitalWriteFast
+ * library is used to get faster speeds over `digitalWrite()` and `pinMode()`
+ * functions. But speed of the `digitalWrite()` functions is not the limiting
+ * factor in this library because every bit flip is followed by a
+ * `delayMicroseconds()` which is far longer than the CPU cycle savings from
+ * `digitalWritFast()`.
  *
  * The reason that you may want to use `digitalWriteFast` library is because it
  * consumes far less flash memory than normal `digitalWrite()`. The benchmarks
- * in MemoryBenchmark shows that using this `Tm1637DriverFast` instead of
- * `Tm1637Driver` saves 650-770 bytes of flash on an AVR processor.
+ * in MemoryBenchmark shows that using this `FastSwWireInterface` instead of
+ * `SwWireInterface` saves 650-770 bytes of flash on an AVR processor.
  *
- * Word of caution though, there is a use-case where you may want to still use
- * the normal `Tm1637Driver`. If your application uses more than one TM1637 LED
- * Module, you will need to create multiple instances of the `Tm1637Display`.
- * But note that the pin numbers of this class must be a compile-time constants,
- * so different pins means that a different template class is generated. Since
- * `Tm1637Display` class takes a `Tm1637DriverFast` as a template argument, each
- * LED Module generate a new template instance of the `Tm1637Display` class.
+ * Word of caution: There is a use-case where you may want to still use the
+ * normal `SwWireInterface`. If your application uses more than one TM1637 LED
+ * Module, you will need to create multiple instances of the `Tm1637Module`. But
+ * the pin numbers of this class must be a compile-time constants, so different
+ * pins means that a different template class is generated. Since the
+ * `Tm1637Module` class takes a `FastSwWireInterface` as a template argument,
+ * each LED Module generate a new template instance of the `Tm1637Module` class.
  *
- * In the case of multiple LED modules, it may actually be more efficient to use
- * the non-fast `Tm1637Driver`, because you will generate only a single template
- * instantiation. There will be multiple instances of that class, but only a
- * single class.
+ * When there are more than some number of TM1636 LED modules, it may actually
+ * be more efficient to use the non-fast `SwWireInterface`, because you will
+ * generate only a single template instantiation. I have not currently done any
+ * experimentation to see where the break-even point would be.
  *
  * This class is stateless. It is thread-safe.
  */
@@ -67,9 +68,9 @@ template <
     uint8_t DIO_PIN,
     uint16_t DELAY_MICROS
 >
-class Tm1637DriverFast {
+class FastSwWireInterface {
   public:
-    explicit Tm1637DriverFast() = default;
+    explicit FastSwWireInterface() = default;
 
     /** Initialize the GPIO pins. */
     void begin() const {

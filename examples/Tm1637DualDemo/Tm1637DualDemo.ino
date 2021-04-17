@@ -34,7 +34,7 @@ const uint8_t DIO2_PIN = 8;
   #error Unknown AUNITER environment
 #endif
 
-// For a Tm1637Driver (non-fast), time to send 4 digits using flush():
+// For a SwWireInterface (non-fast), time to send 4 digits using flush():
 //
 // * 12 ms at 50 us delay, but does not work.
 // * 17 ms at 75 us delay.
@@ -44,11 +44,11 @@ const uint8_t DIO2_PIN = 8;
 // Using flushIncremental() is about 1/2 these numbers.
 constexpr uint16_t BIT_DELAY = 100;
 
-using Driver = Tm1637Driver;
-Driver driver1(CLK_PIN, DIO1_PIN, BIT_DELAY);
-Driver driver2(CLK_PIN, DIO2_PIN, BIT_DELAY);
-Tm1637Module<Driver, NUM_DIGITS> module1(driver1);
-Tm1637Module<Driver, NUM_DIGITS> module2(driver2);
+using WireInterface = SwWireInterface;
+WireInterface wireInterface1(CLK_PIN, DIO1_PIN, BIT_DELAY);
+WireInterface wireInterface2(CLK_PIN, DIO2_PIN, BIT_DELAY);
+Tm1637Module<WireInterface, NUM_DIGITS> module1(wireInterface1);
+Tm1637Module<WireInterface, NUM_DIGITS> module2(wireInterface2);
 LedDisplay display1(module1);
 LedDisplay display2(module2);
 
@@ -65,8 +65,8 @@ void setup() {
   while (!Serial);
 #endif
 
-  driver1.begin();
-  driver2.begin();
+  wireInterface1.begin();
+  wireInterface2.begin();
   module1.begin();
   module2.begin();
 }

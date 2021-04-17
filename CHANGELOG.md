@@ -74,8 +74,8 @@
         * Since these classes depend on an external library, the headers must be
           manually included:
             * `#include <ace_segment/hw/FastSwSpiInterface.h>`
+            * `#include <ace_segment/hw/FastSwWireInterface.h>`
             * `#include <ace_segment/scanning/LedMatrixDirectFast.h>`
-            * `#include <ace_segment/tm1637/Tm1637DriverFast.h>`
     * Resource consumption
         * Reduce flash consumption on AVR by 70-80%, from 4-4.3 kB down
           to 700-1200 bytes.

@@ -44,7 +44,7 @@ volatile int disableCompilerOptimization = 0;
     #include <digitalWriteFast.h>
     #include <ace_segment/hw/FastSwSpiInterface.h>
     #include <ace_segment/scanning/LedMatrixDirectFast.h>
-    #include <ace_segment/tm1637/Tm1637DriverFast.h>
+    #include <ace_segment/tm1637/FastSwWireInterface.h>
   #endif
   using namespace ace_segment;
 
@@ -197,18 +197,18 @@ volatile int disableCompilerOptimization = 0;
         scanningModule(ledMatrix, FRAMES_PER_SECOND);
 
   #elif FEATURE == FEATURE_TM1637_MODULE
-    using Driver = Tm1637Driver;
-    Driver driver(CLK_PIN, DIO_PIN, BIT_DELAY);
-    Tm1637Module<Driver, NUM_DIGITS> tm1637Module(driver);
+    using WireInterface = SwWireInterface;
+    WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
+    Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module(wireInterface);
 
   #elif FEATURE == FEATURE_TM1637_MODULE_FAST
     #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
       #error Unsupported FEATURE on this platform
     #endif
 
-    using Driver = Tm1637DriverFast<CLK_PIN, DIO_PIN, BIT_DELAY>;
-    Driver driver;
-    Tm1637Module<Driver, NUM_DIGITS> tm1637Module(driver);
+    using WireInterface = FastSwWireInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
+    WireInterface wireInterface;
+    Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module(wireInterface);
 
   #elif FEATURE == FEATURE_STUB_MODULE
     StubModule stubModule;
@@ -293,11 +293,11 @@ void setup() {
   scanningModule.begin();
 
 #elif FEATURE == FEATURE_TM1637_MODULE
-  driver.begin();
+  wireInterface.begin();
   tm1637Module.begin();
 
 #elif FEATURE == FEATURE_TM1637_MODULE_FAST
-  driver.begin();
+  wireInterface.begin();
   tm1637Module.begin();
 
 #else

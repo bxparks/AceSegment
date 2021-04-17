@@ -13,14 +13,14 @@ using ace_common::TimingStats;
 using namespace ace_segment;
 
 // Select driver version, either normal digitalWrite() or digitalWriteFast()
-#define TM16137_DRIVER_TYPE_NORMAL 0
-#define TM16137_DRIVER_TYPE_FAST 1
-#define TM16137_DRIVER_TYPE TM16137_DRIVER_TYPE_FAST
+#define TM16137_WIRE_INTERFACE_TYPE_NORMAL 0
+#define TM16137_WIRE_INTERFACE_TYPE_FAST 1
+#define TM16137_WIRE_INTERFACE_TYPE TM16137_WIRE_INTERFACE_TYPE_FAST
 
-#if TM16137_DRIVER_TYPE == TM16137_DRIVER_TYPE_FAST
+#if TM16137_WIRE_INTERFACE_TYPE == TM16137_WIRE_INTERFACE_TYPE_FAST
   #include <digitalWriteFast.h>
-  #include <ace_segment/tm1637/Tm1637DriverFast.h> // Tm1637DriverFast
-  using ace_segment::Tm1637DriverFast;
+  #include <ace_segment/hw/FastSwWireInterface.h> // FastSwWireInterface
+  using ace_segment::FastSwWireInterface;
 #endif
 
 //#if ! defined(AUNITER_LED_CLOCK_TM1637)
@@ -52,21 +52,21 @@ const uint8_t DIO_PIN = 9;
   #error Unknown AUNITER environment
 #endif
 
-// For a Tm1637Driver (non-fast), time to send 4 digits:
+// For a SwWireInterface (non-fast), time to send 4 digits:
 // * 12 ms at 50 us delay, but does not work.
 // * 17 ms at 75 us delay.
 // * 22 ms at 100 us delay.
 // * 43 ms at 200 us delay.
 constexpr uint16_t BIT_DELAY = 100;
 
-#if TM16137_DRIVER_TYPE == TM16137_DRIVER_TYPE_NORMAL
-  using Driver = Tm1637Driver;
-  Driver driver(CLK_PIN, DIO_PIN, BIT_DELAY);
-#elif TM16137_DRIVER_TYPE == TM16137_DRIVER_TYPE_FAST
-  using Driver = Tm1637DriverFast<CLK_PIN, DIO_PIN, BIT_DELAY>;
-  Driver driver;
+#if TM16137_WIRE_INTERFACE_TYPE == TM16137_WIRE_INTERFACE_TYPE_NORMAL
+  using WireInterface = SwWireInterface;
+  WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
+#elif TM16137_WIRE_INTERFACE_TYPE == TM16137_WIRE_INTERFACE_TYPE_FAST
+  using WireInterface = FastSwWireInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
+  WireInterface wireInterface;
 #else
-  #error Unknown TM16137_DRIVER_TYPE
+  #error Unknown TM16137_WIRE_INTERFACE_TYPE
 #endif
 
 #if defined(AUNITER_LED_CLOCK_TM1637) || defined(EPOXY_DUINO)
@@ -75,7 +75,7 @@ constexpr uint16_t BIT_DELAY = 100;
   const uint8_t* const remapArray = ace_segment::kSixDigitRemapArray;
 #endif
 
-Tm1637Module<Driver, NUM_DIGITS> tm1637Module(driver, remapArray);
+Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module(wireInterface, remapArray);
 LedDisplay display(tm1637Module);
 
 TimingStats stats;
@@ -90,7 +90,7 @@ void setup() {
   while (!Serial);
 #endif
 
-  driver.begin();
+  wireInterface.begin();
   tm1637Module.begin();
 }
 

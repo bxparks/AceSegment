@@ -59,26 +59,31 @@ static const uint8_t kSixDigitRemapArray[6] = {
 
 /**
  * An implementation of seven-segment LedModule using the TM1637 chip.
+ * The chip communicates using a protocol that is electrically similar to I2C,
+ * but does not use a 7-8 bit address. We can use a software-based I2C
+ * interface.
  *
- * @tparam DRIVER driver class, either Tm1637Driver or Tm1637DriverFast
+ * @tparam WI wire protocol interface, either SwWireInterface or
+ *    FastSwWireInterface
  * @tparam DIGITS number of digits in the LED module (usually 4 or 6)
  */
-template <typename DRIVER, uint8_t DIGITS>
+template <typename WI, uint8_t DIGITS>
 class Tm1637Module : public LedModule {
   public:
 
     /**
      * Constructor.
-     * @param driver instance of either Tm1637Driver or Tm1637DriverFast
+     * @param wireInterface instance of either SwWireInterface or
+     *    FastSwWireInterface
      * @param remapArray (optional) some (most?) six-digit LED modules using the
      *      TM1637 chip need remapping of the digit addresses
      */
     explicit Tm1637Module(
-        const DRIVER& driver,
+        const WI& wireInterface,
         const uint8_t* remapArray = nullptr
     ) :
         LedModule(DIGITS),
-        mDriver(driver),
+        mWireInterface(wireInterface),
         mRemapArray(remapArray)
     {}
 
@@ -87,7 +92,7 @@ class Tm1637Module : public LedModule {
     //-----------------------------------------------------------------------
 
     /**
-     * Initialize the module. The Tm1637Driver object must be initialized
+     * Initialize the module. The SwWireInterface object must be initialized
      * separately.
      *
      * @param remapArray optional array of positions to handle LED modules whose
@@ -155,21 +160,21 @@ class Tm1637Module : public LedModule {
      */
     void flush() {
       // Update the brightness first
-      mDriver.startCondition();
-      mDriver.sendByte(mBrightness);
-      mDriver.stopCondition();
+      mWireInterface.startCondition();
+      mWireInterface.sendByte(mBrightness);
+      mWireInterface.stopCondition();
 
       // Update the digits.
-      mDriver.startCondition();
-      mDriver.sendByte(kDataCmdAutoAddress);
-      mDriver.stopCondition();
+      mWireInterface.startCondition();
+      mWireInterface.sendByte(kDataCmdAutoAddress);
+      mWireInterface.stopCondition();
 
-      mDriver.startCondition();
-      mDriver.sendByte(kAddressCmd);
+      mWireInterface.startCondition();
+      mWireInterface.sendByte(kAddressCmd);
       for (uint8_t i = 0; i < DIGITS; ++i) {
-        mDriver.sendByte(mPatterns[i]);
+        mWireInterface.sendByte(mPatterns[i]);
       }
-      mDriver.stopCondition();
+      mWireInterface.stopCondition();
 
       mIsDirty = 0x0;
     }
@@ -204,19 +209,19 @@ class Tm1637Module : public LedModule {
       if (isDirtyBit(mFlushStage)) {
         if (mFlushStage == DIGITS) {
           // Check for brightness change.
-          mDriver.startCondition();
-          mDriver.sendByte(mBrightness);
-          mDriver.stopCondition();
+          mWireInterface.startCondition();
+          mWireInterface.sendByte(mBrightness);
+          mWireInterface.stopCondition();
         } else {
           // Check for changed digits.
-          mDriver.startCondition();
-          mDriver.sendByte(kDataCmdFixedAddress);
-          mDriver.stopCondition();
+          mWireInterface.startCondition();
+          mWireInterface.sendByte(kDataCmdFixedAddress);
+          mWireInterface.stopCondition();
 
-          mDriver.startCondition();
-          mDriver.sendByte(kAddressCmd | mFlushStage);
-          mDriver.sendByte(mPatterns[mFlushStage]);
-          mDriver.stopCondition();
+          mWireInterface.startCondition();
+          mWireInterface.sendByte(kAddressCmd | mFlushStage);
+          mWireInterface.sendByte(mPatterns[mFlushStage]);
+          mWireInterface.stopCondition();
         }
         clearDirtyBit(mFlushStage);
       }
@@ -257,7 +262,7 @@ class Tm1637Module : public LedModule {
 
     // The ordering of these fields is partially determined to save memory on
     // 32-bit processors.
-    const DRIVER& mDriver;
+    const WI& mWireInterface;
     const uint8_t* const mRemapArray;
     uint8_t mPatterns[DIGITS]; // maps to dirty bits 0-5
     uint8_t mBrightness; // maps to dirty bit 7

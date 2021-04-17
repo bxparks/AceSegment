@@ -116,8 +116,8 @@ On AVR processors, the "fast" options are available using the
 `digitalWriteFast()` functions can be up to 50X faster if the `pin` number and
 `value` parameters are compile-time constants.
 
-The `digitalWriteFast` library is useful to create the `Tm1637DriverFast` class,
-because it consumes 600-700 fewer bytes of flash memory.
+The `digitalWriteFast` library is useful to create the `FastSwWireInterface`
+class, because it consumes 600-700 fewer bytes of flash memory.
 
 ### Arduino Nano
 
@@ -137,7 +137,7 @@ sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 8
 sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 5
 sizeof(LedDisplay): 2
 sizeof(ScanningModule<LedMatrixBase, 4, 1>): 22
-sizeof(Tm1637Module<Tm1637Driver, 4>): 14
+sizeof(Tm1637Module<SwWireInterface, 4>): 14
 sizeof(NumberWriter): 2
 sizeof(ClockWriter): 3
 sizeof(CharWriter): 2
@@ -188,7 +188,7 @@ sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 8
 sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 5
 sizeof(LedDisplay): 2
 sizeof(ScanningModule<LedMatrixBase, 4, 1>): 22
-sizeof(Tm1637Module<Tm1637Driver, 4>): 14
+sizeof(Tm1637Module<SwWireInterface, 4>): 14
 sizeof(NumberWriter): 2
 sizeof(ClockWriter): 3
 sizeof(CharWriter): 2
@@ -236,7 +236,7 @@ sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 16
 sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 12
 sizeof(LedDisplay): 4
 sizeof(ScanningModule<LedMatrixBase, 4, 1>): 32
-sizeof(Tm1637Module<Tm1637Driver, 4>): 24
+sizeof(Tm1637Module<SwWireInterface, 4>): 24
 sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
 sizeof(CharWriter): 4
@@ -277,7 +277,7 @@ sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 16
 sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 12
 sizeof(LedDisplay): 4
 sizeof(ScanningModule<LedMatrixBase, 4, 1>): 32
-sizeof(Tm1637Module<Tm1637Driver, 4>): 24
+sizeof(Tm1637Module<SwWireInterface, 4>): 24
 sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
 sizeof(CharWriter): 4
@@ -318,7 +318,7 @@ sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 16
 sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 12
 sizeof(LedDisplay): 4
 sizeof(ScanningModule<LedMatrixBase, 4, 1>): 32
-sizeof(Tm1637Module<Tm1637Driver, 4>): 24
+sizeof(Tm1637Module<SwWireInterface, 4>): 24
 sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
 sizeof(CharWriter): 4
@@ -359,7 +359,7 @@ sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 16
 sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 12
 sizeof(LedDisplay): 4
 sizeof(ScanningModule<LedMatrixBase, 4, 1>): 32
-sizeof(Tm1637Module<Tm1637Driver, 4>): 24
+sizeof(Tm1637Module<SwWireInterface, 4>): 24
 sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
 sizeof(CharWriter): 4
@@ -401,7 +401,7 @@ sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 16
 sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 12
 sizeof(LedDisplay): 4
 sizeof(ScanningModule<LedMatrixBase, 4, 1>): 32
-sizeof(Tm1637Module<Tm1637Driver, 4>): 24
+sizeof(Tm1637Module<SwWireInterface, 4>): 24
 sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
 sizeof(CharWriter): 4

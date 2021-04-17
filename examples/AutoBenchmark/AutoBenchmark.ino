@@ -44,8 +44,8 @@ SOFTWARE.
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 #include <digitalWriteFast.h>
 #include <ace_segment/hw/FastSwSpiInterface.h>
+#include <ace_segment/hw/FastSwWireInterface.h>
 #include <ace_segment/scanning/LedMatrixDirectFast.h>
-#include <ace_segment/tm1637/Tm1637DriverFast.h>
 #endif
 
 using namespace ace_segment;
@@ -439,29 +439,29 @@ void runTm1637Benchmark(const char* name, LM& ledModule) {
 
 // Tm1637Module(Normal)
 void runTm1637DisplayNormal() {
-  using Driver = Tm1637Driver;
-  Driver driver(CLK_PIN, DIO_PIN, BIT_DELAY);
-  Tm1637Module<Driver, NUM_DIGITS> tm1637Module(driver);
+  using WireInterface = SwWireInterface;
+  WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
+  Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module(wireInterface);
 
-  driver.begin();
+  wireInterface.begin();
   tm1637Module.begin();
   runTm1637Benchmark("Tm1637(Normal)", tm1637Module);
   tm1637Module.end();
-  driver.end();
+  wireInterface.end();
 }
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 // Tm1637Module(Fast)
 void runTm1637DisplayFast() {
-  using Driver = Tm1637DriverFast<CLK_PIN, DIO_PIN, BIT_DELAY>;
-  Driver driver;
-  Tm1637Module<Driver, NUM_DIGITS> tm1637Module(driver);
+  using WireInterface = FastSwWireInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
+  WireInterface wireInterface;
+  Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module(wireInterface);
 
-  driver.begin();
+  wireInterface.begin();
   tm1637Module.begin();
   runTm1637Benchmark("Tm1637(Fast)", tm1637Module);
   tm1637Module.end();
-  driver.end();
+  wireInterface.end();
 }
 #endif
 
@@ -525,8 +525,8 @@ void printSizeOf() {
   SERIAL_PORT_MONITOR.println(
       sizeof(ScanningModule<LedMatrixBase, 4, 1>));
 
-  SERIAL_PORT_MONITOR.print(F("sizeof(Tm1637Module<Tm1637Driver, 4>): "));
-  SERIAL_PORT_MONITOR.println(sizeof(Tm1637Module<Tm1637Driver, 4>));
+  SERIAL_PORT_MONITOR.print(F("sizeof(Tm1637Module<SwWireInterface, 4>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(Tm1637Module<SwWireInterface, 4>));
 
   SERIAL_PORT_MONITOR.print(F("sizeof(NumberWriter): "));
   SERIAL_PORT_MONITOR.println(sizeof(NumberWriter));

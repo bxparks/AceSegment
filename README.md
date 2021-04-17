@@ -293,8 +293,8 @@ The dependency diagram among these classes looks something like this:
    ScanningModule       Tm1637Module
                             |
                             v
-                        Tm1637Driver
-                        Tm1637DriverFast
+                        SwWireInterface
+                        FastSwWireInterface
 
 
                  ScanningModule
@@ -430,10 +430,6 @@ MCU                      LED display (Common Cathode)
                     |
                    GND
 ```
-
-The `useTransistors()` method on `DriverBuilder` tells the software
-that transistor drivers are being used, and that the logic levels should be
-inverted.
 
 If the LED display was using common anode, instead of common cathode as shown
 above, then a PNP transistor would be used, with the emitter tied to Vcc. Again,
@@ -964,8 +960,8 @@ I have written versions of some lower-level classes to take advantage of
     * Variant of `LedMatrixDirect` using `digitalWriteFast()`
 * `hw/FastSwSpiInterface.h`
     * Variant of `SwSpiInterface.h` using  `digitalWriteFast()`
-* `tm1637/Tm1637DriverFast.h`
-    * Variant of `Tm1637Driver.h` using `digitalWriteFast()`
+* `hw/FastSwWireInterface.h`
+    * Variant of `SwWireInterface.h` using `digitalWriteFast()`
 
 Since these header files require an external `digitalWriteFast` library to be
 installed, and they are only valid for AVR processors, these header files are
@@ -976,8 +972,8 @@ need to include these headers manually, like this:
 #include <AceSegment.h> // do this first
 #include <digitalWriteFast.h> // from 3rd party library
 #include <ace_segment/hw/FastSwSpiInterface.h>
+#include <ace_segment/hw/FastSwWireInterface.h>
 #include <ace_segment/scanning/LedMatrixDirectFast.h>
-#include <ace_segment/tm1637/Tm1637DriverFast.h>
 ```
 
 <a name="ResourceConsumption"></a>
@@ -997,7 +993,7 @@ Here are the sizes of the various classes on the 8-bit AVR microcontrollers
 * sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 5
 * sizeof(LedDisplay): 3
 * sizeof(ScanningModule<LedMatrixBase, 4, 1>): 25
-* sizeof(Tm1637Display<Tm1637Driver, 4>): 12
+* sizeof(Tm1637Display<SwWireInterface, 4>): 12
 * sizeof(NumberWriter): 2
 * sizeof(ClockWriter): 3
 * sizeof(CharWriter): 2

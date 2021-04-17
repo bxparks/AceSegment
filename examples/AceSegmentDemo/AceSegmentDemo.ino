@@ -6,8 +6,8 @@
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 #include <digitalWriteFast.h>
 #include <ace_segment/hw/FastSwSpiInterface.h>
+#include <ace_segment/hw/FastSwWireInterface.h>
 #include <ace_segment/scanning/LedMatrixDirectFast.h>
-#include <ace_segment/tm1637/Tm1637DriverFast.h>
 #endif
 
 using ace_common::incrementMod;
@@ -218,9 +218,9 @@ const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
       modulatingModule(ledMatrix, FRAMES_PER_SECOND);
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_TM1637
-  using TmDriver = Tm1637Driver;
-  TmDriver driver(CLK_PIN, DIO_PIN, BIT_DELAY);
-  Tm1637Module<TmDriver, 4> module(driver);
+  using WireInterface = SwWireInterface;
+  WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
+  Tm1637Module<WireInterface, 4> module(wireInterface);
 
 #else
   #error Unknown LED_DISPLAY_TYPE
@@ -236,7 +236,7 @@ StringWriter stringWriter(charWriter);
 // Setup the various resources.
 void setupAceSegment() {
 #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_TM1637
-  driver.begin();
+  wireInterface.begin();
   module.begin();
   module.setBrightness(2);
 #else
