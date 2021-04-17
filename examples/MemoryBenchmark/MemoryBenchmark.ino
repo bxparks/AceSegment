@@ -70,33 +70,18 @@ volatile int disableCompilerOptimization = 0;
 
   class StubDisplay : public LedDisplay {
     public:
-      StubDisplay(): LedDisplay(NUM_DIGITS) {}
-
-      void writePatternAt(uint8_t /*pos*/, uint8_t pattern) override {
-        disableCompilerOptimization = pattern;
-      }
-
-      void writePatternsAt(uint8_t /*pos*/, const uint8_t patterns[],
-          uint8_t /*len*/) override {
-        disableCompilerOptimization = patterns[0];
-      }
-
-      void writePatternsAt_P(uint8_t /*pos*/, const uint8_t patterns[],
-          uint8_t /*len*/) override {
-        disableCompilerOptimization = pgm_read_byte(patterns);
-      }
-
-      void writeDecimalPointAt(uint8_t /*pos*/, bool state = true)
-          override {
-        disableCompilerOptimization = state;
-      }
+      StubDisplay() : LedDisplay(NUM_DIGITS) {}
 
       void setBrightness(uint8_t brightness) override {
         disableCompilerOptimization = brightness;
       }
 
-      void clear() override {
-        disableCompilerOptimization = 0;
+      void setPatternAt(uint8_t pos, uint8_t pattern) override {
+        disableCompilerOptimization = pattern;
+      }
+
+      uint8_t getPatternAt(uint8_t pos) override {
+        return disableCompilerOptimization;
       }
   };
 

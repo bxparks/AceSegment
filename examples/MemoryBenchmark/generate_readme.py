@@ -146,6 +146,11 @@ before substantional refactoring in 2021.
 * Add memory usage for `Tm1637Display` using `Tm1637DriverFast` which uses
   `digitalWriteFast` library for AVR processors. Saves 662 - 776 bytes of flash
   on AVR processors compared to `Tm1637Display` using normal `Tm1637Driver`.
+* Save 150-200 bytes of flash on AVR processors by lifting all of the
+  `LedDisplay::writePatternAt()` type of methods to `LedDisplay`, making them
+  non-virtual, then funneling these methods through just 2 lower-level virtual
+  methods: `setPatternAt()` and `getPatternAt()`. It also made the
+  implementation of `Tm1637Display` position remapping easier.
 
 ## Results
 
