@@ -127,6 +127,10 @@ before substantional refactoring in 2021.
   non-virtual, then funneling these methods through just 2 lower-level virtual
   methods: `setPatternAt()` and `getPatternAt()`. It also made the
   implementation of `Tm1637Module` position remapping easier.
+* Extracting `LedModule` from `LedDisplay` saves 10-40 bytes on AVR for
+  `ScanningModule` and `Tm1637Module`, but add about that many bytes for various
+  Writer classes (probably because they have to go though one additional layer
+  of indirect, through the `LedModule`). So overall, I think it's a wash.
 
 ## Results
 
@@ -163,25 +167,25 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        |    456/   11 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| ScanningDisplay(direct)         |   1536/   69 |  1080/   58 |
-| ScanningDisplay(single_sw_spi)  |   1542/   63 |  1086/   52 |
-| ScanningDisplay(single_hw_spi)  |   1604/   64 |  1148/   53 |
-| ScanningDisplay(dual_sw_spi)    |   1444/   54 |   988/   43 |
-| ScanningDisplay(dual_hw_spi)    |   1518/   55 |  1062/   44 |
+| ScanningModule(direct)          |   1498/   64 |  1042/   53 |
+| ScanningModule(single_sw_spi)   |   1520/   58 |  1064/   47 |
+| ScanningModule(single_hw_spi)   |   1582/   59 |  1126/   48 |
+| ScanningModule(dual_sw_spi)     |   1428/   51 |   972/   40 |
+| ScanningModule(dual_hw_spi)     |   1502/   52 |  1046/   41 |
 |---------------------------------+--------------+-------------|
-| ScanningDisplay(direct_fast)    |   1278/   97 |   822/   86 |
-| ScanningDisplay(single_sw_fast) |   1434/   61 |   978/   50 |
-| ScanningDisplay(dual_sw_fast)   |   1044/   52 |   588/   41 |
+| ScanningModule(direct_fast)     |   1258/   94 |   802/   83 |
+| ScanningModule(single_sw_fast)  |   1412/   56 |   956/   45 |
+| ScanningModule(dual_sw_fast)    |   1028/   49 |   572/   38 |
 |---------------------------------+--------------+-------------|
-| Tm1637Display(Normal)           |   1606/   39 |  1150/   28 |
-| Tm1637Display(Fast)             |    946/   36 |   490/   25 |
+| Tm1637Module(Normal)            |   1590/   39 |  1134/   28 |
+| Tm1637Module(Fast)              |    930/   36 |   474/   25 |
 |---------------------------------+--------------+-------------|
-| StubDisplay                     |    584/   24 |   128/   13 |
-| NumberWriter+Stub               |    710/   26 |   254/   15 |
-| ClockWriter+Stub                |    768/   27 |   312/   16 |
-| TemperatureWriter+Stub          |    768/   26 |   312/   15 |
-| CharWriter+Stub                 |    742/   26 |   286/   15 |
-| StringWriter+Stub               |    940/   34 |   484/   23 |
+| StubModule+LedDisplay           |    578/   24 |   122/   13 |
+| NumberWriter+Stub               |    682/   28 |   226/   17 |
+| ClockWriter+Stub                |    796/   29 |   340/   18 |
+| TemperatureWriter+Stub          |    764/   28 |   308/   17 |
+| CharWriter+Stub                 |    758/   28 |   302/   17 |
+| StringWriter+Stub               |    988/   36 |   532/   25 |
 +--------------------------------------------------------------+
 
 ```
@@ -198,25 +202,25 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        |   3472/  151 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| ScanningDisplay(direct)         |   4530/  209 |  1058/   58 |
-| ScanningDisplay(single_sw_spi)  |   4538/  203 |  1066/   52 |
-| ScanningDisplay(single_hw_spi)  |   4600/  204 |  1128/   53 |
-| ScanningDisplay(dual_sw_spi)    |   4440/  194 |   968/   43 |
-| ScanningDisplay(dual_hw_spi)    |   4514/  195 |  1042/   44 |
+| ScanningModule(direct)          |   4492/  204 |  1020/   53 |
+| ScanningModule(single_sw_spi)   |   4516/  198 |  1044/   47 |
+| ScanningModule(single_hw_spi)   |   4578/  199 |  1106/   48 |
+| ScanningModule(dual_sw_spi)     |   4424/  191 |   952/   40 |
+| ScanningModule(dual_hw_spi)     |   4498/  192 |  1026/   41 |
 |---------------------------------+--------------+-------------|
-| ScanningDisplay(direct_fast)    |   4158/  237 |   686/   86 |
-| ScanningDisplay(single_sw_fast) |   4430/  201 |   958/   50 |
-| ScanningDisplay(dual_sw_fast)   |   3924/  192 |   452/   41 |
+| ScanningModule(direct_fast)     |   4138/  234 |   666/   83 |
+| ScanningModule(single_sw_fast)  |   4408/  196 |   936/   45 |
+| ScanningModule(dual_sw_fast)    |   3908/  189 |   436/   38 |
 |---------------------------------+--------------+-------------|
-| Tm1637Display(Normal)           |   4676/  179 |  1204/   28 |
-| Tm1637Display(Fast)             |   3902/  176 |   430/   25 |
+| Tm1637Module(Normal)            |   4660/  179 |  1188/   28 |
+| Tm1637Module(Fast)              |   3886/  176 |   414/   25 |
 |---------------------------------+--------------+-------------|
-| StubDisplay                     |   3540/  164 |    68/   13 |
-| NumberWriter+Stub               |   3666/  166 |   194/   15 |
-| ClockWriter+Stub                |   3724/  167 |   252/   16 |
-| TemperatureWriter+Stub          |   3724/  166 |   252/   15 |
-| CharWriter+Stub                 |   3698/  166 |   226/   15 |
-| StringWriter+Stub               |   3896/  174 |   424/   23 |
+| StubModule+LedDisplay           |   3534/  164 |    62/   13 |
+| NumberWriter+Stub               |   3638/  168 |   166/   17 |
+| ClockWriter+Stub                |   3752/  169 |   280/   18 |
+| TemperatureWriter+Stub          |   3720/  168 |   248/   17 |
+| CharWriter+Stub                 |   3714/  168 |   242/   17 |
+| StringWriter+Stub               |   3944/  176 |   472/   25 |
 +--------------------------------------------------------------+
 
 ```
@@ -233,25 +237,25 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        |  10064/    0 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| ScanningDisplay(direct)         |  10792/    0 |   728/    0 |
-| ScanningDisplay(single_sw_spi)  |  10840/    0 |   776/    0 |
-| ScanningDisplay(single_hw_spi)  |  11288/    0 |  1224/    0 |
-| ScanningDisplay(dual_sw_spi)    |  10728/    0 |   664/    0 |
-| ScanningDisplay(dual_hw_spi)    |  11248/    0 |  1184/    0 |
+| ScanningModule(direct)          |  10792/    0 |   728/    0 |
+| ScanningModule(single_sw_spi)   |  10848/    0 |   784/    0 |
+| ScanningModule(single_hw_spi)   |  11296/    0 |  1232/    0 |
+| ScanningModule(dual_sw_spi)     |  10736/    0 |   672/    0 |
+| ScanningModule(dual_hw_spi)     |  11256/    0 |  1192/    0 |
 |---------------------------------+--------------+-------------|
-| ScanningDisplay(direct_fast)    |     -1/   -1 |    -1/   -1 |
-| ScanningDisplay(single_sw_fast) |     -1/   -1 |    -1/   -1 |
-| ScanningDisplay(dual_sw_fast)   |     -1/   -1 |    -1/   -1 |
+| ScanningModule(direct_fast)     |     -1/   -1 |    -1/   -1 |
+| ScanningModule(single_sw_fast)  |     -1/   -1 |    -1/   -1 |
+| ScanningModule(dual_sw_fast)    |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Tm1637Display(Normal)           |  10800/    0 |   736/    0 |
-| Tm1637Display(Fast)             |     -1/   -1 |    -1/   -1 |
+| Tm1637Module(Normal)            |  10808/    0 |   744/    0 |
+| Tm1637Module(Fast)              |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| StubDisplay                     |  10312/    0 |   248/    0 |
-| NumberWriter+Stub               |  10632/    0 |   568/    0 |
-| ClockWriter+Stub                |  10432/    0 |   368/    0 |
-| TemperatureWriter+Stub          |  10696/    0 |   632/    0 |
-| CharWriter+Stub                 |  10472/    0 |   408/    0 |
-| StringWriter+Stub               |  10656/    0 |   592/    0 |
+| StubModule+LedDisplay           |  10336/    0 |   272/    0 |
+| NumberWriter+Stub               |  10672/    0 |   608/    0 |
+| ClockWriter+Stub                |  10480/    0 |   416/    0 |
+| TemperatureWriter+Stub          |  10736/    0 |   672/    0 |
+| CharWriter+Stub                 |  10520/    0 |   456/    0 |
+| StringWriter+Stub               |  10704/    0 |   640/    0 |
 +--------------------------------------------------------------+
 
 ```
@@ -268,25 +272,25 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        |  19136/ 3788 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| ScanningDisplay(direct)         |  21512/ 4016 |  2376/  228 |
-| ScanningDisplay(single_sw_spi)  |  21576/ 4020 |  2440/  232 |
-| ScanningDisplay(single_hw_spi)  |  23320/ 4020 |  4184/  232 |
-| ScanningDisplay(dual_sw_spi)    |  21468/ 4012 |  2332/  224 |
-| ScanningDisplay(dual_hw_spi)    |  23252/ 4012 |  4116/  224 |
+| ScanningModule(direct)          |  21528/ 4392 |  2392/  604 |
+| ScanningModule(single_sw_spi)   |  21592/ 4396 |  2456/  608 |
+| ScanningModule(single_hw_spi)   |  23340/ 4396 |  4204/  608 |
+| ScanningModule(dual_sw_spi)     |  21488/ 4392 |  2352/  604 |
+| ScanningModule(dual_hw_spi)     |  23272/ 4392 |  4136/  604 |
 |---------------------------------+--------------+-------------|
-| ScanningDisplay(direct_fast)    |     -1/   -1 |    -1/   -1 |
-| ScanningDisplay(single_sw_fast) |     -1/   -1 |    -1/   -1 |
-| ScanningDisplay(dual_sw_fast)   |     -1/   -1 |    -1/   -1 |
+| ScanningModule(direct_fast)     |     -1/   -1 |    -1/   -1 |
+| ScanningModule(single_sw_fast)  |     -1/   -1 |    -1/   -1 |
+| ScanningModule(dual_sw_fast)    |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Tm1637Display(Normal)           |  21612/ 3984 |  2476/  196 |
-| Tm1637Display(Fast)             |     -1/   -1 |    -1/   -1 |
+| Tm1637Module(Normal)            |  21636/ 4372 |  2500/  584 |
+| Tm1637Module(Fast)              |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| StubDisplay                     |  19300/ 3948 |   164/  160 |
-| NumberWriter+Stub               |  19576/ 3952 |   440/  164 |
-| ClockWriter+Stub                |  19456/ 3956 |   320/  168 |
-| TemperatureWriter+Stub          |  19668/ 3952 |   532/  164 |
-| CharWriter+Stub                 |  19460/ 3952 |   324/  164 |
-| StringWriter+Stub               |  19628/ 3956 |   492/  168 |
+| StubModule+LedDisplay           |  19328/ 4340 |   192/  552 |
+| NumberWriter+Stub               |  19616/ 4344 |   480/  556 |
+| ClockWriter+Stub                |  19496/ 4348 |   360/  560 |
+| TemperatureWriter+Stub          |  19712/ 4344 |   576/  556 |
+| CharWriter+Stub                 |  19500/ 4344 |   364/  556 |
+| StringWriter+Stub               |  19676/ 4348 |   540/  560 |
 +--------------------------------------------------------------+
 
 ```
@@ -303,25 +307,25 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        | 256700/26784 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| ScanningDisplay(direct)         | 257764/26860 |  1064/   76 |
-| ScanningDisplay(single_sw_spi)  | 257836/26868 |  1136/   84 |
-| ScanningDisplay(single_hw_spi)  | 258940/26876 |  2240/   92 |
-| ScanningDisplay(dual_sw_spi)    | 257704/26848 |  1004/   64 |
-| ScanningDisplay(dual_hw_spi)    | 258904/26856 |  2204/   72 |
+| ScanningModule(direct)          | 257772/27260 |  1072/  476 |
+| ScanningModule(single_sw_spi)   | 257844/27244 |  1144/  460 |
+| ScanningModule(single_hw_spi)   | 258948/27252 |  2248/  468 |
+| ScanningModule(dual_sw_spi)     | 257728/27248 |  1028/  464 |
+| ScanningModule(dual_hw_spi)     | 258912/27256 |  2212/  472 |
 |---------------------------------+--------------+-------------|
-| ScanningDisplay(direct_fast)    |     -1/   -1 |    -1/   -1 |
-| ScanningDisplay(single_sw_fast) |     -1/   -1 |    -1/   -1 |
-| ScanningDisplay(dual_sw_fast)   |     -1/   -1 |    -1/   -1 |
+| ScanningModule(direct_fast)     |     -1/   -1 |    -1/   -1 |
+| ScanningModule(single_sw_fast)  |     -1/   -1 |    -1/   -1 |
+| ScanningModule(dual_sw_fast)    |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Tm1637Display(Normal)           | 257896/26824 |  1196/   40 |
-| Tm1637Display(Fast)             |     -1/   -1 |    -1/   -1 |
+| Tm1637Module(Normal)            | 257936/27224 |  1236/  440 |
+| Tm1637Module(Fast)              |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| StubDisplay                     | 256836/26792 |   136/    8 |
-| NumberWriter+Stub               | 257316/26792 |   616/    8 |
-| ClockWriter+Stub                | 257108/26800 |   408/   16 |
-| TemperatureWriter+Stub          | 257412/26792 |   712/    8 |
-| CharWriter+Stub                 | 257028/26792 |   328/    8 |
-| StringWriter+Stub               | 257260/26816 |   560/   32 |
+| StubModule+LedDisplay           | 256876/27200 |   176/  416 |
+| NumberWriter+Stub               | 257372/27200 |   672/  416 |
+| ClockWriter+Stub                | 257164/27208 |   464/  424 |
+| TemperatureWriter+Stub          | 257484/27200 |   784/  416 |
+| CharWriter+Stub                 | 257084/27200 |   384/  416 |
+| StringWriter+Stub               | 257316/27208 |   616/  424 |
 +--------------------------------------------------------------+
 
 ```
@@ -338,25 +342,25 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        | 197730/13100 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| ScanningDisplay(direct)         | 200468/13404 |  2738/  304 |
-| ScanningDisplay(single_sw_spi)  | 200524/13404 |  2794/  304 |
-| ScanningDisplay(single_hw_spi)  | 202816/13452 |  5086/  352 |
-| ScanningDisplay(dual_sw_spi)    | 200396/13396 |  2666/  296 |
-| ScanningDisplay(dual_hw_spi)    | 202764/13444 |  5034/  344 |
+| ScanningModule(direct)          | 200496/13780 |  2766/  680 |
+| ScanningModule(single_sw_spi)   | 200552/13780 |  2822/  680 |
+| ScanningModule(single_hw_spi)   | 202844/13828 |  5114/  728 |
+| ScanningModule(dual_sw_spi)     | 200428/13780 |  2698/  680 |
+| ScanningModule(dual_hw_spi)     | 202796/13828 |  5066/  728 |
 |---------------------------------+--------------+-------------|
-| ScanningDisplay(direct_fast)    |     -1/   -1 |    -1/   -1 |
-| ScanningDisplay(single_sw_fast) |     -1/   -1 |    -1/   -1 |
-| ScanningDisplay(dual_sw_fast)   |     -1/   -1 |    -1/   -1 |
+| ScanningModule(direct_fast)     |     -1/   -1 |    -1/   -1 |
+| ScanningModule(single_sw_fast)  |     -1/   -1 |    -1/   -1 |
+| ScanningModule(dual_sw_fast)    |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Tm1637Display(Normal)           | 200716/13372 |  2986/  272 |
-| Tm1637Display(Fast)             |     -1/   -1 |    -1/   -1 |
+| Tm1637Module(Normal)            | 200744/13756 |  3014/  656 |
+| Tm1637Module(Fast)              |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| StubDisplay                     | 199194/13176 |  1464/   76 |
-| NumberWriter+Stub               | 199570/13184 |  1840/   84 |
-| ClockWriter+Stub                | 199462/13184 |  1732/   84 |
-| TemperatureWriter+Stub          | 199658/13184 |  1928/   84 |
-| CharWriter+Stub                 | 199410/13184 |  1680/   84 |
-| StringWriter+Stub               | 199582/13184 |  1852/   84 |
+| StubModule+LedDisplay           | 199242/13568 |  1512/  468 |
+| NumberWriter+Stub               | 199630/13576 |  1900/  476 |
+| ClockWriter+Stub                | 199518/13576 |  1788/  476 |
+| TemperatureWriter+Stub          | 199750/13576 |  2020/  476 |
+| CharWriter+Stub                 | 199474/13576 |  1744/  476 |
+| StringWriter+Stub               | 199650/13576 |  1920/  476 |
 +--------------------------------------------------------------+
 
 ```
@@ -374,25 +378,25 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        |   7624/ 3048 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| ScanningDisplay(direct)         |  11860/ 4204 |  4236/ 1156 |
-| ScanningDisplay(single_sw_spi)  |  11908/ 4208 |  4284/ 1160 |
-| ScanningDisplay(single_hw_spi)  |  12980/ 4264 |  5356/ 1216 |
-| ScanningDisplay(dual_sw_spi)    |  11824/ 4200 |  4200/ 1152 |
-| ScanningDisplay(dual_hw_spi)    |  12888/ 4256 |  5264/ 1208 |
+| ScanningModule(direct)          |  11884/ 4584 |  4260/ 1536 |
+| ScanningModule(single_sw_spi)   |  11936/ 4588 |  4312/ 1540 |
+| ScanningModule(single_hw_spi)   |  13008/ 4644 |  5384/ 1596 |
+| ScanningModule(dual_sw_spi)     |  11840/ 4584 |  4216/ 1536 |
+| ScanningModule(dual_hw_spi)     |  12912/ 4640 |  5288/ 1592 |
 |---------------------------------+--------------+-------------|
-| ScanningDisplay(direct_fast)    |     -1/   -1 |    -1/   -1 |
-| ScanningDisplay(single_sw_fast) |     -1/   -1 |    -1/   -1 |
-| ScanningDisplay(dual_sw_fast)   |     -1/   -1 |    -1/   -1 |
+| ScanningModule(direct_fast)     |     -1/   -1 |    -1/   -1 |
+| ScanningModule(single_sw_fast)  |     -1/   -1 |    -1/   -1 |
+| ScanningModule(dual_sw_fast)    |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Tm1637Display(Normal)           |  12544/ 4172 |  4920/ 1124 |
-| Tm1637Display(Fast)             |     -1/   -1 |    -1/   -1 |
+| Tm1637Module(Normal)            |  12576/ 4564 |  4952/ 1516 |
+| Tm1637Module(Fast)              |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| StubDisplay                     |  10888/ 4156 |  3264/ 1108 |
-| NumberWriter+Stub               |  11340/ 4160 |  3716/ 1112 |
-| ClockWriter+Stub                |  11052/ 4164 |  3428/ 1116 |
-| TemperatureWriter+Stub          |  11492/ 4160 |  3868/ 1112 |
-| CharWriter+Stub                 |  11048/ 4160 |  3424/ 1112 |
-| StringWriter+Stub               |  11244/ 4164 |  3620/ 1116 |
+| StubModule+LedDisplay           |  10924/ 4552 |  3300/ 1504 |
+| NumberWriter+Stub               |  11400/ 4556 |  3776/ 1508 |
+| ClockWriter+Stub                |  11112/ 4560 |  3488/ 1512 |
+| TemperatureWriter+Stub          |  11556/ 4556 |  3932/ 1508 |
+| CharWriter+Stub                 |  11100/ 4556 |  3476/ 1508 |
+| StringWriter+Stub               |  11300/ 4560 |  3676/ 1512 |
 +--------------------------------------------------------------+
 
 ```
