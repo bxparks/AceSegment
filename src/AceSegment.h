@@ -32,16 +32,18 @@ SOFTWARE.
 #ifndef ACE_SEGMENT_ACE_SEGMENT_H
 #define ACE_SEGMENT_ACE_SEGMENT_H
 
-#include "ace_segment/hw/Hardware.h"
+#include "ace_segment/hw/ClockInterface.h"
+#include "ace_segment/hw/GpioInterface.h"
 #include "ace_segment/hw/SwSpiAdapter.h"
 #include "ace_segment/hw/HwSpiAdapter.h"
-#include "ace_segment/LedDisplay.h"
 #include "ace_segment/scanning/LedMatrixDirect.h"
 #include "ace_segment/scanning/LedMatrixSingleShiftRegister.h"
 #include "ace_segment/scanning/LedMatrixDualShiftRegister.h"
-#include "ace_segment/scanning/ScanningDisplay.h"
 #include "ace_segment/tm1637/Tm1637Driver.h"
-#include "ace_segment/tm1637/Tm1637Display.h"
+#include "ace_segment/LedModule.h"
+#include "ace_segment/scanning/ScanningModule.h"
+#include "ace_segment/tm1637/Tm1637Module.h"
+#include "ace_segment/LedDisplay.h"
 #include "ace_segment/writer/NumberWriter.h"
 #include "ace_segment/writer/ClockWriter.h"
 #include "ace_segment/writer/TemperatureWriter.h"

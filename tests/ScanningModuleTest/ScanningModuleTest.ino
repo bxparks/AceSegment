@@ -1,4 +1,4 @@
-#line 2 "ScanningDisplayTest.ino"
+#line 2 "ScanningModuleTest.ino"
 
 /*
  * MIT License
@@ -10,7 +10,7 @@
 #include <AUnitVerbose.h>
 #include <AceSegment.h>
 #include <ace_segment/testing/EventLog.h>
-#include <ace_segment/testing/TestableHardware.h>
+#include <ace_segment/testing/TestableClockInterface.h>
 #include <ace_segment/testing/TestableLedMatrix.h>
 
 using aunit::TestRunner;
@@ -23,34 +23,37 @@ const int8_t NUM_SEGMENTS = 8;
 const uint16_t FRAMES_PER_SECOND = 60;
 const int8_t NUM_SUB_FIELDS = 1;
 
-TestableHardware hardware;
 TestableLedMatrix ledMatrix;
 
-ScanningDisplay<TestableHardware, TestableLedMatrix, NUM_DIGITS, NUM_SUB_FIELDS>
-  scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
+ScanningModule<
+    TestableLedMatrix,
+    NUM_DIGITS,
+    NUM_SUB_FIELDS,
+    TestableClockInterface
+> scanningModule(ledMatrix, FRAMES_PER_SECOND);
 
 // ----------------------------------------------------------------------
 // Tests for SplitDigitDriver w/ LedMatrixDirect
 // ----------------------------------------------------------------------
 
-class ScanningDisplayTest: public TestOnce {
+class ScanningModuleTest: public TestOnce {
   protected:
     void setup() override {
-      scanningDisplay.begin();
-      hardware.mEventLog.clear();
+      scanningModule.begin();
+      TestableClockInterface::sEventLog.clear();
       ledMatrix.mEventLog.clear();
     }
 };
 
-testF(ScanningDisplayTest, renderFieldNow) {
-  scanningDisplay.writePatternAt(0, 0x00);
-  scanningDisplay.writePatternAt(1, 0x11);
-  scanningDisplay.writePatternAt(2, 0x22);
-  scanningDisplay.writePatternAt(3, 0x33);
+testF(ScanningModuleTest, renderFieldNow) {
+  scanningModule.setPatternAt(0, 0x00);
+  scanningModule.setPatternAt(1, 0x11);
+  scanningModule.setPatternAt(2, 0x22);
+  scanningModule.setPatternAt(3, 0x33);
 
   // display field 0
   ledMatrix.mEventLog.clear();
-  scanningDisplay.renderFieldNow();
+  scanningModule.renderFieldNow();
   assertEqual(1, ledMatrix.mEventLog.getNumRecords());
   // Cast to (int) required on 8-bit AVR processors (not sure why), something to
   // do with the size of EventType, which is a uint8_t, which does not get
@@ -60,28 +63,28 @@ testF(ScanningDisplayTest, renderFieldNow) {
 
   // display field 1
   ledMatrix.mEventLog.clear();
-  scanningDisplay.renderFieldNow();
+  scanningModule.renderFieldNow();
   assertEqual(1, ledMatrix.mEventLog.getNumRecords());
   assertTrue(ledMatrix.mEventLog.assertEvents(
       1, (int) EventType::kLedMatrixDraw, 1, 0x11));
 
   // display field 2
   ledMatrix.mEventLog.clear();
-  scanningDisplay.renderFieldNow();
+  scanningModule.renderFieldNow();
   assertEqual(1, ledMatrix.mEventLog.getNumRecords());
   assertTrue(ledMatrix.mEventLog.assertEvents(
       1, (int) EventType::kLedMatrixDraw, 2, 0x22));
 
   // display field 3
   ledMatrix.mEventLog.clear();
-  scanningDisplay.renderFieldNow();
+  scanningModule.renderFieldNow();
   assertEqual(1, ledMatrix.mEventLog.getNumRecords());
   assertTrue(ledMatrix.mEventLog.assertEvents(
       1, (int) EventType::kLedMatrixDraw, 3, 0x33));
 
   // cycle back to field 0
   ledMatrix.mEventLog.clear();
-  scanningDisplay.renderFieldNow();
+  scanningModule.renderFieldNow();
   assertEqual(1, ledMatrix.mEventLog.getNumRecords());
   assertTrue(ledMatrix.mEventLog.assertEvents(
       1, (int) EventType::kLedMatrixDraw, 0, 0x00));

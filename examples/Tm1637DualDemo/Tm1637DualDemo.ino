@@ -47,8 +47,10 @@ constexpr uint16_t BIT_DELAY = 100;
 using Driver = Tm1637Driver;
 Driver driver1(CLK_PIN, DIO1_PIN, BIT_DELAY);
 Driver driver2(CLK_PIN, DIO2_PIN, BIT_DELAY);
-Tm1637Display<Driver, NUM_DIGITS> display1(driver1);
-Tm1637Display<Driver, NUM_DIGITS> display2(driver2);
+Tm1637Module<Driver, NUM_DIGITS> module1(driver1);
+Tm1637Module<Driver, NUM_DIGITS> module2(driver2);
+LedDisplay display1(module1);
+LedDisplay display2(module2);
 
 TimingStats stats;
 
@@ -65,8 +67,8 @@ void setup() {
 
   driver1.begin();
   driver2.begin();
-  display1.begin();
-  display2.begin();
+  module1.begin();
+  module2.begin();
 }
 
 #if 0
@@ -93,8 +95,8 @@ void loop() {
 
   // Flush the change to the LED Module, and measure the time.
   uint16_t startMicros = micros();
-  display1.flush();
-  display2.flush();
+  module1.flush();
+  module2.flush();
   uint16_t elapsedMicros = (uint16_t) micros() - startMicros;
   stats.update(elapsedMicros);
 
@@ -148,8 +150,8 @@ void loop() {
 
     // Flush incrementally, and measure the time.
     uint16_t startMicros = micros();
-    display1.flushIncremental();
-    display2.flushIncremental();
+    module1.flushIncremental();
+    module2.flushIncremental();
     uint16_t elapsedMicros = (uint16_t) micros() - startMicros;
     stats.update(elapsedMicros);
   }

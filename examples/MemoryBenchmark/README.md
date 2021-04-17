@@ -80,16 +80,16 @@ before substantional refactoring in 2021.
   making the `LedMatrix` class into a better abstraction and unifying the API
   into a single `draw(group, elementPattern)` method.
 * Reduce flash by 20-50 bytes on AVR by merging `Renderer` into
-  `ScanningDisplay`.
+  `ScanningModule`.
 * Reduce flash by 100-200 bytes on AVR, SAMD21, STM32 and ESP8266 by
-  templatizing the `ScanningDisplay` on `NUM_DIGITS` and `NUM_SUBFIELDS`, and
-  merging `patterns` and `brightnesses` arrays directly into `ScanningDisplay`.
+  templatizing the `ScanningModule` on `NUM_DIGITS` and `NUM_SUBFIELDS`, and
+  merging `patterns` and `brightnesses` arrays directly into `ScanningModule`.
   Flash usage actually goes up by ~40 bytes on Teensy3.2, but it has enough
   flash memory.
 * Reduce flash by 300-350 bytes on AVR (~150 on SAMD, 150-500 bytes on STM32,
   ~250 bytes on ESP8266, 300-600 bytes on ESP32) by templatizing LedMatrix
-  and ScanningDisplay on `NUM_DIGITS`, `NUM_SUBFIELDS`, `Hardware` class,
-  `SwSpiAdapter` and `HwSpiAdapter`.
+  and ScanningModule on `NUM_DIGITS`, `NUM_SUBFIELDS`, `SwSpiAdapter` and
+  `HwSpiAdapter`.
 * Reduce flash by flattening the `LedMatrix` hierarchy into templatized
   classes, and removing virtual methods. Saves 250-300 bytes on AVR, 150-200 on
   SAMD, 150-300 on STM32, 200-300 on ESP8266, 300-1300 bytes on ESP32, 800-1300
@@ -108,7 +108,7 @@ before substantional refactoring in 2021.
   HardwareSerial class. (I will make a fix to AUnit so that the `HardwareSerial`
   will not be pulled in by other libraries in the future.)
 * Reduce flash size by ~130 bytes on AVR and 70-80 bytes on 32-bit processors
-  by removing the pointer to `TimingStats` from `ScanningDisplay`. The pointer
+  by removing the pointer to `TimingStats` from `ScanningModule`. The pointer
   causes the code for the `TimingStats` class to be pulled in, even if it is not
   used.
 
@@ -117,29 +117,30 @@ before substantional refactoring in 2021.
 * Slight increase in memory usage (20-30 bytes) on some processors (AVR,
   ESP8266, ESP8266), but slight decrease on others (STM32, Teensy), I think the
   changes are due to some removal/addition of some methods in `LedDisplay`.
-* Add memory usage for `Tm1637Display`. Seems to consume something in between
-  similar to the `ScanningDisplay` w/ SW SPI and `ScanningDisplay` with HW SPI.
-* Add memory usage for `Tm1637Display` using `Tm1637DriverFast` which uses
+* Add memory usage for `Tm1637Module`. Seems to consume something in between
+  similar to the `ScanningModule` w/ SW SPI and `ScanningModule` with HW SPI.
+* Add memory usage for `Tm1637Module` using `Tm1637DriverFast` which uses
   `digitalWriteFast` library for AVR processors. Saves 662 - 776 bytes of flash
-  on AVR processors compared to `Tm1637Display` using normal `Tm1637Driver`.
+  on AVR processors compared to `Tm1637Module` using normal `Tm1637Driver`.
 * Save 150-200 bytes of flash on AVR processors by lifting all of the
   `LedDisplay::writePatternAt()` type of methods to `LedDisplay`, making them
   non-virtual, then funneling these methods through just 2 lower-level virtual
   methods: `setPatternAt()` and `getPatternAt()`. It also made the
-  implementation of `Tm1637Display` position remapping easier.
+  implementation of `Tm1637Module` position remapping easier.
 
 ## Results
 
 The following shows the flash and static memory sizes of the `MemoryBenchmark`
 program that includes the resources needed to perform a
-`ScanningDisplay::renderFieldWhenReady()`. This includes:
+`ScanningModule::renderFieldWhenReady()`. This includes:
 
-* `Hardware` (which is opimized away by the compiler)
+* `ClockInterface`, `GpioInterface` (which are opimized away by the compiler)
 * `SwSpiAdapter` or `HwSpiAdapter`
 * `LedMatrixXxx`
-* `ScanningDisplay`
+* `ScanningModule`
 * `NumberWriter`
 * `ClockWriter`
+* `TemperatureWriter`
 * `CharWriter`
 * `StringWriter`
 

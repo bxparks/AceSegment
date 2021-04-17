@@ -7,17 +7,17 @@
 
 BEGIN {
   labels[0] = "baseline"
-  labels[1] = "ScanningDisplay(direct)";
-  labels[2] = "ScanningDisplay(single_sw_spi)";
-  labels[3] = "ScanningDisplay(single_hw_spi)";
-  labels[4] = "ScanningDisplay(dual_sw_spi)";
-  labels[5] = "ScanningDisplay(dual_hw_spi)";
-  labels[6] = "ScanningDisplay(direct_fast)";
-  labels[7] = "ScanningDisplay(single_sw_fast)";
-  labels[8] = "ScanningDisplay(dual_sw_fast)";
-  labels[9] = "Tm1637Display(Normal)";
-  labels[10] = "Tm1637Display(Fast)";
-  labels[11] = "StubDisplay";
+  labels[1] = "ScanningModule(direct)";
+  labels[2] = "ScanningModule(single_sw_spi)";
+  labels[3] = "ScanningModule(single_hw_spi)";
+  labels[4] = "ScanningModule(dual_sw_spi)";
+  labels[5] = "ScanningModule(dual_hw_spi)";
+  labels[6] = "ScanningModule(direct_fast)";
+  labels[7] = "ScanningModule(single_sw_fast)";
+  labels[8] = "ScanningModule(dual_sw_fast)";
+  labels[9] = "Tm1637Module(Normal)";
+  labels[10] = "Tm1637Module(Fast)";
+  labels[11] = "StubModule+LedDisplay";
   labels[12] = "NumberWriter+Stub";
   labels[13] = "ClockWriter+Stub";
   labels[14] = "TemperatureWriter+Stub";
@@ -54,8 +54,8 @@ END {
   printf("|---------------------------------+--------------+-------------|\n")
   for (i = 1 ; i < NUM_ENTRIES; i++) {
     if (labels[i] ~ /direct_fast/ \
-        || labels[i] ~ /Tm1637Display\(Normal\)/ \
-        || labels[i] == "StubDisplay") {
+        || labels[i] ~ /Tm1637Module\(Normal\)/ \
+        || labels[i] == "StubModule+LedDisplay") {
       printf(\
         "|---------------------------------+--------------+-------------|\n")
     }

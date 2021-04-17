@@ -22,12 +22,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_TM1637_DISPLAY_H
-#define ACE_SEGMENT_TM1637_DISPLAY_H
+#ifndef ACE_SEGMENT_TM1637_MODULE_H
+#define ACE_SEGMENT_TM1637_MODULE_H
 
 #include <Arduino.h>
 #include <AceCommon.h> // incrementMod()
-#include "../LedDisplay.h"
+#include "../LedModule.h"
 
 namespace ace_segment {
 
@@ -43,66 +43,94 @@ static const uint16_t kDefaultTm1637DelayMicros = 100;
 
 /**
  * Many (if not all) of the 6-digit LED modules on eBay and Amazon using the
- * TM1637 chip have their digits incorrectly ordered. Not sure why the did that
- * since their 4-digit LED modules follow the natural order. This array remaps
- * the digit position to the correct order expected by this library where digit
- * 0 is on the left, and digit 5 is on the far right.
+ * TM1637 chip have their digit addresses incorrectly ordered. Not sure why the
+ * did that since their 4-digit LED modules follow the natural order. This array
+ * remaps the digit position to the correct order expected by this library where
+ * digit 0 is on the left, and digit 5 is on the far right.
  *
  * You can create your own remap array to handle other LED modules with
  * different physical ordering compared to the logical ordering.
  *
- * Pass this array into the Tm1637Display::begin() method.
+ * Pass this array into the Tm1637Module constructor.
  */
 static const uint8_t kSixDigitRemapArray[6] = {
   2, 1, 0, 5, 4, 3
 };
 
 /**
- * An implementation of LedDisplay that works with 7-segment LED modules
- * using the TM1637 chip.
+ * An implementation of seven-segment LedModule using the TM1637 chip.
  *
  * @tparam DRIVER driver class, either Tm1637Driver or Tm1637DriverFast
  * @tparam DIGITS number of digits in the LED module (usually 4 or 6)
  */
 template <typename DRIVER, uint8_t DIGITS>
-class Tm1637Display : public LedDisplay {
+class Tm1637Module : public LedModule {
   public:
-    explicit Tm1637Display(const DRIVER& driver) :
-        LedDisplay(DIGITS),
-        mDriver(driver),
-        mRemapArray(nullptr)
-    {}
-
-    /** Return the number of digits supported by this display instance. */
-    uint8_t getNumDigits() const { return DIGITS; }
 
     /**
-     * Initialize the object. The Tm1637 driver must be initialized separately.
+     * Constructor.
+     * @param driver instance of either Tm1637Driver or Tm1637DriverFast
+     * @param remapArray (optional) some (most?) six-digit LED modules using the
+     *      TM1637 chip need remapping of the digit addresses
+     */
+    explicit Tm1637Module(
+        const DRIVER& driver,
+        const uint8_t* remapArray = nullptr
+    ) :
+        LedModule(DIGITS),
+        mDriver(driver),
+        mRemapArray(remapArray)
+    {}
+
+    //-----------------------------------------------------------------------
+    // Initialization and termination.
+    //-----------------------------------------------------------------------
+
+    /**
+     * Initialize the module. The Tm1637Driver object must be initialized
+     * separately.
      *
      * @param remapArray optional array of positions to handle LED modules whose
      *    digit ordering is physically different than the logical ordering
      *    (where digit 0 is on the left, and digit (DIGITS-1) is on the far
      *    right).
      */
-    void begin(const uint8_t* remapArray = nullptr) {
+    void begin() {
       memset(mPatterns, 0, DIGITS);
       mBrightness = kBrightnessCmd | kBrightnessLevelOn | 0x7;
       mIsDirty = 0xFF; // force initial values are sent to LED module
       mFlushStage = 0;
-      mRemapArray = remapArray;
     }
 
     /** Signal end of usage. Currently does nothing. */
     void end() {}
 
     //-----------------------------------------------------------------------
-    // Methods related to brightness control.
+    // Implement the LedModule interface
     //-----------------------------------------------------------------------
+
+    /** Return the number of digits supported by this display instance. */
+    uint8_t getNumDigits() const { return DIGITS; }
+
+    void setPatternAt(uint8_t pos, uint8_t pattern) override {
+      uint8_t actualPos = remap(pos);
+      mPatterns[actualPos] = pattern;
+      setDirtyBit(actualPos);
+    }
+
+    uint8_t getPatternAt(uint8_t pos) override {
+      uint8_t actualPos = remap(pos);
+      return mPatterns[actualPos];
+    }
 
     void setBrightness(uint8_t brightness) override {
       mBrightness = (mBrightness & ~0x7) | (brightness & 0x7);
       setDirtyBit(kBrightnessDirtyBit);
     }
+
+    //-----------------------------------------------------------------------
+    // Additional brightness control supported by the TM1637 chip.
+    //-----------------------------------------------------------------------
 
     /**
      * Turn off the entire display. The brightness is not affected so when it is
@@ -196,18 +224,6 @@ class Tm1637Display : public LedDisplay {
       ace_common::incrementMod(mFlushStage, (uint8_t) (DIGITS + 1));
     }
 
-  protected:
-    void setPatternAt(uint8_t pos, uint8_t pattern) override {
-      uint8_t actualPos = remap(pos);
-      mPatterns[actualPos] = pattern;
-      setDirtyBit(actualPos);
-    }
-
-    uint8_t getPatternAt(uint8_t pos) override {
-      uint8_t actualPos = remap(pos);
-      return mPatterns[actualPos];
-    }
-
   private:
     void setDirtyBit(uint8_t bit) {
       mIsDirty |= (0x1 << bit);
@@ -239,12 +255,14 @@ class Tm1637Display : public LedDisplay {
     // A TM1637 can have a maximum of 6 DIGITS, so we are safe.
     static uint8_t const kBrightnessDirtyBit = DIGITS;
 
+    // The ordering of these fields is partially determined to save memory on
+    // 32-bit processors.
     const DRIVER& mDriver;
+    const uint8_t* const mRemapArray;
+    uint8_t mPatterns[DIGITS]; // maps to dirty bits 0-5
     uint8_t mBrightness; // maps to dirty bit 7
     uint8_t mIsDirty; // bit array
     uint8_t mFlushStage; // [0, DIGITS], DIGITS for brightness update
-    uint8_t mPatterns[DIGITS]; // maps to dirty bits 0-5
-    const uint8_t* mRemapArray;
 };
 
 

@@ -4,14 +4,15 @@
 
 An adjustable, configurable, and extensible framework for rendering seven
 segment LED displays on Arduino platforms. Supported wiring confirguations
-include direct pin wiring to the microcontroller, or through a 74HC595
-Shift Register that is accessed through software or hardware SPI.
+include direct pin wiring to the microcontroller, through a 74HC595 Shift
+Register that is accessed through software or hardware SPI, or using an TM1637
+LED driver chip.
 
-**Version**: 0.4 (2021-04-09)
+**Version**: 0.4+ (2021-04-17)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
-**Status**: Experimental work in progress. Not ready for public consumption.
+**Status**: Need to add documentation for `Tm1637Module`.
 
 ## Table of Contents
 
@@ -24,14 +25,14 @@ Shift Register that is accessed through software or hardware SPI.
 * [Usage](#Usage)
     * [Include Header and Namespace](#HeaderAndNamespace)
     * [Classes](#Classes)
-    * [Setting Up the Resources](#SettingResources)
+    * [Setting Up the Scanning Module](#SettingUpScanningModule)
     * [Choosing the LedMatrix](#ChoosingLedMatrix)
         * [Resistors and Transistors](#ResistorsAndTransistors)
         * [Pins Wired Directly, Common Cathode](#LedMatrixDirectCommonCathode)
         * [Pins Wired Directly, Common Anode](#LedMatrixDirectCommonAnode)
         * [Segments On 74HC595 Shift Register](#LedMatrixSingleShiftRegister)
         * [Digits and Segments On Two Shift Registers](#LedMatrixDualShiftRegister)
-    * [Using the ScanningDisplay](#UsingScanningDisplay)
+    * [Using the ScanningModule](#UsingScanningModule)
         * [Writing the Digit Bit Patterns](#DigitBitPatterns)
         * [Global Brightness](#GlobalBrightness)
         * [Frames and Fields](#FramesAndFields)
@@ -90,11 +91,10 @@ components:
     * resistors on segments
     * transistors on digits or segments
     * using 74HC595 with `shiftOut()` or hardware SPI
-* The `ScanningDisplay` class knows how to render the array of digit patterns to
-  the LED module using multiplexing.
-  digit to be associated with a particular brightness.
-* The `ScanningDisplay` knows how to display the bit patterns to a specific
-  physical wiring of an LED display.
+* The `LedModule` class and subclasses such as `ScanningModule` know how to
+  render the array of digit patterns to the LED module using multiplexing.
+* The `LedDisplay` knows how to write the segment bit patterns to an
+  `LedModule`.
 
 The rendering of an array of bit patterns is split into 2 parts:
 
@@ -102,14 +102,14 @@ The rendering of an array of bit patterns is split into 2 parts:
 * a *field* is a partial rendering of a single frame
 
 A frame rate of about 60Hz will be sufficient to prevent obvious flickering of
-the LED. Depending on the configuration of the `ScanningDisplay` class, we could
+the LED. Depending on the configuration of the `ScanningModule` class, we could
 reasonably have between 4 and 64 fields per frame (this is partially a
 user-selectable parameter), giving us a fields per second rate of 240Hz to
 3840Hz.
 
 At 3840 fields per second, a single field needs to be written in less than 260
 microseconds. The AceSegment library is able to meet this timing requirement
-because `ScanningDisplay::renderFieldNow()` is able to render a single field
+because `ScanningModule::renderFieldNow()` is able to render a single field
 with a maximum CPU time of 124 microseconds on a 16MHz ATmega328P
 microcontroller (Arduino UNO, Nano, Mini, etc).
 
@@ -209,12 +209,6 @@ Here are the classes in the library which will be most useful to the
 end-users, listed roughly from low-level to higher-level classes which often
 depend on the lower-level classes:
 
-* `Hardware`
-    * A thin class that hold hardware dependent functions (such as
-      `digitalWrite()`). The compiler optimizes away the entire object, so that
-      resulting code is as-if the underlying hardware functions were called
-      directly.
-    * Can be swapped out with `TestableHardware` for testing.
 * SpiAdapter
     * Thin-wrapper classes to indicate whether we are using software or hardware
       SPI. There are 3 implementations:
@@ -237,15 +231,20 @@ depend on the lower-level classes:
     * `LedMatrixDualShiftRegister`
         * Both group and element pions are access through two 74HC595 chips
           through SPI using one of the SpiAdapter classes
-* `LedDisplay`
-    * Base class interface between Writer classes and the actual LED segment
-      display module
-    * `ScanningDisplay`
-        * An implementation of `LedDisplay` for LED segment modules which do not
+* `LedModule`
+    * Base interface for all hardware dependent implementation of a
+      seven-segment LED module.
+    * `ScanningModule`
+        * An implementation of `LedModule` for LED segment modules which do not
           have a hardware controller, and must be multiplexed across multiple
           digits by the host microcontroller
         * Uses the `LedMatrix` classes to send the segment patterns to the
           actual LED module
+    * `Tm1637Module`
+        * An implementation of `LedModule` using a TM1637 chip.
+* `LedDisplay`
+    * Knows how to write bit patterns to a `LedModule`.
+    * Provides common interfaces and common methods to various Writer classes.
 * Writers
     * Helper classes built on top of the `LedDisplay` which provide higher-level
       interface to the LED module, such as printing numbers, time (hh:mm),
@@ -275,55 +274,59 @@ depend on the lower-level classes:
 The dependency diagram among these classes looks something like this:
 
 ```
-                StringWriter    ClockWriter  TemperatureWriter
-                     |              \           /
-                     V               v         v
-                  CharWriter         NumberWriter
-                          \            /
-                           v          v
-                            LedDisplay
-                                ^
-                                |
-                       +--------+-----------------------------+
-                       |                                      |
-                ScanningDiplay                            Tm1637Display
-                  /    |      \                               |
-            .----.     |       .----------.                   v
-           v           v                   v              Tm1637Driver
-  LedMatrixDirect     LedMatrixSingleSR   LedMatrixDualSR
-LedMatrixDirectFast    |      |        \ /    |
-              \        |      |         X     |
-               \       |      |        / \    |
-                \      |      v       v   v   v
-                 \     |   SwSpiAdapter   HwSpiAdapter
-                  \    | SwSpiAdapaterFast
-                   \   |    /
-                    v  v   v
-                    Hardware
-                       |
-                       v
-                  digitalWrite()
-                  pinMode()
-                  millis()
-                  micros()
+   StringWriter    ClockWriter  TemperatureWriter
+        |              \           /
+        V               v         v
+     CharWriter         NumberWriter
+             \            /
+              v          v
+               LedDisplay
+                   |            (hardware independent)
+-------------------|-------------------------------------
+                   |            (hardware dependent)
+                   v
+                LedModule
+                   ^
+                   |
+          +--------+--------+
+          |                 |
+   ScanningModule       Tm1637Module
+                            |
+                            v
+                        Tm1637Driver
+                        Tm1637DriverFast
+
+
+                 ScanningModule
+                 /      |     \
+                /       |      .-------------.
+               v        v                     v
+  LedMatrixDirect   LedMatrixSingleSftRgstr  LedMatrixDualShiftRegister
+LedMatrixDirectFast               \             /
+                                   \           /
+                                    v         v
+                                   SwSpiAdapter
+                                   HwSpiAdapter
+                                   SwSpiAdapterFast
 ```
 
-<a name="SettingResources"></a>
-### Setting Up the Resources
+<a name="SettingUpScanningModule"></a>
+### Setting Up the Scanning Module
 
 A series of resources must be built up to finally create an instance of
-`ScanningDisplay`. The resource creation occurs in roughly 5 stages, with the
-objects in the later stages depending on the objects created in the earlier
-stage:
+`ScanningModule`. For an LED module using direct scanning, the `ScanningModule`
+is used, and the resource creation occurs in roughly 5 stages, with the objects
+in the later stages depending on the objects created in the earlier stage:
 
-1. The `Hardware` object which provides access to the various pins.
 1. The SpiAdapter object determines whether software SPI or hardware SPI is
    used. Needed only by `LedMatrixSingleShiftRegister` and
    `LedMatrixDualShiftRegister` classes.
 1. The LedMatrix object determine how the LEDs are wired and how to
    communicate to the LED segments.
-1. The `ScanningDisplay` object wraps a segment pattern buffer and an LedMatrix
-   object.
+1. The `ScanningModule` represents the actual LED segment module using
+   direct scanning, or scanning through an 74HC595 shift register chip.
+1. The `LedDisplay` writes seven-segment bit patterns to the underlying
+   `LedModule`.
 1. The various Writer classes which translate higher level characters and
    strings into bit patterns used by `LedDisplay`.
 
@@ -337,28 +340,27 @@ const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 11, 12, 13, 14, 15};
 const uint16_t FRAMES_PER_SECOND = 60;
 
 // The chain of resources.
-Hardware hardware;
-using LedMatrix = LedMatrixDirect<Hardware>;
+using LedMatrix = LedMatrixDirect<>;
 LedMatrix ledMatrix(
-    hardware,
     LedMatrix::kActiveLowPattern /*groupOnPattern*/,
     LedMatrix::kActiveLowPattern /*elementOnPattern*/,
     NUM_DIGITS,
     DIGIT_PINS,
     NUM_SEGMENTS,
     SEGMENT_PINS);
-ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS> scanningDisplay(
-    hardware, ledMatrix, FRAMES_PER_SECOND);
+ScanningModule<LedMatrix, NUM_DIGITS> scanningModule(
+    ledMatrix, FRAMES_PER_SECOND);
+LedDisplay ledDisplay(scanningModule);
 
-NumberWriter hexWriter(scanningDisplay);
-ClockWriter clockWriter(scanningDisplay);
-CharWriter charWriter(scanningDisplay);
+NumberWriter hexWriter(ledDisplay);
+ClockWriter clockWriter(ledDisplay);
+CharWriter charWriter(ledDisplay);
 StringWriter stringWriter(charWriter);
 ...
 
 void setupAceSegment() {
   ledMatrix.begin();
-  scanningDisplay.begin();
+  scanningModule.begin();
 }
 
 void setup() {
@@ -470,24 +472,22 @@ const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
 const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 11, 12, 13, 14, 15};
 const uint16_t FRAMES_PER_SECOND = 60;
 
-Hardware hardware;
-using LedMatrix = LedMatrixDirect<Hardware>;
+using LedMatrix = LedMatrixDirect<>;
 LedMatrix ledMatrix(
-    hardware,
     LedMatrix::kActiveHighPattern /*groupOnPattern*/,
     LedMatrix::kActiveHighPattern /*elementOnPattern*/,
     NUM_DIGITS,
     DIGIT_PINS,
     NUM_SEGMENTS,
     SEGMENT_PINS);
-ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS> scanningDisplay(
-    hardware, ledMatrix, FRAMES_PER_SECOND);
-
+ScanningModule<LedMatrix, NUM_DIGITS> scanningModule(
+    ledMatrix, FRAMES_PER_SECOND);
+LedDisplay ledDisplay(scanningModule);
 ...
 
-void setupScanningDisplay() {
+void setupScanningModule() {
   ledMatrix.begin();
-  scanningDisplay.begin();
+  scanningModule.begin();
 }
 ```
 
@@ -560,25 +560,23 @@ const uint8_t CLOCK_PIN = 13; // SH_CP on 74HC595
 const uint16_t FRAMES_PER_SECOND = 60;
 
 // Common Cathode, with transistors on Group pins
-Hardware hardware;
 SwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-using LedMatrix = LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>;
+using LedMatrix = LedMatrixSingleShiftRegister<SwSpiAdapter>;
 LedMatrix ledMatrix(
-    hardware,
     spiAdapter,
     LedMatrix::kActiveHighPattern /*groupOnPattern*/,
     LedMatrix::kActiveHighPattern /*elementOnPattern*/,
     NUM_DIGITS,
     DIGIT_PINS):
-ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS> scanningDisplay(
-    hardware, ledMatrix, FRAMES_PER_SECOND);
-
+ScanningModule<LedMatrix, NUM_DIGITS> scanningModule(
+    ledMatrix, FRAMES_PER_SECOND);
+LedDisplay ledDisplay(scanningModule);
 ...
 
-void setupScanningDisplay() {
+void setupScanningModule() {
   spiAdapter.begin();
   ledMatrix.begin();
-  scanningDisplay.begin();
+  scanningModule.begin();
 }
 ```
 
@@ -628,29 +626,30 @@ const uint8_t CLOCK_PIN = 13; // SH_CP on 74HC595
 const uint16_t FRAMES_PER_SECOND = 60;
 
 HwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-using LedMatrix = LedMatrixSingleShiftRegister<Hardware, HwSpiAdapter>;
+using LedMatrix = LedMatrixSingleShiftRegister<HwSpiAdapter>;
 LedMatrix ledMatrix(
     spiAdapter,
     LedMatrix::kActiveHighPattern /*groupOnPattern*/,
     LedMatrix::kActiveHighPattern /*elementOnPattern*/);
-ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS> scanningDisplay(
-    hardware, ledMatrix, FRAMES_PER_SECOND);
+ScanningModule<LedMatrix, NUM_DIGITS> scanningModule(
+    ledMatrix, FRAMES_PER_SECOND);
+LedDisplay ledDisplay(scanningModule);
 ...
 
-void setupScanningDisplay() {
+void setupScanningModule() {
   spiAdapter.begin();
   ledMatrix.begin();
-  scanningDisplay.begin();
+  scanningModule.begin();
 }
 ```
 
-<a name="UsingScanningDisplay"></a>
-### Using the ScanningDisplay
+<a name="UsingScanningModule"></a>
+### Using the ScanningModule
 
 <a name="DigitBitPatterns"></a>
 #### Writing Digit Bit Patterns
 
-The `ScanningDisplay` contains a number of methods to write the bit patterns of
+The `ScanningModule` contains a number of methods to write the bit patterns of
 the seven segment display:
 * `void writePatternAt(uint8_t pos, uint8_t pattern)`
 * `void writeDecimalPointAt(uint8_t pos, bool state = true)`
@@ -682,25 +681,25 @@ initially. The `state` variable controls whether the decimal point should
 be turned on (default) or off (false).
 
 The `brightness` is an integer constant (0-255) associated with the digit. It
-requires the `ScanningDisplay` object to be configured to support PWM on the
+requires the `ScanningModule` object to be configured to support PWM on the
 digit pins. Otherwise, the brightness is ignored.
 
 <a name="GlobalBrightness"></a>
 #### Global Brightness
 
-If the `ScanningDisplay` supports it, we can control the global brightness of
+If the `ScanningModule` supports it, we can control the global brightness of
 the entire LED display using:
 
 ```
-scanningDisplay->setBrightness(value);
+scanningModule.setBrightness(value);
 ```
 
 Note that the `value` is an integer from `[0, NUM_DIGITS]`, and represents the
 brightness of the display, where 0 means OFF and `NUM_DIGITS` means 100% ON.
 
 The global brightness is enabled only if the `NUM_SUBFIELDS` template parameter
-of the `ScanningDisplay` was set to be `> 1`. By default, this is set to 1. For
-example, this creates a `ScanningDisplay` using hardware SPI, setting the
+of the `ScanningModule` was set to be `> 1`. By default, this is set to 1. For
+example, this creates a `ScanningModule` using hardware SPI, setting the
 `NUM_SUBFIELDS` to be 16:
 
 ```
@@ -712,13 +711,14 @@ const uint16_t FRAMES_PER_SECOND = 60;
 const uint8_t NUM_SUBFIELDS = 16;
 
 HwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-using LedMatrix = LedMatrixSingleShiftRegister<Hardware, HwSpiAdapter>;
+using LedMatrix = LedMatrixSingleShiftRegister<HwSpiAdapter>;
 LedMatrix ledMatrix(
     spiAdapter,
     LedMatrix::kActiveHighPattern /*groupOnPattern*/,
     LedMatrix::kActiveHighPattern /*elementOnPattern*/);
-ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> scanningDisplay(
-    hardware, ledMatrix, FRAMES_PER_SECOND);
+ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
+    ledMatrix, FRAMES_PER_SECOND);
+LedDisplay ledDisplay(scanningModule);
 ```
 
 Each digit is rendered 16 times within a single field, and modulated using pulse
@@ -729,7 +729,7 @@ and will appear dimmer to the human eye.
 <a name="FramesAndFields"></a>
 #### Frames and Fields
 
-To understand how to the `ScanningDisplay` supports brightness, we first need to
+To understand how to the `ScanningModule` supports brightness, we first need to
 explain a couple of terms that we borrowed from the field of
 [video processing](https://en.wikipedia.org/wiki/Field_(video)):
 
@@ -738,7 +738,7 @@ explain a couple of terms that we borrowed from the field of
   LED display. Any changes in bit patterns or brightness of the digits happens
   through the rendering of multiple frames.
 * **Field**: A field is a partial rendering of a frame. If the current limiting
-  resistors are on the segments (recommended), then the `ScanningDisplay`
+  resistors are on the segments (recommended), then the `ScanningModule`
   multiplexes through the digits. Each rendering of the digit is a *field* and
   for a 4-digit display, there are 4 fields per frame.
 
@@ -750,8 +750,8 @@ within a field, giving a total *field* rate of about 2000-4000Hz. That's abaout
 250-500 microseconds per field, which is surprisingly doable using an 8-bit
 processor like an Arduino UNO or Nano on an ATmega328 running at 16MHz.
 
-The primary unit of rendering in `ScanningDisplay` is a single field,
-implemented in `ScanningDisplay::renderFieldNow()`. The `ScanningDisplay` class
+The primary unit of rendering in `ScanningModule` is a single field,
+implemented in `ScanningModule::renderFieldNow()`. The `ScanningModule` class
 keeps track of the current digit, the current frame, and the current field, and
 each successive call to `renderFieldNow()` sends the appropriate bit pattern to
 the LED module.
@@ -765,7 +765,7 @@ time, and they are explained below:
 <a name="RenderingByPolling"></a>
 #### Rendering By Polling
 
-The `ScanningDisplay::renderFieldWhenReady()` is meant to be called at a
+The `ScanningModule::renderFieldWhenReady()` is meant to be called at a
 frequency somewhat higher than that needed to sustain the actual frame rate. It
 keeps an internal variable containing the time (in `micros()`) of the previous
 rendering of the field. When the time is up, it calls `renderFieldNow()` and
@@ -775,7 +775,7 @@ The code looks like this:
 
 ```
 void loop() {
-  scanningDisplay.renderFieldWhenReady();
+  scanningModule.renderFieldWhenReady();
 }
 ```
 
@@ -792,7 +792,7 @@ flickering problem.
 #### Rendering Using Interrupts
 
 The calling code sets up an interrupt service routine (ISR) which calls
-`ScanningDisplay::renderFieldNow()` at exactly the periodic frequency needed to
+`ScanningModule::renderFieldNow()` at exactly the periodic frequency needed to
 achieve the desired frames per second and fields per second.
 
 Unfortunately, timer interrupts are not part of the Arduino API (probably
@@ -801,14 +801,14 @@ For example, an ATmega328 (e.g. Arduino UNO, Nano, Mini), using an 8-bit timer
 on Timer 2 looks like this:
 ```
 ISR(TIMER2_COMPA_vect) {
-  scanningDisplay.renderFieldNow();
+  scanningModule.renderFieldNow();
 }
 
 void setup() {
   ...
   // set up Timer 2
   uint8_t timerCompareValue =
-      (unsigned long) F_CPU / 1024 / scanningDisplay->getFieldsPerSecond() - 1;
+      (unsigned long) F_CPU / 1024 / scanningModul.getFieldsPerSecond() - 1;
   noInterrupts();
   TCNT2  = 0;	// Initialize counter value to 0
   TCCR2A = 0;
@@ -831,7 +831,7 @@ void loop() {
 
 While it is exciting to be able to write any bit patterns to the LED display, we
 often want to just write numbers to the LED display. The `NumberWriter` can
-print integers to the `ScanningDisplay` using decimal or hexadecimal formats. On
+print integers to the `ScanningModule` using decimal or hexadecimal formats. On
 platforms that support it (ATmega and ESP8266), the bit mapping table is stored
 in flash memory to conserve static memory.
 
@@ -988,16 +988,15 @@ need to include these headers manually, like this:
 Here are the sizes of the various classes on the 8-bit AVR microcontrollers
 (Arduino Uno, Nano, etc):
 
-* sizeof(Hardware): 1
 * sizeof(SwSpiAdapter): 3
 * sizeof(SwSpiAdapterFast<1,2,3>): 1
 * sizeof(HwSpiAdapter): 3
-* sizeof(LedMatrixDirect<Hardware>): 11
+* sizeof(LedMatrixDirect<>): 11
 * sizeof(LedMatrixDirectFast<0..3, 0..7>): 3
-* sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 10
+* sizeof(LedMatrixSingleShiftRegister<SwSpiAdapter>): 10
 * sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 5
 * sizeof(LedDisplay): 3
-* sizeof(ScanningDisplay<Hardware, LedMatrixBase, 4, 1>): 25
+* sizeof(ScanningModule<LedMatrixBase, 4, 1>): 25
 * sizeof(Tm1637Display<Tm1637Driver, 4>): 12
 * sizeof(NumberWriter): 2
 * sizeof(ClockWriter): 3
@@ -1021,15 +1020,15 @@ static memory consumptions for various configurations on an Arduino Nano
 |---------------------------------+--------------+-------------|
 | baseline                        |    456/   11 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| ScanningDisplay(direct)         |   1700/   76 |  1244/   65 |
-| ScanningDisplay(single_sw_spi)  |   1724/   70 |  1268/   59 |
-| ScanningDisplay(single_hw_spi)  |   1786/   71 |  1330/   60 |
-| ScanningDisplay(dual_sw_spi)    |   1626/   61 |  1170/   50 |
-| ScanningDisplay(dual_hw_spi)    |   1700/   62 |  1244/   51 |
+| ScanningModule(direct)          |   1700/   76 |  1244/   65 |
+| ScanningModule(single_sw_spi)   |   1724/   70 |  1268/   59 |
+| ScanningModule(single_hw_spi)   |   1786/   71 |  1330/   60 |
+| ScanningModule(dual_sw_spi)     |   1626/   61 |  1170/   50 |
+| ScanningModule(dual_hw_spi)     |   1700/   62 |  1244/   51 |
 |---------------------------------+--------------+-------------|
-| ScanningDisplay(direct_fast)    |   1460/  104 |  1004/   93 |
-| ScanningDisplay(single_sw_fast) |   1616/   68 |  1160/   57 |
-| ScanningDisplay(dual_sw_fast)   |   1226/   59 |   770/   48 |
+| ScanningModule(direct_fast)     |   1460/  104 |  1004/   93 |
+| ScanningModule(single_sw_fast)  |   1616/   68 |  1160/   57 |
+| ScanningModule(dual_sw_fast)    |   1226/   59 |   770/   48 |
 |---------------------------------+--------------+-------------|
 | Tm1637Display(Normal)           |   1814/   43 |  1358/   32 |
 | Tm1637Display(Fast)             |   1152/   40 |   696/   29 |
@@ -1050,15 +1049,15 @@ And here are the memory consumption numbers for an ESP8266:
 |---------------------------------+--------------+-------------|
 | baseline                        | 256700/26784 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| ScanningDisplay(direct)         | 257972/26860 |  1272/   76 |
-| ScanningDisplay(single_sw_spi)  | 258044/26868 |  1344/   84 |
-| ScanningDisplay(single_hw_spi)  | 259148/26876 |  2448/   92 |
-| ScanningDisplay(dual_sw_spi)    | 257928/26848 |  1228/   64 |
-| ScanningDisplay(dual_hw_spi)    | 259128/26856 |  2428/   72 |
+| ScanningModule(direct)          | 257972/26860 |  1272/   76 |
+| ScanningModule(single_sw_spi)   | 258044/26868 |  1344/   84 |
+| ScanningModule(single_hw_spi)   | 259148/26876 |  2448/   92 |
+| ScanningModule(dual_sw_spi)     | 257928/26848 |  1228/   64 |
+| ScanningModule(dual_hw_spi)     | 259128/26856 |  2428/   72 |
 |---------------------------------+--------------+-------------|
-| ScanningDisplay(direct_fast)    |     -1/   -1 |    -1/   -1 |
-| ScanningDisplay(single_sw_fast) |     -1/   -1 |    -1/   -1 |
-| ScanningDisplay(dual_sw_fast)   |     -1/   -1 |    -1/   -1 |
+| ScanningModule(direct_fast)     |     -1/   -1 |    -1/   -1 |
+| ScanningModule(single_sw_fast)  |     -1/   -1 |    -1/   -1 |
+| ScanningModule(dual_sw_fast)    |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | Tm1637Display(Normal)           | 258168/26816 |  1468/   32 |
 | Tm1637Display(Fast)             |     -1/   -1 |    -1/   -1 |

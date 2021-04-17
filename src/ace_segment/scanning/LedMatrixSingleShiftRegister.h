@@ -26,6 +26,7 @@ SOFTWARE.
 #define ACE_SEGMENT_LED_MATRIX_SINGLE_SHIFT_REGISTER_H
 
 #include <Arduino.h> // OUTPUT, INPUT
+#include "../hw/GpioInterface.h"
 #include "LedMatrixBase.h"
 
 class LedMatrixSingleShiftRegisterTest_drawElements;
@@ -43,14 +44,14 @@ namespace ace_segment {
  *   dataPin/D11/MOSI -- DS (Phillips) / SER (TI) / Pin 14
  *   clockPin/D13/SCK -- SH_CP (Phillips) / SRCK (TI) / Pin 11 (rising)
  *
- * @tparam H class that provides access to hardware pins functions
  * @tparam SA class that provides SPI, either SwSpiAdapter or HwSpiAdapter
+ * @tparam GPI (optional) class that provides access to GPIO functions, default
+ *    GpioInterface
  */
-template<typename H, typename SA>
+template<typename SA, typename GPI = GpioInterface>
 class LedMatrixSingleShiftRegister : public LedMatrixBase {
   public:
     LedMatrixSingleShiftRegister(
-        const H& hardware,
         const SA& spiAdapter,
         uint8_t groupOnPattern,
         uint8_t elementOnPattern,
@@ -58,7 +59,6 @@ class LedMatrixSingleShiftRegister : public LedMatrixBase {
         const uint8_t* groupPins
     ) :
         LedMatrixBase(groupOnPattern, elementOnPattern),
-        mHardware(hardware),
         mSpiAdapter(spiAdapter),
         mGroupPins(groupPins),
         mNumGroups(numGroups)
@@ -69,8 +69,8 @@ class LedMatrixSingleShiftRegister : public LedMatrixBase {
       uint8_t output = (0x00 ^ mGroupXorMask) & 0x1;
       for (uint8_t group = 0; group < mNumGroups; group++) {
         uint8_t pin = mGroupPins[group];
-        mHardware.pinMode(pin, OUTPUT);
-        mHardware.digitalWrite(pin, output);
+        GPI::pinMode(pin, OUTPUT);
+        GPI::digitalWrite(pin, output);
       }
     }
 
@@ -78,7 +78,7 @@ class LedMatrixSingleShiftRegister : public LedMatrixBase {
       // Set pins to INPUT mode.
       for (uint8_t group = 0; group < mNumGroups; group++) {
         uint8_t pin = mGroupPins[group];
-        mHardware.pinMode(pin, INPUT);
+        GPI::pinMode(pin, INPUT);
       }
     }
 
@@ -121,11 +121,10 @@ class LedMatrixSingleShiftRegister : public LedMatrixBase {
     /** Write bit 0 of output to group pin. */
     void writeGroupPin(uint8_t group, uint8_t output) const {
       uint8_t groupPin = mGroupPins[group];
-      mHardware.digitalWrite(groupPin, (output ^ mGroupXorMask) & 0x1);
+      GPI::digitalWrite(groupPin, (output ^ mGroupXorMask) & 0x1);
     }
 
   private:
-    const H& mHardware;
     const SA& mSpiAdapter;
     const uint8_t* const mGroupPins;
     uint8_t const mNumGroups;

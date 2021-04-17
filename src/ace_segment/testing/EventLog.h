@@ -26,6 +26,7 @@ SOFTWARE.
 #define ACE_SEGMENT_TEST_EVENT_LOG_H
 
 #include <stdint.h>
+#include <stdarg.h>
 
 namespace ace_segment {
 namespace testing {

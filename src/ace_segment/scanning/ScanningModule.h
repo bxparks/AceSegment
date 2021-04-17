@@ -22,19 +22,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_SCANNING_DISPLAY_H
-#define ACE_SEGMENT_SCANNING_DISPLAY_H
+#ifndef ACE_SEGMENT_SCANNING_MODULE_H
+#define ACE_SEGMENT_SCANNING_MODULE_H
 
 #include <stdint.h>
 #include <AceCommon.h> // incrementMod()
-#include "../LedDisplay.h"
+#include "../LedModule.h"
 
-class ScanningDisplayTest_displayCurrentField;
+class ScanningModuleTest_displayCurrentField;
 
 namespace ace_segment {
 
 /**
- * An implementation of `LedDisplay` for display modules which do not have
+ * An implementation of `LedModule` for display modules which do not have
  * hardware controller chips, so they require the microcontroller to perform the
  * multiplexed scanning across the digits. The matrix wiring of the segment and
  * digit pins allow only a single digit to be turned on at any given time, so
@@ -62,22 +62,26 @@ namespace ace_segment {
  *    loop(), and an internal timing parameter will trigger a renderFieldNow()
  *    at the appropriate time.
  *
- * @tparam HW class that provides access to hardware pins and timing functions
- * @tparam LM LedMatrixBase class that provides access to LED segments
+ * @tparam LM the LedMatrixBase class that provides access to LED segments
       (elements) organized by digit (group)
  * @tparam DIGITS number of LED digits
  * @tparam SUBFIELDS number of subfields for each digit to get brightness
  *    control using PWM. The default is 1, but can be set to greater than 1 to
  *    get brightness control.
+ * @tparam CI class that provides access to Arduino clock functions (millis()
+ *    and micros()). The default is ClockInterface.
  */
-template <typename HW, typename LM, uint8_t DIGITS, uint8_t SUBFIELDS = 1>
-class ScanningDisplay : public LedDisplay {
+template <
+    typename LM,
+    uint8_t DIGITS,
+    uint8_t SUBFIELDS = 1,
+    typename CI = ClockInterface>
+class ScanningModule : public LedModule {
 
   public:
     /**
      * Constructor.
      *
-     * @param hardware pointer to an instance of Hardware. Required.
      * @param ledMatrix instance of LedMatrixBase that understanding the wiring
      * @param framesPerSecond the rate at which all digits of the LED display
      *    will be refreshed
@@ -85,13 +89,11 @@ class ScanningDisplay : public LedDisplay {
      * @param patterns array of segment pattern per digit, not nullable
      * @param brightnesses array of brightness for each digit (default: nullptr)
      */
-    explicit ScanningDisplay(
-        const HW& hardware,
+    explicit ScanningModule(
         const LM& ledMatrix,
         uint8_t framesPerSecond
     ):
-        LedDisplay(DIGITS),
-        mHardware(hardware),
+        LedModule(DIGITS),
         mLedMatrix(ledMatrix),
         mFramesPerSecond(framesPerSecond)
     {}
@@ -105,7 +107,7 @@ class ScanningDisplay : public LedDisplay {
     void begin() {
       // Set up durations for the renderFieldWhenReady() polling function.
       mMicrosPerField = (uint32_t) 1000000UL / getFieldsPerSecond();
-      mLastRenderFieldMicros = mHardware.micros();
+      mLastRenderFieldMicros = CI::micros();
 
       // Initialize variables needed for multiplexing.
       mCurrentDigit = 0;
@@ -124,17 +126,42 @@ class ScanningDisplay : public LedDisplay {
     /** A no-op end() function for consistency with other classes. */
     void end() {}
 
+    //-----------------------------------------------------------------------
+    // Implement the LedModule interface.
+    //-----------------------------------------------------------------------
+
     /** Get the number of digits. */
     uint8_t getNumDigits() const { return DIGITS; }
 
+    void setPatternAt(uint8_t pos, uint8_t pattern) override {
+      mPatterns[pos] = pattern;
+    }
+
+    uint8_t getPatternAt(uint8_t pos) override {
+      return mPatterns[pos];
+    }
+
+    /**
+     * @copydoc
+     *
+     * See the documentation for setBrightnessAt() for information about the
+     * range of values of `brightness` and how it is interpreted.
+     */
+    void setBrightness(uint8_t brightness) override {
+      for (uint8_t i = 0; i < DIGITS; i++) {
+        setBrightnessAt(i, brightness);
+      }
+    }
+
     //-----------------------------------------------------------------------
-    // Methods related to brightness control.
+    // Additional brightness control. ScanningModule allows brightness to be
+    // defined on a per-digit basis.
     //-----------------------------------------------------------------------
 
     /**
      * Set the brightness for a given pos, leaving pattern unchanged.
      * Not all implementation of `LedClass` can support brightness for each
-     * digit, so this is implemented at the ScanningDisplay class.
+     * digit, so this is implemented at the ScanningModule class.
      *
      * The maximum brightness should is exactly `SUBFIELDS` which turns on the
      * LED 100% of the time. The minimum brightness is 0, which turns OFF the
@@ -156,18 +183,6 @@ class ScanningDisplay : public LedDisplay {
     void setBrightnessAt(uint8_t pos, uint8_t brightness) {
       if (pos >= DIGITS) return;
       mBrightnesses[pos] = (brightness >= SUBFIELDS) ? SUBFIELDS : brightness;
-    }
-
-    /**
-     * @copydoc
-     *
-     * See the documentation for setBrightnessAt() for information about the
-     * range of values of `brightness` and how it is interpreted.
-     */
-    void setBrightness(uint8_t brightness) override {
-      for (uint8_t i = 0; i < DIGITS; i++) {
-        setBrightnessAt(i, brightness);
-      }
     }
 
     //-----------------------------------------------------------------------
@@ -194,7 +209,7 @@ class ScanningDisplay : public LedDisplay {
      *    rendered.
      */
     bool renderFieldWhenReady() {
-      uint16_t now = mHardware.micros();
+      uint16_t now = CI::micros();
       uint16_t elapsedMicros = now - mLastRenderFieldMicros;
       if (elapsedMicros >= mMicrosPerField) {
         renderFieldNow();
@@ -222,21 +237,12 @@ class ScanningDisplay : public LedDisplay {
       }
     }
 
-  protected:
-    void setPatternAt(uint8_t pos, uint8_t pattern) override {
-      mPatterns[pos] = pattern;
-    }
-
-    uint8_t getPatternAt(uint8_t pos) override {
-      return mPatterns[pos];
-    }
-
   private:
-    friend class ::ScanningDisplayTest_displayCurrentField;
+    friend class ::ScanningModuleTest_displayCurrentField;
 
     // disable copy-constructor and assignment operator
-    ScanningDisplay(const ScanningDisplay&) = delete;
-    ScanningDisplay& operator=(const ScanningDisplay&) = delete;
+    ScanningModule(const ScanningModule&) = delete;
+    ScanningModule& operator=(const ScanningModule&) = delete;
 
     /** Display field normally without modulation. */
     void displayCurrentFieldPlain() {
@@ -279,10 +285,8 @@ class ScanningDisplay : public LedDisplay {
     }
 
   private:
-    // Ordered to save space on 32-bit processors.
-
-    /** Indirection to the digitalWrite(), micros() hardware functions. */
-    const HW& mHardware;
+    // The ordering of the fields below partially motivated to save memory on
+    // 32-bit processors.
 
     /** LedMatrixBase instance that knows how to set and unset LED segments. */
     const LM& mLedMatrix;

@@ -1,5 +1,5 @@
 /*
- * A program which compiles in different ScanningDisplay objects configured with
+ * A program which compiles in different ScanningModule objects configured with
  * using different LED configurations to determine the flash and static memory
  * sizes from the output of the compiler. Set the FEATURE macro to various
  * integer to compile different algorithms.
@@ -25,9 +25,9 @@
 #define FEATURE_DIRECT_FAST 6
 #define FEATURE_SINGLE_SW_SPI_FAST 7
 #define FEATURE_DUAL_SW_SPI_FAST 8
-#define FEATURE_TM1637_DISPLAY 9
-#define FEATURE_TM1637_DISPLAY_FAST 10
-#define FEATURE_STUB_DISPLAY 11
+#define FEATURE_TM1637_MODULE 9
+#define FEATURE_TM1637_MODULE_FAST 10
+#define FEATURE_STUB_MODULE 11
 #define FEATURE_NUMBER_WRITER 12
 #define FEATURE_CLOCK_WRITER 13
 #define FEATURE_TEMPERATURE_WRITER 14
@@ -68,52 +68,48 @@ volatile int disableCompilerOptimization = 0;
   const uint8_t DIO_PIN = 10;
   const uint16_t BIT_DELAY = 100;
 
-  class StubDisplay : public LedDisplay {
+  class StubModule : public LedModule {
     public:
-      StubDisplay() : LedDisplay(NUM_DIGITS) {}
+      StubModule() : LedModule(NUM_DIGITS) {}
 
       void setBrightness(uint8_t brightness) override {
         disableCompilerOptimization = brightness;
       }
 
-      void setPatternAt(uint8_t pos, uint8_t pattern) override {
+      void setPatternAt(uint8_t /*pos*/, uint8_t pattern) override {
         disableCompilerOptimization = pattern;
       }
 
-      uint8_t getPatternAt(uint8_t pos) override {
+      uint8_t getPatternAt(uint8_t /*pos*/) override {
         return disableCompilerOptimization;
       }
   };
 
-  Hardware hardware;
-
   #if FEATURE == FEATURE_DIRECT
     // Common Anode, with transitions on Group pins
-    using LedMatrix = LedMatrixDirect<Hardware>;
+    using LedMatrix = LedMatrixDirect<>;
     LedMatrix ledMatrix(
-        hardware,
         LedMatrix::kActiveLowPattern /*groupOnPattern*/,
         LedMatrix::kActiveLowPattern /*elementOnPattern*/,
         NUM_DIGITS,
         DIGIT_PINS,
         NUM_SEGMENTS,
         SEGMENT_PINS);
-    ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-        scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
+    ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+        scanningModule(ledMatrix, FRAMES_PER_SECOND);
 
   #elif FEATURE == FEATURE_SINGLE_SW_SPI
     // Common Cathode, with transistors on Group pins
     SwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-    using LedMatrix = LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>;
+    using LedMatrix = LedMatrixSingleShiftRegister<SwSpiAdapter>;
     LedMatrix ledMatrix(
-        hardware,
         spiAdapter,
         LedMatrix::kActiveHighPattern /*groupOnPattern*/,
         LedMatrix::kActiveHighPattern /*elementOnPattern*/,
         NUM_DIGITS,
         DIGIT_PINS);
-    ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-        scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
+    ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+        scanningModule(ledMatrix, FRAMES_PER_SECOND);
 
   #elif FEATURE == FEATURE_SINGLE_SW_SPI_FAST
     #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
@@ -123,30 +119,28 @@ volatile int disableCompilerOptimization = 0;
     // Common Cathode, with transistors on Group pins
     using SpiAdapter = SwSpiAdapterFast<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiAdapter spiAdapter;
-    using LedMatrix = LedMatrixSingleShiftRegister<Hardware, SpiAdapter>;
+    using LedMatrix = LedMatrixSingleShiftRegister<SpiAdapter>;
     LedMatrix ledMatrix(
-        hardware,
         spiAdapter,
         LedMatrix::kActiveHighPattern /*groupOnPattern*/,
         LedMatrix::kActiveHighPattern /*elementOnPattern*/,
         NUM_DIGITS,
         DIGIT_PINS);
-    ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-        scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
+    ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+        scanningModule(ledMatrix, FRAMES_PER_SECOND);
 
   #elif FEATURE == FEATURE_SINGLE_HW_SPI
     // Common Cathode, with transistors on Group pins
     HwSpiAdapter spiAdapter(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-    using LedMatrix = LedMatrixSingleShiftRegister<Hardware, HwSpiAdapter>;
+    using LedMatrix = LedMatrixSingleShiftRegister<HwSpiAdapter>;
     LedMatrix ledMatrix(
-        hardware,
         spiAdapter,
         LedMatrix::kActiveHighPattern /*groupOnPattern*/,
         LedMatrix::kActiveHighPattern /*elementOnPattern*/,
         NUM_DIGITS,
         DIGIT_PINS);
-    ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-        scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
+    ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+        scanningModule(ledMatrix, FRAMES_PER_SECOND);
 
   #elif FEATURE == FEATURE_DUAL_SW_SPI
     // Common Cathode, with transistors on Group pins
@@ -156,8 +150,8 @@ volatile int disableCompilerOptimization = 0;
         spiAdapter,
         LedMatrix::kActiveLowPattern /*groupOnPattern*/,
         LedMatrix::kActiveLowPattern /*elementOnPattern*/);
-    ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-        scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
+    ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+        scanningModule(ledMatrix, FRAMES_PER_SECOND);
 
   #elif FEATURE == FEATURE_DUAL_SW_SPI_FAST
     #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
@@ -172,8 +166,8 @@ volatile int disableCompilerOptimization = 0;
         spiAdapter,
         LedMatrix::kActiveLowPattern /*groupOnPattern*/,
         LedMatrix::kActiveLowPattern /*elementOnPattern*/);
-    ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-        scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
+    ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+        scanningModule(ledMatrix, FRAMES_PER_SECOND);
 
   #elif FEATURE == FEATURE_DUAL_HW_SPI
     // Common Cathode, with transistors on Group pins
@@ -183,8 +177,8 @@ volatile int disableCompilerOptimization = 0;
         spiAdapter,
         LedMatrix::kActiveLowPattern /*groupOnPattern*/,
         LedMatrix::kActiveLowPattern /*elementOnPattern*/);
-    ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-        scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
+    ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+        scanningModule(ledMatrix, FRAMES_PER_SECOND);
 
   #elif FEATURE == FEATURE_DIRECT_FAST
     #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
@@ -199,44 +193,50 @@ volatile int disableCompilerOptimization = 0;
     LedMatrix ledMatrix(
         LedMatrix::kActiveLowPattern /*groupOnPattern*/,
         LedMatrix::kActiveLowPattern /*elementOnPattern*/);
-    ScanningDisplay<Hardware, LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-        scanningDisplay(hardware, ledMatrix, FRAMES_PER_SECOND);
+    ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+        scanningModule(ledMatrix, FRAMES_PER_SECOND);
 
-  #elif FEATURE == FEATURE_TM1637_DISPLAY
+  #elif FEATURE == FEATURE_TM1637_MODULE
     using Driver = Tm1637Driver;
     Driver driver(CLK_PIN, DIO_PIN, BIT_DELAY);
-    Tm1637Display<Driver, NUM_DIGITS> ledDisplay(driver);
+    Tm1637Module<Driver, NUM_DIGITS> tm1637Module(driver);
 
-  #elif FEATURE == FEATURE_TM1637_DISPLAY_FAST
+  #elif FEATURE == FEATURE_TM1637_MODULE_FAST
     #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
       #error Unsupported FEATURE on this platform
     #endif
 
     using Driver = Tm1637DriverFast<CLK_PIN, DIO_PIN, BIT_DELAY>;
     Driver driver;
-    Tm1637Display<Driver, NUM_DIGITS> ledDisplay(driver);
+    Tm1637Module<Driver, NUM_DIGITS> tm1637Module(driver);
 
-  #elif FEATURE == FEATURE_STUB_DISPLAY
-    StubDisplay ledDisplay;
+  #elif FEATURE == FEATURE_STUB_MODULE
+    StubModule stubModule;
+    LedDisplay ledDisplay(stubModule);
 
   #elif FEATURE == FEATURE_NUMBER_WRITER
-    StubDisplay ledDisplay;
+    StubModule stubModule;
+    LedDisplay ledDisplay(stubModule);
     NumberWriter numberWriter(ledDisplay);
 
   #elif FEATURE == FEATURE_CLOCK_WRITER
-    StubDisplay ledDisplay;
+    StubModule stubModule;
+    LedDisplay ledDisplay(stubModule);
     ClockWriter clockWriter(ledDisplay);
 
   #elif FEATURE == FEATURE_TEMPERATURE_WRITER
-    StubDisplay ledDisplay;
+    StubModule stubModule;
+    LedDisplay ledDisplay(stubModule);
     TemperatureWriter temperatureWriter(ledDisplay);
 
   #elif FEATURE == FEATURE_CHAR_WRITER
-    StubDisplay ledDisplay;
+    StubModule stubModule;
+    LedDisplay ledDisplay(stubModule);
     CharWriter charWriter(ledDisplay);
 
   #elif FEATURE == FEATURE_STRING_WRITER
-    StubDisplay ledDisplay;
+    StubModule stubModule;
+    LedDisplay ledDisplay(stubModule);
     CharWriter charWriter(ledDisplay);
     StringWriter stringWriter(charWriter);
 
@@ -249,56 +249,56 @@ void setup() {
 
 // In the following, I used to grab the output of patterns[] and write to
 // disableCompilerOptimization to prevent the compiler from optimizing away the
-// entire program. But after templatizing ScanningDisplay, pattterns variable is
+// entire program. But after templatizing ScanningModule, pattterns variable is
 // no longer accessible. But it does not matter because I realized that
-// ScanningDisplay performs a digitalWrite(), which has the same effect of
+// ScanningModule performs a digitalWrite(), which has the same effect of
 // disabling optimizations.
 
 #elif FEATURE == FEATURE_DIRECT
   ledMatrix.begin();
-  scanningDisplay.begin();
+  scanningModule.begin();
 
 #elif FEATURE == FEATURE_DIRECT_FAST
   ledMatrix.begin();
-  scanningDisplay.begin();
+  scanningModule.begin();
 
 #elif FEATURE == FEATURE_SINGLE_SW_SPI
   spiAdapter.begin();
   ledMatrix.begin();
-  scanningDisplay.begin();
+  scanningModule.begin();
 
 #elif FEATURE == FEATURE_SINGLE_SW_SPI_FAST
   spiAdapter.begin();
   ledMatrix.begin();
-  scanningDisplay.begin();
+  scanningModule.begin();
 
 #elif FEATURE == FEATURE_SINGLE_HW_SPI
   spiAdapter.begin();
   ledMatrix.begin();
-  scanningDisplay.begin();
+  scanningModule.begin();
 
 #elif FEATURE == FEATURE_DUAL_SW_SPI
   spiAdapter.begin();
   ledMatrix.begin();
-  scanningDisplay.begin();
+  scanningModule.begin();
 
 #elif FEATURE == FEATURE_DUAL_SW_SPI_FAST
   spiAdapter.begin();
   ledMatrix.begin();
-  scanningDisplay.begin();
+  scanningModule.begin();
 
 #elif FEATURE == FEATURE_DUAL_HW_SPI
   spiAdapter.begin();
   ledMatrix.begin();
-  scanningDisplay.begin();
+  scanningModule.begin();
 
-#elif FEATURE == FEATURE_TM1637_DISPLAY
+#elif FEATURE == FEATURE_TM1637_MODULE
   driver.begin();
-  ledDisplay.begin();
+  tm1637Module.begin();
 
-#elif FEATURE == FEATURE_TM1637_DISPLAY_FAST
+#elif FEATURE == FEATURE_TM1637_MODULE_FAST
   driver.begin();
-  ledDisplay.begin();
+  tm1637Module.begin();
 
 #else
   // No setup() needed for Writers.
@@ -307,20 +307,20 @@ void setup() {
 }
 
 void loop() {
-#if FEATURE > FEATURE_BASELINE && FEATURE < FEATURE_TM1637_DISPLAY
-  scanningDisplay.writePatternAt(0, 0x3A);
-  scanningDisplay.renderFieldWhenReady();
+#if FEATURE > FEATURE_BASELINE && FEATURE < FEATURE_TM1637_MODULE
+  scanningModule.setPatternAt(0, 0x3A);
+  scanningModule.renderFieldWhenReady();
 
-#elif FEATURE == FEATURE_TM1637_DISPLAY
-  ledDisplay.writePatternAt(0, 0xff);
-  ledDisplay.flush();
+#elif FEATURE == FEATURE_TM1637_MODULE
+  tm1637Module.setPatternAt(0, 0xff);
+  tm1637Module.flush();
 
-#elif FEATURE == FEATURE_TM1637_DISPLAY_FAST
-  ledDisplay.writePatternAt(0, 0xff);
-  ledDisplay.flush();
+#elif FEATURE == FEATURE_TM1637_MODULE_FAST
+  tm1637Module.setPatternAt(0, 0xff);
+  tm1637Module.flush();
 
-#elif FEATURE == FEATURE_STUB_DISPLAY
-  ledDisplay.writePatternAt(0, 0xff);
+#elif FEATURE == FEATURE_STUB_MODULE
+  stubModule.setPatternAt(0, 0xff);
 
 #elif FEATURE == FEATURE_NUMBER_WRITER
   numberWriter.writeUnsignedDecimalAt(0, 42);

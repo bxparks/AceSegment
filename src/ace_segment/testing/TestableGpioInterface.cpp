@@ -1,7 +1,7 @@
 /*
 MIT License
 
-Copyright (c) 2018 Brian T. Park
+Copyright (c) 2021 Brian T. Park
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,50 +22,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_HARDWARE_H
-#define ACE_SEGMENT_HARDWARE_H
-
-#include <stdint.h>
-#include <Arduino.h>
+#include "TestableGpioInterface.h"
 
 namespace ace_segment {
+namespace testing {
 
-/**
- * Class that provides a layer of indirection to various hardware pins and
- * timing class. A different Hardware class can be used as a template parameter
- * to ScanningDisplay.
- */
-class Hardware {
-  public:
-    /** Write value to pin. */
-    void digitalWrite(uint8_t pin, uint8_t value) const {
-    #if defined(ARDUINO_API_VERSION)
-      arduino::digitalWrite(pin, value);
-    #else
-      ::digitalWrite(pin, value);
-    #endif
-    }
-
-    /** Set pin mode. */
-    void pinMode(uint8_t pin, uint8_t mode) const {
-    #if defined(ARDUINO_API_VERSION)
-      arduino::pinMode(pin, mode);
-    #else
-      ::pinMode(pin, mode);
-    #endif
-    }
-
-    /** Get the current micros  */
-    unsigned long micros() const {
-      return ::micros();
-    }
-
-    /** Get the current millis  */
-    unsigned long millis() const {
-      return ::millis();
-    }
-};
+EventLog TestableGpioInterface::sEventLog;
 
 }
-
-#endif
+}
