@@ -9,7 +9,7 @@
 #include <Arduino.h>
 #include <AUnit.h>
 #include <AceSegment.h>
-#include <ace_segment/testing/TestableLedDisplay.h>
+#include <ace_segment/testing/TestableLedModule.h>
 
 using aunit::TestRunner;
 using aunit::TestOnce;
@@ -20,7 +20,8 @@ const uint8_t NUM_DIGITS = 4;
 const uint8_t CUSTOM_BRIGHTNESS = 64;
 const uint8_t DIFFERENT_BRIGHTNESS = 32;
 
-TestableLedDisplay<NUM_DIGITS> ledDisplay;
+TestableLedModule<NUM_DIGITS> ledModule;
+LedDisplay ledDisplay(ledModule);
 NumberWriter numberWriter(ledDisplay);
 ClockWriter clockWriter(ledDisplay);
 TemperatureWriter temperatureWriter(ledDisplay);
@@ -35,7 +36,7 @@ class CharWriterTest : public TestOnce {
   protected:
     void setup() override {
       ledDisplay.clear();
-      mPatterns = ledDisplay.getPatterns();
+      mPatterns = ledModule.getPatterns();
     }
 
     uint8_t* mPatterns;
@@ -61,7 +62,7 @@ class StringWriterTest : public TestOnce {
   protected:
     void setup() override {
       ledDisplay.clear();
-      mPatterns = ledDisplay.getPatterns();
+      mPatterns = ledModule.getPatterns();
     }
 
     void assertPatternsEqual(int n, ...) {
@@ -98,7 +99,7 @@ class NumberWriterTest : public TestOnce {
   protected:
     void setup() override {
       ledDisplay.clear();
-      mPatterns = ledDisplay.getPatterns();
+      mPatterns = ledModule.getPatterns();
     }
 
     uint8_t* mPatterns;
@@ -188,7 +189,7 @@ class ClockWriterTest: public TestOnce {
   protected:
     void setup() override {
       ledDisplay.clear();
-      mPatterns = ledDisplay.getPatterns();
+      mPatterns = ledModule.getPatterns();
     }
 
     uint8_t* mPatterns;
@@ -250,7 +251,7 @@ class TemperatureWriterTest: public TestOnce {
   protected:
     void setup() override {
       ledDisplay.clear();
-      mPatterns = ledDisplay.getPatterns();
+      mPatterns = ledModule.getPatterns();
     }
 
     uint8_t* mPatterns;

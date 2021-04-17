@@ -1,10 +1,11 @@
 # Changelog
 
 * Unreleased
-    * Add `Tm1637Display` class to support LED modules using the TM1637 chip.
     * Simplify `LedDisplay` base class API.
+    * Extract hardware dependent API from `LedDisplay` into `LedModule`.
+    * Add `Tm1637Module` class to support LED modules using the TM1637 chip.
     * Add `TemperatureWriter`.
-    * Add `remapArray` to `Tm1637Display::begin()` to support logical reordering
+    * Add `remapArray` to `Tm1637Module::begin()` to support logical reordering
       of the LED digits to support certain 6-digit LED modules which are
       physically wired out of order.
 * 0.4 (2021-04-09)

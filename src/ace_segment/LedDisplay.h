@@ -27,40 +27,40 @@ SOFTWARE.
 
 #include <stdint.h>
 #include <Arduino.h> // pgm_read_byte()
+#include "LedModule.h"
 
 namespace ace_segment {
 
 /**
- * General interface for writing LED segment patterns to the LED display module.
+ * General interface for writing segment patterns to the underlying LedModule.
  * Various 'Writer' classes provide additional functionality on top of this
- * interface:
+ * interface (e.g. NumberWriter, ClockWriter, TemperatureWriter, CharWriter,
+ * StringWriter).
  *
- *  * NumberWriter: write numberse in decimal or hexadecimal format
- *  * ClockWriter: write strings of the form "HH:MM"
- *  * CharWriter: write ASCII characters in the range of 0-127
- *  * StringWriter: uses a CharWriter to write c-strings
+ * This class is stateless and does not contain any virtual functions. If it is
+ * created transiently, the function calls can sometimes be optimized away by
+ * the compiler. But usually, an instance of this class is created around a
+ * specific subclass of `LedModule`, and then passed into one of the Writer
+ * classes.
  */
 class LedDisplay {
   public:
     /**
      * Constructor.
-     *
-     * @param numDigits number of digits in the LED module; this value is
-     *    returned by getNumDigits(). The value is usually a compile-time
-     *    constant, so it is faster/cheaper to just use the constant value.
-     *    However, sometimes your code needs this value but it has only a
-     *    reference/pointer to the LedDisplay (or one of its subclasses). Then
-     *    getNumDigits() can be used.
+     * @param ledModule an instance of LedModule or one of its subclasses
      */
-    LedDisplay(uint8_t numDigits) : mNumDigits(numDigits) {}
+    LedDisplay(LedModule& ledModule) : mLedModule(ledModule) {}
+
+    /** Return the number of digits supported by this display instance. */
+    uint8_t getNumDigits() const { return mLedModule.getNumDigits(); }
 
     /**
      * Write the pattern for a given pos. If the pos is out of bounds, the
      * method does nothing.
      */
     void writePatternAt(uint8_t pos, uint8_t pattern) {
-      if (pos >= mNumDigits) return;
-      setPatternAt(pos, pattern);
+      if (pos >= mLedModule.getNumDigits()) return;
+      mLedModule.setPatternAt(pos, pattern);
     }
 
     /**
@@ -73,8 +73,8 @@ class LedDisplay {
      */
     void writePatternsAt(uint8_t pos, const uint8_t patterns[], uint8_t len) {
       for (uint8_t i = 0; i < len; i++) {
-        if (pos >= mNumDigits) break;
-        setPatternAt(pos++, patterns[i]);
+        if (pos >= mLedModule.getNumDigits()) break;
+        mLedModule.setPatternAt(pos++, patterns[i]);
       }
     }
 
@@ -89,9 +89,9 @@ class LedDisplay {
      */
     void writePatternsAt_P(uint8_t pos, const uint8_t patterns[], uint8_t len) {
       for (uint8_t i = 0; i < len; i++) {
-        if (pos >= mNumDigits) break;
+        if (pos >= mLedModule.getNumDigits()) break;
         uint8_t pattern = pgm_read_byte(patterns + i);
-        setPatternAt(pos++, pattern);
+        mLedModule.setPatternAt(pos++, pattern);
       }
     }
 
@@ -100,21 +100,15 @@ class LedDisplay {
      * colon segment to one of the decimal points.
      */
     void writeDecimalPointAt(uint8_t pos, bool state = true) {
-      if (pos >= mNumDigits) return;
-      uint8_t pattern = getPatternAt(pos);
+      if (pos >= mLedModule.getNumDigits()) return;
+      uint8_t pattern = mLedModule.getPatternAt(pos);
       if (state) {
         pattern |= 0x80;
       } else {
         pattern &= ~0x80;
       }
-      setPatternAt(pos, pattern);
+      mLedModule.setPatternAt(pos, pattern);
     }
-
-    /**
-     * Set global brightness of all digits. Different subclasses will interpret
-     * the brightness integer value differently.
-     */
-    virtual void setBrightness(uint8_t brightness) = 0;
 
     /**
      * Clear all digits to blank pattern. The default implementation writes a
@@ -122,23 +116,23 @@ class LedDisplay {
      * needed.
      */
     void clear() {
-      for (uint8_t i = 0; i < mNumDigits; ++i) {
-        setPatternAt(i, 0);
+      for (uint8_t i = 0; i < mLedModule.getNumDigits(); ++i) {
+        mLedModule.setPatternAt(i, 0);
       }
     }
 
-    /** Return the number of digits supported by this display instance. */
-    uint8_t getNumDigits() const { return mNumDigits; }
-
-  protected:
-    /** Set the led digit pattern at position pos. */
-    virtual void setPatternAt(uint8_t pos, uint8_t pattern) = 0;
-
-    /** Get the led digit pattern at position pos. */
-    virtual uint8_t getPatternAt(uint8_t pos) = 0;
+    /** Set the global brightness. */
+    void setBrightness(uint8_t brightness) {
+      mLedModule.setBrightness(brightness);
+    }
 
   private:
-    uint8_t const mNumDigits;
+    // disable copy-constructor and assignment operator
+    LedDisplay(const LedDisplay&) = delete;
+    LedDisplay& operator=(const LedDisplay&) = delete;
+
+  private:
+    LedModule& mLedModule;
 };
 
 } // ace_segment

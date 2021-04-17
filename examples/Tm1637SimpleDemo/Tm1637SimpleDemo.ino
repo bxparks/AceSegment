@@ -5,7 +5,7 @@
 
 #include <Arduino.h>
 #include <AceCommon.h> // incrementMod()
-#include <AceSegment.h> // Tm1637Display
+#include <AceSegment.h> // Tm1636Module, LedDisplay
 
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
@@ -68,7 +68,8 @@ constexpr uint16_t BIT_DELAY = 100;
 #else
   #error Unknown TM16137_DRIVER_TYPE
 #endif
-Tm1637Display<Driver, NUM_DIGITS> display(driver);
+Tm1637Module<Driver, NUM_DIGITS> tm1637Module(driver);
+LedDisplay display(tm1637Module);
 
 TimingStats stats;
 
@@ -84,10 +85,10 @@ void setup() {
 
   driver.begin();
 
-#if defined(AUNITER_LED_CLOCK_TM1637)
-  display.begin();
+#if defined(AUNITER_LED_CLOCK_TM1637) || defined(EPOXY_DUINO)
+  tm1637Module.begin();
 #elif defined(AUNITER_LED_CLOCK_TM1637_6)
-  display.begin(kSixDigitRemapArray);
+  tm1637Module.begin(ace_segment::kSixDigitRemapArray);
 #endif
 }
 
@@ -110,7 +111,7 @@ void loop() {
 
   // Flush the change to the LED Module, and measure the time.
   uint16_t startMicros = micros();
-  display.flush();
+  tm1637Module.flush();
   uint16_t elapsedMicros = (uint16_t) micros() - startMicros;
   stats.update(elapsedMicros);
 
@@ -157,7 +158,7 @@ void loop() {
 
     // Flush incrementally, and measure the time.
     uint16_t startMicros = micros();
-    display.flushIncremental();
+    tm1637Module.flushIncremental();
     uint16_t elapsedMicros = (uint16_t) micros() - startMicros;
     stats.update(elapsedMicros);
   }

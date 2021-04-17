@@ -119,8 +119,8 @@ const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
 #endif
 
 #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_TM1637
-  const uint8_t CLK_PIN = 16;
-  const uint8_t DIO_PIN = 10;
+  const uint8_t CLK_PIN = 10;
+  const uint8_t DIO_PIN = 9;
   const uint16_t BIT_DELAY = 100;
 #endif
 
@@ -210,22 +210,23 @@ const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
 
 #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_SCANNING
   // 1-bit brightness
-  ScanningDisplay<LedMatrix, NUM_DIGITS> display(
-      ledMatrix, FRAMES_PER_SECOND);
+  ScanningModule<LedMatrix, NUM_DIGITS>
+      module(ledMatrix, FRAMES_PER_SECOND);
 
   // 16 levels of brightness, need render-fields/second of 60*4*16 = 3840.
-  ScanningDisplay<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-      scanningDisplayModulating(ledMatrix, FRAMES_PER_SECOND);
+  ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+      modulatingModule(ledMatrix, FRAMES_PER_SECOND);
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_TM1637
   using TmDriver = Tm1637Driver;
   TmDriver driver(CLK_PIN, DIO_PIN, BIT_DELAY);
-  Tm1637Display<TmDriver, 4> display(driver);
+  Tm1637Module<TmDriver, 4> module(driver);
 
 #else
   #error Unknown LED_DISPLAY_TYPE
 #endif
 
+LedDisplay display(module);
 NumberWriter numberWriter(display);
 ClockWriter clockWriter(display);
 TemperatureWriter temperatureWriter(display);
@@ -236,7 +237,8 @@ StringWriter stringWriter(charWriter);
 void setupAceSegment() {
 #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_TM1637
   driver.begin();
-  display.begin();
+  module.begin();
+  module.setBrightness(2);
 #else
   #if LED_MATRIX_MODE == LED_MATRIX_MODE_PARIAL_SW_SPI \
       || LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HW_SPI \
@@ -248,8 +250,8 @@ void setupAceSegment() {
   #endif
 
   ledMatrix.begin();
-  display.begin();
-  scanningDisplayModulating.begin();
+  module.begin();
+  modulatingModule.begin();
 #endif
 
 #if USE_INTERRUPT == 1
@@ -282,9 +284,9 @@ void setupInterupt(uint16_t fieldsPerSecond) {
 // interrupt handler for timer 2
 ISR(TIMER2_COMPA_vect) {
   if (demoMode == DEMO_MODE_PULSE) {
-    scanningDisplayModulating.renderFieldNow();
+    modulatingModule.renderFieldNow();
   } else {
-    display.renderFieldNow();
+    module.renderFieldNow();
   }
 }
 #endif
@@ -438,7 +440,8 @@ void scrollString(const char* s) {
 #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_SCANNING
 
 void setupPulseDisplay() {
-  NumberWriter numberWriter(scanningDisplayModulating);
+  LedDisplay modulatingDisplay(modulatingModule);
+  NumberWriter numberWriter(modulatingDisplay);
   numberWriter.writeHexCharAt(0, 1);
   numberWriter.writeHexCharAt(1, 2);
   numberWriter.writeHexCharAt(2, 3);
@@ -450,10 +453,10 @@ void setBrightnesses(int i) {
   uint8_t brightness1 = levels[(i+1) % NUM_BRIGHTNESSES];
   uint8_t brightness2 = levels[(i+2) % NUM_BRIGHTNESSES];
   uint8_t brightness3 = levels[(i+3) % NUM_BRIGHTNESSES];
-  scanningDisplayModulating.setBrightnessAt(0, brightness0);
-  scanningDisplayModulating.setBrightnessAt(1, brightness1);
-  scanningDisplayModulating.setBrightnessAt(2, brightness2);
-  scanningDisplayModulating.setBrightnessAt(3, brightness3);
+  modulatingModule.setBrightnessAt(0, brightness0);
+  modulatingModule.setBrightnessAt(1, brightness1);
+  modulatingModule.setBrightnessAt(2, brightness2);
+  modulatingModule.setBrightnessAt(3, brightness3);
 }
 
 void pulseDisplay() {
@@ -550,9 +553,6 @@ void nextDemo() {
   }
 
   display.clear();
-  #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_SCANNING
-    scanningDisplayModulating.clear();
-  #endif
 
   updateDemo();
 }
@@ -583,13 +583,13 @@ void demoLoop() {
 void renderField() {
   #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_SCANNING
     if (demoMode == DEMO_MODE_PULSE) {
-      scanningDisplayModulating.renderFieldWhenReady();
+      modulatingModule.renderFieldWhenReady();
     } else {
-      display.renderFieldWhenReady();
+      module.renderFieldWhenReady();
     }
   #else
-    display.flush();
-    //display.flushIncremental();
+    module.flush();
+    //module.flushIncremental();
   #endif
 }
 
