@@ -1,11 +1,11 @@
 SIZEOF
-sizeof(SwSpiAdapter): 3
-sizeof(SwSpiAdapterFast<1,2,3>): 1
-sizeof(HwSpiAdapter): 3
+sizeof(SwSpiInterface): 3
+sizeof(FastSwSpiInterface<1,2,3>): 1
+sizeof(HwSpiInterface): 3
 sizeof(LedMatrixDirect<>): 9
 sizeof(LedMatrixDirectFast<0..3, 0..7>): 3
-sizeof(LedMatrixSingleShiftRegister<SwSpiAdapter>): 8
-sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 5
+sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 8
+sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 5
 sizeof(LedDisplay): 2
 sizeof(ScanningModule<LedMatrixBase, 4, 1>): 22
 sizeof(Tm1637Module<Tm1637Driver, 4>): 14
@@ -14,22 +14,22 @@ sizeof(ClockWriter): 3
 sizeof(CharWriter): 2
 sizeof(StringWriter): 2
 BENCHMARKS
-Scanning(direct) 72 76 88 240
-Scanning(direct,subfields) 4 12 84 3840
-Scanning(single,sw_spi) 156 159 180 240
-Scanning(single,sw_spi,subfields) 4 19 176 3840
-Scanning(single,hw_spi) 36 38 52 240
-Scanning(single,hw_spi,subfields) 4 8 48 3840
-Scanning(dual,sw_spi) 264 268 296 240
-Scanning(dual,sw_spi,subfields) 4 30 300 3840
-Scanning(dual,hw_spi) 24 25 36 240
-Scanning(dual,hw_spi,subfields) 4 7 36 3840
-Scanning(direct_fast) 24 28 44 240
-Scanning(direct_fast,subfields) 4 7 36 3840
-Scanning(single,sw_spi_fast) 28 30 44 240
-Scanning(single,sw_spi_fast,subfields) 4 7 40 3840
-Scanning(dual,sw_spi_fast) 20 24 36 240
-Scanning(dual,sw_spi_fast,subfields) 4 7 32 3840
+Scanning(Direct) 72 76 88 240
+Scanning(Direct,subfields) 4 12 84 3840
+Scanning(Single,SwSpi) 156 159 180 240
+Scanning(Single,SwSpi,subfields) 4 19 176 3840
+Scanning(Single,HwSpi) 36 38 52 240
+Scanning(Single,HwSpi,subfields) 4 8 48 3840
+Scanning(Dual,SwSpi) 264 268 296 240
+Scanning(Dual,SwSpi,subfields) 4 30 300 3840
+Scanning(Dual,HwSpi) 24 25 36 240
+Scanning(Dual,HwSpi,subfields) 4 7 36 3840
+Scanning(DirectFast) 24 28 44 240
+Scanning(DirectFast,subfields) 4 7 36 3840
+Scanning(Single,FastSwSpi) 28 30 44 240
+Scanning(Single,FastSwSpi,subfields) 4 7 40 3840
+Scanning(Dual,FastSwSpi) 20 24 36 240
+Scanning(Dual,FastSwSpi,subfields) 4 7 32 3840
 Tm1637(Normal) 22304 22326 22600 20
 Tm1637(Fast) 21056 21069 21208 20
 END

@@ -42,7 +42,7 @@ It measures the time taken by `ScanningModule::renderFieldNow()` which
 renders a single digit (multiple fields make up a frame, a frame is the
 rendering of all digits on the display module).
 
-**Version**: AceSegment v0.4
+**Version**: AceSegment v0.4+
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 

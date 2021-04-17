@@ -210,9 +210,9 @@ void runDirect() {
   ledMatrix.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("Scanning(direct)",
+  runScanningBenchmark("Scanning(Direct)",
       scanningModule);
-  runScanningBenchmark("Scanning(direct,subfields)",
+  runScanningBenchmark("Scanning(Direct,subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -236,9 +236,9 @@ void runDirectFast() {
   ledMatrix.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("Scanning(direct_fast)",
+  runScanningBenchmark("Scanning(DirectFast)",
       scanningModule);
-  runScanningBenchmark("Scanning(direct_fast,subfields)",
+  runScanningBenchmark("Scanning(DirectFast,subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -265,9 +265,9 @@ void runSingleShiftRegisterSwSpi() {
   ledMatrix.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("Scanning(single,sw_spi)",
+  runScanningBenchmark("Scanning(Single,SwSpi)",
       scanningModule);
-  runScanningBenchmark("Scanning(single,sw_spi,subfields)",
+  runScanningBenchmark("Scanning(Single,SwSpi,subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -296,9 +296,9 @@ void runSingleShiftRegisterSwSpiFast() {
   ledMatrix.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("Scanning(single,sw_spi_fast)",
+  runScanningBenchmark("Scanning(Single,FastSwSpi)",
       scanningModule);
-  runScanningBenchmark("Scanning(single,sw_spi_fast,subfields)",
+  runScanningBenchmark("Scanning(Single,FastSwSpi,subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -326,9 +326,9 @@ void runSingleShiftRegisterHwSpi() {
   ledMatrix.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("Scanning(single,hw_spi)",
+  runScanningBenchmark("Scanning(Single,HwSpi)",
       scanningModule);
-  runScanningBenchmark("Scanning(single,hw_spi,subfields)",
+  runScanningBenchmark("Scanning(Single,HwSpi,subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -353,8 +353,8 @@ void runDualShiftRegisterSwSpi() {
   ledMatrix.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("Scanning(dual,sw_spi)", scanningModule);
-  runScanningBenchmark("Scanning(dual,sw_spi,subfields)",
+  runScanningBenchmark("Scanning(dual,SwSpi)", scanningModule);
+  runScanningBenchmark("Scanning(dual,SwSpi,subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -381,8 +381,8 @@ void runDualShiftRegisterSwSpiFast() {
   ledMatrix.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("Scanning(dual,sw_spi_fast)", scanningModule);
-  runScanningBenchmark("Scanning(dual,sw_spi_fast,subfields)",
+  runScanningBenchmark("Scanning(dual,FastSwSpi)", scanningModule);
+  runScanningBenchmark("Scanning(dual,FastSwSpi,subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -408,8 +408,8 @@ void runDualShiftRegisterHwSpi() {
   ledMatrix.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("Scanning(dual,hw_spi)", scanningModule);
-  runScanningBenchmark("Scanning(dual,hw_spi,subfields)",
+  runScanningBenchmark("Scanning(dual,HwSpi)", scanningModule);
+  runScanningBenchmark("Scanning(dual,HwSpi,subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
