@@ -40,10 +40,13 @@ SOFTWARE.
 #include <Arduino.h>
 #include <AceCommon.h> // TimingStats
 #include <AceSegment.h>
+
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 #include <digitalWriteFast.h>
 #include <ace_segment/hw/SwSpiAdapterFast.h>
 #include <ace_segment/scanning/LedMatrixDirectFast.h>
 #include <ace_segment/tm1637/Tm1637DriverFast.h>
+#endif
 
 using namespace ace_segment;
 using ace_common::TimingStats;
