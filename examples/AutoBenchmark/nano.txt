@@ -1,16 +1,20 @@
 SIZEOF
+sizeof(SwWireInterface): 4
+sizeof(SwWireFastInterface<4, 5, 100>): 1
 sizeof(SwSpiInterface): 3
-sizeof(FastSwSpiInterface<1,2,3>): 1
+sizeof(SwSpiFastInterface<11, 12, 13>): 1
 sizeof(HwSpiInterface): 3
 sizeof(LedMatrixDirect<>): 9
-sizeof(LedMatrixDirectFast<0..3, 0..7>): 3
+sizeof(LedMatrixDirectFast<2..5, 6..13>): 3
 sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 8
 sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 5
-sizeof(LedDisplay): 2
-sizeof(ScanningModule<LedMatrixBase, 4, 1>): 22
+sizeof(LedModule): 2
+sizeof(ScanningModule<LedMatrixBase, 4>): 22
 sizeof(Tm1637Module<SwWireInterface, 4>): 14
+sizeof(LedDisplay): 2
 sizeof(NumberWriter): 2
 sizeof(ClockWriter): 3
+sizeof(TemperatureWriter): 2
 sizeof(CharWriter): 2
 sizeof(StringWriter): 2
 BENCHMARKS
@@ -18,18 +22,18 @@ Scanning(Direct) 72 76 88 240
 Scanning(Direct,subfields) 4 12 84 3840
 Scanning(Single,SwSpi) 156 159 180 240
 Scanning(Single,SwSpi,subfields) 4 19 176 3840
-Scanning(Single,HwSpi) 36 38 52 240
+Scanning(Single,HwSpi) 36 38 48 240
 Scanning(Single,HwSpi,subfields) 4 8 48 3840
-Scanning(Dual,SwSpi) 264 268 296 240
-Scanning(Dual,SwSpi,subfields) 4 30 300 3840
-Scanning(Dual,HwSpi) 24 25 36 240
-Scanning(Dual,HwSpi,subfields) 4 7 36 3840
-Scanning(DirectFast) 24 28 44 240
+Scanning(dual,SwSpi) 264 268 304 240
+Scanning(dual,SwSpi,subfields) 4 30 300 3840
+Scanning(dual,HwSpi) 24 25 40 240
+Scanning(dual,HwSpi,subfields) 4 7 32 3840
+Scanning(DirectFast) 24 28 40 240
 Scanning(DirectFast,subfields) 4 7 36 3840
-Scanning(Single,FastSwSpi) 28 30 44 240
+Scanning(Single,FastSwSpi) 28 31 44 240
 Scanning(Single,FastSwSpi,subfields) 4 7 40 3840
-Scanning(Dual,FastSwSpi) 20 24 36 240
-Scanning(Dual,FastSwSpi,subfields) 4 7 32 3840
-Tm1637(Normal) 22304 22326 22600 20
+Scanning(dual,FastSwSpi) 20 24 32 240
+Scanning(dual,FastSwSpi,subfields) 4 7 32 3840
+Tm1637(Normal) 22308 22325 22576 20
 Tm1637(Fast) 21056 21069 21208 20
 END
