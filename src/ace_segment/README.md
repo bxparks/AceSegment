@@ -10,19 +10,25 @@ writer/
     v
 ace_segment/
   LedDisplay.h
+    |
+    v
+  LedModule.h
     ^
     |
     +-------+
             |
             |
-      scanning/
-        ScanningDisplay.h
-        LedMatrix*.h
-        /          \
-       /            \
-      v              v
-    hw/              fast/
-      Hardware.h       FastSwSpiInterface.h
-      SwSpiInterface.h   LedMatrixDirectFast.h
-      HwSpiInterface.h
+        scanning/
+          ScanningDisplay.h
+          LedMatrix*.h
+          LedMatrixDirectFast.h
+             |
+             |
+             v
+         hw/
+           ClockInterface.h
+           GpioInterface.h
+           SwSpiInterface.h
+           SwSpiFastInterface.h
+           HwSpiInterface.h
 ```

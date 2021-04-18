@@ -43,8 +43,8 @@ SOFTWARE.
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 #include <digitalWriteFast.h>
-#include <ace_segment/hw/FastSwSpiInterface.h>
-#include <ace_segment/hw/FastSwWireInterface.h>
+#include <ace_segment/hw/SwSpiFastInterface.h>
+#include <ace_segment/hw/SwWireFastInterface.h>
 #include <ace_segment/scanning/LedMatrixDirectFast.h>
 #endif
 
@@ -278,7 +278,7 @@ void runSingleShiftRegisterSwSpi() {
 // Common Cathode, with transistors on Group pins
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 void runSingleShiftRegisterSwSpiFast() {
-  using SpiInterface = FastSwSpiInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  using SpiInterface = SwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
   using LedMatrix = LedMatrixSingleShiftRegister<SpiInterface>;
   LedMatrix ledMatrix(
@@ -365,7 +365,7 @@ void runDualShiftRegisterSwSpi() {
 // Common Anode, with transistors on Group pins
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 void runDualShiftRegisterSwSpiFast() {
-  using SpiInterface = FastSwSpiInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  using SpiInterface = SwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
   using LedMatrix = LedMatrixDualShiftRegister<SpiInterface>;
   LedMatrix ledMatrix(
@@ -453,7 +453,7 @@ void runTm1637DisplayNormal() {
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 // Tm1637Module(Fast)
 void runTm1637DisplayFast() {
-  using WireInterface = FastSwWireInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
+  using WireInterface = SwWireFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
   WireInterface wireInterface;
   Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module(wireInterface);
 
@@ -486,12 +486,20 @@ void runBenchmarks() {
 }
 
 void printSizeOf() {
+  SERIAL_PORT_MONITOR.print(F("sizeof(SwWireInterface): "));
+  SERIAL_PORT_MONITOR.println(sizeof(SwWireInterface));
+
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+  SERIAL_PORT_MONITOR.print(F("sizeof(SwWireFastInterface<4, 5, 100>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(SwWireFastInterface<4, 5, 100>));
+#endif
+
   SERIAL_PORT_MONITOR.print(F("sizeof(SwSpiInterface): "));
   SERIAL_PORT_MONITOR.println(sizeof(SwSpiInterface));
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  SERIAL_PORT_MONITOR.print(F("sizeof(FastSwSpiInterface<1,2,3>): "));
-  SERIAL_PORT_MONITOR.println(sizeof(FastSwSpiInterface<1,2,3>));
+  SERIAL_PORT_MONITOR.print(F("sizeof(SwSpiFastInterface<11, 12, 13>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(SwSpiFastInterface<11, 12, 13>));
 #endif
 
   SERIAL_PORT_MONITOR.print(F("sizeof(HwSpiInterface): "));
@@ -501,7 +509,7 @@ void printSizeOf() {
   SERIAL_PORT_MONITOR.println(sizeof(LedMatrixDirect<>));
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  SERIAL_PORT_MONITOR.print(F("sizeof(LedMatrixDirectFast<0..3, 0..7>): "));
+  SERIAL_PORT_MONITOR.print(F("sizeof(LedMatrixDirectFast<2..5, 6..13>): "));
   SERIAL_PORT_MONITOR.println(sizeof(LedMatrixDirectFast<
       2, 3, 4, 5,
       6, 7, 8, 9, 10, 11, 12, 13>));
@@ -517,22 +525,26 @@ void printSizeOf() {
   SERIAL_PORT_MONITOR.println(
       sizeof(LedMatrixDualShiftRegister<HwSpiInterface>));
 
-  SERIAL_PORT_MONITOR.print(F("sizeof(LedDisplay): "));
+  SERIAL_PORT_MONITOR.print(F("sizeof(LedModule): "));
   SERIAL_PORT_MONITOR.println(sizeof(LedDisplay));
 
-  SERIAL_PORT_MONITOR.print(
-      F("sizeof(ScanningModule<LedMatrixBase, 4, 1>): "));
-  SERIAL_PORT_MONITOR.println(
-      sizeof(ScanningModule<LedMatrixBase, 4, 1>));
+  SERIAL_PORT_MONITOR.print( F("sizeof(ScanningModule<LedMatrixBase, 4>): "));
+  SERIAL_PORT_MONITOR.println( sizeof(ScanningModule<LedMatrixBase, 4>));
 
   SERIAL_PORT_MONITOR.print(F("sizeof(Tm1637Module<SwWireInterface, 4>): "));
   SERIAL_PORT_MONITOR.println(sizeof(Tm1637Module<SwWireInterface, 4>));
+
+  SERIAL_PORT_MONITOR.print(F("sizeof(LedDisplay): "));
+  SERIAL_PORT_MONITOR.println(sizeof(LedDisplay));
 
   SERIAL_PORT_MONITOR.print(F("sizeof(NumberWriter): "));
   SERIAL_PORT_MONITOR.println(sizeof(NumberWriter));
 
   SERIAL_PORT_MONITOR.print(F("sizeof(ClockWriter): "));
   SERIAL_PORT_MONITOR.println(sizeof(ClockWriter));
+
+  SERIAL_PORT_MONITOR.print(F("sizeof(TemperatureWriter): "));
+  SERIAL_PORT_MONITOR.println(sizeof(TemperatureWriter));
 
   SERIAL_PORT_MONITOR.print(F("sizeof(CharWriter): "));
   SERIAL_PORT_MONITOR.println(sizeof(CharWriter));

@@ -5,8 +5,8 @@
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 #include <digitalWriteFast.h>
-#include <ace_segment/hw/FastSwSpiInterface.h>
-#include <ace_segment/hw/FastSwWireInterface.h>
+#include <ace_segment/hw/SwSpiFastInterface.h>
+#include <ace_segment/hw/SwWireFastInterface.h>
 #include <ace_segment/scanning/LedMatrixDirectFast.h>
 #endif
 
@@ -156,7 +156,7 @@ const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
       DIGIT_PINS):
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SW_SPI_FAST
   // Common Cathode, with transistors on Group pins
-  using SpiInterface = FastSwSpiInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  using SpiInterface = SwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
   using LedMatrix = LedMatrixSingleShiftRegister<SpiInterface>;
   LedMatrix ledMatrix(
@@ -185,7 +185,7 @@ const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
       LedMatrix::kActiveLowPattern /*elementOnPattern*/);
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SW_SPI_FAST
   // Common Anode, with transistors on Group pins
-  using SpiInterface = FastSwSpiInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  using SpiInterface = SwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
   using LedMatrix = LedMatrixDualShiftRegister<SpiInterface>;
   LedMatrix ledMatrix(

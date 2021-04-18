@@ -96,7 +96,7 @@ before substantional refactoring in 2021.
   bytes on Teensy 3.2.
 * Reduce flash by 250-400 bytes on AVR by providing ability to use
   `digitalWriteFast()` (https://github.com/NicksonYap/digitalWriteFast) using
-  the `fast/LedMatrixDirectFast.h` and `fast/FastSwSpiInterface.h` classes.
+  the `scanning/LedMatrixDirectFast.h` and `hw/SwSpiFastInterface.h` classes.
 * Total flash size saved is around 2kB for AVR, from (4 to 4.4) kB to (2 to 2.5)
   kB.
 * Reduce flash size by 828 bytes on AVR, 3kB on ESP8266, 5kB on ESP32 in commit
@@ -119,7 +119,7 @@ before substantional refactoring in 2021.
   changes are due to some removal/addition of some methods in `LedDisplay`.
 * Add memory usage for `Tm1637Module`. Seems to consume something in between
   similar to the `ScanningModule` w/ SW SPI and `ScanningModule` with HW SPI.
-* Add memory usage for `Tm1637Module` using `FastSwWireInterface` which uses
+* Add memory usage for `Tm1637Module` using `SwWireFastInterface` which uses
   `digitalWriteFast` library for AVR processors. Saves 662 - 776 bytes of flash
   on AVR processors compared to `Tm1637Module` using normal `SwWireInterface`.
 * Save 150-200 bytes of flash on AVR processors by lifting all of the

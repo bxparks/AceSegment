@@ -64,7 +64,7 @@ static const uint8_t kSixDigitRemapArray[6] = {
  * interface.
  *
  * @tparam WI wire protocol interface, either SwWireInterface or
- *    FastSwWireInterface
+ *    SwWireFastInterface
  * @tparam DIGITS number of digits in the LED module (usually 4 or 6)
  */
 template <typename WI, uint8_t DIGITS>
@@ -74,7 +74,7 @@ class Tm1637Module : public LedModule {
     /**
      * Constructor.
      * @param wireInterface instance of either SwWireInterface or
-     *    FastSwWireInterface
+     *    SwWireFastInterface
      * @param remapArray (optional) some (most?) six-digit LED modules using the
      *      TM1637 chip need remapping of the digit addresses
      */
