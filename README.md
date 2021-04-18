@@ -216,7 +216,7 @@ depend on the lower-level classes:
         * Software SPI using `shiftOut()`
     * `HwSpiInterface`
         * Native hardware SPI.
-    * `FastSwSpiInterface`
+    * `SwSpiFastInterface`
         * Software SPI using `digitalWriteFast()` on AVR processors
 * `LedMatrix`: Various subclasses capture the wiring of the matrix of LEDs.
     * `LedMatrixDirect`
@@ -294,7 +294,7 @@ The dependency diagram among these classes looks something like this:
                             |
                             v
                         SwWireInterface
-                        FastSwWireInterface
+                        SwWireFastInterface
 
 
                  ScanningModule
@@ -307,7 +307,7 @@ LedMatrixDirectFast               \             /
                                     v         v
                                    SwSpiInterface
                                    HwSpiInterface
-                                   FastSwSpiInterface
+                                   SwSpiFastInterface
 ```
 
 <a name="SettingUpScanningModule"></a>
@@ -958,9 +958,9 @@ I have written versions of some lower-level classes to take advantage of
 
 * `scanning/LedMatrixDirectFast.h`
     * Variant of `LedMatrixDirect` using `digitalWriteFast()`
-* `hw/FastSwSpiInterface.h`
+* `hw/SwSpiFastInterface.h`
     * Variant of `SwSpiInterface.h` using  `digitalWriteFast()`
-* `hw/FastSwWireInterface.h`
+* `hw/SwWireFastInterface.h`
     * Variant of `SwWireInterface.h` using `digitalWriteFast()`
 
 Since these header files require an external `digitalWriteFast` library to be
@@ -970,10 +970,12 @@ need to include these headers manually, like this:
 
 ```C++
 #include <AceSegment.h> // do this first
-#include <digitalWriteFast.h> // from 3rd party library
-#include <ace_segment/hw/FastSwSpiInterface.h>
-#include <ace_segment/hw/FastSwWireInterface.h>
-#include <ace_segment/scanning/LedMatrixDirectFast.h>
+#if defined(ARDUINO_ARCH_AVR)
+  #include <digitalWriteFast.h> // from 3rd party library
+  #include <ace_segment/hw/SwSpiFastInterface.h>
+  #include <ace_segment/hw/SwWireFastInterface.h>
+  #include <ace_segment/scanning/LedMatrixDirectFast.h>
+#endif
 ```
 
 <a name="ResourceConsumption"></a>
@@ -985,7 +987,7 @@ Here are the sizes of the various classes on the 8-bit AVR microcontrollers
 (Arduino Uno, Nano, etc):
 
 * sizeof(SwSpiInterface): 3
-* sizeof(FastSwSpiInterface<1,2,3>): 1
+* sizeof(SwSpiFastInterface<1,2,3>): 1
 * sizeof(HwSpiInterface): 3
 * sizeof(LedMatrixDirect<>): 11
 * sizeof(LedMatrixDirectFast<0..3, 0..7>): 3

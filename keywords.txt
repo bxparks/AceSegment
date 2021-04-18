@@ -8,7 +8,7 @@
 
 HwSpiInterface	KEYWORD1
 SwSpiInterface	KEYWORD1
-FastSwSpiInterface	KEYWORD1
+SwSpiFastInterface	KEYWORD1
 LedMatrixBase	KEYWORD1
 LedMatrixDirect	KEYWORD1
 LedMatrixDirectFast	KEYWORD1

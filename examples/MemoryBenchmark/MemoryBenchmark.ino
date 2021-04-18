@@ -42,9 +42,9 @@ volatile int disableCompilerOptimization = 0;
   #include <AceSegment.h>
   #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
     #include <digitalWriteFast.h>
-    #include <ace_segment/hw/FastSwSpiInterface.h>
+    #include <ace_segment/hw/SwSpiFastInterface.h>
+    #include <ace_segment/hw/SwWireFastInterface.h>
     #include <ace_segment/scanning/LedMatrixDirectFast.h>
-    #include <ace_segment/tm1637/FastSwWireInterface.h>
   #endif
   using namespace ace_segment;
 
@@ -117,7 +117,7 @@ volatile int disableCompilerOptimization = 0;
     #endif
 
     // Common Cathode, with transistors on Group pins
-    using SpiInterface = FastSwSpiInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    using SpiInterface = SwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
     using LedMatrix = LedMatrixSingleShiftRegister<SpiInterface>;
     LedMatrix ledMatrix(
@@ -159,7 +159,7 @@ volatile int disableCompilerOptimization = 0;
     #endif
 
     // Common Cathode, with transistors on Group pins
-    using SpiInterface = FastSwSpiInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    using SpiInterface = SwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
     using LedMatrix = LedMatrixDualShiftRegister<SpiInterface>;
     LedMatrix ledMatrix(
@@ -206,7 +206,7 @@ volatile int disableCompilerOptimization = 0;
       #error Unsupported FEATURE on this platform
     #endif
 
-    using WireInterface = FastSwWireInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
+    using WireInterface = SwWireFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
     WireInterface wireInterface;
     Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module(wireInterface);
 

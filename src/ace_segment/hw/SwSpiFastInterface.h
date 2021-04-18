@@ -22,15 +22,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_FAST_SW_SPI_INTERFACE_H
-#define ACE_SEGMENT_FAST_SW_SPI_INTERFACE_H
+#ifndef ACE_SEGMENT_SW_SPI_FAST_INTERFACE_H
+#define ACE_SEGMENT_SW_SPI_FAST_INTERFACE_H
 
 // This header file requires the digitalWriteFast library on AVR, or the
 // EpoxyMockDigitalWriteFast library on EpoxyDuino.
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 
 #include <stdint.h>
-#include <Arduino.h> // OUTPUT
+#include <Arduino.h> // OUTPUT, INPUT
 
 namespace ace_segment {
 
@@ -43,9 +43,9 @@ namespace ace_segment {
  * @tparam clockPin the clock pin (CLK)
  */
 template <uint8_t latchPin, uint8_t dataPin, uint8_t clockPin>
-class FastSwSpiInterface {
+class SwSpiFastInterface {
   public:
-    FastSwSpiInterface() = default;
+    SwSpiFastInterface() = default;
 
     void begin() const {
       pinModeFast(latchPin, OUTPUT);

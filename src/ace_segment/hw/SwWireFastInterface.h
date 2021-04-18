@@ -22,8 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_FAST_SW_WIRE_INTERFACE_H
-#define ACE_SEGMENT_FAST_SW_WIRE_INTERFACE_H
+#ifndef ACE_SEGMENT_SW_WIRE_FAST_INTERFACE_H
+#define ACE_SEGMENT_SW_WIRE_FAST_INTERFACE_H
 
 // This header file requires the digitalWriteFast library on AVR, or the
 // EpoxyMockDigitalWriteFast library on EpoxyDuino.
@@ -45,7 +45,7 @@ namespace ace_segment {
  *
  * The reason that you may want to use `digitalWriteFast` library is because it
  * consumes far less flash memory than normal `digitalWrite()`. The benchmarks
- * in MemoryBenchmark shows that using this `FastSwWireInterface` instead of
+ * in MemoryBenchmark shows that using this `SwWireFastInterface` instead of
  * `SwWireInterface` saves 650-770 bytes of flash on an AVR processor.
  *
  * Word of caution: There is a use-case where you may want to still use the
@@ -53,7 +53,7 @@ namespace ace_segment {
  * Module, you will need to create multiple instances of the `Tm1637Module`. But
  * the pin numbers of this class must be a compile-time constants, so different
  * pins means that a different template class is generated. Since the
- * `Tm1637Module` class takes a `FastSwWireInterface` as a template argument,
+ * `Tm1637Module` class takes a `SwWireFastInterface` as a template argument,
  * each LED Module generate a new template instance of the `Tm1637Module` class.
  *
  * When there are more than some number of TM1636 LED modules, it may actually
@@ -68,9 +68,9 @@ template <
     uint8_t DIO_PIN,
     uint16_t DELAY_MICROS
 >
-class FastSwWireInterface {
+class SwWireFastInterface {
   public:
-    explicit FastSwWireInterface() = default;
+    explicit SwWireFastInterface() = default;
 
     /** Initialize the GPIO pins. */
     void begin() const {

@@ -19,8 +19,8 @@ using namespace ace_segment;
 
 #if TM16137_WIRE_INTERFACE_TYPE == TM16137_WIRE_INTERFACE_TYPE_FAST
   #include <digitalWriteFast.h>
-  #include <ace_segment/hw/FastSwWireInterface.h> // FastSwWireInterface
-  using ace_segment::FastSwWireInterface;
+  #include <ace_segment/hw/SwWireFastInterface.h>
+  using ace_segment::SwWireFastInterface;
 #endif
 
 //#if ! defined(AUNITER_LED_CLOCK_TM1637)
@@ -63,7 +63,7 @@ constexpr uint16_t BIT_DELAY = 100;
   using WireInterface = SwWireInterface;
   WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
 #elif TM16137_WIRE_INTERFACE_TYPE == TM16137_WIRE_INTERFACE_TYPE_FAST
-  using WireInterface = FastSwWireInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
+  using WireInterface = SwWireFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
   WireInterface wireInterface;
 #else
   #error Unknown TM16137_WIRE_INTERFACE_TYPE
