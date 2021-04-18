@@ -103,7 +103,7 @@ class Tm1637Module : public LedModule {
     void begin() {
       memset(mPatterns, 0, DIGITS);
       mBrightness = kBrightnessCmd | kBrightnessLevelOn | 0x7;
-      mIsDirty = 0xFF; // force initial values are sent to LED module
+      mIsDirty = 0xFF; // force initial values to LED module
       mFlushStage = 0;
     }
 
