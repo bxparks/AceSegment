@@ -62,7 +62,9 @@ END {
     if (u[i]["name"] ~ /Scanning\(Direct\)/ \
         || u[i]["name"] ~ /Scanning\(Single,SwSpi\)/ \
         || u[i]["name"] ~ /Scanning\(Dual,SwSpi\)/ \
-        || u[i]["name"] ~ /Tm1637\(Wire\)/) {
+        || u[i]["name"] ~ /Tm1637\(Wire\)/ \
+        || u[i]["name"] ~ /Max7219\(SwSpi\)/ \
+    ) {
       printf("|----------------------------------------+-------------------+---------|\n")
     }
     printf("| %-38s | %5d/%5d/%5d |    %4d |\n",

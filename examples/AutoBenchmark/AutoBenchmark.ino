@@ -192,6 +192,8 @@ void runScanningBenchmark(const char* name, LM& scanningModule) {
   printStats(name, timingStats, numSamples);
 }
 
+//-----------------------------------------------------------------------------
+
 // Common Anode, with transistors on Group pins
 void runDirect() {
   using LedMatrix = LedMatrixDirect<>;
@@ -245,6 +247,8 @@ void runDirectFast() {
   ledMatrix.end();
 }
 #endif
+
+//-----------------------------------------------------------------------------
 
 // Common Cathode, with transistors on Group pins
 void runSingleShiftRegisterSwSpi() {
@@ -336,6 +340,8 @@ void runSingleShiftRegisterHwSpi() {
   spiInterface.end();
 }
 
+//-----------------------------------------------------------------------------
+
 // Common Anode, with transistors on Group pins
 void runDualShiftRegisterSwSpi() {
   SwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
@@ -417,6 +423,8 @@ void runDualShiftRegisterHwSpi() {
   spiInterface.end();
 }
 
+//-----------------------------------------------------------------------------
+
 template <typename LM>
 void runTm1637Benchmark(const char* name, LM& ledModule) {
   ledModule.setPatternAt(0, 0x13);
@@ -437,8 +445,7 @@ void runTm1637Benchmark(const char* name, LM& ledModule) {
   printStats(name, timingStats, numSamples);
 }
 
-// Tm1637Module(Wire)
-void runTm1637DisplayNormal() {
+void runTm1637ModuleWire() {
   using WireInterface = SwWireInterface;
   WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
   Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module(wireInterface);
@@ -451,8 +458,7 @@ void runTm1637DisplayNormal() {
 }
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-// Tm1637Module(WireFast)
-void runTm1637DisplayFast() {
+void runTm1637ModuleWireFast() {
   using WireInterface = SwWireFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
   WireInterface wireInterface;
   Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module(wireInterface);
@@ -464,6 +470,71 @@ void runTm1637DisplayFast() {
   wireInterface.end();
 }
 #endif
+
+//-----------------------------------------------------------------------------
+
+template <typename LM>
+void runMax7219Benchmark(const char* name, LM& ledModule) {
+  ledModule.setPatternAt(0, 0x13);
+  ledModule.setPatternAt(0, 0x37);
+  ledModule.setPatternAt(0, 0x7F);
+  ledModule.setPatternAt(0, 0xFF);
+
+  timingStats.reset();
+  const uint16_t numSamples = 20;
+  for (uint16_t i = 0; i < numSamples; ++i) {
+    uint16_t startMicros = micros();
+    ledModule.flush();
+    uint16_t endMicros = micros();
+    timingStats.update(endMicros - startMicros);
+    yield();
+  }
+
+  printStats(name, timingStats, numSamples);
+}
+
+void runMax7219SwSpi() {
+  using SpiInterface = SwSpiInterface;
+  SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
+      spiInterface, kEightDigitRemapArray);
+
+  spiInterface.begin();
+  max7219Module.begin();
+  runMax7219Benchmark("Max7219(SwSpi)", max7219Module);
+  max7219Module.end();
+  spiInterface.end();
+}
+
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+void runMax7219SwSpiFast() {
+  using SpiInterface = SwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  SpiInterface spiInterface;
+  Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
+      spiInterface, kEightDigitRemapArray);
+
+  spiInterface.begin();
+  max7219Module.begin();
+  runMax7219Benchmark("Max7219(SwSpiFast)", max7219Module);
+  max7219Module.end();
+  spiInterface.end();
+}
+#endif
+
+void runMax7219HwSpi() {
+  using SpiInterface = HwSpiInterface;
+  SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
+      spiInterface, kEightDigitRemapArray);
+
+  spiInterface.begin();
+  max7219Module.begin();
+  runMax7219Benchmark("Max7219(HwSpi)", max7219Module);
+  max7219Module.end();
+  spiInterface.end();
+}
+
+//-----------------------------------------------------------------------------
 
 void runBenchmarks() {
   runDirect();
@@ -483,12 +554,19 @@ void runBenchmarks() {
 #endif
   runDualShiftRegisterHwSpi();
 
-  runTm1637DisplayNormal();
-
+  runTm1637ModuleWire();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  runTm1637DisplayFast();
+  runTm1637ModuleWireFast();
 #endif
+
+  runMax7219SwSpi();
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+  runMax7219SwSpiFast();
+#endif
+  runMax7219HwSpi();
 }
+
+//-----------------------------------------------------------------------------
 
 void printSizeOf() {
   SERIAL_PORT_MONITOR.print(F("sizeof(SwWireInterface): "));
@@ -538,6 +616,9 @@ void printSizeOf() {
 
   SERIAL_PORT_MONITOR.print(F("sizeof(Tm1637Module<SwWireInterface, 4>): "));
   SERIAL_PORT_MONITOR.println(sizeof(Tm1637Module<SwWireInterface, 4>));
+
+  SERIAL_PORT_MONITOR.print(F("sizeof(Max7219Module<SwSpiInterface, 8>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(Max7219Module<SwSpiInterface, 8>));
 
   SERIAL_PORT_MONITOR.print(F("sizeof(LedDisplay): "));
   SERIAL_PORT_MONITOR.println(sizeof(LedDisplay));

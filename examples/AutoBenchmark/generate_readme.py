@@ -97,12 +97,17 @@ number of `TimingStats::update()` calls that were made.
 
 ## CPU Time Changes
 
-v0.4: Huge refactoring of core AceSegment classes. Rewrote AutoBenchmark
-to match similar programs in the AceButton, AceCrc and AceTime libraries.
+**v0.4:**
+* Huge refactoring of core AceSegment classes. Rewrote AutoBenchmark
+  to match similar programs in the AceButton, AceCrc and AceTime libraries.
 
-v0.5: Add benchmarks for `Tm1637Display`. The CPU time is mostly determined by
-the calls to `delayMicroseconds()`, which is required to meet the electrical
-characteristics of the LED module.
+**v0.4+:**
+
+* Add benchmarks for `Tm1637Module`. The CPU time is mostly determined by
+  the calls to `delayMicroseconds()`, which is required to meet the electrical
+  characteristics of the LED module.
+* Add benchmarks for `Max7219Module`.
+* Upgrade from ESP32 Core v1.0.4 to v1.0.6.
 
 ## Results
 
@@ -113,10 +118,13 @@ The following tables show the number of microseconds taken by:
       digits, then `renderFieldNow()` must be called 4 times to render the light
       pattern of the entire LED module. The entire rendering is then called a
       frame.
-* `Tm1637Display::flush()`
+* `Tm1637Module::flush()`
     * sends all digits in the buffer to the TM1637 LED module using the I2C-like
       protocol
     * a bitDelay of 100 microseconds is used
+* `Max7219Module::flush()`
+    * sends all digits in the buffer to the MAX7219 LED module using standard
+      software or hardware SPI
 
 Most people can no longer see flickering of the display at about 60 frames a
 second. To achieve that, the `renderFieldNow()` method must be called 240
@@ -139,10 +147,10 @@ to meet this threshhold.
 On AVR processors, the "fast" options are available using the
 [digitalWriteFast](https://github.com/NicksonYap/digitalWriteFast) library whose
 `digitalWriteFast()` functions can be up to 50X faster if the `pin` number and
-`value` parameters are compile-time constants.
-
-The `digitalWriteFast` library is useful to create the `SwWireFastInterface`
-class, because it consumes 600-700 fewer bytes of flash memory.
+`value` parameters are compile-time constants. In addition, the
+`digitalWriteFast` functions reduce flash memory consumption by 600-700 bytes
+for `SwWireFastInterface` and `SwSpiFastInterface` compared to their non-fast
+equivalents.
 
 ### Arduino Nano
 
