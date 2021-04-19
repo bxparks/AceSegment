@@ -29,6 +29,8 @@ SOFTWARE.
 #include <string.h> // memset()
 #include "../LedModule.h"
 
+class Max7219ModuleTest_convertPattern;
+
 namespace ace_segment {
 
 /**
@@ -117,6 +119,8 @@ class Max7219Module : public LedModule {
     }
 
   private:
+    friend class ::Max7219ModuleTest_convertPattern;
+
     /**
      * MAX7219 uses bit 0 for segment G, and bit 6 for segment A. This is
      * the reverse of what I would normally expect, certainly the reverse of the
