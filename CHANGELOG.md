@@ -8,6 +8,7 @@
     * Add `remapArray` to `Tm1637Module::begin()` to support logical reordering
       of the LED digits to support certain 6-digit LED modules which are
       physically wired out of order.
+    * Upgrade ESP32 Core from 1.0.4 to 1.0.6. No signficant change detected.
 * 0.4 (2021-04-09)
     * A complete refactoring of the previous v0.3 version, which I could not
       understand anymore.
