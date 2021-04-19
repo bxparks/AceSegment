@@ -16,14 +16,14 @@ sizeof(CharWriter): 4
 sizeof(StringWriter): 4
 BENCHMARKS
 Scanning(Direct) 2 2 10 240
-Scanning(Direct,subfields) 0 1 11 3840
-Scanning(Single,SwSpi) 4 4 12 240
-Scanning(Single,SwSpi,subfields) 0 1 13 3840
-Scanning(Single,HwSpi) 9 9 18 240
+Scanning(Direct,subfields) 0 1 9 3840
+Scanning(Single,SwSpi) 4 4 5 240
+Scanning(Single,SwSpi,subfields) 0 1 12 3840
+Scanning(Single,HwSpi) 9 9 17 240
 Scanning(Single,HwSpi,subfields) 0 1 18 3840
-Scanning(dual,SwSpi) 7 7 15 240
-Scanning(dual,SwSpi,subfields) 0 1 15 3840
-Scanning(dual,HwSpi) 9 9 11 240
-Scanning(dual,HwSpi,subfields) 0 1 18 3840
-Tm1637(Normal) 21228 21237 21246 20
+Scanning(Dual,SwSpi) 7 7 16 240
+Scanning(Dual,SwSpi,subfields) 0 1 15 3840
+Scanning(Dual,HwSpi) 9 9 18 240
+Scanning(Dual,HwSpi,subfields) 0 1 18 3840
+Tm1637(Wire) 21230 21239 21249 20
 END

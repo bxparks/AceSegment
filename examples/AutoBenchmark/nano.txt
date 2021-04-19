@@ -20,20 +20,20 @@ sizeof(StringWriter): 2
 BENCHMARKS
 Scanning(Direct) 72 76 88 240
 Scanning(Direct,subfields) 4 12 84 3840
+Scanning(DirectFast) 24 28 44 240
+Scanning(DirectFast,subfields) 4 7 36 3840
 Scanning(Single,SwSpi) 156 159 180 240
 Scanning(Single,SwSpi,subfields) 4 19 176 3840
-Scanning(Single,HwSpi) 36 38 48 240
+Scanning(Single,SwSpiFast) 28 30 44 240
+Scanning(Single,SwSpiFast,subfields) 4 7 44 3840
+Scanning(Single,HwSpi) 36 38 52 240
 Scanning(Single,HwSpi,subfields) 4 8 48 3840
-Scanning(dual,SwSpi) 264 268 304 240
-Scanning(dual,SwSpi,subfields) 4 30 300 3840
-Scanning(dual,HwSpi) 24 25 40 240
-Scanning(dual,HwSpi,subfields) 4 7 32 3840
-Scanning(DirectFast) 24 28 40 240
-Scanning(DirectFast,subfields) 4 7 36 3840
-Scanning(Single,FastSwSpi) 28 31 44 240
-Scanning(Single,FastSwSpi,subfields) 4 7 40 3840
-Scanning(dual,FastSwSpi) 20 24 32 240
-Scanning(dual,FastSwSpi,subfields) 4 7 32 3840
-Tm1637(Normal) 22308 22325 22576 20
-Tm1637(Fast) 21056 21069 21208 20
+Scanning(Dual,SwSpi) 264 268 304 240
+Scanning(Dual,SwSpi,subfields) 4 30 296 3840
+Scanning(Dual,SwSpiFast) 20 24 32 240
+Scanning(Dual,SwSpiFast,subfields) 4 7 32 3840
+Scanning(Dual,HwSpi) 24 26 40 240
+Scanning(Dual,HwSpi,subfields) 4 7 32 3840
+Tm1637(Wire) 22308 22327 22560 20
+Tm1637(WireFast) 21060 21071 21188 20
 END

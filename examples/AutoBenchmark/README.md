@@ -149,27 +149,29 @@ sizeof(StringWriter): 2
 
 CPU:
 +----------------------------------------+-------------------+---------+
-| LedDisplay Operation                   |   min/  avg/  max | samples |
+| Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
 | Scanning(Direct)                       |    72/   76/   88 |     240 |
 | Scanning(Direct,subfields)             |     4/   12/   84 |    3840 |
+| Scanning(DirectFast)                   |    24/   28/   44 |     240 |
+| Scanning(DirectFast,subfields)         |     4/    7/   36 |    3840 |
+|----------------------------------------+-------------------+---------|
 | Scanning(Single,SwSpi)                 |   156/  159/  180 |     240 |
 | Scanning(Single,SwSpi,subfields)       |     4/   19/  176 |    3840 |
-| Scanning(Single,HwSpi)                 |    36/   38/   48 |     240 |
+| Scanning(Single,SwSpiFast)             |    28/   30/   44 |     240 |
+| Scanning(Single,SwSpiFast,subfields)   |     4/    7/   44 |    3840 |
+| Scanning(Single,HwSpi)                 |    36/   38/   52 |     240 |
 | Scanning(Single,HwSpi,subfields)       |     4/    8/   48 |    3840 |
-| Scanning(dual,SwSpi)                   |   264/  268/  304 |     240 |
-| Scanning(dual,SwSpi,subfields)         |     4/   30/  300 |    3840 |
-| Scanning(dual,HwSpi)                   |    24/   25/   40 |     240 |
-| Scanning(dual,HwSpi,subfields)         |     4/    7/   32 |    3840 |
-| Scanning(DirectFast)                   |    24/   28/   40 |     240 |
-| Scanning(DirectFast,subfields)         |     4/    7/   36 |    3840 |
-| Scanning(Single,FastSwSpi)             |    28/   31/   44 |     240 |
-| Scanning(Single,FastSwSpi,subfields)   |     4/    7/   40 |    3840 |
-| Scanning(dual,FastSwSpi)               |    20/   24/   32 |     240 |
-| Scanning(dual,FastSwSpi,subfields)     |     4/    7/   32 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(Normal)                         | 22308/22325/22576 |      20 |
-| Tm1637(Fast)                           | 21056/21069/21208 |      20 |
+| Scanning(Dual,SwSpi)                   |   264/  268/  304 |     240 |
+| Scanning(Dual,SwSpi,subfields)         |     4/   30/  296 |    3840 |
+| Scanning(Dual,SwSpiFast)               |    20/   24/   32 |     240 |
+| Scanning(Dual,SwSpiFast,subfields)     |     4/    7/   32 |    3840 |
+| Scanning(Dual,HwSpi)                   |    24/   26/   40 |     240 |
+| Scanning(Dual,HwSpi,subfields)         |     4/    7/   32 |    3840 |
+|----------------------------------------+-------------------+---------|
+| Tm1637(Wire)                           | 22308/22327/22560 |      20 |
+| Tm1637(WireFast)                       | 21060/21071/21188 |      20 |
 +----------------------------------------+-------------------+---------+
 
 ```
@@ -204,27 +206,29 @@ sizeof(StringWriter): 2
 
 CPU:
 +----------------------------------------+-------------------+---------+
-| LedDisplay Operation                   |   min/  avg/  max | samples |
+| Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Scanning(Direct)                       |    72/   78/   92 |     240 |
+| Scanning(Direct)                       |    72/   78/   88 |     240 |
 | Scanning(Direct,subfields)             |     4/   14/   92 |    3840 |
-| Scanning(Single,SwSpi)                 |   148/  152/  164 |     240 |
-| Scanning(Single,SwSpi,subfields)       |     4/   23/  164 |    3840 |
-| Scanning(Single,HwSpi)                 |    36/   40/   48 |     240 |
-| Scanning(Single,HwSpi,subfields)       |     4/    9/   52 |    3840 |
-| Scanning(dual,SwSpi)                   |   248/  252/  264 |     240 |
-| Scanning(dual,SwSpi,subfields)         |     4/   36/  264 |    3840 |
-| Scanning(dual,HwSpi)                   |    24/   26/   36 |     240 |
-| Scanning(dual,HwSpi,subfields)         |     4/    8/   36 |    3840 |
-| Scanning(DirectFast)                   |    24/   28/   40 |     240 |
-| Scanning(DirectFast,subfields)         |     4/    8/   36 |    3840 |
-| Scanning(Single,FastSwSpi)             |    28/   31/   40 |     240 |
-| Scanning(Single,FastSwSpi,subfields)   |     4/    8/   44 |    3840 |
-| Scanning(dual,FastSwSpi)               |    20/   23/   32 |     240 |
-| Scanning(dual,FastSwSpi,subfields)     |     4/    8/   32 |    3840 |
+| Scanning(DirectFast)                   |    24/   28/   36 |     240 |
+| Scanning(DirectFast,subfields)         |     4/    8/   40 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(Normal)                         | 22428/22436/22448 |      20 |
-| Tm1637(Fast)                           | 21164/21173/21184 |      20 |
+| Scanning(Single,SwSpi)                 |   148/  152/  164 |     240 |
+| Scanning(Single,SwSpi,subfields)       |     4/   23/  168 |    3840 |
+| Scanning(Single,SwSpiFast)             |    28/   31/   44 |     240 |
+| Scanning(Single,SwSpiFast,subfields)   |     4/    8/   40 |    3840 |
+| Scanning(Single,HwSpi)                 |    36/   40/   56 |     240 |
+| Scanning(Single,HwSpi,subfields)       |     4/    9/   48 |    3840 |
+|----------------------------------------+-------------------+---------|
+| Scanning(Dual,SwSpi)                   |   248/  252/  264 |     240 |
+| Scanning(Dual,SwSpi,subfields)         |     4/   36/  264 |    3840 |
+| Scanning(Dual,SwSpiFast)               |    20/   23/   32 |     240 |
+| Scanning(Dual,SwSpiFast,subfields)     |     4/    8/   32 |    3840 |
+| Scanning(Dual,HwSpi)                   |    24/   26/   36 |     240 |
+| Scanning(Dual,HwSpi,subfields)         |     4/    8/   36 |    3840 |
+|----------------------------------------+-------------------+---------|
+| Tm1637(Wire)                           | 22432/22439/22452 |      20 |
+| Tm1637(WireFast)                       | 21168/21175/21188 |      20 |
 +----------------------------------------+-------------------+---------+
 
 ```
@@ -255,20 +259,22 @@ sizeof(StringWriter): 4
 
 CPU:
 +----------------------------------------+-------------------+---------+
-| LedDisplay Operation                   |   min/  avg/  max | samples |
+| Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
 | Scanning(Direct)                       |    24/   24/   29 |     240 |
-| Scanning(Direct,subfields)             |     2/    4/   29 |    3840 |
-| Scanning(Single,SwSpi)                 |    52/   53/   57 |     240 |
-| Scanning(Single,SwSpi,subfields)       |     2/    7/   58 |    3840 |
-| Scanning(Single,HwSpi)                 |    24/   24/   28 |     240 |
-| Scanning(Single,HwSpi,subfields)       |     2/    4/   29 |    3840 |
-| Scanning(dual,SwSpi)                   |    88/   89/   94 |     240 |
-| Scanning(dual,SwSpi,subfields)         |     2/   11/   93 |    3840 |
-| Scanning(dual,HwSpi)                   |    22/   22/   26 |     240 |
-| Scanning(dual,HwSpi,subfields)         |     2/    4/   26 |    3840 |
+| Scanning(Direct,subfields)             |     2/    5/   29 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(Normal)                         | 22223/22225/22231 |      20 |
+| Scanning(Single,SwSpi)                 |    51/   51/   56 |     240 |
+| Scanning(Single,SwSpi,subfields)       |     2/    7/   56 |    3840 |
+| Scanning(Single,HwSpi)                 |    23/   23/   28 |     240 |
+| Scanning(Single,HwSpi,subfields)       |     2/    4/   28 |    3840 |
+|----------------------------------------+-------------------+---------|
+| Scanning(Dual,SwSpi)                   |    87/   87/   92 |     240 |
+| Scanning(Dual,SwSpi,subfields)         |     3/   11/   92 |    3840 |
+| Scanning(Dual,HwSpi)                   |    22/   22/   26 |     240 |
+| Scanning(Dual,HwSpi,subfields)         |     3/    4/   26 |    3840 |
+|----------------------------------------+-------------------+---------|
+| Tm1637(Wire)                           | 22221/22224/22232 |      20 |
 +----------------------------------------+-------------------+---------+
 
 ```
@@ -299,20 +305,22 @@ sizeof(StringWriter): 4
 
 CPU:
 +----------------------------------------+-------------------+---------+
-| LedDisplay Operation                   |   min/  avg/  max | samples |
+| Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Scanning(Direct)                       |    14/   14/   19 |     240 |
-| Scanning(Direct,subfields)             |     1/    2/   38 |    3840 |
+| Scanning(Direct)                       |    14/   14/   20 |     240 |
+| Scanning(Direct,subfields)             |     1/    2/   29 |    3840 |
+|----------------------------------------+-------------------+---------|
 | Scanning(Single,SwSpi)                 |    32/   32/   38 |     240 |
-| Scanning(Single,SwSpi,subfields)       |     1/    4/   55 |    3840 |
+| Scanning(Single,SwSpi,subfields)       |     1/    4/   56 |    3840 |
 | Scanning(Single,HwSpi)                 |    40/   41/   46 |     240 |
-| Scanning(Single,HwSpi,subfields)       |     1/    4/   51 |    3840 |
-| Scanning(dual,SwSpi)                   |    55/   55/   61 |     240 |
-| Scanning(dual,SwSpi,subfields)         |     1/    7/   66 |    3840 |
-| Scanning(dual,HwSpi)                   |    40/   40/   45 |     240 |
-| Scanning(dual,HwSpi,subfields)         |     1/    6/   50 |    3840 |
+| Scanning(Single,HwSpi,subfields)       |     1/    4/   65 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(Normal)                         | 22395/22399/22403 |      20 |
+| Scanning(Dual,SwSpi)                   |    55/   56/   61 |     240 |
+| Scanning(Dual,SwSpi,subfields)         |     1/    5/   79 |    3840 |
+| Scanning(Dual,HwSpi)                   |    40/   40/   45 |     240 |
+| Scanning(Dual,HwSpi,subfields)         |     1/    5/   51 |    3840 |
+|----------------------------------------+-------------------+---------|
+| Tm1637(Wire)                           | 22398/22404/22413 |      20 |
 +----------------------------------------+-------------------+---------+
 
 ```
@@ -343,20 +351,22 @@ sizeof(StringWriter): 4
 
 CPU:
 +----------------------------------------+-------------------+---------+
-| LedDisplay Operation                   |   min/  avg/  max | samples |
+| Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Scanning(Direct)                       |    12/   12/   28 |     240 |
-| Scanning(Direct,subfields)             |     0/    2/   25 |    3840 |
-| Scanning(Single,SwSpi)                 |    29/   29/   41 |     240 |
-| Scanning(Single,SwSpi,subfields)       |     0/    4/   43 |    3840 |
-| Scanning(Single,HwSpi)                 |    11/   11/   24 |     240 |
+| Scanning(Direct)                       |    12/   12/   33 |     240 |
+| Scanning(Direct,subfields)             |     0/    2/   21 |    3840 |
+|----------------------------------------+-------------------+---------|
+| Scanning(Single,SwSpi)                 |    29/   29/   37 |     240 |
+| Scanning(Single,SwSpi,subfields)       |     0/    4/   37 |    3840 |
+| Scanning(Single,HwSpi)                 |    11/   11/   16 |     240 |
 | Scanning(Single,HwSpi,subfields)       |     0/    2/   23 |    3840 |
-| Scanning(dual,SwSpi)                   |    50/   50/   59 |     240 |
-| Scanning(dual,SwSpi,subfields)         |     0/    7/   66 |    3840 |
-| Scanning(dual,HwSpi)                   |    12/   12/   20 |     240 |
-| Scanning(dual,HwSpi,subfields)         |     0/    2/   28 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(Normal)                         | 21493/21501/21537 |      20 |
+| Scanning(Dual,SwSpi)                   |    50/   50/   59 |     240 |
+| Scanning(Dual,SwSpi,subfields)         |     0/    7/   64 |    3840 |
+| Scanning(Dual,HwSpi)                   |    12/   12/   20 |     240 |
+| Scanning(Dual,HwSpi,subfields)         |     0/    2/   32 |    3840 |
+|----------------------------------------+-------------------+---------|
+| Tm1637(Wire)                           | 21493/21503/21545 |      20 |
 +----------------------------------------+-------------------+---------+
 
 ```
@@ -365,7 +375,7 @@ CPU:
 
 * ESP32-01 Dev Board, 240 MHz Tensilica LX6
 * Arduino IDE 1.8.13
-* ESP32 Boards 1.0.4
+* ESP32 Boards 1.0.6
 
 ```
 Sizes of Objects:
@@ -387,20 +397,22 @@ sizeof(StringWriter): 4
 
 CPU:
 +----------------------------------------+-------------------+---------+
-| LedDisplay Operation                   |   min/  avg/  max | samples |
+| Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
 | Scanning(Direct)                       |     2/    2/   10 |     240 |
-| Scanning(Direct,subfields)             |     0/    1/   11 |    3840 |
-| Scanning(Single,SwSpi)                 |     4/    4/   12 |     240 |
-| Scanning(Single,SwSpi,subfields)       |     0/    1/   13 |    3840 |
-| Scanning(Single,HwSpi)                 |     9/    9/   18 |     240 |
-| Scanning(Single,HwSpi,subfields)       |     0/    1/   18 |    3840 |
-| Scanning(dual,SwSpi)                   |     7/    7/   15 |     240 |
-| Scanning(dual,SwSpi,subfields)         |     0/    1/   15 |    3840 |
-| Scanning(dual,HwSpi)                   |     9/    9/   11 |     240 |
-| Scanning(dual,HwSpi,subfields)         |     0/    1/   18 |    3840 |
+| Scanning(Direct,subfields)             |     0/    1/    9 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(Normal)                         | 21228/21237/21246 |      20 |
+| Scanning(Single,SwSpi)                 |     4/    4/    5 |     240 |
+| Scanning(Single,SwSpi,subfields)       |     0/    1/   12 |    3840 |
+| Scanning(Single,HwSpi)                 |     9/    9/   17 |     240 |
+| Scanning(Single,HwSpi,subfields)       |     0/    1/   18 |    3840 |
+|----------------------------------------+-------------------+---------|
+| Scanning(Dual,SwSpi)                   |     7/    7/   16 |     240 |
+| Scanning(Dual,SwSpi,subfields)         |     0/    1/   15 |    3840 |
+| Scanning(Dual,HwSpi)                   |     9/    9/   18 |     240 |
+| Scanning(Dual,HwSpi,subfields)         |     0/    1/   18 |    3840 |
+|----------------------------------------+-------------------+---------|
+| Tm1637(Wire)                           | 21230/21239/21249 |      20 |
 +----------------------------------------+-------------------+---------+
 
 ```
@@ -432,20 +444,22 @@ sizeof(StringWriter): 4
 
 CPU:
 +----------------------------------------+-------------------+---------+
-| LedDisplay Operation                   |   min/  avg/  max | samples |
+| Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
 | Scanning(Direct)                       |     5/    5/    9 |     240 |
-| Scanning(Direct,subfields)             |     0/    1/    7 |    3840 |
-| Scanning(Single,SwSpi)                 |     9/   10/   13 |     240 |
-| Scanning(Single,SwSpi,subfields)       |     0/    1/   14 |    3840 |
-| Scanning(Single,HwSpi)                 |     3/    3/    6 |     240 |
-| Scanning(Single,HwSpi,subfields)       |     0/    1/    6 |    3840 |
-| Scanning(dual,SwSpi)                   |    16/   16/   21 |     240 |
-| Scanning(dual,SwSpi,subfields)         |     0/    2/   21 |    3840 |
-| Scanning(dual,HwSpi)                   |     3/    3/    6 |     240 |
-| Scanning(dual,HwSpi,subfields)         |     0/    1/    7 |    3840 |
+| Scanning(Direct,subfields)             |     0/    1/   10 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(Normal)                         | 21154/21155/21162 |      20 |
+| Scanning(Single,SwSpi)                 |     9/    9/   12 |     240 |
+| Scanning(Single,SwSpi,subfields)       |     0/    1/   13 |    3840 |
+| Scanning(Single,HwSpi)                 |     3/    3/    5 |     240 |
+| Scanning(Single,HwSpi,subfields)       |     0/    0/    5 |    3840 |
+|----------------------------------------+-------------------+---------|
+| Scanning(Dual,SwSpi)                   |    16/   16/   19 |     240 |
+| Scanning(Dual,SwSpi,subfields)         |     0/    1/   21 |    3840 |
+| Scanning(Dual,HwSpi)                   |     3/    3/    4 |     240 |
+| Scanning(Dual,HwSpi,subfields)         |     0/    1/    5 |    3840 |
+|----------------------------------------+-------------------+---------|
+| Tm1637(Wire)                           | 21152/21153/21158 |      20 |
 +----------------------------------------+-------------------+---------+
 
 ```

@@ -200,7 +200,7 @@ class, because it consumes 600-700 fewer bytes of flash memory.
 
 * ESP32-01 Dev Board, 240 MHz Tensilica LX6
 * Arduino IDE 1.8.13
-* ESP32 Boards 1.0.4
+* ESP32 Boards 1.0.6
 
 ```
 {esp32_results}

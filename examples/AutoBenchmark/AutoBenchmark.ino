@@ -296,9 +296,9 @@ void runSingleShiftRegisterSwSpiFast() {
   ledMatrix.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("Scanning(Single,FastSwSpi)",
+  runScanningBenchmark("Scanning(Single,SwSpiFast)",
       scanningModule);
-  runScanningBenchmark("Scanning(Single,FastSwSpi,subfields)",
+  runScanningBenchmark("Scanning(Single,SwSpiFast,subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -353,8 +353,8 @@ void runDualShiftRegisterSwSpi() {
   ledMatrix.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("Scanning(dual,SwSpi)", scanningModule);
-  runScanningBenchmark("Scanning(dual,SwSpi,subfields)",
+  runScanningBenchmark("Scanning(Dual,SwSpi)", scanningModule);
+  runScanningBenchmark("Scanning(Dual,SwSpi,subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -381,8 +381,8 @@ void runDualShiftRegisterSwSpiFast() {
   ledMatrix.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("Scanning(dual,FastSwSpi)", scanningModule);
-  runScanningBenchmark("Scanning(dual,FastSwSpi,subfields)",
+  runScanningBenchmark("Scanning(Dual,SwSpiFast)", scanningModule);
+  runScanningBenchmark("Scanning(Dual,SwSpiFast,subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -408,8 +408,8 @@ void runDualShiftRegisterHwSpi() {
   ledMatrix.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("Scanning(dual,HwSpi)", scanningModule);
-  runScanningBenchmark("Scanning(dual,HwSpi,subfields)",
+  runScanningBenchmark("Scanning(Dual,HwSpi)", scanningModule);
+  runScanningBenchmark("Scanning(Dual,HwSpi,subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -437,7 +437,7 @@ void runTm1637Benchmark(const char* name, LM& ledModule) {
   printStats(name, timingStats, numSamples);
 }
 
-// Tm1637Module(Normal)
+// Tm1637Module(Wire)
 void runTm1637DisplayNormal() {
   using WireInterface = SwWireInterface;
   WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
@@ -445,13 +445,13 @@ void runTm1637DisplayNormal() {
 
   wireInterface.begin();
   tm1637Module.begin();
-  runTm1637Benchmark("Tm1637(Normal)", tm1637Module);
+  runTm1637Benchmark("Tm1637(Wire)", tm1637Module);
   tm1637Module.end();
   wireInterface.end();
 }
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-// Tm1637Module(Fast)
+// Tm1637Module(WireFast)
 void runTm1637DisplayFast() {
   using WireInterface = SwWireFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
   WireInterface wireInterface;
@@ -459,7 +459,7 @@ void runTm1637DisplayFast() {
 
   wireInterface.begin();
   tm1637Module.begin();
-  runTm1637Benchmark("Tm1637(Fast)", tm1637Module);
+  runTm1637Benchmark("Tm1637(WireFast)", tm1637Module);
   tm1637Module.end();
   wireInterface.end();
 }
@@ -467,16 +467,21 @@ void runTm1637DisplayFast() {
 
 void runBenchmarks() {
   runDirect();
-  runSingleShiftRegisterSwSpi();
-  runSingleShiftRegisterHwSpi();
-  runDualShiftRegisterSwSpi();
-  runDualShiftRegisterHwSpi();
-
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
   runDirectFast();
+#endif
+
+  runSingleShiftRegisterSwSpi();
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
   runSingleShiftRegisterSwSpiFast();
+#endif
+  runSingleShiftRegisterHwSpi();
+
+  runDualShiftRegisterSwSpi();
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
   runDualShiftRegisterSwSpiFast();
 #endif
+  runDualShiftRegisterHwSpi();
 
   runTm1637DisplayNormal();
 

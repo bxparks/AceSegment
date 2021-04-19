@@ -57,10 +57,12 @@ END {
   print "CPU:"
 
   printf("+----------------------------------------+-------------------+---------+\n")
-  printf("| LedDisplay Operation                   |   min/  avg/  max | samples |\n")
-  printf("|----------------------------------------+-------------------+---------|\n")
+  printf("| Functionality                          |   min/  avg/  max | samples |\n")
   for (i = 0; i < TOTAL_BENCHMARKS; i++) {
-    if (u[i]["name"] ~ /direct_fast\)/ || u[i]["name"] ~ /Tm1637\(Normal\)/) {
+    if (u[i]["name"] ~ /Scanning\(Direct\)/ \
+        || u[i]["name"] ~ /Scanning\(Single,SwSpi\)/ \
+        || u[i]["name"] ~ /Scanning\(Dual,SwSpi\)/ \
+        || u[i]["name"] ~ /Tm1637\(Wire\)/) {
       printf("|----------------------------------------+-------------------+---------|\n")
     }
     printf("| %-38s | %5d/%5d/%5d |    %4d |\n",
