@@ -34,19 +34,16 @@ class Max7219ModuleTest_convertPattern;
 namespace ace_segment {
 
 /**
- * The 8-digit MAX7219 LED modules that I bought on eBay and Amazon have
- * the digits wired so that digit 0 is the *right* most digit, and digit 7 is
- * the *left* most digit. This is the reverse of the convention used by the
- * `LedDisplay` class. Use this remap array to reverse the digit addresses.
+ * The 8-digit MAX7219 LED modules that I bought on eBay and Amazon are wired
+ * such that digit 0 is the *right* most digit, and digit 7 is the *left* most
+ * digit. This is the reverse of the convention used by the `LedDisplay` class.
+ * Use this remap array to reverse the digit addresses by passing it into the
+ * Max7219Module constructor.
  *
  * You can create your own remap array to handle other LED modules with
  * different physical ordering compared to the logical ordering.
- *
- * Pass this array into the Max7219Module constructor.
  */
-static const uint8_t kEightDigitRemapArray[8] = {
-  7, 6, 5, 4, 3, 2, 1, 0
-};
+extern const uint8_t kEightDigitRemapArray[8];
 
 template <typename SPII, uint8_t DIGITS>
 class Max7219Module : public LedModule {
