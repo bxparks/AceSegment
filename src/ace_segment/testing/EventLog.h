@@ -36,8 +36,8 @@ enum class EventType : uint8_t {
   kPinMode,
   kSpiBegin,
   kSpiEnd,
-  kSpiTransfer,
-  kSpiTransfer16,
+  kSpiSend8,
+  kSpiSend16,
   kLedMatrixDraw,
   kLedMatrixEnableGroup,
   kLedMatrixDisableGroup,
@@ -50,7 +50,7 @@ struct Event {
   uint8_t arg1;
   uint8_t arg2;
   uint8_t arg3;
-  uint16_t arg5; // used by transfer16()
+  uint16_t arg5; // used by send16()
 };
 
 class EventLog {
@@ -93,20 +93,20 @@ class EventLog {
       mNumRecords++;
     }
 
-    void addSpiTransfer(uint8_t value) {
+    void addSpiSend8(uint8_t value) {
       if (mNumRecords >= kMaxRecords) return;
 
       Event& event = mEvents[mNumRecords];
-      event.type = EventType::kSpiTransfer;
+      event.type = EventType::kSpiSend8;
       event.arg1 = value;
       mNumRecords++;
     }
 
-    void addSpiTransfer16(uint16_t value) {
+    void addSpiSend16(uint16_t value) {
       if (mNumRecords >= kMaxRecords) return;
 
       Event& event = mEvents[mNumRecords];
-      event.type = EventType::kSpiTransfer16;
+      event.type = EventType::kSpiSend16;
       event.arg5 = value;
       mNumRecords++;
     }
@@ -187,13 +187,13 @@ class EventLog {
           case EventType::kSpiEnd:
             break;
 
-          case EventType::kSpiTransfer: {
+          case EventType::kSpiSend8: {
               uint8_t value = va_arg(args, int);
               if (value != event.arg1) return false;
             }
             break;
 
-          case EventType::kSpiTransfer16: {
+          case EventType::kSpiSend16: {
               uint16_t value = va_arg(args, int);
               if (value != event.arg5) return false;
             }

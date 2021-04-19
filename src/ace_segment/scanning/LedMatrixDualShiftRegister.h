@@ -70,8 +70,7 @@ class LedMatrixDualShiftRegister: public LedMatrixBase {
       uint8_t actualGroupPattern = (groupPattern ^ mGroupXorMask);
       uint8_t actualElementPattern = (elementPattern ^ mElementXorMask);
 
-      mSpiInterface.transfer16(
-          actualGroupPattern << 8 | actualElementPattern);
+      mSpiInterface.send16(actualGroupPattern << 8 | actualElementPattern);
       mPrevElementPattern = elementPattern;
     }
 
@@ -87,8 +86,7 @@ class LedMatrixDualShiftRegister: public LedMatrixBase {
     void clear() const {
       uint8_t actualGroupPattern = 0x00 ^ mGroupXorMask;
       uint8_t actualElementPattern = 0x00 ^ mElementXorMask;
-      mSpiInterface.transfer16(
-          actualGroupPattern << 8 | actualElementPattern);
+      mSpiInterface.send16(actualGroupPattern << 8 | actualElementPattern);
       mPrevElementPattern = 0x00;
     }
 

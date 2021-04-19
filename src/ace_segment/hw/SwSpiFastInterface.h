@@ -38,56 +38,58 @@ namespace ace_segment {
  * Software SPI using pinModeFast(), digitalWriteFast() and shiftOutFast()
  * from https://github.com/NicksonYap/digitalWriteFast.
  *
- * @tparam latchPin the latch pin (CS)
- * @tparam dataPin the data pin (MOSI)
- * @tparam clockPin the clock pin (CLK)
+ * @tparam LATCH_PIN the latch pin (CS)
+ * @tparam DATA_PIN the data pin (MOSI)
+ * @tparam CLOCK_PIN the clock pin (CLK)
  */
-template <uint8_t latchPin, uint8_t dataPin, uint8_t clockPin>
+template <uint8_t LATCH_PIN, uint8_t DATA_PIN, uint8_t CLOCK_PIN>
 class SwSpiFastInterface {
   public:
     SwSpiFastInterface() = default;
 
     void begin() const {
-      pinModeFast(latchPin, OUTPUT);
-      pinModeFast(dataPin, OUTPUT);
-      pinModeFast(clockPin, OUTPUT);
+      pinModeFast(LATCH_PIN, OUTPUT);
+      pinModeFast(DATA_PIN, OUTPUT);
+      pinModeFast(CLOCK_PIN, OUTPUT);
     }
 
     void end() const {
-      pinModeFast(latchPin, INPUT);
-      pinModeFast(dataPin, INPUT);
-      pinModeFast(clockPin, INPUT);
+      pinModeFast(LATCH_PIN, INPUT);
+      pinModeFast(DATA_PIN, INPUT);
+      pinModeFast(CLOCK_PIN, INPUT);
     }
 
-    void transfer(uint8_t value) const {
-      digitalWriteFast(latchPin, LOW);
+    /** Send 8 bits, including latching LOW and HIGH. */
+    void send8(uint8_t value) const {
+      digitalWriteFast(LATCH_PIN, LOW);
       shiftOutFast(value);
-      digitalWriteFast(latchPin, HIGH);
+      digitalWriteFast(LATCH_PIN, HIGH);
     }
 
-    void transfer16(uint16_t value) const {
+    /** Send 16 bits, including latching LOW and HIGH. */
+    void send16(uint16_t value) const {
       uint8_t msb = (value & 0xff00) >> 8;
       uint8_t lsb = (value & 0xff);
-      digitalWriteFast(latchPin, LOW);
+      digitalWriteFast(LATCH_PIN, LOW);
       shiftOutFast(msb);
       shiftOutFast(lsb);
-      digitalWriteFast(latchPin, HIGH);
+      digitalWriteFast(LATCH_PIN, HIGH);
     }
 
-  static void shiftOutFast(uint8_t output) {
-    uint8_t mask = 0x80; // start with the MSB
-    for (uint8_t i = 0; i < 8; i++)  {
-      digitalWriteFast(clockPin, LOW);
-      if (output & mask) {
-        digitalWriteFast(dataPin, HIGH);
-      } else {
-        digitalWriteFast(dataPin, LOW);
+  private:
+    static void shiftOutFast(uint8_t output) {
+      uint8_t mask = 0x80; // start with the MSB
+      for (uint8_t i = 0; i < 8; i++)  {
+        digitalWriteFast(CLOCK_PIN, LOW);
+        if (output & mask) {
+          digitalWriteFast(DATA_PIN, HIGH);
+        } else {
+          digitalWriteFast(DATA_PIN, LOW);
+        }
+        digitalWriteFast(CLOCK_PIN, HIGH);
+        mask >>= 1;
       }
-      digitalWriteFast(clockPin, HIGH);
-      mask >>= 1;
     }
-  }
-
 };
 
 } // ace_segment

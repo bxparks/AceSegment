@@ -195,7 +195,7 @@ testF(LedMatrixSingleShiftRegisterTest, drawElements) {
   ledMatrixSingleShiftRegister.drawElements(0x55);
   assertEqual(1, spiInterface.mEventLog.getNumRecords());
   assertTrue(spiInterface.mEventLog.assertEvents(1,
-      (int) EventType::kSpiTransfer, 0x55
+      (int) EventType::kSpiSend8, 0x55
   ));
 }
 
@@ -228,7 +228,7 @@ testF(LedMatrixDualShiftRegisterTest, enableGroup) {
   assertEqual(1, spiInterface.mEventLog.getNumRecords());
   uint16_t expectedOutput = ((0x1 << 1) << 8) | 0x42;
   assertTrue(spiInterface.mEventLog.assertEvents(1,
-      (int) EventType::kSpiTransfer16, expectedOutput));
+      (int) EventType::kSpiSend16, expectedOutput));
 }
 
 testF(LedMatrixDualShiftRegisterTest, disableGroup) {
@@ -237,7 +237,7 @@ testF(LedMatrixDualShiftRegisterTest, disableGroup) {
   assertEqual(1, spiInterface.mEventLog.getNumRecords());
   uint16_t expectedOutput = 0x0000;
   assertTrue(spiInterface.mEventLog.assertEvents(1,
-      (int) EventType::kSpiTransfer16, expectedOutput));
+      (int) EventType::kSpiSend16, expectedOutput));
 }
 
 testF(LedMatrixDualShiftRegisterTest, draw) {
@@ -246,7 +246,7 @@ testF(LedMatrixDualShiftRegisterTest, draw) {
   uint16_t expectedOutput = ((0x1 << 3) << 8) | 0x55;
   assertEqual(1, spiInterface.mEventLog.getNumRecords());
   assertTrue(spiInterface.mEventLog.assertEvents(1,
-    (int) EventType::kSpiTransfer16, expectedOutput
+    (int) EventType::kSpiSend16, expectedOutput
   ));
 }
 

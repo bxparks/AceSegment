@@ -115,7 +115,7 @@ class LedMatrixSingleShiftRegister : public LedMatrixBase {
     /** Send the pattern to the element pins. */
     void drawElements(uint8_t pattern) const {
       uint8_t actualPattern = pattern ^ mElementXorMask;
-      mSpiInterface.transfer(actualPattern);
+      mSpiInterface.send8(actualPattern);
     }
 
     /** Write bit 0 of output to group pin. */

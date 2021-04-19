@@ -55,13 +55,15 @@ class SwSpiInterface {
       pinMode(mClockPin, INPUT);
     }
 
-    void transfer(uint8_t value) const {
+    /** Send 8 bits, including latching LOW and HIGH. */
+    void send8(uint8_t value) const {
       digitalWrite(mLatchPin, LOW);
       shiftOut(mDataPin, mClockPin, MSBFIRST, value);
       digitalWrite(mLatchPin, HIGH);
     }
 
-    void transfer16(uint16_t value) const {
+    /** Send 16 bits, including latching LOW and HIGH. */
+    void send16(uint16_t value) const {
       uint8_t msb = (value & 0xff00) >> 8;
       uint8_t lsb = (value & 0xff);
       digitalWrite(mLatchPin, LOW);

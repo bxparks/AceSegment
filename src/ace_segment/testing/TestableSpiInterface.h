@@ -16,12 +16,12 @@ class TestableSpiInterface {
       mEventLog.addSpiEnd();
     }
 
-    void transfer(uint8_t value) const {
-      mEventLog.addSpiTransfer(value);
+    void send8(uint8_t value) const {
+      mEventLog.addSpiSend8(value);
     }
 
-    void transfer16(uint16_t value) const {
-      mEventLog.addSpiTransfer16(value);
+    void send16(uint16_t value) const {
+      mEventLog.addSpiSend16(value);
     }
 
   public:

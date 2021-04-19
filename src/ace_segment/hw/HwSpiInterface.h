@@ -31,7 +31,13 @@ SOFTWARE.
 
 namespace ace_segment {
 
-/** Hardware SPI. */
+/**
+ * Hardware SPI interface to talk to one or two 74HC595 Shift Register chip(s),
+ * using the predefined `SPI` global instance. This is currently not meant to be
+ * general-purpose SPI interface. For different SPI configurations, it is
+ * probably easiest to just copy this file, make the necessary changes, then
+ * substitute the new class in places where this class is used.
+ */
 class HwSpiInterface {
   public:
     HwSpiInterface(
@@ -58,7 +64,8 @@ class HwSpiInterface {
       SPI.end();
     }
 
-    void transfer(uint8_t value) const {
+    /** Send 8 bits, including latching LOW and HIGH. */
+    void send8(uint8_t value) const {
       digitalWrite(mLatchPin, LOW);
       SPI.beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
       SPI.transfer(value);
@@ -66,7 +73,8 @@ class HwSpiInterface {
       digitalWrite(mLatchPin, HIGH);
     }
 
-    void transfer16(uint16_t value) const {
+    /** Send 16 bits, including latching LOW and HIGH. */
+    void send16(uint16_t value) const {
       digitalWrite(mLatchPin, LOW);
       SPI.beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
       SPI.transfer16(value);
