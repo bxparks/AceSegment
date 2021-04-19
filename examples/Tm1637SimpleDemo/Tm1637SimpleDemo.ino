@@ -23,10 +23,6 @@ using namespace ace_segment;
   using ace_segment::SwWireFastInterface;
 #endif
 
-//#if ! defined(AUNITER_LED_CLOCK_TM1637)
-//#error Compatible only with env:ledclock_tm1636 configuration.
-//#endif
-
 const uint8_t CLK_PIN = 10;
 const uint8_t DIO_PIN = 9;
 
@@ -96,13 +92,13 @@ void setup() {
 
 #if 0
 
-// This version of loop() uses the Tm1636Display.flush() method to update all
+// This version of loop() uses the Tm1637Module::flush() method to update all
 // digits in a single dump to the LED module, taking ~22ms per call.
 void loop() {
   // Update the display
   uint8_t j = digitIndex;
   for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
-    display.setPatternAt(i, PATTERNS[j]);
+    display.writePatternAt(i, PATTERNS[j]);
     incrementMod(j, (uint8_t) NUM_DIGITS);
   }
   incrementMod(digitIndex, (uint8_t) NUM_DIGITS);
@@ -127,7 +123,7 @@ void loop() {
 
 #else
 
-// This version of loop() uses the Tm1636Display.flushIncremental() method to
+// This version of loop() uses the Tm1637Module::flushIncremental() method to
 // update only a single digit per call, taking only ~10 ms at 100 us delay.
 void loop() {
   static uint16_t prevChangeMillis = millis();
@@ -143,13 +139,13 @@ void loop() {
     uint8_t j = digitIndex;
     for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
       display.writePatternAt(i, PATTERNS[j]);
-      // Write a decimal point every other
+      // Write a decimal point every other digit, for demo purposes.
       display.writeDecimalPointAt(i, j & 0x1);
       incrementMod(j, (uint8_t) NUM_DIGITS);
     }
     incrementMod(digitIndex, (uint8_t) NUM_DIGITS);
 
-    // Update the brightness
+    // Update the brightness, range from 1 to 7.
     display.setBrightness(brightness);
     incrementModOffset(brightness, (uint8_t) 7, (uint8_t) 1);
   }

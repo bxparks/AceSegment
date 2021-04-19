@@ -33,17 +33,17 @@ namespace ace_segment {
 
 /**
  * In theory, the chip should be able to handle fairly small delays, like
- * 250 kHz or 4 microseconds. But Many TM1637 LED Modules from eBay
- * apparently uses a low value pullup resistor, coupled with high valued
- * capacitor, so the rise time of the signal on these lines are slow. A
- * value of 50 microseconds does not work on my LED Modules, but 100 does
- * work.
+ * 250 kHz or 4 microseconds. But many TM1637 LED Modules from eBay
+ * apparently use capacitors which are far too large (~10 nF, instead of ~100
+ * pF). So the rise time of the signal on these lines are too slow, and we need
+ * to use a very large delay between bits. A value of 50 microseconds does not
+ * work on my LED Modules, but 100 microseconds does.
  */
 static const uint16_t kDefaultTm1637DelayMicros = 100;
 
 /**
  * Many (if not all) of the 6-digit LED modules on eBay and Amazon using the
- * TM1637 chip have their digit addresses incorrectly ordered. Not sure why the
+ * TM1637 chip have their digit addresses incorrectly ordered. Not sure why they
  * did that since their 4-digit LED modules follow the natural order. This array
  * remaps the digit position to the correct order expected by this library where
  * digit 0 is on the left, and digit 5 is on the far right.
@@ -58,10 +58,10 @@ static const uint8_t kSixDigitRemapArray[6] = {
 };
 
 /**
- * An implementation of seven-segment LedModule using the TM1637 chip.
- * The chip communicates using a protocol that is electrically similar to I2C,
- * but does not use a 7-8 bit address. We can use a software-based I2C
- * interface.
+ * An implementation of seven-segment LedModule using the TM1637 chip. The chip
+ * communicates using a protocol that is electrically similar to I2C, but does
+ * not use an address byte at the beginning of the protocol. We can use a
+ * software-based I2C interface.
  *
  * @tparam WI wire protocol interface, either SwWireInterface or
  *    SwWireFastInterface
@@ -118,14 +118,12 @@ class Tm1637Module : public LedModule {
     uint8_t getNumDigits() const { return DIGITS; }
 
     void setPatternAt(uint8_t pos, uint8_t pattern) override {
-      uint8_t actualPos = remap(pos);
-      mPatterns[actualPos] = pattern;
-      setDirtyBit(actualPos);
+      mPatterns[pos] = pattern;
+      setDirtyBit(pos);
     }
 
     uint8_t getPatternAt(uint8_t pos) override {
-      uint8_t actualPos = remap(pos);
-      return mPatterns[actualPos];
+      return mPatterns[pos];
     }
 
     void setBrightness(uint8_t brightness) override {
@@ -172,7 +170,8 @@ class Tm1637Module : public LedModule {
       mWireInterface.startCondition();
       mWireInterface.sendByte(kAddressCmd);
       for (uint8_t i = 0; i < DIGITS; ++i) {
-        mWireInterface.sendByte(mPatterns[i]);
+        uint8_t actualPos = remapDigit(i);
+        mWireInterface.sendByte(mPatterns[actualPos]);
       }
       mWireInterface.stopCondition();
 
@@ -184,6 +183,7 @@ class Tm1637Module : public LedModule {
      * (DIGITS + 1) times to update the digits of entire module, including the
      * brightness which is updated using a separate step. Uses the mFlushStage
      * and the mIsDirty bit array to update only the part that needs updating.
+     *
      * This method should be used if the processor cannot be blocked for the
      * entire duration of the flush() method (e.g. on the ESP8266, which will
      * cause a WDT reset when it is blocked for more than 20-40 ms).
@@ -219,8 +219,9 @@ class Tm1637Module : public LedModule {
           mWireInterface.stopCondition();
 
           mWireInterface.startCondition();
-          mWireInterface.sendByte(kAddressCmd | mFlushStage);
-          mWireInterface.sendByte(mPatterns[mFlushStage]);
+          uint8_t actualPos = remapDigit(mFlushStage);
+          mWireInterface.sendByte(kAddressCmd | actualPos);
+          mWireInterface.sendByte(mPatterns[actualPos]);
           mWireInterface.stopCondition();
         }
         clearDirtyBit(mFlushStage);
@@ -238,12 +239,12 @@ class Tm1637Module : public LedModule {
       mIsDirty &= ~(0x1 << bit);
     }
 
-    bool isDirtyBit(uint8_t bit) {
+    bool isDirtyBit(uint8_t bit) const {
       return mIsDirty & (0x1 << bit);
     }
 
     /** Convert a logical position into the physical position. */
-    uint8_t remap(uint8_t pos) {
+    uint8_t remapDigit(uint8_t pos) const {
       return mRemapArray ? mRemapArray[pos] : pos;
     }
 
@@ -269,7 +270,6 @@ class Tm1637Module : public LedModule {
     uint8_t mIsDirty; // bit array
     uint8_t mFlushStage; // [0, DIGITS], DIGITS for brightness update
 };
-
 
 } // ace_segment
 

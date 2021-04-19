@@ -82,6 +82,11 @@ class HwSpiInterface {
       digitalWrite(mLatchPin, HIGH);
     }
 
+    void send16(uint8_t msb, uint8_t lsb) const {
+      uint16_t value = ((uint16_t) msb) << 8 | (uint16_t) lsb;
+      send16(value);
+    }
+
   private:
     uint8_t const mLatchPin;
     uint8_t const mDataPin;
