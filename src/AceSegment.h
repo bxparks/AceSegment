@@ -43,6 +43,7 @@ SOFTWARE.
 #include "ace_segment/LedModule.h"
 #include "ace_segment/scanning/ScanningModule.h"
 #include "ace_segment/tm1637/Tm1637Module.h"
+#include "ace_segment/max7219/Max7219Module.h"
 #include "ace_segment/LedDisplay.h"
 #include "ace_segment/writer/NumberWriter.h"
 #include "ace_segment/writer/ClockWriter.h"
