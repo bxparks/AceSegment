@@ -13,7 +13,8 @@ LED driver chip.
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
 **Status**: This is a **work in progress**. It is not ready for public
-consumption. Need to add documentation for `Tm1637Module`.
+consumption. Need to add documentation for `Tm1637Module`. Need to add
+documentation for `Max7219Module`.
 
 ## Table of Contents
 
@@ -243,6 +244,8 @@ depend on the lower-level classes:
           actual LED module
     * `Tm1637Module`
         * An implementation of `LedModule` using a TM1637 chip.
+    * `Max7219Module`
+        * An implementation of `LedModule` using a MAX7219 chip.
 * `LedDisplay`
     * Knows how to write bit patterns to a `LedModule`.
     * Provides common interfaces and common methods to various Writer classes.
@@ -289,26 +292,27 @@ The dependency diagram among these classes looks something like this:
                 LedModule
                    ^
                    |
-          +--------+--------+
-          |                 |
-   ScanningModule       Tm1637Module
-                            |
-                            v
-                        SwWireInterface
-                        SwWireFastInterface
+          +--------+----------------+
+          |        |                |
+ScanningModule  Tm1637Module  Max7219Module
+                   |                 \
+                   v                  v
+             SwWireInterface      SwSpiInterface
+             SwWireFastInterface  SwSpiFastInterface
+                                  HwSpiInterface
 
 
-                 ScanningModule
-                 /      |     \
-                /       |      .-------------.
-               v        v                     v
+                    ScanningModule
+                    /     |     \
+            .------.      |      .-----------.
+           v              v                   v
   LedMatrixDirect   LedMatrixSingleSftRgstr  LedMatrixDualShiftRegister
 LedMatrixDirectFast               \             /
                                    \           /
                                     v         v
                                    SwSpiInterface
-                                   HwSpiInterface
                                    SwSpiFastInterface
+                                   HwSpiInterface
 ```
 
 <a name="SettingUpScanningModule"></a>
