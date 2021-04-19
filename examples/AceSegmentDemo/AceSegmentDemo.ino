@@ -25,6 +25,7 @@ using namespace ace_button;
 
 #define LED_DISPLAY_TYPE_SCANNING 0
 #define LED_DISPLAY_TYPE_TM1637 1
+#define LED_DISPLAY_TYPE_MAX7219 2
 
 #define LED_MATRIX_MODE_NONE 0
 #define LED_MATRIX_MODE_DIRECT 1
@@ -46,12 +47,14 @@ using namespace ace_button;
 // For EpoxyDuino, the actual numbers don't matter, so let's set them to (2,3)
 // since I'm not sure if A2 and A3 are defined.
 #if defined(EPOXY_DUINO)
+  const uint8_t NUM_DIGITS = 4;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
   const uint8_t MODE_BUTTON_PIN = 2;
   const uint8_t CHANGE_BUTTON_PIN = 3;
 
 #elif defined(AUNITER_LED_CLOCK_DIRECT)
+  const uint8_t NUM_DIGITS = 4;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT_FAST
@@ -59,6 +62,7 @@ using namespace ace_button;
   const uint8_t CHANGE_BUTTON_PIN = A3;
 
 #elif defined(AUNITER_LED_CLOCK_SINGLE)
+  const uint8_t NUM_DIGITS = 4;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_SW_SPI
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_HW_SPI
@@ -67,6 +71,7 @@ using namespace ace_button;
   const uint8_t CHANGE_BUTTON_PIN = A3;
 
 #elif defined(AUNITER_LED_CLOCK_DUAL)
+  const uint8_t NUM_DIGITS = 4;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SW_SPI
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HW_SPI
@@ -75,7 +80,15 @@ using namespace ace_button;
   const uint8_t CHANGE_BUTTON_PIN = A3;
 
 #elif defined(AUNITER_LED_CLOCK_TM1637)
+  const uint8_t NUM_DIGITS = 4;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_TM1637
+  #define LED_MATRIX_MODE LED_MATRIX_MODE_NONE
+  const uint8_t MODE_BUTTON_PIN = A2;
+  const uint8_t CHANGE_BUTTON_PIN = A3;
+
+#elif defined(AUNITER_LED_CLOCK_MAX7219)
+  const uint8_t NUM_DIGITS = 8;
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_MAX7219
   #define LED_MATRIX_MODE LED_MATRIX_MODE_NONE
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
@@ -99,20 +112,23 @@ using namespace ace_button;
 const uint8_t FRAMES_PER_SECOND = 60;
 const uint8_t NUM_SUBFIELDS = 16;
 const uint8_t NUM_BRIGHTNESSES = 8;
-
-const uint8_t levels[NUM_BRIGHTNESSES] = {
+const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   1, 2, 4, 8,
   15, 7, 3, 2
 };
 
-const uint8_t NUM_DIGITS = 4;
-const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
+#if LED_MATRIX_MODE == LED_MATRIX_MODE_NONE
+  // Define nothing.
 
-#if LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT
+#elif LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT
   // 4 digits, resistors on segments on Pro Micro.
   const uint8_t NUM_SEGMENTS = 8;
+  const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
   const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
+
 #else
+  const uint8_t NUM_SEGMENTS = 8;
+  const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
   const uint8_t LATCH_PIN = 10; // ST_CP on 74HC595
   const uint8_t DATA_PIN = MOSI; // DS on 74HC595
   const uint8_t CLOCK_PIN = SCK; // SH_CP on 74HC595
@@ -122,6 +138,10 @@ const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
   const uint8_t CLK_PIN = 10;
   const uint8_t DIO_PIN = 9;
   const uint16_t BIT_DELAY = 100;
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_MAX7219
+  const uint8_t LATCH_PIN = A0;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
 #endif
 
 // The chain of resources.
@@ -220,7 +240,13 @@ const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_TM1637
   using WireInterface = SwWireInterface;
   WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
-  Tm1637Module<WireInterface, 4> module(wireInterface);
+  Tm1637Module<WireInterface, NUM_DIGITS> module(wireInterface);
+
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_MAX7219
+  using SpiInterface = SwSpiInterface;
+  SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  Max7219Module<SpiInterface, NUM_DIGITS> module(
+      spiInterface, kEightDigitRemapArray);
 
 #else
   #error Unknown LED_DISPLAY_TYPE
@@ -238,7 +264,13 @@ void setupAceSegment() {
 #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_TM1637
   wireInterface.begin();
   module.begin();
-  module.setBrightness(2);
+  module.setBrightness(2); // 1-7
+
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_MAX7219
+  spiInterface.begin();
+  module.begin();
+  module.setBrightness(2); // 0-15
+
 #else
   #if LED_MATRIX_MODE == LED_MATRIX_MODE_PARIAL_SW_SPI \
       || LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HW_SPI \
@@ -449,10 +481,10 @@ void setupPulseDisplay() {
 }
 
 void setBrightnesses(int i) {
-  uint8_t brightness0 = levels[i % NUM_BRIGHTNESSES];
-  uint8_t brightness1 = levels[(i+1) % NUM_BRIGHTNESSES];
-  uint8_t brightness2 = levels[(i+2) % NUM_BRIGHTNESSES];
-  uint8_t brightness3 = levels[(i+3) % NUM_BRIGHTNESSES];
+  uint8_t brightness0 = BRIGHTNESS_LEVELS[i % NUM_BRIGHTNESSES];
+  uint8_t brightness1 = BRIGHTNESS_LEVELS[(i+1) % NUM_BRIGHTNESSES];
+  uint8_t brightness2 = BRIGHTNESS_LEVELS[(i+2) % NUM_BRIGHTNESSES];
+  uint8_t brightness3 = BRIGHTNESS_LEVELS[(i+3) % NUM_BRIGHTNESSES];
   modulatingModule.setBrightnessAt(0, brightness0);
   modulatingModule.setBrightnessAt(1, brightness1);
   modulatingModule.setBrightnessAt(2, brightness2);
