@@ -4,10 +4,12 @@
     * Simplify `LedDisplay` base class API.
     * Extract hardware dependent API from `LedDisplay` into `LedModule`.
     * Add `Tm1637Module` class to support LED modules using the TM1637 chip.
+        * Supports `remapArray` to reorder the digits for certain 6-digit LED
+          modules which are physically wired out of order.
+    * Add `Max7219Module` class that supports an 8-digit LED module using a
+      single MAX7219 chip.
+        * Supports `remapArray` to reverse the digit ordering.
     * Add `TemperatureWriter`.
-    * Add `remapArray` to `Tm1637Module::begin()` to support logical reordering
-      of the LED digits to support certain 6-digit LED modules which are
-      physically wired out of order.
     * Upgrade ESP32 Core from 1.0.4 to 1.0.6. No signficant change detected.
 * 0.4 (2021-04-09)
     * A complete refactoring of the previous v0.3 version, which I could not

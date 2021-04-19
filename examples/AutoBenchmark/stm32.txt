@@ -8,6 +8,7 @@ sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 12
 sizeof(LedModule): 4
 sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(Tm1637Module<SwWireInterface, 4>): 24
+sizeof(Max7219Module<SwSpiInterface, 8>): 28
 sizeof(LedDisplay): 4
 sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
@@ -15,15 +16,17 @@ sizeof(TemperatureWriter): 4
 sizeof(CharWriter): 4
 sizeof(StringWriter): 4
 BENCHMARKS
-Scanning(Direct) 14 14 20 240
-Scanning(Direct,subfields) 1 2 29 3840
-Scanning(Single,SwSpi) 32 32 38 240
-Scanning(Single,SwSpi,subfields) 1 4 56 3840
-Scanning(Single,HwSpi) 40 41 46 240
-Scanning(Single,HwSpi,subfields) 1 4 65 3840
-Scanning(Dual,SwSpi) 55 56 61 240
-Scanning(Dual,SwSpi,subfields) 1 5 79 3840
-Scanning(Dual,HwSpi) 40 40 45 240
-Scanning(Dual,HwSpi,subfields) 1 5 51 3840
-Tm1637(Wire) 22398 22404 22413 20
+Scanning(Direct) 13 14 19 240
+Scanning(Direct,subfields) 1 2 24 3840
+Scanning(Single,SwSpi) 30 31 36 240
+Scanning(Single,SwSpi,subfields) 1 4 54 3840
+Scanning(Single,HwSpi) 40 40 45 240
+Scanning(Single,HwSpi,subfields) 1 4 50 3840
+Scanning(Dual,SwSpi) 53 53 58 240
+Scanning(Dual,SwSpi,subfields) 1 5 77 3840
+Scanning(Dual,HwSpi) 39 40 44 240
+Scanning(Dual,HwSpi,subfields) 1 5 77 3840
+Tm1637(Wire) 22398 22404 22412 20
+Max7219(SwSpi) 266 267 272 20
+Max7219(HwSpi) 199 200 205 20
 END

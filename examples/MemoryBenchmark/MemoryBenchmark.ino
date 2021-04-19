@@ -27,12 +27,15 @@
 #define FEATURE_DUAL_HW_SPI 8
 #define FEATURE_TM1637_WIRE 9
 #define FEATURE_TM1637_WIRE_FAST 10
-#define FEATURE_STUB_MODULE 11
-#define FEATURE_NUMBER_WRITER 12
-#define FEATURE_CLOCK_WRITER 13
-#define FEATURE_TEMPERATURE_WRITER 14
-#define FEATURE_CHAR_WRITER 15
-#define FEATURE_STRING_WRITER 16
+#define FEATURE_MAX7219_SW_SPI 11
+#define FEATURE_MAX7219_SW_SPI_FAST 12
+#define FEATURE_MAX7219_HW_SPI 13
+#define FEATURE_STUB_MODULE 14
+#define FEATURE_NUMBER_WRITER 15
+#define FEATURE_CLOCK_WRITER 16
+#define FEATURE_TEMPERATURE_WRITER 17
+#define FEATURE_CHAR_WRITER 18
+#define FEATURE_STRING_WRITER 19
 
 // A volatile integer to prevent the compiler from optimizing away the entire
 // program.
@@ -212,6 +215,28 @@ volatile int disableCompilerOptimization = 0;
     WireInterface wireInterface;
     Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module(wireInterface);
 
+  #elif FEATURE == FEATURE_MAX7219_SW_SPI
+    using SpiInterface = SwSpiInterface;
+    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
+        spiInterface, kEightDigitRemapArray);
+
+  #elif FEATURE == FEATURE_MAX7219_SW_SPI_FAST
+    #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
+      #error Unsupported FEATURE on this platform
+    #endif
+
+    using SpiInterface = SwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    SpiInterface spiInterface;
+    Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
+        spiInterface, kEightDigitRemapArray);
+
+  #elif FEATURE == FEATURE_MAX7219_HW_SPI
+    using SpiInterface = HwSpiInterface;
+    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
+        spiInterface, kEightDigitRemapArray);
+
   #elif FEATURE == FEATURE_STUB_MODULE
     StubModule stubModule;
     LedDisplay ledDisplay(stubModule);
@@ -302,6 +327,18 @@ void setup() {
   wireInterface.begin();
   tm1637Module.begin();
 
+#elif FEATURE == FEATURE_MAX7219_SW_SPI
+  spiInterface.begin();
+  max7219Module.begin();
+
+#elif FEATURE == FEATURE_MAX7219_SW_SPI_FAST
+  spiInterface.begin();
+  max7219Module.begin();
+
+#elif FEATURE == FEATURE_MAX7219_HW_SPI
+  spiInterface.begin();
+  max7219Module.begin();
+
 #else
   // No setup() needed for Writers.
 
@@ -320,6 +357,18 @@ void loop() {
 #elif FEATURE == FEATURE_TM1637_WIRE_FAST
   tm1637Module.setPatternAt(0, 0xff);
   tm1637Module.flush();
+
+#elif FEATURE == FEATURE_MAX7219_SW_SPI
+  max7219Module.setPatternAt(0, 0xff);
+  max7219Module.flush();
+
+#elif FEATURE == FEATURE_MAX7219_SW_SPI_FAST
+  max7219Module.setPatternAt(0, 0xff);
+  max7219Module.flush();
+
+#elif FEATURE == FEATURE_MAX7219_HW_SPI
+  max7219Module.setPatternAt(0, 0xff);
+  max7219Module.flush();
 
 #elif FEATURE == FEATURE_STUB_MODULE
   stubModule.setPatternAt(0, 0xff);

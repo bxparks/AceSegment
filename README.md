@@ -13,7 +13,8 @@ LED driver chip.
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
 **Status**: This is a **work in progress**. It is not ready for public
-consumption. Need to add documentation for `Tm1637Module`.
+consumption. Need to add documentation for `Tm1637Module`. Need to add
+documentation for `Max7219Module`.
 
 ## Table of Contents
 
@@ -243,6 +244,8 @@ depend on the lower-level classes:
           actual LED module
     * `Tm1637Module`
         * An implementation of `LedModule` using a TM1637 chip.
+    * `Max7219Module`
+        * An implementation of `LedModule` using a MAX7219 chip.
 * `LedDisplay`
     * Knows how to write bit patterns to a `LedModule`.
     * Provides common interfaces and common methods to various Writer classes.
@@ -289,26 +292,27 @@ The dependency diagram among these classes looks something like this:
                 LedModule
                    ^
                    |
-          +--------+--------+
-          |                 |
-   ScanningModule       Tm1637Module
-                            |
-                            v
-                        SwWireInterface
-                        SwWireFastInterface
+          +--------+----------------+
+          |        |                |
+ScanningModule  Tm1637Module  Max7219Module
+                   |                 \
+                   v                  v
+             SwWireInterface      SwSpiInterface
+             SwWireFastInterface  SwSpiFastInterface
+                                  HwSpiInterface
 
 
-                 ScanningModule
-                 /      |     \
-                /       |      .-------------.
-               v        v                     v
+                    ScanningModule
+                    /     |     \
+            .------.      |      .-----------.
+           v              v                   v
   LedMatrixDirect   LedMatrixSingleSftRgstr  LedMatrixDualShiftRegister
 LedMatrixDirectFast               \             /
                                    \           /
                                     v         v
                                    SwSpiInterface
-                                   HwSpiInterface
                                    SwSpiFastInterface
+                                   HwSpiInterface
 ```
 
 <a name="SettingUpScanningModule"></a>
@@ -987,20 +991,48 @@ need to include these headers manually, like this:
 Here are the sizes of the various classes on the 8-bit AVR microcontrollers
 (Arduino Uno, Nano, etc):
 
-* sizeof(SwSpiInterface): 3
-* sizeof(SwSpiFastInterface<1,2,3>): 1
-* sizeof(HwSpiInterface): 3
-* sizeof(LedMatrixDirect<>): 11
-* sizeof(LedMatrixDirectFast<0..3, 0..7>): 3
-* sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 10
-* sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 5
-* sizeof(LedDisplay): 3
-* sizeof(ScanningModule<LedMatrixBase, 4, 1>): 25
-* sizeof(Tm1637Display<SwWireInterface, 4>): 12
-* sizeof(NumberWriter): 2
-* sizeof(ClockWriter): 3
-* sizeof(CharWriter): 2
-* sizeof(StringWriter): 2
+```
+sizeof(SwWireInterface): 4
+sizeof(SwWireFastInterface<4, 5, 100>): 1
+sizeof(SwSpiInterface): 3
+sizeof(SwSpiFastInterface<11, 12, 13>): 1
+sizeof(HwSpiInterface): 3
+sizeof(LedMatrixDirect<>): 9
+sizeof(LedMatrixDirectFast<2..5, 6..13>): 3
+sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 8
+sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 5
+sizeof(LedModule): 2
+sizeof(ScanningModule<LedMatrixBase, 4>): 22
+sizeof(Tm1637Module<SwWireInterface, 4>): 14
+sizeof(Max7219Module<SwSpiInterface, 8>): 16
+sizeof(LedDisplay): 2
+sizeof(NumberWriter): 2
+sizeof(ClockWriter): 3
+sizeof(TemperatureWriter): 2
+sizeof(CharWriter): 2
+sizeof(StringWriter): 2
+```
+
+On 32-bit processors, these numbers look like this:
+
+```
+sizeof(SwWireInterface): 4
+sizeof(SwSpiInterface): 3
+sizeof(HwSpiInterface): 3
+sizeof(LedMatrixDirect<>): 16
+sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 16
+sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 12
+sizeof(LedModule): 4
+sizeof(ScanningModule<LedMatrixBase, 4>): 32
+sizeof(Tm1637Module<SwWireInterface, 4>): 24
+sizeof(Max7219Module<SwSpiInterface, 8>): 28
+sizeof(LedDisplay): 4
+sizeof(NumberWriter): 4
+sizeof(ClockWriter): 8
+sizeof(TemperatureWriter): 4
+sizeof(CharWriter): 4
+sizeof(StringWriter): 4
+```
 
 ### Flash Memory
 
@@ -1019,24 +1051,30 @@ static memory consumptions for various configurations on an Arduino Nano
 |---------------------------------+--------------+-------------|
 | baseline                        |    456/   11 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| ScanningModule(direct)          |   1700/   76 |  1244/   65 |
-| ScanningModule(single_sw_spi)   |   1724/   70 |  1268/   59 |
-| ScanningModule(single_hw_spi)   |   1786/   71 |  1330/   60 |
-| ScanningModule(dual_sw_spi)     |   1626/   61 |  1170/   50 |
-| ScanningModule(dual_hw_spi)     |   1700/   62 |  1244/   51 |
+| Scanning(Direct)                |   1498/   64 |  1042/   53 |
+| Scanning(DirectFast)            |   1258/   94 |   802/   83 |
 |---------------------------------+--------------+-------------|
-| ScanningModule(direct_fast)     |   1460/  104 |  1004/   93 |
-| ScanningModule(single_sw_fast)  |   1616/   68 |  1160/   57 |
-| ScanningModule(dual_sw_fast)    |   1226/   59 |   770/   48 |
+| Scanning(Single,SwSpi)          |   1520/   58 |  1064/   47 |
+| Scanning(Single,SwSpiFast)      |   1412/   56 |   956/   45 |
+| Scanning(Single,HwSpi)          |   1582/   59 |  1126/   48 |
 |---------------------------------+--------------+-------------|
-| Tm1637Display(Normal)           |   1814/   43 |  1358/   32 |
-| Tm1637Display(Fast)             |   1152/   40 |   696/   29 |
+| Scanning(Dual,SwSpi)            |   1432/   51 |   976/   40 |
+| Scanning(Dual,SwSpiFast)        |   1030/   49 |   574/   38 |
+| Scanning(Dual,HwSpi)            |   1502/   52 |  1046/   41 |
 |---------------------------------+--------------+-------------|
-| StubDisplay                     |    538/   11 |    82/    0 |
-| NumberWriter+Stub               |    692/   32 |   236/   21 |
-| ClockWriter+Stub                |    792/   33 |   336/   22 |
-| CharWriter+Stub                 |    792/   32 |   336/   21 |
-| StringWriter+Stub               |    940/   40 |   484/   29 |
+| Tm1637(Wire)                    |   1582/   39 |  1126/   28 |
+| Tm1637(WireFast)                |    924/   36 |   468/   25 |
+|---------------------------------+--------------+-------------|
+| Max7219(SwSpi)                  |   1220/   44 |   764/   33 |
+| Max7219(SwSpiFast)              |    780/   42 |   324/   31 |
+| Max7219(HwSpi)                  |   1302/   45 |   846/   34 |
+|---------------------------------+--------------+-------------|
+| StubModule+LedDisplay           |    578/   24 |   122/   13 |
+| NumberWriter+Stub               |    682/   28 |   226/   17 |
+| ClockWriter+Stub                |    796/   29 |   340/   18 |
+| TemperatureWriter+Stub          |    764/   28 |   308/   17 |
+| CharWriter+Stub                 |    758/   28 |   302/   17 |
+| StringWriter+Stub               |    988/   36 |   532/   25 |
 +--------------------------------------------------------------+
 ```
 
@@ -1048,24 +1086,30 @@ And here are the memory consumption numbers for an ESP8266:
 |---------------------------------+--------------+-------------|
 | baseline                        | 256700/26784 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| ScanningModule(direct)          | 257972/26860 |  1272/   76 |
-| ScanningModule(single_sw_spi)   | 258044/26868 |  1344/   84 |
-| ScanningModule(single_hw_spi)   | 259148/26876 |  2448/   92 |
-| ScanningModule(dual_sw_spi)     | 257928/26848 |  1228/   64 |
-| ScanningModule(dual_hw_spi)     | 259128/26856 |  2428/   72 |
+| Scanning(Direct)                | 257772/27260 |  1072/  476 |
+| Scanning(DirectFast)            |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| ScanningModule(direct_fast)     |     -1/   -1 |    -1/   -1 |
-| ScanningModule(single_sw_fast)  |     -1/   -1 |    -1/   -1 |
-| ScanningModule(dual_sw_fast)    |     -1/   -1 |    -1/   -1 |
+| Scanning(Single,SwSpi)          | 257844/27244 |  1144/  460 |
+| Scanning(Single,SwSpiFast)      |     -1/   -1 |    -1/   -1 |
+| Scanning(Single,HwSpi)          | 258948/27252 |  2248/  468 |
 |---------------------------------+--------------+-------------|
-| Tm1637Display(Normal)           | 258168/26816 |  1468/   32 |
-| Tm1637Display(Fast)             |     -1/   -1 |    -1/   -1 |
+| Scanning(Dual,SwSpi)            | 257728/27248 |  1028/  464 |
+| Scanning(Dual,SwSpiFast)        |     -1/   -1 |    -1/   -1 |
+| Scanning(Dual,HwSpi)            | 258912/27256 |  2212/  472 |
 |---------------------------------+--------------+-------------|
-| StubDisplay                     | 256884/26792 |   184/    8 |
-| NumberWriter+Stub               | 257380/26792 |   680/    8 |
-| ClockWriter+Stub                | 257140/26800 |   440/   16 |
-| CharWriter+Stub                 | 257092/26792 |   392/    8 |
-| StringWriter+Stub               | 257292/26816 |   592/   32 |
+| Tm1637(Wire)                    | 257920/27224 |  1220/  440 |
+| Tm1637(WireFast)                |     -1/   -1 |    -1/   -1 |
+|---------------------------------+--------------+-------------|
+| Max7219(SwSpi)                  | 257640/27224 |   940/  440 |
+| Max7219(SwSpiFast)              |     -1/   -1 |    -1/   -1 |
+| Max7219(HwSpi)                  | 258872/27232 |  2172/  448 |
+|---------------------------------+--------------+-------------|
+| StubModule+LedDisplay           | 256876/27200 |   176/  416 |
+| NumberWriter+Stub               | 257372/27200 |   672/  416 |
+| ClockWriter+Stub                | 257164/27208 |   464/  424 |
+| TemperatureWriter+Stub          | 257484/27200 |   784/  416 |
+| CharWriter+Stub                 | 257084/27200 |   384/  416 |
+| StringWriter+Stub               | 257316/27208 |   616/  424 |
 +--------------------------------------------------------------+
 ```
 
@@ -1078,28 +1122,33 @@ Here are the CPU numbers for an AVR processor:
 
 ```
 +----------------------------------------+-------------------+---------+
-| LedDisplay Operation                   |   min/  avg/  max | samples |
+| Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Scanning(direct)                       |    72/   76/   88 |     240 |
-| Scanning(direct,subfields)             |     4/   12/   84 |    3840 |
-| Scanning(single_sw_spi)                |   156/  159/  180 |     240 |
-| Scanning(single_sw_spi,subfields)      |     4/   20/  180 |    3840 |
-| Scanning(single_hw_spi)                |    36/   39/   52 |     240 |
-| Scanning(single_hw_spi,subfields)      |     4/    8/   56 |    3840 |
-| Scanning(dual_sw_spi)                  |   264/  269/  300 |     240 |
-| Scanning(dual_sw_spi,subfields)        |     4/   30/  296 |    3840 |
-| Scanning(dual_hw_spi)                  |    24/   26/   40 |     240 |
-| Scanning(dual_hw_spi,subfields)        |     4/    7/   40 |    3840 |
+| Scanning(Direct)                       |    72/   76/   88 |     240 |
+| Scanning(Direct,subfields)             |     4/   13/   84 |    3840 |
+| Scanning(DirectFast)                   |    24/   28/   44 |     240 |
+| Scanning(DirectFast,subfields)         |     4/    8/   40 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Scanning(direct_fast)                  |    28/   29/   36 |     240 |
-| Scanning(direct_fast,subfields)        |     4/    8/   44 |    3840 |
-| Scanning(single_sw_spi_fast)           |    28/   31/   40 |     240 |
-| Scanning(single_sw_spi_fast,subfields) |     4/    8/   40 |    3840 |
-| Scanning(dual_sw_spi_fast)             |    20/   24/   32 |     240 |
-| Scanning(dual_sw_spi_fast,subfields)   |     4/    7/   36 |    3840 |
+| Scanning(Single,SwSpi)                 |   156/  159/  188 |     240 |
+| Scanning(Single,SwSpi,subfields)       |     4/   22/  180 |    3840 |
+| Scanning(Single,SwSpiFast)             |    28/   30/   44 |     240 |
+| Scanning(Single,SwSpiFast,subfields)   |     4/    8/   40 |    3840 |
+| Scanning(Single,HwSpi)                 |    36/   38/   48 |     240 |
+| Scanning(Single,HwSpi,subfields)       |     4/    9/   48 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(Normal)                         | 22308/22326/22596 |      20 |
-| Tm1637(Fast)                           | 21056/21069/21224 |      20 |
+| Scanning(Dual,SwSpi)                   |   264/  268/  304 |     240 |
+| Scanning(Dual,SwSpi,subfields)         |     4/   34/  304 |    3840 |
+| Scanning(Dual,SwSpiFast)               |    20/   24/   36 |     240 |
+| Scanning(Dual,SwSpiFast,subfields)     |     4/    7/   32 |    3840 |
+| Scanning(Dual,HwSpi)                   |    24/   26/   36 |     240 |
+| Scanning(Dual,HwSpi,subfields)         |     4/    7/   36 |    3840 |
+|----------------------------------------+-------------------+---------|
+| Tm1637(Wire)                           | 22308/22328/22560 |      20 |
+| Tm1637(WireFast)                       | 21060/21071/21192 |      20 |
+|----------------------------------------+-------------------+---------|
+| Max7219(SwSpi)                         |  1328/ 1336/ 1424 |      20 |
+| Max7219(SwSpiFast)                     |   120/  126/  136 |      20 |
+| Max7219(HwSpi)                         |   120/  130/  140 |      20 |
 +----------------------------------------+-------------------+---------+
 ```
 
@@ -1111,20 +1160,25 @@ Here are the CPU numbers for an ESP8266:
 
 ```
 +----------------------------------------+-------------------+---------+
-| LedDisplay Operation                   |   min/  avg/  max | samples |
+| Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Scanning(direct)                       |    12/   12/   48 |     240 |
-| Scanning(direct,subfields)             |     0/    2/   24 |    3840 |
-| Scanning(single_sw_spi)                |    29/   29/   33 |     240 |
-| Scanning(single_sw_spi,subfields)      |     0/    4/   43 |    3840 |
-| Scanning(single_hw_spi)                |    11/   11/   23 |     240 |
-| Scanning(single_hw_spi,subfields)      |     0/    2/   24 |    3840 |
-| Scanning(dual_sw_spi)                  |    50/   50/   58 |     240 |
-| Scanning(dual_sw_spi,subfields)        |     1/    7/   67 |    3840 |
-| Scanning(dual_hw_spi)                  |    12/   12/   24 |     240 |
-| Scanning(dual_hw_spi,subfields)        |     1/    2/   28 |    3840 |
+| Scanning(Direct)                       |    12/   12/   29 |     240 |
+| Scanning(Direct,subfields)             |     0/    2/   20 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(Normal)                         | 21494/21500/21539 |      20 |
+| Scanning(Single,SwSpi)                 |    29/   29/   37 |     240 |
+| Scanning(Single,SwSpi,subfields)       |     0/    4/   37 |    3840 |
+| Scanning(Single,HwSpi)                 |    11/   11/   19 |     240 |
+| Scanning(Single,HwSpi,subfields)       |     0/    2/   20 |    3840 |
+|----------------------------------------+-------------------+---------|
+| Scanning(Dual,SwSpi)                   |    50/   50/   58 |     240 |
+| Scanning(Dual,SwSpi,subfields)         |     0/    7/   67 |    3840 |
+| Scanning(Dual,HwSpi)                   |    12/   12/   24 |     240 |
+| Scanning(Dual,HwSpi,subfields)         |     0/    2/   28 |    3840 |
+|----------------------------------------+-------------------+---------|
+| Tm1637(Wire)                           | 21493/21497/21533 |      20 |
+|----------------------------------------+-------------------+---------|
+| Max7219(SwSpi)                         |   254/  254/  266 |      20 |
+| Max7219(HwSpi)                         |    60/   61/   77 |      20 |
 +----------------------------------------+-------------------+---------+
 ```
 

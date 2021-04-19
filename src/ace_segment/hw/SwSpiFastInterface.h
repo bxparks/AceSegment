@@ -70,6 +70,11 @@ class SwSpiFastInterface {
     void send16(uint16_t value) const {
       uint8_t msb = (value & 0xff00) >> 8;
       uint8_t lsb = (value & 0xff);
+      send16(msb, lsb);
+    }
+
+    /** Send 2 bytes as 16-bit stream, including latching LOW and HIGH. */
+    void send16(uint8_t msb, uint8_t lsb) const {
       digitalWriteFast(LATCH_PIN, LOW);
       shiftOutFast(msb);
       shiftOutFast(lsb);

@@ -137,11 +137,12 @@ before substantional refactoring in 2021.
 The following shows the flash and static memory sizes of the `MemoryBenchmark`
 program for various `LedModule` configurations and various Writer classes.
 
-* `ClockInterface`, `GpioInterface` (which are opimized away by the compiler)
+* `ClockInterface`, `GpioInterface` (usually optimized away by the compiler)
 * `SwSpiInterface` or `HwSpiInterface`
 * `LedMatrixXxx`
 * `ScanningModule`
 * `Tm1637Module`
+* `Max7219Module`
 * `NumberWriter`
 * `ClockWriter`
 * `TemperatureWriter`
@@ -175,11 +176,15 @@ other `MemoryBenchmark` programs.)
 | Scanning(Single,HwSpi)          |   1582/   59 |  1126/   48 |
 |---------------------------------+--------------+-------------|
 | Scanning(Dual,SwSpi)            |   1432/   51 |   976/   40 |
-| Scanning(Dual,SwSpiFast)        |   1028/   49 |   572/   38 |
+| Scanning(Dual,SwSpiFast)        |   1030/   49 |   574/   38 |
 | Scanning(Dual,HwSpi)            |   1502/   52 |  1046/   41 |
 |---------------------------------+--------------+-------------|
 | Tm1637(Wire)                    |   1582/   39 |  1126/   28 |
 | Tm1637(WireFast)                |    924/   36 |   468/   25 |
+|---------------------------------+--------------+-------------|
+| Max7219(SwSpi)                  |   1220/   44 |   764/   33 |
+| Max7219(SwSpiFast)              |    780/   42 |   324/   31 |
+| Max7219(HwSpi)                  |   1302/   45 |   846/   34 |
 |---------------------------------+--------------+-------------|
 | StubModule+LedDisplay           |    578/   24 |   122/   13 |
 | NumberWriter+Stub               |    682/   28 |   226/   17 |
@@ -217,6 +222,10 @@ other `MemoryBenchmark` programs.)
 | Tm1637(Wire)                    |   4652/  179 |  1180/   28 |
 | Tm1637(WireFast)                |   3880/  176 |   408/   25 |
 |---------------------------------+--------------+-------------|
+| Max7219(SwSpi)                  |   4290/  184 |   818/   33 |
+| Max7219(SwSpiFast)              |   3736/  182 |   264/   31 |
+| Max7219(HwSpi)                  |   4372/  185 |   900/   34 |
+|---------------------------------+--------------+-------------|
 | StubModule+LedDisplay           |   3534/  164 |    62/   13 |
 | NumberWriter+Stub               |   3638/  168 |   166/   17 |
 | ClockWriter+Stub                |   3752/  169 |   280/   18 |
@@ -252,6 +261,10 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | Tm1637(Wire)                    |  10808/    0 |   744/    0 |
 | Tm1637(WireFast)                |     -1/   -1 |    -1/   -1 |
+|---------------------------------+--------------+-------------|
+| Max7219(SwSpi)                  |  10616/    0 |   552/    0 |
+| Max7219(SwSpiFast)              |     -1/   -1 |    -1/   -1 |
+| Max7219(HwSpi)                  |  11152/    0 |  1088/    0 |
 |---------------------------------+--------------+-------------|
 | StubModule+LedDisplay           |  10336/    0 |   272/    0 |
 | NumberWriter+Stub               |  10672/    0 |   608/    0 |
@@ -289,6 +302,10 @@ other `MemoryBenchmark` programs.)
 | Tm1637(Wire)                    |  21628/ 4372 |  2492/  584 |
 | Tm1637(WireFast)                |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
+| Max7219(SwSpi)                  |  21412/ 4372 |  2276/  584 |
+| Max7219(SwSpiFast)              |     -1/   -1 |    -1/   -1 |
+| Max7219(HwSpi)                  |  23216/ 4372 |  4080/  584 |
+|---------------------------------+--------------+-------------|
 | StubModule+LedDisplay           |  19328/ 4340 |   192/  552 |
 | NumberWriter+Stub               |  19616/ 4344 |   480/  556 |
 | ClockWriter+Stub                |  19496/ 4348 |   360/  560 |
@@ -325,6 +342,10 @@ other `MemoryBenchmark` programs.)
 | Tm1637(Wire)                    | 257920/27224 |  1220/  440 |
 | Tm1637(WireFast)                |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
+| Max7219(SwSpi)                  | 257640/27224 |   940/  440 |
+| Max7219(SwSpiFast)              |     -1/   -1 |    -1/   -1 |
+| Max7219(HwSpi)                  | 258872/27232 |  2172/  448 |
+|---------------------------------+--------------+-------------|
 | StubModule+LedDisplay           | 256876/27200 |   176/  416 |
 | NumberWriter+Stub               | 257372/27200 |   672/  416 |
 | ClockWriter+Stub                | 257164/27208 |   464/  424 |
@@ -347,26 +368,30 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        | 197748/13084 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| Scanning(Direct)                | 200482/13752 |  2734/  668 |
+| Scanning(Direct)                | 200514/13760 |  2766/  676 |
 | Scanning(DirectFast)            |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Scanning(Single,SwSpi)          | 200522/13760 |  2774/  676 |
+| Scanning(Single,SwSpi)          | 200554/13768 |  2806/  684 |
 | Scanning(Single,SwSpiFast)      |     -1/   -1 |    -1/   -1 |
-| Scanning(Single,HwSpi)          | 202814/13808 |  5066/  724 |
+| Scanning(Single,HwSpi)          | 202846/13816 |  5098/  732 |
 |---------------------------------+--------------+-------------|
-| Scanning(Dual,SwSpi)            | 200422/13752 |  2674/  668 |
+| Scanning(Dual,SwSpi)            | 200454/13760 |  2706/  676 |
 | Scanning(Dual,SwSpiFast)        |     -1/   -1 |    -1/   -1 |
-| Scanning(Dual,HwSpi)            | 202766/13800 |  5018/  716 |
+| Scanning(Dual,HwSpi)            | 202798/13808 |  5050/  724 |
 |---------------------------------+--------------+-------------|
-| Tm1637(Wire)                    | 200710/13736 |  2962/  652 |
+| Tm1637(Wire)                    | 200742/13744 |  2994/  660 |
 | Tm1637(WireFast)                |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| StubModule+LedDisplay           | 199236/13552 |  1488/  468 |
-| NumberWriter+Stub               | 199624/13552 |  1876/  468 |
-| ClockWriter+Stub                | 199512/13560 |  1764/  476 |
-| TemperatureWriter+Stub          | 199744/13552 |  1996/  468 |
-| CharWriter+Stub                 | 199468/13552 |  1720/  468 |
-| StringWriter+Stub               | 199644/13560 |  1896/  476 |
+| Max7219(SwSpi)                  | 200352/13728 |  2604/  644 |
+| Max7219(SwSpiFast)              |     -1/   -1 |    -1/   -1 |
+| Max7219(HwSpi)                  | 202776/13776 |  5028/  692 |
+|---------------------------------+--------------+-------------|
+| StubModule+LedDisplay           | 199268/13560 |  1520/  476 |
+| NumberWriter+Stub               | 199656/13560 |  1908/  476 |
+| ClockWriter+Stub                | 199544/13568 |  1796/  484 |
+| TemperatureWriter+Stub          | 199776/13560 |  2028/  476 |
+| CharWriter+Stub                 | 199500/13560 |  1752/  476 |
+| StringWriter+Stub               | 199676/13568 |  1928/  484 |
 +--------------------------------------------------------------+
 
 ```
@@ -397,6 +422,10 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | Tm1637(Wire)                    |  12556/ 4564 |  4932/ 1516 |
 | Tm1637(WireFast)                |     -1/   -1 |    -1/   -1 |
+|---------------------------------+--------------+-------------|
+| Max7219(SwSpi)                  |  11848/ 4564 |  4224/ 1516 |
+| Max7219(SwSpiFast)              |     -1/   -1 |    -1/   -1 |
+| Max7219(HwSpi)                  |  13284/ 4620 |  5660/ 1572 |
 |---------------------------------+--------------+-------------|
 | StubModule+LedDisplay           |  10924/ 4552 |  3300/ 1504 |
 | NumberWriter+Stub               |  11400/ 4556 |  3776/ 1508 |

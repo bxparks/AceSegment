@@ -43,19 +43,16 @@ static const uint16_t kDefaultTm1637DelayMicros = 100;
 
 /**
  * Many (if not all) of the 6-digit LED modules on eBay and Amazon using the
- * TM1637 chip have their digit addresses incorrectly ordered. Not sure why they
- * did that since their 4-digit LED modules follow the natural order. This array
- * remaps the digit position to the correct order expected by this library where
- * digit 0 is on the left, and digit 5 is on the far right.
+ * TM1637 chip are wired out of sequence. Not sure why since their 4-digit LED
+ * modules follow the natural order. This array remaps the digit position to the
+ * correct order expected by this library where digit 0 is on the left, and
+ * digit 5 is on the far right. Pass this array into the Tm1637Module
+ * constructor.
  *
  * You can create your own remap array to handle other LED modules with
  * different physical ordering compared to the logical ordering.
- *
- * Pass this array into the Tm1637Module constructor.
  */
-static const uint8_t kSixDigitRemapArray[6] = {
-  2, 1, 0, 5, 4, 3
-};
+extern const uint8_t kSixDigitRemapArray[6];
 
 /**
  * An implementation of seven-segment LedModule using the TM1637 chip. The chip
