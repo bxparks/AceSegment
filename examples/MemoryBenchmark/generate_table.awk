@@ -8,15 +8,15 @@
 BEGIN {
   labels[0] = "baseline"
   labels[1] = "Scanning(Direct)";
-  labels[2] = "Scanning(Single,SwSpi)";
-  labels[3] = "Scanning(Single,HwSpi)";
-  labels[4] = "Scanning(Dual,SwSpi)";
-  labels[5] = "Scanning(Dual,HwSpi)";
-  labels[6] = "Scanning(DirectFast)";
-  labels[7] = "Scanning(Single,FastSwSpi)";
-  labels[8] = "Scanning(Dual,FastSwSpi)";
-  labels[9] = "Tm1637(Normal)";
-  labels[10] = "Tm1637(Fast)";
+  labels[2] = "Scanning(DirectFast)";
+  labels[3] = "Scanning(Single,SwSpi)";
+  labels[4] = "Scanning(Single,SwSpiFast)";
+  labels[5] = "Scanning(Single,HwSpi)";
+  labels[6] = "Scanning(Dual,SwSpi)";
+  labels[7] = "Scanning(Dual,SwSpiFast)";
+  labels[8] = "Scanning(Dual,HwSpi)";
+  labels[9] = "Tm1637(Wire)";
+  labels[10] = "Tm1637(WireFast)";
   labels[11] = "StubModule+LedDisplay";
   labels[12] = "NumberWriter+Stub";
   labels[13] = "ClockWriter+Stub";
@@ -51,10 +51,11 @@ END {
   printf("|---------------------------------+--------------+-------------|\n")
   printf("| %-31s | %6d/%5d | %5d/%5d |\n",
     labels[0], u[0]["flash"], u[0]["ram"], u[0]["d_flash"], u[0]["d_ram"])
-  printf("|---------------------------------+--------------+-------------|\n")
   for (i = 1 ; i < NUM_ENTRIES; i++) {
-    if (labels[i] ~ /direct_fast/ \
-        || labels[i] ~ /Tm1637Module\(Normal\)/ \
+    if (labels[i] ~ /Scanning\(Direct\)/ \
+        || labels[i] ~ /Scanning\(Single,SwSpi\)/ \
+        || labels[i] ~ /Scanning\(Dual,SwSpi\)/ \
+        || labels[i] ~ /Tm1637\(Wire\)/ \
         || labels[i] == "StubModule+LedDisplay") {
       printf(\
         "|---------------------------------+--------------+-------------|\n")

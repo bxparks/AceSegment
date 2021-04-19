@@ -1,5 +1,5 @@
 /*
- * A program which compiles in different ScanningModule objects configured with
+ * A program which compiles various LedModule and Writer objects configured with
  * using different LED configurations to determine the flash and static memory
  * sizes from the output of the compiler. Set the FEATURE macro to various
  * integer to compile different algorithms.
@@ -18,15 +18,15 @@
 // List of features of AceSegment that we want to gather memory usage numbers.
 #define FEATURE_BASELINE 0
 #define FEATURE_DIRECT 1
-#define FEATURE_SINGLE_SW_SPI 2
-#define FEATURE_SINGLE_HW_SPI 3
-#define FEATURE_DUAL_SW_SPI 4
-#define FEATURE_DUAL_HW_SPI 5
-#define FEATURE_DIRECT_FAST 6
-#define FEATURE_SINGLE_SW_SPI_FAST 7
-#define FEATURE_DUAL_SW_SPI_FAST 8
-#define FEATURE_TM1637_MODULE 9
-#define FEATURE_TM1637_MODULE_FAST 10
+#define FEATURE_DIRECT_FAST 2
+#define FEATURE_SINGLE_SW_SPI 3
+#define FEATURE_SINGLE_SW_SPI_FAST 4
+#define FEATURE_SINGLE_HW_SPI 5
+#define FEATURE_DUAL_SW_SPI 6
+#define FEATURE_DUAL_SW_SPI_FAST 7
+#define FEATURE_DUAL_HW_SPI 8
+#define FEATURE_TM1637_WIRE 9
+#define FEATURE_TM1637_WIRE_FAST 10
 #define FEATURE_STUB_MODULE 11
 #define FEATURE_NUMBER_WRITER 12
 #define FEATURE_CLOCK_WRITER 13
@@ -68,6 +68,8 @@ volatile int disableCompilerOptimization = 0;
   const uint8_t DIO_PIN = 10;
   const uint16_t BIT_DELAY = 100;
 
+  // A stub LedModule to allow various Writer classes to be created, but mostly
+  // isolated from the underlying LedModule implementations.
   class StubModule : public LedModule {
     public:
       StubModule() : LedModule(NUM_DIGITS) {}
@@ -95,6 +97,22 @@ volatile int disableCompilerOptimization = 0;
         DIGIT_PINS,
         NUM_SEGMENTS,
         SEGMENT_PINS);
+    ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+        scanningModule(ledMatrix, FRAMES_PER_SECOND);
+
+  #elif FEATURE == FEATURE_DIRECT_FAST
+    #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
+      #error Unsupported FEATURE on this platform
+    #endif
+
+    // Common Anode, with transitions on Group pins
+    using LedMatrix = LedMatrixDirectFast<
+      4, 5, 6, 7,
+      8, 9, 10, 16, 14, 18, 19, 15
+    >;
+    LedMatrix ledMatrix(
+        LedMatrix::kActiveLowPattern /*groupOnPattern*/,
+        LedMatrix::kActiveLowPattern /*elementOnPattern*/);
     ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
         scanningModule(ledMatrix, FRAMES_PER_SECOND);
 
@@ -180,28 +198,12 @@ volatile int disableCompilerOptimization = 0;
     ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
         scanningModule(ledMatrix, FRAMES_PER_SECOND);
 
-  #elif FEATURE == FEATURE_DIRECT_FAST
-    #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
-      #error Unsupported FEATURE on this platform
-    #endif
-
-    // Common Anode, with transitions on Group pins
-    using LedMatrix = LedMatrixDirectFast<
-      4, 5, 6, 7,
-      8, 9, 10, 16, 14, 18, 19, 15
-    >;
-    LedMatrix ledMatrix(
-        LedMatrix::kActiveLowPattern /*groupOnPattern*/,
-        LedMatrix::kActiveLowPattern /*elementOnPattern*/);
-    ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-        scanningModule(ledMatrix, FRAMES_PER_SECOND);
-
-  #elif FEATURE == FEATURE_TM1637_MODULE
+  #elif FEATURE == FEATURE_TM1637_WIRE
     using WireInterface = SwWireInterface;
     WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
     Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module(wireInterface);
 
-  #elif FEATURE == FEATURE_TM1637_MODULE_FAST
+  #elif FEATURE == FEATURE_TM1637_WIRE_FAST
     #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
       #error Unsupported FEATURE on this platform
     #endif
@@ -292,11 +294,11 @@ void setup() {
   ledMatrix.begin();
   scanningModule.begin();
 
-#elif FEATURE == FEATURE_TM1637_MODULE
+#elif FEATURE == FEATURE_TM1637_WIRE
   wireInterface.begin();
   tm1637Module.begin();
 
-#elif FEATURE == FEATURE_TM1637_MODULE_FAST
+#elif FEATURE == FEATURE_TM1637_WIRE_FAST
   wireInterface.begin();
   tm1637Module.begin();
 
@@ -307,15 +309,15 @@ void setup() {
 }
 
 void loop() {
-#if FEATURE > FEATURE_BASELINE && FEATURE < FEATURE_TM1637_MODULE
+#if FEATURE > FEATURE_BASELINE && FEATURE < FEATURE_TM1637_WIRE
   scanningModule.setPatternAt(0, 0x3A);
   scanningModule.renderFieldWhenReady();
 
-#elif FEATURE == FEATURE_TM1637_MODULE
+#elif FEATURE == FEATURE_TM1637_WIRE
   tm1637Module.setPatternAt(0, 0xff);
   tm1637Module.flush();
 
-#elif FEATURE == FEATURE_TM1637_MODULE_FAST
+#elif FEATURE == FEATURE_TM1637_WIRE_FAST
   tm1637Module.setPatternAt(0, 0xff);
   tm1637Module.flush();
 

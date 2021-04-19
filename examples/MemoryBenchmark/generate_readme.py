@@ -136,7 +136,7 @@ before substantional refactoring in 2021.
   causes the code for the `TimingStats` class to be pulled in, even if it is not
   used.
 
-**v0.5**
+**v0.4+**
 
 * Slight increase in memory usage (20-30 bytes) on some processors (AVR,
   ESP8266, ESP8266), but slight decrease on others (STM32, Teensy), I think the
@@ -159,13 +159,13 @@ before substantional refactoring in 2021.
 ## Results
 
 The following shows the flash and static memory sizes of the `MemoryBenchmark`
-program that includes the resources needed to perform a
-`ScanningModule::renderFieldWhenReady()`. This includes:
+program for various `LedModule` configurations and various Writer classes.
 
 * `ClockInterface`, `GpioInterface` (which are opimized away by the compiler)
 * `SwSpiInterface` or `HwSpiInterface`
 * `LedMatrixXxx`
 * `ScanningModule`
+* `Tm1637Module`
 * `NumberWriter`
 * `ClockWriter`
 * `TemperatureWriter`
@@ -233,7 +233,7 @@ other `MemoryBenchmark` programs.)
 
 * ESP32-01 Dev Board, 240 MHz Tensilica LX6
 * Arduino IDE 1.8.13
-* ESP32 Boards 1.0.4
+* ESP32 Boards 1.0.6
 
 ```
 {esp32_results}
