@@ -12,7 +12,8 @@ LED driver chip.
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
-**Status**: Need to add documentation for `Tm1637Module`.
+**Status**: This is a **work in progress**. It is not ready for public
+consumption. Need to add documentation for `Tm1637Module`.
 
 ## Table of Contents
 
