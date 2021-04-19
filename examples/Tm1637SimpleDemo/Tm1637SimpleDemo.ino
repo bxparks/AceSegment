@@ -13,11 +13,11 @@ using ace_common::TimingStats;
 using namespace ace_segment;
 
 // Select driver version, either normal digitalWrite() or digitalWriteFast()
-#define TM16137_WIRE_INTERFACE_TYPE_NORMAL 0
-#define TM16137_WIRE_INTERFACE_TYPE_FAST 1
-#define TM16137_WIRE_INTERFACE_TYPE TM16137_WIRE_INTERFACE_TYPE_FAST
+#define WIRE_INTERFACE_TYPE_NORMAL 0
+#define WIRE_INTERFACE_TYPE_FAST 1
+#define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_FAST
 
-#if TM16137_WIRE_INTERFACE_TYPE == TM16137_WIRE_INTERFACE_TYPE_FAST
+#if WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_FAST
   #include <digitalWriteFast.h>
   #include <ace_segment/hw/SwWireFastInterface.h>
   using ace_segment::SwWireFastInterface;
@@ -59,14 +59,14 @@ const uint8_t DIO_PIN = 9;
 // * 43 ms at 200 us delay.
 constexpr uint16_t BIT_DELAY = 100;
 
-#if TM16137_WIRE_INTERFACE_TYPE == TM16137_WIRE_INTERFACE_TYPE_NORMAL
+#if WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_NORMAL
   using WireInterface = SwWireInterface;
   WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
-#elif TM16137_WIRE_INTERFACE_TYPE == TM16137_WIRE_INTERFACE_TYPE_FAST
+#elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_FAST
   using WireInterface = SwWireFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
   WireInterface wireInterface;
 #else
-  #error Unknown TM16137_WIRE_INTERFACE_TYPE
+  #error Unknown WIRE_INTERFACE_TYPE
 #endif
 
 #if defined(AUNITER_LED_CLOCK_TM1637) || defined(EPOXY_DUINO)
