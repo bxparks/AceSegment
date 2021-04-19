@@ -161,11 +161,12 @@ before substantional refactoring in 2021.
 The following shows the flash and static memory sizes of the `MemoryBenchmark`
 program for various `LedModule` configurations and various Writer classes.
 
-* `ClockInterface`, `GpioInterface` (which are opimized away by the compiler)
+* `ClockInterface`, `GpioInterface` (usually optimized away by the compiler)
 * `SwSpiInterface` or `HwSpiInterface`
 * `LedMatrixXxx`
 * `ScanningModule`
 * `Tm1637Module`
+* `Max7219Module`
 * `NumberWriter`
 * `ClockWriter`
 * `TemperatureWriter`

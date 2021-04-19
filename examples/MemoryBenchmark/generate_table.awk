@@ -17,12 +17,15 @@ BEGIN {
   labels[8] = "Scanning(Dual,HwSpi)";
   labels[9] = "Tm1637(Wire)";
   labels[10] = "Tm1637(WireFast)";
-  labels[11] = "StubModule+LedDisplay";
-  labels[12] = "NumberWriter+Stub";
-  labels[13] = "ClockWriter+Stub";
-  labels[14] = "TemperatureWriter+Stub";
-  labels[15] = "CharWriter+Stub";
-  labels[16] = "StringWriter+Stub";
+  labels[11] = "Max7219(SwSpi)";
+  labels[12] = "Max7219(SwSpiFast)";
+  labels[13] = "Max7219(HwSpi)";
+  labels[14] = "StubModule+LedDisplay";
+  labels[15] = "NumberWriter+Stub";
+  labels[16] = "ClockWriter+Stub";
+  labels[17] = "TemperatureWriter+Stub";
+  labels[18] = "CharWriter+Stub";
+  labels[19] = "StringWriter+Stub";
   record_index = 0
 }
 {
@@ -56,6 +59,7 @@ END {
         || labels[i] ~ /Scanning\(Single,SwSpi\)/ \
         || labels[i] ~ /Scanning\(Dual,SwSpi\)/ \
         || labels[i] ~ /Tm1637\(Wire\)/ \
+        || labels[i] ~ /Max7219\(SwSpi\)/ \
         || labels[i] == "StubModule+LedDisplay") {
       printf(\
         "|---------------------------------+--------------+-------------|\n")
