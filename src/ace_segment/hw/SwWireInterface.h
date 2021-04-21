@@ -64,11 +64,11 @@ namespace ace_segment {
 class SwWireInterface {
   public:
     explicit SwWireInterface(
-        uint8_t clockPin,
+        uint8_t clkPin,
         uint8_t dioPin,
         uint16_t delayMicros
     ) :
-        mClockPin(clockPin),
+        mClkPin(clkPin),
         mDioPin(dioPin),
         mDelayMicros(delayMicros)
     {}
@@ -80,7 +80,7 @@ class SwWireInterface {
       // end of the line pulling LOW. Instead, we go into INPUT mode to let the
       // line to HIGH through the pullup resistor, then go to OUTPUT mode only
       // to pull down.
-      digitalWrite(mClockPin, LOW);
+      digitalWrite(mClkPin, LOW);
       digitalWrite(mDioPin, LOW);
 
       // Begin with both lines at HIGH.
@@ -141,16 +141,16 @@ class SwWireInterface {
   private:
     void bitDelay() const { delayMicroseconds(mDelayMicros); }
 
-    void clockHigh() const { pinMode(mClockPin, INPUT); bitDelay(); }
+    void clockHigh() const { pinMode(mClkPin, INPUT); bitDelay(); }
 
-    void clockLow() const { pinMode(mClockPin, OUTPUT); bitDelay(); }
+    void clockLow() const { pinMode(mClkPin, OUTPUT); bitDelay(); }
 
     void dataHigh() const { pinMode(mDioPin, INPUT); bitDelay(); }
 
     void dataLow() const { pinMode(mDioPin, OUTPUT); bitDelay(); }
 
   private:
-    uint8_t const mClockPin;
+    uint8_t const mClkPin;
     uint8_t const mDioPin;
     uint16_t const mDelayMicros;
 };

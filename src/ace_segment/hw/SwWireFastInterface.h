@@ -48,8 +48,8 @@ namespace ace_segment {
  * in MemoryBenchmark shows that using this `SwWireFastInterface` instead of
  * `SwWireInterface` saves 650-770 bytes of flash on an AVR processor.
  *
- * Word of caution: There is a use-case where you may want to still use the
- * normal `SwWireInterface`. If your application uses more than one TM1637 LED
+ * Word of caution: There is a use-case where the normal `SwWireInterface` might
+ * consume less flash memory. If your application uses more than one TM1637 LED
  * Module, you will need to create multiple instances of the `Tm1637Module`. But
  * the pin numbers of this class must be a compile-time constants, so different
  * pins means that a different template class is generated. Since the
@@ -64,9 +64,9 @@ namespace ace_segment {
  * This class is stateless. It is thread-safe.
  */
 template <
-    uint8_t CLOCK_PIN,
-    uint8_t DIO_PIN,
-    uint16_t DELAY_MICROS
+    uint8_t T_CLK_PIN,
+    uint8_t T_DIO_PIN,
+    uint16_t T_DELAY_MICROS
 >
 class SwWireFastInterface {
   public:
@@ -79,8 +79,8 @@ class SwWireFastInterface {
       // end of the line pulling LOW. Instead, we go into INPUT mode to let the
       // line to HIGH through the pullup resistor, then go to OUTPUT mode only
       // to pull down.
-      digitalWriteFast(CLOCK_PIN, LOW);
-      digitalWriteFast(DIO_PIN, LOW);
+      digitalWriteFast(T_CLK_PIN, LOW);
+      digitalWriteFast(T_DIO_PIN, LOW);
 
       // Begin with both lines at HIGH.
       clockHigh();
@@ -127,9 +127,9 @@ class SwWireFastInterface {
 
       // Device places the ACK/NACK bit upon the falling edge of the 8th CLK,
       // which happens in the loop above.
-      pinModeFast(DIO_PIN, INPUT);
+      pinModeFast(T_DIO_PIN, INPUT);
       bitDelay();
-      uint8_t ack = digitalReadFast(DIO_PIN);
+      uint8_t ack = digitalReadFast(T_DIO_PIN);
 
       // Device releases DIO upon falling edge of the 9th CLK.
       clockHigh();
@@ -138,15 +138,15 @@ class SwWireFastInterface {
     }
 
   private:
-    void bitDelay() const { delayMicroseconds(DELAY_MICROS); }
+    void bitDelay() const { delayMicroseconds(T_DELAY_MICROS); }
 
-    void clockHigh() const { pinModeFast(CLOCK_PIN, INPUT); bitDelay(); }
+    void clockHigh() const { pinModeFast(T_CLK_PIN, INPUT); bitDelay(); }
 
-    void clockLow() const { pinModeFast(CLOCK_PIN, OUTPUT); bitDelay(); }
+    void clockLow() const { pinModeFast(T_CLK_PIN, OUTPUT); bitDelay(); }
 
-    void dataHigh() const { pinModeFast(DIO_PIN, INPUT); bitDelay(); }
+    void dataHigh() const { pinModeFast(T_DIO_PIN, INPUT); bitDelay(); }
 
-    void dataLow() const { pinModeFast(DIO_PIN, OUTPUT); bitDelay(); }
+    void dataLow() const { pinModeFast(T_DIO_PIN, OUTPUT); bitDelay(); }
 };
 
 } // ace_segment

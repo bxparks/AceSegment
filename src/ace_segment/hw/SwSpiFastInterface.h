@@ -38,32 +38,32 @@ namespace ace_segment {
  * Software SPI using pinModeFast(), digitalWriteFast() and shiftOutFast()
  * from https://github.com/NicksonYap/digitalWriteFast.
  *
- * @tparam LATCH_PIN the latch pin (CS)
- * @tparam DATA_PIN the data pin (MOSI)
- * @tparam CLOCK_PIN the clock pin (CLK)
+ * @tparam T_LATCH_PIN the latch pin (CS)
+ * @tparam T_DATA_PIN the data pin (MOSI)
+ * @tparam T_CLOCK_PIN the clock pin (CLK)
  */
-template <uint8_t LATCH_PIN, uint8_t DATA_PIN, uint8_t CLOCK_PIN>
+template <uint8_t T_LATCH_PIN, uint8_t T_DATA_PIN, uint8_t T_CLOCK_PIN>
 class SwSpiFastInterface {
   public:
     SwSpiFastInterface() = default;
 
     void begin() const {
-      pinModeFast(LATCH_PIN, OUTPUT);
-      pinModeFast(DATA_PIN, OUTPUT);
-      pinModeFast(CLOCK_PIN, OUTPUT);
+      pinModeFast(T_LATCH_PIN, OUTPUT);
+      pinModeFast(T_DATA_PIN, OUTPUT);
+      pinModeFast(T_CLOCK_PIN, OUTPUT);
     }
 
     void end() const {
-      pinModeFast(LATCH_PIN, INPUT);
-      pinModeFast(DATA_PIN, INPUT);
-      pinModeFast(CLOCK_PIN, INPUT);
+      pinModeFast(T_LATCH_PIN, INPUT);
+      pinModeFast(T_DATA_PIN, INPUT);
+      pinModeFast(T_CLOCK_PIN, INPUT);
     }
 
     /** Send 8 bits, including latching LOW and HIGH. */
     void send8(uint8_t value) const {
-      digitalWriteFast(LATCH_PIN, LOW);
+      digitalWriteFast(T_LATCH_PIN, LOW);
       shiftOutFast(value);
-      digitalWriteFast(LATCH_PIN, HIGH);
+      digitalWriteFast(T_LATCH_PIN, HIGH);
     }
 
     /** Send 16 bits, including latching LOW and HIGH. */
@@ -75,23 +75,23 @@ class SwSpiFastInterface {
 
     /** Send 2 bytes as 16-bit stream, including latching LOW and HIGH. */
     void send16(uint8_t msb, uint8_t lsb) const {
-      digitalWriteFast(LATCH_PIN, LOW);
+      digitalWriteFast(T_LATCH_PIN, LOW);
       shiftOutFast(msb);
       shiftOutFast(lsb);
-      digitalWriteFast(LATCH_PIN, HIGH);
+      digitalWriteFast(T_LATCH_PIN, HIGH);
     }
 
   private:
     static void shiftOutFast(uint8_t output) {
       uint8_t mask = 0x80; // start with the MSB
       for (uint8_t i = 0; i < 8; i++)  {
-        digitalWriteFast(CLOCK_PIN, LOW);
+        digitalWriteFast(T_CLOCK_PIN, LOW);
         if (output & mask) {
-          digitalWriteFast(DATA_PIN, HIGH);
+          digitalWriteFast(T_DATA_PIN, HIGH);
         } else {
-          digitalWriteFast(DATA_PIN, LOW);
+          digitalWriteFast(T_DATA_PIN, LOW);
         }
-        digitalWriteFast(CLOCK_PIN, HIGH);
+        digitalWriteFast(T_CLOCK_PIN, HIGH);
         mask >>= 1;
       }
     }
