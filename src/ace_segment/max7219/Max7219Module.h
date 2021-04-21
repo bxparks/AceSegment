@@ -29,9 +29,57 @@ SOFTWARE.
 #include <string.h> // memset()
 #include "../LedModule.h"
 
-class Max7219ModuleTest_convertPattern;
-
 namespace ace_segment {
+
+namespace internal {
+
+/**
+  * MAX7219 uses bit 0 for segment G, and bit 6 for segment A. This is the
+  * reverse of the convention used by `LedModule`, and the reverse of the
+  * TM1637. The weird thing is that the MAX7219 still uses bit 7 for the decimal
+  * point. This method converts the normalized pattern used by `LedModule` into
+  * the pattern expected by the MAX7219.
+  *
+  * This was pulled out of the Max7219Module class into a separate function
+  * because Max7219Module is a template class, and I didn't want the compiler
+  * generating extra copies of this function. Maybe the compiler (or linker) is
+  * smart enough to optimize away the multiple copies, but by using this
+  * separate function, I don't have to worry about the compiler doing the wrong
+  * thing.
+  *
+  * TODO: This would be a great piece of code to rewrite in hand-optimized
+  * assembly, for the learning experience.
+  *
+  */
+inline uint8_t convertPatternMax7219(uint8_t pattern) {
+  // Transfer the decimal point on bit 8.
+  // Amazingly, the AVR compiler is able to implement this using bit shifting
+  // operations so that no branching is performed.
+  uint8_t result = (pattern & 0x80) ? 0x1 : 0x0;
+
+  // Reverse the remaining 7 bits.
+  for (uint8_t i = 0; i < 7; ++i) {
+    result <<= 1;
+    if (pattern & 0x1) {
+      result |= 0x1;
+    }
+
+    // Division by 2 produces more efficient machine code on the AVR compiler (a
+    // single `lsr` instruction) compared to the right-shift-operator. For some
+    // reason, the right-shift operator (`pattern >>= 1`) produces code that
+    // uses 8 extra bytes of extraneous instructions, casting the uint8_t into a
+    // 16-bit word, setting the high byte to 0, then doing a `asr` and a `ror`,
+    // then ignoring the high byte. For 32-bit processors, they have so much
+    // flash memory that we don't need to optimize their code. But I suspect
+    // that their compilers optimize the integer division by 2 just as well as
+    // the AVR compiler.
+    pattern /= 2;
+  }
+
+  return result;
+}
+
+} // internal
 
 /**
  * The 8-digit MAX7219 LED modules that I bought on eBay and Amazon are wired
@@ -108,7 +156,8 @@ class Max7219Module : public LedModule {
     void flush() {
       for (uint8_t i = 0; i < DIGITS; ++i) {
         uint8_t actualPos = remapDigit(i);
-        uint8_t convertedPattern = convertPattern(mPatterns[i]);
+        uint8_t convertedPattern = internal::convertPatternMax7219(
+            mPatterns[i]);
         mSpiInterface.send16(actualPos + 1, convertedPattern);
       }
 
@@ -116,35 +165,6 @@ class Max7219Module : public LedModule {
     }
 
   private:
-    friend class ::Max7219ModuleTest_convertPattern;
-
-    /**
-     * MAX7219 uses bit 0 for segment G, and bit 6 for segment A. This is
-     * the reverse of what I would normally expect, certainly the reverse of the
-     * TM1637. The weird thing is that the MAX7219 still uses bit 7 for the
-     * decimal point. This method converts the normalized pattern into the
-     * pattern expected by the MAX7219.
-     */
-    static uint8_t convertPattern(uint8_t pattern) {
-      uint8_t result = 0;
-
-      // Reverse the first 7 bits.
-      for (uint8_t i = 0; i < 7; ++i) {
-        result <<= 1;
-        if (pattern & 0x1) {
-          result |= 0x1;
-        }
-        pattern >>= 1;
-      }
-
-      // Transfer the decimal point on bit 8.
-      if (pattern & 0x1) {
-        result |= 0x80;
-      }
-
-      return result;
-    }
-
     /** Convert a logical position into the physical position. */
     uint8_t remapDigit(uint8_t pos) const {
       return mRemapArray ? mRemapArray[pos] : pos;

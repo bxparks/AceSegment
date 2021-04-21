@@ -12,18 +12,13 @@
 #include <ace_segment/testing/TestableSpiInterface.h>
 
 using aunit::TestRunner;
-using ace_segment::Max7219Module;
-using ace_segment::testing::TestableSpiInterface;
-
-const int8_t NUM_DIGITS = 8;
-
-TestableSpiInterface spiInterface;
-Max7219Module<TestableSpiInterface, NUM_DIGITS> max7219Module(spiInterface);
+using ace_segment::internal::convertPatternMax7219;
 
 //----------------------------------------------------------------------------
-test(Max7219ModuleTest, convertPattern) {
-  assertEqual(0b01010001, max7219Module.convertPattern(0b01000101));
-  assertEqual(0b11010001, max7219Module.convertPattern(0b11000101));
+
+test(Max7219ModuleTest, convertPatternMax7219) {
+  assertEqual(0b01010001, convertPatternMax7219(0b01000101));
+  assertEqual(0b11010001, convertPatternMax7219(0b11000101));
 }
 
 //----------------------------------------------------------------------------
