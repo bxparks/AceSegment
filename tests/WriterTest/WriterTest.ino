@@ -243,6 +243,17 @@ testF(ClockWriterTest, writeHourMinute) {
   assertEqual(0b01100110, mPatterns[3]);
 }
 
+testF(ClockWriterTest, writeChars2At) {
+  clockWriter.writeChars2At(0, 1, 2);
+  assertEqual(0b00000110, mPatterns[0]);
+  assertEqual(0b01011011, mPatterns[1]);
+
+  clockWriter.writeChars2At(
+      0, ClockWriter::kCharSpace, ClockWriter::kCharSpace);
+  assertEqual(0b0, mPatterns[0]);
+  assertEqual(0b0, mPatterns[1]);
+}
+
 // ----------------------------------------------------------------------
 // Tests for TemperatureWriter.
 // ----------------------------------------------------------------------

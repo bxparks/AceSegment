@@ -79,6 +79,16 @@ class ClockWriter {
     }
 
     /**
+     * Write the 2 hexchar_t 'c0' and 'c1' at 'pos' and 'pos+1'.
+     * This is a convenience method because the need to write 2 digits (or 2
+     * spaces) occurs quite frequently when implementing clocks.
+     */
+    void writeChars2At(uint8_t pos, hexchar_t c0, hexchar_t c1) {
+      writeCharAt(pos++, c0);
+      writeCharAt(pos++, c1);
+    }
+
+    /**
      * Write a 2-digit BCD number at position, which involves just printing the
      * number as a hexadecimal number. For example, 0x12 is printed as "12", but
      * 0x1A is printed as "1 ".
@@ -88,8 +98,7 @@ class ClockWriter {
       uint8_t low = (bcd & 0x0F);
       if (high > 9) high = kCharSpace;
       if (low > 9) low = kCharSpace;
-      mNumberWriter.writeHexCharAt(pos++, high);
-      mNumberWriter.writeHexCharAt(pos++, low);
+      writeChars2At(pos, high, low);
     }
 
     /**
@@ -99,8 +108,7 @@ class ClockWriter {
      */
     void writeDec2At(uint8_t pos, uint8_t d) {
       if (d >= 100) {
-        mNumberWriter.writeHexCharAt(pos++, kCharSpace);
-        mNumberWriter.writeHexCharAt(pos++, kCharSpace);
+        writeChars2At(pos++, kCharSpace, kCharSpace);
       } else {
         uint8_t bcd = ace_common::decToBcd(d);
         writeBcd2At(pos, bcd);
