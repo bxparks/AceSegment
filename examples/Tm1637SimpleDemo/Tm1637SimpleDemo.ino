@@ -15,18 +15,18 @@ using namespace ace_segment;
 // Select driver version, either normal digitalWrite() or digitalWriteFast()
 #define WIRE_INTERFACE_TYPE_NORMAL 0
 #define WIRE_INTERFACE_TYPE_FAST 1
-#define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_FAST
 
-#if WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_FAST
-  #include <digitalWriteFast.h>
-  #include <ace_segment/hw/SwWireFastInterface.h>
-  using ace_segment::SwWireFastInterface;
-#endif
+// Select the TM1637Module flush() method
+#define TM_FLUSH_METHOD_FLUSH 0
+#define TM_FLUSH_METHOD_FLUSH_INCREMENTAL 1
 
-const uint8_t CLK_PIN = 10;
-const uint8_t DIO_PIN = 9;
+#if defined(EPOXY_DUINO)
+  #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_NORMAL
+  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_FLUSH
 
-#if defined(AUNITER_LED_CLOCK_TM1637) || defined(EPOXY_DUINO)
+  const uint8_t CLK_PIN = 10;
+  const uint8_t DIO_PIN = 9;
+
   const uint8_t NUM_DIGITS = 4;
   const uint8_t PATTERNS[NUM_DIGITS] = {
     0b00111111, // 0
@@ -34,7 +34,29 @@ const uint8_t DIO_PIN = 9;
     0b01011011, // 2
     0b01001111, // 3
   };
+
+#elif defined(AUNITER_LED_CLOCK_TM1637)
+  #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_FAST
+  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_FLUSH_INCREMENTAL
+
+  const uint8_t CLK_PIN = 10;
+  const uint8_t DIO_PIN = 9;
+
+  const uint8_t NUM_DIGITS = 4;
+  const uint8_t PATTERNS[NUM_DIGITS] = {
+    0b00111111, // 0
+    0b00000110, // 1
+    0b01011011, // 2
+    0b01001111, // 3
+  };
+
 #elif defined(AUNITER_LED_CLOCK_TM1637_6)
+  #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_FAST
+  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_FLUSH_INCREMENTAL
+
+  const uint8_t CLK_PIN = 10;
+  const uint8_t DIO_PIN = 9;
+
   const uint8_t NUM_DIGITS = 6;
   const uint8_t PATTERNS[NUM_DIGITS] = {
     0b00111111, // 0
@@ -44,6 +66,22 @@ const uint8_t DIO_PIN = 9;
     0b01100110, // 4
     0b01101101, // 5
   };
+
+#elif defined(AUNITER_STM32_TM1637)
+  #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_NORMAL
+  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_FLUSH
+
+  const uint8_t CLK_PIN = PB3;
+  const uint8_t DIO_PIN = PB4;
+
+  const uint8_t NUM_DIGITS = 4;
+  const uint8_t PATTERNS[NUM_DIGITS] = {
+    0b00111111, // 0
+    0b00000110, // 1
+    0b01011011, // 2
+    0b01001111, // 3
+  };
+
 #else
   #error Unknown AUNITER environment
 #endif
@@ -59,16 +97,20 @@ constexpr uint16_t BIT_DELAY = 100;
   using WireInterface = SwWireInterface;
   WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_FAST
+  #include <digitalWriteFast.h>
+  #include <ace_segment/hw/SwWireFastInterface.h>
+  using ace_segment::SwWireFastInterface;
+
   using WireInterface = SwWireFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
   WireInterface wireInterface;
 #else
   #error Unknown WIRE_INTERFACE_TYPE
 #endif
 
-#if defined(AUNITER_LED_CLOCK_TM1637) || defined(EPOXY_DUINO)
-  const uint8_t* const remapArray = nullptr;
-#elif defined(AUNITER_LED_CLOCK_TM1637_6)
+#if defined(AUNITER_LED_CLOCK_TM1637_6)
   const uint8_t* const remapArray = ace_segment::kSixDigitRemapArray;
+#else
+  const uint8_t* const remapArray = nullptr;
 #endif
 
 Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module(wireInterface, remapArray);
@@ -90,7 +132,7 @@ void setup() {
   tm1637Module.begin();
 }
 
-#if 0
+#if TM_FLUSH_METHOD == TM_FLUSH_METHOD_FLUSH
 
 // This version of loop() uses the Tm1637Module::flush() method to update all
 // digits in a single dump to the LED module, taking ~22ms per call.
@@ -121,7 +163,7 @@ void loop() {
   delay(1000);
 }
 
-#else
+#elif TM_FLUSH_METHOD == TM_FLUSH_METHOD_FLUSH_INCREMENTAL
 
 // This version of loop() uses the Tm1637Module::flushIncremental() method to
 // update only a single digit per call, taking only ~10 ms at 100 us delay.
@@ -161,20 +203,23 @@ void loop() {
     stats.update(elapsedMicros);
   }
 
-#if ENABLE_SERIAL_DEBUG >= 1
-  // Every 5 seconds, print out the statistics.
-  if (nowMillis - prevStatsMillis > 5000) {
-    prevStatsMillis = nowMillis;
+  #if ENABLE_SERIAL_DEBUG >= 1
+    // Every 5 seconds, print out the statistics.
+    if (nowMillis - prevStatsMillis > 5000) {
+      prevStatsMillis = nowMillis;
 
-    Serial.print("min/avg/max:");
-    Serial.print(stats.getMin());
-    Serial.print('/');
-    Serial.print(stats.getAvg());
-    Serial.print('/');
-    Serial.println(stats.getMax());
-    stats.reset();
-  }
-#endif
+      Serial.print("min/avg/max:");
+      Serial.print(stats.getMin());
+      Serial.print('/');
+      Serial.print(stats.getAvg());
+      Serial.print('/');
+      Serial.println(stats.getMax());
+      stats.reset();
+    }
+  #endif
 }
+
+#else
+#error Unknown TM_FLUSH_METHOD
 
 #endif
