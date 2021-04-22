@@ -44,6 +44,14 @@ using ace_segment::kEightDigitRemapArray;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
 
+#elif defined(AUNITER_STM32_MAX7219)
+  #define SPI_INTERFACE_TYPE SPI_INTERFACE_TYPE_SW
+
+  // SPI pins
+  const uint8_t LATCH_PIN = PA4;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+
 #else
   #error Unknown environment
 #endif
