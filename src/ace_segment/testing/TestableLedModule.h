@@ -33,12 +33,12 @@ namespace testing {
 /**
  * An implementation of LedModule for unit testing purposes.
  *
- * @tparam DIGITS number of digits supported by this class
+ * @tparam T_DIGITS number of digits supported by this class
  */
-template <uint8_t DIGITS>
+template <uint8_t T_DIGITS>
 class TestableLedModule : public LedModule {
   public:
-    TestableLedModule() : LedModule(DIGITS) {}
+    TestableLedModule() : LedModule(T_DIGITS) {}
 
     void setBrightness(uint8_t /*brightness*/) override {}
 
@@ -53,7 +53,7 @@ class TestableLedModule : public LedModule {
     uint8_t* getPatterns() { return mPatterns; }
 
   private:
-    uint8_t mPatterns[DIGITS + 1]; // + 1 to test overflow
+    uint8_t mPatterns[T_DIGITS + 1]; // + 1 to test overflow
 };
 
 } // testing

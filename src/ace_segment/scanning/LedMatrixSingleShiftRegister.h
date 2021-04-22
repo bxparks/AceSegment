@@ -44,15 +44,15 @@ namespace ace_segment {
  *   dataPin/D11/MOSI -- DS (Phillips) / SER (TI) / Pin 14
  *   clockPin/D13/SCK -- SH_CP (Phillips) / SRCK (TI) / Pin 11 (rising)
  *
- * @tparam SPII interface to SPI, either SwSpiInterface or HwSpiInterface
- * @tparam GPIOI (optional) interface to GPIO functions,
+ * @tparam T_SPII interface to SPI, either SwSpiInterface or HwSpiInterface
+ * @tparam T_GPIOI (optional) interface to GPIO functions,
  *    default GpioInterface (note: 'GPI' is already taken on ESP8266)
  */
-template<typename SPII, typename GPIOI = GpioInterface>
+template <typename T_SPII, typename T_GPIOI = GpioInterface>
 class LedMatrixSingleShiftRegister : public LedMatrixBase {
   public:
     LedMatrixSingleShiftRegister(
-        const SPII& spiInterface,
+        const T_SPII& spiInterface,
         uint8_t groupOnPattern,
         uint8_t elementOnPattern,
         uint8_t numGroups,
@@ -69,8 +69,8 @@ class LedMatrixSingleShiftRegister : public LedMatrixBase {
       uint8_t output = (0x00 ^ mGroupXorMask) & 0x1;
       for (uint8_t group = 0; group < mNumGroups; group++) {
         uint8_t pin = mGroupPins[group];
-        GPIOI::pinMode(pin, OUTPUT);
-        GPIOI::digitalWrite(pin, output);
+        T_GPIOI::pinMode(pin, OUTPUT);
+        T_GPIOI::digitalWrite(pin, output);
       }
     }
 
@@ -78,7 +78,7 @@ class LedMatrixSingleShiftRegister : public LedMatrixBase {
       // Set pins to INPUT mode.
       for (uint8_t group = 0; group < mNumGroups; group++) {
         uint8_t pin = mGroupPins[group];
-        GPIOI::pinMode(pin, INPUT);
+        T_GPIOI::pinMode(pin, INPUT);
       }
     }
 
@@ -121,11 +121,11 @@ class LedMatrixSingleShiftRegister : public LedMatrixBase {
     /** Write bit 0 of output to group pin. */
     void writeGroupPin(uint8_t group, uint8_t output) const {
       uint8_t groupPin = mGroupPins[group];
-      GPIOI::digitalWrite(groupPin, (output ^ mGroupXorMask) & 0x1);
+      T_GPIOI::digitalWrite(groupPin, (output ^ mGroupXorMask) & 0x1);
     }
 
   private:
-    const SPII& mSpiInterface;
+    const T_SPII& mSpiInterface;
     const uint8_t* const mGroupPins;
     uint8_t const mNumGroups;
 

@@ -93,15 +93,15 @@ inline uint8_t convertPatternMax7219(uint8_t pattern) {
  */
 extern const uint8_t kEightDigitRemapArray[8];
 
-template <typename SPII, uint8_t DIGITS>
+template <typename T_SPII, uint8_t T_DIGITS>
 class Max7219Module : public LedModule {
   public:
     /** Constructor */
     Max7219Module(
-        const SPII& spiInterface,
+        const T_SPII& spiInterface,
         const uint8_t* remapArray = nullptr
     ) :
-        LedModule(DIGITS),
+        LedModule(T_DIGITS),
         mSpiInterface(spiInterface),
         mRemapArray(remapArray)
     {}
@@ -111,7 +111,7 @@ class Max7219Module : public LedModule {
     //-----------------------------------------------------------------------
 
     void begin() {
-      memset(mPatterns, 0, DIGITS);
+      memset(mPatterns, 0, T_DIGITS);
 
       mSpiInterface.send16(kRegisterScanLimit, 7); // all digits
       mSpiInterface.send16(kRegisterDecodeMode, 0); // no BCD decoding
@@ -127,7 +127,7 @@ class Max7219Module : public LedModule {
     //-----------------------------------------------------------------------
 
     /** Return the number of digits supported by this display instance. */
-    uint8_t getNumDigits() const { return DIGITS; }
+    uint8_t getNumDigits() const { return T_DIGITS; }
 
     void setPatternAt(uint8_t pos, uint8_t pattern) override {
       mPatterns[pos] = pattern;
@@ -154,7 +154,7 @@ class Max7219Module : public LedModule {
      *  * SW SPI Fast: 210 microseconds
      */
     void flush() {
-      for (uint8_t i = 0; i < DIGITS; ++i) {
+      for (uint8_t i = 0; i < T_DIGITS; ++i) {
         uint8_t actualPos = remapDigit(i);
         uint8_t convertedPattern = internal::convertPatternMax7219(
             mPatterns[i]);
@@ -187,13 +187,13 @@ class Max7219Module : public LedModule {
     static uint8_t const kRegisterDisplayTest = 0x0F;
 
     /** SPI interface. */
-    const SPII& mSpiInterface;
+    const T_SPII& mSpiInterface;
 
     /** Array to map digit addresses. */
     const uint8_t* const mRemapArray;
 
     /** Pattern for each digit. */
-    uint8_t mPatterns[DIGITS];
+    uint8_t mPatterns[T_DIGITS];
 
     /** Brightness 0 - 15 */
     uint8_t mBrightness;

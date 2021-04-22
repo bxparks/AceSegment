@@ -52,14 +52,15 @@ typedef void (*DigitalWriter)(void);
 #endif
 
 /**
- * An LedMatrix whose group pins and element pins are wired directly to the MCU.
- * This version is optimized to use the `pinModeFast()` and `digitalWriteFast()`
- * functions from https://github.com/NicksonYap/digitalWriteFast.
+ * An LedMatrix of 4 groups (e.g. digits) of 8 elements (e.g. LED segments)
+ * whose group pins and element pins are wired directly to the MCU. This version
+ * is optimized to use the `pinModeFast()` and `digitalWriteFast()` functions
+ * from https://github.com/NicksonYap/digitalWriteFast.
  *
  * @tparam gX group pin numbers
  * @tparam eX element pin numbers
  */
-template<
+template <
   uint8_t g0, uint8_t g1, uint8_t g2, uint8_t g3,
   uint8_t e0, uint8_t e1, uint8_t e2, uint8_t e3,
   uint8_t e4, uint8_t e5, uint8_t e6, uint8_t e7
@@ -245,7 +246,7 @@ class LedMatrixDirectFast : public LedMatrixBase {
 
 #if ACE_SEGMENT_LMDF_OPTION == ACE_SEGMENT_LMDF_OPTION_ARRAY
 
-template<
+template <
   uint8_t g0, uint8_t g1, uint8_t g2, uint8_t g3,
   uint8_t e0, uint8_t e1, uint8_t e2, uint8_t e3,
   uint8_t e4, uint8_t e5, uint8_t e6, uint8_t e7
@@ -271,7 +272,7 @@ LedMatrixDirectFast<g0, g1, g2, g3, e0, e1, e2, e3, e4, e5, e6, e7>
   digitalWriteFastElement7H,
 };
 
-template<
+template <
   uint8_t g0, uint8_t g1, uint8_t g2, uint8_t g3,
   uint8_t e0, uint8_t e1, uint8_t e2, uint8_t e3,
   uint8_t e4, uint8_t e5, uint8_t e6, uint8_t e7

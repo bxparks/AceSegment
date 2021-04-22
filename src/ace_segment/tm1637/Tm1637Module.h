@@ -60,11 +60,11 @@ extern const uint8_t kSixDigitRemapArray[6];
  * not use an address byte at the beginning of the protocol. We can use a
  * software-based I2C interface.
  *
- * @tparam WI wire protocol interface, either SwWireInterface or
+ * @tparam T_WI wire protocol interface, either SwWireInterface or
  *    SwWireFastInterface
- * @tparam DIGITS number of digits in the LED module (usually 4 or 6)
+ * @tparam T_DIGITS number of digits in the LED module (usually 4 or 6)
  */
-template <typename WI, uint8_t DIGITS>
+template <typename T_WI, uint8_t T_DIGITS>
 class Tm1637Module : public LedModule {
   public:
 
@@ -76,10 +76,10 @@ class Tm1637Module : public LedModule {
      *      TM1637 chip need remapping of the digit addresses
      */
     explicit Tm1637Module(
-        const WI& wireInterface,
+        const T_WI& wireInterface,
         const uint8_t* remapArray = nullptr
     ) :
-        LedModule(DIGITS),
+        LedModule(T_DIGITS),
         mWireInterface(wireInterface),
         mRemapArray(remapArray)
     {}
@@ -94,11 +94,11 @@ class Tm1637Module : public LedModule {
      *
      * @param remapArray optional array of positions to handle LED modules whose
      *    digit ordering is physically different than the logical ordering
-     *    (where digit 0 is on the left, and digit (DIGITS-1) is on the far
+     *    (where digit 0 is on the left, and digit (T_DIGITS-1) is on the far
      *    right).
      */
     void begin() {
-      memset(mPatterns, 0, DIGITS);
+      memset(mPatterns, 0, T_DIGITS);
       mBrightness = kBrightnessCmd | kBrightnessLevelOn | 0x7;
       mIsDirty = 0xFF; // force initial values to LED module
       mFlushStage = 0;
@@ -112,7 +112,7 @@ class Tm1637Module : public LedModule {
     //-----------------------------------------------------------------------
 
     /** Return the number of digits supported by this display instance. */
-    uint8_t getNumDigits() const { return DIGITS; }
+    uint8_t getNumDigits() const { return T_DIGITS; }
 
     void setPatternAt(uint8_t pos, uint8_t pattern) override {
       mPatterns[pos] = pattern;
@@ -166,7 +166,7 @@ class Tm1637Module : public LedModule {
 
       mWireInterface.startCondition();
       mWireInterface.sendByte(kAddressCmd);
-      for (uint8_t i = 0; i < DIGITS; ++i) {
+      for (uint8_t i = 0; i < T_DIGITS; ++i) {
         uint8_t actualPos = remapDigit(i);
         mWireInterface.sendByte(mPatterns[actualPos]);
       }
@@ -177,7 +177,7 @@ class Tm1637Module : public LedModule {
 
     /**
      * Update only a single digit or the brightness. This method must be called
-     * (DIGITS + 1) times to update the digits of entire module, including the
+     * (T_DIGITS + 1) times to update the digits of entire module, including the
      * brightness which is updated using a separate step. Uses the mFlushStage
      * and the mIsDirty bit array to update only the part that needs updating.
      *
@@ -192,7 +192,7 @@ class Tm1637Module : public LedModule {
      * bit high.
      *
      * 2) If brightness is checked and updated during its own mFlushStage (==
-     * DIGITS), then I see `min/avg/max:4/492/10152`, saving about 3.5ms from
+     * T_DIGITS), then I see `min/avg/max:4/492/10152`, saving about 3.5ms from
      * the latency. The side effect is a slightly flicker when the display and
      * brightness changes at the same time, because this incrementally updating
      * function makes those changes in 2 steps.
@@ -204,7 +204,7 @@ class Tm1637Module : public LedModule {
      */
     void flushIncremental() {
       if (isDirtyBit(mFlushStage)) {
-        if (mFlushStage == DIGITS) {
+        if (mFlushStage == T_DIGITS) {
           // Check for brightness change.
           mWireInterface.startCondition();
           mWireInterface.sendByte(mBrightness);
@@ -224,7 +224,7 @@ class Tm1637Module : public LedModule {
         clearDirtyBit(mFlushStage);
       }
 
-      ace_common::incrementMod(mFlushStage, (uint8_t) (DIGITS + 1));
+      ace_common::incrementMod(mFlushStage, (uint8_t) (T_DIGITS + 1));
     }
 
   private:
@@ -254,18 +254,18 @@ class Tm1637Module : public LedModule {
     static uint8_t const kBrightnessCmd =       0b10000000;
     static uint8_t const kBrightnessLevelOn =   0b00001000;
 
-    // Use the bit at position 'DIGITS' as the dirty bit for brightness.
-    // A TM1637 can have a maximum of 6 DIGITS, so we are safe.
-    static uint8_t const kBrightnessDirtyBit = DIGITS;
+    // Use the bit at position 'T_DIGITS' as the dirty bit for brightness.
+    // A TM1637 can have a maximum of 6 T_DIGITS, so we are safe.
+    static uint8_t const kBrightnessDirtyBit = T_DIGITS;
 
     // The ordering of these fields is partially determined to save memory on
     // 32-bit processors.
-    const WI& mWireInterface;
+    const T_WI& mWireInterface;
     const uint8_t* const mRemapArray;
-    uint8_t mPatterns[DIGITS]; // maps to dirty bits 0-5
+    uint8_t mPatterns[T_DIGITS]; // maps to dirty bits 0-5
     uint8_t mBrightness; // maps to dirty bit 7
     uint8_t mIsDirty; // bit array
-    uint8_t mFlushStage; // [0, DIGITS], DIGITS for brightness update
+    uint8_t mFlushStage; // [0, T_DIGITS], with T_DIGITS for brightness update
 };
 
 } // ace_segment

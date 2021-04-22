@@ -42,13 +42,13 @@ namespace ace_segment {
  * The group pins are assumed to be connected to the most significant byte. The
  * element pins are connected to the least signficiant byte.
  *
- * @tparam SPII class providing SPI, either SwSpiInterface or HwSpiInterface
+ * @tparam T_SPII class providing SPI, either SwSpiInterface or HwSpiInterface
  */
-template<typename SPII>
+template <typename T_SPII>
 class LedMatrixDualShiftRegister: public LedMatrixBase {
   public:
     LedMatrixDualShiftRegister(
-        const SPII& spiInterface,
+        const T_SPII& spiInterface,
         uint8_t groupOnPattern,
         uint8_t elementOnPattern
     ) :
@@ -95,7 +95,7 @@ class LedMatrixDualShiftRegister: public LedMatrixBase {
     friend class ::LedMatrixDualShiftRegisterTest_enableGroup;
     friend class ::LedMatrixDualShiftRegisterTest_disableGroup;
 
-    const SPII& mSpiInterface;
+    const T_SPII& mSpiInterface;
 
     /**
      * Remember the previous element pattern to support disableGroup() and
