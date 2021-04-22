@@ -19,18 +19,40 @@ using ace_segment::kEightDigitRemapArray;
 #define SPI_INTERFACE_TYPE_HW 0
 #define SPI_INTERFACE_TYPE_SW 1
 #define SPI_INTERFACE_TYPE_SW_FAST 2
-#define SPI_INTERFACE_TYPE SPI_INTERFACE_TYPE_SW_FAST
+
+#if defined(EPOXY_DUINO)
+  #define SPI_INTERFACE_TYPE SPI_INTERFACE_TYPE_SW_FAST
+
+  // SPI pins
+  const uint8_t LATCH_PIN = A0;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+
+#elif defined(AUNITER_LEDCLOCK_MAX7219)
+  #define SPI_INTERFACE_TYPE SPI_INTERFACE_TYPE_SW
+
+  // SPI pins
+  const uint8_t LATCH_PIN = A0;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+
+#elif defined(AUNITER_D1MINI_LARGE_MAX7219)
+  #define SPI_INTERFACE_TYPE SPI_INTERFACE_TYPE_SW
+
+  // SPI pins
+  const uint8_t LATCH_PIN = D8;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+
+#else
+  #error Unknown environment
+#endif
 
 #if SPI_INTERFACE_TYPE == SPI_INTERFACE_TYPE_SW_FAST
   #include <digitalWriteFast.h>
   #include <ace_segment/hw/SwSpiFastInterface.h>
   using ace_segment::SwSpiFastInterface;
 #endif
-
-// SPI pins
-const uint8_t LATCH_PIN = A0;
-const uint8_t DATA_PIN = MOSI;
-const uint8_t CLOCK_PIN = SCK;
 
 // LED segment patterns.
 const uint8_t NUM_DIGITS = 8;
