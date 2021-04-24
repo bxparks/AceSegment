@@ -146,7 +146,7 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 
 // The chain of resources.
 #if LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT
-  // Common Anode, with transitions on Group pins
+  // Common Anode, with transitors on Group pins
   using LedMatrix = LedMatrixDirect<>;
   LedMatrix ledMatrix(
       LedMatrix::kActiveLowPattern /*groupOnPattern*/,
@@ -156,7 +156,7 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
       NUM_SEGMENTS,
       SEGMENT_PINS);
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT_FAST
-  // Common Anode, with transitions on Group pins
+  // Common Anode, with transitors on Group pins
   using LedMatrix = LedMatrixDirectFast<
     4, 5, 6, 7,
     8, 9, 10, 16, 14, 18, 19, 15
@@ -231,7 +231,7 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_SCANNING
   // 1-bit brightness
   ScanningModule<LedMatrix, NUM_DIGITS>
-      module(ledMatrix, FRAMES_PER_SECOND);
+      ledModule(ledMatrix, FRAMES_PER_SECOND);
 
   // 16 levels of brightness, need render-fields/second of 60*4*16 = 3840.
   ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
@@ -240,19 +240,19 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_TM1637
   using WireInterface = SwWireInterface;
   WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
-  Tm1637Module<WireInterface, NUM_DIGITS> module(wireInterface);
+  Tm1637Module<WireInterface, NUM_DIGITS> ledModule(wireInterface);
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_MAX7219
   using SpiInterface = SwSpiInterface;
   SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  Max7219Module<SpiInterface, NUM_DIGITS> module(
+  Max7219Module<SpiInterface, NUM_DIGITS> ledModule(
       spiInterface, kEightDigitRemapArray);
 
 #else
   #error Unknown LED_DISPLAY_TYPE
 #endif
 
-LedDisplay display(module);
+LedDisplay display(ledModule);
 NumberWriter numberWriter(display);
 ClockWriter clockWriter(display);
 TemperatureWriter temperatureWriter(display);
@@ -263,13 +263,13 @@ StringWriter stringWriter(charWriter);
 void setupAceSegment() {
 #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_TM1637
   wireInterface.begin();
-  module.begin();
-  module.setBrightness(2); // 1-7
+  ledModule.begin();
+  ledModule.setBrightness(2); // 1-7
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_MAX7219
   spiInterface.begin();
-  module.begin();
-  module.setBrightness(2); // 0-15
+  ledModule.begin();
+  ledModule.setBrightness(2); // 0-15
 
 #else
   #if LED_MATRIX_MODE == LED_MATRIX_MODE_PARIAL_SW_SPI \
@@ -282,7 +282,7 @@ void setupAceSegment() {
   #endif
 
   ledMatrix.begin();
-  module.begin();
+  ledModule.begin();
   modulatingModule.begin();
 #endif
 
@@ -318,7 +318,7 @@ ISR(TIMER2_COMPA_vect) {
   if (demoMode == DEMO_MODE_PULSE) {
     modulatingModule.renderFieldNow();
   } else {
-    module.renderFieldNow();
+    ledModule.renderFieldNow();
   }
 }
 #endif
@@ -617,11 +617,11 @@ void renderField() {
     if (demoMode == DEMO_MODE_PULSE) {
       modulatingModule.renderFieldWhenReady();
     } else {
-      module.renderFieldWhenReady();
+      ledModule.renderFieldWhenReady();
     }
   #else
-    module.flush();
-    //module.flushIncremental();
+    ledModule.flush();
+    //ledModule.flushIncremental();
   #endif
 }
 
