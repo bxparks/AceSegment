@@ -110,8 +110,8 @@ volatile int disableCompilerOptimization = 0;
 
     // Common Anode, with transitions on Group pins
     using LedMatrix = LedMatrixDirectFast<
-      4, 5, 6, 7,
-      8, 9, 10, 16, 14, 18, 19, 15
+      8, 9, 10, 16, 14, 18, 19, 15,
+      4, 5, 6, 7
     >;
     LedMatrix ledMatrix(
         LedMatrix::kActiveLowPattern /*groupOnPattern*/,

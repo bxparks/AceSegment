@@ -74,8 +74,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
       SEGMENT_PINS);
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT_FAST
   using LedMatrix = LedMatrixDirectFast<
-    4, 5, 6, 7,
-    8, 9, 10, 16, 14, 18, 19, 15
+    8, 9, 10, 16, 14, 18, 19, 15,
+    4, 5, 6, 7
   >;
   LedMatrix ledMatrix(
       LedMatrix::kActiveLowPattern /*groupOnPattern*/,

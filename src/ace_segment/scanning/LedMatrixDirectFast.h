@@ -57,30 +57,28 @@ typedef void (*DigitalWriter)(void);
  * is optimized to use the `pinModeFast()` and `digitalWriteFast()` functions
  * from https://github.com/NicksonYap/digitalWriteFast.
  *
- * @tparam gX group pin numbers
  * @tparam eX element pin numbers
+ * @tparam gX group pin numbers
  */
 template <
-  uint8_t g0, uint8_t g1, uint8_t g2, uint8_t g3,
   uint8_t e0, uint8_t e1, uint8_t e2, uint8_t e3,
-  uint8_t e4, uint8_t e5, uint8_t e6, uint8_t e7
+  uint8_t e4, uint8_t e5, uint8_t e6, uint8_t e7,
+  uint8_t g0, uint8_t g1, uint8_t g2, uint8_t g3
 >
 class LedMatrixDirectFast : public LedMatrixBase {
   public:
-    constexpr static uint8_t kNumGroups = 4;
     constexpr static uint8_t kNumElements = 8;
+    constexpr static uint8_t kNumGroups = 4;
 
     LedMatrixDirectFast(uint8_t groupOnPattern, uint8_t elementOnPattern) :
         LedMatrixBase(groupOnPattern, elementOnPattern)
     {}
 
     void begin() const {
-      // Set pins to OUTPUT mode but set LEDs to OFF.
-      pinModeFast(g0, OUTPUT);
-      pinModeFast(g1, OUTPUT);
-      pinModeFast(g2, OUTPUT);
-      pinModeFast(g3, OUTPUT);
+      // Set LEDs to off.
+      clear();
 
+      // Set pins to OUTPUT mode.
       pinModeFast(e0, OUTPUT);
       pinModeFast(e1, OUTPUT);
       pinModeFast(e2, OUTPUT);
@@ -90,8 +88,11 @@ class LedMatrixDirectFast : public LedMatrixBase {
       pinModeFast(e6, OUTPUT);
       pinModeFast(e7, OUTPUT);
 
-      // Set LEDs to off.
-      clear();
+      // Set pins to OUTPUT mode.
+      pinModeFast(g0, OUTPUT);
+      pinModeFast(g1, OUTPUT);
+      pinModeFast(g2, OUTPUT);
+      pinModeFast(g3, OUTPUT);
     }
 
     void end() const {
@@ -247,12 +248,12 @@ class LedMatrixDirectFast : public LedMatrixBase {
 #if ACE_SEGMENT_LMDF_OPTION == ACE_SEGMENT_LMDF_OPTION_ARRAY
 
 template <
-  uint8_t g0, uint8_t g1, uint8_t g2, uint8_t g3,
   uint8_t e0, uint8_t e1, uint8_t e2, uint8_t e3,
-  uint8_t e4, uint8_t e5, uint8_t e6, uint8_t e7
+  uint8_t e4, uint8_t e5, uint8_t e6, uint8_t e7,
+  uint8_t g0, uint8_t g1, uint8_t g2, uint8_t g3
 >
 const DigitalWriter
-LedMatrixDirectFast<g0, g1, g2, g3, e0, e1, e2, e3, e4, e5, e6, e7>
+LedMatrixDirectFast<e0, e1, e2, e3, e4, e5, e6, e7, g0, g1, g2, g3>
 ::kElementWriters[2 * kNumElements] = {
   digitalWriteFastElement0L,
   digitalWriteFastElement0H,
@@ -273,12 +274,12 @@ LedMatrixDirectFast<g0, g1, g2, g3, e0, e1, e2, e3, e4, e5, e6, e7>
 };
 
 template <
-  uint8_t g0, uint8_t g1, uint8_t g2, uint8_t g3,
   uint8_t e0, uint8_t e1, uint8_t e2, uint8_t e3,
-  uint8_t e4, uint8_t e5, uint8_t e6, uint8_t e7
+  uint8_t e4, uint8_t e5, uint8_t e6, uint8_t e7,
+  uint8_t g0, uint8_t g1, uint8_t g2, uint8_t g3
 >
 const DigitalWriter
-LedMatrixDirectFast<g0, g1, g2, g3, e0, e1, e2, e3, e4, e5, e6, e7>
+LedMatrixDirectFast<e0, e1, e2, e3, e4, e5, e6, e7, g0, g1, g2, g3>
 ::kGroupWriters[2 * kNumGroups] = {
   digitalWriteFastGroup0L,
   digitalWriteFastGroup0H,
