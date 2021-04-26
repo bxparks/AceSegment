@@ -47,7 +47,7 @@ volatile int disableCompilerOptimization = 0;
     #include <digitalWriteFast.h>
     #include <ace_segment/hw/SwSpiFastInterface.h>
     #include <ace_segment/hw/SwWireFastInterface.h>
-    #include <ace_segment/scanning/LedMatrixDirectFast.h>
+    #include <ace_segment/scanning/LedMatrixDirectFast4.h>
   #endif
   using namespace ace_segment;
 
@@ -94,12 +94,12 @@ volatile int disableCompilerOptimization = 0;
     // Common Anode, with transitions on Group pins
     using LedMatrix = LedMatrixDirect<>;
     LedMatrix ledMatrix(
-        LedMatrix::kActiveLowPattern /*groupOnPattern*/,
         LedMatrix::kActiveLowPattern /*elementOnPattern*/,
-        NUM_DIGITS,
-        DIGIT_PINS,
+        LedMatrix::kActiveLowPattern /*groupOnPattern*/,
         NUM_SEGMENTS,
-        SEGMENT_PINS);
+        SEGMENT_PINS,
+        NUM_DIGITS,
+        DIGIT_PINS);
     ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
         scanningModule(ledMatrix, FRAMES_PER_SECOND);
 
@@ -109,13 +109,13 @@ volatile int disableCompilerOptimization = 0;
     #endif
 
     // Common Anode, with transitions on Group pins
-    using LedMatrix = LedMatrixDirectFast<
-      4, 5, 6, 7,
-      8, 9, 10, 16, 14, 18, 19, 15
+    using LedMatrix = LedMatrixDirectFast4<
+      8, 9, 10, 16, 14, 18, 19, 15,
+      4, 5, 6, 7
     >;
     LedMatrix ledMatrix(
-        LedMatrix::kActiveLowPattern /*groupOnPattern*/,
-        LedMatrix::kActiveLowPattern /*elementOnPattern*/);
+        LedMatrix::kActiveLowPattern /*elementOnPattern*/,
+        LedMatrix::kActiveLowPattern /*groupOnPattern*/);
     ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
         scanningModule(ledMatrix, FRAMES_PER_SECOND);
 
@@ -125,8 +125,8 @@ volatile int disableCompilerOptimization = 0;
     using LedMatrix = LedMatrixSingleShiftRegister<SwSpiInterface>;
     LedMatrix ledMatrix(
         spiInterface,
-        LedMatrix::kActiveHighPattern /*groupOnPattern*/,
         LedMatrix::kActiveHighPattern /*elementOnPattern*/,
+        LedMatrix::kActiveHighPattern /*groupOnPattern*/,
         NUM_DIGITS,
         DIGIT_PINS);
     ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
@@ -143,8 +143,8 @@ volatile int disableCompilerOptimization = 0;
     using LedMatrix = LedMatrixSingleShiftRegister<SpiInterface>;
     LedMatrix ledMatrix(
         spiInterface,
-        LedMatrix::kActiveHighPattern /*groupOnPattern*/,
         LedMatrix::kActiveHighPattern /*elementOnPattern*/,
+        LedMatrix::kActiveHighPattern /*groupOnPattern*/,
         NUM_DIGITS,
         DIGIT_PINS);
     ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
@@ -156,8 +156,8 @@ volatile int disableCompilerOptimization = 0;
     using LedMatrix = LedMatrixSingleShiftRegister<HwSpiInterface>;
     LedMatrix ledMatrix(
         spiInterface,
-        LedMatrix::kActiveHighPattern /*groupOnPattern*/,
         LedMatrix::kActiveHighPattern /*elementOnPattern*/,
+        LedMatrix::kActiveHighPattern /*groupOnPattern*/,
         NUM_DIGITS,
         DIGIT_PINS);
     ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
@@ -169,8 +169,8 @@ volatile int disableCompilerOptimization = 0;
     using LedMatrix = LedMatrixDualShiftRegister<SwSpiInterface>;
     LedMatrix ledMatrix(
         spiInterface,
-        LedMatrix::kActiveLowPattern /*groupOnPattern*/,
-        LedMatrix::kActiveLowPattern /*elementOnPattern*/);
+        LedMatrix::kActiveLowPattern /*elementOnPattern*/,
+        LedMatrix::kActiveLowPattern /*groupOnPattern*/);
     ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
         scanningModule(ledMatrix, FRAMES_PER_SECOND);
 
@@ -185,8 +185,8 @@ volatile int disableCompilerOptimization = 0;
     using LedMatrix = LedMatrixDualShiftRegister<SpiInterface>;
     LedMatrix ledMatrix(
         spiInterface,
-        LedMatrix::kActiveLowPattern /*groupOnPattern*/,
-        LedMatrix::kActiveLowPattern /*elementOnPattern*/);
+        LedMatrix::kActiveLowPattern /*elementOnPattern*/,
+        LedMatrix::kActiveLowPattern /*groupOnPattern*/);
     ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
         scanningModule(ledMatrix, FRAMES_PER_SECOND);
 
@@ -196,8 +196,8 @@ volatile int disableCompilerOptimization = 0;
     using LedMatrix = LedMatrixDualShiftRegister<HwSpiInterface>;
     LedMatrix ledMatrix(
         spiInterface,
-        LedMatrix::kActiveLowPattern /*groupOnPattern*/,
-        LedMatrix::kActiveLowPattern /*elementOnPattern*/);
+        LedMatrix::kActiveLowPattern /*elementOnPattern*/,
+        LedMatrix::kActiveLowPattern /*groupOnPattern*/);
     ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
         scanningModule(ledMatrix, FRAMES_PER_SECOND);
 

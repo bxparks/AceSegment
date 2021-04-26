@@ -224,7 +224,7 @@ depend on the lower-level classes:
     * `LedMatrixDirect`
         * Group pins and element pins are directly accessed through the
           microcontroller pins.
-    * `LedMatrixDirectFast`
+    * `LedMatrixDirectFast4`
         * Same as `LedMatrixDirect` but using `digitalWriteFast()` on AVR
           processors
     * `LedMatrixSingleShiftRegister`
@@ -307,7 +307,7 @@ ScanningModule  Tm1637Module  Max7219Module
             .------.      |      .-----------.
            v              v                   v
   LedMatrixDirect   LedMatrixSingleSftRgstr  LedMatrixDualShiftRegister
-LedMatrixDirectFast               \             /
+LedMatrixDirectFast4              \             /
                                    \           /
                                     v         v
                                    SwSpiInterface
@@ -338,21 +338,21 @@ in the later stages depending on the objects created in the earlier stage:
 A typical resource creation code looks like this:
 
 ```C++
-const uint8_t NUM_DIGITS = 4;
 const uint8_t NUM_SEGMENTS = 8;
-const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
 const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 11, 12, 13, 14, 15};
+const uint8_t NUM_DIGITS = 4;
+const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
 const uint16_t FRAMES_PER_SECOND = 60;
 
 // The chain of resources.
 using LedMatrix = LedMatrixDirect<>;
 LedMatrix ledMatrix(
-    LedMatrix::kActiveLowPattern /*groupOnPattern*/,
     LedMatrix::kActiveLowPattern /*elementOnPattern*/,
-    NUM_DIGITS,
-    DIGIT_PINS,
+    LedMatrix::kActiveLowPattern /*groupOnPattern*/,
     NUM_SEGMENTS,
-    SEGMENT_PINS);
+    SEGMENT_PINS,
+    NUM_DIGITS,
+    DIGIT_PINS);
 ScanningModule<LedMatrix, NUM_DIGITS> scanningModule(
     ledMatrix, FRAMES_PER_SECOND);
 LedDisplay ledDisplay(scanningModule);
@@ -467,20 +467,20 @@ MCU                      LED display (Common Cathode)
 The `LedMatrixDirect` constructor is:
 
 ```C++
-const uint8_t NUM_DIGITS = 4;
 const uint8_t NUM_SEGMENTS = 8;
-const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
 const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 11, 12, 13, 14, 15};
+const uint8_t NUM_DIGITS = 4;
+const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
 const uint16_t FRAMES_PER_SECOND = 60;
 
 using LedMatrix = LedMatrixDirect<>;
 LedMatrix ledMatrix(
-    LedMatrix::kActiveHighPattern /*groupOnPattern*/,
     LedMatrix::kActiveHighPattern /*elementOnPattern*/,
-    NUM_DIGITS,
-    DIGIT_PINS,
+    LedMatrix::kActiveHighPattern /*groupOnPattern*/,
     NUM_SEGMENTS,
-    SEGMENT_PINS);
+    SEGMENT_PINS,
+    NUM_DIGITS,
+    DIGIT_PINS);
 ScanningModule<LedMatrix, NUM_DIGITS> scanningModule(
     ledMatrix, FRAMES_PER_SECOND);
 LedDisplay ledDisplay(scanningModule);
@@ -565,8 +565,8 @@ SwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
 using LedMatrix = LedMatrixSingleShiftRegister<SwSpiInterface>;
 LedMatrix ledMatrix(
     spiInterface,
-    LedMatrix::kActiveHighPattern /*groupOnPattern*/,
     LedMatrix::kActiveHighPattern /*elementOnPattern*/,
+    LedMatrix::kActiveHighPattern /*groupOnPattern*/,
     NUM_DIGITS,
     DIGIT_PINS):
 ScanningModule<LedMatrix, NUM_DIGITS> scanningModule(
@@ -630,8 +630,8 @@ HwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
 using LedMatrix = LedMatrixSingleShiftRegister<HwSpiInterface>;
 LedMatrix ledMatrix(
     spiInterface,
-    LedMatrix::kActiveHighPattern /*groupOnPattern*/,
-    LedMatrix::kActiveHighPattern /*elementOnPattern*/);
+    LedMatrix::kActiveHighPattern /*elementOnPattern*/,
+    LedMatrix::kActiveHighPattern /*groupOnPattern*/);
 ScanningModule<LedMatrix, NUM_DIGITS> scanningModule(
     ledMatrix, FRAMES_PER_SECOND);
 LedDisplay ledDisplay(scanningModule);
@@ -715,8 +715,8 @@ HwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
 using LedMatrix = LedMatrixSingleShiftRegister<HwSpiInterface>;
 LedMatrix ledMatrix(
     spiInterface,
-    LedMatrix::kActiveHighPattern /*groupOnPattern*/,
-    LedMatrix::kActiveHighPattern /*elementOnPattern*/);
+    LedMatrix::kActiveHighPattern /*elementOnPattern*/,
+    LedMatrix::kActiveHighPattern /*groupOnPattern*/);
 ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
     ledMatrix, FRAMES_PER_SECOND);
 LedDisplay ledDisplay(scanningModule);
@@ -961,7 +961,7 @@ provide the `digitalWriteFast()` variants:
 I have written versions of some lower-level classes to take advantage of
 `digitalWriteFast()`:
 
-* `scanning/LedMatrixDirectFast.h`
+* `scanning/LedMatrixDirectFast4.h`
     * Variant of `LedMatrixDirect` using `digitalWriteFast()`
 * `hw/SwSpiFastInterface.h`
     * Variant of `SwSpiInterface.h` using  `digitalWriteFast()`
@@ -979,7 +979,7 @@ need to include these headers manually, like this:
   #include <digitalWriteFast.h> // from 3rd party library
   #include <ace_segment/hw/SwSpiFastInterface.h>
   #include <ace_segment/hw/SwWireFastInterface.h>
-  #include <ace_segment/scanning/LedMatrixDirectFast.h>
+  #include <ace_segment/scanning/LedMatrixDirectFast4.h>
 #endif
 ```
 
@@ -998,7 +998,7 @@ sizeof(SwSpiInterface): 3
 sizeof(SwSpiFastInterface<11, 12, 13>): 1
 sizeof(HwSpiInterface): 3
 sizeof(LedMatrixDirect<>): 9
-sizeof(LedMatrixDirectFast<2..5, 6..13>): 3
+sizeof(LedMatrixDirectFast4<6..13, 2..5>): 3
 sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 8
 sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 5
 sizeof(LedModule): 2

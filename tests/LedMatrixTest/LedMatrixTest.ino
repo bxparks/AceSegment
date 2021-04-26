@@ -25,28 +25,28 @@ const uint8_t SEGMENT_PINS[8] = {4, 5, 6, 7, 8, 9, 10, 11};
 
 // Common Cathode, with transistors on Group pins
 LedMatrixDirect<TestableGpioInterface> ledMatrixDirect(
-    LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
     LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
-    NUM_DIGITS,
-    DIGIT_PINS,
+    LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
     NUM_SEGMENTS,
-    SEGMENT_PINS);
+    SEGMENT_PINS,
+    NUM_DIGITS,
+    DIGIT_PINS);
 
 // Common Cathode, with transistors on Group pins
 TestableSpiInterface spiInterface;
 LedMatrixSingleShiftRegister<TestableSpiInterface, TestableGpioInterface>
   ledMatrixSingleShiftRegister(
     spiInterface,
-    LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
     LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
+    LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
     NUM_DIGITS,
     DIGIT_PINS);
 
 // Common Cathode, with transistors on Group pins
 LedMatrixDualShiftRegister<TestableSpiInterface> ledMatrixDualShiftRegister(
     spiInterface,
-    LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
-    LedMatrixBase::kActiveHighPattern /*elementOnPattern*/);
+    LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
+    LedMatrixBase::kActiveHighPattern /*groupOnPattern*/);
 
 // ----------------------------------------------------------------------
 // Tests for LedMatrixSplitDirect.
@@ -64,15 +64,6 @@ testF(LedMatrixDirectTest, begin) {
   ledMatrixDirect.begin();
   assertEqual(24, TestableGpioInterface::sEventLog.getNumRecords());
   assertTrue(TestableGpioInterface::sEventLog.assertEvents(24,
-      (int) EventType::kPinMode, 0, OUTPUT,
-      (int) EventType::kDigitalWrite, 0, LOW,
-      (int) EventType::kPinMode, 1, OUTPUT,
-      (int) EventType::kDigitalWrite, 1, LOW,
-      (int) EventType::kPinMode, 2, OUTPUT,
-      (int) EventType::kDigitalWrite, 2, LOW,
-      (int) EventType::kPinMode, 3, OUTPUT,
-      (int) EventType::kDigitalWrite, 3, LOW,
-
       (int) EventType::kPinMode, 4, OUTPUT,
       (int) EventType::kDigitalWrite, 4, LOW,
       (int) EventType::kPinMode, 5, OUTPUT,
@@ -88,7 +79,16 @@ testF(LedMatrixDirectTest, begin) {
       (int) EventType::kPinMode, 10, OUTPUT,
       (int) EventType::kDigitalWrite, 10, LOW,
       (int) EventType::kPinMode, 11, OUTPUT,
-      (int) EventType::kDigitalWrite, 11, LOW
+      (int) EventType::kDigitalWrite, 11, LOW,
+
+      (int) EventType::kPinMode, 0, OUTPUT,
+      (int) EventType::kDigitalWrite, 0, LOW,
+      (int) EventType::kPinMode, 1, OUTPUT,
+      (int) EventType::kDigitalWrite, 1, LOW,
+      (int) EventType::kPinMode, 2, OUTPUT,
+      (int) EventType::kDigitalWrite, 2, LOW,
+      (int) EventType::kPinMode, 3, OUTPUT,
+      (int) EventType::kDigitalWrite, 3, LOW
   ));
 }
 
@@ -96,10 +96,6 @@ testF(LedMatrixDirectTest, end) {
   ledMatrixDirect.end();
   assertEqual(12, TestableGpioInterface::sEventLog.getNumRecords());
   assertTrue(TestableGpioInterface::sEventLog.assertEvents(12,
-      (int) EventType::kPinMode, 0, INPUT,
-      (int) EventType::kPinMode, 1, INPUT,
-      (int) EventType::kPinMode, 2, INPUT,
-      (int) EventType::kPinMode, 3, INPUT,
       (int) EventType::kPinMode, 4, INPUT,
       (int) EventType::kPinMode, 5, INPUT,
       (int) EventType::kPinMode, 6, INPUT,
@@ -107,7 +103,12 @@ testF(LedMatrixDirectTest, end) {
       (int) EventType::kPinMode, 8, INPUT,
       (int) EventType::kPinMode, 9, INPUT,
       (int) EventType::kPinMode, 10, INPUT,
-      (int) EventType::kPinMode, 11, INPUT
+      (int) EventType::kPinMode, 11, INPUT,
+
+      (int) EventType::kPinMode, 0, INPUT,
+      (int) EventType::kPinMode, 1, INPUT,
+      (int) EventType::kPinMode, 2, INPUT,
+      (int) EventType::kPinMode, 3, INPUT
   ));
 }
 

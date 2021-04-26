@@ -11,14 +11,14 @@
 #include <digitalWriteFast.h>
 #include <ace_segment/hw/SwSpiFastInterface.h>
 #include <ace_segment/hw/SwWireFastInterface.h>
-#include <ace_segment/scanning/LedMatrixDirectFast.h>
+#include <ace_segment/scanning/LedMatrixDirectFast4.h>
 #endif
 
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
 using ace_segment::LedMatrixDirect;
-using ace_segment::LedMatrixDirectFast;
+using ace_segment::LedMatrixDirectFast4;
 using ace_segment::ScanningModule;
 using ace_segment::LedDisplay;
 
@@ -66,20 +66,20 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 #if LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT
   using LedMatrix = LedMatrixDirect<>;
   LedMatrix ledMatrix(
-      LedMatrix::kActiveLowPattern /*groupOnPattern*/,
       LedMatrix::kActiveLowPattern /*elementOnPattern*/,
-      NUM_DIGITS,
-      DIGIT_PINS,
+      LedMatrix::kActiveLowPattern /*groupOnPattern*/,
       NUM_SEGMENTS,
-      SEGMENT_PINS);
+      SEGMENT_PINS,
+      NUM_DIGITS,
+      DIGIT_PINS);
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT_FAST
-  using LedMatrix = LedMatrixDirectFast<
-    4, 5, 6, 7,
-    8, 9, 10, 16, 14, 18, 19, 15
+  using LedMatrix = LedMatrixDirectFast4<
+    8, 9, 10, 16, 14, 18, 19, 15,
+    4, 5, 6, 7
   >;
   LedMatrix ledMatrix(
-      LedMatrix::kActiveLowPattern /*groupOnPattern*/,
-      LedMatrix::kActiveLowPattern /*elementOnPattern*/);
+      LedMatrix::kActiveLowPattern /*elementOnPattern*/,
+      LedMatrix::kActiveLowPattern /*groupOnPattern*/);
 #endif
 
 ScanningModule<LedMatrix, NUM_DIGITS> ledModule(ledMatrix, FRAMES_PER_SECOND);

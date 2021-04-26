@@ -44,49 +44,49 @@ template <typename T_GPIOI = GpioInterface>
 class LedMatrixDirect : public LedMatrixBase {
   public:
     LedMatrixDirect(
-        uint8_t groupOnPattern,
         uint8_t elementOnPattern,
-        uint8_t numGroups,
-        const uint8_t* groupPins,
+        uint8_t groupOnPattern,
         uint8_t numElements,
-        const uint8_t* elementPins
+        const uint8_t* elementPins,
+        uint8_t numGroups,
+        const uint8_t* groupPins
     ) :
-        LedMatrixBase(groupOnPattern, elementOnPattern),
-        mGroupPins(groupPins),
+        LedMatrixBase(elementOnPattern, groupOnPattern),
         mElementPins(elementPins),
-        mNumGroups(numGroups),
-        mNumElements(numElements)
+        mGroupPins(groupPins),
+        mNumElements(numElements),
+        mNumGroups(numGroups)
     {}
 
     void begin() const {
-      // Set pins to OUTPUT mode but set LEDs to OFF.
-      uint8_t output = (0x00 ^ mGroupXorMask) & 0x1;
-      for (uint8_t group = 0; group < mNumGroups; group++) {
-        uint8_t pin = mGroupPins[group];
-        T_GPIOI::pinMode(pin, OUTPUT);
-        T_GPIOI::digitalWrite(pin, output);
-      }
-
-      // Set pins to OUTPUT mode but set LEDs to OFF.
-      output = (0x00 ^ mElementXorMask) & 0x1;
+      // Set element pins to OUTPUT mode but set LEDs to OFF.
+      uint8_t output = (0x00 ^ mElementXorMask) & 0x1;
       for (uint8_t element = 0; element < mNumElements; element++) {
         uint8_t elementPin = mElementPins[element];
         T_GPIOI::pinMode(elementPin, OUTPUT);
         T_GPIOI::digitalWrite(elementPin, output);
       }
+
+      // Set group pins to OUTPUT mode but set LEDs to OFF.
+      output = (0x00 ^ mGroupXorMask) & 0x1;
+      for (uint8_t group = 0; group < mNumGroups; group++) {
+        uint8_t pin = mGroupPins[group];
+        T_GPIOI::pinMode(pin, OUTPUT);
+        T_GPIOI::digitalWrite(pin, output);
+      }
     }
 
     void end() const {
-      // Set pins to INPUT mode.
-      for (uint8_t group = 0; group < mNumGroups; group++) {
-        uint8_t pin = mGroupPins[group];
-        T_GPIOI::pinMode(pin, INPUT);
-      }
-
-      // Set pins to INPUT mode.
+      // Set element pins to INPUT mode.
       for (uint8_t element = 0; element < mNumElements; element++) {
         uint8_t elementPin = mElementPins[element];
         T_GPIOI::pinMode(elementPin, INPUT);
+      }
+
+      // Set group pins to INPUT mode.
+      for (uint8_t group = 0; group < mNumGroups; group++) {
+        uint8_t pin = mGroupPins[group];
+        T_GPIOI::pinMode(pin, INPUT);
       }
     }
 
@@ -141,10 +141,10 @@ class LedMatrixDirect : public LedMatrixBase {
     }
 
   private:
-    const uint8_t* const mGroupPins;
     const uint8_t* const mElementPins;
-    uint8_t const mNumGroups;
+    const uint8_t* const mGroupPins;
     uint8_t const mNumElements;
+    uint8_t const mNumGroups;
 
     /** Store the previous group, to turn it off after moving to new group. */
     mutable uint8_t mPrevGroup = 0;

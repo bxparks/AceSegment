@@ -7,7 +7,7 @@
 #include <digitalWriteFast.h>
 #include <ace_segment/hw/SwSpiFastInterface.h>
 #include <ace_segment/hw/SwWireFastInterface.h>
-#include <ace_segment/scanning/LedMatrixDirectFast.h>
+#include <ace_segment/scanning/LedMatrixDirectFast4.h>
 #endif
 
 using ace_common::incrementMod;
@@ -149,29 +149,29 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   // Common Anode, with transitors on Group pins
   using LedMatrix = LedMatrixDirect<>;
   LedMatrix ledMatrix(
-      LedMatrix::kActiveLowPattern /*groupOnPattern*/,
       LedMatrix::kActiveLowPattern /*elementOnPattern*/,
-      NUM_DIGITS,
-      DIGIT_PINS,
+      LedMatrix::kActiveLowPattern /*groupOnPattern*/,
       NUM_SEGMENTS,
-      SEGMENT_PINS);
+      SEGMENT_PINS,
+      NUM_DIGITS,
+      DIGIT_PINS);
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT_FAST
   // Common Anode, with transitors on Group pins
-  using LedMatrix = LedMatrixDirectFast<
-    4, 5, 6, 7,
-    8, 9, 10, 16, 14, 18, 19, 15
+  using LedMatrix = LedMatrixDirectFast4<
+    8, 9, 10, 16, 14, 18, 19, 15,
+    4, 5, 6, 7
   >;
   LedMatrix ledMatrix(
-      LedMatrix::kActiveLowPattern /*groupOnPattern*/,
-      LedMatrix::kActiveLowPattern /*elementOnPattern*/);
+      LedMatrix::kActiveLowPattern /*elementOnPattern*/,
+      LedMatrix::kActiveLowPattern /*groupOnPattern*/);
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_PARIAL_SW_SPI
   // Common Cathode, with transistors on Group pins
   SwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
   using LedMatrix = LedMatrixSingleShiftRegister<SwSpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
-      LedMatrix::kActiveHighPattern /*groupOnPattern*/,
       LedMatrix::kActiveHighPattern /*elementOnPattern*/,
+      LedMatrix::kActiveHighPattern /*groupOnPattern*/,
       NUM_DIGITS,
       DIGIT_PINS):
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SW_SPI_FAST
@@ -181,8 +181,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   using LedMatrix = LedMatrixSingleShiftRegister<SpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
-      LedMatrix::kActiveHighPattern /*groupOnPattern*/,
       LedMatrix::kActiveHighPattern /*elementOnPattern*/,
+      LedMatrix::kActiveHighPattern /*groupOnPattern*/,
       NUM_DIGITS,
       DIGIT_PINS);
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HW_SPI
@@ -191,8 +191,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   using LedMatrix = LedMatrixSingleShiftRegister<HwSpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
-      LedMatrix::kActiveHighPattern /*groupOnPattern*/,
       LedMatrix::kActiveHighPattern /*elementOnPattern*/,
+      LedMatrix::kActiveHighPattern /*groupOnPattern*/,
       NUM_DIGITS,
       DIGIT_PINS);
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SW_SPI
@@ -201,8 +201,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   using LedMatrix = LedMatrixDualShiftRegister<SwSpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
-      LedMatrix::kActiveLowPattern /*groupOnPattern*/,
-      LedMatrix::kActiveLowPattern /*elementOnPattern*/);
+      LedMatrix::kActiveLowPattern /*elementOnPattern*/,
+      LedMatrix::kActiveLowPattern /*groupOnPattern*/);
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SW_SPI_FAST
   // Common Anode, with transistors on Group pins
   using SpiInterface = SwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
@@ -210,16 +210,16 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   using LedMatrix = LedMatrixDualShiftRegister<SpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
-      LedMatrix::kActiveLowPattern /*groupOnPattern*/,
-      LedMatrix::kActiveLowPattern /*elementOnPattern*/);
+      LedMatrix::kActiveLowPattern /*elementOnPattern*/,
+      LedMatrix::kActiveLowPattern /*groupOnPattern*/);
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HW_SPI
   // Common Anode, with transistors on Group pins
   HwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
   using LedMatrix = LedMatrixDualShiftRegister<HwSpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
-      LedMatrix::kActiveLowPattern /*groupOnPattern*/,
-      LedMatrix::kActiveLowPattern /*elementOnPattern*/);
+      LedMatrix::kActiveLowPattern /*elementOnPattern*/,
+      LedMatrix::kActiveLowPattern /*groupOnPattern*/);
 
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_NONE
   // Do nothing

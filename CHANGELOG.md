@@ -78,7 +78,7 @@
           manually included:
             * `#include <ace_segment/hw/SwSpiFastInterface.h>`
             * `#include <ace_segment/hw/SwWireFastInterface.h>`
-            * `#include <ace_segment/scanning/LedMatrixDirectFast.h>`
+            * `#include <ace_segment/scanning/LedMatrixDirectFast4.h>`
     * Resource consumption
         * Reduce flash consumption on AVR by 70-80%, from 4-4.3 kB down
           to 700-1200 bytes.

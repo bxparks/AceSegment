@@ -49,10 +49,10 @@ class LedMatrixDualShiftRegister: public LedMatrixBase {
   public:
     LedMatrixDualShiftRegister(
         const T_SPII& spiInterface,
-        uint8_t groupOnPattern,
-        uint8_t elementOnPattern
+        uint8_t elementOnPattern,
+        uint8_t groupOnPattern
     ) :
-        LedMatrixBase(groupOnPattern, elementOnPattern),
+        LedMatrixBase(elementOnPattern, groupOnPattern),
         mSpiInterface(spiInterface)
     {}
 

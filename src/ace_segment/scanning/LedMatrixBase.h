@@ -38,32 +38,33 @@ namespace ace_segment {
  * I have provided 3 wiring implementations:
  *
  *  * LedMatrixDirect
- *      * The group and element pins are directly attached to GPIO pins
+ *      * The element and group pins are directly attached to GPIO pins
  *        on the microcontroller.
  *  * LedMatrixSingleShiftRegister
- *      * The group pins are directly attached to GPIO pins.
- *      * The Segment pins are attached to one 74HC595 shift register chip,
+ *      * The element pins are attached to one 74HC595 shift register chip,
  *        accessed through SPI (either software or hardware).
+ *      * The group pins are directly attached to GPIO pins.
  *  * LedMatrixDualShiftRegister
- *    * Both the Group and Element pins are controlled by 74HC595 chips
+ *    * Both the element and group pins are controlled by 74HC595 chips
  *      using SPI (software or hardware).
  *
- * If the resistors are on the segments, then the segments become the Elements
- * and the digits become the Groups.
+ * In most cases, the resistors will be on the segments to control the current
+ * on each segment, so the segments become elements and the digits become the
+ * groups.
  *
- * If the resistors are on the digits, then the digits become the Elements and
- * the segments become the Groups. This configuration is not very useful and has
+ * If the resistors are on the digits, then the digits become the elements and
+ * the segments become the groups. This configuration is not very useful and has
  * not been tested very much.
  *
- * The groupOnPattern and elementOnPattern is the bit pattern that activates
- * the group or element. For example, a Common Cathode places the negative
- * end of the LED on the group pin and the element pins are positive. So
- * groupOnPattern should be kActiveLowPattern and elementOnPattern should be
- * kActiveHighPattern. However, if a driver transitor is placed on the group
- * pins to handle the higher current, then it inverts the logic on the group
- * pins, so groupOnPattern must be set to kActiveHighPattern.
+ * The elementOnPattern and groupOnPattern are the bit patterns that activate
+ * the element and group. For example, a Common Cathode LED module places the
+ * negative end of the LED on the group pin and the element pins are positive.
+ * So elementOnPattern should be kActiveHighPattern and groupOnPattern should be
+ * kActiveLowPattern. However, if a driver transitor is placed on the group pins
+ * to handle the higher current, then it inverts the logic on the group pins, so
+ * groupOnPattern must be set to kActiveHighPattern.
  *
- * The groupOnPattern and elementPattern are compile-time constants so these
+ * The elementPattern and groupOnPattern are compile-time constants so these
  * parameters could be moved into the template parameters. When I did that, the
  * flash size when down by only ~20 bytes on AVR, and ~40 bytes on an STM32. I
  * decided to leave them as instance variables, because the decrease in
@@ -79,15 +80,15 @@ class LedMatrixBase {
     static constexpr uint8_t kActiveLowPattern = 0x00;
 
     /**
-     * @param groupOnPattern bit pattern that turns on the groups
      * @param elementOnPattern bit pattern that turns on the elements on group
+     * @param groupOnPattern bit pattern that turns on the groups
      */
     LedMatrixBase(
-        uint8_t groupOnPattern,
-        uint8_t elementOnPattern
+        uint8_t elementOnPattern,
+        uint8_t groupOnPattern
     ) :
-        mGroupXorMask(~groupOnPattern),
-        mElementXorMask(~elementOnPattern)
+        mElementXorMask(~elementOnPattern),
+        mGroupXorMask(~groupOnPattern)
     {}
 
     /** Configure the pins for the given LED wiring. */
@@ -109,8 +110,8 @@ class LedMatrixBase {
     void clear() const {}
 
   protected:
-    uint8_t const mGroupXorMask;
     uint8_t const mElementXorMask;
+    uint8_t const mGroupXorMask;
 };
 
 }
