@@ -198,12 +198,12 @@ void runScanningBenchmark(const char* name, LM& scanningModule) {
 void runDirect() {
   using LedMatrix = LedMatrixDirect<>;
   LedMatrix ledMatrix(
-      LedMatrix::kActiveLowPattern /*groupOnPattern*/,
       LedMatrix::kActiveLowPattern /*elementOnPattern*/,
-      NUM_DIGITS,
-      DIGIT_PINS,
+      LedMatrix::kActiveLowPattern /*groupOnPattern*/,
       NUM_SEGMENTS,
-      SEGMENT_PINS);
+      SEGMENT_PINS,
+      NUM_DIGITS,
+      DIGIT_PINS);
   ScanningModule<LedMatrix, NUM_DIGITS, 1> scanningModule(
       ledMatrix, FRAMES_PER_SECOND);
   ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
@@ -225,11 +225,11 @@ void runDirect() {
 // Common Anode, with transistors on Group pins
 void runDirectFast() {
   using LedMatrix = LedMatrixDirectFast<
-      4, 5, 6, 7,
-      8, 9, 10, 16, 14, 18, 19, 15>;
+      8, 9, 10, 16, 14, 18, 19, 15,
+      4, 5, 6, 7>;
   LedMatrix ledMatrix(
-      LedMatrix::kActiveLowPattern /*groupOnPattern*/,
-      LedMatrix::kActiveLowPattern /*elementOnPattern*/);
+      LedMatrix::kActiveLowPattern /*elementOnPattern*/,
+      LedMatrix::kActiveLowPattern /*groupOnPattern*/);
   ScanningModule<LedMatrix, NUM_DIGITS, 1> scanningModule(
       ledMatrix, FRAMES_PER_SECOND);
   ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
@@ -256,8 +256,8 @@ void runSingleShiftRegisterSwSpi() {
   using LedMatrix = LedMatrixSingleShiftRegister<SwSpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
-      LedMatrix::kActiveHighPattern /*groupOnPattern*/,
       LedMatrix::kActiveHighPattern /*elementOnPattern*/,
+      LedMatrix::kActiveHighPattern /*groupOnPattern*/,
       NUM_DIGITS,
       DIGIT_PINS);
   ScanningModule<LedMatrix, NUM_DIGITS, 1> scanningModule(
@@ -287,8 +287,8 @@ void runSingleShiftRegisterSwSpiFast() {
   using LedMatrix = LedMatrixSingleShiftRegister<SpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
-      LedMatrix::kActiveHighPattern /*groupOnPattern*/,
       LedMatrix::kActiveHighPattern /*elementOnPattern*/,
+      LedMatrix::kActiveHighPattern /*groupOnPattern*/,
       NUM_DIGITS,
       DIGIT_PINS);
   ScanningModule<LedMatrix, NUM_DIGITS, 1> scanningModule(
@@ -317,8 +317,8 @@ void runSingleShiftRegisterHwSpi() {
   using LedMatrix = LedMatrixSingleShiftRegister<HwSpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
-      LedMatrix::kActiveHighPattern /*groupOnPattern*/,
       LedMatrix::kActiveHighPattern /*elementOnPattern*/,
+      LedMatrix::kActiveHighPattern /*groupOnPattern*/,
       NUM_DIGITS,
       DIGIT_PINS);
   ScanningModule<LedMatrix, NUM_DIGITS, 1> scanningModule(
@@ -348,8 +348,8 @@ void runDualShiftRegisterSwSpi() {
   using LedMatrix = LedMatrixDualShiftRegister<SwSpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
-      LedMatrix::kActiveLowPattern /*groupOnPattern*/,
-      LedMatrix::kActiveLowPattern /*elementOnPattern*/);
+      LedMatrix::kActiveLowPattern /*elementOnPattern*/,
+      LedMatrix::kActiveLowPattern /*groupOnPattern*/);
   ScanningModule<LedMatrix, NUM_DIGITS, 1> scanningModule(
       ledMatrix, FRAMES_PER_SECOND);
   ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
@@ -376,8 +376,8 @@ void runDualShiftRegisterSwSpiFast() {
   using LedMatrix = LedMatrixDualShiftRegister<SpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
-      LedMatrix::kActiveLowPattern /*groupOnPattern*/,
-      LedMatrix::kActiveLowPattern /*elementOnPattern*/);
+      LedMatrix::kActiveLowPattern /*elementOnPattern*/,
+      LedMatrix::kActiveLowPattern /*groupOnPattern*/);
   ScanningModule<LedMatrix, NUM_DIGITS, 1> scanningModule(
       ledMatrix, FRAMES_PER_SECOND);
   ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
@@ -403,8 +403,8 @@ void runDualShiftRegisterHwSpi() {
   using LedMatrix = LedMatrixDualShiftRegister<HwSpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
-      LedMatrix::kActiveLowPattern /*groupOnPattern*/,
-      LedMatrix::kActiveLowPattern /*elementOnPattern*/);
+      LedMatrix::kActiveLowPattern /*elementOnPattern*/,
+      LedMatrix::kActiveLowPattern /*groupOnPattern*/);
   ScanningModule<LedMatrix, NUM_DIGITS, 1> scanningModule(
       ledMatrix, FRAMES_PER_SECOND);
   ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
@@ -592,10 +592,11 @@ void printSizeOf() {
   SERIAL_PORT_MONITOR.println(sizeof(LedMatrixDirect<>));
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  SERIAL_PORT_MONITOR.print(F("sizeof(LedMatrixDirectFast<2..5, 6..13>): "));
+  SERIAL_PORT_MONITOR.print(F("sizeof(LedMatrixDirectFast<6..13, 2..5>): "));
   SERIAL_PORT_MONITOR.println(sizeof(LedMatrixDirectFast<
-      2, 3, 4, 5,
-      6, 7, 8, 9, 10, 11, 12, 13>));
+      6, 7, 8, 9, 10, 11, 12, 13,
+      2, 3, 4, 5
+  >));
 #endif
 
   SERIAL_PORT_MONITOR.print(

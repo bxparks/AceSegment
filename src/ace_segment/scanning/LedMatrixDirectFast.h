@@ -70,8 +70,11 @@ class LedMatrixDirectFast : public LedMatrixBase {
     constexpr static uint8_t kNumElements = 8;
     constexpr static uint8_t kNumGroups = 4;
 
-    LedMatrixDirectFast(uint8_t groupOnPattern, uint8_t elementOnPattern) :
-        LedMatrixBase(groupOnPattern, elementOnPattern)
+    LedMatrixDirectFast(
+        uint8_t elementOnPattern,
+        uint8_t groupOnPattern
+    ) :
+        LedMatrixBase(elementOnPattern, groupOnPattern)
     {}
 
     void begin() const {

@@ -338,21 +338,21 @@ in the later stages depending on the objects created in the earlier stage:
 A typical resource creation code looks like this:
 
 ```C++
-const uint8_t NUM_DIGITS = 4;
 const uint8_t NUM_SEGMENTS = 8;
-const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
 const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 11, 12, 13, 14, 15};
+const uint8_t NUM_DIGITS = 4;
+const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
 const uint16_t FRAMES_PER_SECOND = 60;
 
 // The chain of resources.
 using LedMatrix = LedMatrixDirect<>;
 LedMatrix ledMatrix(
-    LedMatrix::kActiveLowPattern /*groupOnPattern*/,
     LedMatrix::kActiveLowPattern /*elementOnPattern*/,
-    NUM_DIGITS,
-    DIGIT_PINS,
+    LedMatrix::kActiveLowPattern /*groupOnPattern*/,
     NUM_SEGMENTS,
-    SEGMENT_PINS);
+    SEGMENT_PINS,
+    NUM_DIGITS,
+    DIGIT_PINS);
 ScanningModule<LedMatrix, NUM_DIGITS> scanningModule(
     ledMatrix, FRAMES_PER_SECOND);
 LedDisplay ledDisplay(scanningModule);
@@ -467,20 +467,20 @@ MCU                      LED display (Common Cathode)
 The `LedMatrixDirect` constructor is:
 
 ```C++
-const uint8_t NUM_DIGITS = 4;
 const uint8_t NUM_SEGMENTS = 8;
-const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
 const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 11, 12, 13, 14, 15};
+const uint8_t NUM_DIGITS = 4;
+const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
 const uint16_t FRAMES_PER_SECOND = 60;
 
 using LedMatrix = LedMatrixDirect<>;
 LedMatrix ledMatrix(
-    LedMatrix::kActiveHighPattern /*groupOnPattern*/,
     LedMatrix::kActiveHighPattern /*elementOnPattern*/,
-    NUM_DIGITS,
-    DIGIT_PINS,
+    LedMatrix::kActiveHighPattern /*groupOnPattern*/,
     NUM_SEGMENTS,
-    SEGMENT_PINS);
+    SEGMENT_PINS,
+    NUM_DIGITS,
+    DIGIT_PINS);
 ScanningModule<LedMatrix, NUM_DIGITS> scanningModule(
     ledMatrix, FRAMES_PER_SECOND);
 LedDisplay ledDisplay(scanningModule);
@@ -565,8 +565,8 @@ SwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
 using LedMatrix = LedMatrixSingleShiftRegister<SwSpiInterface>;
 LedMatrix ledMatrix(
     spiInterface,
-    LedMatrix::kActiveHighPattern /*groupOnPattern*/,
     LedMatrix::kActiveHighPattern /*elementOnPattern*/,
+    LedMatrix::kActiveHighPattern /*groupOnPattern*/,
     NUM_DIGITS,
     DIGIT_PINS):
 ScanningModule<LedMatrix, NUM_DIGITS> scanningModule(
@@ -630,8 +630,8 @@ HwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
 using LedMatrix = LedMatrixSingleShiftRegister<HwSpiInterface>;
 LedMatrix ledMatrix(
     spiInterface,
-    LedMatrix::kActiveHighPattern /*groupOnPattern*/,
-    LedMatrix::kActiveHighPattern /*elementOnPattern*/);
+    LedMatrix::kActiveHighPattern /*elementOnPattern*/,
+    LedMatrix::kActiveHighPattern /*groupOnPattern*/);
 ScanningModule<LedMatrix, NUM_DIGITS> scanningModule(
     ledMatrix, FRAMES_PER_SECOND);
 LedDisplay ledDisplay(scanningModule);
@@ -715,8 +715,8 @@ HwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
 using LedMatrix = LedMatrixSingleShiftRegister<HwSpiInterface>;
 LedMatrix ledMatrix(
     spiInterface,
-    LedMatrix::kActiveHighPattern /*groupOnPattern*/,
-    LedMatrix::kActiveHighPattern /*elementOnPattern*/);
+    LedMatrix::kActiveHighPattern /*elementOnPattern*/,
+    LedMatrix::kActiveHighPattern /*groupOnPattern*/);
 ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
     ledMatrix, FRAMES_PER_SECOND);
 LedDisplay ledDisplay(scanningModule);

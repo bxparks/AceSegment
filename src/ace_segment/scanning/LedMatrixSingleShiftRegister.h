@@ -53,12 +53,12 @@ class LedMatrixSingleShiftRegister : public LedMatrixBase {
   public:
     LedMatrixSingleShiftRegister(
         const T_SPII& spiInterface,
-        uint8_t groupOnPattern,
         uint8_t elementOnPattern,
+        uint8_t groupOnPattern,
         uint8_t numGroups,
         const uint8_t* groupPins
     ) :
-        LedMatrixBase(groupOnPattern, elementOnPattern),
+        LedMatrixBase(elementOnPattern, groupOnPattern),
         mSpiInterface(spiInterface),
         mGroupPins(groupPins),
         mNumGroups(numGroups)
