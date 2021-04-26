@@ -22,7 +22,7 @@ are organized in subdirectories like this:
 scanning/               tm1637/               max7219/
   ScanningDisplay.h       Tm1637Module.h        Max7219Module.h
   LedMatrix*.h              |                   /
-  LedMatrixDirectFast.h     |                  /
+  LedMatrixDirectFast4.h    |                  /
                   \         |                 /
                    \        |                /
                     v       v               v

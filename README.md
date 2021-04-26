@@ -224,7 +224,7 @@ depend on the lower-level classes:
     * `LedMatrixDirect`
         * Group pins and element pins are directly accessed through the
           microcontroller pins.
-    * `LedMatrixDirectFast`
+    * `LedMatrixDirectFast4`
         * Same as `LedMatrixDirect` but using `digitalWriteFast()` on AVR
           processors
     * `LedMatrixSingleShiftRegister`
@@ -307,7 +307,7 @@ ScanningModule  Tm1637Module  Max7219Module
             .------.      |      .-----------.
            v              v                   v
   LedMatrixDirect   LedMatrixSingleSftRgstr  LedMatrixDualShiftRegister
-LedMatrixDirectFast               \             /
+LedMatrixDirectFast4              \             /
                                    \           /
                                     v         v
                                    SwSpiInterface
@@ -961,7 +961,7 @@ provide the `digitalWriteFast()` variants:
 I have written versions of some lower-level classes to take advantage of
 `digitalWriteFast()`:
 
-* `scanning/LedMatrixDirectFast.h`
+* `scanning/LedMatrixDirectFast4.h`
     * Variant of `LedMatrixDirect` using `digitalWriteFast()`
 * `hw/SwSpiFastInterface.h`
     * Variant of `SwSpiInterface.h` using  `digitalWriteFast()`
@@ -979,7 +979,7 @@ need to include these headers manually, like this:
   #include <digitalWriteFast.h> // from 3rd party library
   #include <ace_segment/hw/SwSpiFastInterface.h>
   #include <ace_segment/hw/SwWireFastInterface.h>
-  #include <ace_segment/scanning/LedMatrixDirectFast.h>
+  #include <ace_segment/scanning/LedMatrixDirectFast4.h>
 #endif
 ```
 
@@ -998,7 +998,7 @@ sizeof(SwSpiInterface): 3
 sizeof(SwSpiFastInterface<11, 12, 13>): 1
 sizeof(HwSpiInterface): 3
 sizeof(LedMatrixDirect<>): 9
-sizeof(LedMatrixDirectFast<6..13, 2..5>): 3
+sizeof(LedMatrixDirectFast4<6..13, 2..5>): 3
 sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 8
 sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 5
 sizeof(LedModule): 2

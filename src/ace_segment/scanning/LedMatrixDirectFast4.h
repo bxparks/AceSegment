@@ -52,25 +52,30 @@ typedef void (*DigitalWriter)(void);
 #endif
 
 /**
- * An LedMatrix of 4 groups (e.g. digits) of 8 elements (e.g. LED segments)
- * whose group pins and element pins are wired directly to the MCU. This version
- * is optimized to use the `pinModeFast()` and `digitalWriteFast()` functions
- * from https://github.com/NicksonYap/digitalWriteFast.
+ * An LedMatrix very similar to LedMatrixDirect, with the element (segment) pins
+ * and group (digit) pins directly connected to the microcontroller. But this
+ * version uses the `pinModeFast()` and `digitalWriteFast()` functions from
+ * https://github.com/NicksonYap/digitalWriteFast.
  *
- * @tparam eX element pin numbers
- * @tparam gX group pin numbers
+ * The pin numbers must be given as compile-time constants, so they are passed
+ * in as template parameters. This forces the number of groups (digits) to be
+ * fixed at compile-time. This particular class supports exactly 4 digits. The
+ * number of elements (segments) is always 8.
+ *
+ * @tparam eX element (segment) pin numbers
+ * @tparam gX group (digit) pin numbers
  */
 template <
   uint8_t e0, uint8_t e1, uint8_t e2, uint8_t e3,
   uint8_t e4, uint8_t e5, uint8_t e6, uint8_t e7,
   uint8_t g0, uint8_t g1, uint8_t g2, uint8_t g3
 >
-class LedMatrixDirectFast : public LedMatrixBase {
+class LedMatrixDirectFast4 : public LedMatrixBase {
   public:
     constexpr static uint8_t kNumElements = 8;
     constexpr static uint8_t kNumGroups = 4;
 
-    LedMatrixDirectFast(
+    LedMatrixDirectFast4(
         uint8_t elementOnPattern,
         uint8_t groupOnPattern
     ) :
@@ -256,7 +261,7 @@ template <
   uint8_t g0, uint8_t g1, uint8_t g2, uint8_t g3
 >
 const DigitalWriter
-LedMatrixDirectFast<e0, e1, e2, e3, e4, e5, e6, e7, g0, g1, g2, g3>
+LedMatrixDirectFast4<e0, e1, e2, e3, e4, e5, e6, e7, g0, g1, g2, g3>
 ::kElementWriters[2 * kNumElements] = {
   digitalWriteFastElement0L,
   digitalWriteFastElement0H,
@@ -282,7 +287,7 @@ template <
   uint8_t g0, uint8_t g1, uint8_t g2, uint8_t g3
 >
 const DigitalWriter
-LedMatrixDirectFast<e0, e1, e2, e3, e4, e5, e6, e7, g0, g1, g2, g3>
+LedMatrixDirectFast4<e0, e1, e2, e3, e4, e5, e6, e7, g0, g1, g2, g3>
 ::kGroupWriters[2 * kNumGroups] = {
   digitalWriteFastGroup0L,
   digitalWriteFastGroup0H,

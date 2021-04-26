@@ -96,7 +96,7 @@ before substantional refactoring in 2021.
   bytes on Teensy 3.2.
 * Reduce flash by 250-400 bytes on AVR by providing ability to use
   `digitalWriteFast()` (https://github.com/NicksonYap/digitalWriteFast) using
-  the `scanning/LedMatrixDirectFast.h` and `hw/SwSpiFastInterface.h` classes.
+  the `scanning/LedMatrixDirectFast4.h` and `hw/SwSpiFastInterface.h` classes.
 * Total flash size saved is around 2kB for AVR, from (4 to 4.4) kB to (2 to 2.5)
   kB.
 * Reduce flash size by 828 bytes on AVR, 3kB on ESP8266, 5kB on ESP32 in commit

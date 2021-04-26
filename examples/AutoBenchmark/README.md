@@ -142,7 +142,7 @@ sizeof(SwSpiInterface): 3
 sizeof(SwSpiFastInterface<11, 12, 13>): 1
 sizeof(HwSpiInterface): 3
 sizeof(LedMatrixDirect<>): 9
-sizeof(LedMatrixDirectFast<6..13, 2..5>): 3
+sizeof(LedMatrixDirectFast4<6..13, 2..5>): 3
 sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 8
 sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 5
 sizeof(LedModule): 2
@@ -204,7 +204,7 @@ sizeof(SwSpiInterface): 3
 sizeof(SwSpiFastInterface<11, 12, 13>): 1
 sizeof(HwSpiInterface): 3
 sizeof(LedMatrixDirect<>): 9
-sizeof(LedMatrixDirectFast<2..5, 6..13>): 3
+sizeof(LedMatrixDirectFast4<2..5, 6..13>): 3
 sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 8
 sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 5
 sizeof(LedModule): 2

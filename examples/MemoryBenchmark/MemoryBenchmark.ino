@@ -47,7 +47,7 @@ volatile int disableCompilerOptimization = 0;
     #include <digitalWriteFast.h>
     #include <ace_segment/hw/SwSpiFastInterface.h>
     #include <ace_segment/hw/SwWireFastInterface.h>
-    #include <ace_segment/scanning/LedMatrixDirectFast.h>
+    #include <ace_segment/scanning/LedMatrixDirectFast4.h>
   #endif
   using namespace ace_segment;
 
@@ -109,7 +109,7 @@ volatile int disableCompilerOptimization = 0;
     #endif
 
     // Common Anode, with transitions on Group pins
-    using LedMatrix = LedMatrixDirectFast<
+    using LedMatrix = LedMatrixDirectFast4<
       8, 9, 10, 16, 14, 18, 19, 15,
       4, 5, 6, 7
     >;

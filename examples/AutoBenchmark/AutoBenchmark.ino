@@ -45,7 +45,7 @@ SOFTWARE.
 #include <digitalWriteFast.h>
 #include <ace_segment/hw/SwSpiFastInterface.h>
 #include <ace_segment/hw/SwWireFastInterface.h>
-#include <ace_segment/scanning/LedMatrixDirectFast.h>
+#include <ace_segment/scanning/LedMatrixDirectFast4.h>
 #endif
 
 using namespace ace_segment;
@@ -224,7 +224,7 @@ void runDirect() {
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 // Common Anode, with transistors on Group pins
 void runDirectFast() {
-  using LedMatrix = LedMatrixDirectFast<
+  using LedMatrix = LedMatrixDirectFast4<
       8, 9, 10, 16, 14, 18, 19, 15,
       4, 5, 6, 7>;
   LedMatrix ledMatrix(
@@ -592,8 +592,8 @@ void printSizeOf() {
   SERIAL_PORT_MONITOR.println(sizeof(LedMatrixDirect<>));
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  SERIAL_PORT_MONITOR.print(F("sizeof(LedMatrixDirectFast<6..13, 2..5>): "));
-  SERIAL_PORT_MONITOR.println(sizeof(LedMatrixDirectFast<
+  SERIAL_PORT_MONITOR.print(F("sizeof(LedMatrixDirectFast4<6..13, 2..5>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(LedMatrixDirectFast4<
       6, 7, 8, 9, 10, 11, 12, 13,
       2, 3, 4, 5
   >));

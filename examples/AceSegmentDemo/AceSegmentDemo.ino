@@ -7,7 +7,7 @@
 #include <digitalWriteFast.h>
 #include <ace_segment/hw/SwSpiFastInterface.h>
 #include <ace_segment/hw/SwWireFastInterface.h>
-#include <ace_segment/scanning/LedMatrixDirectFast.h>
+#include <ace_segment/scanning/LedMatrixDirectFast4.h>
 #endif
 
 using ace_common::incrementMod;
@@ -157,7 +157,7 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
       DIGIT_PINS);
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT_FAST
   // Common Anode, with transitors on Group pins
-  using LedMatrix = LedMatrixDirectFast<
+  using LedMatrix = LedMatrixDirectFast4<
     8, 9, 10, 16, 14, 18, 19, 15,
     4, 5, 6, 7
   >;
