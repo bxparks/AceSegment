@@ -252,12 +252,12 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   #error Unknown LED_DISPLAY_TYPE
 #endif
 
-LedDisplay display(ledModule);
-NumberWriter numberWriter(display);
-ClockWriter clockWriter(display);
-TemperatureWriter temperatureWriter(display);
-CharWriter charWriter(display);
-StringWriter stringWriter(charWriter);
+LedDisplay ledDisplay(ledModule);
+NumberWriter numberWriter(ledDisplay);
+ClockWriter clockWriter(ledDisplay);
+TemperatureWriter temperatureWriter(ledDisplay);
+CharWriter charWriter(ledDisplay);
+StringWriter stringWriter(ledDisplay);
 
 // Setup the various resources.
 void setupAceSegment() {
@@ -287,7 +287,7 @@ void setupAceSegment() {
 #endif
 
 #if USE_INTERRUPT == 1
-  setupInterupt(display.getFieldsPerSecond());
+  setupInterupt(ledDisplay.getFieldsPerSecond());
 #endif
 }
 
@@ -445,9 +445,9 @@ void writeChars() {
 void writeStrings() {
   static const char* STRINGS[] = {
     "0123",
-    "1.123",
-    "2.1 ",
-    "3.2.3.4.",
+    "0.123",
+    "0.1 ",
+    "0.1.2.3.",
     "a.b.c.d",
     ".1.2..3",
     "brian"
@@ -455,7 +455,8 @@ void writeStrings() {
   static const uint8_t NUM_STRINGS = sizeof(STRINGS) / sizeof(STRINGS[0]);
   static uint8_t i = 0;
 
-  stringWriter.writeStringAt(0, STRINGS[i]);
+  uint8_t written = stringWriter.writeStringAt(0, STRINGS[i]);
+  stringWriter.clearToEnd(written);
 
   incrementMod(i, NUM_STRINGS);
 }
@@ -517,7 +518,7 @@ const uint8_t SPIN_PATTERNS[NUM_SPIN_PATTERNS][4] PROGMEM = {
 void spinDisplay() {
   static uint8_t i = 0;
   const uint8_t* patterns = SPIN_PATTERNS[i];
-  display.writePatternsAt_P(0, patterns, 4);
+  ledDisplay.writePatternsAt_P(0, patterns, 4);
 
   incrementMod(i, NUM_SPIN_PATTERNS);
 }
@@ -538,7 +539,7 @@ const uint8_t SPIN_PATTERNS_2[NUM_SPIN_PATTERNS_2][4] PROGMEM = {
 void spinDisplay2() {
   static uint8_t i = 0;
   const uint8_t* patterns = SPIN_PATTERNS_2[i];
-  display.writePatternsAt_P(0, patterns, 4);
+  ledDisplay.writePatternsAt_P(0, patterns, 4);
 
   incrementMod(i, NUM_SPIN_PATTERNS_2);
 }
@@ -564,7 +565,7 @@ void updateDemo() {
   } else if (demoMode == DEMO_MODE_STRINGS) {
     writeStrings();
   } else if (demoMode == DEMO_MODE_SCROLL) {
-    scrollString("   Angela is the best.");
+    scrollString("   You are the best");
 #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_SCANNING
   } else if (demoMode == DEMO_MODE_PULSE) {
     pulseDisplay();
@@ -584,7 +585,7 @@ void nextDemo() {
     incrementMod(demoMode, DEMO_MODE_COUNT);
   }
 
-  display.clear();
+  ledDisplay.clear();
 
   updateDemo();
 }

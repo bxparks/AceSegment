@@ -360,7 +360,7 @@ LedDisplay ledDisplay(scanningModule);
 NumberWriter hexWriter(ledDisplay);
 ClockWriter clockWriter(ledDisplay);
 CharWriter charWriter(ledDisplay);
-StringWriter stringWriter(charWriter);
+StringWriter stringWriter(ledDisplay);
 ...
 
 void setupAceSegment() {
@@ -915,33 +915,37 @@ to write entirely strings into the LED display. It provides the following
 methods:
 
 * `LedDisplay& display()`
-* `void writeStringAt(uint8_t pos, const char* s, bool padRight = false)`
+* `uint8_t writeStringAt(uint8_t pos, const char* cs, uint8_t numChar = 255)`
+* `uint8_t writeStringAt(uint8_t pos, const __FlashStringHelper* fs, uint8_t numChar = 255)`
+* `void clearToEnd(uint8_t pos)`
 
-The implementation of this method is straightforward except for the handling of
-a decimal point. A seven segment LED digit contains a small LED for the decimal
-point. Instead of taking up an entire digit for a single '.' character, we can
-collapse the '.' character into the decimal point indicator of the previous
-character on the left.
+The implementation of `writeStringAt()` is straightforward except for the
+handling of a decimal point. A seven segment LED digit contains a small LED for
+the decimal point. Instead of taking up an entire digit for a single '.'
+character, we can collapse the '.' character into the decimal point indicator of
+the previous character on the left.
 
-The `padRight` flag tells the method to pad spaces to the right if we run out of
-characters before getting to the end of the digits on the LED display.
+The optional `numChar` parameter limits the number of characters in the string
+to write. The default value is 255 which is expected to be larger than the
+largest LED module that will be used with AceSegment, so the default value will
+print the entire string.
 
-Scrolling can be achieved by writing success string fragments into digit 0, with
-a scrolling timing interval:
+The actual number of LED digits written is returned by `writeStringAt()`. For
+example, writing `"1.2"` returns 2 because the decimal point was merged into the
+previous digit and only 2 digits are written.
+
+The `clearToEnd()` method clears the LED display from the given `pos` to the end
+of the display.
+
+The following sequence of calls will write the given string and clear all digits
+after the end of the string:
+
+```C++
+StringWriter stringWriter(ledDisplay);
+
+uint8_t written = stringWriter.writeStringAt(0, s);
+stringWriter.clearToEnd(written);
 ```
-void scrollString(const char* s) {
-  static uint8_t i = 0;
-
-  if (i >= strlen(s)) i = 0;
-  stringWriter.writeStringAt(0, &s[i], true /* padRight */);
-  i++;
-}
-```
-
-A `StringWriter` consumes about 400 bytes of flash memory on an AVR, which
-includes an instance of `CharWriter`.
-
-(TODO: Maybe merge `StringWriter` and `CharWriter`?)
 
 <a name="AdvancedUsage"></a>
 ## Advanced Usage

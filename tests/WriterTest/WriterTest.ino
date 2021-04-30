@@ -26,7 +26,7 @@ NumberWriter numberWriter(ledDisplay);
 ClockWriter clockWriter(ledDisplay);
 TemperatureWriter temperatureWriter(ledDisplay);
 CharWriter charWriter(ledDisplay);
-StringWriter stringWriter(charWriter);
+StringWriter stringWriter(ledDisplay);
 
 // ----------------------------------------------------------------------
 // Tests for CharWriter.
