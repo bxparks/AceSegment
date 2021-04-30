@@ -26,6 +26,7 @@ using namespace ace_button;
 #define LED_DISPLAY_TYPE_SCANNING 0
 #define LED_DISPLAY_TYPE_TM1637 1
 #define LED_DISPLAY_TYPE_MAX7219 2
+#define LED_DISPLAY_TYPE_HC595 3
 
 #define LED_MATRIX_MODE_NONE 0
 #define LED_MATRIX_MODE_DIRECT 1
@@ -93,6 +94,13 @@ using namespace ace_button;
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
 
+#elif defined(AUNITER_LED_CLOCK_HC595)
+  const uint8_t NUM_DIGITS = 4;
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595
+  #define LED_MATRIX_MODE LED_MATRIX_MODE_NONE
+  const uint8_t MODE_BUTTON_PIN = A2;
+  const uint8_t CHANGE_BUTTON_PIN = A3;
+
 #else
   #error Unknown AUNITER environment
 #endif
@@ -140,6 +148,10 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   const uint16_t BIT_DELAY = 100;
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_MAX7219
   const uint8_t LATCH_PIN = A0;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595
+  const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
 #endif
@@ -248,6 +260,16 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   Max7219Module<SpiInterface, NUM_DIGITS> ledModule(
       spiInterface, kEightDigitRemapArray);
 
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595
+  using SpiInterface = SwSpiInterface;
+  SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  DualHc595Module<SpiInterface, NUM_DIGITS> ledModule(
+      spiInterface,
+      LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
+      LedMatrixBase::kActiveLowPattern /*groupOnPattern*/,
+      FRAMES_PER_SECOND
+  );
+
 #else
   #error Unknown LED_DISPLAY_TYPE
 #endif
@@ -270,6 +292,11 @@ void setupAceSegment() {
   spiInterface.begin();
   ledModule.begin();
   ledModule.setBrightness(2); // 0-15
+
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595
+  spiInterface.begin();
+  ledModule.begin();
+  ledModule.setBrightness(1); // 0-1
 
 #else
   #if LED_MATRIX_MODE == LED_MATRIX_MODE_PARIAL_SW_SPI \
@@ -644,6 +671,8 @@ void renderField() {
     } else {
       ledModule.renderFieldWhenReady();
     }
+  #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595
+      ledModule.renderFieldWhenReady();
   #else
     ledModule.flush();
     //ledModule.flushIncremental();
