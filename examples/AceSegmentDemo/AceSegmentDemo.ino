@@ -358,7 +358,7 @@ static const uint16_t DEMO_INTERNAL_DELAY[DEMO_MODE_COUNT] = {
   100, // DEMO_MODE_TEMPERATURE_F
   200, // DEMO_MODE_CHAR
   500, // DEMO_MODE_STRINGS
-  500, // DEMO_MODE_SCROLL
+  300, // DEMO_MODE_SCROLL
   200, // DEMO_MODE_PULSE
   100, // DEMO_MODE_SPIN
   100, // DEMO_MODE_SPIN2
@@ -443,14 +443,14 @@ void writeChars() {
 //-----------------------------------------------------------------------------
 
 void writeStrings() {
-  static const char* STRINGS[] = {
-    "0123",
-    "0.123",
-    "0.1 ",
-    "0.1.2.3.",
-    "a.b.c.d",
-    ".1.2..3",
-    "brian"
+  static const __FlashStringHelper* STRINGS[] = {
+    F("0123"),
+    F("0.123"),
+    F("0.1 "),
+    F("0.1.2.3."),
+    F("a.b.c.d"),
+    F(".1.2.3"),
+    F("brian"),
   };
   static const uint8_t NUM_STRINGS = sizeof(STRINGS) / sizeof(STRINGS[0]);
   static uint8_t i = 0;
@@ -461,11 +461,35 @@ void writeStrings() {
   incrementMod(i, NUM_STRINGS);
 }
 
-void scrollString(const char* s) {
-  static uint8_t i = 0;
+//-----------------------------------------------------------------------------
 
-  stringWriter.writeStringAt(0, &s[i], true /* padRight */);
-  incrementMod(i, (uint8_t) strlen(s));
+StringScroller stringScroller(ledDisplay);
+const char SCROLL_STRING[] = "You are the best";
+
+void scrollString() {
+  static bool isInit = false;
+  static bool scrollLeft = true;
+
+  if (! isInit) {
+    if (scrollLeft) {
+      stringScroller.initScrollLeft(SCROLL_STRING);
+    } else {
+      stringScroller.initScrollRight(SCROLL_STRING);
+    }
+    isInit = true;
+  }
+
+  bool isDone;
+  if (scrollLeft) {
+    isDone = stringScroller.scrollLeft();
+  } else {
+    isDone = stringScroller.scrollRight();
+  }
+
+  if (isDone) {
+    scrollLeft = !scrollLeft;
+    isInit = false;
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -565,7 +589,7 @@ void updateDemo() {
   } else if (demoMode == DEMO_MODE_STRINGS) {
     writeStrings();
   } else if (demoMode == DEMO_MODE_SCROLL) {
-    scrollString("   You are the best");
+    scrollString();
 #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_SCANNING
   } else if (demoMode == DEMO_MODE_PULSE) {
     pulseDisplay();

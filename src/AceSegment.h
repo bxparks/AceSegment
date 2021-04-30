@@ -50,6 +50,7 @@ SOFTWARE.
 #include "ace_segment/writer/TemperatureWriter.h"
 #include "ace_segment/writer/CharWriter.h"
 #include "ace_segment/writer/StringWriter.h"
+#include "ace_segment/writer/StringScroller.h"
 
 // Version format: xxyyzz == "xx.yy.zz"
 #define ACE_SEGMENT_VERSION 400
