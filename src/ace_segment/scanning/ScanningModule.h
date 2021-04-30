@@ -51,8 +51,8 @@ namespace ace_segment {
  *
  * A frame is divided into fields. A field is a partial rendering of a frame.
  * Normally, the one digit corresponds to one field. However if brightness
- * control is enabled by setting `SUBFIELDS > 1`, then a single digit will be
- * rendered for SUBFIELDS number of times so that the brightness of the digit
+ * control is enabled by setting `T_SUBFIELDS > 1`, then a single digit will be
+ * rendered for T_SUBFIELDS number of times so that the brightness of the digit
  * will be controlled by PWM.
  *
  * There are 2 ways to get the expected number of frames per second:
@@ -62,20 +62,20 @@ namespace ace_segment {
  *    loop(), and an internal timing parameter will trigger a renderFieldNow()
  *    at the appropriate time.
  *
- * @tparam LM the LedMatrixBase class that provides access to LED segments
+ * @tparam T_LM the LedMatrixBase class that provides access to LED segments
       (elements) organized by digit (group)
- * @tparam DIGITS number of LED digits
- * @tparam SUBFIELDS number of subfields for each digit to get brightness
+ * @tparam T_DIGITS number of LED digits
+ * @tparam T_SUBFIELDS number of subfields for each digit to get brightness
  *    control using PWM. The default is 1, but can be set to greater than 1 to
  *    get brightness control.
- * @tparam CI class that provides access to Arduino clock functions (millis()
+ * @tparam T_CI class that provides access to Arduino clock functions (millis()
  *    and micros()). The default is ClockInterface.
  */
 template <
-    typename LM,
-    uint8_t DIGITS,
-    uint8_t SUBFIELDS = 1,
-    typename CI = ClockInterface>
+    typename T_LM,
+    uint8_t T_DIGITS,
+    uint8_t T_SUBFIELDS = 1,
+    typename T_CI = ClockInterface>
 class ScanningModule : public LedModule {
 
   public:
@@ -90,10 +90,10 @@ class ScanningModule : public LedModule {
      * @param brightnesses array of brightness for each digit (default: nullptr)
      */
     explicit ScanningModule(
-        const LM& ledMatrix,
+        const T_LM& ledMatrix,
         uint8_t framesPerSecond
     ):
-        LedModule(DIGITS),
+        LedModule(T_DIGITS),
         mLedMatrix(ledMatrix),
         mFramesPerSecond(framesPerSecond)
     {}
@@ -107,18 +107,18 @@ class ScanningModule : public LedModule {
     void begin() {
       // Set up durations for the renderFieldWhenReady() polling function.
       mMicrosPerField = (uint32_t) 1000000UL / getFieldsPerSecond();
-      mLastRenderFieldMicros = CI::micros();
+      mLastRenderFieldMicros = T_CI::micros();
 
       // Initialize variables needed for multiplexing.
       mCurrentDigit = 0;
-      mPrevDigit = DIGITS - 1;
+      mPrevDigit = T_DIGITS - 1;
       mCurrentSubField = 0;
       mPattern = 0;
 
       // Set initial patterns and global brightness.
       mLedMatrix.clear();
-      if (SUBFIELDS > 1) {
-        setBrightness(SUBFIELDS / 2); // half brightness
+      if (T_SUBFIELDS > 1) {
+        setBrightness(T_SUBFIELDS / 2); // half brightness
       }
     }
 
@@ -131,7 +131,7 @@ class ScanningModule : public LedModule {
     //-----------------------------------------------------------------------
 
     /** Get the number of digits. */
-    uint8_t getNumDigits() const { return DIGITS; }
+    uint8_t getNumDigits() const { return T_DIGITS; }
 
     void setPatternAt(uint8_t pos, uint8_t pattern) override {
       mPatterns[pos] = pattern;
@@ -148,7 +148,7 @@ class ScanningModule : public LedModule {
      * range of values of `brightness` and how it is interpreted.
      */
     void setBrightness(uint8_t brightness) override {
-      for (uint8_t i = 0; i < DIGITS; i++) {
+      for (uint8_t i = 0; i < T_DIGITS; i++) {
         setBrightnessAt(i, brightness);
       }
     }
@@ -163,26 +163,28 @@ class ScanningModule : public LedModule {
      * Not all implementation of `LedClass` can support brightness for each
      * digit, so this is implemented at the ScanningModule class.
      *
-     * The maximum brightness should is exactly `SUBFIELDS` which turns on the
+     * The maximum brightness should is exactly `T_SUBFIELDS` which turns on the
      * LED 100% of the time. The minimum brightness is 0, which turns OFF the
-     * digit. For example, if `SUBFIELDS==16`, the the maximum brightness is 16
-     * which turns ON the digit 100% of the time. The relative brightness of
-     * each brightness level is in units of 1/SUBFIELDS.
+     * digit. For example, if `T_SUBFIELDS==16`, the the maximum brightness is
+     * 16 which turns ON the digit 100% of the time. The relative brightness of
+     * each brightness level is in units of 1/T_SUBFIELDS.
      *
      * The brightness scale is *not* normalized to [0,255]. A previous version
      * of this class tried to do that, but I found that this introduced
      * discretization errors which made it difficult to control the brightness
-     * at intermediate values. For example, suppose SUBFIELDS=16. If we changed
-     * the normalized brightness value from 32 to 40, it was impossible to
-     * determine without actually running the program if the 2 values actually
-     * differed in brightness. Instead, the calling program is expected to keep
-     * track of the value of SUBFIELDS, and create an array of brightness values
-     * in these raw units. The side benefit of using raw brightness values is
-     * that it makes displayCurrentFieldModulated() easier to implement.
+     * at intermediate values. For example, suppose T_SUBFIELDS=16. If we
+     * changed the normalized brightness value from 32 to 40, it was impossible
+     * to determine without actually running the program if the 2 values
+     * actually differed in brightness. Instead, the calling program is expected
+     * to keep track of the value of T_SUBFIELDS, and create an array of
+     * brightness values in these raw units. The side benefit of using raw
+     * brightness values is that it makes displayCurrentFieldModulated() easier
+     * to implement.
      */
     void setBrightnessAt(uint8_t pos, uint8_t brightness) {
-      if (pos >= DIGITS) return;
-      mBrightnesses[pos] = (brightness >= SUBFIELDS) ? SUBFIELDS : brightness;
+      if (pos >= T_DIGITS) return;
+      mBrightnesses[pos] = (brightness >= T_SUBFIELDS)
+          ? T_SUBFIELDS : brightness;
     }
 
     //-----------------------------------------------------------------------
@@ -198,7 +200,7 @@ class ScanningModule : public LedModule {
     }
 
     /** Total fields per frame across all digits. */
-    uint16_t getFieldsPerFrame() const { return DIGITS * SUBFIELDS; }
+    uint16_t getFieldsPerFrame() const { return T_DIGITS * T_SUBFIELDS; }
 
     /**
      * Display one field of a frame when the time is right. This is a polling
@@ -209,7 +211,7 @@ class ScanningModule : public LedModule {
      *    rendered.
      */
     bool renderFieldWhenReady() {
-      uint16_t now = CI::micros();
+      uint16_t now = T_CI::micros();
       uint16_t elapsedMicros = now - mLastRenderFieldMicros;
       if (elapsedMicros >= mMicrosPerField) {
         renderFieldNow();
@@ -222,15 +224,15 @@ class ScanningModule : public LedModule {
 
     /**
      * Render the current field immediately. If modulation is off (i.e.
-     * SUBFIELDS == 1), then the field corresponds to the single digit. If
-     * modulation is enabled (SUBFIELDS > 1), then each digit is PWM modulated
-     * over SUBFIELDS number of renderings.
+     * T_SUBFIELDS == 1), then the field corresponds to the single digit. If
+     * modulation is enabled (T_SUBFIELDS > 1), then each digit is PWM modulated
+     * over T_SUBFIELDS number of renderings.
      *
      * This method is intended to be called directly from a timer interrupt
      * handler.
      */
     void renderFieldNow() {
-      if (SUBFIELDS > 1) {
+      if (T_SUBFIELDS > 1) {
         displayCurrentFieldModulated();
       } else {
         displayCurrentFieldPlain();
@@ -249,7 +251,7 @@ class ScanningModule : public LedModule {
       const uint8_t pattern = mPatterns[mCurrentDigit];
       mLedMatrix.draw(mCurrentDigit, pattern);
       mPrevDigit = mCurrentDigit;
-      ace_common::incrementMod(mCurrentDigit, DIGITS);
+      ace_common::incrementMod(mCurrentDigit, T_DIGITS);
     }
 
     /** Display field using subfield modulation. */
@@ -260,13 +262,13 @@ class ScanningModule : public LedModule {
       // Implement pulse width modulation PWM, using the following boundaries:
       //
       // * If brightness == 0, then turn the digit OFF 100% of the time.
-      // * If brightness >= SUBFIELDS, turn the digit ON 100% of the time.
+      // * If brightness >= T_SUBFIELDS, turn the digit ON 100% of the time.
       //
-      // The mCurrentSubField is incremented modulo SUBFIELDS, so will always be
-      // in the range of [0, SUBFIELDS-1]. The brightness will always be <=
-      // SUBFIELDS, with the value of SUBFIELDS being 100% bright. So if we turn
-      // on the LED when (mCurrentSubField < brightness), we get the desired
-      // outcome.
+      // The mCurrentSubField is incremented modulo T_SUBFIELDS, so will always
+      // be in the range of [0, T_SUBFIELDS-1]. The brightness will always be <=
+      // T_SUBFIELDS, with the value of T_SUBFIELDS being 100% bright. So if we
+      // turn on the LED when (mCurrentSubField < brightness), we get the
+      // desired outcome.
       const uint8_t pattern = (mCurrentSubField < brightness)
           ? mPatterns[mCurrentDigit]
           : 0;
@@ -278,8 +280,8 @@ class ScanningModule : public LedModule {
 
       mCurrentSubField++;
       mPrevDigit = mCurrentDigit;
-      if (mCurrentSubField >= SUBFIELDS) {
-        ace_common::incrementMod(mCurrentDigit, DIGITS);
+      if (mCurrentSubField >= T_SUBFIELDS) {
+        ace_common::incrementMod(mCurrentDigit, T_DIGITS);
         mCurrentSubField = 0;
       }
     }
@@ -289,13 +291,13 @@ class ScanningModule : public LedModule {
     // 32-bit processors.
 
     /** LedMatrixBase instance that knows how to set and unset LED segments. */
-    const LM& mLedMatrix;
+    const T_LM& mLedMatrix;
 
     /** Pattern for each digit. */
-    uint8_t mPatterns[DIGITS];
+    uint8_t mPatterns[T_DIGITS];
 
-    /** Brightness for each digit. Unused if SUBFIELDS <= 1. */
-    uint8_t mBrightnesses[DIGITS];
+    /** Brightness for each digit. Unused if T_SUBFIELDS <= 1. */
+    uint8_t mBrightnesses[T_DIGITS];
 
     //-----------------------------------------------------------------------
     // Variables needed by renderFieldWhenReady() to render frames and fields at
