@@ -30,7 +30,7 @@ using namespace ace_button;
 
 #define LED_MATRIX_MODE_NONE 0
 #define LED_MATRIX_MODE_DIRECT 1
-#define LED_MATRIX_MODE_PARIAL_SW_SPI 2
+#define LED_MATRIX_MODE_SINGLE_SW_SPI 2
 #define LED_MATRIX_MODE_SINGLE_HW_SPI 3
 #define LED_MATRIX_MODE_DUAL_SW_SPI 4
 #define LED_MATRIX_MODE_DUAL_HW_SPI 5
@@ -176,7 +176,7 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   LedMatrix ledMatrix(
       LedMatrix::kActiveLowPattern /*elementOnPattern*/,
       LedMatrix::kActiveLowPattern /*groupOnPattern*/);
-#elif LED_MATRIX_MODE == LED_MATRIX_MODE_PARIAL_SW_SPI
+#elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SW_SPI
   // Common Cathode, with transistors on Group pins
   SwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
   using LedMatrix = LedMatrixSingleShiftRegister<SwSpiInterface>;
@@ -299,7 +299,7 @@ void setupAceSegment() {
   ledModule.setBrightness(1); // 0-1
 
 #else
-  #if LED_MATRIX_MODE == LED_MATRIX_MODE_PARIAL_SW_SPI \
+  #if LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SW_SPI \
       || LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HW_SPI \
       || LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SW_SPI_FAST \
       || LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SW_SPI \
