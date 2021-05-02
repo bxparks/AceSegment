@@ -32,12 +32,12 @@ using namespace ace_button;
 
 #define LED_MATRIX_MODE_NONE 0
 #define LED_MATRIX_MODE_DIRECT 1
-#define LED_MATRIX_MODE_SINGLE_SW_SPI 2
-#define LED_MATRIX_MODE_SINGLE_HW_SPI 3
-#define LED_MATRIX_MODE_DUAL_SW_SPI 4
-#define LED_MATRIX_MODE_DUAL_HW_SPI 5
-#define LED_MATRIX_MODE_DIRECT_FAST 6
-#define LED_MATRIX_MODE_SINGLE_SW_SPI_FAST 7
+#define LED_MATRIX_MODE_DIRECT_FAST 2
+#define LED_MATRIX_MODE_SINGLE_SW_SPI 3
+#define LED_MATRIX_MODE_SINGLE_HW_SPI 4
+#define LED_MATRIX_MODE_SINGLE_SW_SPI_FAST 5
+#define LED_MATRIX_MODE_DUAL_SW_SPI 6
+#define LED_MATRIX_MODE_DUAL_HW_SPI 7
 #define LED_MATRIX_MODE_DUAL_SW_SPI_FAST 8
 
 // LedClock buttons are now hardwared to A2 and A3, instead of being configured
@@ -128,18 +128,15 @@ using namespace ace_button;
 // Use polling or interrupt.
 #define USE_INTERRUPT 0
 
-// Total field/second = FRAMES_PER_SECOND * NUM_SUBFIELDS * NUM_DIGITS
-//      = 60 * 64 * 4 = 15360 fields/sec = 65 micros/field
+// Total field/second
+//      = FRAMES_PER_SECOND * NUM_SUBFIELDS * NUM_DIGITS
+//      = 60 * 1 * 4 = 240 fields/sec = 4167 micros/field
 //
-// Fortunately, according to AutoBenchmark, the "fast" versions of LedMatrix can
-// render a single field in about 20-30 micros.
+// According to AutoBenchmark, *all* versions of ScanningModule with all
+// configurations of LedMatrix can render a single field less than 304
+// microseconds on a 16 MHz AVR processor.
 const uint8_t FRAMES_PER_SECOND = 60;
-const uint8_t NUM_SUBFIELDS = 16;
-const uint8_t NUM_BRIGHTNESSES = 8;
-const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
-  1, 2, 4, 8,
-  15, 7, 3, 2
-};
+const uint8_t NUM_SUBFIELDS = 1;
 
 // Define GPIO pins.
 #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_SCANNING
@@ -271,10 +268,6 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   ScanningModule<LedMatrix, NUM_DIGITS>
       ledModule(ledMatrix, FRAMES_PER_SECOND);
 
-  // 16 levels of brightness, need render-fields/second of 60*4*16 = 3840.
-  ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-      modulatingModule(ledMatrix, FRAMES_PER_SECOND);
-
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_TM1637
   using WireInterface = SwWireInterface;
   WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
@@ -288,8 +281,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_DUAL
   // Common Anode, with transistors on Group pins
-  using SpiInterface = SwSpiInterface;
-  SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  using SpiInterface = SwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  SpiInterface spiInterface;
   DualHc595Module<SpiInterface, NUM_DIGITS> ledModule(
       spiInterface,
       LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
@@ -299,8 +292,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_SINGLE
   // Common Cathode, with transistors on Group pins
-  using SpiInterface = SwSpiInterface;
-  SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  using SpiInterface = SwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  SpiInterface spiInterface;
   SingleHc595Module<SpiInterface, NUM_DIGITS> ledModule(
       spiInterface,
       LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
@@ -344,7 +337,6 @@ void setupAceSegment() {
 
   ledMatrix.begin();
   ledModule.begin();
-  modulatingModule.begin();
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_TM1637
   wireInterface.begin();
@@ -401,11 +393,7 @@ void setupInterupt(uint16_t fieldsPerSecond) {
 #if USE_INTERRUPT == 1
 // interrupt handler for timer 2
 ISR(TIMER2_COMPA_vect) {
-  if (demoMode == DEMO_MODE_PULSE) {
-    modulatingModule.renderFieldNow();
-  } else {
-    ledModule.renderFieldNow();
-  }
+  ledModule.renderFieldNow();
 }
 #endif
 
@@ -428,10 +416,9 @@ const uint8_t DEMO_MODE_TEMPERATURE_F = 5;
 const uint8_t DEMO_MODE_CHAR = 6;
 const uint8_t DEMO_MODE_STRINGS = 7;
 const uint8_t DEMO_MODE_SCROLL = 8;
-const uint8_t DEMO_MODE_PULSE = 9;
-const uint8_t DEMO_MODE_SPIN = 10;
-const uint8_t DEMO_MODE_SPIN_2 = 11;
-const uint8_t DEMO_MODE_COUNT = 12;
+const uint8_t DEMO_MODE_SPIN = 9;
+const uint8_t DEMO_MODE_SPIN_2 = 10;
+const uint8_t DEMO_MODE_COUNT = 11;
 uint8_t demoMode = DEMO_MODE_TEMPERATURE_C;
 uint8_t prevDemoMode = demoMode - 1;
 
@@ -445,7 +432,6 @@ static const uint16_t DEMO_INTERNAL_DELAY[DEMO_MODE_COUNT] = {
   200, // DEMO_MODE_CHAR
   500, // DEMO_MODE_STRINGS
   300, // DEMO_MODE_SCROLL
-  200, // DEMO_MODE_PULSE
   100, // DEMO_MODE_SPIN
   100, // DEMO_MODE_SPIN2
 };
@@ -580,43 +566,6 @@ void scrollString() {
 
 //-----------------------------------------------------------------------------
 
-#if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_SCANNING
-
-void setupPulseDisplay() {
-  LedDisplay modulatingDisplay(modulatingModule);
-  NumberWriter numberWriter(modulatingDisplay);
-  numberWriter.writeHexCharAt(0, 1);
-  numberWriter.writeHexCharAt(1, 2);
-  numberWriter.writeHexCharAt(2, 3);
-  numberWriter.writeHexCharAt(3, 4);
-}
-
-void setBrightnesses(int i) {
-  uint8_t brightness0 = BRIGHTNESS_LEVELS[i % NUM_BRIGHTNESSES];
-  uint8_t brightness1 = BRIGHTNESS_LEVELS[(i+1) % NUM_BRIGHTNESSES];
-  uint8_t brightness2 = BRIGHTNESS_LEVELS[(i+2) % NUM_BRIGHTNESSES];
-  uint8_t brightness3 = BRIGHTNESS_LEVELS[(i+3) % NUM_BRIGHTNESSES];
-  modulatingModule.setBrightnessAt(0, brightness0);
-  modulatingModule.setBrightnessAt(1, brightness1);
-  modulatingModule.setBrightnessAt(2, brightness2);
-  modulatingModule.setBrightnessAt(3, brightness3);
-}
-
-void pulseDisplay() {
-  static uint8_t i = 0;
-
-  if (prevDemoMode != demoMode) {
-    setupPulseDisplay();
-  }
-
-  i++;
-  setBrightnesses(i);
-}
-
-#endif
-
-//-----------------------------------------------------------------------------
-
 static const uint8_t NUM_SPIN_PATTERNS = 3;
 
 const uint8_t SPIN_PATTERNS[NUM_SPIN_PATTERNS][4] PROGMEM = {
@@ -676,10 +625,6 @@ void updateDemo() {
     writeStrings();
   } else if (demoMode == DEMO_MODE_SCROLL) {
     scrollString();
-#if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_SCANNING
-  } else if (demoMode == DEMO_MODE_PULSE) {
-    pulseDisplay();
-#endif
   } else if (demoMode == DEMO_MODE_SPIN) {
     spinDisplay();
   } else if (demoMode == DEMO_MODE_SPIN_2) {
@@ -691,10 +636,6 @@ void updateDemo() {
 void nextDemo() {
   prevDemoMode = demoMode;
   incrementMod(demoMode, DEMO_MODE_COUNT);
-  if (demoMode == DEMO_MODE_PULSE) {
-    incrementMod(demoMode, DEMO_MODE_COUNT);
-  }
-
   ledDisplay.clear();
 
   updateDemo();
@@ -713,24 +654,12 @@ void demoLoop() {
     if (demoLoopMode == DEMO_LOOP_MODE_AUTO) {
       updateDemo();
     }
-
-    /*
-    if (iter++ >= 100) {
-      incrementMod(demoMode, DEMO_MODE_COUNT);
-      iter = 0;
-    }
-    */
   }
 }
 
 void renderField() {
-  #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_SCANNING
-    if (demoMode == DEMO_MODE_PULSE) {
-      modulatingModule.renderFieldWhenReady();
-    } else {
-      ledModule.renderFieldWhenReady();
-    }
-  #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_DUAL \
+  #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_SCANNING \
+      || LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_DUAL \
       || LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_SINGLE \
       || LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_BARE
     ledModule.renderFieldWhenReady();
