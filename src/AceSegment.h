@@ -42,6 +42,7 @@ SOFTWARE.
 #include "ace_segment/scanning/LedMatrixDualShiftRegister.h"
 #include "ace_segment/LedModule.h"
 #include "ace_segment/scanning/ScanningModule.h"
+#include "ace_segment/bare/BareModule.h"
 #include "ace_segment/hc595/DualHc595Module.h"
 #include "ace_segment/hc595/SingleHc595Module.h"
 #include "ace_segment/tm1637/Tm1637Module.h"

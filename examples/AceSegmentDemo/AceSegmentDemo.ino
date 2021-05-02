@@ -28,6 +28,7 @@ using namespace ace_button;
 #define LED_DISPLAY_TYPE_MAX7219 2
 #define LED_DISPLAY_TYPE_HC595_DUAL 3
 #define LED_DISPLAY_TYPE_HC595_SINGLE 4
+#define LED_DISPLAY_TYPE_BARE 5
 
 #define LED_MATRIX_MODE_NONE 0
 #define LED_MATRIX_MODE_DIRECT 1
@@ -109,6 +110,13 @@ using namespace ace_button;
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
 
+#elif defined(AUNITER_LED_CLOCK_BARE)
+  const uint8_t NUM_DIGITS = 4;
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_BARE
+  #define LED_MATRIX_MODE LED_MATRIX_MODE_NONE
+  const uint8_t MODE_BUTTON_PIN = A2;
+  const uint8_t CHANGE_BUTTON_PIN = A3;
+
 #else
   #error Unknown AUNITER environment
 #endif
@@ -169,6 +177,11 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
+
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_BARE
+  const uint8_t NUM_SEGMENTS = 8;
+  const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
+  const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
 
 #endif
 
@@ -279,8 +292,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
   DualHc595Module<SpiInterface, NUM_DIGITS> ledModule(
       spiInterface,
-      LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
-      LedMatrixBase::kActiveLowPattern /*groupOnPattern*/,
+      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
+      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
       FRAMES_PER_SECOND
   );
 
@@ -290,11 +303,20 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
   SingleHc595Module<SpiInterface, NUM_DIGITS> ledModule(
       spiInterface,
-      LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
-      LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
+      LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
+      LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
       FRAMES_PER_SECOND,
       DIGIT_PINS
   );
+
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_BARE
+  // Common Anode, with transitors on Group pins
+  BareModule<NUM_DIGITS> ledModule(
+      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
+      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+      FRAMES_PER_SECOND,
+      SEGMENT_PINS,
+      DIGIT_PINS);
 
 #else
   #error Unknown LED_DISPLAY_TYPE
@@ -341,6 +363,10 @@ void setupAceSegment() {
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_SINGLE
   spiInterface.begin();
+  ledModule.begin();
+  ledModule.setBrightness(1); // 0-1
+
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_BARE
   ledModule.begin();
   ledModule.setBrightness(1); // 0-1
 
@@ -705,7 +731,8 @@ void renderField() {
       ledModule.renderFieldWhenReady();
     }
   #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_DUAL \
-      || LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_SINGLE
+      || LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_SINGLE \
+      || LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_BARE
     ledModule.renderFieldWhenReady();
   #else
     ledModule.flush();
