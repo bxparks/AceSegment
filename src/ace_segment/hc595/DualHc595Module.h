@@ -34,6 +34,14 @@ namespace ace_segment {
  * An implementation of LedModule class that supports an LED module using 2
  * 74HC595 Shift Register chips. This is a convenience class that pairs together
  * a ScanningModule and a LedMatrixDualShiftRegister in a single class.
+ *
+ * @tparam T_SPII interface to SPI, either SwSpiInterface or HwSpiInterface
+ * @tparam T_DIGITS number of LED digits
+ * @tparam T_SUBFIELDS number of subfields for each digit to get brightness
+ *    control using PWM. The default is 1, but can be set to greater than 1 to
+ *    get brightness control.
+ * @tparam T_CI class that provides access to Arduino clock functions (millis()
+ *    and micros()). The default is ClockInterface.
  */
 template <
     typename T_SPII,
@@ -47,21 +55,38 @@ class DualHc595Module : public ScanningModule<
     T_SUBFIELDS,
     T_CI
 > {
+  private:
+    using Super = ScanningModule<
+        LedMatrixDualShiftRegister<T_SPII>,
+        T_DIGITS,
+        T_SUBFIELDS,
+        T_CI
+    >;
+
   public:
     DualHc595Module(
         const T_SPII& spiInterface,
-        uint8_t elementOnPattern,
-        uint8_t groupOnPattern,
+        uint8_t segmentOnPattern,
+        uint8_t digitOnPattern,
         uint8_t framesPerSecond
     ) :
-        ScanningModule<
-            LedMatrixDualShiftRegister<T_SPII>,
-            T_DIGITS,
-            T_SUBFIELDS,
-            T_CI
-        >(mLedMatrix, framesPerSecond),
-        mLedMatrix(spiInterface, elementOnPattern, groupOnPattern)
+        Super(mLedMatrix, framesPerSecond),
+        mLedMatrix(
+            spiInterface,
+            segmentOnPattern /*elementOnPattern*/,
+            digitOnPattern /*groupOnPattern*/
+        )
     {}
+
+    void begin() {
+      mLedMatrix.begin();
+      Super::begin();
+    }
+
+    void end() {
+      mLedMatrix.end();
+      Super::end();
+    }
 
   private:
     LedMatrixDualShiftRegister<T_SPII> mLedMatrix;

@@ -35,6 +35,16 @@ namespace ace_segment {
  * single 74HC595 Shift Register chip on the segment pins. This is a convenience
  * class that pairs together a ScanningModule and a LedMatrixSingleShiftRegister
  * in a single class.
+ *
+ * @tparam T_SPII interface to SPI, either SwSpiInterface or HwSpiInterface
+ * @tparam T_DIGITS number of LED digits
+ * @tparam T_SUBFIELDS number of subfields for each digit to get brightness
+ *    control using PWM. The default is 1, but can be set to greater than 1 to
+ *    get brightness control.
+ * @tparam T_CI class that provides access to Arduino clock functions (millis()
+ *    and micros()). The default is ClockInterface.
+ * @tparam T_GPIOI (optional) interface to GPIO functions,
+ *    default GpioInterface (note: 'GPI' is already taken on ESP8266)
  */
 template <
     typename T_SPII,
@@ -49,28 +59,41 @@ class SingleHc595Module : public ScanningModule<
     T_SUBFIELDS,
     T_CI
 > {
+  private:
+    using Super = ScanningModule<
+        LedMatrixSingleShiftRegister<T_SPII, T_GPIOI>,
+        T_DIGITS,
+        T_SUBFIELDS,
+        T_CI
+    >;
+
   public:
     SingleHc595Module(
         const T_SPII& spiInterface,
-        uint8_t elementOnPattern,
-        uint8_t groupOnPattern,
+        uint8_t segmentOnPattern,
+        uint8_t digitOnPattern,
         uint8_t framesPerSecond,
-        const uint8_t* groupPins
+        const uint8_t* digitPins
     ) :
-        ScanningModule<
-            LedMatrixSingleShiftRegister<T_SPII>,
-            T_DIGITS,
-            T_SUBFIELDS,
-            T_CI
-        >(mLedMatrix, framesPerSecond),
+        Super(mLedMatrix, framesPerSecond),
         mLedMatrix(
             spiInterface,
-            elementOnPattern,
-            groupOnPattern,
-            T_DIGITS,
-            groupPins
+            segmentOnPattern /*elementOnPattern*/,
+            digitOnPattern /*groupOnPattern*/,
+            T_DIGITS /*numGroups*/,
+            digitPins /*groupPins*/
         )
     {}
+
+    void begin() {
+      mLedMatrix.begin();
+      Super::begin();
+    }
+
+    void end() {
+      mLedMatrix.end();
+      Super::end();
+    }
 
   private:
     LedMatrixSingleShiftRegister<T_SPII, T_GPIOI> mLedMatrix;
