@@ -77,9 +77,11 @@ const uint8_t NUM_SEGMENTS = 8;
 // Configurations for AceSegment
 //------------------------------------------------------------------
 
-// Total field/second
+// Total fields/second
 //      = FRAMES_PER_SECOND * NUM_SUBFIELDS * NUM_DIGITS
-//      = 60 * 16 * 4 = 3840 fields/sec = 260 micros/field
+//      = 60 * 16 * 4
+//      = 3840 fields/sec
+//      => 260 micros/field
 //
 // According to AutoBenchmark, almost all versions of ScanningModule with
 // various LedMatrix can render a single field in less than this on 16 MHz AVR

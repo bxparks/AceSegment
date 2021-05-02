@@ -1,11 +1,12 @@
 /*
- * A demo of a single, 4-digit, bare LED module with digit and segment pins
- * connected directly to the microcontroller.
+ * A demo of a 4-digit LED module with the segment pins connected to a 74HC595
+ * shift register and the digit pins also connected to a 74HC595 shift regstier.
+ * Uses the DualHc595Module class.
  */
 
 #include <Arduino.h>
 #include <AceCommon.h> // incrementMod()
-#include <AceSegment.h> // BareModule, LedDisplay
+#include <AceSegment.h> // DualHc595Module, LedDisplay
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 #include <digitalWriteFast.h>
@@ -18,7 +19,8 @@ using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
 using ace_segment::LedMatrixBase;
-using ace_segment::BareModule;
+using ace_segment::SwSpiFastInterface;
+using ace_segment::DualHc595Module;
 using ace_segment::LedDisplay;
 
 //----------------------------------------------------------------------------
@@ -33,43 +35,51 @@ using ace_segment::LedDisplay;
 #define LED_DISPLAY_TYPE_BARE 5
 
 #if defined(EPOXY_DUINO)
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_BARE
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
 
-#elif defined(AUNITER_LED_CLOCK_BARE)
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_BARE
+#elif defined(AUNITER_LED_CLOCK_HC595_DUAL)
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
 
 #else
   #error Unknown environment
 #endif
 
+//------------------------------------------------------------------
+// AceSegment Configuration
+//------------------------------------------------------------------
+
 // LED segment patterns.
 const uint8_t NUM_DIGITS = 4;
 const uint8_t NUM_SEGMENTS = 8;
-// Pin numbers
-const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
-const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
+const uint8_t LATCH_PIN = 10;
+const uint8_t DATA_PIN = MOSI;
+const uint8_t CLOCK_PIN = SCK;
 
 // Total fields/second
 //    = FRAMES_PER_SECOND * NUM_SUBFIELDS * NUM_DIGITS
 //    = 60 * 16 * 4
 //    = 3840 fields/sec
 //    => 260 micros/field
+//
+// Fortunately, according to AutoBenchmark, the "fast" versions of LedMatrix can
+// render a single field in about 20-30 micros.
 const uint8_t FRAMES_PER_SECOND = 60;
 const uint8_t NUM_SUBFIELDS = 16;
 const uint8_t NUM_BRIGHTNESSES = 8;
 const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   1, 2, 4, 8,
-  15, 7, 3, 2
+  15, 9, 5, 2
 };
 
-// Common Anode, with transitors on Group pins
-BareModule<NUM_DIGITS, NUM_SUBFIELDS> ledModule(
+// Common Cathode, with transistors on Group pins
+using SpiInterface = SwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+SpiInterface spiInterface;
+DualHc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
+    spiInterface,
     LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
     LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
-    FRAMES_PER_SECOND,
-    SEGMENT_PINS,
-    DIGIT_PINS);
-
+    FRAMES_PER_SECOND
+);
 LedDisplay display(ledModule);
 
 // LedDisplay patterns
@@ -81,6 +91,7 @@ const uint8_t PATTERNS[NUM_DIGITS] = {
 };
 
 void setupAceSegment() {
+  spiInterface.begin();
   ledModule.begin();
 }
 

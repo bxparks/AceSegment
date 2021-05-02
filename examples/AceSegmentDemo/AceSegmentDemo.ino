@@ -128,9 +128,11 @@ using namespace ace_button;
 // Use polling or interrupt.
 #define USE_INTERRUPT 0
 
-// Total field/second
+// Total fields/second
 //      = FRAMES_PER_SECOND * NUM_SUBFIELDS * NUM_DIGITS
-//      = 60 * 1 * 4 = 240 fields/sec = 4167 micros/field
+//      = 60 * 1 * 4
+//      = 240 fields/sec
+//      => 4167 micros/field
 //
 // According to AutoBenchmark, *all* versions of ScanningModule with all
 // configurations of LedMatrix can render a single field less than 304

@@ -1,5 +1,6 @@
 /*
  * A simple demo of a single, 8-digit LED module using a MAX7219 chip.
+ * Display the digits 0 to 7 on the module.
  */
 
 #include <Arduino.h>
