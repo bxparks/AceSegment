@@ -13,15 +13,20 @@ LED driver chip.
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
 **Status**: This is a **work in progress**. It is not ready for public
-consumption. Need to add documentation for `Tm1637Module`. Need to add
-documentation for `Max7219Module`.
+consumption. Need to add documentation for:
+* `Tm1637Module`
+* `Max7219Module`
+* `SingleHc595Module`
+* `DualHc595Module`
+* `BareModule`
+* `BareFast4Module`
 
 ## Table of Contents
 
 * [Summary](#Summary)
 * [Installation](#Installation)
     * [Source Code](#SourceCode)
-    * [Documentation](#Documentation)
+* [Documentation](#Documentation)
     * [Examples](#Examples)
 * [LED Wiring](#LEDWiring)
 * [Usage](#Usage)
@@ -140,7 +145,7 @@ The source files are organized as follows:
 * `docs/` - contains the doxygen docs and additional manual docs
 
 <a name="Documentation"></a>
-### Documentation
+## Documentation
 
 * this `README.md` file
 * [Doxygen docs published on GitHub Pages](https://bxparks.github.io/AceSegment/html).
@@ -278,6 +283,7 @@ depend on the lower-level classes:
 The dependency diagram among these classes looks something like this:
 
 ```
+   StringScroller
    StringWriter    ClockWriter  TemperatureWriter
         |              \           /
         V               v         v
@@ -303,9 +309,15 @@ ScanningModule  Tm1637Module  Max7219Module
 
 
                     ScanningModule
-                    /     |     \
-            .------.      |      .-----------.
-           v              v                   v
+                         ^
+                         |
+               +---------+------------+
+               |         |            |
+        BareModule SingleHc595Module DualHc595Module
+   BareFast4Module      |                 \
+           /            |                  \
+          /             |                   \
+         v              v                    v
   LedMatrixDirect   LedMatrixSingleSftRgstr  LedMatrixDualShiftRegister
 LedMatrixDirectFast4              \             /
                                    \           /
