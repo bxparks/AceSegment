@@ -1,16 +1,25 @@
 /*
  * A demo of a single, 4-digit, bare LED module with digit and segment pins
- * connected directly to the microcontroller.
+ * connected directly to the microcontroller. Use the BareFast4Module
+ * convenience class which combines a ScanningModule with an
+ * LedMatrixDirectFast4 class.
  */
 
 #include <Arduino.h>
 #include <AceCommon.h> // incrementMod()
-#include <AceSegment.h> // BareModule, LedDisplay
+#include <AceSegment.h> // LedDisplay
+
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+#include <digitalWriteFast.h>
+#include <ace_segment/hw/SwSpiFastInterface.h>
+#include <ace_segment/hw/SwWireFastInterface.h>
+#include <ace_segment/bare/BareFast4Module.h>
+#endif
 
 using ace_common::incrementMod;
 using ace_common::TimingStats;
 using ace_segment::LedMatrixBase;
-using ace_segment::BareModule;
+using ace_segment::BareFast4Module;
 using ace_segment::LedDisplay;
 
 //----------------------------------------------------------------------------
@@ -37,9 +46,6 @@ using ace_segment::LedDisplay;
 // LED segment patterns.
 const uint8_t NUM_DIGITS = 4;
 const uint8_t NUM_SEGMENTS = 8;
-// Pin numbers
-const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
-const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
 
 // Total fields/second
 //    = FRAMES_PER_SECOND * NUM_SUBFIELDS * NUM_DIGITS
@@ -55,12 +61,15 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 };
 
 // Common Anode, with transitors on Group pins
-BareModule<NUM_DIGITS, NUM_SUBFIELDS> ledModule(
+BareFast4Module<
+    8, 9, 10, 16, 14, 18, 19, 15, // segment pins
+    4, 5, 6, 7, // digit pins
+    NUM_DIGITS,
+    NUM_SUBFIELDS
+> ledModule(
     LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
     LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
-    FRAMES_PER_SECOND,
-    SEGMENT_PINS,
-    DIGIT_PINS);
+    FRAMES_PER_SECOND);
 
 LedDisplay display(ledModule);
 

@@ -8,6 +8,7 @@
 #include <ace_segment/hw/SwSpiFastInterface.h>
 #include <ace_segment/hw/SwWireFastInterface.h>
 #include <ace_segment/scanning/LedMatrixDirectFast4.h>
+#include <ace_segment/bare/BareFast4Module.h>
 #endif
 
 using ace_common::incrementMod;
