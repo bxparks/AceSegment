@@ -22,20 +22,23 @@
 #define FEATURE_SINGLE_SW_SPI 3
 #define FEATURE_SINGLE_SW_SPI_FAST 4
 #define FEATURE_SINGLE_HW_SPI 5
-#define FEATURE_DUAL_SW_SPI 6
-#define FEATURE_DUAL_SW_SPI_FAST 7
-#define FEATURE_DUAL_HW_SPI 8
-#define FEATURE_TM1637_WIRE 9
-#define FEATURE_TM1637_WIRE_FAST 10
-#define FEATURE_MAX7219_SW_SPI 11
-#define FEATURE_MAX7219_SW_SPI_FAST 12
-#define FEATURE_MAX7219_HW_SPI 13
-#define FEATURE_STUB_MODULE 14
-#define FEATURE_NUMBER_WRITER 15
-#define FEATURE_CLOCK_WRITER 16
-#define FEATURE_TEMPERATURE_WRITER 17
-#define FEATURE_CHAR_WRITER 18
-#define FEATURE_STRING_WRITER 19
+#define FEATURE_SINGLE_HW_SPI_FAST 6
+#define FEATURE_DUAL_SW_SPI 7
+#define FEATURE_DUAL_SW_SPI_FAST 8
+#define FEATURE_DUAL_HW_SPI 9
+#define FEATURE_DUAL_HW_SPI_FAST 10
+#define FEATURE_TM1637_WIRE 11
+#define FEATURE_TM1637_WIRE_FAST 12
+#define FEATURE_MAX7219_SW_SPI 13
+#define FEATURE_MAX7219_SW_SPI_FAST 14
+#define FEATURE_MAX7219_HW_SPI 15
+#define FEATURE_MAX7219_HW_SPI_FAST 16
+#define FEATURE_STUB_MODULE 17
+#define FEATURE_NUMBER_WRITER 18
+#define FEATURE_CLOCK_WRITER 19
+#define FEATURE_TEMPERATURE_WRITER 20
+#define FEATURE_CHAR_WRITER 21
+#define FEATURE_STRING_WRITER 22
 
 // A volatile integer to prevent the compiler from optimizing away the entire
 // program.
@@ -46,6 +49,7 @@ volatile int disableCompilerOptimization = 0;
   #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
     #include <digitalWriteFast.h>
     #include <ace_segment/hw/SwSpiFastInterface.h>
+    #include <ace_segment/hw/HwSpiFastInterface.h>
     #include <ace_segment/hw/SwWireFastInterface.h>
     #include <ace_segment/scanning/LedMatrixDirectFast4.h>
   #endif
@@ -163,6 +167,24 @@ volatile int disableCompilerOptimization = 0;
     ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
         scanningModule(ledMatrix, FRAMES_PER_SECOND);
 
+  #elif FEATURE == FEATURE_SINGLE_HW_SPI_FAST
+    #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
+      #error Unsupported FEATURE on this platform
+    #endif
+
+    // Common Cathode, with transistors on Group pins
+    using SpiInterface = HwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    SpiInterface spiInterface;
+    using LedMatrix = LedMatrixSingleShiftRegister<SpiInterface>;
+    LedMatrix ledMatrix(
+        spiInterface,
+        LedMatrix::kActiveHighPattern /*elementOnPattern*/,
+        LedMatrix::kActiveHighPattern /*groupOnPattern*/,
+        NUM_DIGITS,
+        DIGIT_PINS);
+    ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+        scanningModule(ledMatrix, FRAMES_PER_SECOND);
+
   #elif FEATURE == FEATURE_DUAL_SW_SPI
     // Common Cathode, with transistors on Group pins
     SwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
@@ -194,6 +216,22 @@ volatile int disableCompilerOptimization = 0;
     // Common Cathode, with transistors on Group pins
     HwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
     using LedMatrix = LedMatrixDualShiftRegister<HwSpiInterface>;
+    LedMatrix ledMatrix(
+        spiInterface,
+        LedMatrix::kActiveLowPattern /*elementOnPattern*/,
+        LedMatrix::kActiveLowPattern /*groupOnPattern*/);
+    ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+        scanningModule(ledMatrix, FRAMES_PER_SECOND);
+
+  #elif FEATURE == FEATURE_DUAL_HW_SPI_FAST
+    #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
+      #error Unsupported FEATURE on this platform
+    #endif
+
+    // Common Cathode, with transistors on Group pins
+    using SpiInterface = HwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    SpiInterface spiInterface;
+    using LedMatrix = LedMatrixDualShiftRegister<SpiInterface>;
     LedMatrix ledMatrix(
         spiInterface,
         LedMatrix::kActiveLowPattern /*elementOnPattern*/,
@@ -237,6 +275,16 @@ volatile int disableCompilerOptimization = 0;
     Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
         spiInterface, kEightDigitRemapArray);
 
+  #elif FEATURE == FEATURE_MAX7219_HW_SPI_FAST
+    #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
+      #error Unsupported FEATURE on this platform
+    #endif
+
+    using SpiInterface = HwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    SpiInterface spiInterface;
+    Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
+        spiInterface, kEightDigitRemapArray);
+
   #elif FEATURE == FEATURE_STUB_MODULE
     StubModule stubModule;
     LedDisplay ledDisplay(stubModule);
@@ -264,8 +312,7 @@ volatile int disableCompilerOptimization = 0;
   #elif FEATURE == FEATURE_STRING_WRITER
     StubModule stubModule;
     LedDisplay ledDisplay(stubModule);
-    CharWriter charWriter(ledDisplay);
-    StringWriter stringWriter(charWriter);
+    StringWriter stringWriter(ledDisplay);
 
   #endif
 #endif
@@ -304,6 +351,11 @@ void setup() {
   ledMatrix.begin();
   scanningModule.begin();
 
+#elif FEATURE == FEATURE_SINGLE_HW_SPI_FAST
+  spiInterface.begin();
+  ledMatrix.begin();
+  scanningModule.begin();
+
 #elif FEATURE == FEATURE_DUAL_SW_SPI
   spiInterface.begin();
   ledMatrix.begin();
@@ -315,6 +367,11 @@ void setup() {
   scanningModule.begin();
 
 #elif FEATURE == FEATURE_DUAL_HW_SPI
+  spiInterface.begin();
+  ledMatrix.begin();
+  scanningModule.begin();
+
+#elif FEATURE == FEATURE_DUAL_HW_SPI_FAST
   spiInterface.begin();
   ledMatrix.begin();
   scanningModule.begin();
@@ -336,6 +393,10 @@ void setup() {
   max7219Module.begin();
 
 #elif FEATURE == FEATURE_MAX7219_HW_SPI
+  spiInterface.begin();
+  max7219Module.begin();
+
+#elif FEATURE == FEATURE_MAX7219_HW_SPI_FAST
   spiInterface.begin();
   max7219Module.begin();
 

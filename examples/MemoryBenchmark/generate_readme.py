@@ -154,7 +154,9 @@ before substantional refactoring in 2021.
 * Extracting `LedModule` from `LedDisplay` saves 10-40 bytes on AVR for
   `ScanningModule` and `Tm1637Module`, but add about that many bytes for various
   Writer classes (probably because they have to go though one additional layer
-  of indirect, through the `LedModule`). So overall, I think it's a wash.
+  of indirection through the `LedModule`). So overall, I think it's a wash.
+* Add `HwSpiFastInterface` which saves 70 bytes for `ScanningModule(Single)`, 90
+  bytes for `ScanningModule(Dual)`, and 250 bytes for `Max7219Module`.
 
 ## Results
 
