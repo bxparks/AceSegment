@@ -1148,28 +1148,36 @@ Here are the CPU numbers for an AVR processor:
 +----------------------------------------+-------------------+---------+
 | Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Scanning(Direct)                       |    72/   76/   88 |     240 |
-| Scanning(Direct,subfields)             |     4/   13/   84 |    3840 |
-| Scanning(DirectFast)                   |    24/   28/   44 |     240 |
-| Scanning(DirectFast,subfields)         |     4/    8/   40 |    3840 |
-| Scanning(Single,SoftSpi)               |   156/  159/  188 |     240 |
-| Scanning(Single,SoftSpi,subfields)     |     4/   22/  180 |    3840 |
-| Scanning(Single,SoftSpiFast)           |    28/   30/   44 |     240 |
-| Scanning(Single,SoftSpiFast,subfields) |     4/    8/   40 |    3840 |
-| Scanning(Single,HardSpi)               |    36/   38/   48 |     240 |
-| Scanning(Single,HardSpi,subfields)     |     4/    9/   48 |    3840 |
-| Scanning(Dual,SoftSpi)                 |   264/  268/  304 |     240 |
-| Scanning(Dual,SoftSpi,subfields)       |     4/   34/  304 |    3840 |
-| Scanning(Dual,SoftSpiFast)             |    20/   24/   36 |     240 |
-| Scanning(Dual,SoftSpiFast,subfields)   |     4/    7/   32 |    3840 |
-| Scanning(Dual,HardSpi)                 |    24/   26/   36 |     240 |
-| Scanning(Dual,HardSpi,subfields)       |     4/    7/   36 |    3840 |
+| Scanning(Direct)                       |    68/   74/   88 |     240 |
+| Scanning(Direct,subfields)             |     4/   12/   88 |    3840 |
+| Scanning(DirectFast)                   |    24/   28/   40 |     240 |
+| Scanning(DirectFast,subfields)         |     4/    8/   36 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(Wire)                           | 22308/22328/22560 |      20 |
-| Tm1637(WireFast)                       | 21060/21071/21192 |      20 |
-| Max7219(SoftSpi)                       |  1328/ 1336/ 1424 |      20 |
-| Max7219(SoftSpiFast)                   |   120/  126/  136 |      20 |
-| Max7219(HardSpi)                       |   120/  130/  140 |      20 |
+| Scanning(Single,SoftSpi)               |   156/  159/  180 |     240 |
+| Scanning(Single,SoftSpi,subfields)     |     4/   22/  180 |    3840 |
+| Scanning(Single,SoftSpiFast)           |    28/   31/   44 |     240 |
+| Scanning(Single,SoftSpiFast,subfields) |     4/    8/   40 |    3840 |
+| Scanning(Single,HardSpi)               |    36/   39/   52 |     240 |
+| Scanning(Single,HardSpi,subfields)     |     4/    9/   48 |    3840 |
+| Scanning(Single,HardSpiFast)           |    24/   27/   40 |     240 |
+| Scanning(Single,HardSpiFast,subfields) |     4/    7/   40 |    3840 |
+|----------------------------------------+-------------------+---------|
+| Scanning(Dual,SoftSpi)                 |   264/  269/  304 |     240 |
+| Scanning(Dual,SoftSpi,subfields)       |     4/   34/  296 |    3840 |
+| Scanning(Dual,SoftSpiFast)             |    20/   24/   32 |     240 |
+| Scanning(Dual,SoftSpiFast,subfields)   |     4/    7/   32 |    3840 |
+| Scanning(Dual,HardSpi)                 |    24/   27/   36 |     240 |
+| Scanning(Dual,HardSpi,subfields)       |     4/    8/   36 |    3840 |
+| Scanning(Dual,HardSpiFast)             |    12/   14/   28 |     240 |
+| Scanning(Dual,HardSpiFast,subfields)   |     4/    6/   24 |    3840 |
+|----------------------------------------+-------------------+---------|
+| Tm1637(SoftWire)                       | 22308/22329/22600 |      20 |
+| Tm1637(SoftWireFast)                   | 21060/21073/21224 |      20 |
+|----------------------------------------+-------------------+---------|
+| Max7219(SoftSpi)                       |  1320/ 1331/ 1456 |      20 |
+| Max7219(SoftSpiFast)                   |   112/  120/  132 |      20 |
+| Max7219(HardSpi)                       |   120/  130/  144 |      20 |
+| Max7219(HardSpiFast)                   |    56/   63/   68 |      20 |
 +----------------------------------------+-------------------+---------+
 ```
 
@@ -1183,20 +1191,23 @@ Here are the CPU numbers for an ESP8266:
 +----------------------------------------+-------------------+---------+
 | Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Scanning(Direct)                       |    12/   12/   29 |     240 |
-| Scanning(Direct,subfields)             |     0/    2/   20 |    3840 |
-| Scanning(Single,SoftSpi)               |    29/   29/   37 |     240 |
-| Scanning(Single,SoftSpi,subfields)     |     0/    4/   37 |    3840 |
-| Scanning(Single,HardSpi)               |    11/   11/   19 |     240 |
-| Scanning(Single,HardSpi,subfields)     |     0/    2/   20 |    3840 |
-| Scanning(Dual,SoftSpi)                 |    50/   50/   58 |     240 |
+| Scanning(Direct)                       |    12/   12/   25 |     240 |
+| Scanning(Direct,subfields)             |     0/    2/   25 |    3840 |
+|----------------------------------------+-------------------+---------|
+| Scanning(Single,SoftSpi)               |    29/   29/   41 |     240 |
+| Scanning(Single,SoftSpi,subfields)     |     0/    4/   45 |    3840 |
+| Scanning(Single,HardSpi)               |    11/   11/   24 |     240 |
+| Scanning(Single,HardSpi,subfields)     |     0/    2/   23 |    3840 |
+|----------------------------------------+-------------------+---------|
+| Scanning(Dual,SoftSpi)                 |    50/   50/   59 |     240 |
 | Scanning(Dual,SoftSpi,subfields)       |     0/    7/   67 |    3840 |
-| Scanning(Dual,HardSpi)                 |    12/   12/   24 |     240 |
+| Scanning(Dual,HardSpi)                 |    12/   12/   20 |     240 |
 | Scanning(Dual,HardSpi,subfields)       |     0/    2/   28 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(Wire)                           | 21493/21497/21533 |      20 |
-| Max7219(SoftSpi)                       |   254/  254/  266 |      20 |
-| Max7219(HardSpi)                       |    60/   61/   77 |      20 |
+| Tm1637(SoftWire)                       | 21496/21501/21532 |      20 |
+|----------------------------------------+-------------------+---------|
+| Max7219(SoftSpi)                       |   254/  255/  271 |      20 |
+| Max7219(HardSpi)                       |    61/   61/   70 |      20 |
 +----------------------------------------+-------------------+---------+
 ```
 
