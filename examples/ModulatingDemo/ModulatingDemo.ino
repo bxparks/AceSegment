@@ -5,70 +5,83 @@
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 #include <digitalWriteFast.h>
 #include <ace_segment/hw/SwSpiFastInterface.h>
-#include <ace_segment/hw/SwWireFastInterface.h>
+#include <ace_segment/hw/HwSpiFastInterface.h>
 #include <ace_segment/scanning/LedMatrixDirectFast4.h>
 #endif
 
 using ace_common::incrementMod;
 using namespace ace_segment;
 
-#define LED_DISPLAY_TYPE_SCANNING 0
-#define LED_DISPLAY_TYPE_HC595_DUAL 3
-#define LED_DISPLAY_TYPE_HC595_SINGLE 4
-#define LED_DISPLAY_TYPE_BARE 5
-
-#define LED_MATRIX_MODE_NONE 0
-#define LED_MATRIX_MODE_DIRECT 1
-#define LED_MATRIX_MODE_DIRECT_FAST 2
-#define LED_MATRIX_MODE_SINGLE_SW_SPI 3
-#define LED_MATRIX_MODE_SINGLE_HW_SPI 4
-#define LED_MATRIX_MODE_SINGLE_SW_SPI_FAST 5
-#define LED_MATRIX_MODE_DUAL_SW_SPI 6
-#define LED_MATRIX_MODE_DUAL_HW_SPI 7
-#define LED_MATRIX_MODE_DUAL_SW_SPI_FAST 8
+#ifndef ENABLE_SERIAL_DEBUG
+#define ENABLE_SERIAL_DEBUG 0
+#endif
 
 //------------------------------------------------------------------
 // Hardware environment configuration.
 //------------------------------------------------------------------
 
-#ifndef ENABLE_SERIAL_DEBUG
-#define ENABLE_SERIAL_DEBUG 0
-#endif
+#define LED_DISPLAY_TYPE_SCANNING 0
+#define LED_DISPLAY_TYPE_BARE 3
+#define LED_DISPLAY_TYPE_HC595_SINGLE 4
+#define LED_DISPLAY_TYPE_HC595_DUAL 5
+
+#define LED_MATRIX_MODE_NONE 0
+#define LED_MATRIX_MODE_DIRECT 1
+#define LED_MATRIX_MODE_DIRECT_FAST 2
+#define LED_MATRIX_MODE_SINGLE_SW_SPI 3
+#define LED_MATRIX_MODE_SINGLE_SW_SPI_FAST 4
+#define LED_MATRIX_MODE_SINGLE_HW_SPI 5
+#define LED_MATRIX_MODE_SINGLE_HW_SPI_FAST 6
+#define LED_MATRIX_MODE_DUAL_SW_SPI 7
+#define LED_MATRIX_MODE_DUAL_SW_SPI_FAST 8
+#define LED_MATRIX_MODE_DUAL_HW_SPI 9
+#define LED_MATRIX_MODE_DUAL_HW_SPI_FAST 10
 
 const uint8_t NUM_DIGITS = 4;
 const uint8_t NUM_SEGMENTS = 8;
 
 #if defined(EPOXY_DUINO)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
-  #define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
+
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT_FAST
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SW_SPI
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SW_SPI_FAST
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HW_SPI
+  #define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HW_SPI_FAST
 
 #elif defined(AUNITER_LED_CLOCK_DIRECT)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
+
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT_FAST
 
 #elif defined(AUNITER_LED_CLOCK_SINGLE)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
+
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_SW_SPI
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_SW_SPI_FAST
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_HW_SPI
-  #define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_SW_SPI_FAST
+  #define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_HW_SPI_FAST
 
 #elif defined(AUNITER_LED_CLOCK_DUAL)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
-  //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SW_SPI
-  //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HW_SPI
-  #define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SW_SPI_FAST
 
-#elif defined(AUNITER_LED_CLOCK_HC595_DUAL)
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SW_SPI
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SW_SPI_FAST
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HW_SPI
+  #define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HW_SPI_FAST
+
+#elif defined(AUNITER_LED_CLOCK_BARE)
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_BARE
   #define LED_MATRIX_MODE LED_MATRIX_MODE_NONE
 
 #elif defined(AUNITER_LED_CLOCK_HC595_SINGLE)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_SINGLE
   #define LED_MATRIX_MODE LED_MATRIX_MODE_NONE
 
-#elif defined(AUNITER_LED_CLOCK_BARE)
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_BARE
+#elif defined(AUNITER_LED_CLOCK_HC595_DUAL)
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
   #define LED_MATRIX_MODE LED_MATRIX_MODE_NONE
 
 #endif
@@ -109,10 +122,9 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
     const uint8_t CLOCK_PIN = SCK; // SH_CP on 74HC595
   #endif
 
-#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_DUAL
-  const uint8_t LATCH_PIN = 10;
-  const uint8_t DATA_PIN = MOSI;
-  const uint8_t CLOCK_PIN = SCK;
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_BARE
+  const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
+  const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_SINGLE
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
@@ -120,9 +132,10 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
 
-#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_BARE
-  const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
-  const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_DUAL
+  const uint8_t LATCH_PIN = 10;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
 
 #endif
 
@@ -132,8 +145,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
     // Common Anode, with transitors on Group pins
     using LedMatrix = LedMatrixDirect<>;
     LedMatrix ledMatrix(
-        LedMatrix::kActiveLowPattern /*elementOnPattern*/,
-        LedMatrix::kActiveLowPattern /*groupOnPattern*/,
+        LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
+        LedMatrixBase::kActiveLowPattern /*groupOnPattern*/,
         NUM_SEGMENTS,
         SEGMENT_PINS,
         NUM_DIGITS,
@@ -145,16 +158,16 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
       4, 5, 6, 7
     >;
     LedMatrix ledMatrix(
-        LedMatrix::kActiveLowPattern /*elementOnPattern*/,
-        LedMatrix::kActiveLowPattern /*groupOnPattern*/);
+        LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
+        LedMatrixBase::kActiveLowPattern /*groupOnPattern*/);
   #elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SW_SPI
     // Common Cathode, with transistors on Group pins
     SwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
     using LedMatrix = LedMatrixSingleShiftRegister<SwSpiInterface>;
     LedMatrix ledMatrix(
         spiInterface,
-        LedMatrix::kActiveHighPattern /*elementOnPattern*/,
-        LedMatrix::kActiveHighPattern /*groupOnPattern*/,
+        LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
+        LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
         NUM_DIGITS,
         DIGIT_PINS):
   #elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SW_SPI_FAST
@@ -164,8 +177,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
     using LedMatrix = LedMatrixSingleShiftRegister<SpiInterface>;
     LedMatrix ledMatrix(
         spiInterface,
-        LedMatrix::kActiveHighPattern /*elementOnPattern*/,
-        LedMatrix::kActiveHighPattern /*groupOnPattern*/,
+        LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
+        LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
         NUM_DIGITS,
         DIGIT_PINS);
   #elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HW_SPI
@@ -174,8 +187,19 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
     using LedMatrix = LedMatrixSingleShiftRegister<HwSpiInterface>;
     LedMatrix ledMatrix(
         spiInterface,
-        LedMatrix::kActiveHighPattern /*elementOnPattern*/,
-        LedMatrix::kActiveHighPattern /*groupOnPattern*/,
+        LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
+        LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
+        NUM_DIGITS,
+        DIGIT_PINS);
+  #elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HW_SPI_FAST
+    // Common Cathode, with transistors on Group pins
+    using SpiInterface = HwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    SpiInterface spiInterface;
+    using LedMatrix = LedMatrixSingleShiftRegister<SpiInterface>;
+    LedMatrix ledMatrix(
+        spiInterface,
+        LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
+        LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
         NUM_DIGITS,
         DIGIT_PINS);
   #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SW_SPI
@@ -184,8 +208,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
     using LedMatrix = LedMatrixDualShiftRegister<SwSpiInterface>;
     LedMatrix ledMatrix(
         spiInterface,
-        LedMatrix::kActiveLowPattern /*elementOnPattern*/,
-        LedMatrix::kActiveLowPattern /*groupOnPattern*/);
+        LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
+        LedMatrixBase::kActiveLowPattern /*groupOnPattern*/);
   #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SW_SPI_FAST
     // Common Anode, with transistors on Group pins
     using SpiInterface = SwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
@@ -193,16 +217,25 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
     using LedMatrix = LedMatrixDualShiftRegister<SpiInterface>;
     LedMatrix ledMatrix(
         spiInterface,
-        LedMatrix::kActiveLowPattern /*elementOnPattern*/,
-        LedMatrix::kActiveLowPattern /*groupOnPattern*/);
+        LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
+        LedMatrixBase::kActiveLowPattern /*groupOnPattern*/);
   #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HW_SPI
     // Common Anode, with transistors on Group pins
     HwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
     using LedMatrix = LedMatrixDualShiftRegister<HwSpiInterface>;
     LedMatrix ledMatrix(
         spiInterface,
-        LedMatrix::kActiveLowPattern /*elementOnPattern*/,
-        LedMatrix::kActiveLowPattern /*groupOnPattern*/);
+        LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
+        LedMatrixBase::kActiveLowPattern /*groupOnPattern*/);
+  #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HW_SPI_FAST
+    // Common Anode, with transistors on Group pins
+    using SpiInterface = HwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    SpiInterface spiInterface;
+    using LedMatrix = LedMatrixDualShiftRegister<SpiInterface>;
+    LedMatrix ledMatrix(
+        spiInterface,
+        LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
+        LedMatrixBase::kActiveLowPattern /*groupOnPattern*/);
 
   #else
     #error Unsupported LED_MATRIX_MODE
@@ -253,9 +286,11 @@ void setupAceSegment() {
   #if LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SW_SPI \
       || LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HW_SPI \
       || LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SW_SPI_FAST \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HW_SPI_FAST \
       || LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SW_SPI \
       || LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HW_SPI \
-      || LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SW_SPI_FAST
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SW_SPI_FAST \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HW_SPI_FAST
     spiInterface.begin();
   #endif
 
