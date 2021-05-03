@@ -5,9 +5,9 @@
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 #include <digitalWriteFast.h>
-#include <ace_segment/hw/SwSpiFastInterface.h>
-#include <ace_segment/hw/HwSpiFastInterface.h>
-#include <ace_segment/hw/SwWireFastInterface.h>
+#include <ace_segment/hw/SoftSpiFastInterface.h>
+#include <ace_segment/hw/HardSpiFastInterface.h>
+#include <ace_segment/hw/SoftWireFastInterface.h>
 #include <ace_segment/scanning/LedMatrixDirectFast4.h>
 #include <ace_segment/bare/BareFast4Module.h>
 #endif
@@ -34,14 +34,14 @@ using namespace ace_button;
 #define LED_MATRIX_MODE_NONE 0
 #define LED_MATRIX_MODE_DIRECT 1
 #define LED_MATRIX_MODE_DIRECT_FAST 2
-#define LED_MATRIX_MODE_SINGLE_SW_SPI 3
-#define LED_MATRIX_MODE_SINGLE_SW_SPI_FAST 4
-#define LED_MATRIX_MODE_SINGLE_HW_SPI 5
-#define LED_MATRIX_MODE_SINGLE_HW_SPI_FAST 6
-#define LED_MATRIX_MODE_DUAL_SW_SPI 7
-#define LED_MATRIX_MODE_DUAL_SW_SPI_FAST 8
-#define LED_MATRIX_MODE_DUAL_HW_SPI 9
-#define LED_MATRIX_MODE_DUAL_HW_SPI_FAST 10
+#define LED_MATRIX_MODE_SINGLE_SOFT_SPI 3
+#define LED_MATRIX_MODE_SINGLE_SOFT_SPI_FAST 4
+#define LED_MATRIX_MODE_SINGLE_HARD_SPI 5
+#define LED_MATRIX_MODE_SINGLE_HARD_SPI_FAST 6
+#define LED_MATRIX_MODE_DUAL_SOFT_SPI 7
+#define LED_MATRIX_MODE_DUAL_SOFT_SPI_FAST 8
+#define LED_MATRIX_MODE_DUAL_HARD_SPI 9
+#define LED_MATRIX_MODE_DUAL_HARD_SPI_FAST 10
 
 // LedClock buttons are now hardwared to A2 and A3, instead of being configured
 // with dip switches to either (2,3) or (8,9). Since (2,3) are used by I2C, and
@@ -55,10 +55,10 @@ using namespace ace_button;
 
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT_FAST
-  //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SW_SPI
-  //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SW_SPI_FAST
-  //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HW_SPI
-  #define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HW_SPI_FAST
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SOFT_SPI
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SOFT_SPI_FAST
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HARD_SPI
+  #define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HARD_SPI_FAST
 
   // For EpoxyDuino, the actual numbers don't matter, so let's set them to (2,3)
   // since I'm not sure if A2 and A3 are defined.
@@ -80,10 +80,10 @@ using namespace ace_button;
   const uint8_t NUM_DIGITS = 4;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
 
-  //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_SW_SPI
-  //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_SW_SPI_FAST
-  //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_HW_SPI
-  #define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_HW_SPI_FAST
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_SOFT_SPI
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_SOFT_SPI_FAST
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_HARD_SPI
+  #define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_HARD_SPI_FAST
 
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
@@ -92,10 +92,10 @@ using namespace ace_button;
   const uint8_t NUM_DIGITS = 4;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
 
-  //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SW_SPI
-  //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SW_SPI_FAST
-  //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HW_SPI
-  #define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HW_SPI_FAST
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SOFT_SPI
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SOFT_SPI_FAST
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HARD_SPI
+  #define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HARD_SPI_FAST
 
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
@@ -223,19 +223,19 @@ const uint8_t NUM_SUBFIELDS = 1;
     LedMatrix ledMatrix(
         LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
         LedMatrixBase::kActiveLowPattern /*groupOnPattern*/);
-  #elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SW_SPI
+  #elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SOFT_SPI
     // Common Cathode, with transistors on Group pins
-    SwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-    using LedMatrix = LedMatrixSingleShiftRegister<SwSpiInterface>;
+    SoftSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    using LedMatrix = LedMatrixSingleShiftRegister<SoftSpiInterface>;
     LedMatrix ledMatrix(
         spiInterface,
         LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
         LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
         NUM_DIGITS,
         DIGIT_PINS):
-  #elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SW_SPI_FAST
+  #elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SOFT_SPI_FAST
     // Common Cathode, with transistors on Group pins
-    using SpiInterface = SwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
     using LedMatrix = LedMatrixSingleShiftRegister<SpiInterface>;
     LedMatrix ledMatrix(
@@ -244,19 +244,19 @@ const uint8_t NUM_SUBFIELDS = 1;
         LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
         NUM_DIGITS,
         DIGIT_PINS);
-  #elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HW_SPI
+  #elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HARD_SPI
     // Common Cathode, with transistors on Group pins
-    HwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-    using LedMatrix = LedMatrixSingleShiftRegister<HwSpiInterface>;
+    HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    using LedMatrix = LedMatrixSingleShiftRegister<HardSpiInterface>;
     LedMatrix ledMatrix(
         spiInterface,
         LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
         LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
         NUM_DIGITS,
         DIGIT_PINS);
-  #elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HW_SPI_FAST
+  #elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HARD_SPI_FAST
     // Common Cathode, with transistors on Group pins
-    using SpiInterface = HwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
     using LedMatrix = LedMatrixSingleShiftRegister<SpiInterface>;
     LedMatrix ledMatrix(
@@ -265,34 +265,34 @@ const uint8_t NUM_SUBFIELDS = 1;
         LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
         NUM_DIGITS,
         DIGIT_PINS);
-  #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SW_SPI
+  #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SOFT_SPI
     // Common Anode, with transistors on Group pins
-    SwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-    using LedMatrix = LedMatrixDualShiftRegister<SwSpiInterface>;
+    SoftSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    using LedMatrix = LedMatrixDualShiftRegister<SoftSpiInterface>;
     LedMatrix ledMatrix(
         spiInterface,
         LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
         LedMatrixBase::kActiveLowPattern /*groupOnPattern*/);
-  #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SW_SPI_FAST
+  #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SOFT_SPI_FAST
     // Common Anode, with transistors on Group pins
-    using SpiInterface = SwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
     using LedMatrix = LedMatrixDualShiftRegister<SpiInterface>;
     LedMatrix ledMatrix(
         spiInterface,
         LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
         LedMatrixBase::kActiveLowPattern /*groupOnPattern*/);
-  #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HW_SPI
+  #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HARD_SPI
     // Common Anode, with transistors on Group pins
-    HwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-    using LedMatrix = LedMatrixDualShiftRegister<HwSpiInterface>;
+    HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    using LedMatrix = LedMatrixDualShiftRegister<HardSpiInterface>;
     LedMatrix ledMatrix(
         spiInterface,
         LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
         LedMatrixBase::kActiveLowPattern /*groupOnPattern*/);
-  #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HW_SPI_FAST
+  #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HARD_SPI_FAST
     // Common Anode, with transistors on Group pins
-    using SpiInterface = HwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
     using LedMatrix = LedMatrixDualShiftRegister<SpiInterface>;
     LedMatrix ledMatrix(
@@ -309,12 +309,12 @@ const uint8_t NUM_SUBFIELDS = 1;
       ledModule(ledMatrix, FRAMES_PER_SECOND);
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_TM1637
-  using WireInterface = SwWireInterface;
+  using WireInterface = SoftWireInterface;
   WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
   Tm1637Module<WireInterface, NUM_DIGITS> ledModule(wireInterface);
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_MAX7219
-  using SpiInterface = SwSpiInterface;
+  using SpiInterface = SoftSpiInterface;
   SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
   Max7219Module<SpiInterface, NUM_DIGITS> ledModule(
       spiInterface, kEightDigitRemapArray);
@@ -330,7 +330,7 @@ const uint8_t NUM_SUBFIELDS = 1;
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_SINGLE
   // Common Cathode, with transistors on Group pins
-  using SpiInterface = SwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
   SingleHc595Module<SpiInterface, NUM_DIGITS> ledModule(
       spiInterface,
@@ -342,7 +342,7 @@ const uint8_t NUM_SUBFIELDS = 1;
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_DUAL
   // Common Anode, with transistors on Group pins
-  using SpiInterface = SwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
   DualHc595Module<SpiInterface, NUM_DIGITS> ledModule(
       spiInterface,
@@ -366,14 +366,14 @@ StringWriter stringWriter(ledDisplay);
 void setupAceSegment() {
 
 #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_SCANNING
-  #if LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SW_SPI \
-      || LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SW_SPI_FAST \
-      || LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HW_SPI \
-      || LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HW_SPI_FAST \
-      || LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SW_SPI \
-      || LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SW_SPI_FAST \
-      || LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HW_SPI \
-      || LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HW_SPI_FAST
+  #if LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SOFT_SPI \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SOFT_SPI_FAST \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HARD_SPI \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HARD_SPI_FAST \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SOFT_SPI \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SOFT_SPI_FAST \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HARD_SPI \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HARD_SPI_FAST
     spiInterface.begin();
   #endif
 

@@ -22,8 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_SW_SPI_FAST_INTERFACE_H
-#define ACE_SEGMENT_SW_SPI_FAST_INTERFACE_H
+#ifndef ACE_SEGMENT_SOFT_SPI_FAST_INTERFACE_H
+#define ACE_SEGMENT_SOFT_SPI_FAST_INTERFACE_H
 
 // This header file requires the digitalWriteFast library on AVR, or the
 // EpoxyMockDigitalWriteFast library on EpoxyDuino.
@@ -43,9 +43,9 @@ namespace ace_segment {
  * @tparam T_CLOCK_PIN the clock pin (CLK)
  */
 template <uint8_t T_LATCH_PIN, uint8_t T_DATA_PIN, uint8_t T_CLOCK_PIN>
-class SwSpiFastInterface {
+class SoftSpiFastInterface {
   public:
-    SwSpiFastInterface() = default;
+    SoftSpiFastInterface() = default;
 
     void begin() const {
       pinModeFast(T_LATCH_PIN, OUTPUT);

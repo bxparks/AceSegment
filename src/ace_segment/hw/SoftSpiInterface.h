@@ -22,8 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_SW_SPI_ADAPTER_H
-#define ACE_SEGMENT_SW_SPI_ADAPTER_H
+#ifndef ACE_SEGMENT_SOFT_SPI_ADAPTER_H
+#define ACE_SEGMENT_SOFT_SPI_ADAPTER_H
 
 #include <stdint.h>
 #include <Arduino.h>
@@ -31,9 +31,9 @@ SOFTWARE.
 namespace ace_segment {
 
 /** Software SPI using shiftOut(). */
-class SwSpiInterface {
+class SoftSpiInterface {
   public:
-    SwSpiInterface(
+    SoftSpiInterface(
         uint8_t latchPin,
         uint8_t dataPin,
         uint8_t clockPin

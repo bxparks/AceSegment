@@ -112,15 +112,15 @@ before substantional refactoring in 2021.
   flash memory.
 * Reduce flash by 300-350 bytes on AVR (~150 on SAMD, 150-500 bytes on STM32,
   ~250 bytes on ESP8266, 300-600 bytes on ESP32) by templatizing LedMatrix
-  and ScanningModule on `NUM_DIGITS`, `NUM_SUBFIELDS`, `SwSpiInterface` and
-  `HwSpiInterface`.
+  and ScanningModule on `NUM_DIGITS`, `NUM_SUBFIELDS`, `SoftSpiInterface` and
+  `HardSpiInterface`.
 * Reduce flash by flattening the `LedMatrix` hierarchy into templatized
   classes, and removing virtual methods. Saves 250-300 bytes on AVR, 150-200 on
   SAMD, 150-300 on STM32, 200-300 on ESP8266, 300-1300 bytes on ESP32, 800-1300
   bytes on Teensy 3.2.
 * Reduce flash by 250-400 bytes on AVR by providing ability to use
   `digitalWriteFast()` (https://github.com/NicksonYap/digitalWriteFast) using
-  the `scanning/LedMatrixDirectFast4.h` and `hw/SwSpiFastInterface.h` classes.
+  the `scanning/LedMatrixDirectFast4.h` and `hw/SoftSpiFastInterface.h` classes.
 * Total flash size saved is around 2kB for AVR, from (4 to 4.4) kB to (2 to 2.5)
   kB.
 * Reduce flash size by 828 bytes on AVR, 3kB on ESP8266, 5kB on ESP32 in commit
@@ -143,9 +143,9 @@ before substantional refactoring in 2021.
   changes are due to some removal/addition of some methods in `LedDisplay`.
 * Add memory usage for `Tm1637Module`. Seems to consume something in between
   similar to the `ScanningModule` w/ SW SPI and `ScanningModule` with HW SPI.
-* Add memory usage for `Tm1637Module` using `SwWireFastInterface` which uses
+* Add memory usage for `Tm1637Module` using `SoftWireFastInterface` which uses
   `digitalWriteFast` library for AVR processors. Saves 662 - 776 bytes of flash
-  on AVR processors compared to `Tm1637Module` using normal `SwWireInterface`.
+  on AVR processors compared to `Tm1637Module` using normal `SoftWireInterface`.
 * Save 150-200 bytes of flash on AVR processors by lifting all of the
   `LedDisplay::writePatternAt()` type of methods to `LedDisplay`, making them
   non-virtual, then funneling these methods through just 2 lower-level virtual
@@ -155,8 +155,8 @@ before substantional refactoring in 2021.
   `ScanningModule` and `Tm1637Module`, but add about that many bytes for various
   Writer classes (probably because they have to go though one additional layer
   of indirection through the `LedModule`). So overall, I think it's a wash.
-* Add `HwSpiFastInterface` which saves 70 bytes for `ScanningModule(Single)`, 90
-  bytes for `ScanningModule(Dual)`, and 250 bytes for `Max7219Module`.
+* Add `HardSpiFastInterface` which saves 70 bytes for `ScanningModule(Single)`,
+  90 bytes for `ScanningModule(Dual)`, and 250 bytes for `Max7219Module`.
 
 ## Results
 
@@ -164,7 +164,7 @@ The following shows the flash and static memory sizes of the `MemoryBenchmark`
 program for various `LedModule` configurations and various Writer classes.
 
 * `ClockInterface`, `GpioInterface` (usually optimized away by the compiler)
-* `SwSpiInterface` or `HwSpiInterface`
+* `SoftSpiInterface` or `HardSpiInterface`
 * `LedMatrixXxx`
 * `ScanningModule`
 * `Tm1637Module`

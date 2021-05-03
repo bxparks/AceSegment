@@ -10,8 +10,8 @@
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 #include <digitalWriteFast.h>
-#include <ace_segment/hw/SwSpiFastInterface.h>
-#include <ace_segment/hw/SwWireFastInterface.h>
+#include <ace_segment/hw/SoftSpiFastInterface.h>
+#include <ace_segment/hw/SoftWireFastInterface.h>
 #include <ace_segment/scanning/LedMatrixDirectFast4.h>
 #endif
 
@@ -19,7 +19,7 @@ using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
 using ace_segment::LedMatrixBase;
-using ace_segment::SwSpiFastInterface;
+using ace_segment::SoftSpiFastInterface;
 using ace_segment::DualHc595Module;
 using ace_segment::LedDisplay;
 
@@ -72,7 +72,7 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 };
 
 // Common Cathode, with transistors on Group pins
-using SpiInterface = SwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
 SpiInterface spiInterface;
 DualHc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
     spiInterface,

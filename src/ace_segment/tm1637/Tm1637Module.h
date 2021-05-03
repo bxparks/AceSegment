@@ -60,8 +60,8 @@ extern const uint8_t kSixDigitRemapArray[6];
  * not use an address byte at the beginning of the protocol. We can use a
  * software-based I2C interface.
  *
- * @tparam T_WI wire protocol interface, either SwWireInterface or
- *    SwWireFastInterface
+ * @tparam T_WI wire protocol interface, either SoftWireInterface or
+ *    SoftWireFastInterface
  * @tparam T_DIGITS number of digits in the LED module (usually 4 or 6)
  */
 template <typename T_WI, uint8_t T_DIGITS>
@@ -70,8 +70,8 @@ class Tm1637Module : public LedModule {
 
     /**
      * Constructor.
-     * @param wireInterface instance of either SwWireInterface or
-     *    SwWireFastInterface
+     * @param wireInterface instance of either SoftWireInterface or
+     *    SoftWireFastInterface
      * @param remapArray (optional) some (most?) six-digit LED modules using the
      *      TM1637 chip need remapping of the digit addresses
      */
@@ -89,7 +89,7 @@ class Tm1637Module : public LedModule {
     //-----------------------------------------------------------------------
 
     /**
-     * Initialize the module. The SwWireInterface object must be initialized
+     * Initialize the module. The SoftWireInterface object must be initialized
      * separately.
      *
      * @param remapArray optional array of positions to handle LED modules whose

@@ -60,6 +60,9 @@ class TemperatureWriter {
       return mNumberWriter.display();
     }
 
+    /**
+     * Write signed integer temperature without deg or unit within the boxSize.
+     */
     uint8_t writeTempAt(uint8_t pos, int16_t temp, int8_t boxSize = 0) {
       return mNumberWriter.writeSignedDecimalAt(pos, temp, boxSize);
     }

@@ -103,7 +103,8 @@ class Max7219Module : public LedModule {
     ) :
         LedModule(T_DIGITS),
         mSpiInterface(spiInterface),
-        mRemapArray(remapArray)
+        mRemapArray(remapArray),
+        mBrightness(1) // set to 1 to avoid using uninitialized value
     {}
 
     //-----------------------------------------------------------------------

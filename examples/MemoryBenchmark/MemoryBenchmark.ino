@@ -19,20 +19,20 @@
 #define FEATURE_BASELINE 0
 #define FEATURE_DIRECT 1
 #define FEATURE_DIRECT_FAST 2
-#define FEATURE_SINGLE_SW_SPI 3
-#define FEATURE_SINGLE_SW_SPI_FAST 4
-#define FEATURE_SINGLE_HW_SPI 5
-#define FEATURE_SINGLE_HW_SPI_FAST 6
-#define FEATURE_DUAL_SW_SPI 7
-#define FEATURE_DUAL_SW_SPI_FAST 8
-#define FEATURE_DUAL_HW_SPI 9
-#define FEATURE_DUAL_HW_SPI_FAST 10
+#define FEATURE_SINGLE_SOFT_SPI 3
+#define FEATURE_SINGLE_SOFT_SPI_FAST 4
+#define FEATURE_SINGLE_HARD_SPI 5
+#define FEATURE_SINGLE_HARD_SPI_FAST 6
+#define FEATURE_DUAL_SOFT_SPI 7
+#define FEATURE_DUAL_SOFT_SPI_FAST 8
+#define FEATURE_DUAL_HARD_SPI 9
+#define FEATURE_DUAL_HARD_SPI_FAST 10
 #define FEATURE_TM1637_WIRE 11
 #define FEATURE_TM1637_WIRE_FAST 12
-#define FEATURE_MAX7219_SW_SPI 13
-#define FEATURE_MAX7219_SW_SPI_FAST 14
-#define FEATURE_MAX7219_HW_SPI 15
-#define FEATURE_MAX7219_HW_SPI_FAST 16
+#define FEATURE_MAX7219_SOFT_SPI 13
+#define FEATURE_MAX7219_SOFT_SPI_FAST 14
+#define FEATURE_MAX7219_HARD_SPI 15
+#define FEATURE_MAX7219_HARD_SPI_FAST 16
 #define FEATURE_STUB_MODULE 17
 #define FEATURE_NUMBER_WRITER 18
 #define FEATURE_CLOCK_WRITER 19
@@ -48,9 +48,9 @@ volatile int disableCompilerOptimization = 0;
   #include <AceSegment.h>
   #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
     #include <digitalWriteFast.h>
-    #include <ace_segment/hw/SwSpiFastInterface.h>
-    #include <ace_segment/hw/HwSpiFastInterface.h>
-    #include <ace_segment/hw/SwWireFastInterface.h>
+    #include <ace_segment/hw/SoftSpiFastInterface.h>
+    #include <ace_segment/hw/HardSpiFastInterface.h>
+    #include <ace_segment/hw/SoftWireFastInterface.h>
     #include <ace_segment/scanning/LedMatrixDirectFast4.h>
   #endif
   using namespace ace_segment;
@@ -123,10 +123,10 @@ volatile int disableCompilerOptimization = 0;
     ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
         scanningModule(ledMatrix, FRAMES_PER_SECOND);
 
-  #elif FEATURE == FEATURE_SINGLE_SW_SPI
+  #elif FEATURE == FEATURE_SINGLE_SOFT_SPI
     // Common Cathode, with transistors on Group pins
-    SwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-    using LedMatrix = LedMatrixSingleShiftRegister<SwSpiInterface>;
+    SoftSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    using LedMatrix = LedMatrixSingleShiftRegister<SoftSpiInterface>;
     LedMatrix ledMatrix(
         spiInterface,
         LedMatrix::kActiveHighPattern /*elementOnPattern*/,
@@ -136,13 +136,13 @@ volatile int disableCompilerOptimization = 0;
     ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
         scanningModule(ledMatrix, FRAMES_PER_SECOND);
 
-  #elif FEATURE == FEATURE_SINGLE_SW_SPI_FAST
+  #elif FEATURE == FEATURE_SINGLE_SOFT_SPI_FAST
     #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
       #error Unsupported FEATURE on this platform
     #endif
 
     // Common Cathode, with transistors on Group pins
-    using SpiInterface = SwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
     using LedMatrix = LedMatrixSingleShiftRegister<SpiInterface>;
     LedMatrix ledMatrix(
@@ -154,10 +154,10 @@ volatile int disableCompilerOptimization = 0;
     ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
         scanningModule(ledMatrix, FRAMES_PER_SECOND);
 
-  #elif FEATURE == FEATURE_SINGLE_HW_SPI
+  #elif FEATURE == FEATURE_SINGLE_HARD_SPI
     // Common Cathode, with transistors on Group pins
-    HwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-    using LedMatrix = LedMatrixSingleShiftRegister<HwSpiInterface>;
+    HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    using LedMatrix = LedMatrixSingleShiftRegister<HardSpiInterface>;
     LedMatrix ledMatrix(
         spiInterface,
         LedMatrix::kActiveHighPattern /*elementOnPattern*/,
@@ -167,13 +167,13 @@ volatile int disableCompilerOptimization = 0;
     ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
         scanningModule(ledMatrix, FRAMES_PER_SECOND);
 
-  #elif FEATURE == FEATURE_SINGLE_HW_SPI_FAST
+  #elif FEATURE == FEATURE_SINGLE_HARD_SPI_FAST
     #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
       #error Unsupported FEATURE on this platform
     #endif
 
     // Common Cathode, with transistors on Group pins
-    using SpiInterface = HwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
     using LedMatrix = LedMatrixSingleShiftRegister<SpiInterface>;
     LedMatrix ledMatrix(
@@ -185,10 +185,10 @@ volatile int disableCompilerOptimization = 0;
     ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
         scanningModule(ledMatrix, FRAMES_PER_SECOND);
 
-  #elif FEATURE == FEATURE_DUAL_SW_SPI
+  #elif FEATURE == FEATURE_DUAL_SOFT_SPI
     // Common Cathode, with transistors on Group pins
-    SwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-    using LedMatrix = LedMatrixDualShiftRegister<SwSpiInterface>;
+    SoftSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    using LedMatrix = LedMatrixDualShiftRegister<SoftSpiInterface>;
     LedMatrix ledMatrix(
         spiInterface,
         LedMatrix::kActiveLowPattern /*elementOnPattern*/,
@@ -196,13 +196,13 @@ volatile int disableCompilerOptimization = 0;
     ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
         scanningModule(ledMatrix, FRAMES_PER_SECOND);
 
-  #elif FEATURE == FEATURE_DUAL_SW_SPI_FAST
+  #elif FEATURE == FEATURE_DUAL_SOFT_SPI_FAST
     #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
       #error Unsupported FEATURE on this platform
     #endif
 
     // Common Cathode, with transistors on Group pins
-    using SpiInterface = SwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
     using LedMatrix = LedMatrixDualShiftRegister<SpiInterface>;
     LedMatrix ledMatrix(
@@ -212,10 +212,10 @@ volatile int disableCompilerOptimization = 0;
     ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
         scanningModule(ledMatrix, FRAMES_PER_SECOND);
 
-  #elif FEATURE == FEATURE_DUAL_HW_SPI
+  #elif FEATURE == FEATURE_DUAL_HARD_SPI
     // Common Cathode, with transistors on Group pins
-    HwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-    using LedMatrix = LedMatrixDualShiftRegister<HwSpiInterface>;
+    HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    using LedMatrix = LedMatrixDualShiftRegister<HardSpiInterface>;
     LedMatrix ledMatrix(
         spiInterface,
         LedMatrix::kActiveLowPattern /*elementOnPattern*/,
@@ -223,13 +223,13 @@ volatile int disableCompilerOptimization = 0;
     ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
         scanningModule(ledMatrix, FRAMES_PER_SECOND);
 
-  #elif FEATURE == FEATURE_DUAL_HW_SPI_FAST
+  #elif FEATURE == FEATURE_DUAL_HARD_SPI_FAST
     #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
       #error Unsupported FEATURE on this platform
     #endif
 
     // Common Cathode, with transistors on Group pins
-    using SpiInterface = HwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
     using LedMatrix = LedMatrixDualShiftRegister<SpiInterface>;
     LedMatrix ledMatrix(
@@ -240,7 +240,7 @@ volatile int disableCompilerOptimization = 0;
         scanningModule(ledMatrix, FRAMES_PER_SECOND);
 
   #elif FEATURE == FEATURE_TM1637_WIRE
-    using WireInterface = SwWireInterface;
+    using WireInterface = SoftWireInterface;
     WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
     Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module(wireInterface);
 
@@ -249,38 +249,38 @@ volatile int disableCompilerOptimization = 0;
       #error Unsupported FEATURE on this platform
     #endif
 
-    using WireInterface = SwWireFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
+    using WireInterface = SoftWireFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
     WireInterface wireInterface;
     Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module(wireInterface);
 
-  #elif FEATURE == FEATURE_MAX7219_SW_SPI
-    using SpiInterface = SwSpiInterface;
+  #elif FEATURE == FEATURE_MAX7219_SOFT_SPI
+    using SpiInterface = SoftSpiInterface;
     SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
     Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
         spiInterface, kEightDigitRemapArray);
 
-  #elif FEATURE == FEATURE_MAX7219_SW_SPI_FAST
+  #elif FEATURE == FEATURE_MAX7219_SOFT_SPI_FAST
     #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
       #error Unsupported FEATURE on this platform
     #endif
 
-    using SpiInterface = SwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
     Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
         spiInterface, kEightDigitRemapArray);
 
-  #elif FEATURE == FEATURE_MAX7219_HW_SPI
-    using SpiInterface = HwSpiInterface;
+  #elif FEATURE == FEATURE_MAX7219_HARD_SPI
+    using SpiInterface = HardSpiInterface;
     SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
     Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
         spiInterface, kEightDigitRemapArray);
 
-  #elif FEATURE == FEATURE_MAX7219_HW_SPI_FAST
+  #elif FEATURE == FEATURE_MAX7219_HARD_SPI_FAST
     #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
       #error Unsupported FEATURE on this platform
     #endif
 
-    using SpiInterface = HwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
     Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
         spiInterface, kEightDigitRemapArray);
@@ -336,42 +336,42 @@ void setup() {
   ledMatrix.begin();
   scanningModule.begin();
 
-#elif FEATURE == FEATURE_SINGLE_SW_SPI
+#elif FEATURE == FEATURE_SINGLE_SOFT_SPI
   spiInterface.begin();
   ledMatrix.begin();
   scanningModule.begin();
 
-#elif FEATURE == FEATURE_SINGLE_SW_SPI_FAST
+#elif FEATURE == FEATURE_SINGLE_SOFT_SPI_FAST
   spiInterface.begin();
   ledMatrix.begin();
   scanningModule.begin();
 
-#elif FEATURE == FEATURE_SINGLE_HW_SPI
+#elif FEATURE == FEATURE_SINGLE_HARD_SPI
   spiInterface.begin();
   ledMatrix.begin();
   scanningModule.begin();
 
-#elif FEATURE == FEATURE_SINGLE_HW_SPI_FAST
+#elif FEATURE == FEATURE_SINGLE_HARD_SPI_FAST
   spiInterface.begin();
   ledMatrix.begin();
   scanningModule.begin();
 
-#elif FEATURE == FEATURE_DUAL_SW_SPI
+#elif FEATURE == FEATURE_DUAL_SOFT_SPI
   spiInterface.begin();
   ledMatrix.begin();
   scanningModule.begin();
 
-#elif FEATURE == FEATURE_DUAL_SW_SPI_FAST
+#elif FEATURE == FEATURE_DUAL_SOFT_SPI_FAST
   spiInterface.begin();
   ledMatrix.begin();
   scanningModule.begin();
 
-#elif FEATURE == FEATURE_DUAL_HW_SPI
+#elif FEATURE == FEATURE_DUAL_HARD_SPI
   spiInterface.begin();
   ledMatrix.begin();
   scanningModule.begin();
 
-#elif FEATURE == FEATURE_DUAL_HW_SPI_FAST
+#elif FEATURE == FEATURE_DUAL_HARD_SPI_FAST
   spiInterface.begin();
   ledMatrix.begin();
   scanningModule.begin();
@@ -384,19 +384,19 @@ void setup() {
   wireInterface.begin();
   tm1637Module.begin();
 
-#elif FEATURE == FEATURE_MAX7219_SW_SPI
+#elif FEATURE == FEATURE_MAX7219_SOFT_SPI
   spiInterface.begin();
   max7219Module.begin();
 
-#elif FEATURE == FEATURE_MAX7219_SW_SPI_FAST
+#elif FEATURE == FEATURE_MAX7219_SOFT_SPI_FAST
   spiInterface.begin();
   max7219Module.begin();
 
-#elif FEATURE == FEATURE_MAX7219_HW_SPI
+#elif FEATURE == FEATURE_MAX7219_HARD_SPI
   spiInterface.begin();
   max7219Module.begin();
 
-#elif FEATURE == FEATURE_MAX7219_HW_SPI_FAST
+#elif FEATURE == FEATURE_MAX7219_HARD_SPI_FAST
   spiInterface.begin();
   max7219Module.begin();
 
@@ -419,15 +419,15 @@ void loop() {
   tm1637Module.setPatternAt(0, 0xff);
   tm1637Module.flush();
 
-#elif FEATURE == FEATURE_MAX7219_SW_SPI
+#elif FEATURE == FEATURE_MAX7219_SOFT_SPI
   max7219Module.setPatternAt(0, 0xff);
   max7219Module.flush();
 
-#elif FEATURE == FEATURE_MAX7219_SW_SPI_FAST
+#elif FEATURE == FEATURE_MAX7219_SOFT_SPI_FAST
   max7219Module.setPatternAt(0, 0xff);
   max7219Module.flush();
 
-#elif FEATURE == FEATURE_MAX7219_HW_SPI
+#elif FEATURE == FEATURE_MAX7219_HARD_SPI
   max7219Module.setPatternAt(0, 0xff);
   max7219Module.flush();
 

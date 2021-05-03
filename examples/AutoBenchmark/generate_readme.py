@@ -30,13 +30,13 @@ configurations of the `LedMatrix` class:
 
 * `direct`: group and segment pins directly connected to MCU
 * `single_sw_spi`: group pins connected directly to MCU, but segment pins
-  connected to 74HC595 accessed through software SPI (`SwSpiInterface`)
+  connected to 74HC595 accessed through software SPI (`SoftSpiInterface`)
 * `single_hw_spi`: group pins connected directly to MCU, but segment pins
-  connected to 74HC595 accessed through hardware SPI (`HwSpiInterface`)
+  connected to 74HC595 accessed through hardware SPI (`HardSpiInterface`)
 * `dual_sw_spi`: group pins and segment pins connected to 74HC595 accessed
-  through software SPI (`SwSpiInterface`)
+  through software SPI (`SoftSpiInterface`)
 * `dual_hw_spi`: group pins and segment pins connected to 74HC595 accessed
-  through hardware SPI (`HwSpiInterface`)
+  through hardware SPI (`HardSpiInterface`)
 
 It measures the time taken by `ScanningModule::renderFieldNow()` which
 renders a single digit (multiple fields make up a frame, a frame is the
@@ -108,6 +108,8 @@ number of `TimingStats::update()` calls that were made.
   characteristics of the LED module.
 * Add benchmarks for `Max7219Module`.
 * Upgrade from ESP32 Core v1.0.4 to v1.0.6.
+* Add benchmarks for `LedMatrixSingleShiftRegister`,
+  `LedMatrixDualShiftRegister`, and `Max7219Module` using `HardSpiFastInteface`.
 
 ## Results
 
@@ -149,8 +151,8 @@ On AVR processors, the "fast" options are available using the
 `digitalWriteFast()` functions can be up to 50X faster if the `pin` number and
 `value` parameters are compile-time constants. In addition, the
 `digitalWriteFast` functions reduce flash memory consumption by 600-700 bytes
-for `SwWireFastInterface` and `SwSpiFastInterface` compared to their non-fast
-equivalents.
+for `SoftWireFastInterface`, `SoftSpiFastInterface`, and `HardSpiFastInterface`
+compared to their non-fast equivalents.
 
 ### Arduino Nano
 

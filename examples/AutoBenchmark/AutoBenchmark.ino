@@ -43,8 +43,9 @@ SOFTWARE.
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 #include <digitalWriteFast.h>
-#include <ace_segment/hw/SwSpiFastInterface.h>
-#include <ace_segment/hw/SwWireFastInterface.h>
+#include <ace_segment/hw/SoftSpiFastInterface.h>
+#include <ace_segment/hw/HardSpiFastInterface.h>
+#include <ace_segment/hw/SoftWireFastInterface.h>
 #include <ace_segment/scanning/LedMatrixDirectFast4.h>
 #endif
 
@@ -251,9 +252,9 @@ void runDirectFast() {
 //-----------------------------------------------------------------------------
 
 // Common Cathode, with transistors on Group pins
-void runSingleShiftRegisterSwSpi() {
-  SwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  using LedMatrix = LedMatrixSingleShiftRegister<SwSpiInterface>;
+void runSingleShiftRegisterSoftSpi() {
+  SoftSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  using LedMatrix = LedMatrixSingleShiftRegister<SoftSpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
       LedMatrix::kActiveHighPattern /*elementOnPattern*/,
@@ -269,9 +270,9 @@ void runSingleShiftRegisterSwSpi() {
   ledMatrix.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("Scanning(Single,SwSpi)",
+  runScanningBenchmark("Scanning(Single,SoftSpi)",
       scanningModule);
-  runScanningBenchmark("Scanning(Single,SwSpi,subfields)",
+  runScanningBenchmark("Scanning(Single,SoftSpi,subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -281,8 +282,8 @@ void runSingleShiftRegisterSwSpi() {
 
 // Common Cathode, with transistors on Group pins
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-void runSingleShiftRegisterSwSpiFast() {
-  using SpiInterface = SwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+void runSingleShiftRegisterSoftSpiFast() {
+  using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
   using LedMatrix = LedMatrixSingleShiftRegister<SpiInterface>;
   LedMatrix ledMatrix(
@@ -300,9 +301,9 @@ void runSingleShiftRegisterSwSpiFast() {
   ledMatrix.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("Scanning(Single,SwSpiFast)",
+  runScanningBenchmark("Scanning(Single,SoftSpiFast)",
       scanningModule);
-  runScanningBenchmark("Scanning(Single,SwSpiFast,subfields)",
+  runScanningBenchmark("Scanning(Single,SoftSpiFast,subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -312,9 +313,9 @@ void runSingleShiftRegisterSwSpiFast() {
 #endif
 
 // Common Cathode, with transistors on Group pins
-void runSingleShiftRegisterHwSpi() {
-  HwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  using LedMatrix = LedMatrixSingleShiftRegister<HwSpiInterface>;
+void runSingleShiftRegisterHardSpi() {
+  HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  using LedMatrix = LedMatrixSingleShiftRegister<HardSpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
       LedMatrix::kActiveHighPattern /*elementOnPattern*/,
@@ -330,9 +331,9 @@ void runSingleShiftRegisterHwSpi() {
   ledMatrix.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("Scanning(Single,HwSpi)",
+  runScanningBenchmark("Scanning(Single,HardSpi)",
       scanningModule);
-  runScanningBenchmark("Scanning(Single,HwSpi,subfields)",
+  runScanningBenchmark("Scanning(Single,HardSpi,subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -340,12 +341,44 @@ void runSingleShiftRegisterHwSpi() {
   spiInterface.end();
 }
 
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+// Common Cathode, with transistors on Group pins
+void runSingleShiftRegisterHardSpiFast() {
+  using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  SpiInterface spiInterface;
+  using LedMatrix = LedMatrixSingleShiftRegister<SpiInterface>;
+  LedMatrix ledMatrix(
+      spiInterface,
+      LedMatrix::kActiveHighPattern /*elementOnPattern*/,
+      LedMatrix::kActiveHighPattern /*groupOnPattern*/,
+      NUM_DIGITS,
+      DIGIT_PINS);
+  ScanningModule<LedMatrix, NUM_DIGITS, 1> scanningModule(
+      ledMatrix, FRAMES_PER_SECOND);
+  ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+      scanningModuleSubfields(ledMatrix, FRAMES_PER_SECOND);
+
+  spiInterface.begin();
+  ledMatrix.begin();
+  scanningModule.begin();
+  scanningModuleSubfields.begin();
+  runScanningBenchmark("Scanning(Single,HardSpiFast)",
+      scanningModule);
+  runScanningBenchmark("Scanning(Single,HardSpiFast,subfields)",
+      scanningModuleSubfields);
+  scanningModuleSubfields.end();
+  scanningModule.end();
+  ledMatrix.end();
+  spiInterface.end();
+}
+#endif
+
 //-----------------------------------------------------------------------------
 
 // Common Anode, with transistors on Group pins
-void runDualShiftRegisterSwSpi() {
-  SwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  using LedMatrix = LedMatrixDualShiftRegister<SwSpiInterface>;
+void runDualShiftRegisterSoftSpi() {
+  SoftSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  using LedMatrix = LedMatrixDualShiftRegister<SoftSpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
       LedMatrix::kActiveLowPattern /*elementOnPattern*/,
@@ -359,8 +392,8 @@ void runDualShiftRegisterSwSpi() {
   ledMatrix.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("Scanning(Dual,SwSpi)", scanningModule);
-  runScanningBenchmark("Scanning(Dual,SwSpi,subfields)",
+  runScanningBenchmark("Scanning(Dual,SoftSpi)", scanningModule);
+  runScanningBenchmark("Scanning(Dual,SoftSpi,subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -370,8 +403,8 @@ void runDualShiftRegisterSwSpi() {
 
 // Common Anode, with transistors on Group pins
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-void runDualShiftRegisterSwSpiFast() {
-  using SpiInterface = SwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+void runDualShiftRegisterSoftSpiFast() {
+  using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
   using LedMatrix = LedMatrixDualShiftRegister<SpiInterface>;
   LedMatrix ledMatrix(
@@ -387,8 +420,8 @@ void runDualShiftRegisterSwSpiFast() {
   ledMatrix.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("Scanning(Dual,SwSpiFast)", scanningModule);
-  runScanningBenchmark("Scanning(Dual,SwSpiFast,subfields)",
+  runScanningBenchmark("Scanning(Dual,SoftSpiFast)", scanningModule);
+  runScanningBenchmark("Scanning(Dual,SoftSpiFast,subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -398,9 +431,9 @@ void runDualShiftRegisterSwSpiFast() {
 #endif
 
 // Common Anode, with transistors on Group pins
-void runDualShiftRegisterHwSpi() {
-  HwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  using LedMatrix = LedMatrixDualShiftRegister<HwSpiInterface>;
+void runDualShiftRegisterHardSpi() {
+  HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  using LedMatrix = LedMatrixDualShiftRegister<HardSpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
       LedMatrix::kActiveLowPattern /*elementOnPattern*/,
@@ -414,14 +447,43 @@ void runDualShiftRegisterHwSpi() {
   ledMatrix.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("Scanning(Dual,HwSpi)", scanningModule);
-  runScanningBenchmark("Scanning(Dual,HwSpi,subfields)",
+  runScanningBenchmark("Scanning(Dual,HardSpi)", scanningModule);
+  runScanningBenchmark("Scanning(Dual,HardSpi,subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
   ledMatrix.end();
   spiInterface.end();
 }
+
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+// Common Anode, with transistors on Group pins
+void runDualShiftRegisterHardSpiFast() {
+  using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  SpiInterface spiInterface;
+  using LedMatrix = LedMatrixDualShiftRegister<SpiInterface>;
+  LedMatrix ledMatrix(
+      spiInterface,
+      LedMatrix::kActiveLowPattern /*elementOnPattern*/,
+      LedMatrix::kActiveLowPattern /*groupOnPattern*/);
+  ScanningModule<LedMatrix, NUM_DIGITS, 1> scanningModule(
+      ledMatrix, FRAMES_PER_SECOND);
+  ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
+      scanningModuleSubfields(ledMatrix, FRAMES_PER_SECOND);
+
+  spiInterface.begin();
+  ledMatrix.begin();
+  scanningModule.begin();
+  scanningModuleSubfields.begin();
+  runScanningBenchmark("Scanning(Dual,HardSpiFast)", scanningModule);
+  runScanningBenchmark("Scanning(Dual,HardSpiFast,subfields)",
+      scanningModuleSubfields);
+  scanningModuleSubfields.end();
+  scanningModule.end();
+  ledMatrix.end();
+  spiInterface.end();
+}
+#endif
 
 //-----------------------------------------------------------------------------
 
@@ -445,27 +507,27 @@ void runTm1637Benchmark(const char* name, LM& ledModule) {
   printStats(name, timingStats, numSamples);
 }
 
-void runTm1637ModuleWire() {
-  using WireInterface = SwWireInterface;
+void runTm1637ModuleSoftWire() {
+  using WireInterface = SoftWireInterface;
   WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
   Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module(wireInterface);
 
   wireInterface.begin();
   tm1637Module.begin();
-  runTm1637Benchmark("Tm1637(Wire)", tm1637Module);
+  runTm1637Benchmark("Tm1637(SoftWire)", tm1637Module);
   tm1637Module.end();
   wireInterface.end();
 }
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-void runTm1637ModuleWireFast() {
-  using WireInterface = SwWireFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
+void runTm1637ModuleSoftWireFast() {
+  using WireInterface = SoftWireFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
   WireInterface wireInterface;
   Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module(wireInterface);
 
   wireInterface.begin();
   tm1637Module.begin();
-  runTm1637Benchmark("Tm1637(WireFast)", tm1637Module);
+  runTm1637Benchmark("Tm1637(SoftWireFast)", tm1637Module);
   tm1637Module.end();
   wireInterface.end();
 }
@@ -493,46 +555,61 @@ void runMax7219Benchmark(const char* name, LM& ledModule) {
   printStats(name, timingStats, numSamples);
 }
 
-void runMax7219SwSpi() {
-  using SpiInterface = SwSpiInterface;
+void runMax7219SoftSpi() {
+  using SpiInterface = SoftSpiInterface;
   SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
   Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
       spiInterface, kEightDigitRemapArray);
 
   spiInterface.begin();
   max7219Module.begin();
-  runMax7219Benchmark("Max7219(SwSpi)", max7219Module);
+  runMax7219Benchmark("Max7219(SoftSpi)", max7219Module);
   max7219Module.end();
   spiInterface.end();
 }
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-void runMax7219SwSpiFast() {
-  using SpiInterface = SwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+void runMax7219SoftSpiFast() {
+  using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
   Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
       spiInterface, kEightDigitRemapArray);
 
   spiInterface.begin();
   max7219Module.begin();
-  runMax7219Benchmark("Max7219(SwSpiFast)", max7219Module);
+  runMax7219Benchmark("Max7219(SoftSpiFast)", max7219Module);
   max7219Module.end();
   spiInterface.end();
 }
 #endif
 
-void runMax7219HwSpi() {
-  using SpiInterface = HwSpiInterface;
+void runMax7219HardSpi() {
+  using SpiInterface = HardSpiInterface;
   SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
   Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
       spiInterface, kEightDigitRemapArray);
 
   spiInterface.begin();
   max7219Module.begin();
-  runMax7219Benchmark("Max7219(HwSpi)", max7219Module);
+  runMax7219Benchmark("Max7219(HardSpi)", max7219Module);
   max7219Module.end();
   spiInterface.end();
 }
+
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+void runMax7219HardSpiFast() {
+  using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  SpiInterface spiInterface;
+  Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
+      spiInterface, kEightDigitRemapArray);
+
+  spiInterface.begin();
+  max7219Module.begin();
+  runMax7219Benchmark("Max7219(HardSpiFast)", max7219Module);
+  max7219Module.end();
+  spiInterface.end();
+}
+#endif
 
 //-----------------------------------------------------------------------------
 
@@ -542,51 +619,68 @@ void runBenchmarks() {
   runDirectFast();
 #endif
 
-  runSingleShiftRegisterSwSpi();
+  runSingleShiftRegisterSoftSpi();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  runSingleShiftRegisterSwSpiFast();
-#endif
-  runSingleShiftRegisterHwSpi();
-
-  runDualShiftRegisterSwSpi();
-#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  runDualShiftRegisterSwSpiFast();
-#endif
-  runDualShiftRegisterHwSpi();
-
-  runTm1637ModuleWire();
-#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  runTm1637ModuleWireFast();
+  runSingleShiftRegisterSoftSpiFast();
 #endif
 
-  runMax7219SwSpi();
+  runSingleShiftRegisterHardSpi();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  runMax7219SwSpiFast();
+  runSingleShiftRegisterHardSpiFast();
 #endif
-  runMax7219HwSpi();
+
+  runDualShiftRegisterSoftSpi();
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+  runDualShiftRegisterSoftSpiFast();
+#endif
+
+  runDualShiftRegisterHardSpi();
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+  runDualShiftRegisterHardSpiFast();
+#endif
+
+  runTm1637ModuleSoftWire();
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+  runTm1637ModuleSoftWireFast();
+#endif
+
+  runMax7219SoftSpi();
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+  runMax7219SoftSpiFast();
+#endif
+
+  runMax7219HardSpi();
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+  runMax7219HardSpiFast();
+#endif
 }
 
 //-----------------------------------------------------------------------------
 
 void printSizeOf() {
-  SERIAL_PORT_MONITOR.print(F("sizeof(SwWireInterface): "));
-  SERIAL_PORT_MONITOR.println(sizeof(SwWireInterface));
+  SERIAL_PORT_MONITOR.print(F("sizeof(SoftWireInterface): "));
+  SERIAL_PORT_MONITOR.println(sizeof(SoftWireInterface));
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  SERIAL_PORT_MONITOR.print(F("sizeof(SwWireFastInterface<4, 5, 100>): "));
-  SERIAL_PORT_MONITOR.println(sizeof(SwWireFastInterface<4, 5, 100>));
+  SERIAL_PORT_MONITOR.print(F("sizeof(SoftWireFastInterface<4, 5, 100>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(SoftWireFastInterface<4, 5, 100>));
 #endif
 
-  SERIAL_PORT_MONITOR.print(F("sizeof(SwSpiInterface): "));
-  SERIAL_PORT_MONITOR.println(sizeof(SwSpiInterface));
+  SERIAL_PORT_MONITOR.print(F("sizeof(SoftSpiInterface): "));
+  SERIAL_PORT_MONITOR.println(sizeof(SoftSpiInterface));
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  SERIAL_PORT_MONITOR.print(F("sizeof(SwSpiFastInterface<11, 12, 13>): "));
-  SERIAL_PORT_MONITOR.println(sizeof(SwSpiFastInterface<11, 12, 13>));
+  SERIAL_PORT_MONITOR.print(F("sizeof(SoftSpiFastInterface<11, 12, 13>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(SoftSpiFastInterface<11, 12, 13>));
 #endif
 
-  SERIAL_PORT_MONITOR.print(F("sizeof(HwSpiInterface): "));
-  SERIAL_PORT_MONITOR.println(sizeof(HwSpiInterface));
+  SERIAL_PORT_MONITOR.print(F("sizeof(HardSpiInterface): "));
+  SERIAL_PORT_MONITOR.println(sizeof(HardSpiInterface));
+
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+  SERIAL_PORT_MONITOR.print(F("sizeof(HardSpiFastInterface<11, 12, 13>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(HardSpiFastInterface<11, 12, 13>));
+#endif
 
   SERIAL_PORT_MONITOR.print(F("sizeof(LedMatrixDirect<>): "));
   SERIAL_PORT_MONITOR.println(sizeof(LedMatrixDirect<>));
@@ -600,14 +694,14 @@ void printSizeOf() {
 #endif
 
   SERIAL_PORT_MONITOR.print(
-      F("sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): "));
+      F("sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>): "));
   SERIAL_PORT_MONITOR.println(
-      sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>));
+      sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>));
 
   SERIAL_PORT_MONITOR.print(
-      F("sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): "));
+      F("sizeof(LedMatrixDualShiftRegister<HardSpiInterface>): "));
   SERIAL_PORT_MONITOR.println(
-      sizeof(LedMatrixDualShiftRegister<HwSpiInterface>));
+      sizeof(LedMatrixDualShiftRegister<HardSpiInterface>));
 
   SERIAL_PORT_MONITOR.print(F("sizeof(LedModule): "));
   SERIAL_PORT_MONITOR.println(sizeof(LedDisplay));
@@ -615,11 +709,11 @@ void printSizeOf() {
   SERIAL_PORT_MONITOR.print( F("sizeof(ScanningModule<LedMatrixBase, 4>): "));
   SERIAL_PORT_MONITOR.println( sizeof(ScanningModule<LedMatrixBase, 4>));
 
-  SERIAL_PORT_MONITOR.print(F("sizeof(Tm1637Module<SwWireInterface, 4>): "));
-  SERIAL_PORT_MONITOR.println(sizeof(Tm1637Module<SwWireInterface, 4>));
+  SERIAL_PORT_MONITOR.print(F("sizeof(Tm1637Module<SoftWireInterface, 4>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(Tm1637Module<SoftWireInterface, 4>));
 
-  SERIAL_PORT_MONITOR.print(F("sizeof(Max7219Module<SwSpiInterface, 8>): "));
-  SERIAL_PORT_MONITOR.println(sizeof(Max7219Module<SwSpiInterface, 8>));
+  SERIAL_PORT_MONITOR.print(F("sizeof(Max7219Module<SoftSpiInterface, 8>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(Max7219Module<SoftSpiInterface, 8>));
 
   SERIAL_PORT_MONITOR.print(F("sizeof(LedDisplay): "));
   SERIAL_PORT_MONITOR.println(sizeof(LedDisplay));
@@ -638,6 +732,9 @@ void printSizeOf() {
 
   SERIAL_PORT_MONITOR.print(F("sizeof(StringWriter): "));
   SERIAL_PORT_MONITOR.println(sizeof(StringWriter));
+
+  SERIAL_PORT_MONITOR.print(F("sizeof(StringScroller): "));
+  SERIAL_PORT_MONITOR.println(sizeof(StringScroller));
 }
 
 //-----------------------------------------------------------------------------

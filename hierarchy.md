@@ -67,10 +67,10 @@ Interface). Most microcontrollers support either hardware SPI or software SPI.
 You can choose to use either modes, and the library provides 2 classes that
 allows this configuration:
 
-* `SwSpiInterface`
+* `SoftSpiInterface`
     * Uses `digitalWrite()` function to manually write the correct signal at the
       correct time. (Also called "big-banging").
-* `HwSpiInterface`
+* `HardSpiInterface`
     * Uses the `SPI.h` library that is provided on most microcontrollers
       using the Arduino platform.
 
@@ -78,10 +78,10 @@ Since the 74HC595 shift registers can be communicated using 2 different methods,
 there are 5 combinations possible:
 
 * LedMatrixDirect
-* LedMatrixSingleShiftRegister + SwSpiInterface
-* LedMatrixSingleShiftRegister + HwSpiInterface
-* LedMatrixDualShiftRegister + SwSpiInterface
-* LedMatrixDualShiftRegister + HwSpiInterface
+* LedMatrixSingleShiftRegister + SoftSpiInterface
+* LedMatrixSingleShiftRegister + HardSpiInterface
+* LedMatrixDualShiftRegister + SoftSpiInterface
+* LedMatrixDualShiftRegister + HardSpiInterface
 
 ## ScanningDisplay
 

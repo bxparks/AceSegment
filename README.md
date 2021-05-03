@@ -219,11 +219,11 @@ depend on the lower-level classes:
 * SpiInterface
     * Thin-wrapper classes to indicate whether we are using software or hardware
       SPI. There are 3 implementations:
-    * `SwSpiInterface`
+    * `SoftSpiInterface`
         * Software SPI using `shiftOut()`
-    * `HwSpiInterface`
+    * `HardSpiInterface`
         * Native hardware SPI.
-    * `SwSpiFastInterface`
+    * `SoftSpiFastInterface`
         * Software SPI using `digitalWriteFast()` on AVR processors
 * `LedMatrix`: Various subclasses capture the wiring of the matrix of LEDs.
     * `LedMatrixDirect`
@@ -303,9 +303,10 @@ The dependency diagram among these classes looks something like this:
 ScanningModule  Tm1637Module  Max7219Module
                    |                 \
                    v                  v
-             SwWireInterface      SwSpiInterface
-             SwWireFastInterface  SwSpiFastInterface
-                                  HwSpiInterface
+             SoftWireInterface     SoftSpiInterface
+             SoftWireFastInterface SoftSpiFastInterface
+                                   HardSpiInterface
+                                   HardSpiFastInterface
 
 
                     ScanningModule
@@ -322,9 +323,10 @@ ScanningModule  Tm1637Module  Max7219Module
 LedMatrixDirectFast4              \             /
                                    \           /
                                     v         v
-                                   SwSpiInterface
-                                   SwSpiFastInterface
-                                   HwSpiInterface
+                                   SoftSpiInterface
+                                   SoftSpiFastInterface
+                                   HardSpiInterface
+                                   HardSpiFastInterface
 ```
 
 <a name="SettingUpScanningModule"></a>
@@ -573,8 +575,8 @@ const uint8_t CLOCK_PIN = 13; // SH_CP on 74HC595
 const uint16_t FRAMES_PER_SECOND = 60;
 
 // Common Cathode, with transistors on Group pins
-SwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-using LedMatrix = LedMatrixSingleShiftRegister<SwSpiInterface>;
+SoftSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+using LedMatrix = LedMatrixSingleShiftRegister<SoftSpiInterface>;
 LedMatrix ledMatrix(
     spiInterface,
     LedMatrix::kActiveHighPattern /*elementOnPattern*/,
@@ -594,7 +596,7 @@ void setupScanningModule() {
 ```
 
 The `LedMatrixSingleShiftRegister` configuration using hardware SPI is *exactly*
-the same as above but with `HwSpiInterface` replacing `SwSpiInterface`.
+the same as above but with `HardSpiInterface` replacing `SoftSpiInterface`.
 
 <a name="LedMatrixDualShiftRegister"></a>
 #### Digits and Segments on Two Shift Registers
@@ -629,7 +631,7 @@ MCU                 74HC595             LED display (Common Cathode)
 ```
 
 The `LedMatrixDualShiftRegister` configuration is the following. Let's use
-`HwSpiInterface` this time:
+`HardSpiInterface` this time:
 
 ```C++
 const uint8_t NUM_DIGITS = 4;
@@ -638,8 +640,8 @@ const uint8_t DATA_PIN = 11; // DS on 74HC595
 const uint8_t CLOCK_PIN = 13; // SH_CP on 74HC595
 const uint16_t FRAMES_PER_SECOND = 60;
 
-HwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-using LedMatrix = LedMatrixSingleShiftRegister<HwSpiInterface>;
+HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+using LedMatrix = LedMatrixSingleShiftRegister<HardSpiInterface>;
 LedMatrix ledMatrix(
     spiInterface,
     LedMatrix::kActiveHighPattern /*elementOnPattern*/,
@@ -723,8 +725,8 @@ const uint8_t CLOCK_PIN = 13; // SH_CP on 74HC595
 const uint16_t FRAMES_PER_SECOND = 60;
 const uint8_t NUM_SUBFIELDS = 16;
 
-HwSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-using LedMatrix = LedMatrixSingleShiftRegister<HwSpiInterface>;
+HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+using LedMatrix = LedMatrixSingleShiftRegister<HardSpiInterface>;
 LedMatrix ledMatrix(
     spiInterface,
     LedMatrix::kActiveHighPattern /*elementOnPattern*/,
@@ -979,10 +981,10 @@ I have written versions of some lower-level classes to take advantage of
 
 * `scanning/LedMatrixDirectFast4.h`
     * Variant of `LedMatrixDirect` using `digitalWriteFast()`
-* `hw/SwSpiFastInterface.h`
-    * Variant of `SwSpiInterface.h` using  `digitalWriteFast()`
-* `hw/SwWireFastInterface.h`
-    * Variant of `SwWireInterface.h` using `digitalWriteFast()`
+* `hw/SoftSpiFastInterface.h`
+    * Variant of `SoftSpiInterface.h` using  `digitalWriteFast()`
+* `hw/SoftWireFastInterface.h`
+    * Variant of `SoftWireInterface.h` using `digitalWriteFast()`
 
 Since these header files require an external `digitalWriteFast` library to be
 installed, and they are only valid for AVR processors, these header files are
@@ -993,8 +995,8 @@ need to include these headers manually, like this:
 #include <AceSegment.h> // do this first
 #if defined(ARDUINO_ARCH_AVR)
   #include <digitalWriteFast.h> // from 3rd party library
-  #include <ace_segment/hw/SwSpiFastInterface.h>
-  #include <ace_segment/hw/SwWireFastInterface.h>
+  #include <ace_segment/hw/SoftSpiFastInterface.h>
+  #include <ace_segment/hw/SoftWireFastInterface.h>
   #include <ace_segment/scanning/LedMatrixDirectFast4.h>
 #endif
 ```
@@ -1008,19 +1010,19 @@ Here are the sizes of the various classes on the 8-bit AVR microcontrollers
 (Arduino Uno, Nano, etc):
 
 ```
-sizeof(SwWireInterface): 4
-sizeof(SwWireFastInterface<4, 5, 100>): 1
-sizeof(SwSpiInterface): 3
-sizeof(SwSpiFastInterface<11, 12, 13>): 1
-sizeof(HwSpiInterface): 3
+sizeof(SoftWireInterface): 4
+sizeof(SoftWireFastInterface<4, 5, 100>): 1
+sizeof(SoftSpiInterface): 3
+sizeof(SoftSpiFastInterface<11, 12, 13>): 1
+sizeof(HardSpiInterface): 3
 sizeof(LedMatrixDirect<>): 9
 sizeof(LedMatrixDirectFast4<6..13, 2..5>): 3
-sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 8
-sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 5
+sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>): 8
+sizeof(LedMatrixDualShiftRegister<HardSpiInterface>): 5
 sizeof(LedModule): 2
 sizeof(ScanningModule<LedMatrixBase, 4>): 22
-sizeof(Tm1637Module<SwWireInterface, 4>): 14
-sizeof(Max7219Module<SwSpiInterface, 8>): 16
+sizeof(Tm1637Module<SoftWireInterface, 4>): 14
+sizeof(Max7219Module<SoftSpiInterface, 8>): 16
 sizeof(LedDisplay): 2
 sizeof(NumberWriter): 2
 sizeof(ClockWriter): 3
@@ -1032,16 +1034,16 @@ sizeof(StringWriter): 2
 On 32-bit processors, these numbers look like this:
 
 ```
-sizeof(SwWireInterface): 4
-sizeof(SwSpiInterface): 3
-sizeof(HwSpiInterface): 3
+sizeof(SoftWireInterface): 4
+sizeof(SoftSpiInterface): 3
+sizeof(HardSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
-sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 16
-sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 12
+sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>): 16
+sizeof(LedMatrixDualShiftRegister<HardSpiInterface>): 12
 sizeof(LedModule): 4
 sizeof(ScanningModule<LedMatrixBase, 4>): 32
-sizeof(Tm1637Module<SwWireInterface, 4>): 24
-sizeof(Max7219Module<SwSpiInterface, 8>): 28
+sizeof(Tm1637Module<SoftWireInterface, 4>): 24
+sizeof(Max7219Module<SoftSpiInterface, 8>): 28
 sizeof(LedDisplay): 4
 sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
@@ -1070,27 +1072,30 @@ static memory consumptions for various configurations on an Arduino Nano
 | Scanning(Direct)                |   1498/   64 |  1042/   53 |
 | Scanning(DirectFast)            |   1258/   94 |   802/   83 |
 |---------------------------------+--------------+-------------|
-| Scanning(Single,SwSpi)          |   1520/   58 |  1064/   47 |
-| Scanning(Single,SwSpiFast)      |   1412/   56 |   956/   45 |
-| Scanning(Single,HwSpi)          |   1582/   59 |  1126/   48 |
+| Scanning(Single,SoftSpi)        |   1520/   58 |  1064/   47 |
+| Scanning(Single,SoftSpiFast)    |   1412/   56 |   956/   45 |
+| Scanning(Single,HardSpi)        |   1582/   59 |  1126/   48 |
+| Scanning(Single,HardSpiFast)    |   1510/   57 |  1054/   46 |
 |---------------------------------+--------------+-------------|
-| Scanning(Dual,SwSpi)            |   1432/   51 |   976/   40 |
-| Scanning(Dual,SwSpiFast)        |   1030/   49 |   574/   38 |
-| Scanning(Dual,HwSpi)            |   1502/   52 |  1046/   41 |
+| Scanning(Dual,SoftSpi)          |   1422/   51 |   966/   40 |
+| Scanning(Dual,SoftSpiFast)      |   1020/   49 |   564/   38 |
+| Scanning(Dual,HardSpi)          |   1496/   52 |  1040/   41 |
+| Scanning(Dual,HardSpiFast)      |   1412/   50 |   956/   39 |
 |---------------------------------+--------------+-------------|
 | Tm1637(Wire)                    |   1582/   39 |  1126/   28 |
 | Tm1637(WireFast)                |    924/   36 |   468/   25 |
 |---------------------------------+--------------+-------------|
-| Max7219(SwSpi)                  |   1220/   44 |   764/   33 |
-| Max7219(SwSpiFast)              |    780/   42 |   324/   31 |
-| Max7219(HwSpi)                  |   1302/   45 |   846/   34 |
+| Max7219(SoftSpi)                |   1214/   44 |   758/   33 |
+| Max7219(SoftSpiFast)            |    774/   42 |   318/   31 |
+| Max7219(HardSpi)                |   1294/   45 |   838/   34 |
+| Max7219(HardSpiFast)            |   1068/   43 |   612/   32 |
 |---------------------------------+--------------+-------------|
 | StubModule+LedDisplay           |    578/   24 |   122/   13 |
 | NumberWriter+Stub               |    682/   28 |   226/   17 |
-| ClockWriter+Stub                |    796/   29 |   340/   18 |
+| ClockWriter+Stub                |    766/   29 |   310/   18 |
 | TemperatureWriter+Stub          |    764/   28 |   308/   17 |
 | CharWriter+Stub                 |    758/   28 |   302/   17 |
-| StringWriter+Stub               |    988/   36 |   532/   25 |
+| StringWriter+Stub               |    974/   34 |   518/   23 |
 +--------------------------------------------------------------+
 ```
 
@@ -1105,27 +1110,30 @@ And here are the memory consumption numbers for an ESP8266:
 | Scanning(Direct)                | 257772/27260 |  1072/  476 |
 | Scanning(DirectFast)            |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Scanning(Single,SwSpi)          | 257844/27244 |  1144/  460 |
-| Scanning(Single,SwSpiFast)      |     -1/   -1 |    -1/   -1 |
-| Scanning(Single,HwSpi)          | 258948/27252 |  2248/  468 |
+| Scanning(Single,SoftSpi)        | 257844/27244 |  1144/  460 |
+| Scanning(Single,SoftSpiFast)    |     -1/   -1 |    -1/   -1 |
+| Scanning(Single,HardSpi)        | 258948/27252 |  2248/  468 |
+| Scanning(Single,HardSpiFast)    |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Scanning(Dual,SwSpi)            | 257728/27248 |  1028/  464 |
-| Scanning(Dual,SwSpiFast)        |     -1/   -1 |    -1/   -1 |
-| Scanning(Dual,HwSpi)            | 258912/27256 |  2212/  472 |
+| Scanning(Dual,SoftSpi)          | 257728/27248 |  1028/  464 |
+| Scanning(Dual,SoftSpiFast)      |     -1/   -1 |    -1/   -1 |
+| Scanning(Dual,HardSpi)          | 258912/27256 |  2212/  472 |
+| Scanning(Dual,HardSpiFast)      |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | Tm1637(Wire)                    | 257920/27224 |  1220/  440 |
 | Tm1637(WireFast)                |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Max7219(SwSpi)                  | 257640/27224 |   940/  440 |
-| Max7219(SwSpiFast)              |     -1/   -1 |    -1/   -1 |
-| Max7219(HwSpi)                  | 258872/27232 |  2172/  448 |
+| Max7219(SoftSpi)                | 257640/27224 |   940/  440 |
+| Max7219(SoftSpiFast)            |     -1/   -1 |    -1/   -1 |
+| Max7219(HardSpi)                | 258840/27232 |  2140/  448 |
+| Max7219(HardSpiFast)            |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | StubModule+LedDisplay           | 256876/27200 |   176/  416 |
 | NumberWriter+Stub               | 257372/27200 |   672/  416 |
-| ClockWriter+Stub                | 257164/27208 |   464/  424 |
+| ClockWriter+Stub                | 257196/27208 |   496/  424 |
 | TemperatureWriter+Stub          | 257484/27200 |   784/  416 |
 | CharWriter+Stub                 | 257084/27200 |   384/  416 |
-| StringWriter+Stub               | 257316/27208 |   616/  424 |
+| StringWriter+Stub               | 257316/27200 |   616/  416 |
 +--------------------------------------------------------------+
 ```
 
@@ -1140,31 +1148,36 @@ Here are the CPU numbers for an AVR processor:
 +----------------------------------------+-------------------+---------+
 | Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Scanning(Direct)                       |    72/   76/   88 |     240 |
-| Scanning(Direct,subfields)             |     4/   13/   84 |    3840 |
-| Scanning(DirectFast)                   |    24/   28/   44 |     240 |
-| Scanning(DirectFast,subfields)         |     4/    8/   40 |    3840 |
+| Scanning(Direct)                       |    68/   74/   88 |     240 |
+| Scanning(Direct,subfields)             |     4/   12/   88 |    3840 |
+| Scanning(DirectFast)                   |    24/   28/   40 |     240 |
+| Scanning(DirectFast,subfields)         |     4/    8/   36 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Scanning(Single,SwSpi)                 |   156/  159/  188 |     240 |
-| Scanning(Single,SwSpi,subfields)       |     4/   22/  180 |    3840 |
-| Scanning(Single,SwSpiFast)             |    28/   30/   44 |     240 |
-| Scanning(Single,SwSpiFast,subfields)   |     4/    8/   40 |    3840 |
-| Scanning(Single,HwSpi)                 |    36/   38/   48 |     240 |
-| Scanning(Single,HwSpi,subfields)       |     4/    9/   48 |    3840 |
+| Scanning(Single,SoftSpi)               |   156/  159/  180 |     240 |
+| Scanning(Single,SoftSpi,subfields)     |     4/   22/  180 |    3840 |
+| Scanning(Single,SoftSpiFast)           |    28/   31/   44 |     240 |
+| Scanning(Single,SoftSpiFast,subfields) |     4/    8/   40 |    3840 |
+| Scanning(Single,HardSpi)               |    36/   39/   52 |     240 |
+| Scanning(Single,HardSpi,subfields)     |     4/    9/   48 |    3840 |
+| Scanning(Single,HardSpiFast)           |    24/   27/   40 |     240 |
+| Scanning(Single,HardSpiFast,subfields) |     4/    7/   40 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Scanning(Dual,SwSpi)                   |   264/  268/  304 |     240 |
-| Scanning(Dual,SwSpi,subfields)         |     4/   34/  304 |    3840 |
-| Scanning(Dual,SwSpiFast)               |    20/   24/   36 |     240 |
-| Scanning(Dual,SwSpiFast,subfields)     |     4/    7/   32 |    3840 |
-| Scanning(Dual,HwSpi)                   |    24/   26/   36 |     240 |
-| Scanning(Dual,HwSpi,subfields)         |     4/    7/   36 |    3840 |
+| Scanning(Dual,SoftSpi)                 |   264/  269/  304 |     240 |
+| Scanning(Dual,SoftSpi,subfields)       |     4/   34/  296 |    3840 |
+| Scanning(Dual,SoftSpiFast)             |    20/   24/   32 |     240 |
+| Scanning(Dual,SoftSpiFast,subfields)   |     4/    7/   32 |    3840 |
+| Scanning(Dual,HardSpi)                 |    24/   27/   36 |     240 |
+| Scanning(Dual,HardSpi,subfields)       |     4/    8/   36 |    3840 |
+| Scanning(Dual,HardSpiFast)             |    12/   14/   28 |     240 |
+| Scanning(Dual,HardSpiFast,subfields)   |     4/    6/   24 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(Wire)                           | 22308/22328/22560 |      20 |
-| Tm1637(WireFast)                       | 21060/21071/21192 |      20 |
+| Tm1637(SoftWire)                       | 22308/22329/22600 |      20 |
+| Tm1637(SoftWireFast)                   | 21060/21073/21224 |      20 |
 |----------------------------------------+-------------------+---------|
-| Max7219(SwSpi)                         |  1328/ 1336/ 1424 |      20 |
-| Max7219(SwSpiFast)                     |   120/  126/  136 |      20 |
-| Max7219(HwSpi)                         |   120/  130/  140 |      20 |
+| Max7219(SoftSpi)                       |  1320/ 1331/ 1456 |      20 |
+| Max7219(SoftSpiFast)                   |   112/  120/  132 |      20 |
+| Max7219(HardSpi)                       |   120/  130/  144 |      20 |
+| Max7219(HardSpiFast)                   |    56/   63/   68 |      20 |
 +----------------------------------------+-------------------+---------+
 ```
 
@@ -1178,23 +1191,23 @@ Here are the CPU numbers for an ESP8266:
 +----------------------------------------+-------------------+---------+
 | Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Scanning(Direct)                       |    12/   12/   29 |     240 |
-| Scanning(Direct,subfields)             |     0/    2/   20 |    3840 |
+| Scanning(Direct)                       |    12/   12/   25 |     240 |
+| Scanning(Direct,subfields)             |     0/    2/   25 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Scanning(Single,SwSpi)                 |    29/   29/   37 |     240 |
-| Scanning(Single,SwSpi,subfields)       |     0/    4/   37 |    3840 |
-| Scanning(Single,HwSpi)                 |    11/   11/   19 |     240 |
-| Scanning(Single,HwSpi,subfields)       |     0/    2/   20 |    3840 |
+| Scanning(Single,SoftSpi)               |    29/   29/   41 |     240 |
+| Scanning(Single,SoftSpi,subfields)     |     0/    4/   45 |    3840 |
+| Scanning(Single,HardSpi)               |    11/   11/   24 |     240 |
+| Scanning(Single,HardSpi,subfields)     |     0/    2/   23 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Scanning(Dual,SwSpi)                   |    50/   50/   58 |     240 |
-| Scanning(Dual,SwSpi,subfields)         |     0/    7/   67 |    3840 |
-| Scanning(Dual,HwSpi)                   |    12/   12/   24 |     240 |
-| Scanning(Dual,HwSpi,subfields)         |     0/    2/   28 |    3840 |
+| Scanning(Dual,SoftSpi)                 |    50/   50/   59 |     240 |
+| Scanning(Dual,SoftSpi,subfields)       |     0/    7/   67 |    3840 |
+| Scanning(Dual,HardSpi)                 |    12/   12/   20 |     240 |
+| Scanning(Dual,HardSpi,subfields)       |     0/    2/   28 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(Wire)                           | 21493/21497/21533 |      20 |
+| Tm1637(SoftWire)                       | 21496/21501/21532 |      20 |
 |----------------------------------------+-------------------+---------|
-| Max7219(SwSpi)                         |   254/  254/  266 |      20 |
-| Max7219(HwSpi)                         |    60/   61/   77 |      20 |
+| Max7219(SoftSpi)                       |   254/  255/  271 |      20 |
+| Max7219(HardSpi)                       |    61/   61/   70 |      20 |
 +----------------------------------------+-------------------+---------+
 ```
 
