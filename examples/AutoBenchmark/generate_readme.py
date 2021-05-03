@@ -108,6 +108,8 @@ number of `TimingStats::update()` calls that were made.
   characteristics of the LED module.
 * Add benchmarks for `Max7219Module`.
 * Upgrade from ESP32 Core v1.0.4 to v1.0.6.
+* Add benchmarks for `LedMatrixSingleShiftRegister`,
+  `LedMatrixDualShiftRegister`, and `Max7219Module` using `HardSpiFastInteface`.
 
 ## Results
 
@@ -149,8 +151,8 @@ On AVR processors, the "fast" options are available using the
 `digitalWriteFast()` functions can be up to 50X faster if the `pin` number and
 `value` parameters are compile-time constants. In addition, the
 `digitalWriteFast` functions reduce flash memory consumption by 600-700 bytes
-for `SoftWireFastInterface` and `SoftSpiFastInterface` compared to their
-non-fast equivalents.
+for `SoftWireFastInterface`, `SoftSpiFastInterface`, and `HardSpiFastInterface`
+compared to their non-fast equivalents.
 
 ### Arduino Nano
 

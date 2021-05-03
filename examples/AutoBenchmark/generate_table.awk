@@ -62,7 +62,7 @@ END {
     if (u[i]["name"] ~ /Scanning\(Direct\)/ \
         || u[i]["name"] ~ /Scanning\(Single,SoftSpi\)/ \
         || u[i]["name"] ~ /Scanning\(Dual,SoftSpi\)/ \
-        || u[i]["name"] ~ /Tm1637\(Wire\)/ \
+        || u[i]["name"] ~ /Tm1637\(SoftWire\)/ \
         || u[i]["name"] ~ /Max7219\(SoftSpi\)/ \
     ) {
       printf("|----------------------------------------+-------------------+---------|\n")
