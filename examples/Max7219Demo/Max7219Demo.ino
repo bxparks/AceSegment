@@ -30,8 +30,8 @@ using ace_segment::kEightDigitRemapArray;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
 
-#elif defined(AUNITER_LEDCLOCK_MAX7219)
-  #define SPI_INTERFACE_TYPE SPI_INTERFACE_TYPE_SOFT_SPI
+#elif defined(AUNITER_LED_CLOCK_MAX7219)
+  #define SPI_INTERFACE_TYPE SPI_INTERFACE_TYPE_HARD_SPI_FAST
 
   // SPI pins
   const uint8_t LATCH_PIN = A0;
