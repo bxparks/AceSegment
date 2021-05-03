@@ -60,10 +60,10 @@ END {
   printf("| Functionality                          |   min/  avg/  max | samples |\n")
   for (i = 0; i < TOTAL_BENCHMARKS; i++) {
     if (u[i]["name"] ~ /Scanning\(Direct\)/ \
-        || u[i]["name"] ~ /Scanning\(Single,SwSpi\)/ \
-        || u[i]["name"] ~ /Scanning\(Dual,SwSpi\)/ \
+        || u[i]["name"] ~ /Scanning\(Single,SoftSpi\)/ \
+        || u[i]["name"] ~ /Scanning\(Dual,SoftSpi\)/ \
         || u[i]["name"] ~ /Tm1637\(Wire\)/ \
-        || u[i]["name"] ~ /Max7219\(SwSpi\)/ \
+        || u[i]["name"] ~ /Max7219\(SoftSpi\)/ \
     ) {
       printf("|----------------------------------------+-------------------+---------|\n")
     }

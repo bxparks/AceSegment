@@ -5,13 +5,13 @@ configurations of the `LedMatrix` class:
 
 * `direct`: group and segment pins directly connected to MCU
 * `single_sw_spi`: group pins connected directly to MCU, but segment pins
-  connected to 74HC595 accessed through software SPI (`SwSpiInterface`)
+  connected to 74HC595 accessed through software SPI (`SoftSpiInterface`)
 * `single_hw_spi`: group pins connected directly to MCU, but segment pins
-  connected to 74HC595 accessed through hardware SPI (`HwSpiInterface`)
+  connected to 74HC595 accessed through hardware SPI (`HardSpiInterface`)
 * `dual_sw_spi`: group pins and segment pins connected to 74HC595 accessed
-  through software SPI (`SwSpiInterface`)
+  through software SPI (`SoftSpiInterface`)
 * `dual_hw_spi`: group pins and segment pins connected to 74HC595 accessed
-  through hardware SPI (`HwSpiInterface`)
+  through hardware SPI (`HardSpiInterface`)
 
 It measures the time taken by `ScanningModule::renderFieldNow()` which
 renders a single digit (multiple fields make up a frame, a frame is the
@@ -124,8 +124,8 @@ On AVR processors, the "fast" options are available using the
 `digitalWriteFast()` functions can be up to 50X faster if the `pin` number and
 `value` parameters are compile-time constants. In addition, the
 `digitalWriteFast` functions reduce flash memory consumption by 600-700 bytes
-for `SwWireFastInterface` and `SwSpiFastInterface` compared to their non-fast
-equivalents.
+for `SoftWireFastInterface` and `SoftSpiFastInterface` compared to their
+non-fast equivalents.
 
 ### Arduino Nano
 
@@ -136,19 +136,19 @@ equivalents.
 
 ```
 Sizes of Objects:
-sizeof(SwWireInterface): 4
-sizeof(SwWireFastInterface<4, 5, 100>): 1
-sizeof(SwSpiInterface): 3
-sizeof(SwSpiFastInterface<11, 12, 13>): 1
-sizeof(HwSpiInterface): 3
+sizeof(SoftWireInterface): 4
+sizeof(SoftWireFastInterface<4, 5, 100>): 1
+sizeof(SoftSpiInterface): 3
+sizeof(SoftSpiFastInterface<11, 12, 13>): 1
+sizeof(HardSpiInterface): 3
 sizeof(LedMatrixDirect<>): 9
 sizeof(LedMatrixDirectFast4<6..13, 2..5>): 3
-sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 8
-sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 5
+sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>): 8
+sizeof(LedMatrixDualShiftRegister<HardSpiInterface>): 5
 sizeof(LedModule): 2
 sizeof(ScanningModule<LedMatrixBase, 4>): 22
-sizeof(Tm1637Module<SwWireInterface, 4>): 14
-sizeof(Max7219Module<SwSpiInterface, 8>): 16
+sizeof(Tm1637Module<SoftWireInterface, 4>): 14
+sizeof(Max7219Module<SoftSpiInterface, 8>): 16
 sizeof(LedDisplay): 2
 sizeof(NumberWriter): 2
 sizeof(ClockWriter): 3
@@ -164,27 +164,24 @@ CPU:
 | Scanning(Direct,subfields)             |     4/   13/   84 |    3840 |
 | Scanning(DirectFast)                   |    24/   28/   44 |     240 |
 | Scanning(DirectFast,subfields)         |     4/    8/   40 |    3840 |
-|----------------------------------------+-------------------+---------|
-| Scanning(Single,SwSpi)                 |   156/  159/  188 |     240 |
-| Scanning(Single,SwSpi,subfields)       |     4/   22/  180 |    3840 |
-| Scanning(Single,SwSpiFast)             |    28/   30/   44 |     240 |
-| Scanning(Single,SwSpiFast,subfields)   |     4/    8/   40 |    3840 |
-| Scanning(Single,HwSpi)                 |    36/   38/   48 |     240 |
-| Scanning(Single,HwSpi,subfields)       |     4/    9/   48 |    3840 |
-|----------------------------------------+-------------------+---------|
-| Scanning(Dual,SwSpi)                   |   264/  268/  304 |     240 |
-| Scanning(Dual,SwSpi,subfields)         |     4/   34/  304 |    3840 |
-| Scanning(Dual,SwSpiFast)               |    20/   24/   36 |     240 |
-| Scanning(Dual,SwSpiFast,subfields)     |     4/    7/   32 |    3840 |
-| Scanning(Dual,HwSpi)                   |    24/   26/   36 |     240 |
-| Scanning(Dual,HwSpi,subfields)         |     4/    7/   36 |    3840 |
+| Scanning(Single,SoftSpi)               |   156/  159/  188 |     240 |
+| Scanning(Single,SoftSpi,subfields)     |     4/   22/  180 |    3840 |
+| Scanning(Single,SoftSpiFast)           |    28/   30/   44 |     240 |
+| Scanning(Single,SoftSpiFast,subfields) |     4/    8/   40 |    3840 |
+| Scanning(Single,HardSpi)               |    36/   38/   48 |     240 |
+| Scanning(Single,HardSpi,subfields)     |     4/    9/   48 |    3840 |
+| Scanning(Dual,SoftSpi)                 |   264/  268/  304 |     240 |
+| Scanning(Dual,SoftSpi,subfields)       |     4/   34/  304 |    3840 |
+| Scanning(Dual,SoftSpiFast)             |    20/   24/   36 |     240 |
+| Scanning(Dual,SoftSpiFast,subfields)   |     4/    7/   32 |    3840 |
+| Scanning(Dual,HardSpi)                 |    24/   26/   36 |     240 |
+| Scanning(Dual,HardSpi,subfields)       |     4/    7/   36 |    3840 |
 |----------------------------------------+-------------------+---------|
 | Tm1637(Wire)                           | 22308/22328/22560 |      20 |
 | Tm1637(WireFast)                       | 21060/21071/21192 |      20 |
-|----------------------------------------+-------------------+---------|
-| Max7219(SwSpi)                         |  1328/ 1336/ 1424 |      20 |
-| Max7219(SwSpiFast)                     |   120/  126/  136 |      20 |
-| Max7219(HwSpi)                         |   120/  130/  140 |      20 |
+| Max7219(SoftSpi)                       |  1328/ 1336/ 1424 |      20 |
+| Max7219(SoftSpiFast)                   |   120/  126/  136 |      20 |
+| Max7219(HardSpi)                       |   120/  130/  140 |      20 |
 +----------------------------------------+-------------------+---------+
 
 ```
@@ -198,19 +195,19 @@ CPU:
 
 ```
 Sizes of Objects:
-sizeof(SwWireInterface): 4
-sizeof(SwWireFastInterface<4, 5, 100>): 1
-sizeof(SwSpiInterface): 3
-sizeof(SwSpiFastInterface<11, 12, 13>): 1
-sizeof(HwSpiInterface): 3
+sizeof(SoftWireInterface): 4
+sizeof(SoftWireFastInterface<4, 5, 100>): 1
+sizeof(SoftSpiInterface): 3
+sizeof(SoftSpiFastInterface<11, 12, 13>): 1
+sizeof(HardSpiInterface): 3
 sizeof(LedMatrixDirect<>): 9
-sizeof(LedMatrixDirectFast4<2..5, 6..13>): 3
-sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 8
-sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 5
+sizeof(LedMatrixDirectFast4<6..13, 2..5>): 3
+sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>): 8
+sizeof(LedMatrixDualShiftRegister<HardSpiInterface>): 5
 sizeof(LedModule): 2
 sizeof(ScanningModule<LedMatrixBase, 4>): 22
-sizeof(Tm1637Module<SwWireInterface, 4>): 14
-sizeof(Max7219Module<SwSpiInterface, 8>): 16
+sizeof(Tm1637Module<SoftWireInterface, 4>): 14
+sizeof(Max7219Module<SoftSpiInterface, 8>): 16
 sizeof(LedDisplay): 2
 sizeof(NumberWriter): 2
 sizeof(ClockWriter): 3
@@ -226,27 +223,24 @@ CPU:
 | Scanning(Direct,subfields)             |     4/   14/   92 |    3840 |
 | Scanning(DirectFast)                   |    24/   28/   36 |     240 |
 | Scanning(DirectFast,subfields)         |     4/    8/   40 |    3840 |
-|----------------------------------------+-------------------+---------|
-| Scanning(Single,SwSpi)                 |   148/  152/  164 |     240 |
-| Scanning(Single,SwSpi,subfields)       |     4/   23/  164 |    3840 |
-| Scanning(Single,SwSpiFast)             |    28/   31/   40 |     240 |
-| Scanning(Single,SwSpiFast,subfields)   |     4/    8/   40 |    3840 |
-| Scanning(Single,HwSpi)                 |    36/   40/   48 |     240 |
-| Scanning(Single,HwSpi,subfields)       |     4/    9/   52 |    3840 |
-|----------------------------------------+-------------------+---------|
-| Scanning(Dual,SwSpi)                   |   248/  252/  264 |     240 |
-| Scanning(Dual,SwSpi,subfields)         |     4/   36/  264 |    3840 |
-| Scanning(Dual,SwSpiFast)               |    20/   23/   32 |     240 |
-| Scanning(Dual,SwSpiFast,subfields)     |     4/    8/   32 |    3840 |
-| Scanning(Dual,HwSpi)                   |    24/   26/   36 |     240 |
-| Scanning(Dual,HwSpi,subfields)         |     4/    8/   36 |    3840 |
+| Scanning(Single,SoftSpi)               |   148/  152/  164 |     240 |
+| Scanning(Single,SoftSpi,subfields)     |     4/   23/  164 |    3840 |
+| Scanning(Single,SoftSpiFast)           |    28/   31/   40 |     240 |
+| Scanning(Single,SoftSpiFast,subfields) |     4/    8/   40 |    3840 |
+| Scanning(Single,HardSpi)               |    36/   40/   48 |     240 |
+| Scanning(Single,HardSpi,subfields)     |     4/    9/   52 |    3840 |
+| Scanning(Dual,SoftSpi)                 |   248/  252/  264 |     240 |
+| Scanning(Dual,SoftSpi,subfields)       |     4/   36/  264 |    3840 |
+| Scanning(Dual,SoftSpiFast)             |    20/   23/   32 |     240 |
+| Scanning(Dual,SoftSpiFast,subfields)   |     4/    8/   32 |    3840 |
+| Scanning(Dual,HardSpi)                 |    24/   26/   36 |     240 |
+| Scanning(Dual,HardSpi,subfields)       |     4/    8/   36 |    3840 |
 |----------------------------------------+-------------------+---------|
 | Tm1637(Wire)                           | 22432/22439/22444 |      20 |
 | Tm1637(WireFast)                       | 21168/21176/21192 |      20 |
-|----------------------------------------+-------------------+---------|
-| Max7219(SwSpi)                         |  1252/ 1255/ 1260 |      20 |
-| Max7219(SwSpiFast)                     |   116/  120/  124 |      20 |
-| Max7219(HwSpi)                         |   128/  130/  136 |      20 |
+| Max7219(SoftSpi)                       |  1252/ 1255/ 1260 |      20 |
+| Max7219(SoftSpiFast)                   |   116/  120/  124 |      20 |
+| Max7219(HardSpi)                       |   128/  130/  136 |      20 |
 +----------------------------------------+-------------------+---------+
 
 ```
@@ -259,16 +253,16 @@ CPU:
 
 ```
 Sizes of Objects:
-sizeof(SwWireInterface): 4
-sizeof(SwSpiInterface): 3
-sizeof(HwSpiInterface): 3
+sizeof(SoftWireInterface): 4
+sizeof(SoftSpiInterface): 3
+sizeof(HardSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
-sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 16
-sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 12
+sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>): 16
+sizeof(LedMatrixDualShiftRegister<HardSpiInterface>): 12
 sizeof(LedModule): 4
 sizeof(ScanningModule<LedMatrixBase, 4>): 32
-sizeof(Tm1637Module<SwWireInterface, 4>): 24
-sizeof(Max7219Module<SwSpiInterface, 8>): 28
+sizeof(Tm1637Module<SoftWireInterface, 4>): 24
+sizeof(Max7219Module<SoftSpiInterface, 8>): 28
 sizeof(LedDisplay): 4
 sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
@@ -282,21 +276,18 @@ CPU:
 |----------------------------------------+-------------------+---------|
 | Scanning(Direct)                       |    24/   24/   29 |     240 |
 | Scanning(Direct,subfields)             |     2/    5/   29 |    3840 |
-|----------------------------------------+-------------------+---------|
-| Scanning(Single,SwSpi)                 |    51/   52/   56 |     240 |
-| Scanning(Single,SwSpi,subfields)       |     2/    7/   56 |    3840 |
-| Scanning(Single,HwSpi)                 |    23/   23/   28 |     240 |
-| Scanning(Single,HwSpi,subfields)       |     2/    4/   28 |    3840 |
-|----------------------------------------+-------------------+---------|
-| Scanning(Dual,SwSpi)                   |    87/   88/   92 |     240 |
-| Scanning(Dual,SwSpi,subfields)         |     2/   11/   94 |    3840 |
-| Scanning(Dual,HwSpi)                   |    22/   22/   26 |     240 |
-| Scanning(Dual,HwSpi,subfields)         |     3/    4/   28 |    3840 |
+| Scanning(Single,SoftSpi)               |    51/   52/   56 |     240 |
+| Scanning(Single,SoftSpi,subfields)     |     2/    7/   56 |    3840 |
+| Scanning(Single,HardSpi)               |    23/   23/   28 |     240 |
+| Scanning(Single,HardSpi,subfields)     |     2/    4/   28 |    3840 |
+| Scanning(Dual,SoftSpi)                 |    87/   88/   92 |     240 |
+| Scanning(Dual,SoftSpi,subfields)       |     2/   11/   94 |    3840 |
+| Scanning(Dual,HardSpi)                 |    22/   22/   26 |     240 |
+| Scanning(Dual,HardSpi,subfields)       |     3/    4/   28 |    3840 |
 |----------------------------------------+-------------------+---------|
 | Tm1637(Wire)                           | 22221/22223/22232 |      20 |
-|----------------------------------------+-------------------+---------|
-| Max7219(SwSpi)                         |   431/  434/  438 |      20 |
-| Max7219(HwSpi)                         |   106/  107/  111 |      20 |
+| Max7219(SoftSpi)                       |   431/  434/  438 |      20 |
+| Max7219(HardSpi)                       |   106/  107/  111 |      20 |
 +----------------------------------------+-------------------+---------+
 
 ```
@@ -309,16 +300,16 @@ CPU:
 
 ```
 Sizes of Objects:
-sizeof(SwWireInterface): 4
-sizeof(SwSpiInterface): 3
-sizeof(HwSpiInterface): 3
+sizeof(SoftWireInterface): 4
+sizeof(SoftSpiInterface): 3
+sizeof(HardSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
-sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 16
-sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 12
+sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>): 16
+sizeof(LedMatrixDualShiftRegister<HardSpiInterface>): 12
 sizeof(LedModule): 4
 sizeof(ScanningModule<LedMatrixBase, 4>): 32
-sizeof(Tm1637Module<SwWireInterface, 4>): 24
-sizeof(Max7219Module<SwSpiInterface, 8>): 28
+sizeof(Tm1637Module<SoftWireInterface, 4>): 24
+sizeof(Max7219Module<SoftSpiInterface, 8>): 28
 sizeof(LedDisplay): 4
 sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
@@ -332,21 +323,18 @@ CPU:
 |----------------------------------------+-------------------+---------|
 | Scanning(Direct)                       |    13/   14/   19 |     240 |
 | Scanning(Direct,subfields)             |     1/    2/   24 |    3840 |
-|----------------------------------------+-------------------+---------|
-| Scanning(Single,SwSpi)                 |    30/   31/   36 |     240 |
-| Scanning(Single,SwSpi,subfields)       |     1/    4/   54 |    3840 |
-| Scanning(Single,HwSpi)                 |    40/   40/   45 |     240 |
-| Scanning(Single,HwSpi,subfields)       |     1/    4/   50 |    3840 |
-|----------------------------------------+-------------------+---------|
-| Scanning(Dual,SwSpi)                   |    53/   53/   58 |     240 |
-| Scanning(Dual,SwSpi,subfields)         |     1/    5/   77 |    3840 |
-| Scanning(Dual,HwSpi)                   |    39/   40/   44 |     240 |
-| Scanning(Dual,HwSpi,subfields)         |     1/    5/   77 |    3840 |
+| Scanning(Single,SoftSpi)               |    30/   31/   36 |     240 |
+| Scanning(Single,SoftSpi,subfields)     |     1/    4/   54 |    3840 |
+| Scanning(Single,HardSpi)               |    40/   40/   45 |     240 |
+| Scanning(Single,HardSpi,subfields)     |     1/    4/   50 |    3840 |
+| Scanning(Dual,SoftSpi)                 |    53/   53/   58 |     240 |
+| Scanning(Dual,SoftSpi,subfields)       |     1/    5/   77 |    3840 |
+| Scanning(Dual,HardSpi)                 |    39/   40/   44 |     240 |
+| Scanning(Dual,HardSpi,subfields)       |     1/    5/   77 |    3840 |
 |----------------------------------------+-------------------+---------|
 | Tm1637(Wire)                           | 22398/22404/22412 |      20 |
-|----------------------------------------+-------------------+---------|
-| Max7219(SwSpi)                         |   266/  267/  272 |      20 |
-| Max7219(HwSpi)                         |   199/  200/  205 |      20 |
+| Max7219(SoftSpi)                       |   266/  267/  272 |      20 |
+| Max7219(HardSpi)                       |   199/  200/  205 |      20 |
 +----------------------------------------+-------------------+---------+
 
 ```
@@ -359,16 +347,16 @@ CPU:
 
 ```
 Sizes of Objects:
-sizeof(SwWireInterface): 4
-sizeof(SwSpiInterface): 3
-sizeof(HwSpiInterface): 3
+sizeof(SoftWireInterface): 4
+sizeof(SoftSpiInterface): 3
+sizeof(HardSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
-sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 16
-sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 12
+sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>): 16
+sizeof(LedMatrixDualShiftRegister<HardSpiInterface>): 12
 sizeof(LedModule): 4
 sizeof(ScanningModule<LedMatrixBase, 4>): 32
-sizeof(Tm1637Module<SwWireInterface, 4>): 24
-sizeof(Max7219Module<SwSpiInterface, 8>): 28
+sizeof(Tm1637Module<SoftWireInterface, 4>): 24
+sizeof(Max7219Module<SoftSpiInterface, 8>): 28
 sizeof(LedDisplay): 4
 sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
@@ -382,21 +370,18 @@ CPU:
 |----------------------------------------+-------------------+---------|
 | Scanning(Direct)                       |    12/   12/   29 |     240 |
 | Scanning(Direct,subfields)             |     0/    2/   20 |    3840 |
-|----------------------------------------+-------------------+---------|
-| Scanning(Single,SwSpi)                 |    29/   29/   37 |     240 |
-| Scanning(Single,SwSpi,subfields)       |     0/    4/   37 |    3840 |
-| Scanning(Single,HwSpi)                 |    11/   11/   19 |     240 |
-| Scanning(Single,HwSpi,subfields)       |     0/    2/   20 |    3840 |
-|----------------------------------------+-------------------+---------|
-| Scanning(Dual,SwSpi)                   |    50/   50/   58 |     240 |
-| Scanning(Dual,SwSpi,subfields)         |     0/    7/   67 |    3840 |
-| Scanning(Dual,HwSpi)                   |    12/   12/   24 |     240 |
-| Scanning(Dual,HwSpi,subfields)         |     0/    2/   28 |    3840 |
+| Scanning(Single,SoftSpi)               |    29/   29/   37 |     240 |
+| Scanning(Single,SoftSpi,subfields)     |     0/    4/   37 |    3840 |
+| Scanning(Single,HardSpi)               |    11/   11/   19 |     240 |
+| Scanning(Single,HardSpi,subfields)     |     0/    2/   20 |    3840 |
+| Scanning(Dual,SoftSpi)                 |    50/   50/   58 |     240 |
+| Scanning(Dual,SoftSpi,subfields)       |     0/    7/   67 |    3840 |
+| Scanning(Dual,HardSpi)                 |    12/   12/   24 |     240 |
+| Scanning(Dual,HardSpi,subfields)       |     0/    2/   28 |    3840 |
 |----------------------------------------+-------------------+---------|
 | Tm1637(Wire)                           | 21493/21497/21533 |      20 |
-|----------------------------------------+-------------------+---------|
-| Max7219(SwSpi)                         |   254/  254/  266 |      20 |
-| Max7219(HwSpi)                         |    60/   61/   77 |      20 |
+| Max7219(SoftSpi)                       |   254/  254/  266 |      20 |
+| Max7219(HardSpi)                       |    60/   61/   77 |      20 |
 +----------------------------------------+-------------------+---------+
 
 ```
@@ -409,16 +394,16 @@ CPU:
 
 ```
 Sizes of Objects:
-sizeof(SwWireInterface): 4
-sizeof(SwSpiInterface): 3
-sizeof(HwSpiInterface): 3
+sizeof(SoftWireInterface): 4
+sizeof(SoftSpiInterface): 3
+sizeof(HardSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
-sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 16
-sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 12
+sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>): 16
+sizeof(LedMatrixDualShiftRegister<HardSpiInterface>): 12
 sizeof(LedModule): 4
 sizeof(ScanningModule<LedMatrixBase, 4>): 32
-sizeof(Tm1637Module<SwWireInterface, 4>): 24
-sizeof(Max7219Module<SwSpiInterface, 8>): 28
+sizeof(Tm1637Module<SoftWireInterface, 4>): 24
+sizeof(Max7219Module<SoftSpiInterface, 8>): 28
 sizeof(LedDisplay): 4
 sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
@@ -432,21 +417,18 @@ CPU:
 |----------------------------------------+-------------------+---------|
 | Scanning(Direct)                       |     2/    2/    9 |     240 |
 | Scanning(Direct,subfields)             |     0/    1/   11 |    3840 |
-|----------------------------------------+-------------------+---------|
-| Scanning(Single,SwSpi)                 |     4/    4/   13 |     240 |
-| Scanning(Single,SwSpi,subfields)       |     0/    1/   13 |    3840 |
-| Scanning(Single,HwSpi)                 |     9/    9/   17 |     240 |
-| Scanning(Single,HwSpi,subfields)       |     0/    1/   18 |    3840 |
-|----------------------------------------+-------------------+---------|
-| Scanning(Dual,SwSpi)                   |     7/    7/   15 |     240 |
-| Scanning(Dual,SwSpi,subfields)         |     0/    1/   15 |    3840 |
-| Scanning(Dual,HwSpi)                   |     9/    9/   18 |     240 |
-| Scanning(Dual,HwSpi,subfields)         |     0/    1/   18 |    3840 |
+| Scanning(Single,SoftSpi)               |     4/    4/   13 |     240 |
+| Scanning(Single,SoftSpi,subfields)     |     0/    1/   13 |    3840 |
+| Scanning(Single,HardSpi)               |     9/    9/   17 |     240 |
+| Scanning(Single,HardSpi,subfields)     |     0/    1/   18 |    3840 |
+| Scanning(Dual,SoftSpi)                 |     7/    7/   15 |     240 |
+| Scanning(Dual,SoftSpi,subfields)       |     0/    1/   15 |    3840 |
+| Scanning(Dual,HardSpi)                 |     9/    9/   18 |     240 |
+| Scanning(Dual,HardSpi,subfields)       |     0/    1/   18 |    3840 |
 |----------------------------------------+-------------------+---------|
 | Tm1637(Wire)                           | 21229/21236/21243 |      20 |
-|----------------------------------------+-------------------+---------|
-| Max7219(SwSpi)                         |    33/   34/   42 |      20 |
-| Max7219(HwSpi)                         |    44/   44/   47 |      20 |
+| Max7219(SoftSpi)                       |    33/   34/   42 |      20 |
+| Max7219(HardSpi)                       |    44/   44/   47 |      20 |
 +----------------------------------------+-------------------+---------+
 
 ```
@@ -460,16 +442,16 @@ CPU:
 
 ```
 Sizes of Objects:
-sizeof(SwWireInterface): 4
-sizeof(SwSpiInterface): 3
-sizeof(HwSpiInterface): 3
+sizeof(SoftWireInterface): 4
+sizeof(SoftSpiInterface): 3
+sizeof(HardSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
-sizeof(LedMatrixSingleShiftRegister<SwSpiInterface>): 16
-sizeof(LedMatrixDualShiftRegister<HwSpiInterface>): 12
+sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>): 16
+sizeof(LedMatrixDualShiftRegister<HardSpiInterface>): 12
 sizeof(LedModule): 4
 sizeof(ScanningModule<LedMatrixBase, 4>): 32
-sizeof(Tm1637Module<SwWireInterface, 4>): 24
-sizeof(Max7219Module<SwSpiInterface, 8>): 28
+sizeof(Tm1637Module<SoftWireInterface, 4>): 24
+sizeof(Max7219Module<SoftSpiInterface, 8>): 28
 sizeof(LedDisplay): 4
 sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
@@ -483,21 +465,18 @@ CPU:
 |----------------------------------------+-------------------+---------|
 | Scanning(Direct)                       |     5/    5/    9 |     240 |
 | Scanning(Direct,subfields)             |     0/    1/    9 |    3840 |
-|----------------------------------------+-------------------+---------|
-| Scanning(Single,SwSpi)                 |     9/    9/   12 |     240 |
-| Scanning(Single,SwSpi,subfields)       |     0/    1/   12 |    3840 |
-| Scanning(Single,HwSpi)                 |     3/    3/    4 |     240 |
-| Scanning(Single,HwSpi,subfields)       |     0/    0/    6 |    3840 |
-|----------------------------------------+-------------------+---------|
-| Scanning(Dual,SwSpi)                   |    16/   16/   19 |     240 |
-| Scanning(Dual,SwSpi,subfields)         |     0/    2/   21 |    3840 |
-| Scanning(Dual,HwSpi)                   |     3/    3/    6 |     240 |
-| Scanning(Dual,HwSpi,subfields)         |     0/    0/    4 |    3840 |
+| Scanning(Single,SoftSpi)               |     9/    9/   12 |     240 |
+| Scanning(Single,SoftSpi,subfields)     |     0/    1/   12 |    3840 |
+| Scanning(Single,HardSpi)               |     3/    3/    4 |     240 |
+| Scanning(Single,HardSpi,subfields)     |     0/    0/    6 |    3840 |
+| Scanning(Dual,SoftSpi)                 |    16/   16/   19 |     240 |
+| Scanning(Dual,SoftSpi,subfields)       |     0/    2/   21 |    3840 |
+| Scanning(Dual,HardSpi)                 |     3/    3/    6 |     240 |
+| Scanning(Dual,HardSpi,subfields)       |     0/    0/    4 |    3840 |
 |----------------------------------------+-------------------+---------|
 | Tm1637(Wire)                           | 21148/21149/21153 |      20 |
-|----------------------------------------+-------------------+---------|
-| Max7219(SwSpi)                         |    82/   83/   85 |      20 |
-| Max7219(HwSpi)                         |    17/   17/   18 |      20 |
+| Max7219(SoftSpi)                       |    82/   83/   85 |      20 |
+| Max7219(HardSpi)                       |    17/   17/   18 |      20 |
 +----------------------------------------+-------------------+---------+
 
 ```

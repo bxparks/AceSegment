@@ -30,13 +30,13 @@ configurations of the `LedMatrix` class:
 
 * `direct`: group and segment pins directly connected to MCU
 * `single_sw_spi`: group pins connected directly to MCU, but segment pins
-  connected to 74HC595 accessed through software SPI (`SwSpiInterface`)
+  connected to 74HC595 accessed through software SPI (`SoftSpiInterface`)
 * `single_hw_spi`: group pins connected directly to MCU, but segment pins
-  connected to 74HC595 accessed through hardware SPI (`HwSpiInterface`)
+  connected to 74HC595 accessed through hardware SPI (`HardSpiInterface`)
 * `dual_sw_spi`: group pins and segment pins connected to 74HC595 accessed
-  through software SPI (`SwSpiInterface`)
+  through software SPI (`SoftSpiInterface`)
 * `dual_hw_spi`: group pins and segment pins connected to 74HC595 accessed
-  through hardware SPI (`HwSpiInterface`)
+  through hardware SPI (`HardSpiInterface`)
 
 It measures the time taken by `ScanningModule::renderFieldNow()` which
 renders a single digit (multiple fields make up a frame, a frame is the
@@ -149,8 +149,8 @@ On AVR processors, the "fast" options are available using the
 `digitalWriteFast()` functions can be up to 50X faster if the `pin` number and
 `value` parameters are compile-time constants. In addition, the
 `digitalWriteFast` functions reduce flash memory consumption by 600-700 bytes
-for `SwWireFastInterface` and `SwSpiFastInterface` compared to their non-fast
-equivalents.
+for `SoftWireFastInterface` and `SoftSpiFastInterface` compared to their
+non-fast equivalents.
 
 ### Arduino Nano
 

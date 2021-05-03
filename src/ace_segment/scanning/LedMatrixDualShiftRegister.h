@@ -42,7 +42,8 @@ namespace ace_segment {
  * The group pins are assumed to be connected to the most significant byte. The
  * element pins are connected to the least signficiant byte.
  *
- * @tparam T_SPII class providing SPI, either SwSpiInterface or HwSpiInterface
+ * @tparam T_SPII class providing SPI, either SoftSpiInterface or
+ *    HardSpiInterface
  */
 template <typename T_SPII>
 class LedMatrixDualShiftRegister: public LedMatrixBase {

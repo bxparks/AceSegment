@@ -9,20 +9,20 @@ BEGIN {
   labels[0] = "baseline"
   labels[1] = "Scanning(Direct)";
   labels[2] = "Scanning(DirectFast)";
-  labels[3] = "Scanning(Single,SwSpi)";
-  labels[4] = "Scanning(Single,SwSpiFast)";
-  labels[5] = "Scanning(Single,HwSpi)";
-  labels[6] = "Scanning(Single,HwSpiFast)";
-  labels[7] = "Scanning(Dual,SwSpi)";
-  labels[8] = "Scanning(Dual,SwSpiFast)";
-  labels[9] = "Scanning(Dual,HwSpi)";
-  labels[10] = "Scanning(Dual,HwSpiFast)";
+  labels[3] = "Scanning(Single,SoftSpi)";
+  labels[4] = "Scanning(Single,SoftSpiFast)";
+  labels[5] = "Scanning(Single,HardSpi)";
+  labels[6] = "Scanning(Single,HardSpiFast)";
+  labels[7] = "Scanning(Dual,SoftSpi)";
+  labels[8] = "Scanning(Dual,SoftSpiFast)";
+  labels[9] = "Scanning(Dual,HardSpi)";
+  labels[10] = "Scanning(Dual,HardSpiFast)";
   labels[11] = "Tm1637(Wire)";
   labels[12] = "Tm1637(WireFast)";
-  labels[13] = "Max7219(SwSpi)";
-  labels[14] = "Max7219(SwSpiFast)";
-  labels[15] = "Max7219(HwSpi)";
-  labels[16] = "Max7219(HwSpiFast)";
+  labels[13] = "Max7219(SoftSpi)";
+  labels[14] = "Max7219(SoftSpiFast)";
+  labels[15] = "Max7219(HardSpi)";
+  labels[16] = "Max7219(HardSpiFast)";
   labels[17] = "StubModule+LedDisplay";
   labels[18] = "NumberWriter+Stub";
   labels[19] = "ClockWriter+Stub";
@@ -59,10 +59,10 @@ END {
     labels[0], u[0]["flash"], u[0]["ram"], u[0]["d_flash"], u[0]["d_ram"])
   for (i = 1 ; i < NUM_ENTRIES; i++) {
     if (labels[i] ~ /Scanning\(Direct\)/ \
-        || labels[i] ~ /Scanning\(Single,SwSpi\)/ \
-        || labels[i] ~ /Scanning\(Dual,SwSpi\)/ \
+        || labels[i] ~ /Scanning\(Single,SoftSpi\)/ \
+        || labels[i] ~ /Scanning\(Dual,SoftSpi\)/ \
         || labels[i] ~ /Tm1637\(Wire\)/ \
-        || labels[i] ~ /Max7219\(SwSpi\)/ \
+        || labels[i] ~ /Max7219\(SoftSpi\)/ \
         || labels[i] == "StubModule+LedDisplay") {
       printf(\
         "|---------------------------------+--------------+-------------|\n")

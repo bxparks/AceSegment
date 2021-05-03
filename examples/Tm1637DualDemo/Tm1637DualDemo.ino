@@ -34,7 +34,7 @@ const uint8_t DIO2_PIN = 8;
   #error Unknown AUNITER environment
 #endif
 
-// For a SwWireInterface (non-fast), time to send 4 digits using flush():
+// For a SoftWireInterface (non-fast), time to send 4 digits using flush():
 //
 // * 12 ms at 50 us delay, but does not work.
 // * 17 ms at 75 us delay.
@@ -44,7 +44,7 @@ const uint8_t DIO2_PIN = 8;
 // Using flushIncremental() is about 1/2 these numbers.
 constexpr uint16_t BIT_DELAY = 100;
 
-using WireInterface = SwWireInterface;
+using WireInterface = SoftWireInterface;
 WireInterface wireInterface1(CLK_PIN, DIO1_PIN, BIT_DELAY);
 WireInterface wireInterface2(CLK_PIN, DIO2_PIN, BIT_DELAY);
 Tm1637Module<WireInterface, NUM_DIGITS> module1(wireInterface1);

@@ -12,17 +12,18 @@ using ace_common::incrementModOffset;
 using ace_common::TimingStats;
 using ace_segment::Max7219Module;
 using ace_segment::LedDisplay;
-using ace_segment::HwSpiInterface;
-using ace_segment::SwSpiInterface;
+using ace_segment::HardSpiInterface;
+using ace_segment::SoftSpiInterface;
 using ace_segment::kEightDigitRemapArray;
 
 // Select SPI interface type.
-#define SPI_INTERFACE_TYPE_HW 0
-#define SPI_INTERFACE_TYPE_SW 1
-#define SPI_INTERFACE_TYPE_SW_FAST 2
+#define SPI_INTERFACE_TYPE_HARD_SPI 0
+#define SPI_INTERFACE_TYPE_HARD_SPI_FAST 1
+#define SPI_INTERFACE_TYPE_SOFT_SPI 2
+#define SPI_INTERFACE_TYPE_SOFT_SPI_FAST 3
 
 #if defined(EPOXY_DUINO)
-  #define SPI_INTERFACE_TYPE SPI_INTERFACE_TYPE_SW_FAST
+  #define SPI_INTERFACE_TYPE SPI_INTERFACE_TYPE_HARD_SPI_FAST
 
   // SPI pins
   const uint8_t LATCH_PIN = A0;
@@ -30,7 +31,7 @@ using ace_segment::kEightDigitRemapArray;
   const uint8_t CLOCK_PIN = SCK;
 
 #elif defined(AUNITER_LEDCLOCK_MAX7219)
-  #define SPI_INTERFACE_TYPE SPI_INTERFACE_TYPE_SW
+  #define SPI_INTERFACE_TYPE SPI_INTERFACE_TYPE_SOFT_SPI
 
   // SPI pins
   const uint8_t LATCH_PIN = A0;
@@ -38,7 +39,7 @@ using ace_segment::kEightDigitRemapArray;
   const uint8_t CLOCK_PIN = SCK;
 
 #elif defined(AUNITER_D1MINI_LARGE_MAX7219)
-  #define SPI_INTERFACE_TYPE SPI_INTERFACE_TYPE_SW
+  #define SPI_INTERFACE_TYPE SPI_INTERFACE_TYPE_SOFT_SPI
 
   // SPI pins
   const uint8_t LATCH_PIN = D8;
@@ -46,7 +47,7 @@ using ace_segment::kEightDigitRemapArray;
   const uint8_t CLOCK_PIN = SCK;
 
 #elif defined(AUNITER_STM32_MAX7219)
-  #define SPI_INTERFACE_TYPE SPI_INTERFACE_TYPE_SW
+  #define SPI_INTERFACE_TYPE SPI_INTERFACE_TYPE_SOFT_SPI
 
   // SPI pins
   const uint8_t LATCH_PIN = PA4;
@@ -57,10 +58,13 @@ using ace_segment::kEightDigitRemapArray;
   #error Unknown environment
 #endif
 
-#if SPI_INTERFACE_TYPE == SPI_INTERFACE_TYPE_SW_FAST
+#if SPI_INTERFACE_TYPE == SPI_INTERFACE_TYPE_HARD_SPI_FAST \
+    || SPI_INTERFACE_TYPE == SPI_INTERFACE_TYPE_SOFT_SPI_FAST
   #include <digitalWriteFast.h>
-  #include <ace_segment/hw/SwSpiFastInterface.h>
-  using ace_segment::SwSpiFastInterface;
+  #include <ace_segment/hw/HardSpiFastInterface.h>
+  #include <ace_segment/hw/SoftSpiFastInterface.h>
+  using ace_segment::SoftSpiFastInterface;
+  using ace_segment::HardSpiFastInterface;
 #endif
 
 // LED segment patterns.
@@ -76,14 +80,17 @@ const uint8_t PATTERNS[NUM_DIGITS] = {
   0b00000111, // 7
 };
 
-#if SPI_INTERFACE_TYPE == SPI_INTERFACE_TYPE_HW
-  using SpiInterface = HwSpiInterface;
+#if SPI_INTERFACE_TYPE == SPI_INTERFACE_TYPE_HARD_SPI
+  using SpiInterface = HardSpiInterface;
   SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-#elif SPI_INTERFACE_TYPE == SPI_INTERFACE_TYPE_SW
-  using SpiInterface = SwSpiInterface;
+#elif SPI_INTERFACE_TYPE == SPI_INTERFACE_TYPE_HARD_SPI_FAST
+  using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  SpiInterface spiInterface;
+#elif SPI_INTERFACE_TYPE == SPI_INTERFACE_TYPE_SOFT_SPI
+  using SpiInterface = SoftSpiInterface;
   SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-#elif SPI_INTERFACE_TYPE == SPI_INTERFACE_TYPE_SW_FAST
-  using SpiInterface = SwSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+#elif SPI_INTERFACE_TYPE == SPI_INTERFACE_TYPE_SOFT_SPI_FAST
+  using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
 #else
   #error Unknown SPI_INTERFACE_TYPE

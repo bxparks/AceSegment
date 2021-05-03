@@ -86,7 +86,7 @@ using namespace ace_segment;
   #error Unknown AUNITER environment
 #endif
 
-// For a SwWireInterface (non-fast), time to send 4 digits:
+// For a SoftWireInterface (non-fast), time to send 4 digits:
 // * 12 ms at 50 us delay, but does not work.
 // * 17 ms at 75 us delay.
 // * 22 ms at 100 us delay.
@@ -94,14 +94,14 @@ using namespace ace_segment;
 constexpr uint16_t BIT_DELAY = 100;
 
 #if WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_NORMAL
-  using WireInterface = SwWireInterface;
+  using WireInterface = SoftWireInterface;
   WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_FAST
   #include <digitalWriteFast.h>
-  #include <ace_segment/hw/SwWireFastInterface.h>
-  using ace_segment::SwWireFastInterface;
+  #include <ace_segment/hw/SoftWireFastInterface.h>
+  using ace_segment::SoftWireFastInterface;
 
-  using WireInterface = SwWireFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
+  using WireInterface = SoftWireFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
   WireInterface wireInterface;
 #else
   #error Unknown WIRE_INTERFACE_TYPE

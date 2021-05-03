@@ -44,7 +44,7 @@ namespace ace_segment {
  *   dataPin/D11/MOSI -- DS (Phillips) / SER (TI) / Pin 14
  *   clockPin/D13/SCK -- SH_CP (Phillips) / SRCK (TI) / Pin 11 (rising)
  *
- * @tparam T_SPII interface to SPI, either SwSpiInterface or HwSpiInterface
+ * @tparam T_SPII interface to SPI, either SoftSpiInterface or HardSpiInterface
  * @tparam T_GPIOI (optional) interface to GPIO functions,
  *    default GpioInterface (note: 'GPI' is already taken on ESP8266)
  */

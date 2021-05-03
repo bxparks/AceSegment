@@ -29,7 +29,8 @@ scanning/               tm1637/               max7219/
                         hw/
                         ClockInterface.h
                         GpioInterface.h
-                        SwSpiInterface.h
-                        SwSpiFastInterface.h
-                        HwSpiInterface.h
+                        SoftSpiInterface.h
+                        SoftSpiFastInterface.h
+                        HardSpiInterface.h
+                        HardSpiFastInterface.h
 ```

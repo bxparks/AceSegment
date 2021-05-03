@@ -36,7 +36,7 @@ namespace ace_segment {
  * class that pairs together a ScanningModule and a LedMatrixSingleShiftRegister
  * in a single class.
  *
- * @tparam T_SPII interface to SPI, either SwSpiInterface or HwSpiInterface
+ * @tparam T_SPII interface to SPI, either SoftSpiInterface or HardSpiInterface
  * @tparam T_DIGITS number of LED digits
  * @tparam T_SUBFIELDS number of subfields for each digit to get brightness
  *    control using PWM. The default is 1, but can be set to greater than 1 to
