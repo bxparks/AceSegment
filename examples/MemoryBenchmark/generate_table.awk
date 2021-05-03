@@ -12,20 +12,23 @@ BEGIN {
   labels[3] = "Scanning(Single,SwSpi)";
   labels[4] = "Scanning(Single,SwSpiFast)";
   labels[5] = "Scanning(Single,HwSpi)";
-  labels[6] = "Scanning(Dual,SwSpi)";
-  labels[7] = "Scanning(Dual,SwSpiFast)";
-  labels[8] = "Scanning(Dual,HwSpi)";
-  labels[9] = "Tm1637(Wire)";
-  labels[10] = "Tm1637(WireFast)";
-  labels[11] = "Max7219(SwSpi)";
-  labels[12] = "Max7219(SwSpiFast)";
-  labels[13] = "Max7219(HwSpi)";
-  labels[14] = "StubModule+LedDisplay";
-  labels[15] = "NumberWriter+Stub";
-  labels[16] = "ClockWriter+Stub";
-  labels[17] = "TemperatureWriter+Stub";
-  labels[18] = "CharWriter+Stub";
-  labels[19] = "StringWriter+Stub";
+  labels[6] = "Scanning(Single,HwSpiFast)";
+  labels[7] = "Scanning(Dual,SwSpi)";
+  labels[8] = "Scanning(Dual,SwSpiFast)";
+  labels[9] = "Scanning(Dual,HwSpi)";
+  labels[10] = "Scanning(Dual,HwSpiFast)";
+  labels[11] = "Tm1637(Wire)";
+  labels[12] = "Tm1637(WireFast)";
+  labels[13] = "Max7219(SwSpi)";
+  labels[14] = "Max7219(SwSpiFast)";
+  labels[15] = "Max7219(HwSpi)";
+  labels[16] = "Max7219(HwSpiFast)";
+  labels[17] = "StubModule+LedDisplay";
+  labels[18] = "NumberWriter+Stub";
+  labels[19] = "ClockWriter+Stub";
+  labels[20] = "TemperatureWriter+Stub";
+  labels[21] = "CharWriter+Stub";
+  labels[22] = "StringWriter+Stub";
   record_index = 0
 }
 {
