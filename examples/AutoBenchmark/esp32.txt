@@ -15,18 +15,19 @@ sizeof(ClockWriter): 8
 sizeof(TemperatureWriter): 4
 sizeof(CharWriter): 4
 sizeof(StringWriter): 4
+sizeof(StringScroller): 12
 BENCHMARKS
-Scanning(Direct) 2 2 9 240
+Scanning(Direct) 2 2 11 240
 Scanning(Direct,subfields) 0 1 11 3840
 Scanning(Single,SoftSpi) 4 4 13 240
 Scanning(Single,SoftSpi,subfields) 0 1 13 3840
-Scanning(Single,HardSpi) 9 9 17 240
+Scanning(Single,HardSpi) 9 9 18 240
 Scanning(Single,HardSpi,subfields) 0 1 18 3840
 Scanning(Dual,SoftSpi) 7 7 15 240
 Scanning(Dual,SoftSpi,subfields) 0 1 15 3840
-Scanning(Dual,HardSpi) 9 9 18 240
+Scanning(Dual,HardSpi) 9 9 17 240
 Scanning(Dual,HardSpi,subfields) 0 1 18 3840
-Tm1637(Wire) 21229 21236 21243 20
-Max7219(SoftSpi) 33 34 42 20
-Max7219(HardSpi) 44 44 47 20
+Tm1637(SoftWire) 21228 21239 21252 20
+Max7219(SoftSpi) 33 33 36 20
+Max7219(HardSpi) 43 44 52 20
 END

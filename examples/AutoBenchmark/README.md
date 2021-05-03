@@ -83,6 +83,8 @@ number of `TimingStats::update()` calls that were made.
   characteristics of the LED module.
 * Add benchmarks for `Max7219Module`.
 * Upgrade from ESP32 Core v1.0.4 to v1.0.6.
+* Add benchmarks for `LedMatrixSingleShiftRegister`,
+  `LedMatrixDualShiftRegister`, and `Max7219Module` using `HardSpiFastInteface`.
 
 ## Results
 
@@ -124,8 +126,8 @@ On AVR processors, the "fast" options are available using the
 `digitalWriteFast()` functions can be up to 50X faster if the `pin` number and
 `value` parameters are compile-time constants. In addition, the
 `digitalWriteFast` functions reduce flash memory consumption by 600-700 bytes
-for `SoftWireFastInterface` and `SoftSpiFastInterface` compared to their
-non-fast equivalents.
+for `SoftWireFastInterface`, `SoftSpiFastInterface`, and `HardSpiFastInterface`
+compared to their non-fast equivalents.
 
 ### Arduino Nano
 
@@ -141,6 +143,7 @@ sizeof(SoftWireFastInterface<4, 5, 100>): 1
 sizeof(SoftSpiInterface): 3
 sizeof(SoftSpiFastInterface<11, 12, 13>): 1
 sizeof(HardSpiInterface): 3
+sizeof(HardSpiFastInterface<11, 12, 13>): 1
 sizeof(LedMatrixDirect<>): 9
 sizeof(LedMatrixDirectFast4<6..13, 2..5>): 3
 sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>): 8
@@ -155,33 +158,42 @@ sizeof(ClockWriter): 3
 sizeof(TemperatureWriter): 2
 sizeof(CharWriter): 2
 sizeof(StringWriter): 2
+sizeof(StringScroller): 7
 
 CPU:
 +----------------------------------------+-------------------+---------+
 | Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Scanning(Direct)                       |    72/   76/   88 |     240 |
-| Scanning(Direct,subfields)             |     4/   13/   84 |    3840 |
-| Scanning(DirectFast)                   |    24/   28/   44 |     240 |
-| Scanning(DirectFast,subfields)         |     4/    8/   40 |    3840 |
-| Scanning(Single,SoftSpi)               |   156/  159/  188 |     240 |
-| Scanning(Single,SoftSpi,subfields)     |     4/   22/  180 |    3840 |
-| Scanning(Single,SoftSpiFast)           |    28/   30/   44 |     240 |
-| Scanning(Single,SoftSpiFast,subfields) |     4/    8/   40 |    3840 |
-| Scanning(Single,HardSpi)               |    36/   38/   48 |     240 |
-| Scanning(Single,HardSpi,subfields)     |     4/    9/   48 |    3840 |
-| Scanning(Dual,SoftSpi)                 |   264/  268/  304 |     240 |
-| Scanning(Dual,SoftSpi,subfields)       |     4/   34/  304 |    3840 |
-| Scanning(Dual,SoftSpiFast)             |    20/   24/   36 |     240 |
-| Scanning(Dual,SoftSpiFast,subfields)   |     4/    7/   32 |    3840 |
-| Scanning(Dual,HardSpi)                 |    24/   26/   36 |     240 |
-| Scanning(Dual,HardSpi,subfields)       |     4/    7/   36 |    3840 |
+| Scanning(Direct)                       |    68/   74/   88 |     240 |
+| Scanning(Direct,subfields)             |     4/   12/   88 |    3840 |
+| Scanning(DirectFast)                   |    24/   28/   40 |     240 |
+| Scanning(DirectFast,subfields)         |     4/    8/   36 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(Wire)                           | 22308/22328/22560 |      20 |
-| Tm1637(WireFast)                       | 21060/21071/21192 |      20 |
-| Max7219(SoftSpi)                       |  1328/ 1336/ 1424 |      20 |
-| Max7219(SoftSpiFast)                   |   120/  126/  136 |      20 |
-| Max7219(HardSpi)                       |   120/  130/  140 |      20 |
+| Scanning(Single,SoftSpi)               |   156/  159/  180 |     240 |
+| Scanning(Single,SoftSpi,subfields)     |     4/   22/  180 |    3840 |
+| Scanning(Single,SoftSpiFast)           |    28/   31/   44 |     240 |
+| Scanning(Single,SoftSpiFast,subfields) |     4/    8/   40 |    3840 |
+| Scanning(Single,HardSpi)               |    36/   39/   52 |     240 |
+| Scanning(Single,HardSpi,subfields)     |     4/    9/   48 |    3840 |
+| Scanning(Single,HardSpiFast)           |    24/   27/   40 |     240 |
+| Scanning(Single,HardSpiFast,subfields) |     4/    7/   40 |    3840 |
+|----------------------------------------+-------------------+---------|
+| Scanning(Dual,SoftSpi)                 |   264/  269/  304 |     240 |
+| Scanning(Dual,SoftSpi,subfields)       |     4/   34/  296 |    3840 |
+| Scanning(Dual,SoftSpiFast)             |    20/   24/   32 |     240 |
+| Scanning(Dual,SoftSpiFast,subfields)   |     4/    7/   32 |    3840 |
+| Scanning(Dual,HardSpi)                 |    24/   27/   36 |     240 |
+| Scanning(Dual,HardSpi,subfields)       |     4/    8/   36 |    3840 |
+| Scanning(Dual,HardSpiFast)             |    12/   14/   28 |     240 |
+| Scanning(Dual,HardSpiFast,subfields)   |     4/    6/   24 |    3840 |
+|----------------------------------------+-------------------+---------|
+| Tm1637(SoftWire)                       | 22308/22329/22600 |      20 |
+| Tm1637(SoftWireFast)                   | 21060/21073/21224 |      20 |
+|----------------------------------------+-------------------+---------|
+| Max7219(SoftSpi)                       |  1320/ 1331/ 1456 |      20 |
+| Max7219(SoftSpiFast)                   |   112/  120/  132 |      20 |
+| Max7219(HardSpi)                       |   120/  130/  144 |      20 |
+| Max7219(HardSpiFast)                   |    56/   63/   68 |      20 |
 +----------------------------------------+-------------------+---------+
 
 ```
@@ -200,6 +212,7 @@ sizeof(SoftWireFastInterface<4, 5, 100>): 1
 sizeof(SoftSpiInterface): 3
 sizeof(SoftSpiFastInterface<11, 12, 13>): 1
 sizeof(HardSpiInterface): 3
+sizeof(HardSpiFastInterface<11, 12, 13>): 1
 sizeof(LedMatrixDirect<>): 9
 sizeof(LedMatrixDirectFast4<6..13, 2..5>): 3
 sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>): 8
@@ -214,33 +227,42 @@ sizeof(ClockWriter): 3
 sizeof(TemperatureWriter): 2
 sizeof(CharWriter): 2
 sizeof(StringWriter): 2
+sizeof(StringScroller): 7
 
 CPU:
 +----------------------------------------+-------------------+---------+
 | Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Scanning(Direct)                       |    72/   78/   92 |     240 |
-| Scanning(Direct,subfields)             |     4/   14/   92 |    3840 |
+| Scanning(Direct)                       |    72/   76/   84 |     240 |
+| Scanning(Direct,subfields)             |     4/   14/   84 |    3840 |
 | Scanning(DirectFast)                   |    24/   28/   36 |     240 |
-| Scanning(DirectFast,subfields)         |     4/    8/   40 |    3840 |
-| Scanning(Single,SoftSpi)               |   148/  152/  164 |     240 |
+| Scanning(DirectFast,subfields)         |     4/    8/   36 |    3840 |
+|----------------------------------------+-------------------+---------|
+| Scanning(Single,SoftSpi)               |   148/  153/  164 |     240 |
 | Scanning(Single,SoftSpi,subfields)     |     4/   23/  164 |    3840 |
 | Scanning(Single,SoftSpiFast)           |    28/   31/   40 |     240 |
 | Scanning(Single,SoftSpiFast,subfields) |     4/    8/   40 |    3840 |
-| Scanning(Single,HardSpi)               |    36/   40/   48 |     240 |
+| Scanning(Single,HardSpi)               |    36/   41/   52 |     240 |
 | Scanning(Single,HardSpi,subfields)     |     4/    9/   52 |    3840 |
+| Scanning(Single,HardSpiFast)           |    24/   27/   36 |     240 |
+| Scanning(Single,HardSpiFast,subfields) |     4/    8/   36 |    3840 |
+|----------------------------------------+-------------------+---------|
 | Scanning(Dual,SoftSpi)                 |   248/  252/  264 |     240 |
 | Scanning(Dual,SoftSpi,subfields)       |     4/   36/  264 |    3840 |
-| Scanning(Dual,SoftSpiFast)             |    20/   23/   32 |     240 |
+| Scanning(Dual,SoftSpiFast)             |    20/   23/   36 |     240 |
 | Scanning(Dual,SoftSpiFast,subfields)   |     4/    8/   32 |    3840 |
-| Scanning(Dual,HardSpi)                 |    24/   26/   36 |     240 |
+| Scanning(Dual,HardSpi)                 |    24/   28/   36 |     240 |
 | Scanning(Dual,HardSpi,subfields)       |     4/    8/   36 |    3840 |
+| Scanning(Dual,HardSpiFast)             |    12/   13/   20 |     240 |
+| Scanning(Dual,HardSpiFast,subfields)   |     4/    6/   20 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(Wire)                           | 22432/22439/22444 |      20 |
-| Tm1637(WireFast)                       | 21168/21176/21192 |      20 |
-| Max7219(SoftSpi)                       |  1252/ 1255/ 1260 |      20 |
-| Max7219(SoftSpiFast)                   |   116/  120/  124 |      20 |
-| Max7219(HardSpi)                       |   128/  130/  136 |      20 |
+| Tm1637(SoftWire)                       | 22432/22439/22452 |      20 |
+| Tm1637(SoftWireFast)                   | 21168/21177/21184 |      20 |
+|----------------------------------------+-------------------+---------|
+| Max7219(SoftSpi)                       |  1244/ 1247/ 1252 |      20 |
+| Max7219(SoftSpiFast)                   |   112/  113/  120 |      20 |
+| Max7219(HardSpi)                       |   128/  129/  136 |      20 |
+| Max7219(HardSpiFast)                   |    56/   59/   64 |      20 |
 +----------------------------------------+-------------------+---------+
 
 ```
@@ -269,24 +291,28 @@ sizeof(ClockWriter): 8
 sizeof(TemperatureWriter): 4
 sizeof(CharWriter): 4
 sizeof(StringWriter): 4
+sizeof(StringScroller): 12
 
 CPU:
 +----------------------------------------+-------------------+---------+
 | Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
 | Scanning(Direct)                       |    24/   24/   29 |     240 |
-| Scanning(Direct,subfields)             |     2/    5/   29 |    3840 |
-| Scanning(Single,SoftSpi)               |    51/   52/   56 |     240 |
-| Scanning(Single,SoftSpi,subfields)     |     2/    7/   56 |    3840 |
-| Scanning(Single,HardSpi)               |    23/   23/   28 |     240 |
-| Scanning(Single,HardSpi,subfields)     |     2/    4/   28 |    3840 |
-| Scanning(Dual,SoftSpi)                 |    87/   88/   92 |     240 |
-| Scanning(Dual,SoftSpi,subfields)       |     2/   11/   94 |    3840 |
-| Scanning(Dual,HardSpi)                 |    22/   22/   26 |     240 |
-| Scanning(Dual,HardSpi,subfields)       |     3/    4/   28 |    3840 |
+| Scanning(Direct,subfields)             |     2/    4/   29 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(Wire)                           | 22221/22223/22232 |      20 |
-| Max7219(SoftSpi)                       |   431/  434/  438 |      20 |
+| Scanning(Single,SoftSpi)               |    51/   51/   58 |     240 |
+| Scanning(Single,SoftSpi,subfields)     |     2/    7/   58 |    3840 |
+| Scanning(Single,HardSpi)               |    23/   23/   30 |     240 |
+| Scanning(Single,HardSpi,subfields)     |     2/    4/   30 |    3840 |
+|----------------------------------------+-------------------+---------|
+| Scanning(Dual,SoftSpi)                 |    87/   87/   93 |     240 |
+| Scanning(Dual,SoftSpi,subfields)       |     2/   10/   94 |    3840 |
+| Scanning(Dual,HardSpi)                 |    22/   22/   26 |     240 |
+| Scanning(Dual,HardSpi,subfields)       |     3/    4/   27 |    3840 |
+|----------------------------------------+-------------------+---------|
+| Tm1637(SoftWire)                       | 22222/22225/22234 |      20 |
+|----------------------------------------+-------------------+---------|
+| Max7219(SoftSpi)                       |   430/  432/  436 |      20 |
 | Max7219(HardSpi)                       |   106/  107/  111 |      20 |
 +----------------------------------------+-------------------+---------+
 
@@ -316,25 +342,29 @@ sizeof(ClockWriter): 8
 sizeof(TemperatureWriter): 4
 sizeof(CharWriter): 4
 sizeof(StringWriter): 4
+sizeof(StringScroller): 12
 
 CPU:
 +----------------------------------------+-------------------+---------+
 | Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Scanning(Direct)                       |    13/   14/   19 |     240 |
-| Scanning(Direct,subfields)             |     1/    2/   24 |    3840 |
-| Scanning(Single,SoftSpi)               |    30/   31/   36 |     240 |
-| Scanning(Single,SoftSpi,subfields)     |     1/    4/   54 |    3840 |
-| Scanning(Single,HardSpi)               |    40/   40/   45 |     240 |
-| Scanning(Single,HardSpi,subfields)     |     1/    4/   50 |    3840 |
-| Scanning(Dual,SoftSpi)                 |    53/   53/   58 |     240 |
-| Scanning(Dual,SoftSpi,subfields)       |     1/    5/   77 |    3840 |
-| Scanning(Dual,HardSpi)                 |    39/   40/   44 |     240 |
-| Scanning(Dual,HardSpi,subfields)       |     1/    5/   77 |    3840 |
+| Scanning(Direct)                       |    14/   14/   20 |     240 |
+| Scanning(Direct,subfields)             |     1/    2/   25 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(Wire)                           | 22398/22404/22412 |      20 |
-| Max7219(SoftSpi)                       |   266/  267/  272 |      20 |
-| Max7219(HardSpi)                       |   199/  200/  205 |      20 |
+| Scanning(Single,SoftSpi)               |    32/   32/   38 |     240 |
+| Scanning(Single,SoftSpi,subfields)     |     1/    4/   43 |    3840 |
+| Scanning(Single,HardSpi)               |    40/   41/   46 |     240 |
+| Scanning(Single,HardSpi,subfields)     |     1/    4/   65 |    3840 |
+|----------------------------------------+-------------------+---------|
+| Scanning(Dual,SoftSpi)                 |    55/   56/   61 |     240 |
+| Scanning(Dual,SoftSpi,subfields)       |     1/    5/   71 |    3840 |
+| Scanning(Dual,HardSpi)                 |    40/   40/   45 |     240 |
+| Scanning(Dual,HardSpi,subfields)       |     1/    5/   63 |    3840 |
+|----------------------------------------+-------------------+---------|
+| Tm1637(SoftWire)                       | 22399/22405/22413 |      20 |
+|----------------------------------------+-------------------+---------|
+| Max7219(SoftSpi)                       |   281/  283/  287 |      20 |
+| Max7219(HardSpi)                       |   201/  202/  206 |      20 |
 +----------------------------------------+-------------------+---------+
 
 ```
@@ -363,25 +393,29 @@ sizeof(ClockWriter): 8
 sizeof(TemperatureWriter): 4
 sizeof(CharWriter): 4
 sizeof(StringWriter): 4
+sizeof(StringScroller): 12
 
 CPU:
 +----------------------------------------+-------------------+---------+
 | Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Scanning(Direct)                       |    12/   12/   29 |     240 |
-| Scanning(Direct,subfields)             |     0/    2/   20 |    3840 |
-| Scanning(Single,SoftSpi)               |    29/   29/   37 |     240 |
-| Scanning(Single,SoftSpi,subfields)     |     0/    4/   37 |    3840 |
-| Scanning(Single,HardSpi)               |    11/   11/   19 |     240 |
-| Scanning(Single,HardSpi,subfields)     |     0/    2/   20 |    3840 |
-| Scanning(Dual,SoftSpi)                 |    50/   50/   58 |     240 |
+| Scanning(Direct)                       |    12/   12/   25 |     240 |
+| Scanning(Direct,subfields)             |     0/    2/   25 |    3840 |
+|----------------------------------------+-------------------+---------|
+| Scanning(Single,SoftSpi)               |    29/   29/   41 |     240 |
+| Scanning(Single,SoftSpi,subfields)     |     0/    4/   45 |    3840 |
+| Scanning(Single,HardSpi)               |    11/   11/   24 |     240 |
+| Scanning(Single,HardSpi,subfields)     |     0/    2/   23 |    3840 |
+|----------------------------------------+-------------------+---------|
+| Scanning(Dual,SoftSpi)                 |    50/   50/   59 |     240 |
 | Scanning(Dual,SoftSpi,subfields)       |     0/    7/   67 |    3840 |
-| Scanning(Dual,HardSpi)                 |    12/   12/   24 |     240 |
+| Scanning(Dual,HardSpi)                 |    12/   12/   20 |     240 |
 | Scanning(Dual,HardSpi,subfields)       |     0/    2/   28 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(Wire)                           | 21493/21497/21533 |      20 |
-| Max7219(SoftSpi)                       |   254/  254/  266 |      20 |
-| Max7219(HardSpi)                       |    60/   61/   77 |      20 |
+| Tm1637(SoftWire)                       | 21496/21501/21532 |      20 |
+|----------------------------------------+-------------------+---------|
+| Max7219(SoftSpi)                       |   254/  255/  271 |      20 |
+| Max7219(HardSpi)                       |    61/   61/   70 |      20 |
 +----------------------------------------+-------------------+---------+
 
 ```
@@ -410,25 +444,29 @@ sizeof(ClockWriter): 8
 sizeof(TemperatureWriter): 4
 sizeof(CharWriter): 4
 sizeof(StringWriter): 4
+sizeof(StringScroller): 12
 
 CPU:
 +----------------------------------------+-------------------+---------+
 | Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Scanning(Direct)                       |     2/    2/    9 |     240 |
+| Scanning(Direct)                       |     2/    2/   11 |     240 |
 | Scanning(Direct,subfields)             |     0/    1/   11 |    3840 |
+|----------------------------------------+-------------------+---------|
 | Scanning(Single,SoftSpi)               |     4/    4/   13 |     240 |
 | Scanning(Single,SoftSpi,subfields)     |     0/    1/   13 |    3840 |
-| Scanning(Single,HardSpi)               |     9/    9/   17 |     240 |
+| Scanning(Single,HardSpi)               |     9/    9/   18 |     240 |
 | Scanning(Single,HardSpi,subfields)     |     0/    1/   18 |    3840 |
+|----------------------------------------+-------------------+---------|
 | Scanning(Dual,SoftSpi)                 |     7/    7/   15 |     240 |
 | Scanning(Dual,SoftSpi,subfields)       |     0/    1/   15 |    3840 |
-| Scanning(Dual,HardSpi)                 |     9/    9/   18 |     240 |
+| Scanning(Dual,HardSpi)                 |     9/    9/   17 |     240 |
 | Scanning(Dual,HardSpi,subfields)       |     0/    1/   18 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(Wire)                           | 21229/21236/21243 |      20 |
-| Max7219(SoftSpi)                       |    33/   34/   42 |      20 |
-| Max7219(HardSpi)                       |    44/   44/   47 |      20 |
+| Tm1637(SoftWire)                       | 21228/21239/21252 |      20 |
+|----------------------------------------+-------------------+---------|
+| Max7219(SoftSpi)                       |    33/   33/   36 |      20 |
+| Max7219(HardSpi)                       |    43/   44/   52 |      20 |
 +----------------------------------------+-------------------+---------+
 
 ```
@@ -458,6 +496,7 @@ sizeof(ClockWriter): 8
 sizeof(TemperatureWriter): 4
 sizeof(CharWriter): 4
 sizeof(StringWriter): 4
+sizeof(StringScroller): 12
 
 CPU:
 +----------------------------------------+-------------------+---------+
@@ -465,18 +504,21 @@ CPU:
 |----------------------------------------+-------------------+---------|
 | Scanning(Direct)                       |     5/    5/    9 |     240 |
 | Scanning(Direct,subfields)             |     0/    1/    9 |    3840 |
-| Scanning(Single,SoftSpi)               |     9/    9/   12 |     240 |
-| Scanning(Single,SoftSpi,subfields)     |     0/    1/   12 |    3840 |
-| Scanning(Single,HardSpi)               |     3/    3/    4 |     240 |
-| Scanning(Single,HardSpi,subfields)     |     0/    0/    6 |    3840 |
-| Scanning(Dual,SoftSpi)                 |    16/   16/   19 |     240 |
-| Scanning(Dual,SoftSpi,subfields)       |     0/    2/   21 |    3840 |
-| Scanning(Dual,HardSpi)                 |     3/    3/    6 |     240 |
-| Scanning(Dual,HardSpi,subfields)       |     0/    0/    4 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(Wire)                           | 21148/21149/21153 |      20 |
-| Max7219(SoftSpi)                       |    82/   83/   85 |      20 |
-| Max7219(HardSpi)                       |    17/   17/   18 |      20 |
+| Scanning(Single,SoftSpi)               |     9/    9/   12 |     240 |
+| Scanning(Single,SoftSpi,subfields)     |     0/    1/   13 |    3840 |
+| Scanning(Single,HardSpi)               |     3/    3/    6 |     240 |
+| Scanning(Single,HardSpi,subfields)     |     0/    0/    6 |    3840 |
+|----------------------------------------+-------------------+---------|
+| Scanning(Dual,SoftSpi)                 |    16/   16/   20 |     240 |
+| Scanning(Dual,SoftSpi,subfields)       |     0/    2/   20 |    3840 |
+| Scanning(Dual,HardSpi)                 |     3/    3/    4 |     240 |
+| Scanning(Dual,HardSpi,subfields)       |     0/    1/    7 |    3840 |
+|----------------------------------------+-------------------+---------|
+| Tm1637(SoftWire)                       | 21165/21166/21172 |      20 |
+|----------------------------------------+-------------------+---------|
+| Max7219(SoftSpi)                       |    83/   83/   86 |      20 |
+| Max7219(HardSpi)                       |    17/   17/   21 |      20 |
 +----------------------------------------+-------------------+---------+
 
 ```
