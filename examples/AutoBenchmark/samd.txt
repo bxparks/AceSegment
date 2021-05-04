@@ -5,8 +5,11 @@ sizeof(HardSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
 sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>): 16
 sizeof(LedMatrixDualShiftRegister<HardSpiInterface>): 12
-sizeof(LedModule): 4
+sizeof(LedModule): 8
 sizeof(ScanningModule<LedMatrixBase, 4>): 32
+sizeof(BareModule<4>): 48
+sizeof(SingleHc595Module<SoftSpiInterface, 4>): 48
+sizeof(DualHc595Module<SoftSpiInterface, 4>): 44
 sizeof(Tm1637Module<SoftWireInterface, 4>): 24
 sizeof(Max7219Module<SoftSpiInterface, 8>): 28
 sizeof(LedDisplay): 4
@@ -17,17 +20,17 @@ sizeof(CharWriter): 4
 sizeof(StringWriter): 4
 sizeof(StringScroller): 12
 BENCHMARKS
-Scanning(Direct) 24 24 29 240
-Scanning(Direct,subfields) 2 4 29 3840
-Scanning(Single,SoftSpi) 51 51 58 240
-Scanning(Single,SoftSpi,subfields) 2 7 58 3840
-Scanning(Single,HardSpi) 23 23 30 240
-Scanning(Single,HardSpi,subfields) 2 4 30 3840
-Scanning(Dual,SoftSpi) 87 87 93 240
-Scanning(Dual,SoftSpi,subfields) 2 10 94 3840
-Scanning(Dual,HardSpi) 22 22 26 240
-Scanning(Dual,HardSpi,subfields) 3 4 27 3840
-Tm1637(SoftWire) 22222 22225 22234 20
-Max7219(SoftSpi) 430 432 436 20
-Max7219(HardSpi) 106 107 111 20
+BareModule 24 24 29 240
+BareModule(subfields) 2 5 29 3840
+SingleHc595(SoftSpi) 52 53 58 240
+SingleHc595(SoftSpi,subfields) 2 8 58 3840
+SingleHc595(HardSpi) 24 24 28 240
+SingleHc595(HardSpi,subfields) 2 5 29 3840
+DualHc595(SoftSpi) 89 90 95 240
+DualHc595(SoftSpi,subfields) 2 13 95 3840
+DualHc595(HardSpi) 22 22 26 240
+DualHc595(HardSpi,subfields) 2 5 26 3840
+Tm1637(SoftWire) 22225 22228 22237 20
+Max7219(SoftSpi) 448 451 455 20
+Max7219(HardSpi) 107 107 113 20
 END

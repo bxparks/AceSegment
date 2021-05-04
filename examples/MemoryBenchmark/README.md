@@ -53,15 +53,6 @@ will be invoked by the following command:
 $ make README.md
 ```
 
-## Algorithms
-
-* 0 `baseline`: program does (almost) nothing
-* 1 `direct`: segment and digit pins are wired directly
-* 2 `split_sw_spi`: segment pins wired directly, digit pins through SW SPI
-* 3 `split_hw_spi`: segment pins wired directly, digit pins through HW SPI
-* 4 `merged_sw_spi`: segment and digit pins both controlled through SW SPI
-* 5 `merged_hw_spi`: segment and digit pins both controlled through HW SPI
-
 ## Library Size Changes
 
 **v0.3**
@@ -133,6 +124,9 @@ before substantional refactoring in 2021.
   of indirection through the `LedModule`). So overall, I think it's a wash.
 * Add `HardSpiFastInterface` which saves 70 bytes for `ScanningModule(Single)`,
   90 bytes for `ScanningModule(Dual)`, and 250 bytes for `Max7219Module`.
+* Hide implementation details involving `LedMatrixXxx` and `ScanningModule` by
+  using the convenience classes (`BareModule`, `BareFast4Module`,
+  `SingleHc595Module`, `DualHc595Module`).
 
 ## Results
 
@@ -140,9 +134,12 @@ The following shows the flash and static memory sizes of the `MemoryBenchmark`
 program for various `LedModule` configurations and various Writer classes.
 
 * `ClockInterface`, `GpioInterface` (usually optimized away by the compiler)
-* `SoftSpiInterface` or `HardSpiInterface`
-* `LedMatrixXxx`
-* `ScanningModule`
+* `SoftSpiInterface`, `SoftSpiFastInterface`, `HardSpiInterface`,
+  `HardSpiFastInterface`
+* `BareModule`
+* `BareFast4Module`
+* `SingleHc595Module`
+* `DualHc595Module`
 * `Tm1637Module`
 * `Max7219Module`
 * `NumberWriter`
@@ -170,26 +167,26 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        |    456/   11 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| Scanning(Direct)                |   1498/   64 |  1042/   53 |
-| Scanning(DirectFast)            |   1258/   94 |   802/   83 |
+| BareModule                      |   1486/   64 |  1030/   53 |
+| BareFast4Module                 |   1250/   94 |   794/   83 |
 |---------------------------------+--------------+-------------|
-| Scanning(Single,SoftSpi)        |   1520/   58 |  1064/   47 |
-| Scanning(Single,SoftSpiFast)    |   1412/   56 |   956/   45 |
-| Scanning(Single,HardSpi)        |   1582/   59 |  1126/   48 |
-| Scanning(Single,HardSpiFast)    |   1510/   57 |  1054/   46 |
+| SingleHc595(SoftSpi)            |   1508/   58 |  1052/   47 |
+| SingleHc595(SoftSpiFast)        |   1400/   56 |   944/   45 |
+| SingleHc595(HardSpi)            |   1570/   59 |  1114/   48 |
+| SingleHc595(HardSpiFast)        |   1498/   57 |  1042/   46 |
 |---------------------------------+--------------+-------------|
-| Scanning(Dual,SoftSpi)          |   1422/   51 |   966/   40 |
-| Scanning(Dual,SoftSpiFast)      |   1020/   49 |   564/   38 |
-| Scanning(Dual,HardSpi)          |   1496/   52 |  1040/   41 |
-| Scanning(Dual,HardSpiFast)      |   1412/   50 |   956/   39 |
+| DualHc595(SoftSpi)              |   1422/   51 |   966/   40 |
+| DualHc595(SoftSpiFast)          |   1012/   49 |   556/   38 |
+| DualHc595(HardSpi)              |   1496/   52 |  1040/   41 |
+| DualHc595(HardSpiFast)          |   1404/   50 |   948/   39 |
 |---------------------------------+--------------+-------------|
 | Tm1637(Wire)                    |   1582/   39 |  1126/   28 |
 | Tm1637(WireFast)                |    924/   36 |   468/   25 |
 |---------------------------------+--------------+-------------|
-| Max7219(SoftSpi)                |   1214/   44 |   758/   33 |
-| Max7219(SoftSpiFast)            |    774/   42 |   318/   31 |
-| Max7219(HardSpi)                |   1294/   45 |   838/   34 |
-| Max7219(HardSpiFast)            |   1068/   43 |   612/   32 |
+| Max7219(SoftSpi)                |   1218/   44 |   762/   33 |
+| Max7219(SoftSpiFast)            |    778/   42 |   322/   31 |
+| Max7219(HardSpi)                |   1298/   45 |   842/   34 |
+| Max7219(HardSpiFast)            |   1072/   43 |   616/   32 |
 |---------------------------------+--------------+-------------|
 | StubModule+LedDisplay           |    578/   24 |   122/   13 |
 | NumberWriter+Stub               |    682/   28 |   226/   17 |
@@ -213,26 +210,26 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        |   3472/  151 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| Scanning(Direct)                |   4492/  204 |  1020/   53 |
-| Scanning(DirectFast)            |   4138/  234 |   666/   83 |
+| BareModule                      |   4482/  204 |  1010/   53 |
+| BareFast4Module                 |   4132/  234 |   660/   83 |
 |---------------------------------+--------------+-------------|
-| Scanning(Single,SoftSpi)        |   4516/  198 |  1044/   47 |
-| Scanning(Single,SoftSpiFast)    |   4408/  196 |   936/   45 |
-| Scanning(Single,HardSpi)        |   4578/  199 |  1106/   48 |
-| Scanning(Single,HardSpiFast)    |   4506/  197 |  1034/   46 |
+| SingleHc595(SoftSpi)            |   4504/  198 |  1032/   47 |
+| SingleHc595(SoftSpiFast)        |   4396/  196 |   924/   45 |
+| SingleHc595(HardSpi)            |   4566/  199 |  1094/   48 |
+| SingleHc595(HardSpiFast)        |   4494/  197 |  1022/   46 |
 |---------------------------------+--------------+-------------|
-| Scanning(Dual,SoftSpi)          |   4418/  191 |   946/   40 |
-| Scanning(Dual,SoftSpiFast)      |   3900/  189 |   428/   38 |
-| Scanning(Dual,HardSpi)          |   4492/  192 |  1020/   41 |
-| Scanning(Dual,HardSpiFast)      |   4394/  190 |   922/   39 |
+| DualHc595(SoftSpi)              |   4418/  191 |   946/   40 |
+| DualHc595(SoftSpiFast)          |   3894/  189 |   422/   38 |
+| DualHc595(HardSpi)              |   4492/  192 |  1020/   41 |
+| DualHc595(HardSpiFast)          |   4388/  190 |   916/   39 |
 |---------------------------------+--------------+-------------|
 | Tm1637(Wire)                    |   4652/  179 |  1180/   28 |
 | Tm1637(WireFast)                |   3880/  176 |   408/   25 |
 |---------------------------------+--------------+-------------|
-| Max7219(SoftSpi)                |   4284/  184 |   812/   33 |
-| Max7219(SoftSpiFast)            |   3730/  182 |   258/   31 |
-| Max7219(HardSpi)                |   4364/  185 |   892/   34 |
-| Max7219(HardSpiFast)            |   4126/  183 |   654/   32 |
+| Max7219(SoftSpi)                |   4288/  184 |   816/   33 |
+| Max7219(SoftSpiFast)            |   3734/  182 |   262/   31 |
+| Max7219(HardSpi)                |   4368/  185 |   896/   34 |
+| Max7219(HardSpiFast)            |   4130/  183 |   658/   32 |
 |---------------------------------+--------------+-------------|
 | StubModule+LedDisplay           |   3534/  164 |    62/   13 |
 | NumberWriter+Stub               |   3638/  168 |   166/   17 |
@@ -256,18 +253,18 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        |  10064/    0 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| Scanning(Direct)                |  10792/    0 |   728/    0 |
-| Scanning(DirectFast)            |     -1/   -1 |    -1/   -1 |
+| BareModule                      |  10816/    0 |   752/    0 |
+| BareFast4Module                 |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Scanning(Single,SoftSpi)        |  10848/    0 |   784/    0 |
-| Scanning(Single,SoftSpiFast)    |     -1/   -1 |    -1/   -1 |
-| Scanning(Single,HardSpi)        |  11296/    0 |  1232/    0 |
-| Scanning(Single,HardSpiFast)    |     -1/   -1 |    -1/   -1 |
+| SingleHc595(SoftSpi)            |  10856/    0 |   792/    0 |
+| SingleHc595(SoftSpiFast)        |     -1/   -1 |    -1/   -1 |
+| SingleHc595(HardSpi)            |  11304/    0 |  1240/    0 |
+| SingleHc595(HardSpiFast)        |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Scanning(Dual,SoftSpi)          |  10736/    0 |   672/    0 |
-| Scanning(Dual,SoftSpiFast)      |     -1/   -1 |    -1/   -1 |
-| Scanning(Dual,HardSpi)          |  11256/    0 |  1192/    0 |
-| Scanning(Dual,HardSpiFast)      |     -1/   -1 |    -1/   -1 |
+| DualHc595(SoftSpi)              |  10736/    0 |   672/    0 |
+| DualHc595(SoftSpiFast)          |     -1/   -1 |    -1/   -1 |
+| DualHc595(HardSpi)              |  11256/    0 |  1192/    0 |
+| DualHc595(HardSpiFast)          |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | Tm1637(Wire)                    |  10808/    0 |   744/    0 |
 | Tm1637(WireFast)                |     -1/   -1 |    -1/   -1 |
@@ -299,25 +296,25 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        |  19136/ 3788 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| Scanning(Direct)                |  21528/ 4392 |  2392/  604 |
-| Scanning(DirectFast)            |     -1/   -1 |    -1/   -1 |
+| BareModule                      |  21532/ 4392 |  2396/  604 |
+| BareFast4Module                 |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Scanning(Single,SoftSpi)        |  21592/ 4396 |  2456/  608 |
-| Scanning(Single,SoftSpiFast)    |     -1/   -1 |    -1/   -1 |
-| Scanning(Single,HardSpi)        |  23340/ 4396 |  4204/  608 |
-| Scanning(Single,HardSpiFast)    |     -1/   -1 |    -1/   -1 |
+| SingleHc595(SoftSpi)            |  21588/ 4396 |  2452/  608 |
+| SingleHc595(SoftSpiFast)        |     -1/   -1 |    -1/   -1 |
+| SingleHc595(HardSpi)            |  23336/ 4396 |  4200/  608 |
+| SingleHc595(HardSpiFast)        |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Scanning(Dual,SoftSpi)          |  21480/ 4392 |  2344/  604 |
-| Scanning(Dual,SoftSpiFast)      |     -1/   -1 |    -1/   -1 |
-| Scanning(Dual,HardSpi)          |  23272/ 4392 |  4136/  604 |
-| Scanning(Dual,HardSpiFast)      |     -1/   -1 |    -1/   -1 |
+| DualHc595(SoftSpi)              |  21476/ 4392 |  2340/  604 |
+| DualHc595(SoftSpiFast)          |     -1/   -1 |    -1/   -1 |
+| DualHc595(HardSpi)              |  23268/ 4392 |  4132/  604 |
+| DualHc595(HardSpiFast)          |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | Tm1637(Wire)                    |  21628/ 4372 |  2492/  584 |
 | Tm1637(WireFast)                |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Max7219(SoftSpi)                |  21404/ 4372 |  2268/  584 |
+| Max7219(SoftSpi)                |  21408/ 4372 |  2272/  584 |
 | Max7219(SoftSpiFast)            |     -1/   -1 |    -1/   -1 |
-| Max7219(HardSpi)                |  23196/ 4372 |  4060/  584 |
+| Max7219(HardSpi)                |  23200/ 4372 |  4064/  584 |
 | Max7219(HardSpiFast)            |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | StubModule+LedDisplay           |  19328/ 4340 |   192/  552 |
@@ -342,25 +339,25 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        | 256700/26784 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| Scanning(Direct)                | 257772/27260 |  1072/  476 |
-| Scanning(DirectFast)            |     -1/   -1 |    -1/   -1 |
+| BareModule                      | 257772/27260 |  1072/  476 |
+| BareFast4Module                 |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Scanning(Single,SoftSpi)        | 257844/27244 |  1144/  460 |
-| Scanning(Single,SoftSpiFast)    |     -1/   -1 |    -1/   -1 |
-| Scanning(Single,HardSpi)        | 258948/27252 |  2248/  468 |
-| Scanning(Single,HardSpiFast)    |     -1/   -1 |    -1/   -1 |
+| SingleHc595(SoftSpi)            | 257860/27244 |  1160/  460 |
+| SingleHc595(SoftSpiFast)        |     -1/   -1 |    -1/   -1 |
+| SingleHc595(HardSpi)            | 258964/27252 |  2264/  468 |
+| SingleHc595(HardSpiFast)        |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Scanning(Dual,SoftSpi)          | 257728/27248 |  1028/  464 |
-| Scanning(Dual,SoftSpiFast)      |     -1/   -1 |    -1/   -1 |
-| Scanning(Dual,HardSpi)          | 258912/27256 |  2212/  472 |
-| Scanning(Dual,HardSpiFast)      |     -1/   -1 |    -1/   -1 |
+| DualHc595(SoftSpi)              | 257728/27248 |  1028/  464 |
+| DualHc595(SoftSpiFast)          |     -1/   -1 |    -1/   -1 |
+| DualHc595(HardSpi)              | 258928/27256 |  2228/  472 |
+| DualHc595(HardSpiFast)          |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | Tm1637(Wire)                    | 257920/27224 |  1220/  440 |
 | Tm1637(WireFast)                |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | Max7219(SoftSpi)                | 257640/27224 |   940/  440 |
 | Max7219(SoftSpiFast)            |     -1/   -1 |    -1/   -1 |
-| Max7219(HardSpi)                | 258840/27232 |  2140/  448 |
+| Max7219(HardSpi)                | 258856/27232 |  2156/  448 |
 | Max7219(HardSpiFast)            |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | StubModule+LedDisplay           | 256876/27200 |   176/  416 |
@@ -385,25 +382,25 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        | 197748/13084 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| Scanning(Direct)                | 200442/13752 |  2694/  668 |
-| Scanning(DirectFast)            |     -1/   -1 |    -1/   -1 |
+| BareModule                      | 200442/13752 |  2694/  668 |
+| BareFast4Module                 |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Scanning(Single,SoftSpi)        | 200482/13760 |  2734/  676 |
-| Scanning(Single,SoftSpiFast)    |     -1/   -1 |    -1/   -1 |
-| Scanning(Single,HardSpi)        | 202774/13808 |  5026/  724 |
-| Scanning(Single,HardSpiFast)    |     -1/   -1 |    -1/   -1 |
+| SingleHc595(SoftSpi)            | 200482/13760 |  2734/  676 |
+| SingleHc595(SoftSpiFast)        |     -1/   -1 |    -1/   -1 |
+| SingleHc595(HardSpi)            | 202774/13808 |  5026/  724 |
+| SingleHc595(HardSpiFast)        |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Scanning(Dual,SoftSpi)          | 200382/13752 |  2634/  668 |
-| Scanning(Dual,SoftSpiFast)      |     -1/   -1 |    -1/   -1 |
-| Scanning(Dual,HardSpi)          | 202726/13800 |  4978/  716 |
-| Scanning(Dual,HardSpiFast)      |     -1/   -1 |    -1/   -1 |
+| DualHc595(SoftSpi)              | 200382/13752 |  2634/  668 |
+| DualHc595(SoftSpiFast)          |     -1/   -1 |    -1/   -1 |
+| DualHc595(HardSpi)              | 202726/13800 |  4978/  716 |
+| DualHc595(HardSpiFast)          |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | Tm1637(Wire)                    | 200670/13736 |  2922/  652 |
 | Tm1637(WireFast)                |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Max7219(SoftSpi)                | 200272/13720 |  2524/  636 |
+| Max7219(SoftSpi)                | 200280/13720 |  2532/  636 |
 | Max7219(SoftSpiFast)            |     -1/   -1 |    -1/   -1 |
-| Max7219(HardSpi)                | 202664/13768 |  4916/  684 |
+| Max7219(HardSpi)                | 202672/13768 |  4924/  684 |
 | Max7219(HardSpiFast)            |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | StubModule+LedDisplay           | 199196/13552 |  1448/  468 |
@@ -429,25 +426,25 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        |   7624/ 3048 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| Scanning(Direct)                |  11884/ 4584 |  4260/ 1536 |
-| Scanning(DirectFast)            |     -1/   -1 |    -1/   -1 |
+| BareModule                      |  11896/ 4584 |  4272/ 1536 |
+| BareFast4Module                 |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Scanning(Single,SoftSpi)        |  11936/ 4588 |  4312/ 1540 |
-| Scanning(Single,SoftSpiFast)    |     -1/   -1 |    -1/   -1 |
-| Scanning(Single,HardSpi)        |  13008/ 4644 |  5384/ 1596 |
-| Scanning(Single,HardSpiFast)    |     -1/   -1 |    -1/   -1 |
+| SingleHc595(SoftSpi)            |  11940/ 4588 |  4316/ 1540 |
+| SingleHc595(SoftSpiFast)        |     -1/   -1 |    -1/   -1 |
+| SingleHc595(HardSpi)            |  13012/ 4644 |  5388/ 1596 |
+| SingleHc595(HardSpiFast)        |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Scanning(Dual,SoftSpi)          |  11840/ 4584 |  4216/ 1536 |
-| Scanning(Dual,SoftSpiFast)      |     -1/   -1 |    -1/   -1 |
-| Scanning(Dual,HardSpi)          |  12912/ 4640 |  5288/ 1592 |
-| Scanning(Dual,HardSpiFast)      |     -1/   -1 |    -1/   -1 |
+| DualHc595(SoftSpi)              |  11840/ 4584 |  4216/ 1536 |
+| DualHc595(SoftSpiFast)          |     -1/   -1 |    -1/   -1 |
+| DualHc595(HardSpi)              |  12912/ 4640 |  5288/ 1592 |
+| DualHc595(HardSpiFast)          |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | Tm1637(Wire)                    |  12556/ 4564 |  4932/ 1516 |
 | Tm1637(WireFast)                |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Max7219(SoftSpi)                |  11836/ 4564 |  4212/ 1516 |
+| Max7219(SoftSpi)                |  11840/ 4564 |  4216/ 1516 |
 | Max7219(SoftSpiFast)            |     -1/   -1 |    -1/   -1 |
-| Max7219(HardSpi)                |  13272/ 4620 |  5648/ 1572 |
+| Max7219(HardSpi)                |  13276/ 4620 |  5652/ 1572 |
 | Max7219(HardSpiFast)            |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | StubModule+LedDisplay           |  10924/ 4552 |  3300/ 1504 |

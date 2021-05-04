@@ -25,22 +25,31 @@ teensy32_results = check_output(
 print(f"""\
 # AutoBenchmark
 
-This program creates instances of `ScanningModule` using different
-configurations of the `LedMatrix` class:
+This program creates instances of various subclasses `LedModule` using different
+configurations:
 
-* `direct`: group and segment pins directly connected to MCU
-* `single_sw_spi`: group pins connected directly to MCU, but segment pins
-  connected to 74HC595 accessed through software SPI (`SoftSpiInterface`)
-* `single_hw_spi`: group pins connected directly to MCU, but segment pins
-  connected to 74HC595 accessed through hardware SPI (`HardSpiInterface`)
-* `dual_sw_spi`: group pins and segment pins connected to 74HC595 accessed
-  through software SPI (`SoftSpiInterface`)
-* `dual_hw_spi`: group pins and segment pins connected to 74HC595 accessed
-  through hardware SPI (`HardSpiInterface`)
+* `BareModule`: group and segment pins directly connected to MCU
+* `BareFast4Module`: same as `BareModule` but using `digitalWriteFast` library
+* `SingleHc595Module`: group pins connected directly to MCU, but segment pins
+  connected to 74HC595 accessed through SPI
+* `DualHc595Module`: group pins and segment pins connected to two 74HC595
+  which are accessed through SPI
+* `Tm1637Module`: an LED module using a TM1637 driver chip, accessed through
+  a two-wire protocol similar to I2C
+* `Max7219Module`: an LED module using a MAX7219 driver chip, accessed through
+  SPI
 
-It measures the time taken by `ScanningModule::renderFieldNow()` which
-renders a single digit (multiple fields make up a frame, a frame is the
-rendering of all digits on the display module).
+We then measure the time taken by the methods used to render the digit to the
+LED module:
+
+* Subclasses of `ScanningModule`
+    * Measure the time taken by `ScanningModule::renderFieldNow()` which renders
+      a single digit (multiple fields make up a frame (a single frame is the
+      complete rendering of all digits on the display module).
+* `Tm1637Module::flush()
+    * Sends out the buffered digits over the custom two-wire protocol.
+* `Max7219Module::flush()`
+    * Sends out the buffered digits using SPI.
 
 **Version**: AceSegment v0.4+
 
@@ -104,12 +113,13 @@ number of `TimingStats::update()` calls that were made.
 **v0.4+:**
 
 * Add benchmarks for `Tm1637Module`. The CPU time is mostly determined by
-  the calls to `delayMicroseconds()`, which is required to meet the electrical
-  characteristics of the LED module.
+  the calls to `delayMicroseconds()`, which is must be about 100 microseconds
+  due to the unusually large capacitors (20 nF) installed on the DIO and CLK
+  lines. They should have been about 100X smaller (200 pF).
 * Add benchmarks for `Max7219Module`.
+* Add benchmarks for `BareModule`, `BareFast4Module`, `SingleHc595Module`, and
+  `DualHc595Module`.
 * Upgrade from ESP32 Core v1.0.4 to v1.0.6.
-* Add benchmarks for `LedMatrixSingleShiftRegister`,
-  `LedMatrixDualShiftRegister`, and `Max7219Module` using `HardSpiFastInteface`.
 
 ## Results
 
@@ -134,17 +144,17 @@ times a second for a module with 4 digits, or every 4.17 milliseconds. The
 results below show that every processor, even the slowest AVR processor, is able
 to meet this threshhold.
 
-* For the `LedMatrixDirect` type, this involves turning off the previous digit,
-  sending the 8 bits for the current digit's 8 LED segments in a loop, then
-  turning on the current digit. The `digitalWrite()` function is called 10
-  times.
-* For the `LedMatrixSingleShiftRegister` type, the 8 LED segment bits are sent
+* For the `BaseModule` and `BareFast4Module`, this involves turning off the
+  previous digit, sending the 8 bits for the current digit's 8 LED segments in a
+  loop, then turning on the current digit. The `digitalWrite()` function is
+  called 10 times.
+* For the `SingleHc595Module` type, the 8 LED segment bits are sent
   using software SPI or hardware SPI. (Software SPI uses the `shiftOut()`
   method, which is implemented using a loop of `digitalWrite()`.
-* For the `LedMatrixDualShiftRegister` type, the LED digit pins and the LED
+* For the `DualHc595Module` type, the LED digit pins and the LED
   segment pins are using conceptually a single SPI transaction. For software
   SPI, this is implemented using 2 `shiftOut()` operations. For hardware SPI,
-  this uses a single `transfer16()` command.
+  this uses a single `SPI::transfer16()` command.
 
 On AVR processors, the "fast" options are available using the
 [digitalWriteFast](https://github.com/NicksonYap/digitalWriteFast) library whose
