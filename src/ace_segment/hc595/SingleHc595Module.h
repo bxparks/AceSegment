@@ -26,14 +26,14 @@ SOFTWARE.
 #define ACE_SEGMENT_SINGLE_HC595_MODULE_H
 
 #include "../scanning/ScanningModule.h"
-#include "../scanning/LedMatrixSingleShiftRegister.h"
+#include "../scanning/LedMatrixSingleHc595.h"
 
 namespace ace_segment {
 
 /**
  * An implementation of LedModule class that supports an LED module using a
  * single 74HC595 Shift Register chip on the segment pins. This is a convenience
- * class that pairs together a ScanningModule and a LedMatrixSingleShiftRegister
+ * class that pairs together a ScanningModule and a LedMatrixSingleHc595
  * in a single class.
  *
  * @tparam T_SPII interface to SPI, either SoftSpiInterface or HardSpiInterface
@@ -54,14 +54,14 @@ template <
     typename T_GPIOI = GpioInterface
 >
 class SingleHc595Module : public ScanningModule<
-    LedMatrixSingleShiftRegister<T_SPII, T_GPIOI>,
+    LedMatrixSingleHc595<T_SPII, T_GPIOI>,
     T_DIGITS,
     T_SUBFIELDS,
     T_CI
 > {
   private:
     using Super = ScanningModule<
-        LedMatrixSingleShiftRegister<T_SPII, T_GPIOI>,
+        LedMatrixSingleHc595<T_SPII, T_GPIOI>,
         T_DIGITS,
         T_SUBFIELDS,
         T_CI
@@ -96,7 +96,7 @@ class SingleHc595Module : public ScanningModule<
     }
 
   private:
-    LedMatrixSingleShiftRegister<T_SPII, T_GPIOI> mLedMatrix;
+    LedMatrixSingleHc595<T_SPII, T_GPIOI> mLedMatrix;
 };
 
 } // ace_segment

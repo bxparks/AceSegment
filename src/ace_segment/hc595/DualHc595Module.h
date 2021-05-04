@@ -26,14 +26,14 @@ SOFTWARE.
 #define ACE_SEGMENT_DUAL_HC595_MODULE_H
 
 #include "../scanning/ScanningModule.h"
-#include "../scanning/LedMatrixDualShiftRegister.h"
+#include "../scanning/LedMatrixDualHc595.h"
 
 namespace ace_segment {
 
 /**
  * An implementation of LedModule class that supports an LED module using 2
  * 74HC595 Shift Register chips. This is a convenience class that pairs together
- * a ScanningModule and a LedMatrixDualShiftRegister in a single class.
+ * a ScanningModule and a LedMatrixDualHc595 in a single class.
  *
  * @tparam T_SPII interface to SPI, either SoftSpiInterface or HardSpiInterface
  * @tparam T_DIGITS number of LED digits
@@ -50,14 +50,14 @@ template <
     typename T_CI = ClockInterface
 >
 class DualHc595Module : public ScanningModule<
-    LedMatrixDualShiftRegister<T_SPII>,
+    LedMatrixDualHc595<T_SPII>,
     T_DIGITS,
     T_SUBFIELDS,
     T_CI
 > {
   private:
     using Super = ScanningModule<
-        LedMatrixDualShiftRegister<T_SPII>,
+        LedMatrixDualHc595<T_SPII>,
         T_DIGITS,
         T_SUBFIELDS,
         T_CI
@@ -89,7 +89,7 @@ class DualHc595Module : public ScanningModule<
     }
 
   private:
-    LedMatrixDualShiftRegister<T_SPII> mLedMatrix;
+    LedMatrixDualHc595<T_SPII> mLedMatrix;
 };
 
 } // ace_segment

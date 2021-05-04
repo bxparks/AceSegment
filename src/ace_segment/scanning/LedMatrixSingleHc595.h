@@ -22,21 +22,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_LED_MATRIX_SINGLE_SHIFT_REGISTER_H
-#define ACE_SEGMENT_LED_MATRIX_SINGLE_SHIFT_REGISTER_H
+#ifndef ACE_SEGMENT_LED_MATRIX_SINGLE_HC595_H
+#define ACE_SEGMENT_LED_MATRIX_SINGLE_HC595_H
 
 #include <Arduino.h> // OUTPUT, INPUT
 #include "../hw/GpioInterface.h"
 #include "LedMatrixBase.h"
 
-class LedMatrixSingleShiftRegisterTest_drawElements;
+class LedMatrixSingleHc595Test_drawElements;
 
 namespace ace_segment {
 
 /**
- * An implementation of LedMatrixBase with an 74HC595 Serial-To-Parallel
- * converter chip on the segment pins, with the digit pins directly connected to
- * the microcontroller.
+ * An implementation of LedMatrixBase with an 74HC595 Shift Register chip on the
+ * segment pins, with the digit pins directly connected to the microcontroller.
  *
  * The wiring is as follows:
  *
@@ -49,9 +48,9 @@ namespace ace_segment {
  *    default GpioInterface (note: 'GPI' is already taken on ESP8266)
  */
 template <typename T_SPII, typename T_GPIOI = GpioInterface>
-class LedMatrixSingleShiftRegister : public LedMatrixBase {
+class LedMatrixSingleHc595 : public LedMatrixBase {
   public:
-    LedMatrixSingleShiftRegister(
+    LedMatrixSingleHc595(
         const T_SPII& spiInterface,
         uint8_t elementOnPattern,
         uint8_t groupOnPattern,
@@ -110,7 +109,7 @@ class LedMatrixSingleShiftRegister : public LedMatrixBase {
     }
 
   private:
-    friend class ::LedMatrixSingleShiftRegisterTest_drawElements;
+    friend class ::LedMatrixSingleHc595Test_drawElements;
 
     /** Send the pattern to the element pins. */
     void drawElements(uint8_t pattern) const {

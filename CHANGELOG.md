@@ -36,8 +36,8 @@
             * `HardSpiInterface`
         * LedMatrix
             * `LedMatrixDirect`
-            * `LedMatrixSingleShiftRegister`
-            * `LedMatrixDualShiftRegister`
+            * `LedMatrixSingleHc595`
+            * `LedMatrixDualHc595`
         * `LedDisplay`
             * `ScanningDisplay`
         * Writers

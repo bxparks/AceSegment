@@ -55,8 +55,8 @@ The `LedMatrix` classes provide access to the LED diodes using one of the 3
 wiring configurations described above. There are 3 classes provided:
 
 * LedMatrixDirect
-* LedMatrixSingleShiftRegister
-* LedMatrixDualShiftRegister
+* LedMatrixSingleHc595
+* LedMatrixDualHc595
 
 These classes were originally design for a more general LED module, so they use
 slighlty more general terminologies. The digit pins are called "group" pins. And
@@ -78,10 +78,10 @@ Since the 74HC595 shift registers can be communicated using 2 different methods,
 there are 5 combinations possible:
 
 * LedMatrixDirect
-* LedMatrixSingleShiftRegister + SoftSpiInterface
-* LedMatrixSingleShiftRegister + HardSpiInterface
-* LedMatrixDualShiftRegister + SoftSpiInterface
-* LedMatrixDualShiftRegister + HardSpiInterface
+* LedMatrixSingleHc595 + SoftSpiInterface
+* LedMatrixSingleHc595 + HardSpiInterface
+* LedMatrixDualHc595 + SoftSpiInterface
+* LedMatrixDualHc595 + HardSpiInterface
 
 ## ScanningDisplay
 

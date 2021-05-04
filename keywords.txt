@@ -13,8 +13,8 @@ SoftSpiFastInterface	KEYWORD1
 LedMatrixBase	KEYWORD1
 LedMatrixDirect	KEYWORD1
 LedMatrixDirectFast4	KEYWORD1
-LedMatrixSingleShiftRegister	KEYWORD1
-LedMatrixDualShiftRegister	KEYWORD1
+LedMatrixSingleHc595	KEYWORD1
+LedMatrixDualHc595	KEYWORD1
 LedDisplay	KEYWORD1
 ScanningDisplay	KEYWORD1
 NumberWriter	KEYWORD1

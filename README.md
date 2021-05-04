@@ -37,8 +37,8 @@ consumption. Need to add documentation for:
         * [Resistors and Transistors](#ResistorsAndTransistors)
         * [Pins Wired Directly, Common Cathode](#LedMatrixDirectCommonCathode)
         * [Pins Wired Directly, Common Anode](#LedMatrixDirectCommonAnode)
-        * [Segments On 74HC595 Shift Register](#LedMatrixSingleShiftRegister)
-        * [Digits and Segments On Two Shift Registers](#LedMatrixDualShiftRegister)
+        * [Segments On 74HC595 Shift Register](#LedMatrixSingleHc595)
+        * [Digits and Segments On Two Shift Registers](#LedMatrixDualHc595)
     * [Using the ScanningModule](#UsingScanningModule)
         * [Writing the Digit Bit Patterns](#DigitBitPatterns)
         * [Global Brightness](#GlobalBrightness)
@@ -232,10 +232,10 @@ depend on the lower-level classes:
     * `LedMatrixDirectFast4`
         * Same as `LedMatrixDirect` but using `digitalWriteFast()` on AVR
           processors
-    * `LedMatrixSingleShiftRegister`
+    * `LedMatrixSingleHc595`
         * Group pins are access directly, but element pins are access through an
           74HC595 chip through SPI using one of SpiInterface classes
-    * `LedMatrixDualShiftRegister`
+    * `LedMatrixDualHc595`
         * Both group and element pions are access through two 74HC595 chips
           through SPI using one of the SpiInterface classes
 * `LedModule`
@@ -315,11 +315,11 @@ ScanningModule  Tm1637Module  Max7219Module
                +---------+------------+
                |         |            |
         BareModule SingleHc595Module DualHc595Module
-   BareFast4Module      |                 \
-           /            |                  \
-          /             |                   \
-         v              v                    v
-  LedMatrixDirect   LedMatrixSingleSftRgstr  LedMatrixDualShiftRegister
+   BareFast4Module       |                \
+           /             |                 \
+          /              |                  \
+         v               v                   v
+  LedMatrixDirect   LedMatrixSingleHc595  LedMatrixDualHc595
 LedMatrixDirectFast4              \             /
                                    \           /
                                     v         v
@@ -338,8 +338,8 @@ is used, and the resource creation occurs in roughly 5 stages, with the objects
 in the later stages depending on the objects created in the earlier stage:
 
 1. The SpiInterface object determines whether software SPI or hardware SPI is
-   used. Needed only by `LedMatrixSingleShiftRegister` and
-   `LedMatrixDualShiftRegister` classes.
+   used. Needed only by `LedMatrixSingleHc595` and
+   `LedMatrixDualHc595` classes.
 1. The LedMatrix object determine how the LEDs are wired and how to
    communicate to the LED segments.
 1. The `ScanningModule` represents the actual LED segment module using
@@ -533,7 +533,7 @@ The `LedMatrixDirect` configuration is *exactly* the same as the Common Cathode
 case above, except that `kActiveHighPattern` is replaced with
 `kActiveLowPattern`.
 
-<a name="LedMatrixSingleShiftRegister"></a>
+<a name="LedMatrixSingleHc595"></a>
 #### Segments on 74HC595 Shift Register
 
 The segment pins can be placed on a 74HC595 shift register chip that can be
@@ -564,7 +564,7 @@ MCU          74HC595             LED display (Common Cathode)
 +--------+                       +------------------------+
 ```
 
-The `LedMatrixSingleShiftRegister` configuration using software SPI is:
+The `LedMatrixSingleHc595` configuration using software SPI is:
 
 ```C++
 const uint8_t NUM_DIGITS = 4;
@@ -576,7 +576,7 @@ const uint16_t FRAMES_PER_SECOND = 60;
 
 // Common Cathode, with transistors on Group pins
 SoftSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-using LedMatrix = LedMatrixSingleShiftRegister<SoftSpiInterface>;
+using LedMatrix = LedMatrixSingleHc595<SoftSpiInterface>;
 LedMatrix ledMatrix(
     spiInterface,
     LedMatrix::kActiveHighPattern /*elementOnPattern*/,
@@ -595,10 +595,10 @@ void setupScanningModule() {
 }
 ```
 
-The `LedMatrixSingleShiftRegister` configuration using hardware SPI is *exactly*
+The `LedMatrixSingleHc595` configuration using hardware SPI is *exactly*
 the same as above but with `HardSpiInterface` replacing `SoftSpiInterface`.
 
-<a name="LedMatrixDualShiftRegister"></a>
+<a name="LedMatrixDualHc595"></a>
 #### Digits and Segments on Two Shift Registers
 
 In this wiring, both the segment pins and the digit pins are wired to
@@ -630,7 +630,7 @@ MCU                 74HC595             LED display (Common Cathode)
                     +---------+
 ```
 
-The `LedMatrixDualShiftRegister` configuration is the following. Let's use
+The `LedMatrixDualHc595` configuration is the following. Let's use
 `HardSpiInterface` this time:
 
 ```C++
@@ -641,7 +641,7 @@ const uint8_t CLOCK_PIN = 13; // SH_CP on 74HC595
 const uint16_t FRAMES_PER_SECOND = 60;
 
 HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-using LedMatrix = LedMatrixSingleShiftRegister<HardSpiInterface>;
+using LedMatrix = LedMatrixSingleHc595<HardSpiInterface>;
 LedMatrix ledMatrix(
     spiInterface,
     LedMatrix::kActiveHighPattern /*elementOnPattern*/,
@@ -726,7 +726,7 @@ const uint16_t FRAMES_PER_SECOND = 60;
 const uint8_t NUM_SUBFIELDS = 16;
 
 HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-using LedMatrix = LedMatrixSingleShiftRegister<HardSpiInterface>;
+using LedMatrix = LedMatrixSingleHc595<HardSpiInterface>;
 LedMatrix ledMatrix(
     spiInterface,
     LedMatrix::kActiveHighPattern /*elementOnPattern*/,
@@ -1017,8 +1017,8 @@ sizeof(SoftSpiFastInterface<11, 12, 13>): 1
 sizeof(HardSpiInterface): 3
 sizeof(LedMatrixDirect<>): 9
 sizeof(LedMatrixDirectFast4<6..13, 2..5>): 3
-sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>): 8
-sizeof(LedMatrixDualShiftRegister<HardSpiInterface>): 5
+sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 8
+sizeof(LedMatrixDualHc595<HardSpiInterface>): 5
 sizeof(LedModule): 2
 sizeof(ScanningModule<LedMatrixBase, 4>): 22
 sizeof(Tm1637Module<SoftWireInterface, 4>): 14
@@ -1038,8 +1038,8 @@ sizeof(SoftWireInterface): 4
 sizeof(SoftSpiInterface): 3
 sizeof(HardSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
-sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>): 16
-sizeof(LedMatrixDualShiftRegister<HardSpiInterface>): 12
+sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 16
+sizeof(LedMatrixDualHc595<HardSpiInterface>): 12
 sizeof(LedModule): 4
 sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(Tm1637Module<SoftWireInterface, 4>): 24

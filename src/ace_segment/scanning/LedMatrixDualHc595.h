@@ -22,33 +22,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_LED_MATRIX_DUAL_SHIFT_REGISTER_H
-#define ACE_SEGMENT_LED_MATRIX_DUAL_SHIFT_REGISTER_H
+#ifndef ACE_SEGMENT_LED_MATRIX_DUAL_HC595_H
+#define ACE_SEGMENT_LED_MATRIX_DUAL_HC595_H
 
 #include "LedMatrixBase.h"
 
-class LedMatrixDualShiftRegisterTest_draw;
-class LedMatrixDualShiftRegisterTest_enableGroup;
-class LedMatrixDualShiftRegisterTest_disableGroup;
+class LedMatrixDualHc595Test_draw;
+class LedMatrixDualHc595Test_enableGroup;
+class LedMatrixDualHc595Test_disableGroup;
 
 namespace ace_segment {
 
 /**
  * An LedMatrix that whose group pins are attached to one 74HC595 shift register
- * and the element pins are attached to another shift register. The 2 shift
- * registers are daisy chained so that they can be accessed in a serial transfer
- * of 16-bits using hardware or software SPI.
+ * and the element pins are attached to another 74HC595 shift register. The 2
+ * shift registers are daisy chained so that they can be accessed in a serial
+ * transfer of 16-bits using hardware or software SPI.
  *
  * The group pins are assumed to be connected to the most significant byte. The
  * element pins are connected to the least signficiant byte.
  *
- * @tparam T_SPII class providing SPI, either SoftSpiInterface or
- *    HardSpiInterface
+ * @tparam T_SPII interface to SPI, either SoftSpiInterface or HardSpiInterface
  */
 template <typename T_SPII>
-class LedMatrixDualShiftRegister: public LedMatrixBase {
+class LedMatrixDualHc595: public LedMatrixBase {
   public:
-    LedMatrixDualShiftRegister(
+    LedMatrixDualHc595(
         const T_SPII& spiInterface,
         uint8_t elementOnPattern,
         uint8_t groupOnPattern
@@ -92,9 +91,9 @@ class LedMatrixDualShiftRegister: public LedMatrixBase {
     }
 
   private:
-    friend class ::LedMatrixDualShiftRegisterTest_draw;
-    friend class ::LedMatrixDualShiftRegisterTest_enableGroup;
-    friend class ::LedMatrixDualShiftRegisterTest_disableGroup;
+    friend class ::LedMatrixDualHc595Test_draw;
+    friend class ::LedMatrixDualHc595Test_enableGroup;
+    friend class ::LedMatrixDualHc595Test_disableGroup;
 
     const T_SPII& mSpiInterface;
 

@@ -226,7 +226,7 @@ const uint8_t NUM_SUBFIELDS = 1;
   #elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SOFT_SPI
     // Common Cathode, with transistors on Group pins
     SoftSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-    using LedMatrix = LedMatrixSingleShiftRegister<SoftSpiInterface>;
+    using LedMatrix = LedMatrixSingleHc595<SoftSpiInterface>;
     LedMatrix ledMatrix(
         spiInterface,
         LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
@@ -237,7 +237,7 @@ const uint8_t NUM_SUBFIELDS = 1;
     // Common Cathode, with transistors on Group pins
     using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
-    using LedMatrix = LedMatrixSingleShiftRegister<SpiInterface>;
+    using LedMatrix = LedMatrixSingleHc595<SpiInterface>;
     LedMatrix ledMatrix(
         spiInterface,
         LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
@@ -247,7 +247,7 @@ const uint8_t NUM_SUBFIELDS = 1;
   #elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HARD_SPI
     // Common Cathode, with transistors on Group pins
     HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-    using LedMatrix = LedMatrixSingleShiftRegister<HardSpiInterface>;
+    using LedMatrix = LedMatrixSingleHc595<HardSpiInterface>;
     LedMatrix ledMatrix(
         spiInterface,
         LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
@@ -258,7 +258,7 @@ const uint8_t NUM_SUBFIELDS = 1;
     // Common Cathode, with transistors on Group pins
     using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
-    using LedMatrix = LedMatrixSingleShiftRegister<SpiInterface>;
+    using LedMatrix = LedMatrixSingleHc595<SpiInterface>;
     LedMatrix ledMatrix(
         spiInterface,
         LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
@@ -268,7 +268,7 @@ const uint8_t NUM_SUBFIELDS = 1;
   #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SOFT_SPI
     // Common Anode, with transistors on Group pins
     SoftSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-    using LedMatrix = LedMatrixDualShiftRegister<SoftSpiInterface>;
+    using LedMatrix = LedMatrixDualHc595<SoftSpiInterface>;
     LedMatrix ledMatrix(
         spiInterface,
         LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
@@ -277,7 +277,7 @@ const uint8_t NUM_SUBFIELDS = 1;
     // Common Anode, with transistors on Group pins
     using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
-    using LedMatrix = LedMatrixDualShiftRegister<SpiInterface>;
+    using LedMatrix = LedMatrixDualHc595<SpiInterface>;
     LedMatrix ledMatrix(
         spiInterface,
         LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
@@ -285,7 +285,7 @@ const uint8_t NUM_SUBFIELDS = 1;
   #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HARD_SPI
     // Common Anode, with transistors on Group pins
     HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-    using LedMatrix = LedMatrixDualShiftRegister<HardSpiInterface>;
+    using LedMatrix = LedMatrixDualHc595<HardSpiInterface>;
     LedMatrix ledMatrix(
         spiInterface,
         LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
@@ -294,7 +294,7 @@ const uint8_t NUM_SUBFIELDS = 1;
     // Common Anode, with transistors on Group pins
     using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
-    using LedMatrix = LedMatrixDualShiftRegister<SpiInterface>;
+    using LedMatrix = LedMatrixDualHc595<SpiInterface>;
     LedMatrix ledMatrix(
         spiInterface,
         LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,

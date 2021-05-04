@@ -156,8 +156,8 @@ sizeof(HardSpiInterface): 3
 sizeof(HardSpiFastInterface<11, 12, 13>): 1
 sizeof(LedMatrixDirect<>): 9
 sizeof(LedMatrixDirectFast4<6..13, 2..5>): 3
-sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>): 8
-sizeof(LedMatrixDualShiftRegister<HardSpiInterface>): 5
+sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 8
+sizeof(LedMatrixDualHc595<HardSpiInterface>): 5
 sizeof(LedModule): 3
 sizeof(ScanningModule<LedMatrixBase, 4>): 22
 sizeof(BareModule<4>): 31
@@ -229,8 +229,8 @@ sizeof(HardSpiInterface): 3
 sizeof(HardSpiFastInterface<11, 12, 13>): 1
 sizeof(LedMatrixDirect<>): 9
 sizeof(LedMatrixDirectFast4<6..13, 2..5>): 3
-sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>): 8
-sizeof(LedMatrixDualShiftRegister<HardSpiInterface>): 5
+sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 8
+sizeof(LedMatrixDualHc595<HardSpiInterface>): 5
 sizeof(LedModule): 3
 sizeof(ScanningModule<LedMatrixBase, 4>): 22
 sizeof(BareModule<4>): 31
@@ -297,8 +297,8 @@ sizeof(SoftWireInterface): 4
 sizeof(SoftSpiInterface): 3
 sizeof(HardSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
-sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>): 16
-sizeof(LedMatrixDualShiftRegister<HardSpiInterface>): 12
+sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 16
+sizeof(LedMatrixDualHc595<HardSpiInterface>): 12
 sizeof(LedModule): 8
 sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(BareModule<4>): 48
@@ -351,8 +351,8 @@ sizeof(SoftWireInterface): 4
 sizeof(SoftSpiInterface): 3
 sizeof(HardSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
-sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>): 16
-sizeof(LedMatrixDualShiftRegister<HardSpiInterface>): 12
+sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 16
+sizeof(LedMatrixDualHc595<HardSpiInterface>): 12
 sizeof(LedModule): 8
 sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(BareModule<4>): 48
@@ -405,8 +405,8 @@ sizeof(SoftWireInterface): 4
 sizeof(SoftSpiInterface): 3
 sizeof(HardSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
-sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>): 16
-sizeof(LedMatrixDualShiftRegister<HardSpiInterface>): 12
+sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 16
+sizeof(LedMatrixDualHc595<HardSpiInterface>): 12
 sizeof(LedModule): 8
 sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(BareModule<4>): 48
@@ -459,8 +459,8 @@ sizeof(SoftWireInterface): 4
 sizeof(SoftSpiInterface): 3
 sizeof(HardSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
-sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>): 16
-sizeof(LedMatrixDualShiftRegister<HardSpiInterface>): 12
+sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 16
+sizeof(LedMatrixDualHc595<HardSpiInterface>): 12
 sizeof(LedModule): 8
 sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(BareModule<4>): 48
@@ -514,8 +514,8 @@ sizeof(SoftWireInterface): 4
 sizeof(SoftSpiInterface): 3
 sizeof(HardSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
-sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>): 16
-sizeof(LedMatrixDualShiftRegister<HardSpiInterface>): 12
+sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 16
+sizeof(LedMatrixDualHc595<HardSpiInterface>): 12
 sizeof(LedModule): 8
 sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(BareModule<4>): 48

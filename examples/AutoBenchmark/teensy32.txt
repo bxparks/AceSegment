@@ -3,8 +3,8 @@ sizeof(SoftWireInterface): 4
 sizeof(SoftSpiInterface): 3
 sizeof(HardSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
-sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>): 16
-sizeof(LedMatrixDualShiftRegister<HardSpiInterface>): 12
+sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 16
+sizeof(LedMatrixDualHc595<HardSpiInterface>): 12
 sizeof(LedModule): 8
 sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(BareModule<4>): 48

@@ -746,14 +746,12 @@ void printSizeOf() {
 #endif
 
   SERIAL_PORT_MONITOR.print(
-      F("sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>): "));
-  SERIAL_PORT_MONITOR.println(
-      sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>));
+      F("sizeof(LedMatrixSingleHc595<SoftSpiInterface>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(LedMatrixSingleHc595<SoftSpiInterface>));
 
   SERIAL_PORT_MONITOR.print(
-      F("sizeof(LedMatrixDualShiftRegister<HardSpiInterface>): "));
-  SERIAL_PORT_MONITOR.println(
-      sizeof(LedMatrixDualShiftRegister<HardSpiInterface>));
+      F("sizeof(LedMatrixDualHc595<HardSpiInterface>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(LedMatrixDualHc595<HardSpiInterface>));
 
   SERIAL_PORT_MONITOR.print(F("sizeof(LedModule): "));
   SERIAL_PORT_MONITOR.println(sizeof(LedModule));
@@ -775,13 +773,11 @@ void printSizeOf() {
 
   SERIAL_PORT_MONITOR.print(
       F("sizeof(SingleHc595Module<SoftSpiInterface, 4>): "));
-  SERIAL_PORT_MONITOR.println(
-      sizeof(SingleHc595Module<SoftSpiInterface, 4>));
+  SERIAL_PORT_MONITOR.println(sizeof(SingleHc595Module<SoftSpiInterface, 4>));
 
   SERIAL_PORT_MONITOR.print(
       F("sizeof(DualHc595Module<SoftSpiInterface, 4>): "));
-  SERIAL_PORT_MONITOR.println(
-      sizeof(DualHc595Module<SoftSpiInterface, 4>));
+  SERIAL_PORT_MONITOR.println(sizeof(DualHc595Module<SoftSpiInterface, 4>));
 
   SERIAL_PORT_MONITOR.print(F("sizeof(Tm1637Module<SoftWireInterface, 4>): "));
   SERIAL_PORT_MONITOR.println(sizeof(Tm1637Module<SoftWireInterface, 4>));
