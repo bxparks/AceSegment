@@ -403,7 +403,7 @@ void runSingleHc595HardSpiFast() {
 //-----------------------------------------------------------------------------
 
 // Common Anode, with transistors on Group pins
-void runDualShiftRegisterSoftSpi() {
+void runDualHc595SoftSpi() {
   using SpiInterface = SoftSpiInterface;
   SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
 
@@ -436,7 +436,7 @@ void runDualShiftRegisterSoftSpi() {
 
 // Common Anode, with transistors on Group pins
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-void runDualShiftRegisterSoftSpiFast() {
+void runDualHc595SoftSpiFast() {
   using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
 
@@ -470,7 +470,7 @@ void runDualShiftRegisterSoftSpiFast() {
 #endif
 
 // Common Anode, with transistors on Group pins
-void runDualShiftRegisterHardSpi() {
+void runDualHc595HardSpi() {
   using SpiInterface = HardSpiInterface;
   SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
 
@@ -504,7 +504,7 @@ void runDualShiftRegisterHardSpi() {
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 // Common Anode, with transistors on Group pins
-void runDualShiftRegisterHardSpiFast() {
+void runDualHc595HardSpiFast() {
   using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
 
@@ -681,14 +681,14 @@ void runBenchmarks() {
   runSingleHc595HardSpiFast();
 #endif
 
-  runDualShiftRegisterSoftSpi();
+  runDualHc595SoftSpi();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  runDualShiftRegisterSoftSpiFast();
+  runDualHc595SoftSpiFast();
 #endif
 
-  runDualShiftRegisterHardSpi();
+  runDualHc595HardSpi();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  runDualShiftRegisterHardSpiFast();
+  runDualHc595HardSpiFast();
 #endif
 
   runTm1637ModuleSoftWire();
