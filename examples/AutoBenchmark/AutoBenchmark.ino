@@ -46,7 +46,7 @@ SOFTWARE.
 #include <ace_segment/hw/SoftSpiFastInterface.h>
 #include <ace_segment/hw/HardSpiFastInterface.h>
 #include <ace_segment/hw/SoftWireFastInterface.h>
-#include <ace_segment/scanning/LedMatrixDirectFast4.h>
+#include <ace_segment/bare/BareFast4Module.h>
 #endif
 
 using namespace ace_segment;
@@ -196,179 +196,206 @@ void runScanningBenchmark(const char* name, LM& scanningModule) {
 //-----------------------------------------------------------------------------
 
 // Common Anode, with transistors on Group pins
-void runDirect() {
-  using LedMatrix = LedMatrixDirect<>;
-  LedMatrix ledMatrix(
-      LedMatrix::kActiveLowPattern /*elementOnPattern*/,
-      LedMatrix::kActiveLowPattern /*groupOnPattern*/,
-      NUM_SEGMENTS,
+void runBare() {
+  BareModule<NUM_DIGITS> scanningModule(
+      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
+      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+      FRAMES_PER_SECOND,
       SEGMENT_PINS,
-      NUM_DIGITS,
       DIGIT_PINS);
-  ScanningModule<LedMatrix, NUM_DIGITS, 1> scanningModule(
-      ledMatrix, FRAMES_PER_SECOND);
-  ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-      scanningModuleSubfields(ledMatrix, FRAMES_PER_SECOND);
+  BareModule<NUM_DIGITS, NUM_SUBFIELDS> scanningModuleSubfields(
+      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
+      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+      FRAMES_PER_SECOND,
+      SEGMENT_PINS,
+      DIGIT_PINS);
 
-  ledMatrix.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("Scanning(Direct)",
+  runScanningBenchmark("BareModule",
       scanningModule);
-  runScanningBenchmark("Scanning(Direct,subfields)",
+  runScanningBenchmark("BareModule(subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
-  ledMatrix.end();
 }
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 // Common Anode, with transistors on Group pins
-void runDirectFast() {
-  using LedMatrix = LedMatrixDirectFast4<
-      8, 9, 10, 16, 14, 18, 19, 15,
-      4, 5, 6, 7>;
-  LedMatrix ledMatrix(
-      LedMatrix::kActiveLowPattern /*elementOnPattern*/,
-      LedMatrix::kActiveLowPattern /*groupOnPattern*/);
-  ScanningModule<LedMatrix, NUM_DIGITS, 1> scanningModule(
-      ledMatrix, FRAMES_PER_SECOND);
-  ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-      scanningModuleSubfields(ledMatrix, FRAMES_PER_SECOND);
+void runBareFast4() {
+  BareFast4Module<
+      8, 9, 10, 16, 14, 18, 19, 15, // segment pins
+      4, 5, 6, 7, // digit pins
+      NUM_DIGITS
+  > scanningModule(
+      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
+      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+      FRAMES_PER_SECOND);
 
-  ledMatrix.begin();
+  BareFast4Module<
+      8, 9, 10, 16, 14, 18, 19, 15, // segment pins
+      4, 5, 6, 7, // digit pins
+      NUM_DIGITS,
+      NUM_SUBFIELDS
+  > scanningModuleSubfields(
+      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
+      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+      FRAMES_PER_SECOND);
+
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("Scanning(DirectFast)",
+  runScanningBenchmark("BareFast4Module",
       scanningModule);
-  runScanningBenchmark("Scanning(DirectFast,subfields)",
+  runScanningBenchmark("BareFast4Module(subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
-  ledMatrix.end();
 }
 #endif
 
 //-----------------------------------------------------------------------------
 
 // Common Cathode, with transistors on Group pins
-void runSingleShiftRegisterSoftSpi() {
-  SoftSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  using LedMatrix = LedMatrixSingleShiftRegister<SoftSpiInterface>;
-  LedMatrix ledMatrix(
+void runSingleHc595SoftSpi() {
+  using SpiInterface = SoftSpiInterface;
+  SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+
+  SingleHc595Module<SpiInterface, NUM_DIGITS> scanningModule(
       spiInterface,
-      LedMatrix::kActiveHighPattern /*elementOnPattern*/,
-      LedMatrix::kActiveHighPattern /*groupOnPattern*/,
-      NUM_DIGITS,
-      DIGIT_PINS);
-  ScanningModule<LedMatrix, NUM_DIGITS, 1> scanningModule(
-      ledMatrix, FRAMES_PER_SECOND);
-  ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-      scanningModuleSubfields(ledMatrix, FRAMES_PER_SECOND);
+      LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
+      LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
+      FRAMES_PER_SECOND,
+      DIGIT_PINS
+  );
+
+  SingleHc595Module<
+      SpiInterface, NUM_DIGITS, NUM_SUBFIELDS
+  > scanningModuleSubfields(
+      spiInterface,
+      LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
+      LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
+      FRAMES_PER_SECOND,
+      DIGIT_PINS
+  );
 
   spiInterface.begin();
-  ledMatrix.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("Scanning(Single,SoftSpi)",
+  runScanningBenchmark("SingleHc595(SoftSpi)",
       scanningModule);
-  runScanningBenchmark("Scanning(Single,SoftSpi,subfields)",
+  runScanningBenchmark("SingleHc595(SoftSpi,subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
-  ledMatrix.end();
   spiInterface.end();
 }
 
 // Common Cathode, with transistors on Group pins
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-void runSingleShiftRegisterSoftSpiFast() {
+void runSingleHc595SoftSpiFast() {
   using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
-  using LedMatrix = LedMatrixSingleShiftRegister<SpiInterface>;
-  LedMatrix ledMatrix(
+
+  SingleHc595Module<SpiInterface, NUM_DIGITS> scanningModule(
       spiInterface,
-      LedMatrix::kActiveHighPattern /*elementOnPattern*/,
-      LedMatrix::kActiveHighPattern /*groupOnPattern*/,
-      NUM_DIGITS,
-      DIGIT_PINS);
-  ScanningModule<LedMatrix, NUM_DIGITS, 1> scanningModule(
-      ledMatrix, FRAMES_PER_SECOND);
-  ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-      scanningModuleSubfields(ledMatrix, FRAMES_PER_SECOND);
+      LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
+      LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
+      FRAMES_PER_SECOND,
+      DIGIT_PINS
+  );
+
+  SingleHc595Module<
+      SpiInterface, NUM_DIGITS, NUM_SUBFIELDS
+  > scanningModuleSubfields(
+      spiInterface,
+      LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
+      LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
+      FRAMES_PER_SECOND,
+      DIGIT_PINS
+  );
 
   spiInterface.begin();
-  ledMatrix.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("Scanning(Single,SoftSpiFast)",
+  runScanningBenchmark("SingleHc595(SoftSpiFast)",
       scanningModule);
-  runScanningBenchmark("Scanning(Single,SoftSpiFast,subfields)",
+  runScanningBenchmark("SingleHc595(SoftSpiFast,subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
-  ledMatrix.end();
   spiInterface.end();
 }
 #endif
 
 // Common Cathode, with transistors on Group pins
-void runSingleShiftRegisterHardSpi() {
-  HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  using LedMatrix = LedMatrixSingleShiftRegister<HardSpiInterface>;
-  LedMatrix ledMatrix(
+void runSingleHc595HardSpi() {
+  using SpiInterface = HardSpiInterface;
+  SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+
+  SingleHc595Module<SpiInterface, NUM_DIGITS> scanningModule(
       spiInterface,
-      LedMatrix::kActiveHighPattern /*elementOnPattern*/,
-      LedMatrix::kActiveHighPattern /*groupOnPattern*/,
-      NUM_DIGITS,
-      DIGIT_PINS);
-  ScanningModule<LedMatrix, NUM_DIGITS, 1> scanningModule(
-      ledMatrix, FRAMES_PER_SECOND);
-  ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-      scanningModuleSubfields(ledMatrix, FRAMES_PER_SECOND);
+      LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
+      LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
+      FRAMES_PER_SECOND,
+      DIGIT_PINS
+  );
+
+  SingleHc595Module<
+      SpiInterface, NUM_DIGITS, NUM_SUBFIELDS
+  > scanningModuleSubfields(
+      spiInterface,
+      LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
+      LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
+      FRAMES_PER_SECOND,
+      DIGIT_PINS
+  );
 
   spiInterface.begin();
-  ledMatrix.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("Scanning(Single,HardSpi)",
+  runScanningBenchmark("SingleHc595(HardSpi)",
       scanningModule);
-  runScanningBenchmark("Scanning(Single,HardSpi,subfields)",
+  runScanningBenchmark("SingleHc595(HardSpi,subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
-  ledMatrix.end();
   spiInterface.end();
 }
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 // Common Cathode, with transistors on Group pins
-void runSingleShiftRegisterHardSpiFast() {
+void runSingleHc595HardSpiFast() {
   using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
-  using LedMatrix = LedMatrixSingleShiftRegister<SpiInterface>;
-  LedMatrix ledMatrix(
+
+  SingleHc595Module<SpiInterface, NUM_DIGITS> scanningModule(
       spiInterface,
-      LedMatrix::kActiveHighPattern /*elementOnPattern*/,
-      LedMatrix::kActiveHighPattern /*groupOnPattern*/,
-      NUM_DIGITS,
-      DIGIT_PINS);
-  ScanningModule<LedMatrix, NUM_DIGITS, 1> scanningModule(
-      ledMatrix, FRAMES_PER_SECOND);
-  ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-      scanningModuleSubfields(ledMatrix, FRAMES_PER_SECOND);
+      LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
+      LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
+      FRAMES_PER_SECOND,
+      DIGIT_PINS
+  );
+
+  SingleHc595Module<
+      SpiInterface, NUM_DIGITS, NUM_SUBFIELDS
+  >
+  scanningModuleSubfields(
+      spiInterface,
+      LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
+      LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
+      FRAMES_PER_SECOND,
+      DIGIT_PINS
+  );
 
   spiInterface.begin();
-  ledMatrix.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("Scanning(Single,HardSpiFast)",
+  runScanningBenchmark("SingleHc595(HardSpiFast)",
       scanningModule);
-  runScanningBenchmark("Scanning(Single,HardSpiFast,subfields)",
+  runScanningBenchmark("SingleHc595(HardSpiFast,subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
-  ledMatrix.end();
   spiInterface.end();
 }
 #endif
@@ -377,27 +404,33 @@ void runSingleShiftRegisterHardSpiFast() {
 
 // Common Anode, with transistors on Group pins
 void runDualShiftRegisterSoftSpi() {
-  SoftSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  using LedMatrix = LedMatrixDualShiftRegister<SoftSpiInterface>;
-  LedMatrix ledMatrix(
+  using SpiInterface = SoftSpiInterface;
+  SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+
+  DualHc595Module<SpiInterface, NUM_DIGITS> scanningModule(
       spiInterface,
-      LedMatrix::kActiveLowPattern /*elementOnPattern*/,
-      LedMatrix::kActiveLowPattern /*groupOnPattern*/);
-  ScanningModule<LedMatrix, NUM_DIGITS, 1> scanningModule(
-      ledMatrix, FRAMES_PER_SECOND);
-  ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-      scanningModuleSubfields(ledMatrix, FRAMES_PER_SECOND);
+      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
+      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+      FRAMES_PER_SECOND
+  );
+
+  DualHc595Module<
+      SpiInterface, NUM_DIGITS, NUM_SUBFIELDS
+  > scanningModuleSubfields(
+      spiInterface,
+      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
+      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+      FRAMES_PER_SECOND
+  );
 
   spiInterface.begin();
-  ledMatrix.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("Scanning(Dual,SoftSpi)", scanningModule);
-  runScanningBenchmark("Scanning(Dual,SoftSpi,subfields)",
+  runScanningBenchmark("DualHc595(SoftSpi)", scanningModule);
+  runScanningBenchmark("DualHc595(SoftSpi,subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
-  ledMatrix.end();
   spiInterface.end();
 }
 
@@ -406,53 +439,66 @@ void runDualShiftRegisterSoftSpi() {
 void runDualShiftRegisterSoftSpiFast() {
   using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
-  using LedMatrix = LedMatrixDualShiftRegister<SpiInterface>;
-  LedMatrix ledMatrix(
+
+  DualHc595Module<SpiInterface, NUM_DIGITS> scanningModule(
       spiInterface,
-      LedMatrix::kActiveLowPattern /*elementOnPattern*/,
-      LedMatrix::kActiveLowPattern /*groupOnPattern*/);
-  ScanningModule<LedMatrix, NUM_DIGITS, 1> scanningModule(
-      ledMatrix, FRAMES_PER_SECOND);
-  ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-      scanningModuleSubfields(ledMatrix, FRAMES_PER_SECOND);
+      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
+      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+      FRAMES_PER_SECOND
+  );
+
+  DualHc595Module<
+      SpiInterface, NUM_DIGITS, NUM_SUBFIELDS
+  >
+  scanningModuleSubfields(
+      spiInterface,
+      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
+      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+      FRAMES_PER_SECOND
+  );
 
   spiInterface.begin();
-  ledMatrix.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("Scanning(Dual,SoftSpiFast)", scanningModule);
-  runScanningBenchmark("Scanning(Dual,SoftSpiFast,subfields)",
+  runScanningBenchmark("DualHc595(SoftSpiFast)", scanningModule);
+  runScanningBenchmark("DualHc595(SoftSpiFast,subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
-  ledMatrix.end();
   spiInterface.end();
 }
 #endif
 
 // Common Anode, with transistors on Group pins
 void runDualShiftRegisterHardSpi() {
-  HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  using LedMatrix = LedMatrixDualShiftRegister<HardSpiInterface>;
-  LedMatrix ledMatrix(
+  using SpiInterface = HardSpiInterface;
+  SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+
+  DualHc595Module<SpiInterface, NUM_DIGITS> scanningModule(
       spiInterface,
-      LedMatrix::kActiveLowPattern /*elementOnPattern*/,
-      LedMatrix::kActiveLowPattern /*groupOnPattern*/);
-  ScanningModule<LedMatrix, NUM_DIGITS, 1> scanningModule(
-      ledMatrix, FRAMES_PER_SECOND);
-  ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-      scanningModuleSubfields(ledMatrix, FRAMES_PER_SECOND);
+      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
+      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+      FRAMES_PER_SECOND
+  );
+
+  DualHc595Module<
+      SpiInterface, NUM_DIGITS, NUM_SUBFIELDS
+  >
+  scanningModuleSubfields(
+      spiInterface,
+      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
+      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+      FRAMES_PER_SECOND
+  );
 
   spiInterface.begin();
-  ledMatrix.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("Scanning(Dual,HardSpi)", scanningModule);
-  runScanningBenchmark("Scanning(Dual,HardSpi,subfields)",
+  runScanningBenchmark("DualHc595(HardSpi)", scanningModule);
+  runScanningBenchmark("DualHc595(HardSpi,subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
-  ledMatrix.end();
   spiInterface.end();
 }
 
@@ -461,26 +507,32 @@ void runDualShiftRegisterHardSpi() {
 void runDualShiftRegisterHardSpiFast() {
   using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
-  using LedMatrix = LedMatrixDualShiftRegister<SpiInterface>;
-  LedMatrix ledMatrix(
+
+  DualHc595Module<SpiInterface, NUM_DIGITS> scanningModule(
       spiInterface,
-      LedMatrix::kActiveLowPattern /*elementOnPattern*/,
-      LedMatrix::kActiveLowPattern /*groupOnPattern*/);
-  ScanningModule<LedMatrix, NUM_DIGITS, 1> scanningModule(
-      ledMatrix, FRAMES_PER_SECOND);
-  ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-      scanningModuleSubfields(ledMatrix, FRAMES_PER_SECOND);
+      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
+      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+      FRAMES_PER_SECOND
+  );
+
+  DualHc595Module<
+      SpiInterface, NUM_DIGITS, NUM_SUBFIELDS
+  >
+  scanningModuleSubfields(
+      spiInterface,
+      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
+      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+      FRAMES_PER_SECOND
+  );
 
   spiInterface.begin();
-  ledMatrix.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("Scanning(Dual,HardSpiFast)", scanningModule);
-  runScanningBenchmark("Scanning(Dual,HardSpiFast,subfields)",
+  runScanningBenchmark("DualHc595(HardSpiFast)", scanningModule);
+  runScanningBenchmark("DualHc595(HardSpiFast,subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
-  ledMatrix.end();
   spiInterface.end();
 }
 #endif
@@ -614,19 +666,19 @@ void runMax7219HardSpiFast() {
 //-----------------------------------------------------------------------------
 
 void runBenchmarks() {
-  runDirect();
+  runBare();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  runDirectFast();
+  runBareFast4();
 #endif
 
-  runSingleShiftRegisterSoftSpi();
+  runSingleHc595SoftSpi();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  runSingleShiftRegisterSoftSpiFast();
+  runSingleHc595SoftSpiFast();
 #endif
 
-  runSingleShiftRegisterHardSpi();
+  runSingleHc595HardSpi();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  runSingleShiftRegisterHardSpiFast();
+  runSingleHc595HardSpiFast();
 #endif
 
   runDualShiftRegisterSoftSpi();
@@ -704,10 +756,32 @@ void printSizeOf() {
       sizeof(LedMatrixDualShiftRegister<HardSpiInterface>));
 
   SERIAL_PORT_MONITOR.print(F("sizeof(LedModule): "));
-  SERIAL_PORT_MONITOR.println(sizeof(LedDisplay));
+  SERIAL_PORT_MONITOR.println(sizeof(LedModule));
 
   SERIAL_PORT_MONITOR.print( F("sizeof(ScanningModule<LedMatrixBase, 4>): "));
   SERIAL_PORT_MONITOR.println( sizeof(ScanningModule<LedMatrixBase, 4>));
+
+  SERIAL_PORT_MONITOR.print( F("sizeof(BareModule<4>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(BareModule<4>));
+
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+  SERIAL_PORT_MONITOR.print( F("sizeof(BareFast4Module<...>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(BareFast4Module<
+      8, 9, 10, 16, 14, 18, 19, 15, // segment pins
+      4, 5, 6, 7, // digit pins
+      NUM_DIGITS
+  >));
+#endif
+
+  SERIAL_PORT_MONITOR.print(
+      F("sizeof(SingleHc595Module<SoftSpiInterface, 4>): "));
+  SERIAL_PORT_MONITOR.println(
+      sizeof(SingleHc595Module<SoftSpiInterface, 4>));
+
+  SERIAL_PORT_MONITOR.print(
+      F("sizeof(DualHc595Module<SoftSpiInterface, 4>): "));
+  SERIAL_PORT_MONITOR.println(
+      sizeof(DualHc595Module<SoftSpiInterface, 4>));
 
   SERIAL_PORT_MONITOR.print(F("sizeof(Tm1637Module<SoftWireInterface, 4>): "));
   SERIAL_PORT_MONITOR.println(sizeof(Tm1637Module<SoftWireInterface, 4>));

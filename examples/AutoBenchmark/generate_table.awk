@@ -59,11 +59,11 @@ END {
   printf("+----------------------------------------+-------------------+---------+\n")
   printf("| Functionality                          |   min/  avg/  max | samples |\n")
   for (i = 0; i < TOTAL_BENCHMARKS; i++) {
-    if (u[i]["name"] ~ /Scanning\(Direct\)/ \
-        || u[i]["name"] ~ /Scanning\(Single,SoftSpi\)/ \
-        || u[i]["name"] ~ /Scanning\(Dual,SoftSpi\)/ \
-        || u[i]["name"] ~ /Tm1637\(SoftWire\)/ \
-        || u[i]["name"] ~ /Max7219\(SoftSpi\)/ \
+    if (u[i]["name"] ~ /^BareModule$/ \
+        || u[i]["name"] ~ /^SingleHc595\(SoftSpi\)/ \
+        || u[i]["name"] ~ /^DualHc595\(SoftSpi\)/ \
+        || u[i]["name"] ~ /^Tm1637\(SoftWire\)/ \
+        || u[i]["name"] ~ /^Max7219\(SoftSpi\)/ \
     ) {
       printf("|----------------------------------------+-------------------+---------|\n")
     }

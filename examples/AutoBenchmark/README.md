@@ -1,21 +1,30 @@
 # AutoBenchmark
 
-This program creates instances of `ScanningModule` using different
-configurations of the `LedMatrix` class:
+This program creates instances of various subclasses `LedModule` using different
+configurations:
 
-* `direct`: group and segment pins directly connected to MCU
-* `single_sw_spi`: group pins connected directly to MCU, but segment pins
-  connected to 74HC595 accessed through software SPI (`SoftSpiInterface`)
-* `single_hw_spi`: group pins connected directly to MCU, but segment pins
-  connected to 74HC595 accessed through hardware SPI (`HardSpiInterface`)
-* `dual_sw_spi`: group pins and segment pins connected to 74HC595 accessed
-  through software SPI (`SoftSpiInterface`)
-* `dual_hw_spi`: group pins and segment pins connected to 74HC595 accessed
-  through hardware SPI (`HardSpiInterface`)
+* `BareModule`: group and segment pins directly connected to MCU
+* `BareFast4Module`: same as `BareModule` but using `digitalWriteFast` library
+* `SingleHc595Module`: group pins connected directly to MCU, but segment pins
+  connected to 74HC595 accessed through SPI
+* `DualHc595Module`: group pins and segment pins connected to two 74HC595
+  which are accessed through SPI
+* `Tm1637Module`: an LED module using a TM1637 driver chip, accessed through
+  a two-wire protocol similar to I2C
+* `Max7219Module`: an LED module using a MAX7219 driver chip, accessed through
+  SPI
 
-It measures the time taken by `ScanningModule::renderFieldNow()` which
-renders a single digit (multiple fields make up a frame, a frame is the
-rendering of all digits on the display module).
+We then measure the time taken by the methods used to render the digit to the
+LED module:
+
+* Subclasses of `ScanningModule`
+    * Measure the time taken by `ScanningModule::renderFieldNow()` which renders
+      a single digit (multiple fields make up a frame (a single frame is the
+      complete rendering of all digits on the display module).
+* `Tm1637Module::flush()
+    * Sends out the buffered digits over the custom two-wire protocol.
+* `Max7219Module::flush()`
+    * Sends out the buffered digits using SPI.
 
 **Version**: AceSegment v0.4+
 
@@ -79,12 +88,13 @@ number of `TimingStats::update()` calls that were made.
 **v0.4+:**
 
 * Add benchmarks for `Tm1637Module`. The CPU time is mostly determined by
-  the calls to `delayMicroseconds()`, which is required to meet the electrical
-  characteristics of the LED module.
+  the calls to `delayMicroseconds()`, which is must be about 100 microseconds
+  due to the unusually large capacitors (20 nF) installed on the DIO and CLK
+  lines. They should have been about 100X smaller (200 pF).
 * Add benchmarks for `Max7219Module`.
+* Add benchmarks for `BareModule`, `BareFast4Module`, `SingleHc595Module`, and
+  `DualHc595Module`.
 * Upgrade from ESP32 Core v1.0.4 to v1.0.6.
-* Add benchmarks for `LedMatrixSingleShiftRegister`,
-  `LedMatrixDualShiftRegister`, and `Max7219Module` using `HardSpiFastInteface`.
 
 ## Results
 
@@ -109,17 +119,17 @@ times a second for a module with 4 digits, or every 4.17 milliseconds. The
 results below show that every processor, even the slowest AVR processor, is able
 to meet this threshhold.
 
-* For the `LedMatrixDirect` type, this involves turning off the previous digit,
-  sending the 8 bits for the current digit's 8 LED segments in a loop, then
-  turning on the current digit. The `digitalWrite()` function is called 10
-  times.
-* For the `LedMatrixSingleShiftRegister` type, the 8 LED segment bits are sent
+* For the `BaseModule` and `BareFast4Module`, this involves turning off the
+  previous digit, sending the 8 bits for the current digit's 8 LED segments in a
+  loop, then turning on the current digit. The `digitalWrite()` function is
+  called 10 times.
+* For the `SingleHc595Module` type, the 8 LED segment bits are sent
   using software SPI or hardware SPI. (Software SPI uses the `shiftOut()`
   method, which is implemented using a loop of `digitalWrite()`.
-* For the `LedMatrixDualShiftRegister` type, the LED digit pins and the LED
+* For the `DualHc595Module` type, the LED digit pins and the LED
   segment pins are using conceptually a single SPI transaction. For software
   SPI, this is implemented using 2 `shiftOut()` operations. For hardware SPI,
-  this uses a single `transfer16()` command.
+  this uses a single `SPI::transfer16()` command.
 
 On AVR processors, the "fast" options are available using the
 [digitalWriteFast](https://github.com/NicksonYap/digitalWriteFast) library whose
@@ -148,8 +158,12 @@ sizeof(LedMatrixDirect<>): 9
 sizeof(LedMatrixDirectFast4<6..13, 2..5>): 3
 sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>): 8
 sizeof(LedMatrixDualShiftRegister<HardSpiInterface>): 5
-sizeof(LedModule): 2
+sizeof(LedModule): 3
 sizeof(ScanningModule<LedMatrixBase, 4>): 22
+sizeof(BareModule<4>): 31
+sizeof(BareFast4Module<...>): 25
+sizeof(SingleHc595Module<SoftSpiInterface, 4>): 30
+sizeof(DualHc595Module<SoftSpiInterface, 4>): 27
 sizeof(Tm1637Module<SoftWireInterface, 4>): 14
 sizeof(Max7219Module<SoftSpiInterface, 8>): 16
 sizeof(LedDisplay): 2
@@ -164,36 +178,36 @@ CPU:
 +----------------------------------------+-------------------+---------+
 | Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Scanning(Direct)                       |    68/   74/   88 |     240 |
-| Scanning(Direct,subfields)             |     4/   12/   88 |    3840 |
-| Scanning(DirectFast)                   |    24/   28/   40 |     240 |
-| Scanning(DirectFast,subfields)         |     4/    8/   36 |    3840 |
+| BareModule                             |    68/   74/   88 |     240 |
+| BareModule(subfields)                  |     4/   12/   84 |    3840 |
+| BareFast4Module                        |    24/   28/   36 |     240 |
+| BareFast4Module(subfields)             |     4/    8/   40 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Scanning(Single,SoftSpi)               |   156/  159/  180 |     240 |
-| Scanning(Single,SoftSpi,subfields)     |     4/   22/  180 |    3840 |
-| Scanning(Single,SoftSpiFast)           |    28/   31/   44 |     240 |
-| Scanning(Single,SoftSpiFast,subfields) |     4/    8/   40 |    3840 |
-| Scanning(Single,HardSpi)               |    36/   39/   52 |     240 |
-| Scanning(Single,HardSpi,subfields)     |     4/    9/   48 |    3840 |
-| Scanning(Single,HardSpiFast)           |    24/   27/   40 |     240 |
-| Scanning(Single,HardSpiFast,subfields) |     4/    7/   40 |    3840 |
+| SingleHc595(SoftSpi)                   |   156/  159/  180 |     240 |
+| SingleHc595(SoftSpi,subfields)         |     4/   22/  180 |    3840 |
+| SingleHc595(SoftSpiFast)               |    28/   30/   44 |     240 |
+| SingleHc595(SoftSpiFast,subfields)     |     4/    8/   40 |    3840 |
+| SingleHc595(HardSpi)                   |    36/   39/   52 |     240 |
+| SingleHc595(HardSpi,subfields)         |     4/    9/   52 |    3840 |
+| SingleHc595(HardSpiFast)               |    24/   27/   44 |     240 |
+| SingleHc595(HardSpiFast,subfields)     |     4/    7/   36 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Scanning(Dual,SoftSpi)                 |   264/  269/  304 |     240 |
-| Scanning(Dual,SoftSpi,subfields)       |     4/   34/  296 |    3840 |
-| Scanning(Dual,SoftSpiFast)             |    20/   24/   32 |     240 |
-| Scanning(Dual,SoftSpiFast,subfields)   |     4/    7/   32 |    3840 |
-| Scanning(Dual,HardSpi)                 |    24/   27/   36 |     240 |
-| Scanning(Dual,HardSpi,subfields)       |     4/    8/   36 |    3840 |
-| Scanning(Dual,HardSpiFast)             |    12/   14/   28 |     240 |
-| Scanning(Dual,HardSpiFast,subfields)   |     4/    6/   24 |    3840 |
+| DualHc595(SoftSpi)                     |   264/  269/  304 |     240 |
+| DualHc595(SoftSpi,subfields)           |     4/   35/  304 |    3840 |
+| DualHc595(SoftSpiFast)                 |    20/   24/   36 |     240 |
+| DualHc595(SoftSpiFast,subfields)       |     4/    7/   32 |    3840 |
+| DualHc595(HardSpi)                     |    24/   27/   40 |     240 |
+| DualHc595(HardSpi,subfields)           |     4/    8/   36 |    3840 |
+| DualHc595(HardSpiFast)                 |    12/   14/   28 |     240 |
+| DualHc595(HardSpiFast,subfields)       |     4/    6/   24 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(SoftWire)                       | 22308/22329/22600 |      20 |
-| Tm1637(SoftWireFast)                   | 21060/21073/21224 |      20 |
+| Tm1637(SoftWire)                       | 22308/22328/22576 |      20 |
+| Tm1637(SoftWireFast)                   | 21060/21073/21212 |      20 |
 |----------------------------------------+-------------------+---------|
-| Max7219(SoftSpi)                       |  1320/ 1331/ 1456 |      20 |
-| Max7219(SoftSpiFast)                   |   112/  120/  132 |      20 |
-| Max7219(HardSpi)                       |   120/  130/  144 |      20 |
-| Max7219(HardSpiFast)                   |    56/   63/   68 |      20 |
+| Max7219(SoftSpi)                       |  1320/ 1329/ 1448 |      20 |
+| Max7219(SoftSpiFast)                   |   112/  120/  136 |      20 |
+| Max7219(HardSpi)                       |   120/  129/  144 |      20 |
+| Max7219(HardSpiFast)                   |    56/   63/   72 |      20 |
 +----------------------------------------+-------------------+---------+
 
 ```
@@ -217,8 +231,12 @@ sizeof(LedMatrixDirect<>): 9
 sizeof(LedMatrixDirectFast4<6..13, 2..5>): 3
 sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>): 8
 sizeof(LedMatrixDualShiftRegister<HardSpiInterface>): 5
-sizeof(LedModule): 2
+sizeof(LedModule): 3
 sizeof(ScanningModule<LedMatrixBase, 4>): 22
+sizeof(BareModule<4>): 31
+sizeof(BareFast4Module<...>): 25
+sizeof(SingleHc595Module<SoftSpiInterface, 4>): 30
+sizeof(DualHc595Module<SoftSpiInterface, 4>): 27
 sizeof(Tm1637Module<SoftWireInterface, 4>): 14
 sizeof(Max7219Module<SoftSpiInterface, 8>): 16
 sizeof(LedDisplay): 2
@@ -233,36 +251,36 @@ CPU:
 +----------------------------------------+-------------------+---------+
 | Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Scanning(Direct)                       |    72/   76/   84 |     240 |
-| Scanning(Direct,subfields)             |     4/   14/   84 |    3840 |
-| Scanning(DirectFast)                   |    24/   28/   36 |     240 |
-| Scanning(DirectFast,subfields)         |     4/    8/   36 |    3840 |
+| BareModule                             |    72/   76/   84 |     240 |
+| BareModule(subfields)                  |     4/   14/   92 |    3840 |
+| BareFast4Module                        |    24/   28/   36 |     240 |
+| BareFast4Module(subfields)             |     4/    8/   36 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Scanning(Single,SoftSpi)               |   148/  153/  164 |     240 |
-| Scanning(Single,SoftSpi,subfields)     |     4/   23/  164 |    3840 |
-| Scanning(Single,SoftSpiFast)           |    28/   31/   40 |     240 |
-| Scanning(Single,SoftSpiFast,subfields) |     4/    8/   40 |    3840 |
-| Scanning(Single,HardSpi)               |    36/   41/   52 |     240 |
-| Scanning(Single,HardSpi,subfields)     |     4/    9/   52 |    3840 |
-| Scanning(Single,HardSpiFast)           |    24/   27/   36 |     240 |
-| Scanning(Single,HardSpiFast,subfields) |     4/    8/   36 |    3840 |
+| SingleHc595(SoftSpi)                   |   148/  153/  164 |     240 |
+| SingleHc595(SoftSpi,subfields)         |     4/   23/  164 |    3840 |
+| SingleHc595(SoftSpiFast)               |    28/   31/   40 |     240 |
+| SingleHc595(SoftSpiFast,subfields)     |     4/    8/   48 |    3840 |
+| SingleHc595(HardSpi)                   |    36/   41/   52 |     240 |
+| SingleHc595(HardSpi,subfields)         |     4/    9/   52 |    3840 |
+| SingleHc595(HardSpiFast)               |    24/   27/   44 |     240 |
+| SingleHc595(HardSpiFast,subfields)     |     4/    8/   36 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Scanning(Dual,SoftSpi)                 |   248/  252/  264 |     240 |
-| Scanning(Dual,SoftSpi,subfields)       |     4/   36/  264 |    3840 |
-| Scanning(Dual,SoftSpiFast)             |    20/   23/   36 |     240 |
-| Scanning(Dual,SoftSpiFast,subfields)   |     4/    8/   32 |    3840 |
-| Scanning(Dual,HardSpi)                 |    24/   28/   36 |     240 |
-| Scanning(Dual,HardSpi,subfields)       |     4/    8/   36 |    3840 |
-| Scanning(Dual,HardSpiFast)             |    12/   13/   20 |     240 |
-| Scanning(Dual,HardSpiFast,subfields)   |     4/    6/   20 |    3840 |
+| DualHc595(SoftSpi)                     |   248/  253/  264 |     240 |
+| DualHc595(SoftSpi,subfields)           |     4/   37/  268 |    3840 |
+| DualHc595(SoftSpiFast)                 |    20/   23/   32 |     240 |
+| DualHc595(SoftSpiFast,subfields)       |     4/    8/   32 |    3840 |
+| DualHc595(HardSpi)                     |    24/   28/   36 |     240 |
+| DualHc595(HardSpi,subfields)           |     4/    8/   40 |    3840 |
+| DualHc595(HardSpiFast)                 |    12/   14/   20 |     240 |
+| DualHc595(HardSpiFast,subfields)       |     4/    6/   20 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(SoftWire)                       | 22432/22439/22452 |      20 |
-| Tm1637(SoftWireFast)                   | 21168/21177/21184 |      20 |
+| Tm1637(SoftWire)                       | 22428/22440/22452 |      20 |
+| Tm1637(SoftWireFast)                   | 21168/21176/21188 |      20 |
 |----------------------------------------+-------------------+---------|
 | Max7219(SoftSpi)                       |  1244/ 1247/ 1252 |      20 |
-| Max7219(SoftSpiFast)                   |   112/  113/  120 |      20 |
-| Max7219(HardSpi)                       |   128/  129/  136 |      20 |
-| Max7219(HardSpiFast)                   |    56/   59/   64 |      20 |
+| Max7219(SoftSpiFast)                   |   112/  115/  120 |      20 |
+| Max7219(HardSpi)                       |   124/  129/  140 |      20 |
+| Max7219(HardSpiFast)                   |    56/   58/   68 |      20 |
 +----------------------------------------+-------------------+---------+
 
 ```
@@ -281,8 +299,11 @@ sizeof(HardSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
 sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>): 16
 sizeof(LedMatrixDualShiftRegister<HardSpiInterface>): 12
-sizeof(LedModule): 4
+sizeof(LedModule): 8
 sizeof(ScanningModule<LedMatrixBase, 4>): 32
+sizeof(BareModule<4>): 48
+sizeof(SingleHc595Module<SoftSpiInterface, 4>): 48
+sizeof(DualHc595Module<SoftSpiInterface, 4>): 44
 sizeof(Tm1637Module<SoftWireInterface, 4>): 24
 sizeof(Max7219Module<SoftSpiInterface, 8>): 28
 sizeof(LedDisplay): 4
@@ -297,23 +318,23 @@ CPU:
 +----------------------------------------+-------------------+---------+
 | Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Scanning(Direct)                       |    24/   24/   29 |     240 |
-| Scanning(Direct,subfields)             |     2/    4/   29 |    3840 |
+| BareModule                             |    24/   24/   29 |     240 |
+| BareModule(subfields)                  |     2/    5/   29 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Scanning(Single,SoftSpi)               |    51/   51/   58 |     240 |
-| Scanning(Single,SoftSpi,subfields)     |     2/    7/   58 |    3840 |
-| Scanning(Single,HardSpi)               |    23/   23/   30 |     240 |
-| Scanning(Single,HardSpi,subfields)     |     2/    4/   30 |    3840 |
+| SingleHc595(SoftSpi)                   |    52/   53/   58 |     240 |
+| SingleHc595(SoftSpi,subfields)         |     2/    8/   58 |    3840 |
+| SingleHc595(HardSpi)                   |    24/   24/   28 |     240 |
+| SingleHc595(HardSpi,subfields)         |     2/    5/   29 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Scanning(Dual,SoftSpi)                 |    87/   87/   93 |     240 |
-| Scanning(Dual,SoftSpi,subfields)       |     2/   10/   94 |    3840 |
-| Scanning(Dual,HardSpi)                 |    22/   22/   26 |     240 |
-| Scanning(Dual,HardSpi,subfields)       |     3/    4/   27 |    3840 |
+| DualHc595(SoftSpi)                     |    89/   90/   95 |     240 |
+| DualHc595(SoftSpi,subfields)           |     2/   13/   95 |    3840 |
+| DualHc595(HardSpi)                     |    22/   22/   26 |     240 |
+| DualHc595(HardSpi,subfields)           |     2/    5/   26 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(SoftWire)                       | 22222/22225/22234 |      20 |
+| Tm1637(SoftWire)                       | 22225/22228/22237 |      20 |
 |----------------------------------------+-------------------+---------|
-| Max7219(SoftSpi)                       |   430/  432/  436 |      20 |
-| Max7219(HardSpi)                       |   106/  107/  111 |      20 |
+| Max7219(SoftSpi)                       |   448/  451/  455 |      20 |
+| Max7219(HardSpi)                       |   107/  107/  113 |      20 |
 +----------------------------------------+-------------------+---------+
 
 ```
@@ -332,8 +353,11 @@ sizeof(HardSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
 sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>): 16
 sizeof(LedMatrixDualShiftRegister<HardSpiInterface>): 12
-sizeof(LedModule): 4
+sizeof(LedModule): 8
 sizeof(ScanningModule<LedMatrixBase, 4>): 32
+sizeof(BareModule<4>): 48
+sizeof(SingleHc595Module<SoftSpiInterface, 4>): 48
+sizeof(DualHc595Module<SoftSpiInterface, 4>): 44
 sizeof(Tm1637Module<SoftWireInterface, 4>): 24
 sizeof(Max7219Module<SoftSpiInterface, 8>): 28
 sizeof(LedDisplay): 4
@@ -348,23 +372,23 @@ CPU:
 +----------------------------------------+-------------------+---------+
 | Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Scanning(Direct)                       |    14/   14/   20 |     240 |
-| Scanning(Direct,subfields)             |     1/    2/   25 |    3840 |
+| BareModule                             |    13/   14/   19 |     240 |
+| BareModule(subfields)                  |     1/    3/   28 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Scanning(Single,SoftSpi)               |    32/   32/   38 |     240 |
-| Scanning(Single,SoftSpi,subfields)     |     1/    4/   43 |    3840 |
-| Scanning(Single,HardSpi)               |    40/   41/   46 |     240 |
-| Scanning(Single,HardSpi,subfields)     |     1/    4/   65 |    3840 |
+| SingleHc595(SoftSpi)                   |    30/   31/   36 |     240 |
+| SingleHc595(SoftSpi,subfields)         |     1/    4/   41 |    3840 |
+| SingleHc595(HardSpi)                   |    40/   40/   45 |     240 |
+| SingleHc595(HardSpi,subfields)         |     1/    5/   50 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Scanning(Dual,SoftSpi)                 |    55/   56/   61 |     240 |
-| Scanning(Dual,SoftSpi,subfields)       |     1/    5/   71 |    3840 |
-| Scanning(Dual,HardSpi)                 |    40/   40/   45 |     240 |
-| Scanning(Dual,HardSpi,subfields)       |     1/    5/   63 |    3840 |
+| DualHc595(SoftSpi)                     |    53/   53/   58 |     240 |
+| DualHc595(SoftSpi,subfields)           |     1/    6/   77 |    3840 |
+| DualHc595(HardSpi)                     |    39/   40/   45 |     240 |
+| DualHc595(HardSpi,subfields)           |     1/    6/   63 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(SoftWire)                       | 22399/22405/22413 |      20 |
+| Tm1637(SoftWire)                       | 22399/22403/22411 |      20 |
 |----------------------------------------+-------------------+---------|
-| Max7219(SoftSpi)                       |   281/  283/  287 |      20 |
-| Max7219(HardSpi)                       |   201/  202/  206 |      20 |
+| Max7219(SoftSpi)                       |   267/  268/  272 |      20 |
+| Max7219(HardSpi)                       |   199/  200/  204 |      20 |
 +----------------------------------------+-------------------+---------+
 
 ```
@@ -383,8 +407,11 @@ sizeof(HardSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
 sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>): 16
 sizeof(LedMatrixDualShiftRegister<HardSpiInterface>): 12
-sizeof(LedModule): 4
+sizeof(LedModule): 8
 sizeof(ScanningModule<LedMatrixBase, 4>): 32
+sizeof(BareModule<4>): 48
+sizeof(SingleHc595Module<SoftSpiInterface, 4>): 48
+sizeof(DualHc595Module<SoftSpiInterface, 4>): 44
 sizeof(Tm1637Module<SoftWireInterface, 4>): 24
 sizeof(Max7219Module<SoftSpiInterface, 8>): 28
 sizeof(LedDisplay): 4
@@ -399,22 +426,22 @@ CPU:
 +----------------------------------------+-------------------+---------+
 | Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Scanning(Direct)                       |    12/   12/   25 |     240 |
-| Scanning(Direct,subfields)             |     0/    2/   25 |    3840 |
+| BareModule                             |    12/   12/   25 |     240 |
+| BareModule(subfields)                  |     0/    2/   25 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Scanning(Single,SoftSpi)               |    29/   29/   41 |     240 |
-| Scanning(Single,SoftSpi,subfields)     |     0/    4/   45 |    3840 |
-| Scanning(Single,HardSpi)               |    11/   11/   24 |     240 |
-| Scanning(Single,HardSpi,subfields)     |     0/    2/   23 |    3840 |
+| SingleHc595(SoftSpi)                   |    29/   29/   37 |     240 |
+| SingleHc595(SoftSpi,subfields)         |     0/    4/   42 |    3840 |
+| SingleHc595(HardSpi)                   |    11/   11/   19 |     240 |
+| SingleHc595(HardSpi,subfields)         |     0/    2/   23 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Scanning(Dual,SoftSpi)                 |    50/   50/   59 |     240 |
-| Scanning(Dual,SoftSpi,subfields)       |     0/    7/   67 |    3840 |
-| Scanning(Dual,HardSpi)                 |    12/   12/   20 |     240 |
-| Scanning(Dual,HardSpi,subfields)       |     0/    2/   28 |    3840 |
+| DualHc595(SoftSpi)                     |    50/   50/   63 |     240 |
+| DualHc595(SoftSpi,subfields)           |     0/    7/   67 |    3840 |
+| DualHc595(HardSpi)                     |    12/   12/   19 |     240 |
+| DualHc595(HardSpi,subfields)           |     0/    2/   32 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(SoftWire)                       | 21496/21501/21532 |      20 |
+| Tm1637(SoftWire)                       | 21496/21505/21552 |      20 |
 |----------------------------------------+-------------------+---------|
-| Max7219(SoftSpi)                       |   254/  255/  271 |      20 |
+| Max7219(SoftSpi)                       |   254/  256/  271 |      20 |
 | Max7219(HardSpi)                       |    61/   61/   70 |      20 |
 +----------------------------------------+-------------------+---------+
 
@@ -434,8 +461,11 @@ sizeof(HardSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
 sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>): 16
 sizeof(LedMatrixDualShiftRegister<HardSpiInterface>): 12
-sizeof(LedModule): 4
+sizeof(LedModule): 8
 sizeof(ScanningModule<LedMatrixBase, 4>): 32
+sizeof(BareModule<4>): 48
+sizeof(SingleHc595Module<SoftSpiInterface, 4>): 48
+sizeof(DualHc595Module<SoftSpiInterface, 4>): 44
 sizeof(Tm1637Module<SoftWireInterface, 4>): 24
 sizeof(Max7219Module<SoftSpiInterface, 8>): 28
 sizeof(LedDisplay): 4
@@ -450,23 +480,23 @@ CPU:
 +----------------------------------------+-------------------+---------+
 | Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Scanning(Direct)                       |     2/    2/   11 |     240 |
-| Scanning(Direct,subfields)             |     0/    1/   11 |    3840 |
+| BareModule                             |     2/    2/   10 |     240 |
+| BareModule(subfields)                  |     0/    1/    9 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Scanning(Single,SoftSpi)               |     4/    4/   13 |     240 |
-| Scanning(Single,SoftSpi,subfields)     |     0/    1/   13 |    3840 |
-| Scanning(Single,HardSpi)               |     9/    9/   18 |     240 |
-| Scanning(Single,HardSpi,subfields)     |     0/    1/   18 |    3840 |
+| SingleHc595(SoftSpi)                   |     4/    4/    7 |     240 |
+| SingleHc595(SoftSpi,subfields)         |     0/    1/   13 |    3840 |
+| SingleHc595(HardSpi)                   |     9/    9/   17 |     240 |
+| SingleHc595(HardSpi,subfields)         |     0/    1/   18 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Scanning(Dual,SoftSpi)                 |     7/    7/   15 |     240 |
-| Scanning(Dual,SoftSpi,subfields)       |     0/    1/   15 |    3840 |
-| Scanning(Dual,HardSpi)                 |     9/    9/   17 |     240 |
-| Scanning(Dual,HardSpi,subfields)       |     0/    1/   18 |    3840 |
+| DualHc595(SoftSpi)                     |     7/    7/   16 |     240 |
+| DualHc595(SoftSpi,subfields)           |     0/    1/   15 |    3840 |
+| DualHc595(HardSpi)                     |     9/    9/   16 |     240 |
+| DualHc595(HardSpi,subfields)           |     0/    1/   14 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(SoftWire)                       | 21228/21239/21252 |      20 |
+| Tm1637(SoftWire)                       | 21226/21239/21247 |      20 |
 |----------------------------------------+-------------------+---------|
-| Max7219(SoftSpi)                       |    33/   33/   36 |      20 |
-| Max7219(HardSpi)                       |    43/   44/   52 |      20 |
+| Max7219(SoftSpi)                       |    33/   34/   41 |      20 |
+| Max7219(HardSpi)                       |    44/   44/   51 |      20 |
 +----------------------------------------+-------------------+---------+
 
 ```
@@ -486,8 +516,11 @@ sizeof(HardSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
 sizeof(LedMatrixSingleShiftRegister<SoftSpiInterface>): 16
 sizeof(LedMatrixDualShiftRegister<HardSpiInterface>): 12
-sizeof(LedModule): 4
+sizeof(LedModule): 8
 sizeof(ScanningModule<LedMatrixBase, 4>): 32
+sizeof(BareModule<4>): 48
+sizeof(SingleHc595Module<SoftSpiInterface, 4>): 48
+sizeof(DualHc595Module<SoftSpiInterface, 4>): 44
 sizeof(Tm1637Module<SoftWireInterface, 4>): 24
 sizeof(Max7219Module<SoftSpiInterface, 8>): 28
 sizeof(LedDisplay): 4
@@ -502,23 +535,23 @@ CPU:
 +----------------------------------------+-------------------+---------+
 | Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Scanning(Direct)                       |     5/    5/    9 |     240 |
-| Scanning(Direct,subfields)             |     0/    1/    9 |    3840 |
+| BareModule                             |     5/    5/   10 |     240 |
+| BareModule(subfields)                  |     0/    1/    7 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Scanning(Single,SoftSpi)               |     9/    9/   12 |     240 |
-| Scanning(Single,SoftSpi,subfields)     |     0/    1/   13 |    3840 |
-| Scanning(Single,HardSpi)               |     3/    3/    6 |     240 |
-| Scanning(Single,HardSpi,subfields)     |     0/    0/    6 |    3840 |
+| SingleHc595(SoftSpi)                   |     9/   10/   13 |     240 |
+| SingleHc595(SoftSpi,subfields)         |     0/    1/   17 |    3840 |
+| SingleHc595(HardSpi)                   |     3/    3/    4 |     240 |
+| SingleHc595(HardSpi,subfields)         |     0/    1/    6 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Scanning(Dual,SoftSpi)                 |    16/   16/   20 |     240 |
-| Scanning(Dual,SoftSpi,subfields)       |     0/    2/   20 |    3840 |
-| Scanning(Dual,HardSpi)                 |     3/    3/    4 |     240 |
-| Scanning(Dual,HardSpi,subfields)       |     0/    1/    7 |    3840 |
+| DualHc595(SoftSpi)                     |    16/   16/   20 |     240 |
+| DualHc595(SoftSpi,subfields)           |     0/    2/   19 |    3840 |
+| DualHc595(HardSpi)                     |     3/    3/    4 |     240 |
+| DualHc595(HardSpi,subfields)           |     0/    1/    6 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(SoftWire)                       | 21165/21166/21172 |      20 |
+| Tm1637(SoftWire)                       | 21160/21161/21166 |      20 |
 |----------------------------------------+-------------------+---------|
-| Max7219(SoftSpi)                       |    83/   83/   86 |      20 |
-| Max7219(HardSpi)                       |    17/   17/   21 |      20 |
+| Max7219(SoftSpi)                       |    83/   83/   85 |      20 |
+| Max7219(HardSpi)                       |    16/   16/   21 |      20 |
 +----------------------------------------+-------------------+---------+
 
 ```
