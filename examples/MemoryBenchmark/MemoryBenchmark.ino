@@ -17,16 +17,16 @@
 
 // List of features of AceSegment that we want to gather memory usage numbers.
 #define FEATURE_BASELINE 0
-#define FEATURE_DIRECT 1
-#define FEATURE_DIRECT_FAST 2
-#define FEATURE_SINGLE_SOFT_SPI 3
-#define FEATURE_SINGLE_SOFT_SPI_FAST 4
-#define FEATURE_SINGLE_HARD_SPI 5
-#define FEATURE_SINGLE_HARD_SPI_FAST 6
-#define FEATURE_DUAL_SOFT_SPI 7
-#define FEATURE_DUAL_SOFT_SPI_FAST 8
-#define FEATURE_DUAL_HARD_SPI 9
-#define FEATURE_DUAL_HARD_SPI_FAST 10
+#define FEATURE_BARE_MODULE 1
+#define FEATURE_BARE_FAST4_MODULE 2
+#define FEATURE_SINGLE_HC595_SOFT_SPI 3
+#define FEATURE_SINGLE_HC595_SOFT_SPI_FAST 4
+#define FEATURE_SINGLE_HC595_HARD_SPI 5
+#define FEATURE_SINGLE_HC595_HARD_SPI_FAST 6
+#define FEATURE_DUAL_HC595_SOFT_SPI 7
+#define FEATURE_DUAL_HC595_SOFT_SPI_FAST 8
+#define FEATURE_DUAL_HC595_HARD_SPI 9
+#define FEATURE_DUAL_HC595_HARD_SPI_FAST 10
 #define FEATURE_TM1637_WIRE 11
 #define FEATURE_TM1637_WIRE_FAST 12
 #define FEATURE_MAX7219_SOFT_SPI 13
@@ -51,7 +51,7 @@ volatile int disableCompilerOptimization = 0;
     #include <ace_segment/hw/SoftSpiFastInterface.h>
     #include <ace_segment/hw/HardSpiFastInterface.h>
     #include <ace_segment/hw/SoftWireFastInterface.h>
-    #include <ace_segment/scanning/LedMatrixDirectFast4.h>
+    #include <ace_segment/bare/BareFast4Module.h>
   #endif
   using namespace ace_segment;
 
@@ -94,49 +94,43 @@ volatile int disableCompilerOptimization = 0;
       }
   };
 
-  #if FEATURE == FEATURE_DIRECT
+  #if FEATURE == FEATURE_BARE_MODULE
     // Common Anode, with transitions on Group pins
-    using LedMatrix = LedMatrixDirect<>;
-    LedMatrix ledMatrix(
-        LedMatrix::kActiveLowPattern /*elementOnPattern*/,
-        LedMatrix::kActiveLowPattern /*groupOnPattern*/,
-        NUM_SEGMENTS,
+    BareModule<NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
+        LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
+        LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+        FRAMES_PER_SECOND,
         SEGMENT_PINS,
-        NUM_DIGITS,
         DIGIT_PINS);
-    ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-        scanningModule(ledMatrix, FRAMES_PER_SECOND);
 
-  #elif FEATURE == FEATURE_DIRECT_FAST
+  #elif FEATURE == FEATURE_BARE_FAST4_MODULE
     #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
       #error Unsupported FEATURE on this platform
     #endif
 
-    // Common Anode, with transitions on Group pins
-    using LedMatrix = LedMatrixDirectFast4<
-      8, 9, 10, 16, 14, 18, 19, 15,
-      4, 5, 6, 7
-    >;
-    LedMatrix ledMatrix(
-        LedMatrix::kActiveLowPattern /*elementOnPattern*/,
-        LedMatrix::kActiveLowPattern /*groupOnPattern*/);
-    ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-        scanningModule(ledMatrix, FRAMES_PER_SECOND);
-
-  #elif FEATURE == FEATURE_SINGLE_SOFT_SPI
-    // Common Cathode, with transistors on Group pins
-    SoftSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-    using LedMatrix = LedMatrixSingleShiftRegister<SoftSpiInterface>;
-    LedMatrix ledMatrix(
-        spiInterface,
-        LedMatrix::kActiveHighPattern /*elementOnPattern*/,
-        LedMatrix::kActiveHighPattern /*groupOnPattern*/,
+    BareFast4Module<
+        8, 9, 10, 16, 14, 18, 19, 15, // segment pins
+        4, 5, 6, 7, // digit pins
         NUM_DIGITS,
-        DIGIT_PINS);
-    ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-        scanningModule(ledMatrix, FRAMES_PER_SECOND);
+        NUM_SUBFIELDS
+    > scanningModule(
+        LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
+        LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+        FRAMES_PER_SECOND);
 
-  #elif FEATURE == FEATURE_SINGLE_SOFT_SPI_FAST
+  #elif FEATURE == FEATURE_SINGLE_HC595_SOFT_SPI
+    // Common Cathode, with transistors on Group pins
+    using SpiInterface = SoftSpiInterface;
+    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    SingleHc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
+        spiInterface,
+        LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
+        LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
+        FRAMES_PER_SECOND,
+        DIGIT_PINS
+    );
+
+  #elif FEATURE == FEATURE_SINGLE_HC595_SOFT_SPI_FAST
     #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
       #error Unsupported FEATURE on this platform
     #endif
@@ -144,30 +138,27 @@ volatile int disableCompilerOptimization = 0;
     // Common Cathode, with transistors on Group pins
     using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
-    using LedMatrix = LedMatrixSingleShiftRegister<SpiInterface>;
-    LedMatrix ledMatrix(
+    SingleHc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
-        LedMatrix::kActiveHighPattern /*elementOnPattern*/,
-        LedMatrix::kActiveHighPattern /*groupOnPattern*/,
-        NUM_DIGITS,
-        DIGIT_PINS);
-    ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-        scanningModule(ledMatrix, FRAMES_PER_SECOND);
+        LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
+        LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
+        FRAMES_PER_SECOND,
+        DIGIT_PINS
+    );
 
-  #elif FEATURE == FEATURE_SINGLE_HARD_SPI
+  #elif FEATURE == FEATURE_SINGLE_HC595_HARD_SPI
     // Common Cathode, with transistors on Group pins
-    HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-    using LedMatrix = LedMatrixSingleShiftRegister<HardSpiInterface>;
-    LedMatrix ledMatrix(
+    using SpiInterface = HardSpiInterface;
+    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    SingleHc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
-        LedMatrix::kActiveHighPattern /*elementOnPattern*/,
-        LedMatrix::kActiveHighPattern /*groupOnPattern*/,
-        NUM_DIGITS,
-        DIGIT_PINS);
-    ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-        scanningModule(ledMatrix, FRAMES_PER_SECOND);
+        LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
+        LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
+        FRAMES_PER_SECOND,
+        DIGIT_PINS
+    );
 
-  #elif FEATURE == FEATURE_SINGLE_HARD_SPI_FAST
+  #elif FEATURE == FEATURE_SINGLE_HC595_HARD_SPI_FAST
     #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
       #error Unsupported FEATURE on this platform
     #endif
@@ -175,28 +166,26 @@ volatile int disableCompilerOptimization = 0;
     // Common Cathode, with transistors on Group pins
     using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
-    using LedMatrix = LedMatrixSingleShiftRegister<SpiInterface>;
-    LedMatrix ledMatrix(
+    SingleHc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
-        LedMatrix::kActiveHighPattern /*elementOnPattern*/,
-        LedMatrix::kActiveHighPattern /*groupOnPattern*/,
-        NUM_DIGITS,
-        DIGIT_PINS);
-    ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-        scanningModule(ledMatrix, FRAMES_PER_SECOND);
+        LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
+        LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
+        FRAMES_PER_SECOND,
+        DIGIT_PINS
+    );
 
-  #elif FEATURE == FEATURE_DUAL_SOFT_SPI
+  #elif FEATURE == FEATURE_DUAL_HC595_SOFT_SPI
     // Common Cathode, with transistors on Group pins
-    SoftSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-    using LedMatrix = LedMatrixDualShiftRegister<SoftSpiInterface>;
-    LedMatrix ledMatrix(
+    using SpiInterface = SoftSpiInterface;
+    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    DualHc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
-        LedMatrix::kActiveLowPattern /*elementOnPattern*/,
-        LedMatrix::kActiveLowPattern /*groupOnPattern*/);
-    ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-        scanningModule(ledMatrix, FRAMES_PER_SECOND);
+        LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
+        LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+        FRAMES_PER_SECOND
+    );
 
-  #elif FEATURE == FEATURE_DUAL_SOFT_SPI_FAST
+  #elif FEATURE == FEATURE_DUAL_HC595_SOFT_SPI_FAST
     #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
       #error Unsupported FEATURE on this platform
     #endif
@@ -204,26 +193,25 @@ volatile int disableCompilerOptimization = 0;
     // Common Cathode, with transistors on Group pins
     using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
-    using LedMatrix = LedMatrixDualShiftRegister<SpiInterface>;
-    LedMatrix ledMatrix(
+    DualHc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
-        LedMatrix::kActiveLowPattern /*elementOnPattern*/,
-        LedMatrix::kActiveLowPattern /*groupOnPattern*/);
-    ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-        scanningModule(ledMatrix, FRAMES_PER_SECOND);
+        LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
+        LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+        FRAMES_PER_SECOND
+    );
 
-  #elif FEATURE == FEATURE_DUAL_HARD_SPI
+  #elif FEATURE == FEATURE_DUAL_HC595_HARD_SPI
     // Common Cathode, with transistors on Group pins
-    HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-    using LedMatrix = LedMatrixDualShiftRegister<HardSpiInterface>;
-    LedMatrix ledMatrix(
+    using SpiInterface = HardSpiInterface;
+    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    DualHc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
-        LedMatrix::kActiveLowPattern /*elementOnPattern*/,
-        LedMatrix::kActiveLowPattern /*groupOnPattern*/);
-    ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-        scanningModule(ledMatrix, FRAMES_PER_SECOND);
+        LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
+        LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+        FRAMES_PER_SECOND
+    );
 
-  #elif FEATURE == FEATURE_DUAL_HARD_SPI_FAST
+  #elif FEATURE == FEATURE_DUAL_HC595_HARD_SPI_FAST
     #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
       #error Unsupported FEATURE on this platform
     #endif
@@ -231,13 +219,12 @@ volatile int disableCompilerOptimization = 0;
     // Common Cathode, with transistors on Group pins
     using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
-    using LedMatrix = LedMatrixDualShiftRegister<SpiInterface>;
-    LedMatrix ledMatrix(
+    DualHc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
-        LedMatrix::kActiveLowPattern /*elementOnPattern*/,
-        LedMatrix::kActiveLowPattern /*groupOnPattern*/);
-    ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-        scanningModule(ledMatrix, FRAMES_PER_SECOND);
+        LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
+        LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+        FRAMES_PER_SECOND
+    );
 
   #elif FEATURE == FEATURE_TM1637_WIRE
     using WireInterface = SoftWireInterface;
@@ -328,52 +315,42 @@ void setup() {
 // ScanningModule performs a digitalWrite(), which has the same effect of
 // disabling optimizations.
 
-#elif FEATURE == FEATURE_DIRECT
-  ledMatrix.begin();
+#elif FEATURE == FEATURE_BARE_MODULE
   scanningModule.begin();
 
-#elif FEATURE == FEATURE_DIRECT_FAST
-  ledMatrix.begin();
+#elif FEATURE == FEATURE_BARE_FAST4_MODULE
   scanningModule.begin();
 
-#elif FEATURE == FEATURE_SINGLE_SOFT_SPI
+#elif FEATURE == FEATURE_SINGLE_HC595_SOFT_SPI
   spiInterface.begin();
-  ledMatrix.begin();
   scanningModule.begin();
 
-#elif FEATURE == FEATURE_SINGLE_SOFT_SPI_FAST
+#elif FEATURE == FEATURE_SINGLE_HC595_SOFT_SPI_FAST
   spiInterface.begin();
-  ledMatrix.begin();
   scanningModule.begin();
 
-#elif FEATURE == FEATURE_SINGLE_HARD_SPI
+#elif FEATURE == FEATURE_SINGLE_HC595_HARD_SPI
   spiInterface.begin();
-  ledMatrix.begin();
   scanningModule.begin();
 
-#elif FEATURE == FEATURE_SINGLE_HARD_SPI_FAST
+#elif FEATURE == FEATURE_SINGLE_HC595_HARD_SPI_FAST
   spiInterface.begin();
-  ledMatrix.begin();
   scanningModule.begin();
 
-#elif FEATURE == FEATURE_DUAL_SOFT_SPI
+#elif FEATURE == FEATURE_DUAL_HC595_SOFT_SPI
   spiInterface.begin();
-  ledMatrix.begin();
   scanningModule.begin();
 
-#elif FEATURE == FEATURE_DUAL_SOFT_SPI_FAST
+#elif FEATURE == FEATURE_DUAL_HC595_SOFT_SPI_FAST
   spiInterface.begin();
-  ledMatrix.begin();
   scanningModule.begin();
 
-#elif FEATURE == FEATURE_DUAL_HARD_SPI
+#elif FEATURE == FEATURE_DUAL_HC595_HARD_SPI
   spiInterface.begin();
-  ledMatrix.begin();
   scanningModule.begin();
 
-#elif FEATURE == FEATURE_DUAL_HARD_SPI_FAST
+#elif FEATURE == FEATURE_DUAL_HC595_HARD_SPI_FAST
   spiInterface.begin();
-  ledMatrix.begin();
   scanningModule.begin();
 
 #elif FEATURE == FEATURE_TM1637_WIRE

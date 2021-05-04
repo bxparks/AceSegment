@@ -77,15 +77,6 @@ will be invoked by the following command:
 $ make README.md
 ```
 
-## Algorithms
-
-* 0 `baseline`: program does (almost) nothing
-* 1 `direct`: segment and digit pins are wired directly
-* 2 `split_sw_spi`: segment pins wired directly, digit pins through SW SPI
-* 3 `split_hw_spi`: segment pins wired directly, digit pins through HW SPI
-* 4 `merged_sw_spi`: segment and digit pins both controlled through SW SPI
-* 5 `merged_hw_spi`: segment and digit pins both controlled through HW SPI
-
 ## Library Size Changes
 
 **v0.3**
@@ -157,6 +148,9 @@ before substantional refactoring in 2021.
   of indirection through the `LedModule`). So overall, I think it's a wash.
 * Add `HardSpiFastInterface` which saves 70 bytes for `ScanningModule(Single)`,
   90 bytes for `ScanningModule(Dual)`, and 250 bytes for `Max7219Module`.
+* Hide implementation details involving `LedMatrixXxx` and `ScanningModule` by
+  using the convenience classes (`BareModule`, `BareFast4Module`,
+  `SingleHc595Module`, `DualHc595Module`).
 
 ## Results
 
@@ -164,9 +158,12 @@ The following shows the flash and static memory sizes of the `MemoryBenchmark`
 program for various `LedModule` configurations and various Writer classes.
 
 * `ClockInterface`, `GpioInterface` (usually optimized away by the compiler)
-* `SoftSpiInterface` or `HardSpiInterface`
-* `LedMatrixXxx`
-* `ScanningModule`
+* `SoftSpiInterface`, `SoftSpiFastInterface`, `HardSpiInterface`,
+  `HardSpiFastInterface`
+* `BareModule`
+* `BareFast4Module`
+* `SingleHc595Module`
+* `DualHc595Module`
 * `Tm1637Module`
 * `Max7219Module`
 * `NumberWriter`
