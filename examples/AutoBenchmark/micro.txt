@@ -11,8 +11,8 @@ sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 8
 sizeof(LedMatrixDualHc595<HardSpiInterface>): 5
 sizeof(LedModule): 3
 sizeof(ScanningModule<LedMatrixBase, 4>): 22
-sizeof(BareModule<4>): 31
-sizeof(BareFast4Module<...>): 25
+sizeof(DirectModule<4>): 31
+sizeof(DirectFast4Module<...>): 25
 sizeof(SingleHc595Module<SoftSpiInterface, 4>): 30
 sizeof(DualHc595Module<SoftSpiInterface, 4>): 27
 sizeof(Tm1637Module<SoftWireInterface, 4>): 14
@@ -25,10 +25,10 @@ sizeof(CharWriter): 2
 sizeof(StringWriter): 2
 sizeof(StringScroller): 7
 BENCHMARKS
-BareModule 72 76 84 240
-BareModule(subfields) 4 14 92 3840
-BareFast4Module 24 28 36 240
-BareFast4Module(subfields) 4 8 36 3840
+Direct 72 76 84 240
+Direct(subfields) 4 14 92 3840
+DirectFast4 24 28 36 240
+DirectFast4(subfields) 4 8 36 3840
 SingleHc595(SoftSpi) 148 153 164 240
 SingleHc595(SoftSpi,subfields) 4 23 164 3840
 SingleHc595(SoftSpiFast) 28 31 40 240

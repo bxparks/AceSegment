@@ -9,7 +9,7 @@
 #include <ace_segment/hw/HardSpiFastInterface.h>
 #include <ace_segment/hw/SoftWireFastInterface.h>
 #include <ace_segment/scanning/LedMatrixDirectFast4.h>
-#include <ace_segment/bare/BareFast4Module.h>
+#include <ace_segment/direct/DirectFast4Module.h>
 #endif
 
 using ace_common::incrementMod;
@@ -27,7 +27,7 @@ using namespace ace_button;
 #define LED_DISPLAY_TYPE_SCANNING 0
 #define LED_DISPLAY_TYPE_TM1637 1
 #define LED_DISPLAY_TYPE_MAX7219 2
-#define LED_DISPLAY_TYPE_BARE 3
+#define LED_DISPLAY_TYPE_DIRECT 3
 #define LED_DISPLAY_TYPE_HC595_SINGLE 4
 #define LED_DISPLAY_TYPE_HC595_DUAL 5
 
@@ -65,9 +65,8 @@ using namespace ace_button;
   const uint8_t MODE_BUTTON_PIN = 2;
   const uint8_t CHANGE_BUTTON_PIN = 3;
 
-#elif defined(AUNITER_LED_CLOCK_DIRECT)
+#elif defined(AUNITER_LED_CLOCK_SCANNING_DIRECT)
   const uint8_t NUM_DIGITS = 4;
-
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
 
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
@@ -76,7 +75,7 @@ using namespace ace_button;
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
 
-#elif defined(AUNITER_LED_CLOCK_SINGLE)
+#elif defined(AUNITER_LED_CLOCK_SCANNING_SINGLE)
   const uint8_t NUM_DIGITS = 4;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
 
@@ -88,7 +87,7 @@ using namespace ace_button;
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
 
-#elif defined(AUNITER_LED_CLOCK_DUAL)
+#elif defined(AUNITER_LED_CLOCK_SCANNING_DUAL)
   const uint8_t NUM_DIGITS = 4;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
 
@@ -114,9 +113,9 @@ using namespace ace_button;
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
 
-#elif defined(AUNITER_LED_CLOCK_BARE)
+#elif defined(AUNITER_LED_CLOCK_DIRECT)
   const uint8_t NUM_DIGITS = 4;
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_BARE
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_DIRECT
   #define LED_MATRIX_MODE LED_MATRIX_MODE_NONE
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
@@ -184,7 +183,7 @@ const uint8_t NUM_SUBFIELDS = 1;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
 
-#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_BARE
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_DIRECT
   const uint8_t NUM_SEGMENTS = 8;
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
   const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
@@ -319,9 +318,9 @@ const uint8_t NUM_SUBFIELDS = 1;
   Max7219Module<SpiInterface, NUM_DIGITS> ledModule(
       spiInterface, kEightDigitRemapArray);
 
-#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_BARE
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_DIRECT
   // Common Anode, with transitors on Group pins
-  BareModule<NUM_DIGITS> ledModule(
+  DirectModule<NUM_DIGITS> ledModule(
       LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
       LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
       FRAMES_PER_SECOND,
@@ -400,7 +399,7 @@ void setupAceSegment() {
   ledModule.begin();
   ledModule.setBrightness(1); // 0-1
 
-#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_BARE
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_DIRECT
   ledModule.begin();
   ledModule.setBrightness(1); // 0-1
 
@@ -701,9 +700,9 @@ void demoLoop() {
 
 void renderField() {
   #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_SCANNING \
-      || LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_DUAL \
+      || LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_DIRECT \
       || LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_SINGLE \
-      || LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_BARE
+      || LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_DUAL
     ledModule.renderFieldWhenReady();
   #else
     ledModule.flush();

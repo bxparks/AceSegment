@@ -7,8 +7,8 @@
 
 BEGIN {
   labels[0] = "baseline"
-  labels[1] = "BareModule";
-  labels[2] = "BareFast4Module";
+  labels[1] = "DirectModule";
+  labels[2] = "DirectFast4Module";
   labels[3] = "SingleHc595(SoftSpi)";
   labels[4] = "SingleHc595(SoftSpiFast)";
   labels[5] = "SingleHc595(HardSpi)";
@@ -17,8 +17,8 @@ BEGIN {
   labels[8] = "DualHc595(SoftSpiFast)";
   labels[9] = "DualHc595(HardSpi)";
   labels[10] = "DualHc595(HardSpiFast)";
-  labels[11] = "Tm1637(Wire)";
-  labels[12] = "Tm1637(WireFast)";
+  labels[11] = "Tm1637(SoftWire)";
+  labels[12] = "Tm1637(SoftWireFast)";
   labels[13] = "Max7219(SoftSpi)";
   labels[14] = "Max7219(SoftSpiFast)";
   labels[15] = "Max7219(HardSpi)";
@@ -58,10 +58,10 @@ END {
   printf("| %-31s | %6d/%5d | %5d/%5d |\n",
     labels[0], u[0]["flash"], u[0]["ram"], u[0]["d_flash"], u[0]["d_ram"])
   for (i = 1 ; i < NUM_ENTRIES; i++) {
-    if (labels[i] ~ /BareModule/ \
+    if (labels[i] ~ /DirectModule/ \
         || labels[i] ~ /SingleHc595\(SoftSpi\)/ \
         || labels[i] ~ /DualHc595\(SoftSpi\)/ \
-        || labels[i] ~ /Tm1637\(Wire\)/ \
+        || labels[i] ~ /Tm1637\(SoftWire\)/ \
         || labels[i] ~ /Max7219\(SoftSpi\)/ \
         || labels[i] == "StubModule+LedDisplay") {
       printf(\

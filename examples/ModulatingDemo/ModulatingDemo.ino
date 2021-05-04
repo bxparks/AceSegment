@@ -1,3 +1,16 @@
+/*
+ * Demo the ability to control the brightness of each digit separately. Requires
+ * one of the following configurations:
+ *
+ *  * ScanningModule + LedMatrixDirect
+ *  * ScanningModule + LedMatrixDirectFast4
+ *  * ScanningModule + LedMatrixSingleHc595
+ *  * ScanningModule + LedMatrixDualHc595
+ *  * DirectModule
+ *  * DirectFast4Module
+ *  * SingleHc595Module
+ *  * DualHc595Module
+ */
 #include <Arduino.h>
 #include <AceCommon.h> // incrementMod()
 #include <AceSegment.h>
@@ -21,7 +34,7 @@ using namespace ace_segment;
 //------------------------------------------------------------------
 
 #define LED_DISPLAY_TYPE_SCANNING 0
-#define LED_DISPLAY_TYPE_BARE 3
+#define LED_DISPLAY_TYPE_DIRECT 3
 #define LED_DISPLAY_TYPE_HC595_SINGLE 4
 #define LED_DISPLAY_TYPE_HC595_DUAL 5
 
@@ -50,13 +63,13 @@ const uint8_t NUM_SEGMENTS = 8;
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HARD_SPI
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HARD_SPI_FAST
 
-#elif defined(AUNITER_LED_CLOCK_DIRECT)
+#elif defined(AUNITER_LED_CLOCK_SCANNING_DIRECT)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
 
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT_FAST
 
-#elif defined(AUNITER_LED_CLOCK_SINGLE)
+#elif defined(AUNITER_LED_CLOCK_SCANNING_SINGLE)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
 
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_SOFT_SPI
@@ -64,7 +77,7 @@ const uint8_t NUM_SEGMENTS = 8;
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_HARD_SPI
   #define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_HARD_SPI_FAST
 
-#elif defined(AUNITER_LED_CLOCK_DUAL)
+#elif defined(AUNITER_LED_CLOCK_SCANNING_DUAL)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
 
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SOFT_SPI
@@ -72,8 +85,8 @@ const uint8_t NUM_SEGMENTS = 8;
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HARD_SPI
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HARD_SPI_FAST
 
-#elif defined(AUNITER_LED_CLOCK_BARE)
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_BARE
+#elif defined(AUNITER_LED_CLOCK_DIRECT)
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_DIRECT
   #define LED_MATRIX_MODE LED_MATRIX_MODE_NONE
 
 #elif defined(AUNITER_LED_CLOCK_HC595_SINGLE)
@@ -122,7 +135,7 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
     const uint8_t CLOCK_PIN = SCK; // SH_CP on 74HC595
   #endif
 
-#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_BARE
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_DIRECT
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
   const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
 
@@ -245,16 +258,14 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
       modulatingModule(ledMatrix, FRAMES_PER_SECOND);
 
-#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_DUAL
-  // Common Anode, with transistors on Group pins
-  using SpiInterface = SoftSpiInterface;
-  SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  DualHc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> modulatingModule(
-      spiInterface,
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_DIRECT
+  // Common Anode, with transitors on Group pins
+  DirectModule<NUM_DIGITS, NUM_SUBFIELDS> modulatingModule(
       LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
       LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
-      FRAMES_PER_SECOND
-  );
+      FRAMES_PER_SECOND,
+      SEGMENT_PINS,
+      DIGIT_PINS);
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_SINGLE
   // Common Cathode, with transistors on Group pins
@@ -268,14 +279,16 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
       DIGIT_PINS
   );
 
-#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_BARE
-  // Common Anode, with transitors on Group pins
-  BareModule<NUM_DIGITS, NUM_SUBFIELDS> modulatingModule(
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_DUAL
+  // Common Anode, with transistors on Group pins
+  using SpiInterface = SoftSpiInterface;
+  SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  DualHc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> modulatingModule(
+      spiInterface,
       LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
       LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
-      FRAMES_PER_SECOND,
-      SEGMENT_PINS,
-      DIGIT_PINS);
+      FRAMES_PER_SECOND
+  );
 
 #endif
 
@@ -307,7 +320,7 @@ void setupAceSegment() {
   modulatingModule.begin();
   modulatingModule.setBrightness(1); // 0-1
 
-#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_BARE
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_DIRECT
   modulatingModule.begin();
   modulatingModule.setBrightness(1); // 0-1
 

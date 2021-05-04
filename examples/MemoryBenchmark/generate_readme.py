@@ -149,7 +149,7 @@ before substantional refactoring in 2021.
 * Add `HardSpiFastInterface` which saves 70 bytes for `ScanningModule(Single)`,
   90 bytes for `ScanningModule(Dual)`, and 250 bytes for `Max7219Module`.
 * Hide implementation details involving `LedMatrixXxx` and `ScanningModule` by
-  using the convenience classes (`BareModule`, `BareFast4Module`,
+  using the convenience classes (`DirectModule`, `DirectFast4Module`,
   `SingleHc595Module`, `DualHc595Module`).
 
 ## Results
@@ -160,8 +160,8 @@ program for various `LedModule` configurations and various Writer classes.
 * `ClockInterface`, `GpioInterface` (usually optimized away by the compiler)
 * `SoftSpiInterface`, `SoftSpiFastInterface`, `HardSpiInterface`,
   `HardSpiFastInterface`
-* `BareModule`
-* `BareFast4Module`
+* `DirectModule`
+* `DirectFast4Module`
 * `SingleHc595Module`
 * `DualHc595Module`
 * `Tm1637Module`

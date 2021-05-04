@@ -22,21 +22,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_BARE_MODULE_H
-#define ACE_SEGMENT_BARE_MODULE_H
+#ifndef ACE_SEGMENT_DIRECT_FAST_4_MODULE_H
+#define ACE_SEGMENT_DIRECT_FAST_4_MODULE_H
 
+#include <stdint.h>
 #include "../scanning/ScanningModule.h"
-#include "../scanning/LedMatrixDirect.h"
+#include "../scanning/LedMatrixDirectFast4.h"
 
 namespace ace_segment {
 
 /**
  * An implementation of LedModule whose segment and digit pins are directly
  * connected to the GPIO pins of the microcontroller. This is a convenience
- * class that pairs together a ScanningModule and a LedMatrixDirect in a single
- * class. For ease of use, this class assumes that the number of segments is
- * always 8.
+ * class that pairs together a ScanningModule and a LedMatrixDirectFast4 in a
+ * single class. For ease of use, this class assumes that the number of segments
+ * is always 8 and the number of digits is always 4.
  *
+ * @tparam eX element (segment) pin numbers
+ * @tparam gX group (digit) pin numbers
  * @tparam T_DIGITS number of digits in the LED module
  * @tparam T_SUBFIELDS number of subfields for each digit to get brightness
  *    control using PWM. The default is 1, but can be set to greater than 1 to
@@ -47,41 +50,37 @@ namespace ace_segment {
  *    default is GpioInterface (note: 'GPI' is already taken on ESP8266)
  */
 template <
+    uint8_t e0, uint8_t e1, uint8_t e2, uint8_t e3,
+    uint8_t e4, uint8_t e5, uint8_t e6, uint8_t e7,
+    uint8_t g0, uint8_t g1, uint8_t g2, uint8_t g3,
     uint8_t T_DIGITS,
     uint8_t T_SUBFIELDS = 1,
-    typename T_CI = ClockInterface,
-    typename T_GPIOI = GpioInterface
+    typename T_CI = ClockInterface
 >
-class BareModule : public ScanningModule<
-    LedMatrixDirect<T_GPIOI>,
+class DirectFast4Module : public ScanningModule<
+    LedMatrixDirectFast4<e0, e1, e2, e3, e4, e5, e6, e7, g0, g1, g2, g3>,
     T_DIGITS,
     T_SUBFIELDS,
     T_CI
 > {
   private:
     using Super = ScanningModule<
-        LedMatrixDirect<T_GPIOI>,
+        LedMatrixDirectFast4<e0, e1, e2, e3, e4, e5, e6, e7, g0, g1, g2, g3>,
         T_DIGITS,
         T_SUBFIELDS,
         T_CI
     >;
 
   public:
-    BareModule(
+    DirectFast4Module(
         uint8_t segmentOnPattern,
         uint8_t digitOnPattern,
-        uint8_t framesPerSecond,
-        const uint8_t* segmentPins,
-        const uint8_t* digitPins
+        uint8_t framesPerSecond
     ) :
         Super(mLedMatrix, framesPerSecond),
         mLedMatrix(
             segmentOnPattern /*elementOnPattern*/,
-            digitOnPattern /*groupOnPattern*/,
-            8 /* numElements */,
-            segmentPins /*elementPins*/,
-            T_DIGITS /*numGroups*/,
-            digitPins /* groupPins */
+            digitOnPattern /*groupOnPattern*/
         )
     {}
 
@@ -96,7 +95,8 @@ class BareModule : public ScanningModule<
     }
 
   private:
-    LedMatrixDirect<T_GPIOI> mLedMatrix;
+    LedMatrixDirectFast4<e0, e1, e2, e3, e4, e5, e6, e7, g0, g1, g2, g3>
+        mLedMatrix;
 };
 
 } // ace_segment

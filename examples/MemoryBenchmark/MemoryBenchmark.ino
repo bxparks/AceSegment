@@ -17,8 +17,8 @@
 
 // List of features of AceSegment that we want to gather memory usage numbers.
 #define FEATURE_BASELINE 0
-#define FEATURE_BARE_MODULE 1
-#define FEATURE_BARE_FAST4_MODULE 2
+#define FEATURE_DIRECT_MODULE 1
+#define FEATURE_DIRECT_FAST4_MODULE 2
 #define FEATURE_SINGLE_HC595_SOFT_SPI 3
 #define FEATURE_SINGLE_HC595_SOFT_SPI_FAST 4
 #define FEATURE_SINGLE_HC595_HARD_SPI 5
@@ -51,7 +51,7 @@ volatile int disableCompilerOptimization = 0;
     #include <ace_segment/hw/SoftSpiFastInterface.h>
     #include <ace_segment/hw/HardSpiFastInterface.h>
     #include <ace_segment/hw/SoftWireFastInterface.h>
-    #include <ace_segment/bare/BareFast4Module.h>
+    #include <ace_segment/direct/DirectFast4Module.h>
   #endif
   using namespace ace_segment;
 
@@ -94,21 +94,21 @@ volatile int disableCompilerOptimization = 0;
       }
   };
 
-  #if FEATURE == FEATURE_BARE_MODULE
+  #if FEATURE == FEATURE_DIRECT_MODULE
     // Common Anode, with transitions on Group pins
-    BareModule<NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
+    DirectModule<NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
         LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
         FRAMES_PER_SECOND,
         SEGMENT_PINS,
         DIGIT_PINS);
 
-  #elif FEATURE == FEATURE_BARE_FAST4_MODULE
+  #elif FEATURE == FEATURE_DIRECT_FAST4_MODULE
     #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
       #error Unsupported FEATURE on this platform
     #endif
 
-    BareFast4Module<
+    DirectFast4Module<
         8, 9, 10, 16, 14, 18, 19, 15, // segment pins
         4, 5, 6, 7, // digit pins
         NUM_DIGITS,
@@ -315,10 +315,10 @@ void setup() {
 // ScanningModule performs a digitalWrite(), which has the same effect of
 // disabling optimizations.
 
-#elif FEATURE == FEATURE_BARE_MODULE
+#elif FEATURE == FEATURE_DIRECT_MODULE
   scanningModule.begin();
 
-#elif FEATURE == FEATURE_BARE_FAST4_MODULE
+#elif FEATURE == FEATURE_DIRECT_FAST4_MODULE
   scanningModule.begin();
 
 #elif FEATURE == FEATURE_SINGLE_HC595_SOFT_SPI

@@ -28,8 +28,8 @@ print(f"""\
 This program creates instances of various subclasses `LedModule` using different
 configurations:
 
-* `BareModule`: group and segment pins directly connected to MCU
-* `BareFast4Module`: same as `BareModule` but using `digitalWriteFast` library
+* `DirectModule`: group and segment pins directly connected to MCU
+* `DirectFast4Module`: same as `DirectModule` but using `digitalWriteFast` library
 * `SingleHc595Module`: group pins connected directly to MCU, but segment pins
   connected to 74HC595 accessed through SPI
 * `DualHc595Module`: group pins and segment pins connected to two 74HC595
@@ -117,7 +117,7 @@ number of `TimingStats::update()` calls that were made.
   due to the unusually large capacitors (20 nF) installed on the DIO and CLK
   lines. They should have been about 100X smaller (200 pF).
 * Add benchmarks for `Max7219Module`.
-* Add benchmarks for `BareModule`, `BareFast4Module`, `SingleHc595Module`, and
+* Add benchmarks for `DirectModule`, `DirectFast4Module`, `SingleHc595Module`, and
   `DualHc595Module`.
 * Upgrade from ESP32 Core v1.0.4 to v1.0.6.
 
@@ -144,7 +144,7 @@ times a second for a module with 4 digits, or every 4.17 milliseconds. The
 results below show that every processor, even the slowest AVR processor, is able
 to meet this threshhold.
 
-* For the `BaseModule` and `BareFast4Module`, this involves turning off the
+* For the `BaseModule` and `DirectFast4Module`, this involves turning off the
   previous digit, sending the 8 bits for the current digit's 8 LED segments in a
   loop, then turning on the current digit. The `digitalWrite()` function is
   called 10 times.

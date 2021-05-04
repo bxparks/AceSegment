@@ -18,8 +18,8 @@ consumption. Need to add documentation for:
 * `Max7219Module`
 * `SingleHc595Module`
 * `DualHc595Module`
-* `BareModule`
-* `BareFast4Module`
+* `DirectModule`
+* `DirectFast4Module`
 
 ## Table of Contents
 
@@ -314,8 +314,8 @@ ScanningModule  Tm1637Module  Max7219Module
                          |
                +---------+------------+
                |         |            |
-        BareModule SingleHc595Module DualHc595Module
-   BareFast4Module       |                \
+      DirectModule SingleHc595Module DualHc595Module
+ DirectFast4Module       |                \
            /             |                 \
           /              |                  \
          v               v                   v

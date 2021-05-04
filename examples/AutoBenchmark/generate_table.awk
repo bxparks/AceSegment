@@ -59,7 +59,7 @@ END {
   printf("+----------------------------------------+-------------------+---------+\n")
   printf("| Functionality                          |   min/  avg/  max | samples |\n")
   for (i = 0; i < TOTAL_BENCHMARKS; i++) {
-    if (u[i]["name"] ~ /^BareModule$/ \
+    if (u[i]["name"] ~ /^Direct$/ \
         || u[i]["name"] ~ /^SingleHc595\(SoftSpi\)/ \
         || u[i]["name"] ~ /^DualHc595\(SoftSpi\)/ \
         || u[i]["name"] ~ /^Tm1637\(SoftWire\)/ \

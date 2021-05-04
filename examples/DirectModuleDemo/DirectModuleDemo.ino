@@ -5,12 +5,12 @@
 
 #include <Arduino.h>
 #include <AceCommon.h> // incrementMod()
-#include <AceSegment.h> // BareModule, LedDisplay
+#include <AceSegment.h> // DirectModule, LedDisplay
 
 using ace_common::incrementMod;
 using ace_common::TimingStats;
 using ace_segment::LedMatrixBase;
-using ace_segment::BareModule;
+using ace_segment::DirectModule;
 using ace_segment::LedDisplay;
 
 //----------------------------------------------------------------------------
@@ -22,13 +22,13 @@ using ace_segment::LedDisplay;
 #define LED_DISPLAY_TYPE_MAX7219 2
 #define LED_DISPLAY_TYPE_HC595_DUAL 3
 #define LED_DISPLAY_TYPE_HC595_SINGLE 4
-#define LED_DISPLAY_TYPE_BARE 5
+#define LED_DISPLAY_TYPE_DIRECT 5
 
 #if defined(EPOXY_DUINO)
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_BARE
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_DIRECT
 
-#elif defined(AUNITER_LED_CLOCK_BARE)
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_BARE
+#elif defined(AUNITER_LED_CLOCK_DIRECT)
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_DIRECT
 
 #else
   #error Unknown environment
@@ -55,7 +55,7 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 };
 
 // Common Anode, with transitors on Group pins
-BareModule<NUM_DIGITS, NUM_SUBFIELDS> ledModule(
+DirectModule<NUM_DIGITS, NUM_SUBFIELDS> ledModule(
     LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
     LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
     FRAMES_PER_SECOND,

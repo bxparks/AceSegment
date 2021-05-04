@@ -1,7 +1,7 @@
 /*
  * A demo of a 4-digit bare LED module with digit and segment pins connected
  * directly to the microcontroller. Uses ScanningModule and LedMatrixDirect
- * and configures them manually, instead of using BareModule.
+  * and configures them manually, instead of using DirectModule.
  */
 
 #include <Arduino.h>

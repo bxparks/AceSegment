@@ -1,8 +1,7 @@
 /*
  * A demo of a single, 4-digit, bare LED module with digit and segment pins
- * connected directly to the microcontroller. Use the BareFast4Module
- * convenience class which combines a ScanningModule with an
- * LedMatrixDirectFast4 class.
+ * connected directly to the microcontroller. Use the DirectFast4Module
+ * convenience class.
  */
 
 #include <Arduino.h>
@@ -13,13 +12,13 @@
 #include <digitalWriteFast.h>
 #include <ace_segment/hw/SoftSpiFastInterface.h>
 #include <ace_segment/hw/SoftWireFastInterface.h>
-#include <ace_segment/bare/BareFast4Module.h>
+#include <ace_segment/direct/DirectFast4Module.h>
 #endif
 
 using ace_common::incrementMod;
 using ace_common::TimingStats;
 using ace_segment::LedMatrixBase;
-using ace_segment::BareFast4Module;
+using ace_segment::DirectFast4Module;
 using ace_segment::LedDisplay;
 
 //----------------------------------------------------------------------------
@@ -31,13 +30,13 @@ using ace_segment::LedDisplay;
 #define LED_DISPLAY_TYPE_MAX7219 2
 #define LED_DISPLAY_TYPE_HC595_DUAL 3
 #define LED_DISPLAY_TYPE_HC595_SINGLE 4
-#define LED_DISPLAY_TYPE_BARE 5
+#define LED_DISPLAY_TYPE_DIRECT 5
 
 #if defined(EPOXY_DUINO)
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_BARE
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_DIRECT
 
-#elif defined(AUNITER_LED_CLOCK_BARE)
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_BARE
+#elif defined(AUNITER_LED_CLOCK_DIRECT)
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_DIRECT
 
 #else
   #error Unknown environment
@@ -61,7 +60,7 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 };
 
 // Common Anode, with transitors on Group pins
-BareFast4Module<
+DirectFast4Module<
     8, 9, 10, 16, 14, 18, 19, 15, // segment pins
     4, 5, 6, 7, // digit pins
     NUM_DIGITS,

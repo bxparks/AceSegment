@@ -12,7 +12,6 @@
 #include <digitalWriteFast.h>
 #include <ace_segment/hw/SoftSpiFastInterface.h>
 #include <ace_segment/hw/SoftWireFastInterface.h>
-#include <ace_segment/scanning/LedMatrixDirectFast4.h>
 #endif
 
 using ace_common::incrementMod;
@@ -32,7 +31,7 @@ using ace_segment::LedDisplay;
 #define LED_DISPLAY_TYPE_MAX7219 2
 #define LED_DISPLAY_TYPE_HC595_DUAL 3
 #define LED_DISPLAY_TYPE_HC595_SINGLE 4
-#define LED_DISPLAY_TYPE_BARE 5
+#define LED_DISPLAY_TYPE_DIRECT 5
 
 #if defined(EPOXY_DUINO)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_SINGLE

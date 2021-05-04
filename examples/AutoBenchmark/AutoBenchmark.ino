@@ -46,7 +46,7 @@ SOFTWARE.
 #include <ace_segment/hw/SoftSpiFastInterface.h>
 #include <ace_segment/hw/HardSpiFastInterface.h>
 #include <ace_segment/hw/SoftWireFastInterface.h>
-#include <ace_segment/bare/BareFast4Module.h>
+#include <ace_segment/direct/DirectFast4Module.h>
 #endif
 
 using namespace ace_segment;
@@ -196,14 +196,14 @@ void runScanningBenchmark(const char* name, LM& scanningModule) {
 //-----------------------------------------------------------------------------
 
 // Common Anode, with transistors on Group pins
-void runBare() {
-  BareModule<NUM_DIGITS> scanningModule(
+void runDirect() {
+  DirectModule<NUM_DIGITS> scanningModule(
       LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
       LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
       FRAMES_PER_SECOND,
       SEGMENT_PINS,
       DIGIT_PINS);
-  BareModule<NUM_DIGITS, NUM_SUBFIELDS> scanningModuleSubfields(
+  DirectModule<NUM_DIGITS, NUM_SUBFIELDS> scanningModuleSubfields(
       LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
       LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
       FRAMES_PER_SECOND,
@@ -212,18 +212,16 @@ void runBare() {
 
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("BareModule",
-      scanningModule);
-  runScanningBenchmark("BareModule(subfields)",
-      scanningModuleSubfields);
+  runScanningBenchmark("Direct", scanningModule);
+  runScanningBenchmark("Direct(subfields)", scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
 }
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 // Common Anode, with transistors on Group pins
-void runBareFast4() {
-  BareFast4Module<
+void runDirectFast4() {
+  DirectFast4Module<
       8, 9, 10, 16, 14, 18, 19, 15, // segment pins
       4, 5, 6, 7, // digit pins
       NUM_DIGITS
@@ -232,7 +230,7 @@ void runBareFast4() {
       LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
       FRAMES_PER_SECOND);
 
-  BareFast4Module<
+  DirectFast4Module<
       8, 9, 10, 16, 14, 18, 19, 15, // segment pins
       4, 5, 6, 7, // digit pins
       NUM_DIGITS,
@@ -244,10 +242,8 @@ void runBareFast4() {
 
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("BareFast4Module",
-      scanningModule);
-  runScanningBenchmark("BareFast4Module(subfields)",
-      scanningModuleSubfields);
+  runScanningBenchmark("DirectFast4", scanningModule);
+  runScanningBenchmark("DirectFast4(subfields)", scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
 }
@@ -281,8 +277,7 @@ void runSingleHc595SoftSpi() {
   spiInterface.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("SingleHc595(SoftSpi)",
-      scanningModule);
+  runScanningBenchmark("SingleHc595(SoftSpi)", scanningModule);
   runScanningBenchmark("SingleHc595(SoftSpi,subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
@@ -317,8 +312,7 @@ void runSingleHc595SoftSpiFast() {
   spiInterface.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("SingleHc595(SoftSpiFast)",
-      scanningModule);
+  runScanningBenchmark("SingleHc595(SoftSpiFast)", scanningModule);
   runScanningBenchmark("SingleHc595(SoftSpiFast,subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
@@ -353,8 +347,7 @@ void runSingleHc595HardSpi() {
   spiInterface.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("SingleHc595(HardSpi)",
-      scanningModule);
+  runScanningBenchmark("SingleHc595(HardSpi)", scanningModule);
   runScanningBenchmark("SingleHc595(HardSpi,subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
@@ -390,8 +383,7 @@ void runSingleHc595HardSpiFast() {
   spiInterface.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("SingleHc595(HardSpiFast)",
-      scanningModule);
+  runScanningBenchmark("SingleHc595(HardSpiFast)", scanningModule);
   runScanningBenchmark("SingleHc595(HardSpiFast,subfields)",
       scanningModuleSubfields);
   scanningModuleSubfields.end();
@@ -666,9 +658,9 @@ void runMax7219HardSpiFast() {
 //-----------------------------------------------------------------------------
 
 void runBenchmarks() {
-  runBare();
+  runDirect();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  runBareFast4();
+  runDirectFast4();
 #endif
 
   runSingleHc595SoftSpi();
@@ -759,12 +751,12 @@ void printSizeOf() {
   SERIAL_PORT_MONITOR.print( F("sizeof(ScanningModule<LedMatrixBase, 4>): "));
   SERIAL_PORT_MONITOR.println( sizeof(ScanningModule<LedMatrixBase, 4>));
 
-  SERIAL_PORT_MONITOR.print( F("sizeof(BareModule<4>): "));
-  SERIAL_PORT_MONITOR.println(sizeof(BareModule<4>));
+  SERIAL_PORT_MONITOR.print( F("sizeof(DirectModule<4>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(DirectModule<4>));
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  SERIAL_PORT_MONITOR.print( F("sizeof(BareFast4Module<...>): "));
-  SERIAL_PORT_MONITOR.println(sizeof(BareFast4Module<
+  SERIAL_PORT_MONITOR.print( F("sizeof(DirectFast4Module<...>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(DirectFast4Module<
       8, 9, 10, 16, 14, 18, 19, 15, // segment pins
       4, 5, 6, 7, // digit pins
       NUM_DIGITS
