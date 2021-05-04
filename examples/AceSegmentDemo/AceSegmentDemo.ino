@@ -31,6 +31,7 @@ using namespace ace_button;
 #define LED_DISPLAY_TYPE_HC595_SINGLE 4
 #define LED_DISPLAY_TYPE_HC595_DUAL 5
 
+// Used by LED_DISPLAY_TYPE_SCANNING
 #define LED_MATRIX_MODE_NONE 0
 #define LED_MATRIX_MODE_DIRECT 1
 #define LED_MATRIX_MODE_DIRECT_FAST 2
@@ -43,6 +44,18 @@ using namespace ace_button;
 #define LED_MATRIX_MODE_DUAL_HARD_SPI 9
 #define LED_MATRIX_MODE_DUAL_HARD_SPI_FAST 10
 
+// Used by LED_DISPLAY_TYPE_DIRECT
+#define DIRECT_INTERFACE_TYPE_NORMAL 0
+#define DIRECT_INTERFACE_TYPE_FAST_4 1
+
+// Used by LED_DISPLAY_TYPE_HC595_SINGLE and LED_DISPLAY_TYPE_HC595_DUAL
+#define INTERFACE_TYPE_SOFT_SPI 0
+#define INTERFACE_TYPE_SOFT_SPI_FAST 1
+#define INTERFACE_TYPE_HARD_SPI 2
+#define INTERFACE_TYPE_HARD_SPI_FAST 3
+#define INTERFACE_TYPE_SOFT_WIRE 4
+#define INTERFACE_TYPE_SOFT_WIRE_FAST 5
+
 // LedClock buttons are now hardwared to A2 and A3, instead of being configured
 // with dip switches to either (2,3) or (8,9). Since (2,3) are used by I2C, and
 // LED_MATRIX_MODE_DIRECT uses (8,9) pins for two of the LED segments/digits,
@@ -53,6 +66,7 @@ using namespace ace_button;
   const uint8_t NUM_DIGITS = 4;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
 
+  // Choose one of the following variants:
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT_FAST
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SOFT_SPI
@@ -69,6 +83,7 @@ using namespace ace_button;
   const uint8_t NUM_DIGITS = 4;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
 
+  // Choose one of the following variants:
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT_FAST
 
@@ -79,6 +94,7 @@ using namespace ace_button;
   const uint8_t NUM_DIGITS = 4;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
 
+  // Choose one of the following variants:
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_SOFT_SPI
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_SOFT_SPI_FAST
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_HARD_SPI
@@ -91,6 +107,7 @@ using namespace ace_button;
   const uint8_t NUM_DIGITS = 4;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
 
+  // Choose one of the following variants:
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SOFT_SPI
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SOFT_SPI_FAST
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HARD_SPI
@@ -102,37 +119,48 @@ using namespace ace_button;
 #elif defined(AUNITER_LED_CLOCK_TM1637)
   const uint8_t NUM_DIGITS = 4;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_TM1637
-  #define LED_MATRIX_MODE LED_MATRIX_MODE_NONE
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
 
 #elif defined(AUNITER_LED_CLOCK_MAX7219)
   const uint8_t NUM_DIGITS = 8;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_MAX7219
-  #define LED_MATRIX_MODE LED_MATRIX_MODE_NONE
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
 
 #elif defined(AUNITER_LED_CLOCK_DIRECT)
   const uint8_t NUM_DIGITS = 4;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_DIRECT
-  #define LED_MATRIX_MODE LED_MATRIX_MODE_NONE
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
+
+  // Choose one of the following variants:
+  //#define DIRECT_INTERFACE_TYPE DIRECT_INTERFACE_TYPE_NORMAL
+  #define DIRECT_INTERFACE_TYPE DIRECT_INTERFACE_TYPE_FAST
 
 #elif defined(AUNITER_LED_CLOCK_HC595_SINGLE)
   const uint8_t NUM_DIGITS = 4;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_SINGLE
-  #define LED_MATRIX_MODE LED_MATRIX_MODE_NONE
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
+
+  // Choose one of the following variants:
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
+  //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
 
 #elif defined(AUNITER_LED_CLOCK_HC595_DUAL)
   const uint8_t NUM_DIGITS = 4;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
-  #define LED_MATRIX_MODE LED_MATRIX_MODE_NONE
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
+
+  // Choose one of the following variants:
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
+  //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
 
 #else
   #error Unknown AUNITER environment
@@ -308,29 +336,67 @@ const uint8_t NUM_SUBFIELDS = 1;
       ledModule(ledMatrix, FRAMES_PER_SECOND);
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_TM1637
-  using WireInterface = SoftWireInterface;
-  WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
+  #if INTERFACE_TYPE == INTERFACE_TYPE_SOFT_WIRE
+    using WireInterface = SoftWireInterface;
+    WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
+  #elif INTERFACE_TYPE == INTERFACE_TYPE_SOFT_WIRE_FAST
+    using WireInterface = SoftWireInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
+    WireInterface wireInterface;
+  #endif
   Tm1637Module<WireInterface, NUM_DIGITS> ledModule(wireInterface);
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_MAX7219
-  using SpiInterface = SoftSpiInterface;
-  SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  #if INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI
+    using SpiInterface = SoftSpiInterface;
+    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  #elif INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI_FAST
+    using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    SpiInterface spiInterface;
+  #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
+    using SpiInterface = HardSpiInterface;
+    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
+    using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    SpiInterface spiInterface;
+  #endif
   Max7219Module<SpiInterface, NUM_DIGITS> ledModule(
       spiInterface, kEightDigitRemapArray);
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_DIRECT
   // Common Anode, with transitors on Group pins
-  DirectModule<NUM_DIGITS> ledModule(
-      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
-      FRAMES_PER_SECOND,
-      SEGMENT_PINS,
-      DIGIT_PINS);
+  #if DIRECT_INTERFACE_TYPE == DIRECT_INTERFACE_TYPE_NORMAL
+    DirectModule<NUM_DIGITS> ledModule(
+        LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
+        LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+        FRAMES_PER_SECOND,
+        SEGMENT_PINS,
+        DIGIT_PINS);
+  #else
+    DirectFast4Module<
+        8, 9, 10, 16, 14, 18, 19, 15, // segment pins
+        4, 5, 6, 7, // digit pins
+        NUM_DIGITS
+    > ledModule(
+        LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
+        LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+        FRAMES_PER_SECOND);
+  #endif
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_SINGLE
   // Common Cathode, with transistors on Group pins
-  using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
-  SpiInterface spiInterface;
+  #if INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI
+    using SpiInterface = SoftSpiInterface;
+    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  #elif INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI_FAST
+    using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    SpiInterface spiInterface;
+  #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
+    using SpiInterface = HardSpiInterface;
+    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
+    using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    SpiInterface spiInterface;
+  #endif
   SingleHc595Module<SpiInterface, NUM_DIGITS> ledModule(
       spiInterface,
       LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
@@ -341,8 +407,19 @@ const uint8_t NUM_SUBFIELDS = 1;
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_DUAL
   // Common Anode, with transistors on Group pins
-  using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
-  SpiInterface spiInterface;
+  #if INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI
+    using SpiInterface = SoftSpiInterface;
+    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  #elif INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI_FAST
+    using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    SpiInterface spiInterface;
+  #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
+    using SpiInterface = HardSpiInterface;
+    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
+    using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    SpiInterface spiInterface;
+  #endif
   DualHc595Module<SpiInterface, NUM_DIGITS> ledModule(
       spiInterface,
       LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,

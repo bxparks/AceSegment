@@ -38,6 +38,7 @@ using namespace ace_segment;
 #define LED_DISPLAY_TYPE_HC595_SINGLE 4
 #define LED_DISPLAY_TYPE_HC595_DUAL 5
 
+// Used by LED_DISPLAY_TYPE_SCANNING
 #define LED_MATRIX_MODE_NONE 0
 #define LED_MATRIX_MODE_DIRECT 1
 #define LED_MATRIX_MODE_DIRECT_FAST 2
@@ -50,12 +51,23 @@ using namespace ace_segment;
 #define LED_MATRIX_MODE_DUAL_HARD_SPI 9
 #define LED_MATRIX_MODE_DUAL_HARD_SPI_FAST 10
 
+// Used by LED_DISPLAY_TYPE_DIRECT
+#define DIRECT_INTERFACE_TYPE_NORMAL 0
+#define DIRECT_INTERFACE_TYPE_FAST_4 1
+
+// Used by LED_DISPLAY_TYPE_HC595_SINGLE and LED_DISPLAY_TYPE_HC595_DUAL
+#define INTERFACE_TYPE_SOFT_SPI 0
+#define INTERFACE_TYPE_SOFT_SPI_FAST 1
+#define INTERFACE_TYPE_HARD_SPI 2
+#define INTERFACE_TYPE_HARD_SPI_FAST 3
+
 const uint8_t NUM_DIGITS = 4;
 const uint8_t NUM_SEGMENTS = 8;
 
 #if defined(EPOXY_DUINO)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
 
+  // Choose one of the following variants:
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT_FAST
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SOFT_SPI
@@ -66,12 +78,14 @@ const uint8_t NUM_SEGMENTS = 8;
 #elif defined(AUNITER_LED_CLOCK_SCANNING_DIRECT)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
 
+  // Choose one of the following variants:
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT_FAST
 
 #elif defined(AUNITER_LED_CLOCK_SCANNING_SINGLE)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
 
+  // Choose one of the following variants:
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_SOFT_SPI
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_SOFT_SPI_FAST
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_HARD_SPI
@@ -80,6 +94,7 @@ const uint8_t NUM_SEGMENTS = 8;
 #elif defined(AUNITER_LED_CLOCK_SCANNING_DUAL)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
 
+  // Choose one of the following variants:
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SOFT_SPI
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SOFT_SPI_FAST
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HARD_SPI
@@ -87,15 +102,28 @@ const uint8_t NUM_SEGMENTS = 8;
 
 #elif defined(AUNITER_LED_CLOCK_DIRECT)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_DIRECT
-  #define LED_MATRIX_MODE LED_MATRIX_MODE_NONE
+
+  // Choose one of the following variants:
+  //#define DIRECT_INTERFACE_TYPE DIRECT_INTERFACE_TYPE_NORMAL
+  #define DIRECT_INTERFACE_TYPE DIRECT_INTERFACE_TYPE_FAST
 
 #elif defined(AUNITER_LED_CLOCK_HC595_SINGLE)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_SINGLE
-  #define LED_MATRIX_MODE LED_MATRIX_MODE_NONE
+
+  // Choose one of the following variants:
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
+  //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
 
 #elif defined(AUNITER_LED_CLOCK_HC595_DUAL)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
-  #define LED_MATRIX_MODE LED_MATRIX_MODE_NONE
+
+  // Choose one of the following variants:
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
+  //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
 
 #endif
 
@@ -256,22 +284,45 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 
   // 16 levels of brightness, need render-fields/second of 60*4*16 = 3840.
   ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
-      modulatingModule(ledMatrix, FRAMES_PER_SECOND);
+      ledModule(ledMatrix, FRAMES_PER_SECOND);
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_DIRECT
   // Common Anode, with transitors on Group pins
-  DirectModule<NUM_DIGITS, NUM_SUBFIELDS> modulatingModule(
-      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
-      FRAMES_PER_SECOND,
-      SEGMENT_PINS,
-      DIGIT_PINS);
+  #if DIRECT_INTERFACE_TYPE == DIRECT_INTERFACE_TYPE_NORMAL
+    DirectModule<NUM_DIGITS, NUM_SUBFIELDS> ledModule(
+        LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
+        LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+        FRAMES_PER_SECOND,
+        SEGMENT_PINS,
+        DIGIT_PINS);
+  #else
+    DirectFast4Module<
+        8, 9, 10, 16, 14, 18, 19, 15, // segment pins
+        4, 5, 6, 7, // digit pins
+        NUM_DIGITS,
+        NUM_SUBFIELDS
+    > ledModule(
+        LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
+        LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+        FRAMES_PER_SECOND);
+  #endif
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_SINGLE
   // Common Cathode, with transistors on Group pins
-  using SpiInterface = SoftSpiInterface;
-  SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  SingleHc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> modulatingModule(
+  #if INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI
+    using SpiInterface = SoftSpiInterface;
+    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  #elif INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI_FAST
+    using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    SpiInterface spiInterface;
+  #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
+    using SpiInterface = HardSpiInterface;
+    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
+    using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    SpiInterface spiInterface;
+  #endif
+  SingleHc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
       spiInterface,
       LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
       LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
@@ -281,9 +332,20 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_DUAL
   // Common Anode, with transistors on Group pins
-  using SpiInterface = SoftSpiInterface;
-  SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  DualHc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> modulatingModule(
+  #if INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI
+    using SpiInterface = SoftSpiInterface;
+    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  #elif INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI_FAST
+    using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    SpiInterface spiInterface;
+  #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
+    using SpiInterface = HardSpiInterface;
+    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
+    using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    SpiInterface spiInterface;
+  #endif
+  DualHc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
       spiInterface,
       LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
       LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
@@ -308,21 +370,21 @@ void setupAceSegment() {
   #endif
 
   ledMatrix.begin();
-  modulatingModule.begin();
+  ledModule.begin();
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_DUAL
   spiInterface.begin();
-  modulatingModule.begin();
-  modulatingModule.setBrightness(1); // 0-1
+  ledModule.begin();
+  ledModule.setBrightness(1); // 0-1
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_SINGLE
   spiInterface.begin();
-  modulatingModule.begin();
-  modulatingModule.setBrightness(1); // 0-1
+  ledModule.begin();
+  ledModule.setBrightness(1); // 0-1
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_DIRECT
-  modulatingModule.begin();
-  modulatingModule.setBrightness(1); // 0-1
+  ledModule.begin();
+  ledModule.setBrightness(1); // 0-1
 
 #endif
 
@@ -357,8 +419,8 @@ void setupInterupt(uint16_t fieldsPerSecond) {
 //------------------------------------------------------------------
 
 void setupPulseDisplay() {
-  LedDisplay modulatingDisplay(modulatingModule);
-  NumberWriter numberWriter(modulatingDisplay);
+  LedDisplay ledDisplay(ledModule);
+  NumberWriter numberWriter(ledDisplay);
   numberWriter.writeHexCharAt(0, 0);
   numberWriter.writeHexCharAt(1, 1);
   numberWriter.writeHexCharAt(2, 2);
@@ -370,10 +432,10 @@ void setBrightnesses(int i) {
   uint8_t brightness1 = BRIGHTNESS_LEVELS[(i+1) % NUM_BRIGHTNESSES];
   uint8_t brightness2 = BRIGHTNESS_LEVELS[(i+2) % NUM_BRIGHTNESSES];
   uint8_t brightness3 = BRIGHTNESS_LEVELS[(i+3) % NUM_BRIGHTNESSES];
-  modulatingModule.setBrightnessAt(0, brightness0);
-  modulatingModule.setBrightnessAt(1, brightness1);
-  modulatingModule.setBrightnessAt(2, brightness2);
-  modulatingModule.setBrightnessAt(3, brightness3);
+  ledModule.setBrightnessAt(0, brightness0);
+  ledModule.setBrightnessAt(1, brightness1);
+  ledModule.setBrightnessAt(2, brightness2);
+  ledModule.setBrightnessAt(3, brightness3);
 }
 
 void pulseDisplay() {
@@ -413,6 +475,6 @@ void loop() {
   pulseDisplay();
 
   #if USE_INTERRUPT == 0
-    modulatingModule.renderFieldWhenReady();
+    ledModule.renderFieldWhenReady();
   #endif
 }
