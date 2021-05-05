@@ -45,7 +45,7 @@ static const uint8_t UNKNOWN = 0b10000011;
 // Segment: DP G F E D C B A
 //    Bits: 7  6 5 4 3 2 1 0
 //
-const uint8_t CharWriter::kCharacterArray[] PROGMEM = {
+const uint8_t CharWriter::kCharPatterns[] PROGMEM = {
      UNKNOWN, /* 00 */
      UNKNOWN, /* 01 */
      UNKNOWN, /* 02 */
@@ -176,12 +176,16 @@ const uint8_t CharWriter::kCharacterArray[] PROGMEM = {
      UNKNOWN, /* (del) */
 };
 
+uint8_t CharWriter::getPattern(char c) const {
+  uint8_t pattern = ((mNumChars == 0) || ((uint8_t) c < mNumChars))
+      ? pgm_read_byte(&mCharPatterns[(uint8_t) c])
+      : UNKNOWN;
+  return pattern;
+}
+
 void CharWriter::writeCharAt(uint8_t pos, char c) {
   if (pos >= mLedDisplay.getNumDigits()) return;
-  uint8_t pattern = ((uint8_t) c < kNumCharacters)
-      ? pgm_read_byte(&kCharacterArray[(uint8_t) c])
-      : UNKNOWN;
-  mLedDisplay.writePatternAt(pos, pattern);
+  mLedDisplay.writePatternAt(pos, getPattern(c));
 }
 
 }
