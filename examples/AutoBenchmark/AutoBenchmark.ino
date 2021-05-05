@@ -156,7 +156,7 @@ const uint8_t CLOCK_PIN = SCK; // SH_CP on 74HC595
 
 /** Print the result for each LedMatrix algorithm. */
 static void printStats(
-    const char* name,
+    const __FlashStringHelper* name,
     const TimingStats& stats,
     uint16_t numSamples) {
   SERIAL_PORT_MONITOR.print(name);
@@ -173,7 +173,7 @@ static void printStats(
 TimingStats timingStats;
 
 template <typename LM>
-void runScanningBenchmark(const char* name, LM& scanningModule) {
+void runScanningBenchmark(const __FlashStringHelper* name, LM& scanningModule) {
 
   scanningModule.setPatternAt(0, 0x13);
   scanningModule.setPatternAt(0, 0x37);
@@ -212,8 +212,8 @@ void runDirect() {
 
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("Direct", scanningModule);
-  runScanningBenchmark("Direct(subfields)", scanningModuleSubfields);
+  runScanningBenchmark(F("Direct"), scanningModule);
+  runScanningBenchmark(F("Direct(subfields)"), scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
 }
@@ -242,8 +242,8 @@ void runDirectFast4() {
 
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("DirectFast4", scanningModule);
-  runScanningBenchmark("DirectFast4(subfields)", scanningModuleSubfields);
+  runScanningBenchmark(F("DirectFast4"), scanningModule);
+  runScanningBenchmark(F("DirectFast4(subfields)"), scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
 }
@@ -277,8 +277,8 @@ void runSingleHc595SoftSpi() {
   spiInterface.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("SingleHc595(SoftSpi)", scanningModule);
-  runScanningBenchmark("SingleHc595(SoftSpi,subfields)",
+  runScanningBenchmark(F("SingleHc595(SoftSpi)"), scanningModule);
+  runScanningBenchmark(F("SingleHc595(SoftSpi,subfields)"),
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -312,8 +312,8 @@ void runSingleHc595SoftSpiFast() {
   spiInterface.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("SingleHc595(SoftSpiFast)", scanningModule);
-  runScanningBenchmark("SingleHc595(SoftSpiFast,subfields)",
+  runScanningBenchmark(F("SingleHc595(SoftSpiFast)"), scanningModule);
+  runScanningBenchmark(F("SingleHc595(SoftSpiFast,subfields)"),
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -347,8 +347,8 @@ void runSingleHc595HardSpi() {
   spiInterface.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("SingleHc595(HardSpi)", scanningModule);
-  runScanningBenchmark("SingleHc595(HardSpi,subfields)",
+  runScanningBenchmark(F("SingleHc595(HardSpi)"), scanningModule);
+  runScanningBenchmark(F("SingleHc595(HardSpi,subfields)"),
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -383,8 +383,8 @@ void runSingleHc595HardSpiFast() {
   spiInterface.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("SingleHc595(HardSpiFast)", scanningModule);
-  runScanningBenchmark("SingleHc595(HardSpiFast,subfields)",
+  runScanningBenchmark(F("SingleHc595(HardSpiFast)"), scanningModule);
+  runScanningBenchmark(F("SingleHc595(HardSpiFast,subfields)"),
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -418,8 +418,8 @@ void runDualHc595SoftSpi() {
   spiInterface.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("DualHc595(SoftSpi)", scanningModule);
-  runScanningBenchmark("DualHc595(SoftSpi,subfields)",
+  runScanningBenchmark(F("DualHc595(SoftSpi)"), scanningModule);
+  runScanningBenchmark(F("DualHc595(SoftSpi,subfields)"),
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -452,8 +452,8 @@ void runDualHc595SoftSpiFast() {
   spiInterface.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("DualHc595(SoftSpiFast)", scanningModule);
-  runScanningBenchmark("DualHc595(SoftSpiFast,subfields)",
+  runScanningBenchmark(F("DualHc595(SoftSpiFast)"), scanningModule);
+  runScanningBenchmark(F("DualHc595(SoftSpiFast,subfields)"),
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -486,8 +486,8 @@ void runDualHc595HardSpi() {
   spiInterface.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("DualHc595(HardSpi)", scanningModule);
-  runScanningBenchmark("DualHc595(HardSpi,subfields)",
+  runScanningBenchmark(F("DualHc595(HardSpi)"), scanningModule);
+  runScanningBenchmark(F("DualHc595(HardSpi,subfields)"),
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -520,8 +520,8 @@ void runDualHc595HardSpiFast() {
   spiInterface.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark("DualHc595(HardSpiFast)", scanningModule);
-  runScanningBenchmark("DualHc595(HardSpiFast,subfields)",
+  runScanningBenchmark(F("DualHc595(HardSpiFast)"), scanningModule);
+  runScanningBenchmark(F("DualHc595(HardSpiFast,subfields)"),
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -531,19 +531,42 @@ void runDualHc595HardSpiFast() {
 
 //-----------------------------------------------------------------------------
 
+static uint8_t kTm1637Patterns[6] = {
+  0x13, 0x35, 0x57, 0x79, 0x9B, 0xBD
+};
+
 template <typename LM>
-void runTm1637Benchmark(const char* name, LM& ledModule) {
-  ledModule.setPatternAt(0, 0x13);
-  ledModule.setPatternAt(0, 0x37);
-  ledModule.setPatternAt(0, 0x7F);
-  ledModule.setPatternAt(0, 0xFF);
+void runTm1637Benchmark(
+    const __FlashStringHelper* name,
+    LM& ledModule,
+    uint8_t numDigits,
+    bool useFlushIncremental
+) {
+  for (uint8_t i = 0; i < numDigits; ++i) {
+    ledModule.setPatternAt(i, kTm1637Patterns[i]);
+  }
+
+  // Run through 10 full cycles to eliminate any variances.
+  // The flush() method sends all digits (and brightness) to the LED module in a
+  // single call. The flushIncremental() sends only a single digit or the
+  // brightness, so a full cycle takes (numDigits + 1).
+  const uint16_t numSamples = useFlushIncremental
+      ? (numDigits + 1) * 10
+      : 10;
 
   timingStats.reset();
-  const uint16_t numSamples = 20;
   for (uint16_t i = 0; i < numSamples; ++i) {
-    uint16_t startMicros = micros();
-    ledModule.flush();
-    uint16_t endMicros = micros();
+    uint16_t startMicros;
+    uint16_t endMicros;
+    if (useFlushIncremental) {
+      startMicros = micros();
+      ledModule.flushIncremental();
+      endMicros = micros();
+    } else {
+      startMicros = micros();
+      ledModule.flush();
+      endMicros = micros();
+    }
     timingStats.update(endMicros - startMicros);
     yield();
   }
@@ -554,12 +577,14 @@ void runTm1637Benchmark(const char* name, LM& ledModule) {
 void runTm1637ModuleSoftWire() {
   using WireInterface = SoftWireInterface;
   WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
-  Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module(wireInterface);
-
   wireInterface.begin();
+
+  Tm1637Module<WireInterface, 4> tm1637Module(wireInterface);
   tm1637Module.begin();
-  runTm1637Benchmark("Tm1637(SoftWire)", tm1637Module);
+  runTm1637Benchmark(F("Tm1637(SoftWire)"), tm1637Module, 4, false);
+  runTm1637Benchmark(F("Tm1637(SoftWire,incremental)"), tm1637Module, 4, true);
   tm1637Module.end();
+
   wireInterface.end();
 }
 
@@ -567,12 +592,47 @@ void runTm1637ModuleSoftWire() {
 void runTm1637ModuleSoftWireFast() {
   using WireInterface = SoftWireFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
   WireInterface wireInterface;
-  Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module(wireInterface);
-
   wireInterface.begin();
+
+  Tm1637Module<WireInterface, 4> tm1637Module(wireInterface);
   tm1637Module.begin();
-  runTm1637Benchmark("Tm1637(SoftWireFast)", tm1637Module);
+  runTm1637Benchmark(F("Tm1637(SoftWireFast)"), tm1637Module, 4, false);
+  runTm1637Benchmark(
+      F("Tm1637(SoftWireFast,incremental)"), tm1637Module, 4, true);
   tm1637Module.end();
+
+  wireInterface.end();
+}
+#endif
+
+void runTm1637SixModuleSoftWire() {
+  using WireInterface = SoftWireInterface;
+  WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
+  wireInterface.begin();
+
+  Tm1637Module<WireInterface, 6> tm1637SixModule(wireInterface);
+  tm1637SixModule.begin();
+  runTm1637Benchmark(F("Tm1637(6,SoftWire)"), tm1637SixModule, 6, false);
+  runTm1637Benchmark(
+      F("Tm1637(6,SoftWire,incremental)"), tm1637SixModule, 6, true);
+  tm1637SixModule.end();
+
+  wireInterface.end();
+}
+
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+void runTm1637SixModuleSoftWireFast() {
+  using WireInterface = SoftWireFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
+  WireInterface wireInterface;
+  wireInterface.begin();
+
+  Tm1637Module<WireInterface, 6> tm1637SixModule(wireInterface);
+  tm1637SixModule.begin();
+  runTm1637Benchmark(F("Tm1637(6,SoftWireFast)"), tm1637SixModule, 6, false);
+  runTm1637Benchmark(
+      F("Tm1637(6,SoftWireFast,incremental)"), tm1637SixModule, 6, true);
+  tm1637SixModule.end();
+
   wireInterface.end();
 }
 #endif
@@ -580,7 +640,7 @@ void runTm1637ModuleSoftWireFast() {
 //-----------------------------------------------------------------------------
 
 template <typename LM>
-void runMax7219Benchmark(const char* name, LM& ledModule) {
+void runMax7219Benchmark(const __FlashStringHelper* name, LM& ledModule) {
   ledModule.setPatternAt(0, 0x13);
   ledModule.setPatternAt(0, 0x37);
   ledModule.setPatternAt(0, 0x7F);
@@ -607,7 +667,7 @@ void runMax7219SoftSpi() {
 
   spiInterface.begin();
   max7219Module.begin();
-  runMax7219Benchmark("Max7219(SoftSpi)", max7219Module);
+  runMax7219Benchmark(F("Max7219(SoftSpi)"), max7219Module);
   max7219Module.end();
   spiInterface.end();
 }
@@ -621,7 +681,7 @@ void runMax7219SoftSpiFast() {
 
   spiInterface.begin();
   max7219Module.begin();
-  runMax7219Benchmark("Max7219(SoftSpiFast)", max7219Module);
+  runMax7219Benchmark(F("Max7219(SoftSpiFast)"), max7219Module);
   max7219Module.end();
   spiInterface.end();
 }
@@ -635,7 +695,7 @@ void runMax7219HardSpi() {
 
   spiInterface.begin();
   max7219Module.begin();
-  runMax7219Benchmark("Max7219(HardSpi)", max7219Module);
+  runMax7219Benchmark(F("Max7219(HardSpi)"), max7219Module);
   max7219Module.end();
   spiInterface.end();
 }
@@ -649,7 +709,7 @@ void runMax7219HardSpiFast() {
 
   spiInterface.begin();
   max7219Module.begin();
-  runMax7219Benchmark("Max7219(HardSpiFast)", max7219Module);
+  runMax7219Benchmark(F("Max7219(HardSpiFast)"), max7219Module);
   max7219Module.end();
   spiInterface.end();
 }
@@ -686,6 +746,11 @@ void runBenchmarks() {
   runTm1637ModuleSoftWire();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
   runTm1637ModuleSoftWireFast();
+#endif
+
+  runTm1637SixModuleSoftWire();
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+  runTm1637SixModuleSoftWireFast();
 #endif
 
   runMax7219SoftSpi();
@@ -773,6 +838,9 @@ void printSizeOf() {
 
   SERIAL_PORT_MONITOR.print(F("sizeof(Tm1637Module<SoftWireInterface, 4>): "));
   SERIAL_PORT_MONITOR.println(sizeof(Tm1637Module<SoftWireInterface, 4>));
+
+  SERIAL_PORT_MONITOR.print(F("sizeof(Tm1637Module<SoftWireInterface, 6>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(Tm1637Module<SoftWireInterface, 6>));
 
   SERIAL_PORT_MONITOR.print(F("sizeof(Max7219Module<SoftSpiInterface, 8>): "));
   SERIAL_PORT_MONITOR.println(sizeof(Max7219Module<SoftSpiInterface, 8>));
