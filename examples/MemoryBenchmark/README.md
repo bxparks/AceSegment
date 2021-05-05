@@ -127,6 +127,11 @@ before substantional refactoring in 2021.
 * Hide implementation details involving `LedMatrixXxx` and `ScanningModule` by
   using the convenience classes (`DirectModule`, `DirectFast4Module`,
   `SingleHc595Module`, `DualHc595Module`).
+* Enabling user-defined character sets in `CharWriter` causes the flash memory
+  consumption to increase by 30 bytes on AVR processors, and 36 bytes on 32-bit
+  processors. Similar increase in `StringWriter` which now explicitly depends on
+  CharWriter. But I think the additional configurability is worth it since
+  different people have different aesthetic standards and want different fonts.
 
 ## Results
 
@@ -192,8 +197,8 @@ other `MemoryBenchmark` programs.)
 | NumberWriter+Stub               |    682/   28 |   226/   17 |
 | ClockWriter+Stub                |    766/   29 |   310/   18 |
 | TemperatureWriter+Stub          |    764/   28 |   308/   17 |
-| CharWriter+Stub                 |    758/   28 |   302/   17 |
-| StringWriter+Stub               |    974/   34 |   518/   23 |
+| CharWriter+Stub                 |    788/   31 |   332/   20 |
+| StringWriter+Stub               |    988/   39 |   532/   28 |
 +--------------------------------------------------------------+
 
 ```
@@ -235,8 +240,8 @@ other `MemoryBenchmark` programs.)
 | NumberWriter+Stub               |   3638/  168 |   166/   17 |
 | ClockWriter+Stub                |   3722/  169 |   250/   18 |
 | TemperatureWriter+Stub          |   3720/  168 |   248/   17 |
-| CharWriter+Stub                 |   3714/  168 |   242/   17 |
-| StringWriter+Stub               |   3930/  174 |   458/   23 |
+| CharWriter+Stub                 |   3744/  171 |   272/   20 |
+| StringWriter+Stub               |   3944/  179 |   472/   28 |
 +--------------------------------------------------------------+
 
 ```
@@ -278,8 +283,8 @@ other `MemoryBenchmark` programs.)
 | NumberWriter+Stub               |  10672/    0 |   608/    0 |
 | ClockWriter+Stub                |  10480/    0 |   416/    0 |
 | TemperatureWriter+Stub          |  10736/    0 |   672/    0 |
-| CharWriter+Stub                 |  10520/    0 |   456/    0 |
-| StringWriter+Stub               |  10688/    0 |   624/    0 |
+| CharWriter+Stub                 |  10544/    0 |   480/    0 |
+| StringWriter+Stub               |  10728/    0 |   664/    0 |
 +--------------------------------------------------------------+
 
 ```
@@ -321,8 +326,8 @@ other `MemoryBenchmark` programs.)
 | NumberWriter+Stub               |  19616/ 4344 |   480/  556 |
 | ClockWriter+Stub                |  19496/ 4348 |   360/  560 |
 | TemperatureWriter+Stub          |  19712/ 4344 |   576/  556 |
-| CharWriter+Stub                 |  19500/ 4344 |   364/  556 |
-| StringWriter+Stub               |  19660/ 4344 |   524/  556 |
+| CharWriter+Stub                 |  19536/ 4352 |   400/  564 |
+| StringWriter+Stub               |  19708/ 4356 |   572/  568 |
 +--------------------------------------------------------------+
 
 ```
@@ -364,8 +369,8 @@ other `MemoryBenchmark` programs.)
 | NumberWriter+Stub               | 257372/27200 |   672/  416 |
 | ClockWriter+Stub                | 257196/27208 |   496/  424 |
 | TemperatureWriter+Stub          | 257484/27200 |   784/  416 |
-| CharWriter+Stub                 | 257084/27200 |   384/  416 |
-| StringWriter+Stub               | 257316/27200 |   616/  416 |
+| CharWriter+Stub                 | 257116/27208 |   416/  424 |
+| StringWriter+Stub               | 257364/27216 |   664/  432 |
 +--------------------------------------------------------------+
 
 ```
@@ -407,8 +412,8 @@ other `MemoryBenchmark` programs.)
 | NumberWriter+Stub               | 199584/13552 |  1836/  468 |
 | ClockWriter+Stub                | 199528/13560 |  1780/  476 |
 | TemperatureWriter+Stub          | 199704/13552 |  1956/  468 |
-| CharWriter+Stub                 | 199428/13552 |  1680/  468 |
-| StringWriter+Stub               | 199612/13552 |  1864/  468 |
+| CharWriter+Stub                 | 199468/13560 |  1720/  476 |
+| StringWriter+Stub               | 199664/13568 |  1916/  484 |
 +--------------------------------------------------------------+
 
 ```
@@ -451,8 +456,8 @@ other `MemoryBenchmark` programs.)
 | NumberWriter+Stub               |  11400/ 4556 |  3776/ 1508 |
 | ClockWriter+Stub                |  11112/ 4560 |  3488/ 1512 |
 | TemperatureWriter+Stub          |  11556/ 4556 |  3932/ 1508 |
-| CharWriter+Stub                 |  11100/ 4556 |  3476/ 1508 |
-| StringWriter+Stub               |  11288/ 4556 |  3664/ 1508 |
+| CharWriter+Stub                 |  11124/ 4564 |  3500/ 1516 |
+| StringWriter+Stub               |  11328/ 4568 |  3704/ 1520 |
 +--------------------------------------------------------------+
 
 ```
