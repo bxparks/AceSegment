@@ -28,7 +28,12 @@ SOFTWARE.
 namespace ace_segment {
 
 // A poor-man's '?': 0b10000011
-static const uint8_t UNKNOWN = 0b10000011;
+//static const uint8_t UNKNOWN = 0b10000011;
+
+// Set unknown character to be blank. The problem with '?' is that some LED
+// modules don't have an active decimal point on all digits, so the '?' does not
+// look right.
+static const uint8_t UNKNOWN = 0b00000000;
 
 // Bit patterns for ASCII characters (0 - 127).
 // Adapted from https://github.com/dmadison/LED-Segment-ASCII.
