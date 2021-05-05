@@ -299,7 +299,8 @@ volatile int disableCompilerOptimization = 0;
   #elif FEATURE == FEATURE_STRING_WRITER
     StubModule stubModule;
     LedDisplay ledDisplay(stubModule);
-    StringWriter stringWriter(ledDisplay);
+    CharWriter charWriter(ledDisplay);
+    StringWriter stringWriter(charWriter);
 
   #endif
 #endif

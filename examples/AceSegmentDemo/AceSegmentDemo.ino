@@ -446,7 +446,7 @@ NumberWriter numberWriter(ledDisplay);
 ClockWriter clockWriter(ledDisplay);
 TemperatureWriter temperatureWriter(ledDisplay);
 CharWriter charWriter(ledDisplay);
-StringWriter stringWriter(ledDisplay);
+StringWriter stringWriter(charWriter);
 
 // Setup the various resources.
 void setupAceSegment() {
@@ -669,7 +669,10 @@ void writeStrings() {
 //-----------------------------------------------------------------------------
 
 StringScroller stringScroller(ledDisplay);
-const char SCROLL_STRING[] = "You are the best";
+const char SCROLL_STRING[] =
+"the quick brown fox jumps over the lazy dog, "
+"THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG. "
+"[0123456789]";
 
 void scrollString() {
   static bool isInit = false;
