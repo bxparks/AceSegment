@@ -244,7 +244,7 @@ volatile int disableCompilerOptimization = 0;
     using SpiInterface = SoftSpiInterface;
     SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
     Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
-        spiInterface, kEightDigitRemapArray);
+        spiInterface, kDigitRemapArray8);
 
   #elif FEATURE == FEATURE_MAX7219_SOFT_SPI_FAST
     #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
@@ -254,13 +254,13 @@ volatile int disableCompilerOptimization = 0;
     using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
     Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
-        spiInterface, kEightDigitRemapArray);
+        spiInterface, kDigitRemapArray8);
 
   #elif FEATURE == FEATURE_MAX7219_HARD_SPI
     using SpiInterface = HardSpiInterface;
     SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
     Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
-        spiInterface, kEightDigitRemapArray);
+        spiInterface, kDigitRemapArray8);
 
   #elif FEATURE == FEATURE_MAX7219_HARD_SPI_FAST
     #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
@@ -270,7 +270,7 @@ volatile int disableCompilerOptimization = 0;
     using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
     Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
-        spiInterface, kEightDigitRemapArray);
+        spiInterface, kDigitRemapArray8);
 
   #elif FEATURE == FEATURE_STUB_MODULE
     StubModule stubModule;
@@ -299,7 +299,8 @@ volatile int disableCompilerOptimization = 0;
   #elif FEATURE == FEATURE_STRING_WRITER
     StubModule stubModule;
     LedDisplay ledDisplay(stubModule);
-    StringWriter stringWriter(ledDisplay);
+    CharWriter charWriter(ledDisplay);
+    StringWriter stringWriter(charWriter);
 
   #endif
 #endif

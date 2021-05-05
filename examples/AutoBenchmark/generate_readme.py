@@ -112,13 +112,24 @@ number of `TimingStats::update()` calls that were made.
 
 **v0.4+:**
 
-* Add benchmarks for `Tm1637Module`. The CPU time is mostly determined by
-  the calls to `delayMicroseconds()`, which is must be about 100 microseconds
-  due to the unusually large capacitors (20 nF) installed on the DIO and CLK
-  lines. They should have been about 100X smaller (200 pF).
+* Add benchmarks for `Tm1637Module`.
+    * The CPU time is mostly determined by the calls to `delayMicroseconds()`,
+      which is must be about 100 microseconds due to the unusually large
+      capacitors (20 nF) installed on the DIO and CLK lines. They should have
+      been about 100X smaller (200 pF).
+    * Benchmarks both 4-digit and 6-digit LED modules given separately
+      because the `Tm1637::flush()` method is roughtly proportional to the
+      number of digits.
+    * Benchmarks for `Tm1637::flushIncremental()` is independent of the total
+      number of digits because only a single digit is sent for each call.
+      The maximum time for a single call to `flushIncremental()` is about 10 ms.
+    * For a 6-digit module, `flush()` can take as much as 27-30 milliseconds (!)
+      which uncomfortably close to the maximum amount of time before an ESP8266
+      resets via the watch dog timer. On ESP8266 (and maybe others), the
+      `flushIncremental()` should be used.
 * Add benchmarks for `Max7219Module`.
-* Add benchmarks for `DirectModule`, `DirectFast4Module`, `SingleHc595Module`, and
-  `DualHc595Module`.
+* Add benchmarks for `DirectModule`, `DirectFast4Module`, `SingleHc595Module`,
+  and `DualHc595Module`.
 * Upgrade from ESP32 Core v1.0.4 to v1.0.6.
 
 ## Results

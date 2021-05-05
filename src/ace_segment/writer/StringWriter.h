@@ -42,8 +42,8 @@ namespace ace_segment {
 class StringWriter {
   public:
     /** Constructor. */
-    explicit StringWriter(LedDisplay& ledDisplay) :
-        mCharWriter(ledDisplay)
+    explicit StringWriter(CharWriter& charWriter) :
+        mCharWriter(charWriter)
     {}
 
     /** Get the underlying LedDisplay. */
@@ -136,7 +136,7 @@ class StringWriter {
     }
 
   private:
-    CharWriter mCharWriter;
+    CharWriter& mCharWriter;
 };
 
 }

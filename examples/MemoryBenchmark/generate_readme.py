@@ -151,6 +151,11 @@ before substantional refactoring in 2021.
 * Hide implementation details involving `LedMatrixXxx` and `ScanningModule` by
   using the convenience classes (`DirectModule`, `DirectFast4Module`,
   `SingleHc595Module`, `DualHc595Module`).
+* Enabling user-defined character sets in `CharWriter` causes the flash memory
+  consumption to increase by 30 bytes on AVR processors, and 36 bytes on 32-bit
+  processors. Similar increase in `StringWriter` which now explicitly depends on
+  CharWriter. But I think the additional configurability is worth it since
+  different people have different aesthetic standards and want different fonts.
 
 ## Results
 

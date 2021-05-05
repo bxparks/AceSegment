@@ -122,11 +122,21 @@ using namespace ace_button;
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
 
+  // Choose one of the following variants:
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE
+  #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE_FAST
+
 #elif defined(AUNITER_LED_CLOCK_MAX7219)
   const uint8_t NUM_DIGITS = 8;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_MAX7219
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
+
+  // Choose one of the following variants:
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
+  //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
 
 #elif defined(AUNITER_LED_CLOCK_DIRECT)
   const uint8_t NUM_DIGITS = 4;
@@ -340,7 +350,7 @@ const uint8_t NUM_SUBFIELDS = 1;
     using WireInterface = SoftWireInterface;
     WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
   #elif INTERFACE_TYPE == INTERFACE_TYPE_SOFT_WIRE_FAST
-    using WireInterface = SoftWireInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
+    using WireInterface = SoftWireFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
     WireInterface wireInterface;
   #endif
   Tm1637Module<WireInterface, NUM_DIGITS> ledModule(wireInterface);
@@ -360,7 +370,7 @@ const uint8_t NUM_SUBFIELDS = 1;
     SpiInterface spiInterface;
   #endif
   Max7219Module<SpiInterface, NUM_DIGITS> ledModule(
-      spiInterface, kEightDigitRemapArray);
+      spiInterface, kDigitRemapArray8);
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_DIRECT
   // Common Anode, with transitors on Group pins
@@ -436,7 +446,7 @@ NumberWriter numberWriter(ledDisplay);
 ClockWriter clockWriter(ledDisplay);
 TemperatureWriter temperatureWriter(ledDisplay);
 CharWriter charWriter(ledDisplay);
-StringWriter stringWriter(ledDisplay);
+StringWriter stringWriter(charWriter);
 
 // Setup the various resources.
 void setupAceSegment() {
@@ -627,7 +637,12 @@ void writeChars() {
   charWriter.writeCharAt(2, '-');
   charWriter.writeCharAt(3, b);
 
-  incrementMod(b, CharWriter::kNumCharacters);
+  uint8_t numChars = charWriter.getNumChars();
+  if (numChars == 0) { // 0 means 256
+    b++;
+  } else {
+    incrementMod(b, numChars);
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -654,7 +669,10 @@ void writeStrings() {
 //-----------------------------------------------------------------------------
 
 StringScroller stringScroller(ledDisplay);
-const char SCROLL_STRING[] = "You are the best";
+const char SCROLL_STRING[] =
+"the quick brown fox jumps over the lazy dog, "
+"THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG. "
+"[0123456789]";
 
 void scrollString() {
   static bool isInit = false;

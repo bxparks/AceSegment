@@ -108,7 +108,7 @@ constexpr uint16_t BIT_DELAY = 100;
 #endif
 
 #if defined(AUNITER_LED_CLOCK_TM1637_6)
-  const uint8_t* const remapArray = ace_segment::kSixDigitRemapArray;
+  const uint8_t* const remapArray = ace_segment::kDigitRemapArray6;
 #else
   const uint8_t* const remapArray = nullptr;
 #endif

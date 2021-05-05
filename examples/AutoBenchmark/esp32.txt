@@ -11,26 +11,30 @@ sizeof(DirectModule<4>): 48
 sizeof(SingleHc595Module<SoftSpiInterface, 4>): 48
 sizeof(DualHc595Module<SoftSpiInterface, 4>): 44
 sizeof(Tm1637Module<SoftWireInterface, 4>): 24
+sizeof(Tm1637Module<SoftWireInterface, 6>): 28
 sizeof(Max7219Module<SoftSpiInterface, 8>): 28
 sizeof(LedDisplay): 4
 sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
 sizeof(TemperatureWriter): 4
-sizeof(CharWriter): 4
+sizeof(CharWriter): 12
 sizeof(StringWriter): 4
-sizeof(StringScroller): 12
+sizeof(StringScroller): 20
 BENCHMARKS
-Direct 2 2 10 240
-Direct(subfields) 0 1 9 3840
-SingleHc595(SoftSpi) 4 4 7 240
+Direct 2 2 8 240
+Direct(subfields) 0 1 10 3840
+SingleHc595(SoftSpi) 4 4 12 240
 SingleHc595(SoftSpi,subfields) 0 1 13 3840
 SingleHc595(HardSpi) 9 9 17 240
 SingleHc595(HardSpi,subfields) 0 1 18 3840
 DualHc595(SoftSpi) 7 7 16 240
-DualHc595(SoftSpi,subfields) 0 1 15 3840
-DualHc595(HardSpi) 9 9 16 240
-DualHc595(HardSpi,subfields) 0 1 14 3840
-Tm1637(SoftWire) 21226 21239 21247 20
-Max7219(SoftSpi) 33 34 41 20
-Max7219(HardSpi) 44 44 51 20
+DualHc595(SoftSpi,subfields) 0 1 16 3840
+DualHc595(HardSpi) 9 9 18 240
+DualHc595(HardSpi,subfields) 0 2 14 3840
+Tm1637(SoftWire) 21231 21241 21250 10
+Tm1637(SoftWire,incremental) 1 769 9614 50
+Tm1637(6,SoftWire) 26689 26698 26707 10
+Tm1637(6,SoftWire,incremental) 0 824 9614 70
+Max7219(SoftSpi) 33 33 34 20
+Max7219(HardSpi) 43 44 53 20
 END
