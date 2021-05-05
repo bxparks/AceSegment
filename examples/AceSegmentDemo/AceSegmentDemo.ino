@@ -360,7 +360,7 @@ const uint8_t NUM_SUBFIELDS = 1;
     SpiInterface spiInterface;
   #endif
   Max7219Module<SpiInterface, NUM_DIGITS> ledModule(
-      spiInterface, kEightDigitRemapArray);
+      spiInterface, kDigitRemapArray8);
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_DIRECT
   // Common Anode, with transitors on Group pins

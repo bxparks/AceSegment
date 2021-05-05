@@ -603,7 +603,7 @@ void runMax7219SoftSpi() {
   using SpiInterface = SoftSpiInterface;
   SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
   Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
-      spiInterface, kEightDigitRemapArray);
+      spiInterface, kDigitRemapArray8);
 
   spiInterface.begin();
   max7219Module.begin();
@@ -617,7 +617,7 @@ void runMax7219SoftSpiFast() {
   using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
   Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
-      spiInterface, kEightDigitRemapArray);
+      spiInterface, kDigitRemapArray8);
 
   spiInterface.begin();
   max7219Module.begin();
@@ -631,7 +631,7 @@ void runMax7219HardSpi() {
   using SpiInterface = HardSpiInterface;
   SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
   Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
-      spiInterface, kEightDigitRemapArray);
+      spiInterface, kDigitRemapArray8);
 
   spiInterface.begin();
   max7219Module.begin();
@@ -645,7 +645,7 @@ void runMax7219HardSpiFast() {
   using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
   Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
-      spiInterface, kEightDigitRemapArray);
+      spiInterface, kDigitRemapArray8);
 
   spiInterface.begin();
   max7219Module.begin();
