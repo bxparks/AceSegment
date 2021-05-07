@@ -115,7 +115,9 @@ void loop() {
 void loop() {
   static uint16_t prevChangeMillis = millis();
   static uint16_t prevFlushMillis = millis();
+#if ENABLE_SERIAL_DEBUG >= 1
   static uint16_t prevStatsMillis = millis();
+#endif
 
   // Every second, change the brightness and scroll the display.
   uint16_t nowMillis = millis();
