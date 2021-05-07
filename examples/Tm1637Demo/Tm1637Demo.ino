@@ -91,7 +91,7 @@ using namespace ace_segment;
 // * 17 ms at 75 us delay.
 // * 22 ms at 100 us delay.
 // * 43 ms at 200 us delay.
-constexpr uint16_t BIT_DELAY = 100;
+const uint16_t BIT_DELAY = 100;
 
 #if WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_NORMAL
   using WireInterface = SoftWireInterface;

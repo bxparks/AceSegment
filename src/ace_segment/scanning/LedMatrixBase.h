@@ -74,10 +74,10 @@ class LedMatrixBase {
   public:
 
     /** Bit pattern to indicate that logical 1 activates group or element. */
-    static constexpr uint8_t kActiveHighPattern = 0xFF;
+    static const uint8_t kActiveHighPattern = 0xFF;
 
     /** Bit pattern to indicate that logical 0 activates group or element. */
-    static constexpr uint8_t kActiveLowPattern = 0x00;
+    static const uint8_t kActiveLowPattern = 0x00;
 
     /**
      * @param elementOnPattern bit pattern that turns on the elements on group

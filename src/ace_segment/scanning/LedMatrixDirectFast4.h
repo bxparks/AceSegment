@@ -72,8 +72,8 @@ template <
 >
 class LedMatrixDirectFast4 : public LedMatrixBase {
   public:
-    constexpr static uint8_t kNumElements = 8;
-    constexpr static uint8_t kNumGroups = 4;
+    static const uint8_t kNumElements = 8;
+    static const uint8_t kNumGroups = 4;
 
     LedMatrixDirectFast4(
         uint8_t elementOnPattern,

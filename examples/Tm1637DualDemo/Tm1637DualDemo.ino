@@ -42,7 +42,7 @@ const uint8_t DIO2_PIN = 8;
 // * 43 ms at 200 us delay.
 //
 // Using flushIncremental() is about 1/2 these numbers.
-constexpr uint16_t BIT_DELAY = 100;
+const uint16_t BIT_DELAY = 100;
 
 using WireInterface = SoftWireInterface;
 WireInterface wireInterface1(CLK_PIN, DIO1_PIN, BIT_DELAY);
