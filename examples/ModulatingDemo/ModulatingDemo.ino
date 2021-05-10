@@ -250,7 +250,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
     LedMatrix ledMatrix(
         spiInterface,
         LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
-        LedMatrixBase::kActiveLowPattern /*groupOnPattern*/);
+        LedMatrixBase::kActiveLowPattern /*groupOnPattern*/,
+        kByteOrderGroupHighElementLow);
   #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SOFT_SPI_FAST
     // Common Anode, with transistors on Group pins
     using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
@@ -259,7 +260,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
     LedMatrix ledMatrix(
         spiInterface,
         LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
-        LedMatrixBase::kActiveLowPattern /*groupOnPattern*/);
+        LedMatrixBase::kActiveLowPattern /*groupOnPattern*/,
+        kByteOrderGroupHighElementLow);
   #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HARD_SPI
     // Common Anode, with transistors on Group pins
     HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
@@ -267,7 +269,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
     LedMatrix ledMatrix(
         spiInterface,
         LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
-        LedMatrixBase::kActiveLowPattern /*groupOnPattern*/);
+        LedMatrixBase::kActiveLowPattern /*groupOnPattern*/,
+        kByteOrderGroupHighElementLow);
   #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HARD_SPI_FAST
     // Common Anode, with transistors on Group pins
     using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
@@ -276,7 +279,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
     LedMatrix ledMatrix(
         spiInterface,
         LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
-        LedMatrixBase::kActiveLowPattern /*groupOnPattern*/);
+        LedMatrixBase::kActiveLowPattern /*groupOnPattern*/,
+        kByteOrderGroupHighElementLow);
 
   #else
     #error Unsupported LED_MATRIX_MODE
@@ -349,7 +353,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
       spiInterface,
       LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
       LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
-      FRAMES_PER_SECOND
+      FRAMES_PER_SECOND,
+      kByteOrderGroupHighElementLow
   );
 
 #endif

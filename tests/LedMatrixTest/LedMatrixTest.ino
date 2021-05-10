@@ -46,7 +46,8 @@ LedMatrixSingleHc595<TestableSpiInterface, TestableGpioInterface>
 LedMatrixDualHc595<TestableSpiInterface> ledMatrixDualHc595(
     spiInterface,
     LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
-    LedMatrixBase::kActiveHighPattern /*groupOnPattern*/);
+    LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
+    kByteOrderGroupHighElementLow);
 
 // ----------------------------------------------------------------------
 // Tests for LedMatrixSplitDirect.

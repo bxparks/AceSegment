@@ -24,6 +24,7 @@ using namespace ace_button;
 // Hardware configuration.
 //------------------------------------------------------------------
 
+// Type of LED Module
 #define LED_DISPLAY_TYPE_SCANNING 0
 #define LED_DISPLAY_TYPE_TM1637 1
 #define LED_DISPLAY_TYPE_MAX7219 2
@@ -309,7 +310,8 @@ const uint8_t NUM_SUBFIELDS = 1;
     LedMatrix ledMatrix(
         spiInterface,
         LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
-        LedMatrixBase::kActiveLowPattern /*groupOnPattern*/);
+        LedMatrixBase::kActiveLowPattern /*groupOnPattern*/,
+        kByteOrderGroupHighElementLow);
   #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SOFT_SPI_FAST
     // Common Anode, with transistors on Group pins
     using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
@@ -318,7 +320,8 @@ const uint8_t NUM_SUBFIELDS = 1;
     LedMatrix ledMatrix(
         spiInterface,
         LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
-        LedMatrixBase::kActiveLowPattern /*groupOnPattern*/);
+        LedMatrixBase::kActiveLowPattern /*groupOnPattern*/,
+        kByteOrderGroupHighElementLow);
   #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HARD_SPI
     // Common Anode, with transistors on Group pins
     HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
@@ -326,7 +329,8 @@ const uint8_t NUM_SUBFIELDS = 1;
     LedMatrix ledMatrix(
         spiInterface,
         LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
-        LedMatrixBase::kActiveLowPattern /*groupOnPattern*/);
+        LedMatrixBase::kActiveLowPattern /*groupOnPattern*/,
+        kByteOrderGroupHighElementLow);
   #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HARD_SPI_FAST
     // Common Anode, with transistors on Group pins
     using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
@@ -335,7 +339,8 @@ const uint8_t NUM_SUBFIELDS = 1;
     LedMatrix ledMatrix(
         spiInterface,
         LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
-        LedMatrixBase::kActiveLowPattern /*groupOnPattern*/);
+        LedMatrixBase::kActiveLowPattern /*groupOnPattern*/,
+        kByteOrderGroupHighElementLow);
 
   #else
     #error Unsupported LED_MATRIX_MODE
@@ -434,7 +439,8 @@ const uint8_t NUM_SUBFIELDS = 1;
       spiInterface,
       LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
       LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
-      FRAMES_PER_SECOND
+      FRAMES_PER_SECOND,
+      kByteOrderDigitHighSegmentLow
   );
 
 #else

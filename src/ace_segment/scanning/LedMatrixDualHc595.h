@@ -33,6 +33,12 @@ class LedMatrixDualHc595Test_disableGroup;
 
 namespace ace_segment {
 
+/** Send the group bits first, then the element patterns. */
+const uint8_t kByteOrderGroupHighElementLow = 0;
+
+/** Send the element patterns first, then the group bits. */
+const uint8_t kByteOrderElementHighGroupLow = 1;
+
 /**
  * An LedMatrix that whose group pins are attached to one 74HC595 shift register
  * and the element pins are attached to another 74HC595 shift register. The 2
@@ -50,10 +56,12 @@ class LedMatrixDualHc595: public LedMatrixBase {
     LedMatrixDualHc595(
         const T_SPII& spiInterface,
         uint8_t elementOnPattern,
-        uint8_t groupOnPattern
+        uint8_t groupOnPattern,
+        uint8_t byteOrder
     ) :
         LedMatrixBase(elementOnPattern, groupOnPattern),
-        mSpiInterface(spiInterface)
+        mSpiInterface(spiInterface),
+        mByteOrder(byteOrder)
     {}
 
     void begin() const {}
@@ -66,28 +74,46 @@ class LedMatrixDualHc595: public LedMatrixBase {
      */
     void draw(uint8_t group, uint8_t elementPattern) const {
       uint8_t groupPattern = 0x1 << group; // Would a lookup table be faster?
-
-      uint8_t actualGroupPattern = (groupPattern ^ mGroupXorMask);
-      uint8_t actualElementPattern = (elementPattern ^ mElementXorMask);
-
-      mSpiInterface.send16(actualGroupPattern << 8 | actualElementPattern);
+      drawPatterns(groupPattern, elementPattern);
       mPrevElementPattern = elementPattern;
     }
 
+    /**
+     * Turn on the given group, using the previous segment pattern. Useful for
+     * blinking a group (e.g. a digit of an LED segment module).
+     */
     void enableGroup(uint8_t group) const {
       draw(group, mPrevElementPattern);
     }
 
+    /** Turn off the given group. Useful for blinking a group. */
     void disableGroup(uint8_t group) const {
       (void) group;
-      clear();
+      drawPatterns(0x00, 0x00);
+      // Don't update mPrevElementPattern.
     }
 
+    /** Clear the entire display. */
     void clear() const {
-      uint8_t actualGroupPattern = 0x00 ^ mGroupXorMask;
-      uint8_t actualElementPattern = 0x00 ^ mElementXorMask;
-      mSpiInterface.send16(actualGroupPattern << 8 | actualElementPattern);
+      drawPatterns(0x00, 0x00);
       mPrevElementPattern = 0x00;
+    }
+
+  private:
+
+    /**
+     * Send the groupPattern and elementPattern to the display  through SPI. The
+     * patterns are inverted if necessary due to wiring requirements (e.g.
+     * common cathode versus common anode, or if a driver transitor inverts the
+     * logic levels). The byte-order is determined by the mByteOrder setting.
+     */
+    void drawPatterns(uint8_t groupPattern, uint8_t elementPattern) const {
+      uint8_t actualGroupPattern = (groupPattern ^ mGroupXorMask);
+      uint8_t actualElementPattern = (elementPattern ^ mElementXorMask);
+      uint16_t data = (mByteOrder == kByteOrderGroupHighElementLow)
+          ? actualGroupPattern << 8 | actualElementPattern
+          : actualElementPattern << 8 | actualGroupPattern;
+      mSpiInterface.send16(data);
     }
 
   private:
@@ -96,6 +122,7 @@ class LedMatrixDualHc595: public LedMatrixBase {
     friend class ::LedMatrixDualHc595Test_disableGroup;
 
     const T_SPII& mSpiInterface;
+    const uint8_t mByteOrder;
 
     /**
      * Remember the previous element pattern to support disableGroup() and

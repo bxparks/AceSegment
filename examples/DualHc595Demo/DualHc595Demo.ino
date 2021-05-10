@@ -11,21 +11,28 @@
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 #include <digitalWriteFast.h>
 #include <ace_segment/hw/SoftSpiFastInterface.h>
+#include <ace_segment/hw/HardSpiFastInterface.h>
 #include <ace_segment/hw/SoftWireFastInterface.h>
+using ace_segment::SoftSpiFastInterface;
+using ace_segment::HardSpiFastInterface;
 #endif
 
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
 using ace_segment::LedMatrixBase;
-using ace_segment::SoftSpiFastInterface;
 using ace_segment::DualHc595Module;
 using ace_segment::LedDisplay;
+using ace_segment::SoftSpiInterface;
+using ace_segment::HardSpiInterface;
+using ace_segment::kByteOrderDigitHighSegmentLow;
+using ace_segment::kByteOrderSegmentHighDigitLow;
 
 //----------------------------------------------------------------------------
 // Hardware configuration.
 //----------------------------------------------------------------------------
 
+// Type of LED Module
 #define LED_DISPLAY_TYPE_SCANNING 0
 #define LED_DISPLAY_TYPE_TM1637 1
 #define LED_DISPLAY_TYPE_MAX7219 2
@@ -33,11 +40,47 @@ using ace_segment::LedDisplay;
 #define LED_DISPLAY_TYPE_HC595_SINGLE 4
 #define LED_DISPLAY_TYPE_DIRECT 5
 
+// Used by LED_DISPLAY_TYPE_HC595_SINGLE and LED_DISPLAY_TYPE_HC595_DUAL
+#define INTERFACE_TYPE_SOFT_SPI 0
+#define INTERFACE_TYPE_SOFT_SPI_FAST 1
+#define INTERFACE_TYPE_HARD_SPI 2
+#define INTERFACE_TYPE_HARD_SPI_FAST 3
+#define INTERFACE_TYPE_SOFT_WIRE 4
+#define INTERFACE_TYPE_SOFT_WIRE_FAST 5
+
 #if defined(EPOXY_DUINO)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
+  #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
+  const uint8_t NUM_DIGITS = 4;
+  const uint8_t LATCH_PIN = 10;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
 
-#elif defined(AUNITER_LED_CLOCK_HC595_DUAL)
+#elif defined(AUNITER_LED_CLOCK_SCANNING_DUAL)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
+  #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
+  const uint8_t NUM_DIGITS = 4;
+  const uint8_t LATCH_PIN = 10;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
+
+#elif defined(AUNITER_D1MINI_LARGE_HC595) \
+    || defined(AUNITER_STM32_HC595)
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  const uint8_t NUM_DIGITS = 8;
+  const uint8_t LATCH_PIN = SS;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
+  const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
 
 #else
   #error Unknown environment
@@ -48,11 +91,7 @@ using ace_segment::LedDisplay;
 //------------------------------------------------------------------
 
 // LED segment patterns.
-const uint8_t NUM_DIGITS = 4;
 const uint8_t NUM_SEGMENTS = 8;
-const uint8_t LATCH_PIN = 10;
-const uint8_t DATA_PIN = MOSI;
-const uint8_t CLOCK_PIN = SCK;
 
 // Total fields/second
 //    = FRAMES_PER_SECOND * NUM_SUBFIELDS * NUM_DIGITS
@@ -63,7 +102,7 @@ const uint8_t CLOCK_PIN = SCK;
 // Fortunately, according to AutoBenchmark, the "fast" versions of LedMatrix can
 // render a single field in about 20-30 micros.
 const uint8_t FRAMES_PER_SECOND = 60;
-const uint8_t NUM_SUBFIELDS = 16;
+const uint8_t NUM_SUBFIELDS = 1;
 const uint8_t NUM_BRIGHTNESSES = 8;
 const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   1, 2, 4, 8,
@@ -71,22 +110,40 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 };
 
 // Common Cathode, with transistors on Group pins
-using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
-SpiInterface spiInterface;
+#if INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI
+  using SpiInterface = SoftSpiInterface;
+  SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+#elif INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI_FAST
+  using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  SpiInterface spiInterface;
+#elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
+  using SpiInterface = HardSpiInterface;
+  SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+#elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
+  using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  SpiInterface spiInterface;
+#else
+  #error Unknown INTERFACE_TYPE
+#endif
 DualHc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
     spiInterface,
-    LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-    LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
-    FRAMES_PER_SECOND
+    SEGMENT_ON_PATTERN,
+    DIGIT_ON_PATTERN,
+    FRAMES_PER_SECOND,
+    HC595_BYTE_ORDER
 );
 LedDisplay display(ledModule);
 
 // LedDisplay patterns
-const uint8_t PATTERNS[NUM_DIGITS] = {
+const uint8_t PATTERNS[8] = {
   0b00111111, // 0
   0b00000110, // 1
   0b01011011, // 2
   0b01001111, // 3
+  0b01100110, // 4
+  0b01101101, // 5
+  0b01111101, // 6
+  0b00000111, // 7
 };
 
 void setupAceSegment() {
@@ -138,7 +195,7 @@ void loop() {
   uint16_t nowMillis = millis();
 
   // Update the display with new pattern every second.
-  if (nowMillis - prevUpdateMillis >= 1000) {
+  if ((uint16_t) (nowMillis - prevUpdateMillis) >= 1000) {
     prevUpdateMillis = nowMillis;
     updateDisplay();
   }
@@ -151,7 +208,7 @@ void loop() {
 
   // Print the stats every 5 seconds.
 #if ENABLE_SERIAL_DEBUG >= 1
-  if (nowMillis - prevStatsMillis >= 5000) {
+  if ((uint16_t) (nowMillis - prevStatsMillis) >= 5000) {
     prevStatsMillis = nowMillis;
     Serial.print("ExpAvg:");
     Serial.println(stats.getExpDecayAvg());

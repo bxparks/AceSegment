@@ -30,6 +30,12 @@ SOFTWARE.
 
 namespace ace_segment {
 
+/** Send the digit bits first, then the segment patterns. */
+const uint8_t kByteOrderDigitHighSegmentLow = kByteOrderGroupHighElementLow;
+
+/** Send the segment patterns first, then the digit bits. */
+const uint8_t kByteOrderSegmentHighDigitLow = kByteOrderElementHighGroupLow;
+
 /**
  * An implementation of LedModule class that supports an LED module using 2
  * 74HC595 Shift Register chips. This is a convenience class that pairs together
@@ -64,17 +70,33 @@ class DualHc595Module : public ScanningModule<
     >;
 
   public:
+    /**
+     * @param spiInterface object that knows how to send SPI packets
+     * @param segmentOnPattern the bit pattern that indicates whether the
+     *    segment pins are wired to be active high (LedMatrixBase::kActiveHigh)
+     *    or active low (LedMatrixBase::kActiveLow)
+     * @param digitOnPattern the bit pattern that indicates whether the digit
+     *    pins are wired to be active high (LedMatrixBase::kActiveHigh)
+     *    or active low (LedMatrixBase::kActiveLow)
+     * @param framesPerSecond desired number of frames per second (usually
+     *    greater than or equal to 60 to avoid flickering)
+     * @param byteOrder (optional) whether to send the digit patterns first
+     *    (kByteOrderDigitHighSegmentLow) or segment patterns first
+     *    (kByteOrderSegmentHighDigitLow)
+     */
     DualHc595Module(
         const T_SPII& spiInterface,
         uint8_t segmentOnPattern,
         uint8_t digitOnPattern,
-        uint8_t framesPerSecond
+        uint8_t framesPerSecond,
+        uint8_t byteOrder
     ) :
         Super(mLedMatrix, framesPerSecond),
         mLedMatrix(
             spiInterface,
             segmentOnPattern /*elementOnPattern*/,
-            digitOnPattern /*groupOnPattern*/
+            digitOnPattern /*groupOnPattern*/,
+            byteOrder
         )
     {}
 
