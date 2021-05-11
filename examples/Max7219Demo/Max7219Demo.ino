@@ -38,19 +38,19 @@ using ace_segment::kDigitRemapArrayMax7219;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
 
-#elif defined(AUNITER_D1MINI_LARGE_MAX7219)
-  #define SPI_INTERFACE_TYPE SPI_INTERFACE_TYPE_SOFT_SPI
-
-  // SPI pins
-  const uint8_t LATCH_PIN = D8;
-  const uint8_t DATA_PIN = MOSI;
-  const uint8_t CLOCK_PIN = SCK;
-
 #elif defined(AUNITER_STM32_MAX7219)
-  #define SPI_INTERFACE_TYPE SPI_INTERFACE_TYPE_SOFT_SPI
+  #define SPI_INTERFACE_TYPE SPI_INTERFACE_TYPE_HARD_SPI
 
   // SPI pins
   const uint8_t LATCH_PIN = PA4;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+
+#elif defined(AUNITER_D1MINI_LARGE_MAX7219)
+  #define SPI_INTERFACE_TYPE SPI_INTERFACE_TYPE_HARD_SPI
+
+  // SPI pins
+  const uint8_t LATCH_PIN = SS;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
 

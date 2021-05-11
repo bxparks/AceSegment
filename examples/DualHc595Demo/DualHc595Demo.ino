@@ -58,7 +58,7 @@ using namespace ace_segment;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
   const uint8_t NUM_DIGITS = 4;
-  const uint8_t LATCH_PIN = A0;
+  const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
   const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
@@ -70,7 +70,7 @@ using namespace ace_segment;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
   const uint8_t NUM_DIGITS = 8;
-  const uint8_t LATCH_PIN = A0;
+  const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
   const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
@@ -78,8 +78,19 @@ using namespace ace_segment;
   const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
   const uint8_t* const REMAP_ARRAY = kDigitRemapArrayHc595;
 
-#elif defined(AUNITER_D1MINI_LARGE_HC595) \
-    || defined(AUNITER_STM32_HC595)
+#elif defined(AUNITER_STM32_HC595)
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  const uint8_t NUM_DIGITS = 8;
+  const uint8_t LATCH_PIN = SS;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
+  const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
+  const uint8_t* const REMAP_ARRAY = kDigitRemapArrayHc595;
+
+#elif defined(AUNITER_D1MINI_LARGE_HC595)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   const uint8_t NUM_DIGITS = 8;

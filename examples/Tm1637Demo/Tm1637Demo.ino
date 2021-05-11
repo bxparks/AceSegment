@@ -24,7 +24,7 @@ using namespace ace_segment;
   #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_NORMAL
   #define TM_FLUSH_METHOD TM_FLUSH_METHOD_FLUSH
 
-  const uint8_t CLK_PIN = 10;
+  const uint8_t CLK_PIN = A0;
   const uint8_t DIO_PIN = 9;
 
   const uint8_t NUM_DIGITS = 4;
@@ -39,7 +39,7 @@ using namespace ace_segment;
   #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_FAST
   #define TM_FLUSH_METHOD TM_FLUSH_METHOD_FLUSH_INCREMENTAL
 
-  const uint8_t CLK_PIN = 10;
+  const uint8_t CLK_PIN = A0;
   const uint8_t DIO_PIN = 9;
 
   const uint8_t NUM_DIGITS = 4;
@@ -54,7 +54,7 @@ using namespace ace_segment;
   #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_FAST
   #define TM_FLUSH_METHOD TM_FLUSH_METHOD_FLUSH_INCREMENTAL
 
-  const uint8_t CLK_PIN = 10;
+  const uint8_t CLK_PIN = A0;
   const uint8_t DIO_PIN = 9;
 
   const uint8_t NUM_DIGITS = 6;
@@ -73,6 +73,21 @@ using namespace ace_segment;
 
   const uint8_t CLK_PIN = PB3;
   const uint8_t DIO_PIN = PB4;
+
+  const uint8_t NUM_DIGITS = 4;
+  const uint8_t PATTERNS[NUM_DIGITS] = {
+    0b00111111, // 0
+    0b00000110, // 1
+    0b01011011, // 2
+    0b01001111, // 3
+  };
+
+#elif defined(AUNITER_D1MINI_LARGE_TM1637)
+  #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_NORMAL
+  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_FLUSH_INCREMENTAL
+
+  const uint8_t CLK_PIN = D5;
+  const uint8_t DIO_PIN = D7;
 
   const uint8_t NUM_DIGITS = 4;
   const uint8_t PATTERNS[NUM_DIGITS] = {
@@ -170,7 +185,9 @@ void loop() {
 void loop() {
   static uint16_t prevChangeMillis = millis();
   static uint16_t prevFlushMillis = millis();
+#if ENABLE_SERIAL_DEBUG >= 1
   static uint16_t prevStatsMillis = millis();
+#endif
 
   // Every second, change the brightness and scroll the display.
   uint16_t nowMillis = millis();

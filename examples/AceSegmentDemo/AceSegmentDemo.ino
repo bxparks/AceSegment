@@ -57,6 +57,18 @@ using namespace ace_button;
 #define INTERFACE_TYPE_SOFT_WIRE 4
 #define INTERFACE_TYPE_SOFT_WIRE_FAST 5
 
+// Button options: either digital buttons using ButtonConfig, 2 analog buttons
+// using LadderButtonConfig, or 4 analog buttons using LadderButtonConfig:
+//  * AVR: 10-bit analog pin
+//  * ESP8266: 10-bit analog pin
+//  * ESP32: 12-bit analog pin
+#define BUTTON_TYPE_DIGITAL 0
+#define BUTTON_TYPE_ANALOG 1
+
+// Select the TM1637Module flush() method
+#define TM_FLUSH_METHOD_FLUSH 0
+#define TM_FLUSH_METHOD_FLUSH_INCREMENTAL 1
+
 // Pro Micro dev board buttons are now hardwared to A2 and A3, instead of being
 // configured with dip switches to either (2,3) or (8,9). Since (2,3) are used
 // by I2C, and LED_MATRIX_MODE_DIRECT uses (8,9) pins for two of the LED
@@ -66,6 +78,7 @@ using namespace ace_button;
 #if defined(EPOXY_DUINO)
   // For EpoxyDuino, the actual numbers don't matter, so let's set them to (2,3)
   // since I'm not sure if A2 and A3 are defined.
+  #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
   const uint8_t MODE_BUTTON_PIN = 2;
   const uint8_t CHANGE_BUTTON_PIN = 3;
 
@@ -87,6 +100,7 @@ using namespace ace_button;
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HARD_SPI_FAST
 
 #elif defined(AUNITER_MICRO_SCANNING_DIRECT)
+  #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
 
@@ -101,6 +115,7 @@ using namespace ace_button;
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT_FAST
 
 #elif defined(AUNITER_MICRO_SCANNING_SINGLE)
+  #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
 
@@ -118,6 +133,7 @@ using namespace ace_button;
   #define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_HARD_SPI_FAST
 
 #elif defined(AUNITER_MICRO_SCANNING_DUAL)
+  #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
 
@@ -137,6 +153,7 @@ using namespace ace_button;
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HARD_SPI_FAST
 
 #elif defined(AUNITER_MICRO_CUSTOM_DIRECT)
+  #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
 
@@ -151,6 +168,7 @@ using namespace ace_button;
   #define DIRECT_INTERFACE_TYPE DIRECT_INTERFACE_TYPE_FAST
 
 #elif defined(AUNITER_MICRO_CUSTOM_SINGLE)
+  #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
 
@@ -168,6 +186,7 @@ using namespace ace_button;
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
 
 #elif defined(AUNITER_MICRO_CUSTOM_DUAL)
+  #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
 
@@ -188,12 +207,13 @@ using namespace ace_button;
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
 
 #elif defined(AUNITER_MICRO_TM1637)
+  #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
 
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_TM1637
   const uint8_t NUM_DIGITS = 4;
-  const uint8_t CLK_PIN = 10;
+  const uint8_t CLK_PIN = A0;
   const uint8_t DIO_PIN = 9;
   const uint16_t BIT_DELAY = 100;
 
@@ -201,13 +221,18 @@ using namespace ace_button;
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE_FAST
 
+  // Select one of the flush methods.
+  //#define TM_FLUSH_METHOD TM_FLUSH_METHOD_FLUSH
+  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_FLUSH_INCREMENTAL
+
 #elif defined(AUNITER_MICRO_MAX7219)
+  #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
 
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_MAX7219
   const uint8_t NUM_DIGITS = 8;
-  const uint8_t LATCH_PIN = A0;
+  const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
 
@@ -218,12 +243,13 @@ using namespace ace_button;
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
 
 #elif defined(AUNITER_MICRO_HC595)
+  #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
 
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
   const uint8_t NUM_DIGITS = 8;
-  const uint8_t LATCH_PIN = A0;
+  const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
   const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
@@ -236,6 +262,112 @@ using namespace ace_button;
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
+
+#elif defined(AUNITER_STM32_TM1637)
+  #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
+  const uint8_t MODE_BUTTON_PIN = PA0;
+  const uint8_t CHANGE_BUTTON_PIN = PA1;
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_TM1637
+  const uint8_t NUM_DIGITS = 4;
+  const uint8_t CLK_PIN = PB3;
+  const uint8_t DIO_PIN = PB4;
+  const uint16_t BIT_DELAY = 100;
+
+  // Choose one of the following variants:
+  #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE
+
+  // Select one of the flush methods.
+  //#define TM_FLUSH_METHOD TM_FLUSH_METHOD_FLUSH
+  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_FLUSH_INCREMENTAL
+
+#elif defined(AUNITER_STM32_MAX7219)
+  #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
+  const uint8_t MODE_BUTTON_PIN = PA0;
+  const uint8_t CHANGE_BUTTON_PIN = PA1;
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_MAX7219
+  const uint8_t NUM_DIGITS = 8;
+  const uint8_t LATCH_PIN = SS;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+
+  // Choose one of the following variants:
+  #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
+  //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+
+#elif defined(AUNITER_STM32_HC595)
+  #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
+  const uint8_t MODE_BUTTON_PIN = PA0;
+  const uint8_t CHANGE_BUTTON_PIN = PA1;
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
+  const uint8_t NUM_DIGITS = 8;
+  const uint8_t LATCH_PIN = SS;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
+  const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
+  const uint8_t* const REMAP_ARRAY = kDigitRemapArrayHc595;
+
+  // Choose one of the following variants:
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+
+#elif defined(AUNITER_D1MINI_LARGE_TM1637)
+  #define BUTTON_TYPE BUTTON_TYPE_ANALOG
+  const uint8_t MODE_BUTTON_PIN = 0;
+  const uint8_t CHANGE_BUTTON_PIN = 2;
+  #define ANALOG_BUTTON_COUNT 4
+  #define ANALOG_BUTTON_PIN A0
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_TM1637
+  const uint8_t NUM_DIGITS = 4;
+  const uint8_t CLK_PIN = D5;
+  const uint8_t DIO_PIN = D7;
+  const uint16_t BIT_DELAY = 100;
+
+  // Choose one of the following variants:
+  #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE
+
+#elif defined(AUNITER_D1MINI_LARGE_MAX7219)
+  #define BUTTON_TYPE BUTTON_TYPE_ANALOG
+  const uint8_t MODE_BUTTON_PIN = 0;
+  const uint8_t CHANGE_BUTTON_PIN = 2;
+  #define ANALOG_BUTTON_COUNT 4
+  #define ANALOG_BUTTON_PIN A0
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_MAX7219
+  const uint8_t NUM_DIGITS = 8;
+  const uint8_t LATCH_PIN = SS;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+
+  // Choose one of the following variants:
+  #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
+  //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+
+#elif defined(AUNITER_D1MINI_LARGE_HC595)
+  #define BUTTON_TYPE BUTTON_TYPE_ANALOG
+  const uint8_t MODE_BUTTON_PIN = 0;
+  const uint8_t CHANGE_BUTTON_PIN = 2;
+  #define ANALOG_BUTTON_COUNT 4
+  #define ANALOG_BUTTON_PIN A0
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
+  const uint8_t NUM_DIGITS = 8;
+  const uint8_t LATCH_PIN = SS;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
+  const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
+  const uint8_t* const REMAP_ARRAY = kDigitRemapArrayHc595;
+
+  // Choose one of the following variants:
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
 
 #else
   #error Unknown AUNITER environment
@@ -827,8 +959,11 @@ void renderField() {
       || LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_DUAL
     ledModule.renderFieldWhenReady();
   #else
-    ledModule.flush();
-    //ledModule.flushIncremental();
+    #if TM_FLUSH_METHOD == TM_FLUSH_METHOD_FLUSH
+      ledModule.flush();
+    #elif TM_FLUSH_METHOD == TM_FLUSH_METHOD_FLUSH_INCREMENTAL
+      ledModule.flushIncremental();
+    #endif
   #endif
 }
 
@@ -846,8 +981,45 @@ uint8_t renderMode = RENDER_MODE_AUTO;
 
 // Configuration for AceButton, to support Single-Step
 
-AceButton modeButton(MODE_BUTTON_PIN);
-AceButton changeButton(CHANGE_BUTTON_PIN);
+#if BUTTON_TYPE == BUTTON_TYPE_DIGITAL
+
+  ButtonConfig buttonConfig;
+  AceButton modeButton(&buttonConfig, MODE_BUTTON_PIN);
+  AceButton changeButton(&buttonConfig, CHANGE_BUTTON_PIN);
+
+#elif BUTTON_TYPE == BUTTON_TYPE_ANALOG
+
+  AceButton modeButton((uint8_t) MODE_BUTTON_PIN);
+  AceButton changeButton((uint8_t) CHANGE_BUTTON_PIN);
+  AceButton* const BUTTONS[] = {&modeButton, &changeButton};
+
+  #if ANALOG_BUTTON_COUNT == 2
+    const uint16_t LEVELS[] = {0, 512, 1023};
+  #elif ANALOG_BUTTON_COUNT == 4
+    const uint16_t LEVELS[] = {
+      0 /*short to ground*/,
+      327 /*32%, 4.7k*/,
+      512 /*50%, 10k*/,
+      844 /*82%, 47k*/,
+      1023 /*100%, open*/
+    };
+  #else
+    #error Unknown ANALOG_BUTTON_COUNT
+  #endif
+
+  LadderButtonConfig buttonConfig(
+      ANALOG_BUTTON_PIN,
+      sizeof(LEVELS) / sizeof(LEVELS[0]),
+      LEVELS,
+      sizeof(BUTTONS) / sizeof(BUTTONS[0]),
+      BUTTONS
+  );
+
+#else
+
+  #error Unknown BUTTON_TYPE
+
+#endif
 
 void handleEvent(AceButton* button, uint8_t eventType, uint8_t buttonState) {
   (void) buttonState;
@@ -918,17 +1090,35 @@ void handleEvent(AceButton* button, uint8_t eventType, uint8_t buttonState) {
 }
 
 void setupAceButton() {
+#if BUTTON_TYPE == BUTTON_TYPE_DIGITAL
   pinMode(MODE_BUTTON_PIN, INPUT_PULLUP);
   pinMode(CHANGE_BUTTON_PIN, INPUT_PULLUP);
-  ButtonConfig* config = ButtonConfig::getSystemButtonConfig();
-  config->setEventHandler(handleEvent);
-  config->setFeature(ButtonConfig::kFeatureLongPress);
-  config->setFeature(ButtonConfig::kFeatureSuppressAfterLongPress);
-  config->setFeature(ButtonConfig::kFeatureClick);
-  config->setFeature(ButtonConfig::kFeatureSuppressAfterClick);
-  config->setFeature(ButtonConfig::kFeatureDoubleClick);
-  config->setFeature(ButtonConfig::kFeatureSuppressAfterDoubleClick);
-  config->setFeature(ButtonConfig::kFeatureSuppressClickBeforeDoubleClick);
+#endif
+
+  buttonConfig.setEventHandler(handleEvent);
+  buttonConfig.setFeature(ButtonConfig::kFeatureLongPress);
+  buttonConfig.setFeature(ButtonConfig::kFeatureSuppressAfterLongPress);
+  buttonConfig.setFeature(ButtonConfig::kFeatureClick);
+  buttonConfig.setFeature(ButtonConfig::kFeatureSuppressAfterClick);
+  buttonConfig.setFeature(ButtonConfig::kFeatureDoubleClick);
+  buttonConfig.setFeature(ButtonConfig::kFeatureSuppressAfterDoubleClick);
+  buttonConfig.setFeature(ButtonConfig::kFeatureSuppressClickBeforeDoubleClick);
+}
+
+void checkButtons() {
+  static uint16_t prevMillis;
+
+  uint16_t nowMillis = millis();
+  if ((uint16_t) (nowMillis - prevMillis) >= 5) {
+    prevMillis = nowMillis;
+
+  #if BUTTON_TYPE == BUTTON_TYPE_DIGITAL
+    modeButton.check();
+    changeButton.check();
+  #else
+    buttonConfig.checkButtons();
+  #endif
+  }
 }
 
 //-----------------------------------------------------------------------------
@@ -956,15 +1146,12 @@ void setup() {
 
 void loop() {
   if (renderMode == RENDER_MODE_AUTO) {
-    #if USE_INTERRUPT == 0
-      renderField();
-    #endif
+    renderField();
   }
 
   if (demoLoopMode == DEMO_LOOP_MODE_AUTO) {
     demoLoop();
   }
 
-  modeButton.check();
-  changeButton.check();
+  checkButtons();
 }
