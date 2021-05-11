@@ -27,6 +27,7 @@ SOFTWARE.
 
 #include <stdint.h>
 #include <AceCommon.h> // incrementMod()
+#include "../hw/ClockInterface.h" // ClockInterface
 #include "../LedModule.h"
 
 class ScanningModuleTest_displayCurrentField;

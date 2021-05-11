@@ -37,6 +37,16 @@ const uint8_t kByteOrderDigitHighSegmentLow = kByteOrderGroupHighElementLow;
 const uint8_t kByteOrderSegmentHighDigitLow = kByteOrderElementHighGroupLow;
 
 /**
+ * The 8-digit LED module from diymore.cc using dual 74HC595 controller chips
+ * are wired such that the left 4-digits and right 4-digits are flipped.
+ * This remap array fixes that.
+ *
+ * You can create your own remap array to handle other LED modules with
+ * different physical ordering compared to the logical ordering.
+ */
+extern const uint8_t kDigitRemapArrayHc595[8];
+
+/**
  * An implementation of LedModule class that supports an LED module using 2
  * 74HC595 Shift Register chips. This is a convenience class that pairs together
  * a ScanningModule and a LedMatrixDualHc595 in a single class.
@@ -80,23 +90,29 @@ class DualHc595Module : public ScanningModule<
      *    or active low (LedMatrixBase::kActiveLow)
      * @param framesPerSecond desired number of frames per second (usually
      *    greater than or equal to 60 to avoid flickering)
-     * @param byteOrder (optional) whether to send the digit patterns first
+     * @param byteOrder whether to send the digit patterns first
      *    (kByteOrderDigitHighSegmentLow) or segment patterns first
      *    (kByteOrderSegmentHighDigitLow)
+     * @param remapArray (optional) some LED modules using the 74HC595 chip need
+     *    their physical digit positions remapped to their logical positions
+     *    (e.g. the 8-digit LED modules from diymore.cc have the left 4 and
+     *    right 4 LED digits swapped)
      */
     DualHc595Module(
         const T_SPII& spiInterface,
         uint8_t segmentOnPattern,
         uint8_t digitOnPattern,
         uint8_t framesPerSecond,
-        uint8_t byteOrder
+        uint8_t byteOrder,
+        const uint8_t* remapArray = nullptr
     ) :
         Super(mLedMatrix, framesPerSecond),
         mLedMatrix(
             spiInterface,
             segmentOnPattern /*elementOnPattern*/,
             digitOnPattern /*groupOnPattern*/,
-            byteOrder
+            byteOrder,
+            remapArray
         )
     {}
 

@@ -53,14 +53,26 @@ const uint8_t kByteOrderElementHighGroupLow = 1;
 template <typename T_SPII>
 class LedMatrixDualHc595: public LedMatrixBase {
   public:
+    /**
+     * @param spiInterface interface to the SPI protocol
+     * @param elementOnPattern bit pattern that turns on the elements
+     * @param groupOnpattern bit pattern that turns on the groups
+     * @param byteOrder determine order of group and element bytes
+     * @param remapArray (optional) some LED modules using the 74HC595 chip need
+     *    their physical digit positions remapped to their logical positions
+     *    (e.g. the 8-digit LED modules from diymore.cc have the left 4 and
+     *    right 4 LED digits swapped)
+     */
     LedMatrixDualHc595(
         const T_SPII& spiInterface,
         uint8_t elementOnPattern,
         uint8_t groupOnPattern,
-        uint8_t byteOrder
+        uint8_t byteOrder,
+        const uint8_t* remapArray = nullptr
     ) :
         LedMatrixBase(elementOnPattern, groupOnPattern),
         mSpiInterface(spiInterface),
+        mRemapArray(remapArray),
         mByteOrder(byteOrder)
     {}
 
@@ -73,7 +85,8 @@ class LedMatrixDualHc595: public LedMatrixBase {
      * with the group bits in the MSB and the element bits in the LSB.
      */
     void draw(uint8_t group, uint8_t elementPattern) const {
-      uint8_t groupPattern = 0x1 << group; // Would a lookup table be faster?
+      uint8_t actualGroup = remapGroup(group);
+      uint8_t groupPattern = 0x1 << actualGroup;
       drawPatterns(groupPattern, elementPattern);
       mPrevElementPattern = elementPattern;
     }
@@ -100,7 +113,6 @@ class LedMatrixDualHc595: public LedMatrixBase {
     }
 
   private:
-
     /**
      * Send the groupPattern and elementPattern to the display  through SPI. The
      * patterns are inverted if necessary due to wiring requirements (e.g.
@@ -116,12 +128,22 @@ class LedMatrixDualHc595: public LedMatrixBase {
       mSpiInterface.send16(data);
     }
 
+    /** Convert a logical position into the physical position. */
+    uint8_t remapGroup(uint8_t pos) const {
+      return mRemapArray ? mRemapArray[pos] : pos;
+    }
+
   private:
     friend class ::LedMatrixDualHc595Test_draw;
     friend class ::LedMatrixDualHc595Test_enableGroup;
     friend class ::LedMatrixDualHc595Test_disableGroup;
 
     const T_SPII& mSpiInterface;
+
+    /** Mapping of the physical digit to the logical digit of the LED module. */
+    const uint8_t* const mRemapArray;
+
+    /** Determine order of group and element bytes. */
     const uint8_t mByteOrder;
 
     /**

@@ -100,6 +100,7 @@ const uint8_t NUM_SEGMENTS = 8;
   const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
   const uint8_t HC595_SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
   const uint8_t HC595_DIGIT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t* const REMAP_ARRAY = nullptr;
 
   // Choose one of the following variants:
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SOFT_SPI
@@ -131,6 +132,7 @@ const uint8_t NUM_SEGMENTS = 8;
   const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
   const uint8_t HC595_SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
   const uint8_t HC595_DIGIT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t* const REMAP_ARRAY = nullptr;
 
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
@@ -144,6 +146,7 @@ const uint8_t NUM_SEGMENTS = 8;
   const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
   const uint8_t HC595_SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
   const uint8_t HC595_DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
+  const uint8_t* const REMAP_ARRAY = kDigitRemapArrayHc595;
 
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
@@ -380,7 +383,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
       HC595_SEGMENT_ON_PATTERN,
       HC595_DIGIT_ON_PATTERN,
       FRAMES_PER_SECOND,
-      HC595_BYTE_ORDER
+      HC595_BYTE_ORDER,
+      REMAP_ARRAY
   );
 
 #endif
