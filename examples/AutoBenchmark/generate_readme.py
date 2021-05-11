@@ -131,6 +131,9 @@ number of `TimingStats::update()` calls that were made.
 * Add benchmarks for `DirectModule`, `DirectFast4Module`, `SingleHc595Module`,
   and `DualHc595Module`.
 * Upgrade from ESP32 Core v1.0.4 to v1.0.6.
+* Adding `byteOrder` and `remapArray` parameters to `DualHc595Module` increases
+  the CPU time of `renderFieldsNow()` by a tiny amount, maybe a microsecond on a
+  AVR. For 32-bit processors, the difference seems to be within the noise.
 
 ## Results
 

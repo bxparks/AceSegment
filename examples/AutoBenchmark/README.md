@@ -106,6 +106,9 @@ number of `TimingStats::update()` calls that were made.
 * Add benchmarks for `DirectModule`, `DirectFast4Module`, `SingleHc595Module`,
   and `DualHc595Module`.
 * Upgrade from ESP32 Core v1.0.4 to v1.0.6.
+* Adding `byteOrder` and `remapArray` parameters to `DualHc595Module` increases
+  the CPU time of `renderFieldsNow()` by a tiny amount, maybe a microsecond on a
+  AVR. For 32-bit processors, the difference seems to be within the noise.
 
 ## Results
 
@@ -168,13 +171,13 @@ sizeof(HardSpiFastInterface<11, 12, 13>): 1
 sizeof(LedMatrixDirect<>): 9
 sizeof(LedMatrixDirectFast4<6..13, 2..5>): 3
 sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 8
-sizeof(LedMatrixDualHc595<HardSpiInterface>): 5
+sizeof(LedMatrixDualHc595<HardSpiInterface>): 8
 sizeof(LedModule): 3
 sizeof(ScanningModule<LedMatrixBase, 4>): 22
 sizeof(DirectModule<4>): 31
 sizeof(DirectFast4Module<...>): 25
 sizeof(SingleHc595Module<SoftSpiInterface, 4>): 30
-sizeof(DualHc595Module<SoftSpiInterface, 4>): 27
+sizeof(DualHc595Module<SoftSpiInterface, 4>): 30
 sizeof(Tm1637Module<SoftWireInterface, 4>): 14
 sizeof(Tm1637Module<SoftWireInterface, 6>): 16
 sizeof(Max7219Module<SoftSpiInterface, 8>): 16
@@ -204,25 +207,25 @@ CPU:
 | SingleHc595(HardSpiFast)               |    24/   27/   36 |     240 |
 | SingleHc595(HardSpiFast,subfields)     |     4/    7/   36 |    3840 |
 |----------------------------------------+-------------------+---------|
-| DualHc595(SoftSpi)                     |   264/  269/  304 |     240 |
+| DualHc595(SoftSpi)                     |   268/  271/  304 |     240 |
 | DualHc595(SoftSpi,subfields)           |     4/   35/  308 |    3840 |
-| DualHc595(SoftSpiFast)                 |    20/   24/   32 |     240 |
-| DualHc595(SoftSpiFast,subfields)       |     4/    7/   32 |    3840 |
-| DualHc595(HardSpi)                     |    24/   28/   36 |     240 |
-| DualHc595(HardSpi,subfields)           |     4/    8/   40 |    3840 |
-| DualHc595(HardSpiFast)                 |    12/   14/   20 |     240 |
+| DualHc595(SoftSpiFast)                 |    24/   25/   36 |     240 |
+| DualHc595(SoftSpiFast,subfields)       |     4/    7/   36 |    3840 |
+| DualHc595(HardSpi)                     |    28/   29/   40 |     240 |
+| DualHc595(HardSpi,subfields)           |     4/    8/   36 |    3840 |
+| DualHc595(HardSpiFast)                 |    12/   15/   24 |     240 |
 | DualHc595(HardSpiFast,subfields)       |     4/    6/   24 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(SoftWire)                       | 22312/22342/22576 |      10 |
-| Tm1637(SoftWire,incremental)           |     4/  816/10292 |      50 |
-| Tm1637(SoftWireFast)                   | 21060/21084/21260 |      10 |
-| Tm1637(SoftWireFast,incremental)       |     4/  772/ 9764 |      50 |
-| Tm1637(6,SoftWire)                     | 28052/28076/28264 |      10 |
+| Tm1637(SoftWire)                       | 22312/22342/22584 |      10 |
+| Tm1637(SoftWire,incremental)           |     4/  817/10296 |      50 |
+| Tm1637(SoftWireFast)                   | 21060/21086/21284 |      10 |
+| Tm1637(SoftWireFast,incremental)       |     4/  772/ 9756 |      50 |
+| Tm1637(6,SoftWire)                     | 28052/28078/28304 |      10 |
 | Tm1637(6,SoftWire,incremental)         |     4/  874/10308 |      70 |
-| Tm1637(6,SoftWireFast)                 | 26476/26503/26696 |      10 |
-| Tm1637(6,SoftWireFast,incremental)     |     4/  825/ 9768 |      70 |
+| Tm1637(6,SoftWireFast)                 | 26476/26504/26716 |      10 |
+| Tm1637(6,SoftWireFast,incremental)     |     4/  825/ 9772 |      70 |
 |----------------------------------------+-------------------+---------|
-| Max7219(SoftSpi)                       |  1320/ 1333/ 1452 |      20 |
+| Max7219(SoftSpi)                       |  1320/ 1333/ 1468 |      20 |
 | Max7219(SoftSpiFast)                   |   112/  120/  136 |      20 |
 | Max7219(HardSpi)                       |   120/  130/  140 |      20 |
 | Max7219(HardSpiFast)                   |    56/   64/   72 |      20 |
@@ -248,13 +251,13 @@ sizeof(HardSpiFastInterface<11, 12, 13>): 1
 sizeof(LedMatrixDirect<>): 9
 sizeof(LedMatrixDirectFast4<6..13, 2..5>): 3
 sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 8
-sizeof(LedMatrixDualHc595<HardSpiInterface>): 5
+sizeof(LedMatrixDualHc595<HardSpiInterface>): 8
 sizeof(LedModule): 3
 sizeof(ScanningModule<LedMatrixBase, 4>): 22
 sizeof(DirectModule<4>): 31
 sizeof(DirectFast4Module<...>): 25
 sizeof(SingleHc595Module<SoftSpiInterface, 4>): 30
-sizeof(DualHc595Module<SoftSpiInterface, 4>): 27
+sizeof(DualHc595Module<SoftSpiInterface, 4>): 30
 sizeof(Tm1637Module<SoftWireInterface, 4>): 14
 sizeof(Tm1637Module<SoftWireInterface, 6>): 16
 sizeof(Max7219Module<SoftSpiInterface, 8>): 16
@@ -272,40 +275,40 @@ CPU:
 |----------------------------------------+-------------------+---------|
 | Direct                                 |    72/   76/   84 |     240 |
 | Direct(subfields)                      |     4/   14/   88 |    3840 |
-| DirectFast4                            |    24/   28/   40 |     240 |
-| DirectFast4(subfields)                 |     4/    8/   36 |    3840 |
+| DirectFast4                            |    24/   28/   36 |     240 |
+| DirectFast4(subfields)                 |     4/    8/   40 |    3840 |
 |----------------------------------------+-------------------+---------|
-| SingleHc595(SoftSpi)                   |   148/  153/  168 |     240 |
+| SingleHc595(SoftSpi)                   |   148/  153/  164 |     240 |
 | SingleHc595(SoftSpi,subfields)         |     4/   23/  168 |    3840 |
 | SingleHc595(SoftSpiFast)               |    28/   31/   40 |     240 |
 | SingleHc595(SoftSpiFast,subfields)     |     4/    8/   40 |    3840 |
 | SingleHc595(HardSpi)                   |    36/   41/   52 |     240 |
-| SingleHc595(HardSpi,subfields)         |     4/    9/   52 |    3840 |
+| SingleHc595(HardSpi,subfields)         |     4/    9/   56 |    3840 |
 | SingleHc595(HardSpiFast)               |    24/   27/   36 |     240 |
-| SingleHc595(HardSpiFast,subfields)     |     4/    8/   36 |    3840 |
+| SingleHc595(HardSpiFast,subfields)     |     4/    8/   40 |    3840 |
 |----------------------------------------+-------------------+---------|
-| DualHc595(SoftSpi)                     |   248/  253/  264 |     240 |
-| DualHc595(SoftSpi,subfields)           |     4/   37/  264 |    3840 |
-| DualHc595(SoftSpiFast)                 |    20/   23/   32 |     240 |
-| DualHc595(SoftSpiFast,subfields)       |     4/    8/   36 |    3840 |
-| DualHc595(HardSpi)                     |    24/   28/   36 |     240 |
+| DualHc595(SoftSpi)                     |   248/  255/  264 |     240 |
+| DualHc595(SoftSpi,subfields)           |     4/   37/  268 |    3840 |
+| DualHc595(SoftSpiFast)                 |    24/   25/   36 |     240 |
+| DualHc595(SoftSpiFast,subfields)       |     4/    8/   32 |    3840 |
+| DualHc595(HardSpi)                     |    28/   30/   36 |     240 |
 | DualHc595(HardSpi,subfields)           |     4/    8/   36 |    3840 |
-| DualHc595(HardSpiFast)                 |    12/   13/   24 |     240 |
-| DualHc595(HardSpiFast,subfields)       |     4/    6/   20 |    3840 |
+| DualHc595(HardSpiFast)                 |    12/   15/   20 |     240 |
+| DualHc595(HardSpiFast,subfields)       |     4/    6/   28 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(SoftWire)                       | 22436/22444/22452 |      10 |
-| Tm1637(SoftWire,incremental)           |     4/  817/10160 |      50 |
-| Tm1637(SoftWireFast)                   | 21168/21177/21184 |      10 |
-| Tm1637(SoftWireFast,incremental)       |     4/  772/ 9588 |      50 |
-| Tm1637(6,SoftWire)                     | 28204/28213/28228 |      10 |
+| Tm1637(SoftWire)                       | 22436/22442/22452 |      10 |
+| Tm1637(SoftWire,incremental)           |     4/  817/10164 |      50 |
+| Tm1637(SoftWireFast)                   | 21168/21178/21184 |      10 |
+| Tm1637(SoftWireFast,incremental)       |     4/  772/ 9592 |      50 |
+| Tm1637(6,SoftWire)                     | 28204/28214/28228 |      10 |
 | Tm1637(6,SoftWire,incremental)         |     4/  875/10164 |      70 |
 | Tm1637(6,SoftWireFast)                 | 26616/26623/26632 |      10 |
 | Tm1637(6,SoftWireFast,incremental)     |     4/  827/ 9592 |      70 |
 |----------------------------------------+-------------------+---------|
-| Max7219(SoftSpi)                       |  1244/ 1248/ 1256 |      20 |
-| Max7219(SoftSpiFast)                   |   112/  114/  120 |      20 |
-| Max7219(HardSpi)                       |   128/  129/  136 |      20 |
-| Max7219(HardSpiFast)                   |    56/   59/   64 |      20 |
+| Max7219(SoftSpi)                       |  1244/ 1248/ 1252 |      20 |
+| Max7219(SoftSpiFast)                   |   112/  114/  128 |      20 |
+| Max7219(HardSpi)                       |   128/  129/  140 |      20 |
+| Max7219(HardSpiFast)                   |    56/   58/   64 |      20 |
 +----------------------------------------+-------------------+---------+
 
 ```
@@ -323,12 +326,12 @@ sizeof(SoftSpiInterface): 3
 sizeof(HardSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
 sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 16
-sizeof(LedMatrixDualHc595<HardSpiInterface>): 12
+sizeof(LedMatrixDualHc595<HardSpiInterface>): 16
 sizeof(LedModule): 8
 sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(DirectModule<4>): 48
 sizeof(SingleHc595Module<SoftSpiInterface, 4>): 48
-sizeof(DualHc595Module<SoftSpiInterface, 4>): 44
+sizeof(DualHc595Module<SoftSpiInterface, 4>): 48
 sizeof(Tm1637Module<SoftWireInterface, 4>): 24
 sizeof(Tm1637Module<SoftWireInterface, 6>): 28
 sizeof(Max7219Module<SoftSpiInterface, 8>): 28
@@ -344,26 +347,26 @@ CPU:
 +----------------------------------------+-------------------+---------+
 | Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Direct                                 |    24/   24/   29 |     240 |
-| Direct(subfields)                      |     2/    5/   29 |    3840 |
+| Direct                                 |    24/   24/   30 |     240 |
+| Direct(subfields)                      |     2/    4/   30 |    3840 |
 |----------------------------------------+-------------------+---------|
-| SingleHc595(SoftSpi)                   |    53/   54/   58 |     240 |
-| SingleHc595(SoftSpi,subfields)         |     2/    8/   59 |    3840 |
-| SingleHc595(HardSpi)                   |    24/   24/   28 |     240 |
-| SingleHc595(HardSpi,subfields)         |     2/    5/   28 |    3840 |
+| SingleHc595(SoftSpi)                   |    51/   52/   58 |     240 |
+| SingleHc595(SoftSpi,subfields)         |     2/    7/   58 |    3840 |
+| SingleHc595(HardSpi)                   |    23/   24/   28 |     240 |
+| SingleHc595(HardSpi,subfields)         |     2/    4/   28 |    3840 |
 |----------------------------------------+-------------------+---------|
-| DualHc595(SoftSpi)                     |    91/   92/   96 |     240 |
-| DualHc595(SoftSpi,subfields)           |     2/   14/   96 |    3840 |
-| DualHc595(HardSpi)                     |    22/   22/   26 |     240 |
-| DualHc595(HardSpi,subfields)           |     2/    5/   26 |    3840 |
+| DualHc595(SoftSpi)                     |    88/   89/   95 |     240 |
+| DualHc595(SoftSpi,subfields)           |     2/   11/   94 |    3840 |
+| DualHc595(HardSpi)                     |    23/   23/   27 |     240 |
+| DualHc595(HardSpi,subfields)           |     2/    4/   28 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(SoftWire)                       | 22212/22215/22221 |      10 |
-| Tm1637(SoftWire,incremental)           |     2/  806/10053 |      50 |
-| Tm1637(6,SoftWire)                     | 27923/27927/27933 |      10 |
-| Tm1637(6,SoftWire,incremental)         |     2/  864/10055 |      70 |
+| Tm1637(SoftWire)                       | 22217/22221/22229 |      10 |
+| Tm1637(SoftWire,incremental)           |     2/  807/10055 |      50 |
+| Tm1637(6,SoftWire)                     | 27929/27934/27940 |      10 |
+| Tm1637(6,SoftWire,incremental)         |     2/  864/10059 |      70 |
 |----------------------------------------+-------------------+---------|
-| Max7219(SoftSpi)                       |   455/  457/  461 |      20 |
-| Max7219(HardSpi)                       |   107/  107/  111 |      20 |
+| Max7219(SoftSpi)                       |   434/  436/  441 |      20 |
+| Max7219(HardSpi)                       |   106/  107/  111 |      20 |
 +----------------------------------------+-------------------+---------+
 
 ```
@@ -381,12 +384,12 @@ sizeof(SoftSpiInterface): 3
 sizeof(HardSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
 sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 16
-sizeof(LedMatrixDualHc595<HardSpiInterface>): 12
+sizeof(LedMatrixDualHc595<HardSpiInterface>): 16
 sizeof(LedModule): 8
 sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(DirectModule<4>): 48
 sizeof(SingleHc595Module<SoftSpiInterface, 4>): 48
-sizeof(DualHc595Module<SoftSpiInterface, 4>): 44
+sizeof(DualHc595Module<SoftSpiInterface, 4>): 48
 sizeof(Tm1637Module<SoftWireInterface, 4>): 24
 sizeof(Tm1637Module<SoftWireInterface, 6>): 28
 sizeof(Max7219Module<SoftSpiInterface, 8>): 28
@@ -402,26 +405,26 @@ CPU:
 +----------------------------------------+-------------------+---------+
 | Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Direct                                 |    13/   14/   19 |     240 |
-| Direct(subfields)                      |     1/    3/   24 |    3840 |
+| Direct                                 |    13/   14/   18 |     240 |
+| Direct(subfields)                      |     1/    3/   37 |    3840 |
 |----------------------------------------+-------------------+---------|
-| SingleHc595(SoftSpi)                   |    30/   31/   36 |     240 |
-| SingleHc595(SoftSpi,subfields)         |     1/    4/   54 |    3840 |
+| SingleHc595(SoftSpi)                   |    29/   30/   35 |     240 |
+| SingleHc595(SoftSpi,subfields)         |     1/    4/   53 |    3840 |
 | SingleHc595(HardSpi)                   |    40/   40/   45 |     240 |
-| SingleHc595(HardSpi,subfields)         |     1/    5/   64 |    3840 |
+| SingleHc595(HardSpi,subfields)         |     1/    5/   50 |    3840 |
 |----------------------------------------+-------------------+---------|
-| DualHc595(SoftSpi)                     |    53/   53/   58 |     240 |
-| DualHc595(SoftSpi,subfields)           |     1/    6/   77 |    3840 |
-| DualHc595(HardSpi)                     |    39/   40/   45 |     240 |
-| DualHc595(HardSpi,subfields)           |     1/    6/   64 |    3840 |
+| DualHc595(SoftSpi)                     |    51/   52/   57 |     240 |
+| DualHc595(SoftSpi,subfields)           |     1/    8/   75 |    3840 |
+| DualHc595(HardSpi)                     |    40/   40/   45 |     240 |
+| DualHc595(HardSpi,subfields)           |     1/    6/   63 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(SoftWire)                       | 22400/22404/22413 |      10 |
-| Tm1637(SoftWire,incremental)           |     1/  812/10146 |      50 |
-| Tm1637(6,SoftWire)                     | 28162/28170/28174 |      10 |
+| Tm1637(SoftWire)                       | 22392/22398/22402 |      10 |
+| Tm1637(SoftWire,incremental)           |     1/  812/10145 |      50 |
+| Tm1637(6,SoftWire)                     | 28157/28160/28166 |      10 |
 | Tm1637(6,SoftWire,incremental)         |     1/  870/10141 |      70 |
 |----------------------------------------+-------------------+---------|
-| Max7219(SoftSpi)                       |   267/  268/  272 |      20 |
-| Max7219(HardSpi)                       |   199/  201/  205 |      20 |
+| Max7219(SoftSpi)                       |   258/  259/  262 |      20 |
+| Max7219(HardSpi)                       |   201/  202/  206 |      20 |
 +----------------------------------------+-------------------+---------+
 
 ```
@@ -439,12 +442,12 @@ sizeof(SoftSpiInterface): 3
 sizeof(HardSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
 sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 16
-sizeof(LedMatrixDualHc595<HardSpiInterface>): 12
+sizeof(LedMatrixDualHc595<HardSpiInterface>): 16
 sizeof(LedModule): 8
 sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(DirectModule<4>): 48
 sizeof(SingleHc595Module<SoftSpiInterface, 4>): 48
-sizeof(DualHc595Module<SoftSpiInterface, 4>): 44
+sizeof(DualHc595Module<SoftSpiInterface, 4>): 48
 sizeof(Tm1637Module<SoftWireInterface, 4>): 24
 sizeof(Tm1637Module<SoftWireInterface, 6>): 28
 sizeof(Max7219Module<SoftSpiInterface, 8>): 28
@@ -460,25 +463,25 @@ CPU:
 +----------------------------------------+-------------------+---------+
 | Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Direct                                 |    12/   12/   25 |     240 |
-| Direct(subfields)                      |     0/    2/   24 |    3840 |
+| Direct                                 |    12/   12/   33 |     240 |
+| Direct(subfields)                      |     0/    2/   20 |    3840 |
 |----------------------------------------+-------------------+---------|
 | SingleHc595(SoftSpi)                   |    29/   29/   37 |     240 |
-| SingleHc595(SoftSpi,subfields)         |     0/    4/   43 |    3840 |
+| SingleHc595(SoftSpi,subfields)         |     0/    4/   41 |    3840 |
 | SingleHc595(HardSpi)                   |    11/   11/   19 |     240 |
 | SingleHc595(HardSpi,subfields)         |     0/    2/   23 |    3840 |
 |----------------------------------------+-------------------+---------|
-| DualHc595(SoftSpi)                     |    50/   50/   62 |     240 |
-| DualHc595(SoftSpi,subfields)           |     0/    7/   67 |    3840 |
+| DualHc595(SoftSpi)                     |    50/   50/   59 |     240 |
+| DualHc595(SoftSpi,subfields)           |     0/    7/   65 |    3840 |
 | DualHc595(HardSpi)                     |    12/   12/   20 |     240 |
-| DualHc595(HardSpi,subfields)           |     0/    2/   32 |    3840 |
+| DualHc595(HardSpi,subfields)           |     0/    2/   24 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(SoftWire)                       | 21499/21511/21539 |      10 |
-| Tm1637(SoftWire,incremental)           |     0/  779/ 9751 |      50 |
-| Tm1637(6,SoftWire)                     | 27026/27050/27119 |      10 |
-| Tm1637(6,SoftWire,incremental)         |     0/  835/ 9760 |      70 |
+| Tm1637(SoftWire)                       | 21501/21513/21541 |      10 |
+| Tm1637(SoftWire,incremental)           |     0/  780/ 9769 |      50 |
+| Tm1637(6,SoftWire)                     | 27029/27040/27066 |      10 |
+| Tm1637(6,SoftWire,incremental)         |     0/  835/ 9788 |      70 |
 |----------------------------------------+-------------------+---------|
-| Max7219(SoftSpi)                       |   255/  255/  267 |      20 |
+| Max7219(SoftSpi)                       |   254/  255/  263 |      20 |
 | Max7219(HardSpi)                       |    61/   61/   69 |      20 |
 +----------------------------------------+-------------------+---------+
 
@@ -497,12 +500,12 @@ sizeof(SoftSpiInterface): 3
 sizeof(HardSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
 sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 16
-sizeof(LedMatrixDualHc595<HardSpiInterface>): 12
+sizeof(LedMatrixDualHc595<HardSpiInterface>): 16
 sizeof(LedModule): 8
 sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(DirectModule<4>): 48
 sizeof(SingleHc595Module<SoftSpiInterface, 4>): 48
-sizeof(DualHc595Module<SoftSpiInterface, 4>): 44
+sizeof(DualHc595Module<SoftSpiInterface, 4>): 48
 sizeof(Tm1637Module<SoftWireInterface, 4>): 24
 sizeof(Tm1637Module<SoftWireInterface, 6>): 28
 sizeof(Max7219Module<SoftSpiInterface, 8>): 28
@@ -518,22 +521,22 @@ CPU:
 +----------------------------------------+-------------------+---------+
 | Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Direct                                 |     2/    2/    8 |     240 |
-| Direct(subfields)                      |     0/    1/   10 |    3840 |
+| Direct                                 |     2/    2/   11 |     240 |
+| Direct(subfields)                      |     0/    1/   11 |    3840 |
 |----------------------------------------+-------------------+---------|
-| SingleHc595(SoftSpi)                   |     4/    4/   12 |     240 |
+| SingleHc595(SoftSpi)                   |     4/    4/   13 |     240 |
 | SingleHc595(SoftSpi,subfields)         |     0/    1/   13 |    3840 |
-| SingleHc595(HardSpi)                   |     9/    9/   17 |     240 |
+| SingleHc595(HardSpi)                   |     9/    9/   18 |     240 |
 | SingleHc595(HardSpi,subfields)         |     0/    1/   18 |    3840 |
 |----------------------------------------+-------------------+---------|
-| DualHc595(SoftSpi)                     |     7/    7/   16 |     240 |
+| DualHc595(SoftSpi)                     |     7/    7/    9 |     240 |
 | DualHc595(SoftSpi,subfields)           |     0/    1/   16 |    3840 |
 | DualHc595(HardSpi)                     |     9/    9/   18 |     240 |
-| DualHc595(HardSpi,subfields)           |     0/    2/   14 |    3840 |
+| DualHc595(HardSpi,subfields)           |     0/    1/   19 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(SoftWire)                       | 21231/21241/21250 |      10 |
-| Tm1637(SoftWire,incremental)           |     1/  769/ 9614 |      50 |
-| Tm1637(6,SoftWire)                     | 26689/26698/26707 |      10 |
+| Tm1637(SoftWire)                       | 21229/21239/21242 |      10 |
+| Tm1637(SoftWire,incremental)           |     0/  769/ 9613 |      50 |
+| Tm1637(6,SoftWire)                     | 26694/26700/26704 |      10 |
 | Tm1637(6,SoftWire,incremental)         |     0/  824/ 9614 |      70 |
 |----------------------------------------+-------------------+---------|
 | Max7219(SoftSpi)                       |    33/   33/   34 |      20 |
@@ -556,12 +559,12 @@ sizeof(SoftSpiInterface): 3
 sizeof(HardSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
 sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 16
-sizeof(LedMatrixDualHc595<HardSpiInterface>): 12
+sizeof(LedMatrixDualHc595<HardSpiInterface>): 16
 sizeof(LedModule): 8
 sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(DirectModule<4>): 48
 sizeof(SingleHc595Module<SoftSpiInterface, 4>): 48
-sizeof(DualHc595Module<SoftSpiInterface, 4>): 44
+sizeof(DualHc595Module<SoftSpiInterface, 4>): 48
 sizeof(Tm1637Module<SoftWireInterface, 4>): 24
 sizeof(Tm1637Module<SoftWireInterface, 6>): 28
 sizeof(Max7219Module<SoftSpiInterface, 8>): 28
@@ -580,22 +583,22 @@ CPU:
 | Direct                                 |     5/    5/    9 |     240 |
 | Direct(subfields)                      |     0/    1/    8 |    3840 |
 |----------------------------------------+-------------------+---------|
-| SingleHc595(SoftSpi)                   |     9/   10/   12 |     240 |
-| SingleHc595(SoftSpi,subfields)         |     0/    1/   13 |    3840 |
+| SingleHc595(SoftSpi)                   |     9/   10/   13 |     240 |
+| SingleHc595(SoftSpi,subfields)         |     0/    1/   18 |    3840 |
 | SingleHc595(HardSpi)                   |     4/    4/    5 |     240 |
-| SingleHc595(HardSpi,subfields)         |     0/    1/    6 |    3840 |
+| SingleHc595(HardSpi,subfields)         |     0/    1/    5 |    3840 |
 |----------------------------------------+-------------------+---------|
 | DualHc595(SoftSpi)                     |    16/   16/   19 |     240 |
-| DualHc595(SoftSpi,subfields)           |     0/    2/   20 |    3840 |
+| DualHc595(SoftSpi,subfields)           |     0/    1/   21 |    3840 |
 | DualHc595(HardSpi)                     |     3/    3/    5 |     240 |
-| DualHc595(HardSpi,subfields)           |     0/    1/    7 |    3840 |
+| DualHc595(HardSpi,subfields)           |     0/    1/    6 |    3840 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(SoftWire)                       | 21141/21142/21147 |      10 |
-| Tm1637(SoftWire,incremental)           |     0/  765/ 9572 |      50 |
-| Tm1637(6,SoftWire)                     | 26583/26585/26590 |      10 |
-| Tm1637(6,SoftWire,incremental)         |     0/  820/ 9571 |      70 |
+| Tm1637(SoftWire)                       | 21148/21149/21152 |      10 |
+| Tm1637(SoftWire,incremental)           |     0/  766/ 9572 |      50 |
+| Tm1637(6,SoftWire)                     | 26586/26588/26591 |      10 |
+| Tm1637(6,SoftWire,incremental)         |     0/  820/ 9572 |      70 |
 |----------------------------------------+-------------------+---------|
-| Max7219(SoftSpi)                       |    83/   83/   86 |      20 |
+| Max7219(SoftSpi)                       |    83/   84/   86 |      20 |
 | Max7219(HardSpi)                       |    16/   16/   20 |      20 |
 +----------------------------------------+-------------------+---------+
 
