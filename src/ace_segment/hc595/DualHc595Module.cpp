@@ -26,7 +26,7 @@ SOFTWARE.
 
 namespace ace_segment {
 
-const uint8_t kDigitRemapArrayHc595[8] = {
+const uint8_t kDigitRemapArray8Hc595[8] = {
   4, 5, 6, 7, 0, 1, 2, 3
 };
 

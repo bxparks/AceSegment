@@ -172,7 +172,7 @@ using namespace ace_segment;
   const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
   const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
   const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
-  const uint8_t* const REMAP_ARRAY = kDigitRemapArrayHc595;
+  const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
@@ -189,7 +189,7 @@ using namespace ace_segment;
   const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
   const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
-  const uint8_t* const REMAP_ARRAY = kDigitRemapArrayHc595;
+  const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
@@ -204,7 +204,7 @@ using namespace ace_segment;
   const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
   const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
-  const uint8_t* const REMAP_ARRAY = kDigitRemapArrayHc595;
+  const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI

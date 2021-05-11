@@ -52,7 +52,7 @@ static const uint16_t kDefaultTm1637DelayMicros = 100;
  * You can create your own remap array to handle other LED modules with
  * different physical ordering compared to the logical ordering.
  */
-extern const uint8_t kDigitRemapArrayTm1637[6];
+extern const uint8_t kDigitRemapArray6Tm1637[6];
 
 /**
  * An implementation of seven-segment LedModule using the TM1637 chip. The chip

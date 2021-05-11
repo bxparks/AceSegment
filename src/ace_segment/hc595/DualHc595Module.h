@@ -44,7 +44,7 @@ const uint8_t kByteOrderSegmentHighDigitLow = kByteOrderElementHighGroupLow;
  * You can create your own remap array to handle other LED modules with
  * different physical ordering compared to the logical ordering.
  */
-extern const uint8_t kDigitRemapArrayHc595[8];
+extern const uint8_t kDigitRemapArray8Hc595[8];
 
 /**
  * An implementation of LedModule class that supports an LED module using 2

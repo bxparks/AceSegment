@@ -123,7 +123,7 @@ const uint16_t BIT_DELAY = 100;
 #endif
 
 #if defined(AUNITER_MICRO_TM1637_6)
-  const uint8_t* const remapArray = ace_segment::kDigitRemapArrayTm1637;
+  const uint8_t* const remapArray = ace_segment::kDigitRemapArray6Tm1637;
 #else
   const uint8_t* const remapArray = nullptr;
 #endif

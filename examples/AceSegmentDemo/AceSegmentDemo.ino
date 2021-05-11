@@ -255,7 +255,7 @@ using namespace ace_button;
   const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
   const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
   const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
-  const uint8_t* const REMAP_ARRAY = kDigitRemapArrayHc595;
+  const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
@@ -309,7 +309,7 @@ using namespace ace_button;
   const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
   const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
-  const uint8_t* const REMAP_ARRAY = kDigitRemapArrayHc595;
+  const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
@@ -363,7 +363,7 @@ using namespace ace_button;
   const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
   const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
-  const uint8_t* const REMAP_ARRAY = kDigitRemapArrayHc595;
+  const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
@@ -527,7 +527,7 @@ const uint8_t NUM_SUBFIELDS = 1;
     SpiInterface spiInterface;
   #endif
   Max7219Module<SpiInterface, NUM_DIGITS> ledModule(
-      spiInterface, kDigitRemapArrayMax7219);
+      spiInterface, kDigitRemapArray8Max7219);
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_DIRECT
   // Common Anode, with transitors on Group pins

@@ -76,7 +76,7 @@ using namespace ace_segment;
   const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
   const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
-  const uint8_t* const REMAP_ARRAY = kDigitRemapArrayHc595;
+  const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 
 #elif defined(AUNITER_STM32_HC595)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
@@ -88,7 +88,7 @@ using namespace ace_segment;
   const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
   const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
-  const uint8_t* const REMAP_ARRAY = kDigitRemapArrayHc595;
+  const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 
 #elif defined(AUNITER_D1MINI_LARGE_HC595)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
@@ -100,7 +100,7 @@ using namespace ace_segment;
   const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
   const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
-  const uint8_t* const REMAP_ARRAY = kDigitRemapArrayHc595;
+  const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 
 #else
   #error Unknown environment

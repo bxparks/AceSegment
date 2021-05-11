@@ -14,7 +14,7 @@ using ace_segment::Max7219Module;
 using ace_segment::LedDisplay;
 using ace_segment::HardSpiInterface;
 using ace_segment::SoftSpiInterface;
-using ace_segment::kDigitRemapArrayMax7219;
+using ace_segment::kDigitRemapArray8Max7219;
 
 // Select SPI interface type.
 #define SPI_INTERFACE_TYPE_HARD_SPI 0
@@ -97,7 +97,7 @@ const uint8_t PATTERNS[NUM_DIGITS] = {
 #endif
 
 Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
-    spiInterface, kDigitRemapArrayMax7219);
+    spiInterface, kDigitRemapArray8Max7219);
 LedDisplay display(max7219Module);
 
 TimingStats stats;

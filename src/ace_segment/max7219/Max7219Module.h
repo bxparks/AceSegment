@@ -91,7 +91,7 @@ inline uint8_t convertPatternMax7219(uint8_t pattern) {
  * You can create your own remap array to handle other LED modules with
  * different physical ordering compared to the logical ordering.
  */
-extern const uint8_t kDigitRemapArrayMax7219[8];
+extern const uint8_t kDigitRemapArray8Max7219[8];
 
 template <typename T_SPII, uint8_t T_DIGITS>
 class Max7219Module : public LedModule {
