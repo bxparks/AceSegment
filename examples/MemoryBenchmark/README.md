@@ -132,6 +132,9 @@ before substantional refactoring in 2021.
   processors. Similar increase in `StringWriter` which now explicitly depends on
   CharWriter. But I think the additional configurability is worth it since
   different people have different aesthetic standards and want different fonts.
+* Adding `byteOrder` and `remapArray` parameters to `Hc595Module` increases the
+  memory consumption by 60 bytes on AVR and about 20-40 bytes on 32-bit
+  processors.
 
 ## Results
 
@@ -180,10 +183,10 @@ other `MemoryBenchmark` programs.)
 | SingleHc595(HardSpi)            |   1570/   59 |  1114/   48 |
 | SingleHc595(HardSpiFast)        |   1498/   57 |  1042/   46 |
 |---------------------------------+--------------+-------------|
-| DualHc595(SoftSpi)              |   1422/   51 |   966/   40 |
-| DualHc595(SoftSpiFast)          |   1012/   49 |   556/   38 |
-| DualHc595(HardSpi)              |   1496/   52 |  1040/   41 |
-| DualHc595(HardSpiFast)          |   1404/   50 |   948/   39 |
+| DualHc595(SoftSpi)              |   1486/   54 |  1030/   43 |
+| DualHc595(SoftSpiFast)          |   1076/   52 |   620/   41 |
+| DualHc595(HardSpi)              |   1556/   55 |  1100/   44 |
+| DualHc595(HardSpiFast)          |   1466/   53 |  1010/   42 |
 |---------------------------------+--------------+-------------|
 | Tm1637(SoftWire)                |   1582/   39 |  1126/   28 |
 | Tm1637(SoftWireFast)            |    924/   36 |   468/   25 |
@@ -223,10 +226,10 @@ other `MemoryBenchmark` programs.)
 | SingleHc595(HardSpi)            |   4566/  199 |  1094/   48 |
 | SingleHc595(HardSpiFast)        |   4494/  197 |  1022/   46 |
 |---------------------------------+--------------+-------------|
-| DualHc595(SoftSpi)              |   4418/  191 |   946/   40 |
-| DualHc595(SoftSpiFast)          |   3894/  189 |   422/   38 |
-| DualHc595(HardSpi)              |   4492/  192 |  1020/   41 |
-| DualHc595(HardSpiFast)          |   4388/  190 |   916/   39 |
+| DualHc595(SoftSpi)              |   4482/  194 |  1010/   43 |
+| DualHc595(SoftSpiFast)          |   3958/  192 |   486/   41 |
+| DualHc595(HardSpi)              |   4552/  195 |  1080/   44 |
+| DualHc595(HardSpiFast)          |   4450/  193 |   978/   42 |
 |---------------------------------+--------------+-------------|
 | Tm1637(SoftWire)                |   4652/  179 |  1180/   28 |
 | Tm1637(SoftWireFast)            |   3880/  176 |   408/   25 |
@@ -266,9 +269,9 @@ other `MemoryBenchmark` programs.)
 | SingleHc595(HardSpi)            |  11304/    0 |  1240/    0 |
 | SingleHc595(HardSpiFast)        |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| DualHc595(SoftSpi)              |  10736/    0 |   672/    0 |
+| DualHc595(SoftSpi)              |  10760/    0 |   696/    0 |
 | DualHc595(SoftSpiFast)          |     -1/   -1 |    -1/   -1 |
-| DualHc595(HardSpi)              |  11256/    0 |  1192/    0 |
+| DualHc595(HardSpi)              |  11280/    0 |  1216/    0 |
 | DualHc595(HardSpiFast)          |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | Tm1637(SoftWire)                |  10808/    0 |   744/    0 |
@@ -309,9 +312,9 @@ other `MemoryBenchmark` programs.)
 | SingleHc595(HardSpi)            |  23336/ 4396 |  4200/  608 |
 | SingleHc595(HardSpiFast)        |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| DualHc595(SoftSpi)              |  21476/ 4392 |  2340/  604 |
+| DualHc595(SoftSpi)              |  21508/ 4396 |  2372/  608 |
 | DualHc595(SoftSpiFast)          |     -1/   -1 |    -1/   -1 |
-| DualHc595(HardSpi)              |  23268/ 4392 |  4132/  604 |
+| DualHc595(HardSpi)              |  23288/ 4396 |  4152/  608 |
 | DualHc595(HardSpiFast)          |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | Tm1637(SoftWire)                |  21628/ 4372 |  2492/  584 |
@@ -352,9 +355,9 @@ other `MemoryBenchmark` programs.)
 | SingleHc595(HardSpi)            | 258964/27252 |  2264/  468 |
 | SingleHc595(HardSpiFast)        |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| DualHc595(SoftSpi)              | 257728/27248 |  1028/  464 |
+| DualHc595(SoftSpi)              | 257760/27248 |  1060/  464 |
 | DualHc595(SoftSpiFast)          |     -1/   -1 |    -1/   -1 |
-| DualHc595(HardSpi)              | 258928/27256 |  2228/  472 |
+| DualHc595(HardSpi)              | 258944/27256 |  2244/  472 |
 | DualHc595(HardSpiFast)          |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | Tm1637(SoftWire)                | 257920/27224 |  1220/  440 |
@@ -387,33 +390,33 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        | 197748/13084 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| DirectModule                    | 200442/13752 |  2694/  668 |
+| DirectModule                    | 200474/13760 |  2726/  676 |
 | DirectFast4Module               |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| SingleHc595(SoftSpi)            | 200482/13760 |  2734/  676 |
+| SingleHc595(SoftSpi)            | 200514/13768 |  2766/  684 |
 | SingleHc595(SoftSpiFast)        |     -1/   -1 |    -1/   -1 |
-| SingleHc595(HardSpi)            | 202774/13808 |  5026/  724 |
+| SingleHc595(HardSpi)            | 202806/13816 |  5058/  732 |
 | SingleHc595(HardSpiFast)        |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| DualHc595(SoftSpi)              | 200382/13752 |  2634/  668 |
+| DualHc595(SoftSpi)              | 200414/13768 |  2666/  684 |
 | DualHc595(SoftSpiFast)          |     -1/   -1 |    -1/   -1 |
-| DualHc595(HardSpi)              | 202726/13800 |  4978/  716 |
+| DualHc595(HardSpi)              | 202786/13816 |  5038/  732 |
 | DualHc595(HardSpiFast)          |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SoftWire)                | 200670/13736 |  2922/  652 |
+| Tm1637(SoftWire)                | 200702/13744 |  2954/  660 |
 | Tm1637(SoftWireFast)            |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Max7219(SoftSpi)                | 200280/13720 |  2532/  636 |
+| Max7219(SoftSpi)                | 200312/13728 |  2564/  644 |
 | Max7219(SoftSpiFast)            |     -1/   -1 |    -1/   -1 |
-| Max7219(HardSpi)                | 202672/13768 |  4924/  684 |
+| Max7219(HardSpi)                | 202704/13776 |  4956/  692 |
 | Max7219(HardSpiFast)            |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| StubModule+LedDisplay           | 199196/13552 |  1448/  468 |
-| NumberWriter+Stub               | 199584/13552 |  1836/  468 |
-| ClockWriter+Stub                | 199528/13560 |  1780/  476 |
-| TemperatureWriter+Stub          | 199704/13552 |  1956/  468 |
-| CharWriter+Stub                 | 199468/13560 |  1720/  476 |
-| StringWriter+Stub               | 199664/13568 |  1916/  484 |
+| StubModule+LedDisplay           | 199228/13560 |  1480/  476 |
+| NumberWriter+Stub               | 199616/13560 |  1868/  476 |
+| ClockWriter+Stub                | 199560/13568 |  1812/  484 |
+| TemperatureWriter+Stub          | 199736/13560 |  1988/  476 |
+| CharWriter+Stub                 | 199500/13568 |  1752/  484 |
+| StringWriter+Stub               | 199696/13576 |  1948/  492 |
 +--------------------------------------------------------------+
 
 ```
@@ -439,9 +442,9 @@ other `MemoryBenchmark` programs.)
 | SingleHc595(HardSpi)            |  13012/ 4644 |  5388/ 1596 |
 | SingleHc595(HardSpiFast)        |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| DualHc595(SoftSpi)              |  11840/ 4584 |  4216/ 1536 |
+| DualHc595(SoftSpi)              |  11876/ 4588 |  4252/ 1540 |
 | DualHc595(SoftSpiFast)          |     -1/   -1 |    -1/   -1 |
-| DualHc595(HardSpi)              |  12912/ 4640 |  5288/ 1592 |
+| DualHc595(HardSpi)              |  12940/ 4644 |  5316/ 1596 |
 | DualHc595(HardSpiFast)          |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | Tm1637(SoftWire)                |  12556/ 4564 |  4932/ 1516 |

@@ -182,7 +182,8 @@ volatile int disableCompilerOptimization = 0;
         spiInterface,
         LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
         LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
-        FRAMES_PER_SECOND
+        FRAMES_PER_SECOND,
+        kByteOrderDigitHighSegmentLow
     );
 
   #elif FEATURE == FEATURE_DUAL_HC595_SOFT_SPI_FAST
@@ -197,7 +198,8 @@ volatile int disableCompilerOptimization = 0;
         spiInterface,
         LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
         LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
-        FRAMES_PER_SECOND
+        FRAMES_PER_SECOND,
+        kByteOrderDigitHighSegmentLow
     );
 
   #elif FEATURE == FEATURE_DUAL_HC595_HARD_SPI
@@ -208,7 +210,8 @@ volatile int disableCompilerOptimization = 0;
         spiInterface,
         LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
         LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
-        FRAMES_PER_SECOND
+        FRAMES_PER_SECOND,
+        kByteOrderDigitHighSegmentLow
     );
 
   #elif FEATURE == FEATURE_DUAL_HC595_HARD_SPI_FAST
@@ -223,7 +226,8 @@ volatile int disableCompilerOptimization = 0;
         spiInterface,
         LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
         LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
-        FRAMES_PER_SECOND
+        FRAMES_PER_SECOND,
+        kByteOrderDigitHighSegmentLow
     );
 
   #elif FEATURE == FEATURE_TM1637_WIRE

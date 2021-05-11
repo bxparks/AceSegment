@@ -156,6 +156,9 @@ before substantional refactoring in 2021.
   processors. Similar increase in `StringWriter` which now explicitly depends on
   CharWriter. But I think the additional configurability is worth it since
   different people have different aesthetic standards and want different fonts.
+* Adding `byteOrder` and `remapArray` parameters to `Hc595Module` increases the
+  memory consumption by 60 bytes on AVR and about 20-40 bytes on 32-bit
+  processors.
 
 ## Results
 
