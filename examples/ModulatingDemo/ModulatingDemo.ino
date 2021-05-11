@@ -61,12 +61,16 @@ using namespace ace_segment;
 #define INTERFACE_TYPE_HARD_SPI 2
 #define INTERFACE_TYPE_HARD_SPI_FAST 3
 
-const uint8_t NUM_SEGMENTS = 8;
-
 #if defined(EPOXY_DUINO)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
   const uint8_t NUM_DIGITS = 4;
+  const uint8_t LATCH_PIN = 10;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
+  const uint8_t* const REMAP_ARRAY = nullptr;
 
   // Choose one of the following variants:
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
@@ -79,6 +83,9 @@ const uint8_t NUM_SEGMENTS = 8;
 #elif defined(AUNITER_MICRO_SCANNING_DIRECT)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
   const uint8_t NUM_DIGITS = 4;
+  const uint8_t NUM_SEGMENTS = 8;
+  const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
+  const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
 
   // Choose one of the following variants:
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
@@ -87,6 +94,10 @@ const uint8_t NUM_SEGMENTS = 8;
 #elif defined(AUNITER_MICRO_SCANNING_SINGLE)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
   const uint8_t NUM_DIGITS = 4;
+  const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
+  const uint8_t LATCH_PIN = 10;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
 
   // Choose one of the following variants:
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_SOFT_SPI
@@ -97,10 +108,12 @@ const uint8_t NUM_SEGMENTS = 8;
 #elif defined(AUNITER_MICRO_SCANNING_DUAL)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
   const uint8_t NUM_DIGITS = 4;
+  const uint8_t LATCH_PIN = 10;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
   const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
-  const uint8_t HC595_SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t HC595_DIGIT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t* const REMAP_ARRAY = nullptr;
+  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
 
   // Choose one of the following variants:
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SOFT_SPI
@@ -111,6 +124,9 @@ const uint8_t NUM_SEGMENTS = 8;
 #elif defined(AUNITER_MICRO_CUSTOM_DIRECT)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_DIRECT
   const uint8_t NUM_DIGITS = 4;
+  const uint8_t NUM_SEGMENTS = 8;
+  const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
+  const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
 
   // Choose one of the following variants:
   //#define DIRECT_INTERFACE_TYPE DIRECT_INTERFACE_TYPE_NORMAL
@@ -119,6 +135,10 @@ const uint8_t NUM_SEGMENTS = 8;
 #elif defined(AUNITER_MICRO_CUSTOM_SINGLE)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_SINGLE
   const uint8_t NUM_DIGITS = 4;
+  const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
+  const uint8_t LATCH_PIN = 10;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
 
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
@@ -129,9 +149,12 @@ const uint8_t NUM_SEGMENTS = 8;
 #elif defined(AUNITER_MICRO_CUSTOM_DUAL)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
   const uint8_t NUM_DIGITS = 4;
+  const uint8_t LATCH_PIN = 10;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
   const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
-  const uint8_t HC595_SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t HC595_DIGIT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
   const uint8_t* const REMAP_ARRAY = nullptr;
 
   // Choose one of the following variants:
@@ -143,9 +166,12 @@ const uint8_t NUM_SEGMENTS = 8;
 #elif defined(AUNITER_MICRO_HC595)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
   const uint8_t NUM_DIGITS = 8;
+  const uint8_t LATCH_PIN = A0;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
   const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
-  const uint8_t HC595_SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t HC595_DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
+  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
   const uint8_t* const REMAP_ARRAY = kDigitRemapArrayHc595;
 
   // Choose one of the following variants:
@@ -153,6 +179,24 @@ const uint8_t NUM_SEGMENTS = 8;
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
+
+#elif defined(AUNITER_D1MINI_LARGE_HC595) || defined(AUNITER_STM32_HC595)
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
+  const uint8_t NUM_DIGITS = 8;
+  const uint8_t LATCH_PIN = SS;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
+  const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
+  const uint8_t* const REMAP_ARRAY = kDigitRemapArrayHc595;
+
+  // Choose one of the following variants:
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+
+#else
+  #error Unsupported AUNITER environment
 
 #endif
 
@@ -177,37 +221,6 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   1, 2, 4, 8,
   15, 7, 3, 2
 };
-
-// Define GPIO pins.
-#if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_SCANNING
-  #if LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT
-    // 4 digits, resistors on segments on Pro Micro.
-    const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
-    const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
-
-  #else
-    const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
-    const uint8_t LATCH_PIN = A0; // ST_CP on 74HC595
-    const uint8_t DATA_PIN = MOSI; // DS on 74HC595
-    const uint8_t CLOCK_PIN = SCK; // SH_CP on 74HC595
-  #endif
-
-#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_DIRECT
-  const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
-  const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
-
-#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_SINGLE
-  const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
-  const uint8_t LATCH_PIN = A0;
-  const uint8_t DATA_PIN = MOSI;
-  const uint8_t CLOCK_PIN = SCK;
-
-#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_DUAL
-  const uint8_t LATCH_PIN = A0;
-  const uint8_t DATA_PIN = MOSI;
-  const uint8_t CLOCK_PIN = SCK;
-
-#endif
 
 // The chain of resources.
 #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_SCANNING
@@ -380,8 +393,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   #endif
   DualHc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
       spiInterface,
-      HC595_SEGMENT_ON_PATTERN,
-      HC595_DIGIT_ON_PATTERN,
+      SEGMENT_ON_PATTERN,
+      DIGIT_ON_PATTERN,
       FRAMES_PER_SECOND,
       HC595_BYTE_ORDER,
       REMAP_ARRAY

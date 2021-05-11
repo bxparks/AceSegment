@@ -75,8 +75,8 @@ using namespace ace_button;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
   const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
-  const uint8_t HC595_SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t HC595_DIGIT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
 
   // Choose one of the following variants:
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
@@ -107,7 +107,7 @@ using namespace ace_button;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
   const uint8_t NUM_DIGITS = 4;
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
-  const uint8_t LATCH_PIN = A0;
+  const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
 
@@ -123,12 +123,12 @@ using namespace ace_button;
 
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
   const uint8_t NUM_DIGITS = 4;
-  const uint8_t LATCH_PIN = A0;
+  const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
   const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
-  const uint8_t HC595_SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t HC595_DIGIT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
 
   // Choose one of the following variants:
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SOFT_SPI
@@ -157,7 +157,7 @@ using namespace ace_button;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_SINGLE
   const uint8_t NUM_DIGITS = 4;
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
-  const uint8_t LATCH_PIN = A0;
+  const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
 
@@ -173,12 +173,12 @@ using namespace ace_button;
 
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
   const uint8_t NUM_DIGITS = 4;
-  const uint8_t LATCH_PIN = A0;
+  const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
   const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
-  const uint8_t HC595_SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t HC595_DIGIT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
   const uint8_t* const REMAP_ARRAY = nullptr;
 
   // Choose one of the following variants:
@@ -227,8 +227,8 @@ using namespace ace_button;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
   const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
-  const uint8_t HC595_SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t HC595_DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
+  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
   const uint8_t* const REMAP_ARRAY = kDigitRemapArrayHc595;
 
   // Choose one of the following variants:
@@ -457,8 +457,8 @@ const uint8_t NUM_SUBFIELDS = 1;
   #endif
   DualHc595Module<SpiInterface, NUM_DIGITS> ledModule(
       spiInterface,
-      HC595_SEGMENT_ON_PATTERN,
-      HC595_DIGIT_ON_PATTERN,
+      SEGMENT_ON_PATTERN,
+      DIGIT_ON_PATTERN,
       FRAMES_PER_SECOND,
       HC595_BYTE_ORDER,
       REMAP_ARRAY
