@@ -806,17 +806,18 @@ void writeChars() {
 
 //-----------------------------------------------------------------------------
 
+static const __FlashStringHelper* STRINGS[] = {
+  F("0123"),
+  F("0.123"),
+  F("0.1 "),
+  F("0.1.2.3."),
+  F("a.b.c.d"),
+  F(".1.2.3"),
+  F("brian"),
+};
+static const uint8_t NUM_STRINGS = sizeof(STRINGS) / sizeof(STRINGS[0]);
+
 void writeStrings() {
-  static const __FlashStringHelper* STRINGS[] = {
-    F("0123"),
-    F("0.123"),
-    F("0.1 "),
-    F("0.1.2.3."),
-    F("a.b.c.d"),
-    F(".1.2.3"),
-    F("brian"),
-  };
-  static const uint8_t NUM_STRINGS = sizeof(STRINGS) / sizeof(STRINGS[0]);
   static uint8_t i = 0;
 
   uint8_t written = stringWriter.writeStringAt(0, STRINGS[i]);
@@ -828,7 +829,7 @@ void writeStrings() {
 //-----------------------------------------------------------------------------
 
 StringScroller stringScroller(ledDisplay);
-const char SCROLL_STRING[] =
+static const char SCROLL_STRING[] =
 "the quick brown fox jumps over the lazy dog, "
 "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG. "
 "[0123456789]";
@@ -893,7 +894,7 @@ const uint8_t SPIN_PATTERNS_2[NUM_SPIN_PATTERNS_2][4] PROGMEM = {
 void spinDisplay2() {
   static uint8_t i = 0;
   const uint8_t* patterns = SPIN_PATTERNS_2[i];
-  ledDisplay.writePatternsAt_P(0, patterns, 4);
+  ledDisplay.writePatternsAt_P(0, patterns, 4 /*len*/);
 
   incrementMod(i, NUM_SPIN_PATTERNS_2);
 }
@@ -938,14 +939,12 @@ void nextDemo() {
 
 /** Loop within a single demo. */
 void demoLoop() {
-  //static uint16_t iter = 0;
-  static unsigned long lastUpdateTime = millis();
+  static uint16_t lastUpdateMillis = millis();
 
   uint16_t demoInternalDelay = DEMO_INTERNAL_DELAY[demoMode];
-
-  unsigned long now = millis();
-  if (now - lastUpdateTime > demoInternalDelay) {
-    lastUpdateTime = now;
+  uint16_t nowMillis = millis();
+  if ((uint16_t) (nowMillis - lastUpdateMillis) >= demoInternalDelay) {
+    lastUpdateMillis = nowMillis;
     if (demoLoopMode == DEMO_LOOP_MODE_AUTO) {
       updateDemo();
     }
