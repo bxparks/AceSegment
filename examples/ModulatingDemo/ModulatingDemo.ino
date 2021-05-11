@@ -61,11 +61,12 @@ using namespace ace_segment;
 #define INTERFACE_TYPE_HARD_SPI 2
 #define INTERFACE_TYPE_HARD_SPI_FAST 3
 
-const uint8_t NUM_DIGITS = 4;
 const uint8_t NUM_SEGMENTS = 8;
 
 #if defined(EPOXY_DUINO)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
+  const uint8_t NUM_DIGITS = 4;
+  const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
 
   // Choose one of the following variants:
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
@@ -75,15 +76,17 @@ const uint8_t NUM_SEGMENTS = 8;
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HARD_SPI
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HARD_SPI_FAST
 
-#elif defined(AUNITER_LED_CLOCK_SCANNING_DIRECT)
+#elif defined(AUNITER_MICRO_SCANNING_DIRECT)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
+  const uint8_t NUM_DIGITS = 4;
 
   // Choose one of the following variants:
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT_FAST
 
-#elif defined(AUNITER_LED_CLOCK_SCANNING_SINGLE)
+#elif defined(AUNITER_MICRO_SCANNING_SINGLE)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
+  const uint8_t NUM_DIGITS = 4;
 
   // Choose one of the following variants:
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_SOFT_SPI
@@ -91,8 +94,12 @@ const uint8_t NUM_SEGMENTS = 8;
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_HARD_SPI
   #define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_HARD_SPI_FAST
 
-#elif defined(AUNITER_LED_CLOCK_SCANNING_DUAL)
+#elif defined(AUNITER_MICRO_SCANNING_DUAL)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
+  const uint8_t NUM_DIGITS = 4;
+  const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
+  const uint8_t HC595_SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t HC595_DIGIT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
 
   // Choose one of the following variants:
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SOFT_SPI
@@ -100,15 +107,17 @@ const uint8_t NUM_SEGMENTS = 8;
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HARD_SPI
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HARD_SPI_FAST
 
-#elif defined(AUNITER_LED_CLOCK_DIRECT)
+#elif defined(AUNITER_MICRO_CUSTOM_DIRECT)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_DIRECT
+  const uint8_t NUM_DIGITS = 4;
 
   // Choose one of the following variants:
   //#define DIRECT_INTERFACE_TYPE DIRECT_INTERFACE_TYPE_NORMAL
   #define DIRECT_INTERFACE_TYPE DIRECT_INTERFACE_TYPE_FAST
 
-#elif defined(AUNITER_LED_CLOCK_HC595_SINGLE)
+#elif defined(AUNITER_MICRO_CUSTOM_SINGLE)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_SINGLE
+  const uint8_t NUM_DIGITS = 4;
 
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
@@ -116,8 +125,25 @@ const uint8_t NUM_SEGMENTS = 8;
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
 
-#elif defined(AUNITER_LED_CLOCK_HC595_DUAL)
+#elif defined(AUNITER_MICRO_CUSTOM_DUAL)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
+  const uint8_t NUM_DIGITS = 4;
+  const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
+  const uint8_t HC595_SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t HC595_DIGIT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+
+  // Choose one of the following variants:
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
+  //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
+
+#elif defined(AUNITER_MICRO_HC595)
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
+  const uint8_t NUM_DIGITS = 8;
+  const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
+  const uint8_t HC595_SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t HC595_DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
 
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
@@ -158,7 +184,7 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 
   #else
     const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
-    const uint8_t LATCH_PIN = 10; // ST_CP on 74HC595
+    const uint8_t LATCH_PIN = A0; // ST_CP on 74HC595
     const uint8_t DATA_PIN = MOSI; // DS on 74HC595
     const uint8_t CLOCK_PIN = SCK; // SH_CP on 74HC595
   #endif
@@ -169,12 +195,12 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_SINGLE
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
-  const uint8_t LATCH_PIN = 10;
+  const uint8_t LATCH_PIN = A0;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_DUAL
-  const uint8_t LATCH_PIN = 10;
+  const uint8_t LATCH_PIN = A0;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
 
@@ -251,7 +277,7 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
         spiInterface,
         LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
         LedMatrixBase::kActiveLowPattern /*groupOnPattern*/,
-        kByteOrderGroupHighElementLow);
+        HC595_BYTE_ORDER);
   #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SOFT_SPI_FAST
     // Common Anode, with transistors on Group pins
     using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
@@ -261,7 +287,7 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
         spiInterface,
         LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
         LedMatrixBase::kActiveLowPattern /*groupOnPattern*/,
-        kByteOrderGroupHighElementLow);
+        HC595_BYTE_ORDER);
   #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HARD_SPI
     // Common Anode, with transistors on Group pins
     HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
@@ -270,7 +296,7 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
         spiInterface,
         LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
         LedMatrixBase::kActiveLowPattern /*groupOnPattern*/,
-        kByteOrderGroupHighElementLow);
+        HC595_BYTE_ORDER);
   #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HARD_SPI_FAST
     // Common Anode, with transistors on Group pins
     using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
@@ -280,7 +306,7 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
         spiInterface,
         LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
         LedMatrixBase::kActiveLowPattern /*groupOnPattern*/,
-        kByteOrderGroupHighElementLow);
+        HC595_BYTE_ORDER);
 
   #else
     #error Unsupported LED_MATRIX_MODE
@@ -351,10 +377,10 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   #endif
   DualHc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
       spiInterface,
-      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+      HC595_SEGMENT_ON_PATTERN,
+      HC595_DIGIT_ON_PATTERN,
       FRAMES_PER_SECOND,
-      kByteOrderGroupHighElementLow
+      HC595_BYTE_ORDER
   );
 
 #endif
@@ -426,32 +452,28 @@ void setupInterupt(uint16_t fieldsPerSecond) {
 void setupPulseDisplay() {
   LedDisplay ledDisplay(ledModule);
   NumberWriter numberWriter(ledDisplay);
-  numberWriter.writeHexCharAt(0, 0);
-  numberWriter.writeHexCharAt(1, 1);
-  numberWriter.writeHexCharAt(2, 2);
-  numberWriter.writeHexCharAt(3, 3);
+  for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
+    numberWriter.writeHexCharAt(i, i);
+  }
 }
 
-void setBrightnesses(int i) {
-  uint8_t brightness0 = BRIGHTNESS_LEVELS[i % NUM_BRIGHTNESSES];
-  uint8_t brightness1 = BRIGHTNESS_LEVELS[(i+1) % NUM_BRIGHTNESSES];
-  uint8_t brightness2 = BRIGHTNESS_LEVELS[(i+2) % NUM_BRIGHTNESSES];
-  uint8_t brightness3 = BRIGHTNESS_LEVELS[(i+3) % NUM_BRIGHTNESSES];
-  ledModule.setBrightnessAt(0, brightness0);
-  ledModule.setBrightnessAt(1, brightness1);
-  ledModule.setBrightnessAt(2, brightness2);
-  ledModule.setBrightnessAt(3, brightness3);
+void setBrightnesses(int brightnessIndex) {
+  for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
+    uint8_t brightness = BRIGHTNESS_LEVELS[
+        (brightnessIndex + i) % NUM_BRIGHTNESSES];
+    ledModule.setBrightnessAt(i, brightness);
+  }
 }
 
 void pulseDisplay() {
-  static uint8_t i = 0;
+  static uint8_t brightnessIndex = 0;
   static unsigned long lastUpdateTime = millis();
 
   unsigned long now = millis();
   if (now - lastUpdateTime > 200) {
     lastUpdateTime = now;
-    incrementMod(i, NUM_BRIGHTNESSES);
-    setBrightnesses(i);
+    incrementMod(brightnessIndex, NUM_BRIGHTNESSES);
+    setBrightnesses(brightnessIndex);
   }
 }
 

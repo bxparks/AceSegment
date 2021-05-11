@@ -27,7 +27,7 @@ using ace_segment::LedDisplay;
 #if defined(EPOXY_DUINO)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_DIRECT
 
-#elif defined(AUNITER_LED_CLOCK_DIRECT)
+#elif defined(AUNITER_MICRO_DIRECT)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_DIRECT
 
 #else

@@ -57,15 +57,26 @@ using namespace ace_button;
 #define INTERFACE_TYPE_SOFT_WIRE 4
 #define INTERFACE_TYPE_SOFT_WIRE_FAST 5
 
-// LedClock buttons are now hardwared to A2 and A3, instead of being configured
-// with dip switches to either (2,3) or (8,9). Since (2,3) are used by I2C, and
-// LED_MATRIX_MODE_DIRECT uses (8,9) pins for two of the LED segments/digits,
-// the only spare pins are A2 and A3. All other digital pins are taken.
-// Fortunately, the ATmega32U4 allows all analog pins to be used as digital
-// pins.
+// Pro Micro dev board buttons are now hardwared to A2 and A3, instead of being
+// configured with dip switches to either (2,3) or (8,9). Since (2,3) are used
+// by I2C, and LED_MATRIX_MODE_DIRECT uses (8,9) pins for two of the LED
+// segments/digits, the only spare pins are A2 and A3. All other digital pins
+// are taken. Fortunately, the ATmega32U4 allows all analog pins to be used as
+// digital pins.
 #if defined(EPOXY_DUINO)
-  const uint8_t NUM_DIGITS = 4;
+  // For EpoxyDuino, the actual numbers don't matter, so let's set them to (2,3)
+  // since I'm not sure if A2 and A3 are defined.
+  const uint8_t MODE_BUTTON_PIN = 2;
+  const uint8_t CHANGE_BUTTON_PIN = 3;
+
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
+  const uint8_t NUM_DIGITS = 4;
+  const uint8_t LATCH_PIN = 10;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+  const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
+  const uint8_t HC595_SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t HC595_DIGIT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
 
   // Choose one of the following variants:
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
@@ -75,25 +86,30 @@ using namespace ace_button;
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HARD_SPI
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HARD_SPI_FAST
 
-  // For EpoxyDuino, the actual numbers don't matter, so let's set them to (2,3)
-  // since I'm not sure if A2 and A3 are defined.
-  const uint8_t MODE_BUTTON_PIN = 2;
-  const uint8_t CHANGE_BUTTON_PIN = 3;
+#elif defined(AUNITER_MICRO_SCANNING_DIRECT)
+  const uint8_t MODE_BUTTON_PIN = A2;
+  const uint8_t CHANGE_BUTTON_PIN = A3;
 
-#elif defined(AUNITER_LED_CLOCK_SCANNING_DIRECT)
-  const uint8_t NUM_DIGITS = 4;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
+  const uint8_t NUM_DIGITS = 4;
+  const uint8_t NUM_SEGMENTS = 8;
+  const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
+  const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
 
   // Choose one of the following variants:
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT_FAST
 
+#elif defined(AUNITER_MICRO_SCANNING_SINGLE)
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
 
-#elif defined(AUNITER_LED_CLOCK_SCANNING_SINGLE)
-  const uint8_t NUM_DIGITS = 4;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
+  const uint8_t NUM_DIGITS = 4;
+  const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
+  const uint8_t LATCH_PIN = A0;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
 
   // Choose one of the following variants:
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_SOFT_SPI
@@ -101,12 +117,18 @@ using namespace ace_button;
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_HARD_SPI
   #define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_HARD_SPI_FAST
 
+#elif defined(AUNITER_MICRO_SCANNING_DUAL)
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
 
-#elif defined(AUNITER_LED_CLOCK_SCANNING_DUAL)
-  const uint8_t NUM_DIGITS = 4;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
+  const uint8_t NUM_DIGITS = 4;
+  const uint8_t LATCH_PIN = A0;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+  const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
+  const uint8_t HC595_SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t HC595_DIGIT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
 
   // Choose one of the following variants:
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SOFT_SPI
@@ -114,46 +136,30 @@ using namespace ace_button;
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HARD_SPI
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HARD_SPI_FAST
 
+#elif defined(AUNITER_MICRO_CUSTOM_DIRECT)
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
 
-#elif defined(AUNITER_LED_CLOCK_TM1637)
-  const uint8_t NUM_DIGITS = 4;
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_TM1637
-  const uint8_t MODE_BUTTON_PIN = A2;
-  const uint8_t CHANGE_BUTTON_PIN = A3;
-
-  // Choose one of the following variants:
-  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE
-  #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE_FAST
-
-#elif defined(AUNITER_LED_CLOCK_MAX7219)
-  const uint8_t NUM_DIGITS = 8;
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_MAX7219
-  const uint8_t MODE_BUTTON_PIN = A2;
-  const uint8_t CHANGE_BUTTON_PIN = A3;
-
-  // Choose one of the following variants:
-  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
-  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
-  //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
-  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
-
-#elif defined(AUNITER_LED_CLOCK_DIRECT)
-  const uint8_t NUM_DIGITS = 4;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_DIRECT
-  const uint8_t MODE_BUTTON_PIN = A2;
-  const uint8_t CHANGE_BUTTON_PIN = A3;
+  const uint8_t NUM_DIGITS = 4;
+  const uint8_t NUM_SEGMENTS = 8;
+  const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
+  const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
 
   // Choose one of the following variants:
   //#define DIRECT_INTERFACE_TYPE DIRECT_INTERFACE_TYPE_NORMAL
   #define DIRECT_INTERFACE_TYPE DIRECT_INTERFACE_TYPE_FAST
 
-#elif defined(AUNITER_LED_CLOCK_HC595_SINGLE)
-  const uint8_t NUM_DIGITS = 4;
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_SINGLE
+#elif defined(AUNITER_MICRO_CUSTOM_SINGLE)
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_SINGLE
+  const uint8_t NUM_DIGITS = 4;
+  const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
+  const uint8_t LATCH_PIN = A0;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
 
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
@@ -161,11 +167,67 @@ using namespace ace_button;
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
 
-#elif defined(AUNITER_LED_CLOCK_HC595_DUAL)
-  const uint8_t NUM_DIGITS = 4;
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
+#elif defined(AUNITER_MICRO_CUSTOM_DUAL)
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
+  const uint8_t NUM_DIGITS = 4;
+  const uint8_t LATCH_PIN = A0;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+  const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
+  const uint8_t HC595_SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t HC595_DIGIT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+
+  // Choose one of the following variants:
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
+  //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
+
+#elif defined(AUNITER_MICRO_TM1637)
+  const uint8_t MODE_BUTTON_PIN = A2;
+  const uint8_t CHANGE_BUTTON_PIN = A3;
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_TM1637
+  const uint8_t NUM_DIGITS = 4;
+  const uint8_t CLK_PIN = 10;
+  const uint8_t DIO_PIN = 9;
+  const uint16_t BIT_DELAY = 100;
+
+  // Choose one of the following variants:
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE
+  #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE_FAST
+
+#elif defined(AUNITER_MICRO_MAX7219)
+  const uint8_t MODE_BUTTON_PIN = A2;
+  const uint8_t CHANGE_BUTTON_PIN = A3;
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_MAX7219
+  const uint8_t NUM_DIGITS = 8;
+  const uint8_t LATCH_PIN = A0;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+
+  // Choose one of the following variants:
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
+  //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
+
+#elif defined(AUNITER_MICRO_HC595)
+  const uint8_t MODE_BUTTON_PIN = A2;
+  const uint8_t CHANGE_BUTTON_PIN = A3;
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
+  const uint8_t NUM_DIGITS = 8;
+  const uint8_t LATCH_PIN = A0;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+  const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
+  const uint8_t HC595_SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t HC595_DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
 
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
@@ -195,50 +257,6 @@ using namespace ace_button;
 // microseconds on a 16 MHz AVR processor.
 const uint8_t FRAMES_PER_SECOND = 60;
 const uint8_t NUM_SUBFIELDS = 1;
-
-// Define GPIO pins.
-#if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_SCANNING
-  #if LED_MATRIX_MODE == LED_MATRIX_MODE_DIRECT
-    // 4 digits, resistors on segments on Pro Micro.
-    const uint8_t NUM_SEGMENTS = 8;
-    const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
-    const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
-
-  #else
-    const uint8_t NUM_SEGMENTS = 8;
-    const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
-    const uint8_t LATCH_PIN = 10; // ST_CP on 74HC595
-    const uint8_t DATA_PIN = MOSI; // DS on 74HC595
-    const uint8_t CLOCK_PIN = SCK; // SH_CP on 74HC595
-  #endif
-
-#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_TM1637
-  const uint8_t CLK_PIN = 10;
-  const uint8_t DIO_PIN = 9;
-  const uint16_t BIT_DELAY = 100;
-
-#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_MAX7219
-  const uint8_t LATCH_PIN = A0;
-  const uint8_t DATA_PIN = MOSI;
-  const uint8_t CLOCK_PIN = SCK;
-
-#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_DIRECT
-  const uint8_t NUM_SEGMENTS = 8;
-  const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
-  const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
-
-#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_SINGLE
-  const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
-  const uint8_t LATCH_PIN = 10;
-  const uint8_t DATA_PIN = MOSI;
-  const uint8_t CLOCK_PIN = SCK;
-
-#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_DUAL
-  const uint8_t LATCH_PIN = 10;
-  const uint8_t DATA_PIN = MOSI;
-  const uint8_t CLOCK_PIN = SCK;
-
-#endif
 
 // The chain of resources.
 #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_SCANNING
@@ -437,10 +455,10 @@ const uint8_t NUM_SUBFIELDS = 1;
   #endif
   DualHc595Module<SpiInterface, NUM_DIGITS> ledModule(
       spiInterface,
-      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+      HC595_SEGMENT_ON_PATTERN,
+      HC595_DIGIT_ON_PATTERN,
       FRAMES_PER_SECOND,
-      kByteOrderDigitHighSegmentLow
+      HC595_BYTE_ORDER
   );
 
 #else

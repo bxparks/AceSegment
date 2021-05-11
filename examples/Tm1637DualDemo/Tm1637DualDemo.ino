@@ -22,7 +22,7 @@ const uint8_t CLK_PIN = 10;
 const uint8_t DIO1_PIN = 9;
 const uint8_t DIO2_PIN = 8;
 
-#if defined(AUNITER_LED_CLOCK_TM1637_DUAL) || defined(EPOXY_DUINO)
+#if defined(AUNITER_MICRO_TM1637_DUAL) || defined(EPOXY_DUINO)
   const uint8_t NUM_DIGITS = 4;
   const uint8_t PATTERNS[NUM_DIGITS] = {
     0b00111111, // 0

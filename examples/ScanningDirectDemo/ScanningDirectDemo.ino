@@ -35,7 +35,7 @@ using ace_segment::LedDisplay;
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT_FAST
 
-#elif defined(AUNITER_LED_CLOCK_DIRECT)
+#elif defined(AUNITER_MICRO_DIRECT)
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT_FAST
 
@@ -147,7 +147,7 @@ void loop() {
   uint16_t nowMillis = millis();
 
   // Update the display with new pattern every second.
-  if (nowMillis - prevUpdateMillis >= 1000) {
+  if ((uint16_t) (nowMillis - prevUpdateMillis) >= 1000) {
     prevUpdateMillis = nowMillis;
     updateDisplay();
   }
@@ -160,7 +160,7 @@ void loop() {
 
   // Print the stats every 5 seconds.
 #if ENABLE_SERIAL_DEBUG >= 1
-  if (nowMillis - prevStatsMillis >= 5000) {
+  if ((uint16_t) (nowMillis - prevStatsMillis) >= 5000) {
     prevStatsMillis = nowMillis;
     Serial.print("ExpAvg:");
     Serial.println(stats.getExpDecayAvg());

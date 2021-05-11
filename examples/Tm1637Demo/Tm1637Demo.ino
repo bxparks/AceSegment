@@ -35,7 +35,7 @@ using namespace ace_segment;
     0b01001111, // 3
   };
 
-#elif defined(AUNITER_LED_CLOCK_TM1637)
+#elif defined(AUNITER_MICRO_TM1637)
   #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_FAST
   #define TM_FLUSH_METHOD TM_FLUSH_METHOD_FLUSH_INCREMENTAL
 
@@ -50,7 +50,7 @@ using namespace ace_segment;
     0b01001111, // 3
   };
 
-#elif defined(AUNITER_LED_CLOCK_TM1637_6)
+#elif defined(AUNITER_MICRO_TM1637_6)
   #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_FAST
   #define TM_FLUSH_METHOD TM_FLUSH_METHOD_FLUSH_INCREMENTAL
 
@@ -107,7 +107,7 @@ const uint16_t BIT_DELAY = 100;
   #error Unknown WIRE_INTERFACE_TYPE
 #endif
 
-#if defined(AUNITER_LED_CLOCK_TM1637_6)
+#if defined(AUNITER_MICRO_TM1637_6)
   const uint8_t* const remapArray = ace_segment::kDigitRemapArray6;
 #else
   const uint8_t* const remapArray = nullptr;
