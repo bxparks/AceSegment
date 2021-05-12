@@ -17,86 +17,64 @@ using namespace ace_segment;
 #define WIRE_INTERFACE_TYPE_NORMAL 0
 #define WIRE_INTERFACE_TYPE_FAST 1
 
-// Select the TM1637Module flush() method
-#define TM_FLUSH_METHOD_FLUSH 0
-#define TM_FLUSH_METHOD_FLUSH_INCREMENTAL 1
+// Select the TM1637Module flush() method.
+#define TM_FLUSH_METHOD_NORMAL 0
+#define TM_FLUSH_METHOD_INCREMENTAL 1
+
+// The TM1637 controller supports up to 6 digits.
+const uint8_t PATTERNS[6] = {
+  0b00111111, // 0
+  0b00000110, // 1
+  0b01011011, // 2
+  0b01001111, // 3
+  0b01100110, // 4
+  0b01101101, // 5
+};
 
 #if defined(EPOXY_DUINO)
   #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_NORMAL
-  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_FLUSH_INCREMENTAL
+  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
 
   const uint8_t CLK_PIN = A0;
   const uint8_t DIO_PIN = 9;
 
   const uint8_t NUM_DIGITS = 4;
-  const uint8_t PATTERNS[NUM_DIGITS] = {
-    0b00111111, // 0
-    0b00000110, // 1
-    0b01011011, // 2
-    0b01001111, // 3
-  };
 
 #elif defined(AUNITER_MICRO_TM1637)
   #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_FAST
-  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_FLUSH_INCREMENTAL
+  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
 
   const uint8_t CLK_PIN = A0;
   const uint8_t DIO_PIN = 9;
 
   const uint8_t NUM_DIGITS = 4;
-  const uint8_t PATTERNS[NUM_DIGITS] = {
-    0b00111111, // 0
-    0b00000110, // 1
-    0b01011011, // 2
-    0b01001111, // 3
-  };
 
 #elif defined(AUNITER_MICRO_TM1637_6)
   #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_FAST
-  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_FLUSH_INCREMENTAL
+  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_NORMAL
 
   const uint8_t CLK_PIN = A0;
   const uint8_t DIO_PIN = 9;
 
   const uint8_t NUM_DIGITS = 6;
-  const uint8_t PATTERNS[NUM_DIGITS] = {
-    0b00111111, // 0
-    0b00000110, // 1
-    0b01011011, // 2
-    0b01001111, // 3
-    0b01100110, // 4
-    0b01101101, // 5
-  };
 
 #elif defined(AUNITER_STM32_TM1637)
   #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_NORMAL
-  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_FLUSH
+  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
 
   const uint8_t CLK_PIN = PB3;
   const uint8_t DIO_PIN = PB4;
 
   const uint8_t NUM_DIGITS = 4;
-  const uint8_t PATTERNS[NUM_DIGITS] = {
-    0b00111111, // 0
-    0b00000110, // 1
-    0b01011011, // 2
-    0b01001111, // 3
-  };
 
 #elif defined(AUNITER_D1MINI_LARGE_TM1637)
   #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_NORMAL
-  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_FLUSH_INCREMENTAL
+  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
 
   const uint8_t CLK_PIN = D5;
   const uint8_t DIO_PIN = D7;
 
   const uint8_t NUM_DIGITS = 4;
-  const uint8_t PATTERNS[NUM_DIGITS] = {
-    0b00111111, // 0
-    0b00000110, // 1
-    0b01011011, // 2
-    0b01001111, // 3
-  };
 
 #else
   #error Unknown AUNITER environment
@@ -161,13 +139,16 @@ void updateDisplay() {
   }
 }
 
-// Every 50 ms, flushIncremental() to the LED module, which updates only a
-// single digit per call, taking only ~10 ms using 100 us delay.
+// Every 20 ms, flushIncremental() to the LED module, which updates only a
+// single digit per call, taking only ~10 ms using a 100 us delay. Each call to
+// flushIncremental() updates only one digit, so to avoid making the incremental
+// update distracting to the human eye, we need to call this somewhat rapidly.
+// Every 20 ms seems to work pretty well.
 void flushIncrementalModule() {
   static uint16_t prevFlushMillis;
 
   uint16_t nowMillis = millis();
-  if ((uint16_t) (nowMillis - prevFlushMillis) >= 50) {
+  if ((uint16_t) (nowMillis - prevFlushMillis) >= 20) {
     prevFlushMillis = nowMillis;
 
     // Flush incrementally, and measure the time.
@@ -180,7 +161,7 @@ void flushIncrementalModule() {
 
 // Every 100 ms, unconditionally flush() to the LED module which updates all
 // digits, including brightness, taking about 22 ms (4 digits) to 28 ms
-// (6-digits) using 100 us delay.
+// (6-digits) using a 100 us delay.
 void flushModule() {
   static uint16_t prevFlushMillis;
 
@@ -234,9 +215,9 @@ void setup() {
 void loop() {
   updateDisplay();
 
-#if TM_FLUSH_METHOD == TM_FLUSH_METHOD_FLUSH
+#if TM_FLUSH_METHOD == TM_FLUSH_METHOD_NORMAL
   flushModule();
-#elif TM_FLUSH_METHOD == TM_FLUSH_METHOD_FLUSH_INCREMENTAL
+#elif TM_FLUSH_METHOD == TM_FLUSH_METHOD_INCREMENTAL
   flushIncrementalModule();
 #else
   #error Unknown TM_FLUSH_METHOD
