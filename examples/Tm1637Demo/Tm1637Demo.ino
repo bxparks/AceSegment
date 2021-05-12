@@ -1,6 +1,7 @@
 /*
- * A simple demo of a single TM1637 LED module, with the digits 0-3 to 0-5
- * scrolling to the left every second.
+ * A simple demo of a single TM1637 LED module, with the digits [0,3] or [0,5]
+ * scrolling to the left every second, and the brightness changing each
+ * iteration.
  */
 
 #include <Arduino.h>
@@ -22,7 +23,7 @@ using namespace ace_segment;
 
 #if defined(EPOXY_DUINO)
   #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_NORMAL
-  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_FLUSH
+  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_FLUSH_INCREMENTAL
 
   const uint8_t CLK_PIN = A0;
   const uint8_t DIO_PIN = 9;
@@ -136,62 +137,12 @@ TimingStats stats;
 uint8_t digitIndex = 0;
 uint8_t brightness = 1;
 
-void setup() {
-  delay(1000);
-#if ENABLE_SERIAL_DEBUG >= 1
-  Serial.begin(115200);
-  while (!Serial);
-#endif
+// Every second, scroll the display and change the brightness.
+void updateDisplay() {
+  static uint16_t prevChangeMillis;
 
-  wireInterface.begin();
-  tm1637Module.begin();
-}
-
-#if TM_FLUSH_METHOD == TM_FLUSH_METHOD_FLUSH
-
-// This version of loop() uses the Tm1637Module::flush() method to update all
-// digits in a single dump to the LED module, taking ~22ms per call.
-void loop() {
-  // Update the display
-  uint8_t j = digitIndex;
-  for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
-    display.writePatternAt(i, PATTERNS[j]);
-    incrementMod(j, (uint8_t) NUM_DIGITS);
-  }
-  incrementMod(digitIndex, (uint8_t) NUM_DIGITS);
-
-  // Update the brightness
-  display.setBrightness(brightness);
-  incrementModOffset(brightness, (uint8_t) 7, (uint8_t) 1);
-
-  // Flush the change to the LED Module, and measure the time.
-  uint16_t startMicros = micros();
-  tm1637Module.flush();
-  uint16_t elapsedMicros = (uint16_t) micros() - startMicros;
-  stats.update(elapsedMicros);
-
-#if ENABLE_SERIAL_DEBUG >= 1
-  Serial.print("ExpAvg:");
-  Serial.println(stats.getExpDecayAvg());
-#endif
-
-  delay(1000);
-}
-
-#elif TM_FLUSH_METHOD == TM_FLUSH_METHOD_FLUSH_INCREMENTAL
-
-// This version of loop() uses the Tm1637Module::flushIncremental() method to
-// update only a single digit per call, taking only ~10 ms at 100 us delay.
-void loop() {
-  static uint16_t prevChangeMillis = millis();
-  static uint16_t prevFlushMillis = millis();
-#if ENABLE_SERIAL_DEBUG >= 1
-  static uint16_t prevStatsMillis = millis();
-#endif
-
-  // Every second, change the brightness and scroll the display.
   uint16_t nowMillis = millis();
-  if (nowMillis - prevChangeMillis > 1000) {
+  if ((uint16_t) (nowMillis - prevChangeMillis) >= 1000) {
     prevChangeMillis = nowMillis;
 
     // Update the display
@@ -208,9 +159,15 @@ void loop() {
     display.setBrightness(brightness);
     incrementModOffset(brightness, (uint8_t) 7, (uint8_t) 1);
   }
+}
 
-  // Every 10 ms, incrementally flush() to the LED module.
-  if (nowMillis - prevFlushMillis > 10) {
+// Every 50 ms, flushIncremental() to the LED module, which updates only a
+// single digit per call, taking only ~10 ms using 100 us delay.
+void flushIncrementalModule() {
+  static uint16_t prevFlushMillis;
+
+  uint16_t nowMillis = millis();
+  if ((uint16_t) (nowMillis - prevFlushMillis) >= 50) {
     prevFlushMillis = nowMillis;
 
     // Flush incrementally, and measure the time.
@@ -219,24 +176,71 @@ void loop() {
     uint16_t elapsedMicros = (uint16_t) micros() - startMicros;
     stats.update(elapsedMicros);
   }
-
-  #if ENABLE_SERIAL_DEBUG >= 1
-    // Every 5 seconds, print out the statistics.
-    if (nowMillis - prevStatsMillis > 5000) {
-      prevStatsMillis = nowMillis;
-
-      Serial.print("min/avg/max:");
-      Serial.print(stats.getMin());
-      Serial.print('/');
-      Serial.print(stats.getAvg());
-      Serial.print('/');
-      Serial.println(stats.getMax());
-      stats.reset();
-    }
-  #endif
 }
 
-#else
-#error Unknown TM_FLUSH_METHOD
+// Every 100 ms, unconditionally flush() to the LED module which updates all
+// digits, including brightness, taking about 22 ms (4 digits) to 28 ms
+// (6-digits) using 100 us delay.
+void flushModule() {
+  static uint16_t prevFlushMillis;
 
+  uint16_t nowMillis = millis();
+  if ((uint16_t) (nowMillis - prevFlushMillis) >= 100) {
+    prevFlushMillis = nowMillis;
+
+    // Flush incrementally, and measure the time.
+    uint16_t startMicros = micros();
+    tm1637Module.flush();
+    uint16_t elapsedMicros = (uint16_t) micros() - startMicros;
+    stats.update(elapsedMicros);
+  }
+}
+
+// Every 5 seconds, print stats about how long flush() or flushIncremental()
+// took.
+void printStats() {
+#if ENABLE_SERIAL_DEBUG >= 1
+  static uint16_t prevStatsMillis;
+
+  // Every 5 seconds, print out the statistics.
+  if ((uint16_t) (nowMillis - prevStatsMillis) >= 5000) {
+    prevStatsMillis = nowMillis;
+
+    Serial.print("min/avg/max:");
+    Serial.print(stats.getMin());
+    Serial.print('/');
+    Serial.print(stats.getAvg());
+    Serial.print('/');
+    Serial.println(stats.getMax());
+    stats.reset();
+  }
 #endif
+}
+
+//-----------------------------------------------------------------------------
+
+void setup() {
+  delay(1000);
+#if ENABLE_SERIAL_DEBUG >= 1
+  Serial.begin(115200);
+  while (!Serial);
+#endif
+
+  wireInterface.begin();
+  tm1637Module.begin();
+}
+
+
+void loop() {
+  updateDisplay();
+
+#if TM_FLUSH_METHOD == TM_FLUSH_METHOD_FLUSH
+  flushModule();
+#elif TM_FLUSH_METHOD == TM_FLUSH_METHOD_FLUSH_INCREMENTAL
+  flushIncrementalModule();
+#else
+  #error Unknown TM_FLUSH_METHOD
+#endif
+
+  printStats();
+}
