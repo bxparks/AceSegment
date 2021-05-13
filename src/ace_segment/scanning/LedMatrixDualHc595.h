@@ -58,21 +58,19 @@ class LedMatrixDualHc595: public LedMatrixBase {
      * @param elementOnPattern bit pattern that turns on the elements
      * @param groupOnpattern bit pattern that turns on the groups
      * @param byteOrder determine order of group and element bytes
-     * @param remapArrayInverted (optional, nullable) a map of the logical
-     *    positions to their physical positions, which is the inverse of
-     *    the usual arrays expected by higher-level objects such as
-     *    Tm1637Module, Max7219Module, and DualHc595Module
+     * @param remapArray (optional, nullable) a map of the logical positions to
+     *    their physical positions
      */
     LedMatrixDualHc595(
         const T_SPII& spiInterface,
         uint8_t elementOnPattern,
         uint8_t groupOnPattern,
         uint8_t byteOrder,
-        const uint8_t* remapArrayInverted = nullptr
+        const uint8_t* remapArray = nullptr
     ) :
         LedMatrixBase(elementOnPattern, groupOnPattern),
         mSpiInterface(spiInterface),
-        mRemapArrayInverted(remapArrayInverted),
+        mRemapArray(remapArray),
         mByteOrder(byteOrder)
     {}
 
@@ -133,7 +131,7 @@ class LedMatrixDualHc595: public LedMatrixBase {
 
     /** Convert a logical position into its physical position. */
     uint8_t remapLogicalToPhysical(uint8_t pos) const {
-      return mRemapArrayInverted ? mRemapArrayInverted[pos] : pos;
+      return mRemapArray ? mRemapArray[pos] : pos;
     }
 
   private:
@@ -144,7 +142,7 @@ class LedMatrixDualHc595: public LedMatrixBase {
     const T_SPII& mSpiInterface;
 
     /** Mapping of the physical digit to the logical digit of the LED module. */
-    const uint8_t* const mRemapArrayInverted;
+    const uint8_t* const mRemapArray;
 
     /** Determine order of group and element bytes. */
     const uint8_t mByteOrder;

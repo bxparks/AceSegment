@@ -169,19 +169,23 @@ class Max7219Module : public LedModule {
      *  * SW SPI Fast: 210 microseconds
      */
     void flush() {
-      for (uint8_t physicalPos = 0; physicalPos < T_DIGITS; ++physicalPos) {
-        uint8_t logicalPos = remapPhysicalToLogical(physicalPos);
+      for (uint8_t chipPos = 0; chipPos < T_DIGITS; ++chipPos) {
+        // Remap the logical position used by the controller to the actual
+        // position. For example, if the controller digit 0 appears at physical
+        // digit 2, we need to display the segment pattern given by logical
+        // position 2 when sending the byte to controller digit 0.
+        uint8_t physicalPos = remapLogicalToPhysical(chipPos);
         uint8_t convertedPattern = internal::convertPatternMax7219(
-            mPatterns[logicalPos]);
-        mSpiInterface.send16(physicalPos + 1, convertedPattern);
+            mPatterns[physicalPos]);
+        mSpiInterface.send16(chipPos + 1, convertedPattern);
       }
 
       mSpiInterface.send16(kRegisterIntensity, mBrightness);
     }
 
   private:
-    /** Convert a physical position into its logical position. */
-    uint8_t remapPhysicalToLogical(uint8_t pos) const {
+    /** Convert a logical position into its physical position. */
+    uint8_t remapLogicalToPhysical(uint8_t pos) const {
       return mRemapArray ? mRemapArray[pos] : pos;
     }
 

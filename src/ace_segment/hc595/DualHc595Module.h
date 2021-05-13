@@ -37,8 +37,8 @@ const uint8_t kByteOrderDigitHighSegmentLow = kByteOrderGroupHighElementLow;
 const uint8_t kByteOrderSegmentHighDigitLow = kByteOrderElementHighGroupLow;
 
 /**
- * A map of the physical digit position to its physical position. In other words
- * `logicalPos = kDigitRemapArray[physicalPos]`. Pass this array into the
+ * A map of the logical digit position to its physical position. In other words
+ * `physicalPos = kDigitRemapArray[logicalPos]`. Pass this array into the
  * DualHc595Module constructor.
  *
  * The 8-digit LED module from diymore.cc using dual 74HC595 controller chips
@@ -49,25 +49,6 @@ const uint8_t kByteOrderSegmentHighDigitLow = kByteOrderElementHighGroupLow;
  * different physical ordering compared to the logical ordering.
  */
 extern const uint8_t kDigitRemapArray8Hc595[8];
-
-namespace internal {
-
-/**
- * Convert the physical-to-logical array to the logical-to-physical array
- * required by LedMatrixDualHc595.
- */
-static void invertRemapArray(
-    uint8_t logicalToPhysical[],
-    const uint8_t physicalToLogical[],
-    uint8_t numDigits
-) {
-  for (uint8_t physicalPos = 0; physicalPos < numDigits; ++physicalPos) {
-    uint8_t logicalPos = physicalToLogical[physicalPos];
-    logicalToPhysical[logicalPos] = physicalPos;
-  }
-}
-
-} // namespace internal
 
 /**
  * An implementation of LedModule class that supports an LED module using 2
@@ -116,8 +97,8 @@ class DualHc595Module : public ScanningModule<
      * @param byteOrder whether to send the digit patterns first
      *    (kByteOrderDigitHighSegmentLow) or segment patterns first
      *    (kByteOrderSegmentHighDigitLow)
-     * @param remapArray (optional, nullable) a mapping from the physical digit
-     *    positions to their logical positions. For example, the 8-digit LED
+     * @param remapArray (optional, nullable) a mapping from the logical digit
+     *    positions to their physical positions. For example, the 8-digit LED
      *    modules from diymore.cc have the left 4 and right 4 LED digits
      *    swapped.
      */
@@ -135,14 +116,9 @@ class DualHc595Module : public ScanningModule<
             segmentOnPattern /*elementOnPattern*/,
             digitOnPattern /*groupOnPattern*/,
             byteOrder,
-            (remapArray ? mLogicalToPhysicalRemapArray : nullptr)
+            remapArray
         )
-    {
-      // Invert the mapping because LedMatrixDualHc595 requires the inverse
-      // mapping, in other words, logical postion to physical position.
-      internal::invertRemapArray(
-          mLogicalToPhysicalRemapArray, remapArray, T_DIGITS);
-    }
+    {}
 
     void begin() {
       mLedMatrix.begin();
@@ -156,9 +132,6 @@ class DualHc595Module : public ScanningModule<
 
   private:
     LedMatrixDualHc595<T_SPII> mLedMatrix;
-
-    /** Mapping of logical digit positions to their physical positions. */
-    uint8_t mLogicalToPhysicalRemapArray[T_DIGITS];
 };
 
 } // ace_segment

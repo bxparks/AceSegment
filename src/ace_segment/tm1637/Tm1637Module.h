@@ -42,8 +42,8 @@ namespace ace_segment {
 static const uint16_t kDefaultTm1637DelayMicros = 100;
 
 /**
- * A map of the physical digit position to its logical position. In other words
- * `logicalPos = kDigitRemapArray[physicalPos]`. Pass this array into the
+ * A map of the logical digit position to its physical position. In other words
+ * `physicalPos = kDigitRemapArray[logicalPos]`. Pass this array into the
  * Tm1637Module constructor.
  *
  * Many (if not all) of the 6-digit LED modules on eBay and Amazon using the
@@ -90,8 +90,8 @@ class Tm1637Module : public LedModule {
      * Constructor.
      * @param wireInterface instance of either SoftWireInterface or
      *    SoftWireFastInterface
-     * @param remapArray (optional, nullable) a mapping of the physical digit
-     *    positions to their logical positions, useful for 6-digt LED modules
+     * @param remapArray (optional, nullable) a mapping of the logical digit
+     *    positions to their physical positions, useful for 6-digt LED modules
      *    using the TM1637 chip whose digits are wired out of order
      */
     explicit Tm1637Module(
@@ -194,9 +194,14 @@ class Tm1637Module : public LedModule {
 
       mWireInterface.startCondition();
       mWireInterface.sendByte(kAddressCmd);
-      for (uint8_t physicalPos = 0; physicalPos < T_DIGITS; ++physicalPos) {
-        uint8_t logicalPos = remapPhysicalToLogical(physicalPos);
-        mWireInterface.sendByte(mPatterns[logicalPos]);
+      for (uint8_t chipPos = 0; chipPos < T_DIGITS; ++chipPos) {
+        // Remap the logical position used by the controller to the actual
+        // position. For example, if the controller digit 0 appears at physical
+        // digit 2, we need to display the segment pattern given by logical
+        // position 2 when sending the byte to controller digit 0.
+        uint8_t physicalPos = remapLogicalToPhysical(chipPos);
+        uint8_t effectivePattern = mPatterns[physicalPos];
+        mWireInterface.sendByte(effectivePattern);
       }
       mWireInterface.stopCondition();
 
@@ -215,13 +220,13 @@ class Tm1637Module : public LedModule {
      *
      * Using 100 micro delay, I see the following durations:
      *
-     * 1) If brightness is checked and updated on every iteration, I get
+     * 1) If brightness is updated on every iteration, I get
      * 'min/avg/max:4/494/13780', so a maximum of 14 ms, which is still a little
      * bit high.
      *
-     * 2) If brightness is checked and updated during its own mFlushStage (==
-     * T_DIGITS), then I see `min/avg/max:4/492/10152`, saving about 3.5ms from
-     * the latency. The side effect is a slightly flicker when the display and
+     * 2) If brightness is updated during its own mFlushStage (== T_DIGITS),
+     * then I see `min/avg/max:4/492/10152`, saving about 3.5ms from the
+     * latency. The side effect is a slightly flicker when the display and
      * brightness changes at the same time, because this incrementally updating
      * function makes those changes in 2 steps.
      *
@@ -229,6 +234,12 @@ class Tm1637Module : public LedModule {
      * digits, which adds extra commands to the wire protocol to the LED module.
      * If this algorithm is used to send all the digits in one-shot, then this
      * method is about 50% slower (30 ms), compared to flush() (22 ms).
+     *
+     * Technical note: The TM1637 datasheet seems to suggest that the brightness
+     * must always be sent after a set of digits are sent. However,
+     * experimentation shows that the brightness can be sent as an independent
+     * transimission, so this method splits out each digit and the brightness as
+     * separate iterations.
      */
     void flushIncremental() {
       if (mFlushStage == T_DIGITS) {
@@ -239,9 +250,13 @@ class Tm1637Module : public LedModule {
         mWireInterface.stopCondition();
         clearDirtyBit(T_DIGITS);
       } else {
-        const uint8_t physicalPos = mFlushStage;
-        const uint8_t logicalPos = remapPhysicalToLogical(physicalPos);
-        if (! isDirtyBit(logicalPos)) return;
+        // Remap the logical position used by the controller to the actual
+        // position. For example, if the controller digit 0 appears at physical
+        // digit 2, we need to display the segment pattern given by logical
+        // position 2 when sending the byte to controller digit 0.
+        const uint8_t chipPos = mFlushStage;
+        const uint8_t physicalPos = remapLogicalToPhysical(chipPos);
+        if (! isDirtyBit(physicalPos)) return;
 
         // Update changed digit.
         mWireInterface.startCondition();
@@ -249,10 +264,10 @@ class Tm1637Module : public LedModule {
         mWireInterface.stopCondition();
 
         mWireInterface.startCondition();
-        mWireInterface.sendByte(kAddressCmd | physicalPos);
-        mWireInterface.sendByte(mPatterns[logicalPos]);
+        mWireInterface.sendByte(kAddressCmd | chipPos);
+        mWireInterface.sendByte(mPatterns[physicalPos]);
         mWireInterface.stopCondition();
-        clearDirtyBit(logicalPos);
+        clearDirtyBit(physicalPos);
       }
 
       // An extra dirty bit is used for the brightness so use `T_DIGITS + 1`.
@@ -272,8 +287,8 @@ class Tm1637Module : public LedModule {
       return mIsDirty & (0x1 << bit);
     }
 
-    /** Convert a physical position into the logical position. */
-    uint8_t remapPhysicalToLogical(uint8_t pos) const {
+    /** Convert a logical position into the physical position. */
+    uint8_t remapLogicalToPhysical(uint8_t pos) const {
       return mRemapArray ? mRemapArray[pos] : pos;
     }
 

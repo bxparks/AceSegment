@@ -172,6 +172,76 @@ An implementation of `LedModule` that uses a TM1637 chip.
 
 An implementation of `LedModule` that uses a MAX7219 chip.
 
+## Remap Arrays
+
+On many LED displays, the logical digit addresses used by the controller chip
+are mapped to different physical addresses on the actual LED module. For
+example, the 6-digit LED display using a TM1637 chip manufactured by diymore.cc
+maps "0 1 2 3 4 5" so that the digits are displayed as "2 1 0 5 4 3".
+
+The constructors of `DualHc595Module`, `Tm1637Module` and `Max7219Module` accept
+an optional `remapArray` parameter to account for the wiring variations. Various
+predefined `kDigitRemapArrayXxx` are provided for the modules that I have
+encountered.
+
+These arrays are created using the following procedure:
+
+1. Write the segment patterns for the numbers 0 to N-1 to the led module at
+   their natural positions using the `LedModule::setPattern(pos, pattern)`
+   method. For example, `setPattern(0, kPattern0)`, `setPattern(1, kPattern1)`,
+   etc. The patterns are available in `NumberWriter.cpp` or `CharWriter.cpp`.
+1. Observe the patterns that are actually displayed on the LED module. For
+   example, on the 6-digit TM1637 modules, "0 1 2 3 4 5" is displayed as "2 1 0
+   5 4 3".
+1. The displayed array is the mapping from physical positions to their logical
+   positions. In other words, if set set `uint8_t physicalToLogicalArray[] = {2
+   1 0 5 4 3}', then we have that `logicalPos =
+   physicalToLogicalArray[physicalPos]`.
+1. Create the inverse mapping array by looping through each element of
+   `physicalToLogicalArray` and creating a `logicalToPhysicalArray` whose index
+   and value are flipped. For example, since `logicalToPhysical[0] == 2' we
+   set `physicalToLogical[2] = 0`.
+1. It turns out that for all the LED modules that I have looked at, the inverse
+   array is **identical** to the original array, because the mapping from
+   logical positions to physical positions are caused by pair-wise swaps between
+   the controller pins and the LED module pins. In the example above,
+   `logicalToPhysicalArray[] = {2 1 0 5 4 3}`.
+1. Use this inverted `logicalToPhysicalArray` in the various constructors.
+
+Graphically, the process is:
+
+```
+logical:            0 1 2 3 4 5
+
+controller:         0 1 2 3 4 5
+                     \ /   \ /
+                      X     X
+                     / \   / \
+physical:           2 1 0 5 4 3
+
+physicalToLogical:  2 1 0 5 4 3
+
+logicalToPhysical:  2 1 0 5 4 3
+```
+
+If the wires from the controller chip to the LED digits are not simple pair-wise
+swaps, then the `physicalToLogical` and `logicalToPhysical` arrays are not
+identical. Here is an example where the first and second groups of 3 digits are
+rotated instead of swapped pairwise:
+
+```
+logical:            0 1 2 3 4 5
+
+controller:         0 1 2 3 4 5
+                     \|/   \|/
+                     /|\   /|\
+physical:           2 0 1 5 3 4
+
+physicalToLogical:  2 0 1 5 3 4
+
+logicalToPhysical:  1 2 0 4 5 3
+```
+
 ## LedDisplay
 
 A thin layer above an `LedModule` that provides a consistent API to the various
