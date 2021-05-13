@@ -252,7 +252,7 @@ void runDirectFast4() {
 //-----------------------------------------------------------------------------
 
 // Common Cathode, with transistors on Group pins
-void runSingleHc595SoftSpi() {
+void runHybridSoftSpi() {
   using SpiInterface = SoftSpiInterface;
   SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
 
@@ -285,7 +285,7 @@ void runSingleHc595SoftSpi() {
 
 // Common Cathode, with transistors on Group pins
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-void runSingleHc595SoftSpiFast() {
+void runHybridSoftSpiFast() {
   using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
 
@@ -318,7 +318,7 @@ void runSingleHc595SoftSpiFast() {
 #endif
 
 // Common Cathode, with transistors on Group pins
-void runSingleHc595HardSpi() {
+void runHybridHardSpi() {
   using SpiInterface = HardSpiInterface;
   SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
 
@@ -342,8 +342,7 @@ void runSingleHc595HardSpi() {
   scanningModule.begin();
   scanningModuleSubfields.begin();
   runScanningBenchmark(F("Hybrid(HardSpi)"), scanningModule);
-  runScanningBenchmark(F("Hybrid(HardSpi,subfields)"),
-      scanningModuleSubfields);
+  runScanningBenchmark(F("Hybrid(HardSpi,subfields)"), scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
   spiInterface.end();
@@ -351,7 +350,7 @@ void runSingleHc595HardSpi() {
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 // Common Cathode, with transistors on Group pins
-void runSingleHc595HardSpiFast() {
+void runHybridHardSpiFast() {
   using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
 
@@ -386,7 +385,7 @@ void runSingleHc595HardSpiFast() {
 //-----------------------------------------------------------------------------
 
 // Common Anode, with transistors on Group pins
-void runDualHc595SoftSpi() {
+void runHc595SoftSpi() {
   using SpiInterface = SoftSpiInterface;
   SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
 
@@ -420,7 +419,7 @@ void runDualHc595SoftSpi() {
 
 // Common Anode, with transistors on Group pins
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-void runDualHc595SoftSpiFast() {
+void runHc595SoftSpiFast() {
   using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
 
@@ -454,7 +453,7 @@ void runDualHc595SoftSpiFast() {
 #endif
 
 // Common Anode, with transistors on Group pins
-void runDualHc595HardSpi() {
+void runHc595HardSpi() {
   using SpiInterface = HardSpiInterface;
   SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
 
@@ -487,7 +486,7 @@ void runDualHc595HardSpi() {
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 // Common Anode, with transistors on Group pins
-void runDualHc595HardSpiFast() {
+void runHc595HardSpiFast() {
   using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
 
@@ -565,7 +564,7 @@ void runTm1637Benchmark(
   printStats(name, timingStats, numSamples);
 }
 
-void runTm1637ModuleSoftWire() {
+void runTm1637SoftWire() {
   using WireInterface = SoftWireInterface;
   WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
   wireInterface.begin();
@@ -580,7 +579,7 @@ void runTm1637ModuleSoftWire() {
 }
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-void runTm1637ModuleSoftWireFast() {
+void runTm1637SoftWireFast() {
   using WireInterface = SoftWireFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
   WireInterface wireInterface;
   wireInterface.begin();
@@ -596,7 +595,7 @@ void runTm1637ModuleSoftWireFast() {
 }
 #endif
 
-void runTm1637SixModuleSoftWire() {
+void runTm1637SixSoftWire() {
   using WireInterface = SoftWireInterface;
   WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
   wireInterface.begin();
@@ -612,7 +611,7 @@ void runTm1637SixModuleSoftWire() {
 }
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-void runTm1637SixModuleSoftWireFast() {
+void runTm1637SixSoftWireFast() {
   using WireInterface = SoftWireFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
   WireInterface wireInterface;
   wireInterface.begin();
@@ -714,34 +713,34 @@ void runBenchmarks() {
   runDirectFast4();
 #endif
 
-  runSingleHc595SoftSpi();
+  runHybridSoftSpi();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  runSingleHc595SoftSpiFast();
+  runHybridSoftSpiFast();
 #endif
 
-  runSingleHc595HardSpi();
+  runHybridHardSpi();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  runSingleHc595HardSpiFast();
+  runHybridHardSpiFast();
 #endif
 
-  runDualHc595SoftSpi();
+  runHc595SoftSpi();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  runDualHc595SoftSpiFast();
+  runHc595SoftSpiFast();
 #endif
 
-  runDualHc595HardSpi();
+  runHc595HardSpi();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  runDualHc595HardSpiFast();
+  runHc595HardSpiFast();
 #endif
 
-  runTm1637ModuleSoftWire();
+  runTm1637SoftWire();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  runTm1637ModuleSoftWireFast();
+  runTm1637SoftWireFast();
 #endif
 
-  runTm1637SixModuleSoftWire();
+  runTm1637SixSoftWire();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  runTm1637SixModuleSoftWireFast();
+  runTm1637SixSoftWireFast();
 #endif
 
   runMax7219SoftSpi();
