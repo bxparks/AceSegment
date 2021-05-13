@@ -149,11 +149,7 @@ class NumberWriter {
      * writeSignedDecimalAt() and writeUnsignedDecimalAt() which prints a
      * variable number of digits.
      */
-    void clearToEnd(uint8_t pos) {
-      for (uint8_t i = pos; i < mLedDisplay.getNumDigits(); ++i) {
-        writeInternalHexCharAt(i, kCharSpace);
-      }
-    }
+    void clearToEnd(uint8_t pos) { display().clearToEnd(pos); }
 
   private:
     // disable copy-constructor and assignment operator

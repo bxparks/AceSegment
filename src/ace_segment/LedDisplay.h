@@ -49,7 +49,7 @@ class LedDisplay {
      * Constructor.
      * @param ledModule an instance of LedModule or one of its subclasses
      */
-    LedDisplay(LedModule& ledModule) : mLedModule(ledModule) {}
+    explicit LedDisplay(LedModule& ledModule) : mLedModule(ledModule) {}
 
     /** Return the number of digits supported by this display instance. */
     uint8_t getNumDigits() const { return mLedModule.getNumDigits(); }
@@ -110,13 +110,12 @@ class LedDisplay {
       mLedModule.setPatternAt(pos, pattern);
     }
 
-    /**
-     * Clear all digits to blank pattern. The default implementation writes a
-     * `0` into each digit using writePatternAt(). Subclasses can override if
-     * needed.
-     */
-    void clear() {
-      for (uint8_t i = 0; i < mLedModule.getNumDigits(); ++i) {
+    /** Clear the entire display. */
+    void clear() { clearToEnd(0); }
+
+    /** Clear the display from `pos` to the end. */
+    void clearToEnd(uint8_t pos) {
+      for (uint8_t i = pos; i < mLedModule.getNumDigits(); ++i) {
         mLedModule.setPatternAt(i, 0);
       }
     }

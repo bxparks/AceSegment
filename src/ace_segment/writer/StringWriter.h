@@ -78,14 +78,8 @@ class StringWriter {
           pos, ace_common::FlashString(fs), numChar);
     }
 
-    /** Clear to end of display starting at `pos`. */
-    void clearToEnd(uint8_t pos) {
-      LedDisplay& ledDisplay = display();
-      uint8_t numDigits = ledDisplay.getNumDigits();
-      for (uint8_t i = pos; i < numDigits; ++i) {
-        ledDisplay.writePatternAt(i, 0x0);
-      }
-    }
+    /** Clear the display from `pos` to the end. */
+    void clearToEnd(uint8_t pos) { display().clearToEnd(pos); }
 
   private:
     // disable copy-constructor and assignment operator
