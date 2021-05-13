@@ -58,6 +58,7 @@ consumption.
     * [StringScroller](#StringScroller)
 * [Advanced Usage](#AdvancedUsage)
     * [DigitalWriteFast on AVR](#DigitalWriteFast)
+    * [ScanningModule](#ScanningModule)
 * [Resource Consumption](#ResourceConsumption)
 * [System Requirements](#SystemRequirements)
     * [Hardware](#Hardware)
@@ -958,14 +959,23 @@ need to include these headers manually, like this:
 
 ```C++
 #include <AceSegment.h> // do this first
+
 #if defined(ARDUINO_ARCH_AVR)
   #include <digitalWriteFast.h> // from 3rd party library
   #include <ace_segment/hw/SoftSpiFastInterface.h>
   #include <ace_segment/hw/HardSpiFastInterface.h>
   #include <ace_segment/hw/SoftWireFastInterface.h>
-  #include <ace_segment/scanning/LedMatrixDirectFast4.h>
+  #include <ace_segment/direct/DirectFast4Module.h>
 #endif
 ```
+
+<a name="ScanningModule"></a>
+### Custom Configuration of ScanningModule
+
+The 3 convenience classes (`DirectModule`, `HybridModule`, and `Hc595Module`)
+are subclasses of the `ScanningModule` parent class. If you want to know how the
+`ScanningModule` is implemented, I have some notes in
+[docs/scanning_module.md](docs/scanning_module.md).
 
 <a name="ResourceConsumption"></a>
 ## Resource Consumption
@@ -1249,12 +1259,18 @@ them.
 <a name="FeedbackAndSupport"></a>
 ## Feedback and Support
 
-If you have any questions, comments, bug reports, or feature requests, please
-file a GitHub ticket instead of emailing me unless the content is sensitive.
-(The problem with email is that I cannot reference the email conversation when
-other people ask similar questions later.) I'd love to hear about how this
-software and its documentation can be improved. I can't promise that I will
-incorporate everything, but I will give your ideas serious consideration.
+If you have any questions, comments and other support questions about how to
+use this library, use the
+[GitHub Discussions](https://github.com/bxparks/AceSegment/discussions)
+for this project. If you have bug reports or feature requests, file a ticket in
+[GitHub Issues](https://github.com/bxparks/AceSegment/issues). I'd love to hear
+about how this software and its documentation can be improved. I can't promise
+that I will incorporate everything, but I will give your ideas serious
+consideration.
+
+Please refrain from emailing me directly unless the content is sensitive. The
+problem with email is that I cannot reference the email conversation when other
+people ask similar questions later.
 
 <a name="Authors"></a>
 ## Authors

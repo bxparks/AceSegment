@@ -1,16 +1,28 @@
-# AceSegment Advanced Usage
+# AceSegment Scanning Module
+
+The easiest way to integrate with a seven-segment LED display is to get one of
+the off-the-shelf LED modules based on the TM1637, MAX7219 or 74HC595 controller
+chip. Creating your own custom LED display using raw components is possible, but
+it can be tedious process due to the number of wires that you need to connect.
+However, it is a great learning experience and I originally created the
+AceSegment library to enable my own custom LED modules.
+
+This document explains some of the inner workings of `ScanningModule` and its
+associated the `LedMatrix` classes. These low-level classes are mostly hidden
+from public view, but they form the building blocks for implementing the
+`Hc595Module`, `HybridModule` and `DirectModule` classes.
 
 ## Table of Contents
 
-* [LED Wiring](#LEDWiring)
+* [LED Wiring](#LedWiring)
+    * [Resistors and Transistors](#ResistorsAndTransistors)
 * [LedMatrix](#LedMatrix)
     * [LedMatrixClasses](#LedMatrixClasses)
     * [Choosing the LedMatrix](#ChoosingLedMatrix)
-        * [Resistors and Transistors](#ResistorsAndTransistors)
         * [Pins Wired Directly, Common Cathode](#LedMatrixDirectCommonCathode)
         * [Pins Wired Directly, Common Anode](#LedMatrixDirectCommonAnode)
-        * [Segments On 74HC595 Shift Register](#LedMatrixSingleHc595)
-        * [Digits and Segments On Two Shift Registers](#LedMatrixDualHc595)
+        * [Segments On Single 74HC595](#LedMatrixSingleHc595)
+        * [Digits and Segments On Dual 74Hc595](#LedMatrixDualHc595)
 * [Scanning Module](#ScanningModule)
     * [Scanning Module Classes](#ScanningModuleClasses)
     * [Setting Up the Scanning Module](#SettingUpScanningModule)
@@ -21,83 +33,43 @@
         * [Rendering by Polling](#RenderingByPolling)
         * [Rendering using Interrupts](#RenderingUsingInterrupts)
 
-<a name="LedCustomFeatures"></a>
-## LED Module Custom Features
-
-Here are the features supported by this framework:
-
-* multiplexing of segments at a selectable frame rate
-* common cathode or common anode configurations
-* resistors on segments or resistors on digits
-* LED display directly connected to the GPIO pins
-* LED display connected through a 74HC595 shift register chip
-* communication with the 74HC595 through
-    * software SPI (using `shiftOut()`)
-    * hardware SPI (using `<SPI.h>`)
-* transistors drivers to handle high currents
-* LED module using the TM1637 chip
-
 <a name="LedWiring"></a>
 ## LED Wiring
 
-AceSegment library supports the following wiring configurations:
+Raw LED modules come in 2 flavors:
 
 * common cathode
 * common anode
+
+The AceSegment classes support both through an bit-flipping XOR mechanism
+in the `LedModuleBase` class.
+
+Current limiting resistors are required to prevent burning out the LED segments.
+There are two options:
+
 * resistors on segments
 * resistors on digits (not supported)
 
-The driver classes assume that the pins are connected directly to the GPIO pins
-of the microcontroller. In other words, for a 4 digit x 8 segment LED display,
-you would need 12 GPIO pins. This is the cheapest and simplest option if you
-have enough pins available because you need nothing else because the current
-limiting resistors. If the project is not able to allocate this many pins, then
-the usual solution is to use a Serial to Parallel converter such as the 74HC595
-chip.
-
 At first glance, there is not an obvious difference between "resistors on
 segments" configuration and "resistors on digits". I recommend using resistors
-on segments if at all possible. That's because the LEDs with the resistors are
-the ones that can be turned on at the same time, and the ones without the
-resistors are multiplexed to give the illusion of a fully lit display. With the
-resistors on the segments, all the segments on one digit can be activated at the
-same time, and we can use pulse width modulation on the digit line to control
-the brightness of a single digit.
+on segments. That's because the LEDs with the resistors are the ones that can be
+turned on at the same time, and the ones without the resistors are multiplexed
+to give the illusion of a fully lit display. With the resistors on the segments,
+all the segments on one digit can be activated at the same time, and we can use
+pulse width modulation on the digit line to control the brightness of a single
+digit. AceSegment supports only the `resistors on segments` configuration for
+simplicity. (Code that supports "resistors on digits" has been moved into the
+`archived/` directory).
 
-Multiple LED segments will be connected to a single GPIO pin. If the total
-current on the pin exceeds the rated limit, then a transistor will need to be
-added to handle the current. The framework can be configured to support these
-transistors.
-
-<a name="LedMatrix"></a>
-## LedMatrix
-
-<a name="LedMatrixClasses"></a>
-### LedMatrix Classes
-
-* `LedMatrix`: Various subclasses capture the wiring of the matrix of LEDs.
-    * `LedMatrixDirect`
-        * Group pins and element pins are directly accessed through the
-          microcontroller pins.
-    * `LedMatrixDirectFast4`
-        * Same as `LedMatrixDirect` but using `digitalWriteFast()` on AVR
-          processors
-    * `LedMatrixSingleHc595`
-        * Group pins are access directly, but element pins are access through an
-          74HC595 chip through SPI using one of SpiInterface classes
-    * `LedMatrixDualHc595`
-        * Both group and element pions are access through two 74HC595 chips
-          through SPI using one of the SpiInterface classes
-
-<a name="ChoosingLedMatrix"></a>
-### Choosing the LedMatrix
-
-The `LedMatrix` captures the wiring information about the LED module.
-The best way to show how to use these methods is probably through
-examples.
+Multiple LED segments are connected to a single pin. If the microcontroller
+cannot supply the current required by all the segments on a particular pin, a
+transistor must be used to handle the larger current. This usually means that
+the logical level of the pin becomes inverted. The `LedMatrix` classes can
+handle driver transistors using the same bit-flipping XOR mechanism used to
+handle common cathode and common anode configurations.
 
 <a name="ResistorsAndTransistors"></a>
-#### Resistors and Transistors
+### Resistors and Transistors
 
 In the following circuit diagrams, `R` represents the current limiting resistors
 and `T` represents the driving transistor. The resistor protects each LED
@@ -149,6 +121,34 @@ above, then a PNP transistor would be used, with the emitter tied to Vcc. Again,
 the logic level on the D12 pin will become inverted compared to wiring the digit
 pin directly to the microcontroller.
 
+<a name="LedMatrix"></a>
+## LedMatrix
+
+<a name="LedMatrixClasses"></a>
+### LedMatrix Classes
+
+Several `LedMatrix` classes capture the wiring of the matrix of LEDs.
+
+* `LedMatrixDirect`
+    * Group pins and element pins are directly accessed through the
+        microcontroller pins.
+* `LedMatrixDirectFast4`
+    * Same as `LedMatrixDirect` but using `digitalWriteFast()` on AVR
+        processors
+* `LedMatrixSingleHc595`
+    * Group pins are access directly, but element pins are access through an
+        74HC595 chip through SPI using one of SpiInterface classes
+* `LedMatrixDualHc595`
+    * Both group and element pions are access through two 74HC595 chips
+        through SPI using one of the SpiInterface classes
+
+<a name="ChoosingLedMatrix"></a>
+### Choosing the LedMatrix
+
+The `LedMatrix` captures the wiring information about the LED module.
+The best way to show how to use these methods is probably through
+examples.
+
 <a name="LedMatrixDirectCommonCathode"></a>
 #### Pins Wired Directly, Common Cathode
 
@@ -183,8 +183,8 @@ const uint16_t FRAMES_PER_SECOND = 60;
 
 using LedMatrix = LedMatrixDirect<>;
 LedMatrix ledMatrix(
-    LedMatrix::kActiveHighPattern /*elementOnPattern*/,
-    LedMatrix::kActiveHighPattern /*groupOnPattern*/,
+    LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
+    LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
     NUM_SEGMENTS,
     SEGMENT_PINS,
     NUM_DIGITS,
@@ -228,7 +228,7 @@ case above, except that `kActiveHighPattern` is replaced with
 `kActiveLowPattern`.
 
 <a name="LedMatrixSingleHc595"></a>
-#### Segments on 74HC595 Shift Register
+#### Segments on Single 74HC595
 
 The segment pins can be placed on a 74HC595 shift register chip that can be
 accessed through SPI. The caveat is that this chip can supply only 6 mA per pin
@@ -273,8 +273,8 @@ SoftSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
 using LedMatrix = LedMatrixSingleHc595<SoftSpiInterface>;
 LedMatrix ledMatrix(
     spiInterface,
-    LedMatrix::kActiveHighPattern /*elementOnPattern*/,
-    LedMatrix::kActiveHighPattern /*groupOnPattern*/,
+    LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
+    LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
     NUM_DIGITS,
     DIGIT_PINS):
 ScanningModule<LedMatrix, NUM_DIGITS> scanningModule(
@@ -293,7 +293,7 @@ The `LedMatrixSingleHc595` configuration using hardware SPI is *exactly*
 the same as above but with `HardSpiInterface` replacing `SoftSpiInterface`.
 
 <a name="LedMatrixDualHc595"></a>
-#### Digits and Segments on Two Shift Registers
+#### Digits and Segments on Dual 74HC595
 
 In this wiring, both the segment pins and the digit pins are wired to
 two 74HC595 chips so that both sets of pins are set through SPI.
@@ -338,8 +338,8 @@ HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
 using LedMatrix = LedMatrixSingleHc595<HardSpiInterface>;
 LedMatrix ledMatrix(
     spiInterface,
-    LedMatrix::kActiveHighPattern /*elementOnPattern*/,
-    LedMatrix::kActiveHighPattern /*groupOnPattern*/);
+    LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
+    LedMatrixBase::kActiveHighPattern /*groupOnPattern*/);
 ScanningModule<LedMatrix, NUM_DIGITS> scanningModule(
     ledMatrix, FRAMES_PER_SECOND);
 LedDisplay ledDisplay(scanningModule);
@@ -355,23 +355,22 @@ void setupScanningModule() {
 <a name="ScanningModule"></a>
 ## ScanningModule
 
-* An implementation of `LedModule` for LED segment modules which do not
-    have a hardware controller, and must be multiplexed across multiple
-    digits by the host microcontroller
-* Uses the `LedMatrix` classes to send the segment patterns to the
-    actual LED module
+The `ScanningModule` is the base class of 4 convenience classes:
 
-<a name="ScanningModuleClasses"></a>
-### Scanning Module Classes
+* `DirectModule`
+* `DirectModuleFast4`
+* `HybridModule`
+* `Hc595Module`
+
+The class hierarchy diagram looks like this:
 
 ```
-
                     ScanningModule
                          ^
                          |
                +---------+------------+
                |         |            |
-      DirectModule SingleHc595Module DualHc595Module
+      DirectModule  HybridModule   Hc595Module
  DirectFast4Module       |                \
            /             |                 \
           /              |                  \
@@ -385,6 +384,14 @@ LedMatrixDirectFast4              \             /
                                    HardSpiInterface
                                    HardSpiFastInterface
 ```
+
+`ScanningModule` class is designed for LED modules which do not have a hardware
+controller that performs the multiplexing, so must be manually multiplexed by
+the host microcontroller
+
+Instead of using the convenience classes, it is possible to use the
+`ScanningModule` class directly with one of its associated `LedMatrixXxx`
+classes.
 
 <a name="SettingUpScanningModule"></a>
 ### Setting Up the Scanning Module
@@ -418,8 +425,8 @@ const uint16_t FRAMES_PER_SECOND = 60;
 // The chain of resources.
 using LedMatrix = LedMatrixDirect<>;
 LedMatrix ledMatrix(
-    LedMatrix::kActiveLowPattern /*elementOnPattern*/,
-    LedMatrix::kActiveLowPattern /*groupOnPattern*/,
+    LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
+    LedMatrixBase::kActiveLowPattern /*groupOnPattern*/,
     NUM_SEGMENTS,
     SEGMENT_PINS,
     NUM_DIGITS,
@@ -440,18 +447,12 @@ void setupAceSegment() {
 }
 
 void setup() {
-  delay(1000); // Wait for stability on some boards, otherwise garage on Serial
-  Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
-  while (!Serial); // Wait until Serial is ready - Leonardo/Micro
-  Serial.println(F("setup(): begin"));
+  delay(1000);
 
-  ...
   setupAceSegment();
-
-  Serial.println(F("setup(): end"));
+  ...
 }
 ```
-
 
 <a name="UsingScanningModule"></a>
 ### Using the ScanningModule
@@ -461,6 +462,7 @@ void setup() {
 
 The `ScanningModule` contains a number of methods to write the bit patterns of
 the seven segment display:
+
 * `void writePatternAt(uint8_t pos, uint8_t pattern)`
 * `void writeDecimalPointAt(uint8_t pos, bool state = true)`
 * `void setBrightnessAt(uint8_t pos, uint8_t brightness)`
@@ -470,9 +472,10 @@ to the decimal point ('h', bit 7), no matter what previous pattern was there in
 initially. The `state` variable controls whether the decimal point should
 be turned on (default) or off (false).
 
-The `brightness` is an integer constant (0-255) associated with the digit. It
-requires the `ScanningModule` object to be configured to support PWM on the
-digit pins. Otherwise, the brightness is ignored.
+The `brightness` is an integer associated with the digit. The range of
+brightness is controlled by `NUM_SUBFIELDS`. It requires the `ScanningModule`
+object to be configured to support PWM on the digit pins. Otherwise, the
+brightness is ignored.
 
 <a name="GlobalBrightness"></a>
 #### Global Brightness
@@ -484,8 +487,9 @@ the entire LED display using:
 scanningModule.setBrightness(value);
 ```
 
-Note that the `value` is an integer from `[0, NUM_DIGITS]`, and represents the
-brightness of the display, where 0 means OFF and `NUM_DIGITS` means 100% ON.
+Note that the `value` is an integer from `[0, NUM_SUBFIELDS]`, and represents
+the brightness of the display, where 0 means OFF and `NUM_SUBFIELDS` means 100%
+ON.
 
 The global brightness is enabled only if the `NUM_SUBFIELDS` template parameter
 of the `ScanningModule` was set to be `> 1`. By default, this is set to 1. For
@@ -504,8 +508,8 @@ HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
 using LedMatrix = LedMatrixSingleHc595<HardSpiInterface>;
 LedMatrix ledMatrix(
     spiInterface,
-    LedMatrix::kActiveHighPattern /*elementOnPattern*/,
-    LedMatrix::kActiveHighPattern /*groupOnPattern*/);
+    LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
+    LedMatrixBase::kActiveHighPattern /*groupOnPattern*/);
 ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
     ledMatrix, FRAMES_PER_SECOND);
 LedDisplay ledDisplay(scanningModule);
