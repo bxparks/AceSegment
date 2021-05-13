@@ -254,7 +254,7 @@ specific LED segment patterns using an internal "font" table. These classes use
 the `LedDisplay` interface (implemented by `ScanningModule`), so in theory,
 other types of LED displays could be used by these Writer classes.
 
-This library currently provides 4 Writer classes:
+This library currently provides the following Writer and Scroller classes:
 
 * `NumberWriter`
     * `writeHexCharAt()`
