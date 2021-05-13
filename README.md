@@ -121,11 +121,11 @@ Some of the examples may depend on:
 The following example sketches are provided:
 
 * Basic
-    * [DualHc595Demo.ino](examples/DualHc595Demo)
-    * [Max7219Demo.ino](examples/Max7219Demo)
     * [Tm1637Demo.ino](examples/Tm1637Demo)
+    * [Max7219Demo.ino](examples/Max7219Demo)
+    * [Hc595Demo.ino](examples/Hc595Demo)
     * [DirectModuleDemo.ino](examples/DirectModuleDemo)
-    * [SingleHc595Demo.ino](examples/SingleHc595Demo)
+    * [HybridDemo.ino](examples/HybridDemo)
 * Advanced
     * [Tm1637DualDemo.ino](examples/Tm1637DualDemo)
     * [ModulatingDemo.ino](examples/ModulatingDemo)
@@ -153,7 +153,7 @@ depend on the lower-level classes:
 * SpiInterface
     * Thin-wrapper classes for communicating with the LED module that support
       SPI
-    * Used by `Max7219Module` and `DualHc595Module`.
+    * Used by `Max7219Module` and `Hc595Module`.
     * There are 4 implementations.
         * `SoftSpiInterface`
             * Software SPI using `shiftOut()`
@@ -584,7 +584,7 @@ const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 using SpiInterface = HardSpiInterface;
 SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
 
-DualHc595Module<SpiInterface, NUM_DIGITS> ledModule(
+Hc595Module<SpiInterface, NUM_DIGITS> ledModule(
     spiInterface,
     SEGMENT_ON_PATTERN,
     DIGIT_ON_PATTERN,
