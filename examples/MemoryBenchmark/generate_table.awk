@@ -9,14 +9,14 @@ BEGIN {
   labels[0] = "baseline"
   labels[1] = "DirectModule";
   labels[2] = "DirectFast4Module";
-  labels[3] = "SingleHc595(SoftSpi)";
-  labels[4] = "SingleHc595(SoftSpiFast)";
-  labels[5] = "SingleHc595(HardSpi)";
-  labels[6] = "SingleHc595(HardSpiFast)";
-  labels[7] = "DualHc595(SoftSpi)";
-  labels[8] = "DualHc595(SoftSpiFast)";
-  labels[9] = "DualHc595(HardSpi)";
-  labels[10] = "DualHc595(HardSpiFast)";
+  labels[3] = "Hybrid(SoftSpi)";
+  labels[4] = "Hybrid(SoftSpiFast)";
+  labels[5] = "Hybrid(HardSpi)";
+  labels[6] = "Hybrid(HardSpiFast)";
+  labels[7] = "Hc595(SoftSpi)";
+  labels[8] = "Hc595(SoftSpiFast)";
+  labels[9] = "Hc595(HardSpi)";
+  labels[10] = "Hc595(HardSpiFast)";
   labels[11] = "Tm1637(SoftWire)";
   labels[12] = "Tm1637(SoftWireFast)";
   labels[13] = "Max7219(SoftSpi)";
@@ -59,8 +59,8 @@ END {
     labels[0], u[0]["flash"], u[0]["ram"], u[0]["d_flash"], u[0]["d_ram"])
   for (i = 1 ; i < NUM_ENTRIES; i++) {
     if (labels[i] ~ /DirectModule/ \
-        || labels[i] ~ /SingleHc595\(SoftSpi\)/ \
-        || labels[i] ~ /DualHc595\(SoftSpi\)/ \
+        || labels[i] ~ /Hybrid\(SoftSpi\)/ \
+        || labels[i] ~ /Hc595\(SoftSpi\)/ \
         || labels[i] ~ /Tm1637\(SoftWire\)/ \
         || labels[i] ~ /Max7219\(SoftSpi\)/ \
         || labels[i] == "StubModule+LedDisplay") {

@@ -1,12 +1,12 @@
 /*
  * A demo of a 4-digit LED module with segment pins connected to a 74HC595 shift
  * register and the digit pins connected directly to the microcontroller. Uses
- * the SingleHc595Module class.
+ * the HybridModule class.
  */
 
 #include <Arduino.h>
 #include <AceCommon.h> // incrementMod()
-#include <AceSegment.h> // SingleHc595Module, LedDisplay
+#include <AceSegment.h> // HybridModule, LedDisplay
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 #include <digitalWriteFast.h>
@@ -19,7 +19,7 @@ using ace_common::incrementModOffset;
 using ace_common::TimingStats;
 using ace_segment::LedMatrixBase;
 using ace_segment::SoftSpiFastInterface;
-using ace_segment::SingleHc595Module;
+using ace_segment::HybridModule;
 using ace_segment::LedDisplay;
 
 //----------------------------------------------------------------------------
@@ -74,7 +74,7 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 // Common Cathode, with transistors on Group pins
 using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
 SpiInterface spiInterface;
-SingleHc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
+HybridModule<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
     spiInterface,
     LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
     LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,

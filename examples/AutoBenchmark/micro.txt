@@ -7,14 +7,14 @@ sizeof(HardSpiInterface): 3
 sizeof(HardSpiFastInterface<11, 12, 13>): 1
 sizeof(LedMatrixDirect<>): 9
 sizeof(LedMatrixDirectFast4<6..13, 2..5>): 3
-sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 8
+sizeof(LedMatrixHybrid<SoftSpiInterface>): 8
 sizeof(LedMatrixDualHc595<HardSpiInterface>): 8
 sizeof(LedModule): 3
 sizeof(ScanningModule<LedMatrixBase, 4>): 22
 sizeof(DirectModule<4>): 31
 sizeof(DirectFast4Module<...>): 25
-sizeof(SingleHc595Module<SoftSpiInterface, 4>): 30
-sizeof(DualHc595Module<SoftSpiInterface, 4>): 30
+sizeof(HybridModule<SoftSpiInterface, 4>): 30
+sizeof(Hc595Module<SoftSpiInterface, 4>): 30
 sizeof(Tm1637Module<SoftWireInterface, 4>): 14
 sizeof(Tm1637Module<SoftWireInterface, 6>): 16
 sizeof(Max7219Module<SoftSpiInterface, 8>): 16
@@ -30,22 +30,22 @@ Direct 72 76 84 240
 Direct(subfields) 4 14 88 3840
 DirectFast4 24 28 36 240
 DirectFast4(subfields) 4 8 40 3840
-SingleHc595(SoftSpi) 148 153 164 240
-SingleHc595(SoftSpi,subfields) 4 23 168 3840
-SingleHc595(SoftSpiFast) 28 31 40 240
-SingleHc595(SoftSpiFast,subfields) 4 8 40 3840
-SingleHc595(HardSpi) 36 41 52 240
-SingleHc595(HardSpi,subfields) 4 9 56 3840
-SingleHc595(HardSpiFast) 24 27 36 240
-SingleHc595(HardSpiFast,subfields) 4 8 40 3840
-DualHc595(SoftSpi) 248 255 264 240
-DualHc595(SoftSpi,subfields) 4 37 268 3840
-DualHc595(SoftSpiFast) 24 25 36 240
-DualHc595(SoftSpiFast,subfields) 4 8 32 3840
-DualHc595(HardSpi) 28 30 36 240
-DualHc595(HardSpi,subfields) 4 8 36 3840
-DualHc595(HardSpiFast) 12 15 20 240
-DualHc595(HardSpiFast,subfields) 4 6 28 3840
+Hybrid(SoftSpi) 148 153 164 240
+Hybrid(SoftSpi,subfields) 4 23 168 3840
+Hybrid(SoftSpiFast) 28 31 40 240
+Hybrid(SoftSpiFast,subfields) 4 8 40 3840
+Hybrid(HardSpi) 36 41 52 240
+Hybrid(HardSpi,subfields) 4 9 56 3840
+Hybrid(HardSpiFast) 24 27 36 240
+Hybrid(HardSpiFast,subfields) 4 8 40 3840
+Hc595(SoftSpi) 248 255 264 240
+Hc595(SoftSpi,subfields) 4 37 268 3840
+Hc595(SoftSpiFast) 24 25 36 240
+Hc595(SoftSpiFast,subfields) 4 8 32 3840
+Hc595(HardSpi) 28 30 36 240
+Hc595(HardSpi,subfields) 4 8 36 3840
+Hc595(HardSpiFast) 12 15 20 240
+Hc595(HardSpiFast,subfields) 4 6 28 3840
 Tm1637(SoftWire) 22436 22442 22452 10
 Tm1637(SoftWire,incremental) 4 817 10164 50
 Tm1637(SoftWireFast) 21168 21178 21184 10

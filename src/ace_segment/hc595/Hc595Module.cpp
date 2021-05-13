@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "DualHc595Module.h"
+#include "Hc595Module.h"
 
 namespace ace_segment {
 

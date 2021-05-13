@@ -30,9 +30,9 @@ configurations:
 
 * `DirectModule`: group and segment pins directly connected to MCU
 * `DirectFast4Module`: same as `DirectModule` but using `digitalWriteFast` library
-* `SingleHc595Module`: group pins connected directly to MCU, but segment pins
+* `HybridModule`: group pins connected directly to MCU, but segment pins
   connected to 74HC595 accessed through SPI
-* `DualHc595Module`: group pins and segment pins connected to two 74HC595
+* `Hc595Module`: group pins and segment pins connected to two 74HC595
   which are accessed through SPI
 * `Tm1637Module`: an LED module using a TM1637 driver chip, accessed through
   a two-wire protocol similar to I2C
@@ -128,10 +128,10 @@ number of `TimingStats::update()` calls that were made.
       resets via the watch dog timer. On ESP8266 (and maybe others), the
       `flushIncremental()` should be used.
 * Add benchmarks for `Max7219Module`.
-* Add benchmarks for `DirectModule`, `DirectFast4Module`, `SingleHc595Module`,
-  and `DualHc595Module`.
+* Add benchmarks for `DirectModule`, `DirectFast4Module`, `HybridModule`,
+  and `Hc595Module`.
 * Upgrade from ESP32 Core v1.0.4 to v1.0.6.
-* Adding `byteOrder` and `remapArray` parameters to `DualHc595Module` increases
+* Adding `byteOrder` and `remapArray` parameters to `Hc595Module` increases
   the CPU time of `renderFieldsNow()` by a tiny amount, maybe a microsecond on a
   AVR. For 32-bit processors, the difference seems to be within the noise.
 
@@ -162,10 +162,10 @@ to meet this threshhold.
   previous digit, sending the 8 bits for the current digit's 8 LED segments in a
   loop, then turning on the current digit. The `digitalWrite()` function is
   called 10 times.
-* For the `SingleHc595Module` type, the 8 LED segment bits are sent
+* For the `HybridModule` type, the 8 LED segment bits are sent
   using software SPI or hardware SPI. (Software SPI uses the `shiftOut()`
   method, which is implemented using a loop of `digitalWrite()`.
-* For the `DualHc595Module` type, the LED digit pins and the LED
+* For the `Hc595Module` type, the LED digit pins and the LED
   segment pins are using conceptually a single SPI transaction. For software
   SPI, this is implemented using 2 `shiftOut()` operations. For hardware SPI,
   this uses a single `SPI::transfer16()` command.

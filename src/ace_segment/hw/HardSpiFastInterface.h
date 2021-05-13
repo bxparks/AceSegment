@@ -44,7 +44,7 @@ namespace ace_segment {
  * (Max7219Module) bytes. However, if multiple LED modules are used, using
  * different LatchPins, the HardSpiInterface might ultimately consume less flash
  * memory because it avoids generating different template instantiations of the
- * ScanningModule, SingleHc595Module, or DualHc595Module classes. Users are
+ * ScanningModule, HybridModule, or Hc595Module classes. Users are
  * advised to try both and compare the difference.
  */
 template <uint8_t T_LATCH_PIN, uint8_t T_DATA_PIN, uint8_t T_CLOCK_PIN>

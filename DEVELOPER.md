@@ -26,8 +26,8 @@ roughly like this:
   |                       |                |                   |
   |                       |                |                   |
 ace_segment/direct/ ace_segment/hc595/  ace_segment/tm1637/ ace_segment/max7219/
- DirectModule.h      SingleHc595Module.h Tm1637Module.h      Max7219Module.h
- DirectFast4Module.h DualHc595Module.h     /                /
+ DirectModule.h      HybridModule.h     Tm1637Module.h      Max7219Module.h
+ DirectFast4Module.h Hc595Module.h         /                /
        \               /                  /                /
         \             /                  /                /
          v           v                  /                /
@@ -179,7 +179,7 @@ are mapped to different physical addresses on the actual LED module. For
 example, the 6-digit LED display using a TM1637 chip manufactured by diymore.cc
 maps "0 1 2 3 4 5" so that the digits are displayed as "2 1 0 5 4 3".
 
-The constructors of `DualHc595Module`, `Tm1637Module` and `Max7219Module` accept
+The constructors of `Hc595Module`, `Tm1637Module` and `Max7219Module` accept
 an optional `remapArray` parameter to account for the wiring variations. Various
 predefined `kDigitRemapArrayXxx` are provided for the modules that I have
 encountered.

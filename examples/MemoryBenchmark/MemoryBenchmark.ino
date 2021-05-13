@@ -122,7 +122,7 @@ volatile int disableCompilerOptimization = 0;
     // Common Cathode, with transistors on Group pins
     using SpiInterface = SoftSpiInterface;
     SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-    SingleHc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
+    HybridModule<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
         LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
         LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
@@ -138,7 +138,7 @@ volatile int disableCompilerOptimization = 0;
     // Common Cathode, with transistors on Group pins
     using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
-    SingleHc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
+    HybridModule<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
         LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
         LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
@@ -150,7 +150,7 @@ volatile int disableCompilerOptimization = 0;
     // Common Cathode, with transistors on Group pins
     using SpiInterface = HardSpiInterface;
     SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-    SingleHc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
+    HybridModule<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
         LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
         LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
@@ -166,7 +166,7 @@ volatile int disableCompilerOptimization = 0;
     // Common Cathode, with transistors on Group pins
     using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
-    SingleHc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
+    HybridModule<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
         LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
         LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
@@ -178,7 +178,7 @@ volatile int disableCompilerOptimization = 0;
     // Common Cathode, with transistors on Group pins
     using SpiInterface = SoftSpiInterface;
     SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-    DualHc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
+    Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
         LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
         LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
@@ -194,7 +194,7 @@ volatile int disableCompilerOptimization = 0;
     // Common Cathode, with transistors on Group pins
     using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
-    DualHc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
+    Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
         LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
         LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
@@ -206,7 +206,7 @@ volatile int disableCompilerOptimization = 0;
     // Common Cathode, with transistors on Group pins
     using SpiInterface = HardSpiInterface;
     SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-    DualHc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
+    Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
         LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
         LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
@@ -222,7 +222,7 @@ volatile int disableCompilerOptimization = 0;
     // Common Cathode, with transistors on Group pins
     using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
-    DualHc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
+    Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
         LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
         LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,

@@ -8,8 +8,8 @@
  *  * ScanningModule + LedMatrixDualHc595
  *  * DirectModule
  *  * DirectFast4Module
- *  * SingleHc595Module
- *  * DualHc595Module
+ *  * HybridModule
+ *  * Hc595Module
  */
 #include <Arduino.h>
 #include <AceCommon.h> // incrementMod()
@@ -383,7 +383,7 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
     using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
   #endif
-  SingleHc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
+  HybridModule<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
       spiInterface,
       LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
       LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
@@ -406,7 +406,7 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
     using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
   #endif
-  DualHc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
+  Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
       spiInterface,
       SEGMENT_ON_PATTERN,
       DIGIT_ON_PATTERN,

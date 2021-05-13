@@ -16,8 +16,8 @@ LED driver chip.
 consumption. Need to add documentation for:
 * `Tm1637Module`
 * `Max7219Module`
-* `SingleHc595Module`
-* `DualHc595Module`
+* `HybridModule`
+* `Hc595Module`
 * `DirectModule`
 * `DirectFast4Module`
 
@@ -314,7 +314,7 @@ ScanningModule  Tm1637Module  Max7219Module
                          |
                +---------+------------+
                |         |            |
-      DirectModule SingleHc595Module DualHc595Module
+      DirectModule HybridModule    Hc595Module
  DirectFast4Module       |                \
            /             |                 \
           /              |                  \
@@ -1024,8 +1024,8 @@ sizeof(LedModule): 3
 sizeof(ScanningModule<LedMatrixBase, 4>): 22
 sizeof(DirectModule<4>): 31
 sizeof(DirectFast4Module<...>): 25
-sizeof(SingleHc595Module<SoftSpiInterface, 4>): 30
-sizeof(DualHc595Module<SoftSpiInterface, 4>): 27
+sizeof(HybridModule<SoftSpiInterface, 4>): 30
+sizeof(Hc595Module<SoftSpiInterface, 4>): 27
 sizeof(Tm1637Module<SoftWireInterface, 4>): 14
 sizeof(Max7219Module<SoftSpiInterface, 8>): 16
 sizeof(LedDisplay): 2
@@ -1049,8 +1049,8 @@ sizeof(LedMatrixDualHc595<HardSpiInterface>): 12
 sizeof(LedModule): 8
 sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(DirectModule<4>): 48
-sizeof(SingleHc595Module<SoftSpiInterface, 4>): 48
-sizeof(DualHc595Module<SoftSpiInterface, 4>): 44
+sizeof(HybridModule<SoftSpiInterface, 4>): 48
+sizeof(Hc595Module<SoftSpiInterface, 4>): 44
 sizeof(Tm1637Module<SoftWireInterface, 4>): 24
 sizeof(Max7219Module<SoftSpiInterface, 8>): 28
 sizeof(LedDisplay): 4
@@ -1082,15 +1082,15 @@ static memory consumptions for various configurations on an Arduino Nano
 | DirectModule                    |   1486/   64 |  1030/   53 |
 | DirectFast4Module               |   1250/   94 |   794/   83 |
 |---------------------------------+--------------+-------------|
-| SingleHc595(SoftSpi)            |   1508/   58 |  1052/   47 |
-| SingleHc595(SoftSpiFast)        |   1400/   56 |   944/   45 |
-| SingleHc595(HardSpi)            |   1570/   59 |  1114/   48 |
-| SingleHc595(HardSpiFast)        |   1498/   57 |  1042/   46 |
+| Hybrid(SoftSpi)                 |   1508/   58 |  1052/   47 |
+| Hybrid(SoftSpiFast)             |   1400/   56 |   944/   45 |
+| Hybrid(HardSpi)                 |   1570/   59 |  1114/   48 |
+| Hybrid(HardSpiFast)             |   1498/   57 |  1042/   46 |
 |---------------------------------+--------------+-------------|
-| DualHc595(SoftSpi)              |   1422/   51 |   966/   40 |
-| DualHc595(SoftSpiFast)          |   1012/   49 |   556/   38 |
-| DualHc595(HardSpi)              |   1496/   52 |  1040/   41 |
-| DualHc595(HardSpiFast)          |   1404/   50 |   948/   39 |
+| Hc595(SoftSpi)                  |   1422/   51 |   966/   40 |
+| Hc595(SoftSpiFast)              |   1012/   49 |   556/   38 |
+| Hc595(HardSpi)                  |   1496/   52 |  1040/   41 |
+| Hc595(HardSpiFast)              |   1404/   50 |   948/   39 |
 |---------------------------------+--------------+-------------|
 | Tm1637(SoftWire)                |   1582/   39 |  1126/   28 |
 | Tm1637(SoftWireFast)            |    924/   36 |   468/   25 |
@@ -1120,15 +1120,15 @@ And here are the memory consumption numbers for an ESP8266:
 | DirectModule                    | 257772/27260 |  1072/  476 |
 | DirectFast4Module               |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| SingleHc595(SoftSpi)            | 257860/27244 |  1160/  460 |
-| SingleHc595(SoftSpiFast)        |     -1/   -1 |    -1/   -1 |
-| SingleHc595(HardSpi)            | 258964/27252 |  2264/  468 |
-| SingleHc595(HardSpiFast)        |     -1/   -1 |    -1/   -1 |
+| Hybrid(SoftSpi)                 | 257860/27244 |  1160/  460 |
+| Hybrid(SoftSpiFast)             |     -1/   -1 |    -1/   -1 |
+| Hybrid(HardSpi)                 | 258964/27252 |  2264/  468 |
+| Hybrid(HardSpiFast)             |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| DualHc595(SoftSpi)              | 257728/27248 |  1028/  464 |
-| DualHc595(SoftSpiFast)          |     -1/   -1 |    -1/   -1 |
-| DualHc595(HardSpi)              | 258928/27256 |  2228/  472 |
-| DualHc595(HardSpiFast)          |     -1/   -1 |    -1/   -1 |
+| Hc595(SoftSpi)                  | 257728/27248 |  1028/  464 |
+| Hc595(SoftSpiFast)              |     -1/   -1 |    -1/   -1 |
+| Hc595(HardSpi)                  | 258928/27256 |  2228/  472 |
+| Hc595(HardSpiFast)              |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | Tm1637(SoftWire)                | 257920/27224 |  1220/  440 |
 | Tm1637(SoftWireFast)            |     -1/   -1 |    -1/   -1 |
@@ -1163,23 +1163,23 @@ Here are the CPU numbers for an AVR processor:
 | DirectFast4                            |    24/   28/   36 |     240 |
 | DirectFast4(subfields)                 |     4/    8/   40 |    3840 |
 |----------------------------------------+-------------------+---------|
-| SingleHc595(SoftSpi)                   |   156/  159/  180 |     240 |
-| SingleHc595(SoftSpi,subfields)         |     4/   22/  180 |    3840 |
-| SingleHc595(SoftSpiFast)               |    28/   30/   44 |     240 |
-| SingleHc595(SoftSpiFast,subfields)     |     4/    8/   40 |    3840 |
-| SingleHc595(HardSpi)                   |    36/   39/   52 |     240 |
-| SingleHc595(HardSpi,subfields)         |     4/    9/   52 |    3840 |
-| SingleHc595(HardSpiFast)               |    24/   27/   44 |     240 |
-| SingleHc595(HardSpiFast,subfields)     |     4/    7/   36 |    3840 |
+| Hybrid(SoftSpi)                        |   156/  159/  180 |     240 |
+| Hybrid(SoftSpi,subfields)              |     4/   22/  180 |    3840 |
+| Hybrid(SoftSpiFast)                    |    28/   30/   44 |     240 |
+| Hybrid(SoftSpiFast,subfields)          |     4/    8/   40 |    3840 |
+| Hybrid(HardSpi)                        |    36/   39/   52 |     240 |
+| Hybrid(HardSpi,subfields)              |     4/    9/   52 |    3840 |
+| Hybrid(HardSpiFast)                    |    24/   27/   44 |     240 |
+| Hybrid(HardSpiFast,subfields)          |     4/    7/   36 |    3840 |
 |----------------------------------------+-------------------+---------|
-| DualHc595(SoftSpi)                     |   264/  269/  304 |     240 |
-| DualHc595(SoftSpi,subfields)           |     4/   35/  304 |    3840 |
-| DualHc595(SoftSpiFast)                 |    20/   24/   36 |     240 |
-| DualHc595(SoftSpiFast,subfields)       |     4/    7/   32 |    3840 |
-| DualHc595(HardSpi)                     |    24/   27/   40 |     240 |
-| DualHc595(HardSpi,subfields)           |     4/    8/   36 |    3840 |
-| DualHc595(HardSpiFast)                 |    12/   14/   28 |     240 |
-| DualHc595(HardSpiFast,subfields)       |     4/    6/   24 |    3840 |
+| Hc595(SoftSpi)                         |   264/  269/  304 |     240 |
+| Hc595(SoftSpi,subfields)               |     4/   35/  304 |    3840 |
+| Hc595(SoftSpiFast)                     |    20/   24/   36 |     240 |
+| Hc595(SoftSpiFast,subfields)           |     4/    7/   32 |    3840 |
+| Hc595(HardSpi)                         |    24/   27/   40 |     240 |
+| Hc595(HardSpi,subfields)               |     4/    8/   36 |    3840 |
+| Hc595(HardSpiFast)                     |    12/   14/   28 |     240 |
+| Hc595(HardSpiFast,subfields)           |     4/    6/   24 |    3840 |
 |----------------------------------------+-------------------+---------|
 | Tm1637(SoftWire)                       | 22308/22328/22576 |      20 |
 | Tm1637(SoftWireFast)                   | 21060/21073/21212 |      20 |
@@ -1204,15 +1204,15 @@ Here are the CPU numbers for an ESP8266:
 | Direct                                 |    12/   12/   25 |     240 |
 | Direct(subfields)                      |     0/    2/   25 |    3840 |
 |----------------------------------------+-------------------+---------|
-| SingleHc595(SoftSpi)                   |    29/   29/   37 |     240 |
-| SingleHc595(SoftSpi,subfields)         |     0/    4/   42 |    3840 |
-| SingleHc595(HardSpi)                   |    11/   11/   19 |     240 |
-| SingleHc595(HardSpi,subfields)         |     0/    2/   23 |    3840 |
+| Hybrid(SoftSpi)                        |    29/   29/   37 |     240 |
+| Hybrid(SoftSpi,subfields)              |     0/    4/   42 |    3840 |
+| Hybrid(HardSpi)                        |    11/   11/   19 |     240 |
+| Hybrid(HardSpi,subfields)              |     0/    2/   23 |    3840 |
 |----------------------------------------+-------------------+---------|
-| DualHc595(SoftSpi)                     |    50/   50/   63 |     240 |
-| DualHc595(SoftSpi,subfields)           |     0/    7/   67 |    3840 |
-| DualHc595(HardSpi)                     |    12/   12/   19 |     240 |
-| DualHc595(HardSpi,subfields)           |     0/    2/   32 |    3840 |
+| Hc595(SoftSpi)                         |    50/   50/   63 |     240 |
+| Hc595(SoftSpi,subfields)               |     0/    7/   67 |    3840 |
+| Hc595(HardSpi)                         |    12/   12/   19 |     240 |
+| Hc595(HardSpi,subfields)               |     0/    2/   32 |    3840 |
 |----------------------------------------+-------------------+---------|
 | Tm1637(SoftWire)                       | 21496/21505/21552 |      20 |
 |----------------------------------------+-------------------+---------|

@@ -1,12 +1,12 @@
 /*
  * A demo of a 4-digit LED module with the segment pins connected to a 74HC595
  * shift register and the digit pins also connected to a 74HC595 shift regstier.
- * Uses the DualHc595Module class.
+ * Uses the Hc595Module class.
  */
 
 #include <Arduino.h>
 #include <AceCommon.h> // incrementMod()
-#include <AceSegment.h> // DualHc595Module, LedDisplay
+#include <AceSegment.h> // Hc595Module, LedDisplay
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 #include <digitalWriteFast.h>
@@ -145,7 +145,7 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 #else
   #error Unknown INTERFACE_TYPE
 #endif
-DualHc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
+Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
     spiInterface,
     SEGMENT_ON_PATTERN,
     DIGIT_ON_PATTERN,

@@ -564,7 +564,7 @@ const uint8_t NUM_SUBFIELDS = 1;
     using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
   #endif
-  SingleHc595Module<SpiInterface, NUM_DIGITS> ledModule(
+  HybridModule<SpiInterface, NUM_DIGITS> ledModule(
       spiInterface,
       LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
       LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
@@ -587,7 +587,7 @@ const uint8_t NUM_SUBFIELDS = 1;
     using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
   #endif
-  DualHc595Module<SpiInterface, NUM_DIGITS> ledModule(
+  Hc595Module<SpiInterface, NUM_DIGITS> ledModule(
       spiInterface,
       SEGMENT_ON_PATTERN,
       DIGIT_ON_PATTERN,

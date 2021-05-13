@@ -22,8 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_DUAL_HC595_MODULE_H
-#define ACE_SEGMENT_DUAL_HC595_MODULE_H
+#ifndef ACE_SEGMENT_HC595_MODULE_H
+#define ACE_SEGMENT_HC595_MODULE_H
 
 #include "../scanning/ScanningModule.h"
 #include "../scanning/LedMatrixDualHc595.h"
@@ -39,7 +39,7 @@ const uint8_t kByteOrderSegmentHighDigitLow = kByteOrderElementHighGroupLow;
 /**
  * A map of the logical digit position to its physical position. In other words
  * `physicalPos = kDigitRemapArray[logicalPos]`. Pass this array into the
- * DualHc595Module constructor.
+ * Hc595Module constructor.
  *
  * The 8-digit LED module from diymore.cc using dual 74HC595 controller chips
  * are wired such that the digits appear as "4 5 6 7 0 1 2 3" instead of "0 1 2
@@ -69,7 +69,7 @@ template <
     uint8_t T_SUBFIELDS = 1,
     typename T_CI = ClockInterface
 >
-class DualHc595Module : public ScanningModule<
+class Hc595Module : public ScanningModule<
     LedMatrixDualHc595<T_SPII>,
     T_DIGITS,
     T_SUBFIELDS,
@@ -102,7 +102,7 @@ class DualHc595Module : public ScanningModule<
      *    modules from diymore.cc have the left 4 and right 4 LED digits
      *    swapped.
      */
-    DualHc595Module(
+    Hc595Module(
         const T_SPII& spiInterface,
         uint8_t segmentOnPattern,
         uint8_t digitOnPattern,

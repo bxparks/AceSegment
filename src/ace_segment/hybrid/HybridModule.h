@@ -22,8 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_SINGLE_HC595_MODULE_H
-#define ACE_SEGMENT_SINGLE_HC595_MODULE_H
+#ifndef ACE_SEGMENT_HYBRID_MODULE_H
+#define ACE_SEGMENT_HYBRID_MODULE_H
 
 #include "../scanning/ScanningModule.h"
 #include "../scanning/LedMatrixSingleHc595.h"
@@ -53,7 +53,7 @@ template <
     typename T_CI = ClockInterface,
     typename T_GPIOI = GpioInterface
 >
-class SingleHc595Module : public ScanningModule<
+class HybridModule : public ScanningModule<
     LedMatrixSingleHc595<T_SPII, T_GPIOI>,
     T_DIGITS,
     T_SUBFIELDS,
@@ -68,7 +68,7 @@ class SingleHc595Module : public ScanningModule<
     >;
 
   public:
-    SingleHc595Module(
+    HybridModule(
         const T_SPII& spiInterface,
         uint8_t segmentOnPattern,
         uint8_t digitOnPattern,
