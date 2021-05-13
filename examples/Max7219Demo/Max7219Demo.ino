@@ -26,7 +26,7 @@ using ace_segment::kDigitRemapArray8Max7219;
   #define SPI_INTERFACE_TYPE SPI_INTERFACE_TYPE_HARD_SPI_FAST
 
   // SPI pins
-  const uint8_t LATCH_PIN = A0;
+  const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
 
@@ -34,7 +34,7 @@ using ace_segment::kDigitRemapArray8Max7219;
   #define SPI_INTERFACE_TYPE SPI_INTERFACE_TYPE_HARD_SPI_FAST
 
   // SPI pins
-  const uint8_t LATCH_PIN = A0;
+  const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
 

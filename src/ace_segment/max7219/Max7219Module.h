@@ -82,21 +82,35 @@ inline uint8_t convertPatternMax7219(uint8_t pattern) {
 } // internal
 
 /**
- * The 8-digit MAX7219 LED modules that I bought on eBay and Amazon are wired
- * such that digit 0 is the *right* most digit, and digit 7 is the *left* most
- * digit. This is the reverse of the convention used by the `LedDisplay` class.
- * Use this remap array to reverse the digit addresses by passing it into the
+ * A map of the physical digit position to its physical position. In other words
+ * `logicalPos = kDigitRemapArray[physicalPos]`. Pass this array into the
  * Max7219Module constructor.
+ *
+ * The 8-digit MAX7219 LED modules that I bought on eBay and Amazon are wired
+ * such that the digits appear as "7 6 5 4 3 2 1 0" intead of "0 1 2 3 4 5 6 7".
+ * This is the reverse of the convention used by the `LedDisplay` class.
  *
  * You can create your own remap array to handle other LED modules with
  * different physical ordering compared to the logical ordering.
  */
 extern const uint8_t kDigitRemapArray8Max7219[8];
 
+/**
+ * An implementation of LedModule using the MAX7219 chip. The chip uses SPI.
+ *
+ * @tparam T_SPII the class that implements the SPI interface, usually
+ *    either SoftSpiInterface or HardSpiInterface
+ * @tparam T_DIGITS number of digits in the module
+ */
 template <typename T_SPII, uint8_t T_DIGITS>
 class Max7219Module : public LedModule {
   public:
-    /** Constructor */
+    /**
+     * Constructor.
+     * @param spiInterface instance of T_SPII class
+     * @param remapArray (optional, nullable) a mapping of the physical digit
+     *    positions to their logical positions
+     */
     Max7219Module(
         const T_SPII& spiInterface,
         const uint8_t* remapArray = nullptr
@@ -155,19 +169,19 @@ class Max7219Module : public LedModule {
      *  * SW SPI Fast: 210 microseconds
      */
     void flush() {
-      for (uint8_t i = 0; i < T_DIGITS; ++i) {
-        uint8_t actualPos = remapDigit(i);
+      for (uint8_t physicalPos = 0; physicalPos < T_DIGITS; ++physicalPos) {
+        uint8_t logicalPos = remapPhysicalToLogical(physicalPos);
         uint8_t convertedPattern = internal::convertPatternMax7219(
-            mPatterns[i]);
-        mSpiInterface.send16(actualPos + 1, convertedPattern);
+            mPatterns[logicalPos]);
+        mSpiInterface.send16(physicalPos + 1, convertedPattern);
       }
 
       mSpiInterface.send16(kRegisterIntensity, mBrightness);
     }
 
   private:
-    /** Convert a logical position into the physical position. */
-    uint8_t remapDigit(uint8_t pos) const {
+    /** Convert a physical position into its logical position. */
+    uint8_t remapPhysicalToLogical(uint8_t pos) const {
       return mRemapArray ? mRemapArray[pos] : pos;
     }
 

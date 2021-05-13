@@ -42,23 +42,41 @@ namespace ace_segment {
 static const uint16_t kDefaultTm1637DelayMicros = 100;
 
 /**
+ * A map of the physical digit position to its logical position. In other words
+ * `logicalPos = kDigitRemapArray[physicalPos]`. Pass this array into the
+ * Tm1637Module constructor.
+ *
  * Many (if not all) of the 6-digit LED modules on eBay and Amazon using the
- * TM1637 chip are wired out of sequence. Not sure why since their 4-digit LED
- * modules follow the natural order. This array remaps the digit position to the
- * correct order expected by this library where digit 0 is on the left, and
- * digit 5 is on the far right. Pass this array into the Tm1637Module
- * constructor.
+ * TM1637 chip are wired so that the digits appear in the order of "2 1 0 5 4 3"
+ * instead of "0 1 2 3 4 5". Not sure why since the 4-digit LED modules seem to
+ * follow the natural order.
  *
  * You can create your own remap array to handle other LED modules with
  * different physical ordering compared to the logical ordering.
  */
 extern const uint8_t kDigitRemapArray6Tm1637[6];
 
+namespace internal {
+
 /**
- * An implementation of seven-segment LedModule using the TM1637 chip. The chip
- * communicates using a protocol that is electrically similar to I2C, but does
- * not use an address byte at the beginning of the protocol. We can use a
- * software-based I2C interface.
+ * Return a bit mask that sets the lower `numBits` bits to 1. For example, if
+ * `numBits=4`, then we want 0b00001111 or 0x0F. The general expression to get
+ * this result is `2^N - 1`. The exponential operation can be performed using a
+ * left bit-shift. I believe this expression is well-defined in the C++ language
+ * even if `numBits == 8` because `(1 << 8)` is 0, and `0 - 1` is `0xFF` using
+ * unsigned integer arithmetics.
+ */
+constexpr uint8_t initialDirtyBits(uint8_t numBits) {
+  return ((uint8_t) 0x1 << numBits) - 1;
+}
+
+} // namespace internal
+
+/**
+ * An implementation of LedModule using the TM1637 chip. The chip communicates
+ * using a protocol that is electrically similar to I2C, but does not use an
+ * address byte at the beginning of the protocol. We can use a software-based
+ * I2C interface.
  *
  * @tparam T_WI wire protocol interface, either SoftWireInterface or
  *    SoftWireFastInterface
@@ -72,8 +90,9 @@ class Tm1637Module : public LedModule {
      * Constructor.
      * @param wireInterface instance of either SoftWireInterface or
      *    SoftWireFastInterface
-     * @param remapArray (optional) some (most?) six-digit LED modules using the
-     *      TM1637 chip need remapping of the digit addresses
+     * @param remapArray (optional, nullable) a mapping of the physical digit
+     *    positions to their logical positions, useful for 6-digt LED modules
+     *    using the TM1637 chip whose digits are wired out of order
      */
     explicit Tm1637Module(
         const T_WI& wireInterface,
@@ -100,7 +119,13 @@ class Tm1637Module : public LedModule {
     void begin() {
       memset(mPatterns, 0, T_DIGITS);
       mBrightness = kBrightnessCmd | kBrightnessLevelOn | 0x7;
-      mIsDirty = 0xFF; // force initial values to LED module
+
+      // Initially, we want to set all the dirty bits for digits and brightness,
+      // so that they are sent to the LED module upon the first flush() or
+      // flushIncremental(). The number of dirty bits required is `T_DIGITS +
+      // 1` because we use an extra bit for the brightness.
+      mIsDirty = internal::initialDirtyBits(T_DIGITS + 1);
+
       mFlushStage = 0;
     }
 
@@ -150,25 +175,28 @@ class Tm1637Module : public LedModule {
     //-----------------------------------------------------------------------
 
     /**
-     * Send segment patterns of all digits, plus the brightness information to
-     * the display. Takes about 22 ms using a 100 microsecond delay.
+     * Send segment patterns of all digits plus the brightness to the display,
+     * if any of the digits or brightness is dirty. Takes about 22 ms using a
+     * 100 microsecond delay.
      */
     void flush() {
+      if (! mIsDirty) return;
+
       // Update the brightness first
       mWireInterface.startCondition();
       mWireInterface.sendByte(mBrightness);
       mWireInterface.stopCondition();
 
-      // Update the digits.
+      // Update the digits using auto incrementing mode.
       mWireInterface.startCondition();
       mWireInterface.sendByte(kDataCmdAutoAddress);
       mWireInterface.stopCondition();
 
       mWireInterface.startCondition();
       mWireInterface.sendByte(kAddressCmd);
-      for (uint8_t i = 0; i < T_DIGITS; ++i) {
-        uint8_t actualPos = remapDigit(i);
-        mWireInterface.sendByte(mPatterns[actualPos]);
+      for (uint8_t physicalPos = 0; physicalPos < T_DIGITS; ++physicalPos) {
+        uint8_t logicalPos = remapPhysicalToLogical(physicalPos);
+        mWireInterface.sendByte(mPatterns[logicalPos]);
       }
       mWireInterface.stopCondition();
 
@@ -203,27 +231,31 @@ class Tm1637Module : public LedModule {
      * method is about 50% slower (30 ms), compared to flush() (22 ms).
      */
     void flushIncremental() {
-      if (isDirtyBit(mFlushStage)) {
-        if (mFlushStage == T_DIGITS) {
-          // Check for brightness change.
-          mWireInterface.startCondition();
-          mWireInterface.sendByte(mBrightness);
-          mWireInterface.stopCondition();
-        } else {
-          // Check for changed digits.
-          mWireInterface.startCondition();
-          mWireInterface.sendByte(kDataCmdFixedAddress);
-          mWireInterface.stopCondition();
+      if (mFlushStage == T_DIGITS) {
+        // Update brightness.
+        if (! isDirtyBit(T_DIGITS)) return;
+        mWireInterface.startCondition();
+        mWireInterface.sendByte(mBrightness);
+        mWireInterface.stopCondition();
+        clearDirtyBit(T_DIGITS);
+      } else {
+        const uint8_t physicalPos = mFlushStage;
+        const uint8_t logicalPos = remapPhysicalToLogical(physicalPos);
+        if (! isDirtyBit(logicalPos)) return;
 
-          mWireInterface.startCondition();
-          uint8_t actualPos = remapDigit(mFlushStage);
-          mWireInterface.sendByte(kAddressCmd | actualPos);
-          mWireInterface.sendByte(mPatterns[actualPos]);
-          mWireInterface.stopCondition();
-        }
-        clearDirtyBit(mFlushStage);
+        // Update changed digit.
+        mWireInterface.startCondition();
+        mWireInterface.sendByte(kDataCmdFixedAddress);
+        mWireInterface.stopCondition();
+
+        mWireInterface.startCondition();
+        mWireInterface.sendByte(kAddressCmd | physicalPos);
+        mWireInterface.sendByte(mPatterns[logicalPos]);
+        mWireInterface.stopCondition();
+        clearDirtyBit(logicalPos);
       }
 
+      // An extra dirty bit is used for the brightness so use `T_DIGITS + 1`.
       ace_common::incrementMod(mFlushStage, (uint8_t) (T_DIGITS + 1));
     }
 
@@ -240,8 +272,8 @@ class Tm1637Module : public LedModule {
       return mIsDirty & (0x1 << bit);
     }
 
-    /** Convert a logical position into the physical position. */
-    uint8_t remapDigit(uint8_t pos) const {
+    /** Convert a physical position into the logical position. */
+    uint8_t remapPhysicalToLogical(uint8_t pos) const {
       return mRemapArray ? mRemapArray[pos] : pos;
     }
 
@@ -262,8 +294,8 @@ class Tm1637Module : public LedModule {
     // 32-bit processors.
     const T_WI& mWireInterface;
     const uint8_t* const mRemapArray;
-    uint8_t mPatterns[T_DIGITS]; // maps to dirty bits 0-5
-    uint8_t mBrightness; // maps to dirty bit 7
+    uint8_t mPatterns[T_DIGITS]; // maps to dirty bits [0, T_DIGITS-1]
+    uint8_t mBrightness; // maps to dirty bit at T_DIGITS
     uint8_t mIsDirty; // bit array
     uint8_t mFlushStage; // [0, T_DIGITS], with T_DIGITS for brightness update
 };

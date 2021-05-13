@@ -58,21 +58,21 @@ class LedMatrixDualHc595: public LedMatrixBase {
      * @param elementOnPattern bit pattern that turns on the elements
      * @param groupOnpattern bit pattern that turns on the groups
      * @param byteOrder determine order of group and element bytes
-     * @param remapArray (optional) some LED modules using the 74HC595 chip need
-     *    their physical digit positions remapped to their logical positions
-     *    (e.g. the 8-digit LED modules from diymore.cc have the left 4 and
-     *    right 4 LED digits swapped)
+     * @param remapArrayInverted (optional, nullable) a map of the logical
+     *    positions to their physical positions, which is the inverse of
+     *    the usual arrays expected by higher-level objects such as
+     *    Tm1637Module, Max7219Module, and DualHc595Module
      */
     LedMatrixDualHc595(
         const T_SPII& spiInterface,
         uint8_t elementOnPattern,
         uint8_t groupOnPattern,
         uint8_t byteOrder,
-        const uint8_t* remapArray = nullptr
+        const uint8_t* remapArrayInverted = nullptr
     ) :
         LedMatrixBase(elementOnPattern, groupOnPattern),
         mSpiInterface(spiInterface),
-        mRemapArray(remapArray),
+        mRemapArrayInverted(remapArrayInverted),
         mByteOrder(byteOrder)
     {}
 
@@ -81,12 +81,15 @@ class LedMatrixDualHc595: public LedMatrixBase {
     void end() const {}
 
     /**
-     * Write out the group and element patterns in a single 16-bit stream
-     * with the group bits in the MSB and the element bits in the LSB.
+     * Write out the group and element patterns in a single 16-bit stream.
+     * If the `remap` array exists, then the logical group number is converted
+     * to its physical group number. The byteOrder parameter determines whether
+     * the group bits are in the high byte and element bits in the low byte, or
+     * flipped around.
      */
     void draw(uint8_t group, uint8_t elementPattern) const {
-      uint8_t actualGroup = remapGroup(group);
-      uint8_t groupPattern = 0x1 << actualGroup;
+      uint8_t physicalGroup = remapLogicalToPhysical(group);
+      uint8_t groupPattern = 0x1 << physicalGroup;
       drawPatterns(groupPattern, elementPattern);
       mPrevElementPattern = elementPattern;
     }
@@ -128,9 +131,9 @@ class LedMatrixDualHc595: public LedMatrixBase {
       mSpiInterface.send16(data);
     }
 
-    /** Convert a logical position into the physical position. */
-    uint8_t remapGroup(uint8_t pos) const {
-      return mRemapArray ? mRemapArray[pos] : pos;
+    /** Convert a logical position into its physical position. */
+    uint8_t remapLogicalToPhysical(uint8_t pos) const {
+      return mRemapArrayInverted ? mRemapArrayInverted[pos] : pos;
     }
 
   private:
@@ -141,7 +144,7 @@ class LedMatrixDualHc595: public LedMatrixBase {
     const T_SPII& mSpiInterface;
 
     /** Mapping of the physical digit to the logical digit of the LED module. */
-    const uint8_t* const mRemapArray;
+    const uint8_t* const mRemapArrayInverted;
 
     /** Determine order of group and element bytes. */
     const uint8_t mByteOrder;
