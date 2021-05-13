@@ -14,21 +14,23 @@ of LED displays:
 
 The first 3 types are readily available from consumer sources such as Amazon and
 eBay, in multiple colors and sizes. The final 2 types of modules (hybrid and
-directly connected) are usually custom creations. With the right configuration,
-the AceSegment library can be used for these custom LED modules.
+directly connected) are usually custom creations. The AceSegment library hopes
+to support as many of these configurations as possible within a single
+framework.
+
+Different types of seven-segment LED modules using different controller chips
+are similar enough to each other that code at the application layer should be
+mostly agnostic to the hardware differences. The AceSegment library is organized
+into hardware-dependent components and hardware-independent components to allow
+application code to be written without worrying too much about the low-level
+details of the specific LED module.
 
 **Version**: 0.4+ (2021-04-17)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
 **Status**: This is a **work in progress**. It is not ready for public
-consumption. Need to add documentation for:
-* `Tm1637Module`
-* `Max7219Module`
-* `HybridModule`
-* `Hc595Module`
-* `DirectModule`
-* `DirectFast4Module`
+consumption.
 
 ## Table of Contents
 
@@ -43,12 +45,17 @@ consumption. Need to add documentation for:
     * [Digit and Segment Addressing](#DigitAndSegmentAddressing)
 * [Usage](#Usage)
     * [Include Header and Namespace](#HeaderAndNamespace)
+    * [Tm1637Module](#Tm1637Module)
+    * [Max7219Module](#Max7219Module)
     * [Hc595Module](#Hc595Module)
+        * [Rendering the Hc595Module](#RenderingHc595Module)
+    * [LedDisplay](#LedDisplay)
     * [NumberWriter](#NumberWriter)
     * [ClockWriter](#ClockWriter)
     * [TemperatureWriter](#TemperatureWriter)
     * [CharWriter](#CharWriter)
     * [StringWriter](#StringWriter)
+    * [StringScroller](#StringScroller)
 * [Advanced Usage](#AdvancedUsage)
     * [DigitalWriteFast on AVR](#DigitalWriteFast)
 * [Resource Consumption](#ResourceConsumption)
@@ -113,9 +120,20 @@ Some of the examples may depend on:
 
 The following example sketches are provided:
 
-* [AceSegmentDemo.ino](examples/AceSegmentDemo)
-    * runs through some features of the library
-    * uses 2 buttons for "single step" debugging mode
+* Basic
+    * [DualHc595Demo.ino](examples/DualHc595Demo)
+    * [Max7219Demo.ino](examples/Max7219Demo)
+    * [Tm1637Demo.ino](examples/Tm1637Demo)
+    * [DirectModuleDemo.ino](examples/DirectModuleDemo)
+    * [SingleHc595Demo.ino](examples/SingleHc595Demo)
+* Advanced
+    * [Tm1637DualDemo.ino](examples/Tm1637DualDemo)
+    * [ModulatingDemo.ino](examples/ModulatingDemo)
+    * [ScanningDirectDemo.ino](examples/ScanningDirectDemo)
+    * [DirectFast4ModuleDemo.ino](examples/DirectModuleDemo)
+    * [AceSegmentDemo.ino](examples/AceSegmentDemo)
+        * runs through some features of the library
+        * uses 2 buttons for "single step" debugging mode
 * Benchmarks
     * [AutoBenchmark.ino](examples/AutoBenchmark): performs CPU benchmarking of
       most of the supported configurations of the framework
@@ -134,22 +152,26 @@ depend on the lower-level classes:
 
 * SpiInterface
     * Thin-wrapper classes for communicating with the LED module that support
-      SPI. There are 4 implementations.
-    * `SoftSpiInterface`
-        * Software SPI using `shiftOut()`
-    * `SoftSpiFastInterface`
-        * Software SPI using `digitalWriteFast()` on AVR processors
-    * `HardSpiInterface`
-        * Hardware SPI using `digitalWrite()` to control the latch pin.
-    * `HardSpiFastInterface`
-        * Hardware SPI using `digitalWriteFast()` to control the latch pin.
+      SPI
+    * Used by `Max7219Module` and `DualHc595Module`.
+    * There are 4 implementations.
+        * `SoftSpiInterface`
+            * Software SPI using `shiftOut()`
+        * `SoftSpiFastInterface`
+            * Software SPI using `digitalWriteFast()` on AVR processors
+        * `HardSpiInterface`
+            * Hardware SPI using `digitalWrite()` to control the latch pin.
+        * `HardSpiFastInterface`
+            * Hardware SPI using `digitalWriteFast()` to control the latch pin.
 * WireInterface
     * Thin-wrapper classes to communicating with LED modules using the TM1637
       protocol. Similar to I2C but not exactly the same.
-    * `SoftWireInterface`
-        * Implement the TM1637 protocol using `digitalWrite()`.
-    * `SoftWireFastInterface`
-        * Implement the TM1637 protocol using `digitalWriteFast()`.
+    * Used by `Tm1637Module`.
+    * There are 2 implementations:
+        * `SoftWireInterface`
+            * Implement the TM1637 protocol using `digitalWrite()`.
+        * `SoftWireFastInterface`
+            * Implement the TM1637 protocol using `digitalWriteFast()`.
 * `LedModule`
     * Base interface for all hardware dependent implementation of a
       seven-segment LED module.
@@ -185,8 +207,8 @@ depend on the lower-level classes:
     * `StringWriter`
         * A class that prints strings of `char` to a `CharWriter`, which in
           turns, prints to the `LedDisplay`.
-        * It tries to be smart about collapsing decimal point `.` characters
-          into the native decimal point on a seven segment LED display.
+    * `StringScoller`
+        * Scroll a string left and right.
 
 <a name="DependencyDiagram"></a>
 ### Dependency Diagram
@@ -224,8 +246,8 @@ SoftWireFastInterface       SoftSpiFastInterface
 <a name="DigitAndSegmentAddressing"></a>
 ### Digit and Segment Addressing
 
-The `LedModule` and `LedDisplay` classes follow these conventions for addressing
-the digits and segments:
+The `LedModule` and `LedDisplay` classes use the following conventions for
+addressing the digits and segments:
 
 * digits start at position 0 on the left and increase to the right
 * segments are assigned bits 0 to 7 of an unsigned byte (type `uint8_t`) with
@@ -255,12 +277,12 @@ Digit 1 and Digit 2. In these modules, sometimes the decimal points for the
 other digits work normally, but sometimes, the remaining decimal points do not
 work at all.
 
-It is not uncommon for LED modules to be hardwired to the controller chip so
-that the positions of the digits (and sometimes segments) do not not match the
-logical arrangement described above. Fortunately, we can rearrange the digit and
-segment bits in software so that everything is remapped to their correct places.
-For example, the diymore.cc 6-digit TM1637 LED module is wired so that the
-digits are appear in this order:
+Sometimes the LED modules are hardwired to the controller chip so that the
+positions of the digits (and sometimes segments) do not not match the logical
+arrangement described above. Fortunately, we can rearrange the digit and segment
+bits in software so that everything is remapped to their correct places. For
+example, the diymore.cc 6-digit TM1637 LED module is wired so that the digits
+are displayed like this:
 
 ```
 2, 1, 0, 5, 4, 3
@@ -274,7 +296,7 @@ The `Tm1637Module` class can remap these digits into their correct order:
 
 Since it is impossible to predict all the different ways that the LED modules
 can be wired, various classes in the AceSegment library allow the remapping
-array to to be defined by the library user.
+array to be supplied by the library user.
 
 <a name="Modularity"></a>
 ### Modularity
@@ -382,22 +404,34 @@ const uint8_t NUM_DIGITS = 4;
 
 using WireInterface = SoftWireInterface;
 WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
-Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module(wireInterface);
+Tm1637Module<WireInterface, NUM_DIGITS> ledModule(wireInterface);
 
-LedDisplay display(tm1637Module);
+LedDisplay display(ledModule);
 
-void setupLedModule() {
+void setupAceSegment() {
   wireInterface.begin();
-  tm1637Module.begin();
+  ledModule.begin();
+}
+
+// Flush to LED module every 50 millis.
+void flushModule() {
+  static uint16_t prevFlushMillis;
+
+  uint16_t nowMillis = millis();
+  if ((uint16_t) (nowMillis - prevFlushMillis) >= 50) {
+    prevFlushMillis = nowMillis;
+    //ledModule.flush();
+    ledModule.flushIncremental();
+  }
 }
 
 void setup() {
-  setupLedModule();
+  setupAceSegment();
   ...
 }
 
 void loop() {
-  ledModule.flushIncremental();
+  flushModule();
   ...
 }
 ```
@@ -408,7 +442,9 @@ more complicated because the digits are wired to be in the order of `2, 1, 0, 5,
 `Tm1637Module` constructor, like this:
 
 ```C++
+#include <Arduino.h>
 #include <AceSegment.h>
+
 using namespace ace_segment;
 
 const uint8_t CLK_PIN = 10;
@@ -418,68 +454,287 @@ const uint8_t NUM_DIGITS = 4;
 
 using WireInterface = SoftWireInterface;
 WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
-Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module(
+Tm1637Module<WireInterface, NUM_DIGITS> ledModule(
     wireInterface, kDigitRemapArray6Tm1637);
 
-LedDisplay display(tm1637Module);
+LedDisplay display(ledModule);
 
-void setupLedModule() {
+void setupAceSegment() {
   wireInterface.begin();
-  tm1637Module.begin();
+  ledModule.begin();
+}
+
+// Flush to LED module every 50 millis.
+void flushModule() {
+  static uint16_t prevFlushMillis;
+  uint16_t nowMillis = millis();
+  if ((uint16_t) (nowMillis - prevFlushMillis) >= 50) {
+    prevFlushMillis = nowMillis;
+    //ledModule.flush();
+    ledModule.flushIncremental();
+  }
 }
 
 void setup() {
-  setupLedModule();
+  setupAceSegment();
   ...
 }
 
 void loop() {
-  ledModule.flushIncremental();
+  flushModule();
   ...
 }
 ```
 
-
 <a name="Max7219Module"></a>
 ### Max7219Module
+
+These LED modules use the MAX7219 controller chip which communicate using SPI. A
+single chip supports 8 segments of up to 8 digits. Multiple controller chips can
+be daisychained to support more than 8 digits. The 8-digit module is readily
+available commercially from multiple suppliers on Amazon and eBay, and they look
+like this:
+
+![MAX7219 LED Module](docs/max7219/MAX7219_8_digits.png)
+
+The configuration of the `Max7219Module` class for the 8-digit module looks like
+this:
+
+```C++
+#include <Arduino.h>
+#include <AceSegment.h>
+
+using namespace ace_segment;
+
+const uint8_t LATCH_PIN = 10;
+const uint8_t DATA_PIN = MOSI;
+const uint8_t CLOCK_PIN = SCK;
+const uint8_t NUM_DIGITS = 8;
+
+using SpiInterface = HardSpiInterface;
+SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+
+Max7219Module<SpiInterface, NUM_DIGITS> ledModule(
+    spiInterface, kDigitRemapArray8Max7219);
+LedDisplay display(ledModule);
+
+void setupAceSegment() {
+  spiInterface.begin();
+  ledModule.begin();
+}
+
+// Flush to LED module every 100 millis.
+void flushModule() {
+  static uint16_t prevFlushMillis;
+  uint16_t nowMillis = millis();
+  if ((uint16_t) (nowMillis - prevFlushMillis) >= 100) {
+    prevFlushMillis = nowMillis;
+    ledModule.flush();
+  }
+}
+
+void setup() {
+  setupAceSegment();
+  ...
+}
+
+void loop() {
+  flushModule();
+  ...
+}
+```
 
 <a name="Hc595Module"></a>
 ### Hc595Module
 
-The rendering of an array of bit patterns is split into 2 parts:
+The 74HC595 shift register is a well-known chip that can be used to control
+seven-segment LED modules. Each chip converts 8 serial bits into 8 parallel pins
+which can source or sink about 12 mA of current each. With two 74HC595 chips,
+one chip can control the segment pins, the other can control the common digit
+pins, and the two chips can be daisy chained together. The chips can be
+programmed using the straighforward SPI protocol.
 
-* a *frame* is one complete rendering of the LED display
-* a *field* is a partial rendering of a single frame
+Recently (since about Aug 2020?), off-the-shelf 8-digit LED modules using two
+74HC595 have become common on Amazon and eBay, in multiple colors. They look
+like this:
+
+![HC595 LED Module](docs/hc595/HC595_8_digits.png)
+
+The configuration of the `Hc595Module` class for the 8-digit module looks like
+this:
+
+```C++
+#include <Arduino.h>
+#include <AceSegment.h>
+
+using namespace ace_segment;
+
+const uint8_t LATCH_PIN = 10;
+const uint8_t DATA_PIN = MOSI;
+const uint8_t CLOCK_PIN = SCK;
+
+const uint8_t NUM_DIGITS = 8;
+const uint8_t FRAMES_PER_SECOND = 60;
+
+const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
+const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
+const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
+
+using SpiInterface = HardSpiInterface;
+SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+
+DualHc595Module<SpiInterface, NUM_DIGITS> ledModule(
+    spiInterface,
+    SEGMENT_ON_PATTERN,
+    DIGIT_ON_PATTERN,
+    FRAMES_PER_SECOND,
+    HC595_BYTE_ORDER,
+    REMAP_ARRAY
+);
+
+LedDisplay display(ledModule);
+
+void setupAceSegment() {
+  spiInterface.begin();
+  ledModule.begin();
+}
+
+// Flush to LED module when ready. Call this as fast as possible, allowing
+// the internal counters to figure out when to actually render.
+void flushModule() {
+  ledModule.renderFieldWhenReady();
+}
+
+void setup() {
+  setupAceSegment();
+  ...
+}
+
+void loop() {
+  flushModule();
+  ...
+}
+```
+
+<a name="RenderingHc595Module"></a>
+#### Rendering the Hc595Module
+
+Unlike the TM1637 and the MAX7219 chips, the 74HC595 does not automatically
+multiplex through the digits of the LED module, giving the appearance that all
+the digits are on at the same time. The scanning must be performed by the
+microcontroller itself. The `Hc595Module::renderFieldWhenReady()` performs that
+task. It should be called as quickly as possible, usually faster than `60 *
+NUM_DIGITS` times per second, so for a 4-digit LED module, that's 240 times a
+second, or every 5 milliseconds.
+
+The rendering the LED module is split into 2 parts:
+
+* a *frame* is one complete rendering of the LED display (4 digits),
+* a *field* is a partial rendering of a single frame (a single digit).
 
 A frame rate of about 60Hz will be sufficient to prevent obvious flickering of
-the LED. Depending on the configuration of the `ScanningModule` class, we could
-reasonably have between 4 and 64 fields per frame (this is partially a
-user-selectable parameter), giving us a fields per second rate of 240Hz to
-3840Hz.
+the LED. For a 4-digit LED, that requires rendering 240 fields per second. The
+`Hc595Module::renderFieldNow()` is meant to be used inside an interrupt service
+routine (ISR) which is configured to execute exactly at the requested frequency.
+It will immediately render the given field (a single digit) to the 74HC595 shift
+registers. When it is called a second time, it will render the next digit. The
+`Hc595Module::renderFieldWhenReady()` is designed to give an effective rendering
+rate of 240 Hz using a polling method. It should be called as fast as possible
+in the global `loop()` function. It keeps an internal timing variable that
+remembers the last time that it was called. When the correct amount of time has
+passed, it then calls `renderFieldNow()`, and resets the timing variable.
 
-At 3840 fields per second, a single field needs to be written in less than 260
-microseconds. The AceSegment library is able to meet this timing requirement
-because `ScanningModule::renderFieldNow()` is able to render a single field
-with a maximum CPU time of 124 microseconds on a 16MHz ATmega328P
-microcontroller (Arduino UNO, Nano, Mini, etc).
+<a name="LedDisplay"></a>
+### LedDisplay
+
+The `LedDisplay` object is a thin-wrapper around an `LedModule` object which
+provides a unified API to write bit patterns to the LED module at specific
+positions. The `LedDisplay` also provides an API to set and clear the decimal
+point on the LED module if available, and it provides the ability to control the
+brightness of the LED module.
+
+The public methods of class looks like this (not all public methods shown):
+
+```C++
+class LedDisplay {
+  public:
+    explicit LedDisplay(LedModule& ledModule);
+
+    uint8_t getNumDigits() const;
+    void writePatternAt(uint8_t pos, uint8_t pattern);
+    void writePatternsAt(uint8_t pos, const uint8_t patterns[], uint8_t len);
+    void writePatternsAt_P(uint8_t pos, const uint8_t patterns[], uint8_t len);
+    void writeDecimalPointAt(uint8_t pos, bool state = true);
+
+    void clear();
+    void clearToEnd(uint8_t pos);
+
+    void setBrightness(uint8_t brightness);
+};
+```
+
+The decimal point is stored as bit 7 (the most significant bit) of the `uint8_t`
+byte for a given digit. This bit is cleared by the other `writePatternAt()` or
+`writePatternsAt()` functions. So the `writeDecimalPointAt()` should be called
+**after** the other write methods are called.
+
+The brightness value of an LED module is determine by the underlying controller
+chip, and the range of values are different for each chip:
+
+* The TM1637 chip supports 8 levels from 0 to 7, with 0 turning off the
+  display and 7 being the brightest.
+* The MAX7219 chip supports 16 levels from 0 to 15, with 0 being the dimmest
+  level (which does not turn off the display), and 15 being the brightest.
+* The brightness of 74HC595 module is controlled entirely by the
+  microcontroller using pulse width modulation (PWM). The range of values could
+  theoretically be from 0 to 255, but in practice, it is limited by the speed
+  of the SPI protocol to the 74HC595 chip. A brightness range of 0-7 or 0-15
+  seems practical for most configurations.
+
+After a specific, hardware-dependent instance of `LedModule` is created, the
+`LedDisplay` is created by wrapping around the `LedModule`:
+
+```C++
+LedDisplay display(ledModule);
+```
+
+Various Writer classes build upon the `LedDisplay` class to provide additional
+ways of printing numbers and letters to the LED module.
 
 <a name="NumberWriter"></a>
 ### NumberWriter
 
-While it is exciting to be able to write any bit patterns to the LED display, we
-often want to just write numbers to the LED display. The `NumberWriter` can
-print integers to the `ScanningModule` using decimal or hexadecimal formats. On
-platforms that support it (ATmega and ESP8266), the bit mapping table is stored
-in flash memory to conserve static memory.
+The `NumberWriter` can print integers to the `LedDisplay` using decimal (0-9) or
+hexadecimal (0-9A-F) formats. On platforms that support it (ATmega and ESP8266),
+the bit mapping table is stored in flash memory to conserve static memory.
 
-The class supports the following methods:
+The public methods of this class looks something like this:
 
-* `LedDisplay& display()`
-* `void writeHexCharAt(uint8_t pos, hexchar_t c)`
-* `void writeHexByteAt(uint8_t pos, uint8_t b)`
-* `void writeHexWordAt(uint8_t pos, uint16_t w)`
-* `void writeUnsignedDecimalAt(uint8_t pos, uint16_t num, int8_t boxSize = 0)`
-* `void writeSignedDecimalAt(uint8_t pos, int16_t num, int8_t boxSize = 0)`
+```C++
+class NumberWriter {
+  public:
+    typedef uint8_t hexchar_t;
+    static const hexchar_t kCharSpace = 0x10;
+    static const hexchar_t kCharMinus = 0x11;
+
+    explicit NumberWriter(LedDisplay& ledDisplay);
+
+    LedDisplay& display();
+
+    void writeHexCharAt(uint8_t pos, hexchar_t c);
+    void writeHexCharsAt(uint8_t pos, hexchar_t [], uint8_t len);
+
+    void writeHexByteAt(uint8_t pos, uint8_t b);
+    void writeHexWordAt(uint8_t pos, uint16_t w);
+
+    void writeUnsignedDecimalAt(uint8_t pos, uint16_t num, int8_t boxSize = 0);
+    void writeSignedDecimalAt(uint8_t pos, int16_t num, int8_t boxSize = 0);
+    void writeUnsignedDecimal2At(uint8_t pos, uint8_t num);
+
+    void clearToEnd(uint8_t pos);
+};
+```
 
 The `hexchar_t` type semantically represents the character set supported by this
 class. It is implemented as an alias for `uint8_t`, which unfortunately means
@@ -499,15 +754,31 @@ There are special, 4 digit,  seven segment LED displays which replace the
 decimal point with the colon symbol ":" between the 2 digits on either side so
 that it can display a time in the format "hh:mm".
 
-The class supports the following methods:
+The public methods of this class look like this:
 
-* `LedDisplay& display()`
-* `void writeCharAt(uint8_t pos, hexchar_t c)`
-* `void writeBcd2At(uint8_t pos, uint8_t bcd);
-* `void writeDec2At(uint8_t pos, uint8_t d);
-* `void writeDec4At(uint8_t pos, uint16_t dd);
-* `void writeHourMinute(uint8_t hh, uint8_t mm)`
-* `void writeColon(bool state = true)`
+```C++
+class ClockWriter {
+  public:
+    using hexchar_t = NumberWriter::hexchar_t;
+    static const hexchar_t kCharSpace = NumberWriter::kCharSpace;
+    static const hexchar_t kCharMinus = NumberWriter::kCharMinus;
+    static const uint8_t kPatternA = 0b01110111;
+    static const uint8_t kPatternP = 0b01110011;
+
+    explicit ClockWriter(LedDisplay& ledDisplay, uint8_t colonDigit = 1);
+
+    LedDisplay& display() const;
+    void writeCharAt(uint8_t pos, hexchar_t c);
+    void writeChar2At(uint8_t pos, hexchar_t c0, hexchar_t c1);
+
+    void writeBcd2At(uint8_t pos, uint8_t bcd);
+    void writeDec2At(uint8_t pos, uint8_t d);
+    void writeDec4At(uint8_t pos, uint16_t dd);
+
+    void writeHourMinute(uint8_t hh, uint8_t mm);
+    void writeColon(bool state = true);
+};
+```
 
 A `ClockWriter` consumes about 250 bytes of flash memory on an AVR, which
 includes an instance of a `NumberWriter`.
@@ -515,12 +786,26 @@ includes an instance of a `NumberWriter`.
 <a name="TemperatureWriter"></a>
 ### TemperatureWriter
 
-The class supports the following methods:
+This class supports writing out temperatures in degrees Celcius or Fahrenheit.
+The public methods of this class looks something like this:
 
-* `LedDisplay& display()`
-* `uint8_t writeTempDegAt(uint8_t pos, int16_t temp, boxSize = 0);`
-* `uint8_t writeTempDegCAt(uint8_t pos, int16_t temp, boxSize = 0);`
-* `uint8_t writeTempDegFAt(uint8_t pos, int16_t temp, boxSize = 0);`
+```C++
+class TemperatureWriter {
+  public:
+    static const uint8_t kPatternDegree = 0b01100011;
+    static const uint8_t kPatternC = 0b00111001;
+    static const uint8_t kPatternF = 0b01110001;
+
+    explicit TemperatureWriter(LedDisplay& ledDisplay);
+
+    LedDisplay& display()`
+
+    uint8_t writeTempAt(uint8_t pos, int16_t temp, boxSize = 0);`
+    uint8_t writeTempDegAt(uint8_t pos, int16_t temp, boxSize = 0);`
+    uint8_t writeTempDegCAt(uint8_t pos, int16_t temp, boxSize = 0);`
+    uint8_t writeTempDegFAt(uint8_t pos, int16_t temp, boxSize = 0);`
+};
+```
 
 A `TemperatureWriter` consumes about 270 bytes of flash memory on an AVR, which
 includes an instance of a `NumberWriter`.
@@ -536,10 +821,28 @@ to seven-segment bit patterns. On platforms that support it (ATmega and
 ESP8266), the bit pattern array is stored in flash memory to conserve static
 memory.
 
-The class supports the following methods:
+The public methods of this class looks like thid:
 
-* `LedDisplay& display()`
-* `void writeCharAt(uint8_t pos, char c)`
+```C++
+class CharWriter {
+  public:
+    static const uint8_t kCharPatterns[];
+    static const uint8_t kNumChars = 128;
+
+    explicit CharWriter(
+        LedDisplay& ledDisplay,
+        const uint8_t charPatterns[] = kCharPatterns,
+        uint8_t numChars = kNumChars
+    );
+
+    LedDisplay& display();
+
+    void writeCharAt(uint8_t pos, char c);
+
+    uint8_t getNumChars() const;
+    uint8_t getPattern(char c) const;
+};
+```
 
 A `CharWriter` consumes about 250 bytes of flash memory on an AVR.
 
@@ -547,13 +850,23 @@ A `CharWriter` consumes about 250 bytes of flash memory on an AVR.
 ### StringWriter
 
 A `StringWriter` is a class that builds on top of the `CharWriter`. It knows how
-to write entirely strings into the LED display. It provides the following
-methods:
+to write entirely strings into the LED display. The public methods look like:
 
-* `LedDisplay& display()`
-* `uint8_t writeStringAt(uint8_t pos, const char* cs, uint8_t numChar = 255)`
-* `uint8_t writeStringAt(uint8_t pos, const __FlashStringHelper* fs, uint8_t numChar = 255)`
-* `void clearToEnd(uint8_t pos)`
+```C++
+class StringWriter {
+  public:
+    explicit StringWriter(CharWriter& charWriter);
+
+    LedDisplay& display();
+
+    uint8_t writeStringAt(uint8_t pos, const char* cs, uint8_t numChar = 255);
+
+    uint8_t writeStringAt(uint8_t pos, const __FlashStringHelper* fs,
+            uint8_t numChar = 255);
+
+    void clearToEnd(uint8_t pos);
+};
+```
 
 The implementation of `writeStringAt()` is straightforward except for the
 handling of a decimal point. A seven segment LED digit contains a small LED for
@@ -583,6 +896,31 @@ uint8_t written = stringWriter.writeStringAt(0, s);
 stringWriter.clearToEnd(written);
 ```
 
+<a name="StringScroller"></a>
+### StringScroller
+
+A `StringScroller` is a class that builds on top of the `CharWriter`. It knows
+how to write entirely strings into the LED display. The public methods look
+like:
+
+```C++
+class StringScroller {
+  public:
+    explicit StringScroller(LedDisplay& ledDisplay);
+
+    LedDisplay& display() const;
+
+    void initScrollLeft(const char* s);
+    bool scrollLeft();
+
+    void initScrollRight(const char* s);
+    bool scrollRight();
+};
+```
+
+To scroll a string to the left, first initialize the string, then call
+`scrollLeft()` to shift left. Similarly to the right.
+
 <a name="AdvancedUsage"></a>
 ## Advanced Usage
 
@@ -604,7 +942,12 @@ I have written versions of some lower-level classes to take advantage of
 * `scanning/LedMatrixDirectFast4.h`
     * Variant of `LedMatrixDirect` using `digitalWriteFast()`
 * `hw/SoftSpiFastInterface.h`
-    * Variant of `SoftSpiInterface.h` using  `digitalWriteFast()`
+    * Variant of `SoftSpiInterface.h` using  `digitalWriteFast()` for the
+      `MOSI`, `SCK` and `LATCH` pins
+* `hw/HardSpiFastInterface.h`
+    * Variant of `HardSpiInterface.h` using  `digitalWriteFast()` to toggle
+      the `LATCH` pin, while the hardware SPI code controls the `MOSI` and `SCK`
+      pins
 * `hw/SoftWireFastInterface.h`
     * Variant of `SoftWireInterface.h` using `digitalWriteFast()`
 
@@ -618,6 +961,7 @@ need to include these headers manually, like this:
 #if defined(ARDUINO_ARCH_AVR)
   #include <digitalWriteFast.h> // from 3rd party library
   #include <ace_segment/hw/SoftSpiFastInterface.h>
+  #include <ace_segment/hw/HardSpiFastInterface.h>
   #include <ace_segment/hw/SoftWireFastInterface.h>
   #include <ace_segment/scanning/LedMatrixDirectFast4.h>
 #endif
