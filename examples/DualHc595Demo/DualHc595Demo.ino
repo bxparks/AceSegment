@@ -172,6 +172,64 @@ void setupAceSegment() {
   ledModule.begin();
 }
 
+TimingStats stats;
+uint8_t digitIndex = 0;
+uint8_t brightnessIndex = 0;
+
+// Update the display with new pattern and brightness every second.
+void updateDisplay() {
+  static uint16_t prevUpdateMillis;
+
+  uint16_t nowMillis = millis();
+  if ((uint16_t) (nowMillis - prevUpdateMillis) >= 1000) {
+    prevUpdateMillis = nowMillis;
+
+    // Update the display
+    uint8_t j = digitIndex;
+    for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
+      display.writePatternAt(i, PATTERNS[j]);
+      // Write a decimal point every other digit, for demo purposes.
+      display.writeDecimalPointAt(i, j & 0x1);
+      incrementMod(j, (uint8_t) NUM_DIGITS);
+    }
+    incrementMod(digitIndex, (uint8_t) NUM_DIGITS);
+
+    // Update the brightness
+    uint8_t brightness = BRIGHTNESS_LEVELS[brightnessIndex];
+    display.setBrightness(brightness);
+    incrementMod(brightnessIndex, NUM_BRIGHTNESSES);
+  }
+}
+
+// Call renderFieldWhenReady() as fast as possible. It keeps an internal timer
+// that performs the actual rendering when ready.
+void flushModule() {
+  uint16_t startMicros = micros();
+  ledModule.renderFieldWhenReady();
+  uint16_t elapsedMicros = (uint16_t) micros() - startMicros;
+  stats.update(elapsedMicros);
+}
+
+// Every 5 seconds, print stats about how long flushModule() took.
+void printStats() {
+#if ENABLE_SERIAL_DEBUG >= 1
+  static uint16_t prevStatsMillis;
+
+  uint16_t nowMillis = millis();
+  if ((uint16_t) (nowMillis - prevStatsMillis) >= 5000) {
+    prevStatsMillis = nowMillis;
+
+    Serial.print("min/avg/max:");
+    Serial.print(stats.getMin());
+    Serial.print('/');
+    Serial.print(stats.getAvg());
+    Serial.print('/');
+    Serial.println(stats.getMax());
+    stats.reset();
+  }
+#endif
+}
+
 //----------------------------------------------------------------------------
 
 void setup() {
@@ -185,54 +243,8 @@ void setup() {
   setupAceSegment();
 }
 
-// loop() state variables
-TimingStats stats;
-uint8_t digitIndex = 0;
-uint8_t brightnessIndex = 0;
-uint16_t prevUpdateMillis = 0;
-
-#if ENABLE_SERIAL_DEBUG >= 1
-uint16_t prevStatsMillis = 0;
-#endif
-
-void updateDisplay() {
-  // Update the display
-  uint8_t j = digitIndex;
-  for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
-    display.writePatternAt(i, PATTERNS[j]);
-    // Write a decimal point every other digit, for demo purposes.
-    display.writeDecimalPointAt(i, j & 0x1);
-    incrementMod(j, (uint8_t) NUM_DIGITS);
-  }
-  incrementMod(digitIndex, (uint8_t) NUM_DIGITS);
-
-  // Update the brightness
-  uint8_t brightness = BRIGHTNESS_LEVELS[brightnessIndex];
-  display.setBrightness(brightness);
-  incrementMod(brightnessIndex, NUM_BRIGHTNESSES);
-}
-
 void loop() {
-  uint16_t nowMillis = millis();
-
-  // Update the display with new pattern every second.
-  if ((uint16_t) (nowMillis - prevUpdateMillis) >= 1000) {
-    prevUpdateMillis = nowMillis;
-    updateDisplay();
-  }
-
-  // Use renderFieldWhenReady() to multiplex the digits in the LED module.
-  uint16_t startMicros = micros();
-  ledModule.renderFieldWhenReady();
-  uint16_t elapsedMicros = (uint16_t) micros() - startMicros;
-  stats.update(elapsedMicros);
-
-  // Print the stats every 5 seconds.
-#if ENABLE_SERIAL_DEBUG >= 1
-  if ((uint16_t) (nowMillis - prevStatsMillis) >= 5000) {
-    prevStatsMillis = nowMillis;
-    Serial.print("ExpAvg:");
-    Serial.println(stats.getExpDecayAvg());
-  }
-#endif
+  updateDisplay();
+  flushModule();
+  printStats();
 }
