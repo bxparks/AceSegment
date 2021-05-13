@@ -1214,10 +1214,10 @@ microseconds.
 <a name="Hardware"></a>
 ### Hardware
 
-The library is extensively tested on the following boards:
+The library has Tier 1 support on the following boards:
 
-* Arduino Nano clone (16 MHz ATmega328P)
-* SparkFun Pro Micro clone (16 MHz ATmega32U4)
+* Arduino Nano (16 MHz ATmega328P)
+* SparkFun Pro Micro (16 MHz ATmega32U4)
 * SAMD21 M0 Mini (48 MHz ARM Cortex-M0+)
 * STM32 Blue Pill (STM32F103C8, 72 MHz ARM Cortex-M3)
 * NodeMCU 1.0 (ESP-12E module, 80MHz ESP8266)
@@ -1225,16 +1225,25 @@ The library is extensively tested on the following boards:
 * ESP32 dev board (ESP-WROOM-32 module, 240 MHz dual core Tensilica LX6)
 * Teensy 3.2 (72 MHz ARM Cortex-M4)
 
-I will occasionally test on the following hardware as a sanity check:
+Tier 2 support can be expected on the following boards, mostly because I don't
+test these as often:
 
+* ATtiny85 (8 MHz ATtiny85)
 * Teensy LC (48 MHz ARM Cortex-M0+)
 * Mini Mega 2560 (Arduino Mega 2560 compatible, 16 MHz ATmega2560)
+
+The following boards are **not** supported:
+
+* Any platform using the ArduinoCore-API
+  (https://github.com/arduino/ArduinoCore-api). For example, Nano Every,
+  MKRZero, and Raspberry Pi Pico RP2040.
 
 <a name="ToolChain"></a>
 ### Tool Chain
 
 * [Arduino IDE 1.8.13](https://www.arduino.cc/en/Main/Software)
 * [Arduino CLI 0.14.0](https://arduino.github.io/arduino-cli)
+* [SpenceKonde ATTinyCore 1.5.2](https://github.com/SpenceKonde/ATTinyCore)
 * [Arduino AVR Boards 1.8.3](https://github.com/arduino/ArduinoCore-avr)
 * [Arduino SAMD Boards 1.8.9](https://github.com/arduino/ArduinoCore-samd)
 * [SparkFun AVR Boards 1.1.13](https://github.com/sparkfun/Arduino_Boards)
@@ -1247,8 +1256,8 @@ I will occasionally test on the following hardware as a sanity check:
 <a name="OperatingSystem"></a>
 ### Operating System
 
-I use Ubuntu 18.04 and 20.04 for the vast majority of my development. I expect
-that the library will work fine under MacOS and Windows, but I have not tested
+I use Ubuntu 20.04 for the vast majority of my development. I expect that the
+library will work fine under MacOS and Windows, but I have not explicitly tested
 them.
 
 <a name="License"></a>
