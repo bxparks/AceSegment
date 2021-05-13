@@ -105,6 +105,70 @@ TimingStats stats;
 uint8_t digitIndex = 0;
 uint8_t brightness = 1;
 
+// Every second, scroll the display and change the brightness.
+void updateDisplay() {
+  static uint16_t prevChangeMillis;
+
+  uint16_t nowMillis = millis();
+  if ((uint16_t) (nowMillis - prevChangeMillis) >= 1000) {
+    prevChangeMillis = nowMillis;
+
+    uint8_t j = digitIndex;
+    for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
+      display.writePatternAt(i, PATTERNS[j]);
+      // Write a decimal point every other digit, for demo purposes.
+      display.writeDecimalPointAt(i, j & 0x1);
+      incrementMod(j, (uint8_t) NUM_DIGITS);
+    }
+    incrementMod(digitIndex, (uint8_t) NUM_DIGITS);
+
+    // Update the brightness. The MAX7219 has 16 levels of brightness.
+    display.setBrightness(brightness);
+    incrementMod(brightness, (uint8_t) 16);
+  }
+}
+
+// Every 100 ms, unconditionally flush() to the LED module which updates all
+// digits, including brightness. It takes only about 170 microseconds to flush
+// everything to the MAX7219 over SPI, which is so fast it does not seem
+// necessary to perform any incremental updates.
+void flushModule() {
+  static uint16_t prevFlushMillis;
+
+  uint16_t nowMillis = millis();
+  if ((uint16_t) (nowMillis - prevFlushMillis) >= 100) {
+    prevFlushMillis = nowMillis;
+
+    // Flush the change to the LED Module, and measure the time.
+    uint16_t startMicros = micros();
+    max7219Module.flush();
+    uint16_t elapsedMicros = (uint16_t) micros() - startMicros;
+    stats.update(elapsedMicros);
+  }
+}
+
+// Every 5 seconds, print stats about how long flush() took.
+void printStats() {
+#if ENABLE_SERIAL_DEBUG >= 1
+  static uint16_t prevStatsMillis;
+
+  uint16_t nowMillis = millis();
+  if ((uint16_t) (nowMillis - prevStatsMillis) >= 5000) {
+    prevStatsMillis = nowMillis;
+
+    Serial.print("min/avg/max:");
+    Serial.print(stats.getMin());
+    Serial.print('/');
+    Serial.print(stats.getAvg());
+    Serial.print('/');
+    Serial.println(stats.getMax());
+    stats.reset();
+  }
+#endif
+}
+
+//-----------------------------------------------------------------------------
+
 void setup() {
   delay(1000);
 #if ENABLE_SERIAL_DEBUG >= 1
@@ -116,33 +180,8 @@ void setup() {
   max7219Module.begin();
 }
 
-// Use the Max7219Module::flush() method to update all digits in a single dump
-// to the LED module, taking about ~170 microseconds per flush().
 void loop() {
-  // Update the display
-  uint8_t j = digitIndex;
-  for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
-    display.writePatternAt(i, PATTERNS[j]);
-    // Write a decimal point every other digit, for demo purposes.
-    display.writeDecimalPointAt(i, j & 0x1);
-    incrementMod(j, (uint8_t) NUM_DIGITS);
-  }
-  incrementMod(digitIndex, (uint8_t) NUM_DIGITS);
-
-  // Update the brightness
-  display.setBrightness(brightness);
-  incrementMod(brightness, (uint8_t) 16);
-
-  // Flush the change to the LED Module, and measure the time.
-  uint16_t startMicros = micros();
-  max7219Module.flush();
-  uint16_t elapsedMicros = (uint16_t) micros() - startMicros;
-  stats.update(elapsedMicros);
-
-#if ENABLE_SERIAL_DEBUG >= 1
-  Serial.print("ExpAvg:");
-  Serial.println(stats.getExpDecayAvg());
-#endif
-
-  delay(1000);
+  updateDisplay();
+  flushModule();
+  printStats();
 }

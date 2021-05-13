@@ -133,7 +133,7 @@ void updateDisplay() {
     }
     incrementMod(digitIndex, (uint8_t) NUM_DIGITS);
 
-    // Update the brightness, range from 1 to 7.
+    // Update the brightness. The TM1637 has 8 levels of brightness.
     display.setBrightness(brightness);
     incrementModOffset(brightness, (uint8_t) 7, (uint8_t) 1);
   }
