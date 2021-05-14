@@ -3,55 +3,62 @@
 [![AUnit Tests](https://github.com/bxparks/AceSegment/actions/workflows/aunit_tests.yml/badge.svg)](https://github.com/bxparks/AceSegment/actions/workflows/aunit_tests.yml)
 
 An adjustable, configurable, and extensible framework for rendering seven
-segment LED displays on Arduino platforms. Supported wiring confirguations
-include direct pin wiring to the microcontroller, through a 74HC595 Shift
-Register that is accessed through software or hardware SPI, or using an TM1637
-LED driver chip.
+segment LED displays on Arduino platforms. The library supports multiple types
+of LED displays:
+
+* LED modules using the TM1637 controller chip
+* LED modules using the MAX7219/MAX7221 controller chip
+* LED modules using two 74HC595 shift register chips
+* LED modules using a hybrid of one 74HC595 chip and direct GPIO connections
+* LED modules directly connected to the GPIO pins, no controller chips
+
+The first 3 types are readily available from consumer sources such as Amazon and
+eBay, in multiple colors and sizes. The final 2 types of modules (hybrid and
+directly connected) are usually custom creations. The AceSegment library hopes
+to support as many of these configurations as possible within a single
+framework.
+
+Different types of seven-segment LED modules using different controller chips
+are similar enough to each other that code at the application layer should be
+mostly agnostic to the hardware differences. The AceSegment library is organized
+into hardware-dependent components and hardware-independent components to allow
+application code to be written without worrying too much about the low-level
+details of the specific LED module.
 
 **Version**: 0.4+ (2021-04-17)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
 **Status**: This is a **work in progress**. It is not ready for public
-consumption. Need to add documentation for:
-* `Tm1637Module`
-* `Max7219Module`
-* `HybridModule`
-* `Hc595Module`
-* `DirectModule`
-* `DirectFast4Module`
+consumption.
 
 ## Table of Contents
 
-* [Summary](#Summary)
 * [Installation](#Installation)
     * [Source Code](#SourceCode)
+    * [Dependencies](#Dependencies)
 * [Documentation](#Documentation)
     * [Examples](#Examples)
-* [LED Wiring](#LEDWiring)
+* [High Level Overview](#HighLevelOverview)
+    * [Classes](#Classes)
+    * [Dependency Diagram](#DependencyDiagram)
+    * [Digit and Segment Addressing](#DigitAndSegmentAddressing)
 * [Usage](#Usage)
     * [Include Header and Namespace](#HeaderAndNamespace)
-    * [Classes](#Classes)
-    * [Setting Up the Scanning Module](#SettingUpScanningModule)
-    * [Choosing the LedMatrix](#ChoosingLedMatrix)
-        * [Resistors and Transistors](#ResistorsAndTransistors)
-        * [Pins Wired Directly, Common Cathode](#LedMatrixDirectCommonCathode)
-        * [Pins Wired Directly, Common Anode](#LedMatrixDirectCommonAnode)
-        * [Segments On 74HC595 Shift Register](#LedMatrixSingleHc595)
-        * [Digits and Segments On Two Shift Registers](#LedMatrixDualHc595)
-    * [Using the ScanningModule](#UsingScanningModule)
-        * [Writing the Digit Bit Patterns](#DigitBitPatterns)
-        * [Global Brightness](#GlobalBrightness)
-        * [Frames and Fields](#FramesAndFields)
-        * [Rendering by Polling](#RenderingByPolling)
-        * [Rendering using Interrupts](#RenderingUsingInterrupts)
+    * [Tm1637Module](#Tm1637Module)
+    * [Max7219Module](#Max7219Module)
+    * [Hc595Module](#Hc595Module)
+        * [Rendering the Hc595Module](#RenderingHc595Module)
+    * [LedDisplay](#LedDisplay)
     * [NumberWriter](#NumberWriter)
     * [ClockWriter](#ClockWriter)
     * [TemperatureWriter](#TemperatureWriter)
     * [CharWriter](#CharWriter)
     * [StringWriter](#StringWriter)
+    * [StringScroller](#StringScroller)
 * [Advanced Usage](#AdvancedUsage)
     * [DigitalWriteFast on AVR](#DigitalWriteFast)
+    * [ScanningModule](#ScanningModule)
 * [Resource Consumption](#ResourceConsumption)
 * [System Requirements](#SystemRequirements)
     * [Hardware](#Hardware)
@@ -61,77 +68,20 @@ consumption. Need to add documentation for:
 * [Feedback and Support](#FeedbackAndSupport)
 * [Authors](#Authors)
 
-<a name="Summary"></a>
-## Summary
-
-The AceSegment library provides a number of classes that can display
-digits, characters and other patterns on an "seven segment" LED display.
-The framework is intended to be used with LED displays which are
-directly connected to the microcontroller through the GPIO pins,
-instead of through a specialized LED display driver chip, like
-the [MAX7219](https://www.maximintegrated.com/en/datasheet/index.mvp/id/1339)
-or the
-[MC14489B](http://cache.freescale.com/files/timing_interconnect_access/doc/inactive/MC14489B.pdf).
-The framework does support the 74HC595 Shift Register chip which is a
-general purpose chip that helps reduce the GPIO pin usage.
-
-Here are the features supported by this framework:
-
-* multiplexing of segments at a selectable frame rate
-* common cathode or common anode configurations
-* resistors on segments or resistors on digits
-* LED display directly connected to the GPIO pins
-* LED display connected through a 74HC595 shift register chip
-* communication with the 74HC595 through
-    * software SPI (using `shiftOut()`)
-    * hardware SPI (using `<SPI.h>`)
-* transistors drivers to handle high currents
-* LED module using the TM1637 chip
-
-The framework splits the responsibility of displaying LED digits into several
-components:
-
-* The `SpiInterface` is a thin wrapper around either a software SPI or hardware
-  SPI.
-* The `LedMatrix` knows how to enable or disable LED segments on various digit
-  groups. Different subclasses the `LedMatrix` are provided to support:
-    * resistors on segments
-    * transistors on digits or segments
-    * using 74HC595 with `shiftOut()` or hardware SPI
-* The `LedModule` class and subclasses such as `ScanningModule` know how to
-  render the array of digit patterns to the LED module using multiplexing.
-* The `LedDisplay` knows how to write the segment bit patterns to an
-  `LedModule`.
-
-The rendering of an array of bit patterns is split into 2 parts:
-
-* a *frame* is one complete rendering of the LED display
-* a *field* is a partial rendering of a single frame
-
-A frame rate of about 60Hz will be sufficient to prevent obvious flickering of
-the LED. Depending on the configuration of the `ScanningModule` class, we could
-reasonably have between 4 and 64 fields per frame (this is partially a
-user-selectable parameter), giving us a fields per second rate of 240Hz to
-3840Hz.
-
-At 3840 fields per second, a single field needs to be written in less than 260
-microseconds. The AceSegment library is able to meet this timing requirement
-because `ScanningModule::renderFieldNow()` is able to render a single field
-with a maximum CPU time of 124 microseconds on a 16MHz ATmega328P
-microcontroller (Arduino UNO, Nano, Mini, etc).
-
 <a name="Installation"></a>
 ## Installation
 
 The latest stable release will eventually be available in the Arduino IDE
-Library Manager. Search for "AceSegment". Click install. It is not there
-yet.
+Library Manager. Search for "AceSegment". Click install. (It is not there
+yet.)
 
 The development version can be installed by cloning the
 [GitHub repository](https://github.com/bxparks/AceSegment), checking out the
 `develop` branch, then manually copying over the contents to the `./libraries`
 directory used by the Arduino IDE. (The result is a directory named
-`./libraries/AceSegment`.) The `master` branch contains the stable release.
+`./libraries/AceSegment`.)
+
+The `master` branch contains the stable release.
 
 <a name="SourceCode"></a>
 ### Source Code
@@ -144,10 +94,26 @@ The source files are organized as follows:
 * `examples/` - example sketches
 * `docs/` - contains the doxygen docs and additional manual docs
 
+<a name="Dependencies"></a>
+### Dependencies
+
+This library depends on the following additional libraries:
+
+* AceCommon (https://github.com/bxparks/AceCommon)
+
+The unit tests depend on:
+
+* AUnit (https://github.com/bxparks/AUnit)
+
+Some of the examples may depend on:
+
+* AceButton (https://github.com/bxparks/AceButton)
+
 <a name="Documentation"></a>
 ## Documentation
 
 * this `README.md` file
+* [advanced.md](docs/advanced.md): Advanced Usage Guide
 * [Doxygen docs published on GitHub Pages](https://bxparks.github.io/AceSegment/html).
 
 <a name="Examples"></a>
@@ -155,59 +121,28 @@ The source files are organized as follows:
 
 The following example sketches are provided:
 
-* [AceSegmentDemo.ino](examples/AceSegmentDemo):
-  a demo program that exercises a large fraction of the feature of the framework
-* [AutoBenchmark.ino](examples/AutoBenchmark):
-  a program that performs CPU benchmarking of almost all of the various
-  supported configurations of the framework
+* Basic
+    * [Tm1637Demo.ino](examples/Tm1637Demo)
+    * [Max7219Demo.ino](examples/Max7219Demo)
+    * [Hc595Demo.ino](examples/Hc595Demo)
+    * [DirectModuleDemo.ino](examples/DirectModuleDemo)
+    * [HybridDemo.ino](examples/HybridDemo)
+* Advanced
+    * [Tm1637DualDemo.ino](examples/Tm1637DualDemo)
+    * [ModulatingDemo.ino](examples/ModulatingDemo)
+    * [ScanningDirectDemo.ino](examples/ScanningDirectDemo)
+    * [DirectFast4ModuleDemo.ino](examples/DirectModuleDemo)
+    * [AceSegmentDemo.ino](examples/AceSegmentDemo)
+        * runs through some features of the library
+        * uses 2 buttons for "single step" debugging mode
+* Benchmarks
+    * [AutoBenchmark.ino](examples/AutoBenchmark): performs CPU benchmarking of
+      most of the supported configurations of the framework
+    * [MemoryBenchmark.ino](examples/MemoryBenchmark): determines the size of
+      the various components of the library
 
-<a name="LEDWiring"></a>
-## LED Wiring
-
-AceSegment library supports the following wiring configurations:
-
-* common cathode
-* common anode
-* resistors on segments
-* resistors on digits (not supported)
-
-The driver classes assume that the pins are connected directly to the GPIO pins
-of the microcontroller. In other words, for a 4 digit x 8 segment LED display,
-you would need 12 GPIO pins. This is the cheapest and simplest option if you
-have enough pins available because you need nothing else because the current
-limiting resistors. If the project is not able to allocate this many pins, then
-the usual solution is to use a Serial to Parallel converter such as the 74HC595
-chip.
-
-At first glance, there is not an obvious difference between "resistors on
-segments" configuration and "resistors on digits". I recommend using resistors
-on segments if at all possible. That's because the LEDs with the resistors are
-the ones that can be turned on at the same time, and the ones without the
-resistors are multiplexed to give the illusion of a fully lit display. With the
-resistors on the segments, all the segments on one digit can be activated at the
-same time, and we can use pulse width modulation on the digit line to control
-the brightness of a single digit.
-
-Multiple LED segments will be connected to a single GPIO pin. If the total
-current on the pin exceeds the rated limit, then a transistor will need to be
-added to handle the current. The framework can be configured to support these
-transistors.
-
-<a name="Usage"></a>
-## Usage
-
-<a name="HeaderAndNamespace"></a>
-### Include Header and Namespace
-
-Only a single header file `AceSegment.h` is required to use this library.
-To prevent name clashes with other libraries that the calling code may use, all
-classes are defined in the `ace_segment` namespace. To use the code without
-prepending the `ace_segment::` prefix, use the `using` directive:
-
-```
-#include <AceSegment.h>
-using namespace ace_segment;
-```
+<a name="HighLevelOverview"></a>
+## High Level Overview
 
 <a name="Classes"></a>
 ### Classes
@@ -217,47 +152,50 @@ end-users, listed roughly from low-level to higher-level classes which often
 depend on the lower-level classes:
 
 * SpiInterface
-    * Thin-wrapper classes to indicate whether we are using software or hardware
-      SPI. There are 3 implementations:
-    * `SoftSpiInterface`
-        * Software SPI using `shiftOut()`
-    * `HardSpiInterface`
-        * Native hardware SPI.
-    * `SoftSpiFastInterface`
-        * Software SPI using `digitalWriteFast()` on AVR processors
-* `LedMatrix`: Various subclasses capture the wiring of the matrix of LEDs.
-    * `LedMatrixDirect`
-        * Group pins and element pins are directly accessed through the
-          microcontroller pins.
-    * `LedMatrixDirectFast4`
-        * Same as `LedMatrixDirect` but using `digitalWriteFast()` on AVR
-          processors
-    * `LedMatrixSingleHc595`
-        * Group pins are access directly, but element pins are access through an
-          74HC595 chip through SPI using one of SpiInterface classes
-    * `LedMatrixDualHc595`
-        * Both group and element pions are access through two 74HC595 chips
-          through SPI using one of the SpiInterface classes
+    * Thin-wrapper classes for communicating with the LED module that support
+      SPI
+    * Used by `Max7219Module` and `Hc595Module`.
+    * There are 4 implementations.
+        * `SoftSpiInterface`
+            * Software SPI using `shiftOut()`
+        * `SoftSpiFastInterface`
+            * Software SPI using `digitalWriteFast()` on AVR processors
+        * `HardSpiInterface`
+            * Hardware SPI using `digitalWrite()` to control the latch pin.
+        * `HardSpiFastInterface`
+            * Hardware SPI using `digitalWriteFast()` to control the latch pin.
+* WireInterface
+    * Thin-wrapper classes to communicating with LED modules using the TM1637
+      protocol. Similar to I2C but not exactly the same.
+    * Used by `Tm1637Module`.
+    * There are 2 implementations:
+        * `SoftWireInterface`
+            * Implement the TM1637 protocol using `digitalWrite()`.
+        * `SoftWireFastInterface`
+            * Implement the TM1637 protocol using `digitalWriteFast()`.
 * `LedModule`
     * Base interface for all hardware dependent implementation of a
       seven-segment LED module.
-    * `ScanningModule`
-        * An implementation of `LedModule` for LED segment modules which do not
-          have a hardware controller, and must be multiplexed across multiple
-          digits by the host microcontroller
-        * Uses the `LedMatrix` classes to send the segment patterns to the
-          actual LED module
     * `Tm1637Module`
-        * An implementation of `LedModule` using a TM1637 chip.
+        * An implementation using a TM1637 controller.
     * `Max7219Module`
-        * An implementation of `LedModule` using a MAX7219 chip.
+        * An implementation using a MAX7219 controller.
+    * `Hc595Module`
+        * An implementation using two 74HC595 shift registers.
+    * `HybridModule`
+        * An implementation using one 74HC595 shift registers
+          to handle the 8 segment lines, with the digit lines directly connected
+          to the GPIO pins of the micrcontroller.
+    * `DirectModule`
+        * An implementation with all segment and digit pins connected directly
+          to the microcontroller.
 * `LedDisplay`
-    * Knows how to write bit patterns to a `LedModule`.
-    * Provides common interfaces and common methods to various Writer classes.
+    * Class that knows how to write segment bit patterns to an `LedModule`.
+    * Provides a single, common API to the various Writer classes.
 * Writers
     * Helper classes built on top of the `LedDisplay` which provide higher-level
       interface to the LED module, such as printing numbers, time (hh:mm),
-      and ASCII characters
+      and ASCII characters and strings.
     * `NumberWriter`
         * A class that writes integers in decimal or hexadecimal format to the
           `LedDisplay`.
@@ -277,587 +215,518 @@ depend on the lower-level classes:
     * `StringWriter`
         * A class that prints strings of `char` to a `CharWriter`, which in
           turns, prints to the `LedDisplay`.
-        * It tries to be smart about collapsing decimal point `.` characters
-          into the native decimal point on a seven segment LED display.
+    * `StringScoller`
+        * Scroll a string left and right.
 
-The dependency diagram among these classes looks something like this:
+<a name="DependencyDiagram"></a>
+### Dependency Diagram
 
-```
-   StringScroller
-   StringWriter    ClockWriter  TemperatureWriter
-        |              \           /
-        V               v         v
-     CharWriter         NumberWriter
-             \            /
-              v          v
-               LedDisplay
-                   |            (hardware independent)
--------------------|-------------------------------------
-                   |            (hardware dependent)
-                   v
-                LedModule
-                   ^
-                   |
-          +--------+----------------+
-          |        |                |
-ScanningModule  Tm1637Module  Max7219Module
-                   |                 \
-                   v                  v
-             SoftWireInterface     SoftSpiInterface
-             SoftWireFastInterface SoftSpiFastInterface
-                                   HardSpiInterface
-                                   HardSpiFastInterface
-
-
-                    ScanningModule
-                         ^
-                         |
-               +---------+------------+
-               |         |            |
-      DirectModule HybridModule    Hc595Module
- DirectFast4Module       |                \
-           /             |                 \
-          /              |                  \
-         v               v                   v
-  LedMatrixDirect   LedMatrixSingleHc595  LedMatrixDualHc595
-LedMatrixDirectFast4              \             /
-                                   \           /
-                                    v         v
-                                   SoftSpiInterface
-                                   SoftSpiFastInterface
-                                   HardSpiInterface
-                                   HardSpiFastInterface
-```
-
-<a name="SettingUpScanningModule"></a>
-### Setting Up the Scanning Module
-
-A series of resources must be built up to finally create an instance of
-`ScanningModule`. For an LED module using direct scanning, the `ScanningModule`
-is used, and the resource creation occurs in roughly 5 stages, with the objects
-in the later stages depending on the objects created in the earlier stage:
-
-1. The SpiInterface object determines whether software SPI or hardware SPI is
-   used. Needed only by `LedMatrixSingleHc595` and
-   `LedMatrixDualHc595` classes.
-1. The LedMatrix object determine how the LEDs are wired and how to
-   communicate to the LED segments.
-1. The `ScanningModule` represents the actual LED segment module using
-   direct scanning, or scanning through an 74HC595 shift register chip.
-1. The `LedDisplay` writes seven-segment bit patterns to the underlying
-   `LedModule`.
-1. The various Writer classes which translate higher level characters and
-   strings into bit patterns used by `LedDisplay`.
-
-A typical resource creation code looks like this:
-
-```C++
-const uint8_t NUM_SEGMENTS = 8;
-const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 11, 12, 13, 14, 15};
-const uint8_t NUM_DIGITS = 4;
-const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
-const uint16_t FRAMES_PER_SECOND = 60;
-
-// The chain of resources.
-using LedMatrix = LedMatrixDirect<>;
-LedMatrix ledMatrix(
-    LedMatrix::kActiveLowPattern /*elementOnPattern*/,
-    LedMatrix::kActiveLowPattern /*groupOnPattern*/,
-    NUM_SEGMENTS,
-    SEGMENT_PINS,
-    NUM_DIGITS,
-    DIGIT_PINS);
-ScanningModule<LedMatrix, NUM_DIGITS> scanningModule(
-    ledMatrix, FRAMES_PER_SECOND);
-LedDisplay ledDisplay(scanningModule);
-
-NumberWriter hexWriter(ledDisplay);
-ClockWriter clockWriter(ledDisplay);
-CharWriter charWriter(ledDisplay);
-StringWriter stringWriter(ledDisplay);
-...
-
-void setupAceSegment() {
-  ledMatrix.begin();
-  scanningModule.begin();
-}
-
-void setup() {
-  delay(1000); // Wait for stability on some boards, otherwise garage on Serial
-  Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
-  while (!Serial); // Wait until Serial is ready - Leonardo/Micro
-  Serial.println(F("setup(): begin"));
-
-  ...
-  setupAceSegment();
-
-  Serial.println(F("setup(): end"));
-}
-```
-
-<a name="ChoosingLedMatrix"></a>
-### Choosing the LedMatrix
-
-The `LedMatrix` captures the wiring information about the LED module.
-The best way to show how to use these methods is probably through
-examples.
-
-<a name="ResistorsAndTransistors"></a>
-#### Resistors and Transistors
-
-In the following circuit diagrams, `R` represents the current limiting resistors
-and `T` represents the driving transistor. The resistor protects each LED
-segment, and the transistor prevents overloading the GPIO pin of the
-microcontroller.
-
-On an Arduino Nano for example, each GPIO pin can handle 40mA of current. If the
-value of `R` is high enough that each segment only drew only 5mA of current, the
-transistor could be omitted since 8 x 5mA is 40mA, which is within the limit of
-a single GPIO pin.
-
-If the `R` value is increased so that each LED segment is pushed to its rated
-current limit (probably 10-15mA), then 8 segments could potentially push
-80-120mA into the single digit pin of the Nano, which would exceed the maximum
-rating. A driver transistor would be needed on the digit pin to handle this
-current.
-
-If driver transistors are used on the digits, then it is likely that the logic
-levels need to be inverted software. In the examnple below, using common cathode
-display, with the resistors on the segments, an NPN transistor on the digit,
-the digit pin on the microcontroll (D12) needs to be HIGH to turn on the LED
-segement. In contrast, if the D12 pin was connected directly to the LED, the
-digit pin would need to be set LOW to turn on the LED.
+The dependency diagram among these classes looks something like this
+(simplified for ease of understanding):
 
 ```
-MCU                      LED display (Common Cathode)
-+-----+                  +------------------------+
-|  D08|------ R ---------|a -------.              |
-|  D09|------ R ---------|b -------|--------.     |
-|  D10|------ R ---------|c        |        |     |
-|  D11|------ R ---------|d      -----    -----   |
-|  D12|------ R ---------|e       \ /      \ /    |
-|  D13|------ R ---------|f      --v--    --v--   |
-|  D14|------ R ---------|g        |        |     |
-|  D15|------ R ---------|h        |        |     |
-|     |                  |         |        |     |
-|     |              +---|D1 ------+--------'     |
-|     |             /    |                        |
-|     |            /     +------------------------+
-|  D04|----- R ---| NPN
-|     |            \
-+-----+             v
-                    |
-                   GND
+        StringScroller
+        StringWriter      ClockWriter  TemperatureWriter
+               |              \           /
+               V               v         v
+            CharWriter         NumberWriter
+                    \            /
+                     v          v
+                      LedDisplay
+                          |            (hardware independent)
+--------------------------|-------------------------------------
+                          |            (hardware dependent)
+                          v
+                       LedModule
+                          ^
+                          |
+      +-------------------+-----------------+--------------+--------------+
+      |                   |                 |              |              |
+Tm1637Module          Max7219Module     Hc595Module  HybridModule  DirectModule
+      |                         \           |         /
+      |                          \          |        /
+      v                           v         v       v
+SoftWireInterface                 SoftSpiInterface
+SoftWireFastInterface             SoftSpiFastInterface
+                                  HardSpiInterface
+                                  HardSpiFastInterface
 ```
 
-If the LED display was using common anode, instead of common cathode as shown
-above, then a PNP transistor would be used, with the emitter tied to Vcc. Again,
-the logic level on the D12 pin will become inverted compared to wiring the digit
-pin directly to the microcontroller.
+<a name="DigitAndSegmentAddressing"></a>
+### Digit and Segment Addressing
 
-<a name="LedMatrixDirectCommonCathode"></a>
-#### Pins Wired Directly, Common Cathode
+The `LedModule` and `LedDisplay` classes use the following conventions for
+addressing the digits and segments:
 
-The wiring for this configuration looks like this:
-```
-MCU                      LED display (Common Cathode)
-+-----+                  +------------------------+
-|  D08|------ R ---------|a -------.              |
-|  D09|------ R ---------|b -------|--------.     |
-|  D10|------ R ---------|c        |        |     |
-|  D11|------ R ---------|d      -----    -----   |
-|  D12|------ R ---------|e       \ /      \ /    |
-|  D13|------ R ---------|f      --v--    --v--   |
-|  D14|------ R ---------|g        |        |     |
-|  D15|------ R ---------|h        |        |     |
-|     |                  |         |        |     |
-|  D04|---- R - T -------|D1 ------'--------'     |
-|  D05|---- R - T -------|D2                      |
-|  D06|---- R - T -------|D3                      |
-|  D07|---- R - T -------|D4                      |
-+-----+                  +------------------------+
-```
-
-The `LedMatrixDirect` constructor is:
-
-```C++
-const uint8_t NUM_SEGMENTS = 8;
-const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 11, 12, 13, 14, 15};
-const uint8_t NUM_DIGITS = 4;
-const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
-const uint16_t FRAMES_PER_SECOND = 60;
-
-using LedMatrix = LedMatrixDirect<>;
-LedMatrix ledMatrix(
-    LedMatrix::kActiveHighPattern /*elementOnPattern*/,
-    LedMatrix::kActiveHighPattern /*groupOnPattern*/,
-    NUM_SEGMENTS,
-    SEGMENT_PINS,
-    NUM_DIGITS,
-    DIGIT_PINS);
-ScanningModule<LedMatrix, NUM_DIGITS> scanningModule(
-    ledMatrix, FRAMES_PER_SECOND);
-LedDisplay ledDisplay(scanningModule);
-...
-
-void setupScanningModule() {
-  ledMatrix.begin();
-  scanningModule.begin();
-}
-```
-
-<a name="LedMatrixDirectCommonAnode"></a>
-#### Pins Wired Directly, Common Anode
-
-The wiring for this configuration looks like this:
-```
-MCU                      LED display (Common Anode)
-+-----+                  +------------------------+
-|  D08|------ R ---------|a -------.              |
-|  D09|------ R ---------|b -------|--------.     |
-|  D10|------ R ---------|c        |        |     |
-|  D11|------ R ---------|d      --^--    --^--   |
-|  D12|------ R ---------|e       / \      / \    |
-|  D13|------ R ---------|f      -----    -----   |
-|  D14|------ R ---------|g        |        |     |
-|  D15|------ R ---------|h        |        |     |
-|     |                  |         |        |     |
-|  D04|---- R - T -------|D1 ------'--------'     |
-|  D05|---- R - T -------|D2                      |
-|  D06|---- R - T -------|D3                      |
-|  D07|---- R - T -------|D4                      |
-+-----+                  +------------------------+
-```
-
-The `LedMatrixDirect` configuration is *exactly* the same as the Common Cathode
-case above, except that `kActiveHighPattern` is replaced with
-`kActiveLowPattern`.
-
-<a name="LedMatrixSingleHc595"></a>
-#### Segments on 74HC595 Shift Register
-
-The segment pins can be placed on a 74HC595 shift register chip that can be
-accessed through SPI. The caveat is that this chip can supply only 6 mA per pin
-(as opposed to 40 mA for an Arduino Nano for example). But it may be enough in
-some applications.
-
-We assume here that the registors are on the segment pins, and that we are using
-a common cathode LED display.
+* digits start at position 0 on the left and increase to the right
+* segments are assigned bits 0 to 7 of an unsigned byte (type `uint8_t`) with
+  segment `a` assigned to bit 0, segment `g` assigned to bit 6, and the optional
+  decimal point assigned to bit 7
 
 ```
-MCU          74HC595             LED display (Common Cathode)
-+--------+   +---------+         +------------------------+
-|        |   |       Q0|--- R ---|a -------.              |
-|        |   |       Q1|--- R ---|b -------|--------.     |
-|     D10|---|ST_CP  Q2|--- R ---|c        |        |     |
-|MOSI/D11|---|DS     Q3|--- R ---|d      -----    -----   |
-| SCK/D13|---|SH_CP  Q4|--- R ---|e       \ /      \ /    |
-|        |   |       Q5|--- R ---|f      --v--    --v--   |
-|        |   |       Q6|--- R ---|g        |        |     |
-|        |   |       Q7|--- R ---|h        |        |     |
-|        |   +---------+         |         |        |     |
-|        |                       |         |        |     |
-|     D04|------ R - T ----------|D1 ------'--------'     |
-|     D05|------ R - T ----------|D2                      |
-|     D06|------ R - T ----------|D3                      |
-|     D07|------ R - T ----------|D4                      |
-+--------+                       +------------------------+
-```
++------------+  +------------+           +------------+
+|   aaaa     |  |   aaaa     |           |   aaaa     |
+|  f    b    |  |  f    b    |           |  f    b    |
+|  f    b    |  |  f    b    |           |  f    b    |
+|   gggg     |  |   gggg     |  *  *  *  |   gggg     |
+|  e    c    |  |  e    c    |           |  e    c    |
+|  e    c    |  |  e    c    |           |  e    c    |
+|   dddd  dp |  |   dddd  dp |           |   dddd  dp |
++------------+  +------------+           +------------+
+  Digit 0         Digit 1                 Digit {N-1}
 
-The `LedMatrixSingleHc595` configuration using software SPI is:
-
-```C++
-const uint8_t NUM_DIGITS = 4;
-const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
-const uint8_t LATCH_PIN = 10; // ST_CP on 74HC595
-const uint8_t DATA_PIN = 11; // DS on 74HC595
-const uint8_t CLOCK_PIN = 13; // SH_CP on 74HC595
-const uint16_t FRAMES_PER_SECOND = 60;
-
-// Common Cathode, with transistors on Group pins
-SoftSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-using LedMatrix = LedMatrixSingleHc595<SoftSpiInterface>;
-LedMatrix ledMatrix(
-    spiInterface,
-    LedMatrix::kActiveHighPattern /*elementOnPattern*/,
-    LedMatrix::kActiveHighPattern /*groupOnPattern*/,
-    NUM_DIGITS,
-    DIGIT_PINS):
-ScanningModule<LedMatrix, NUM_DIGITS> scanningModule(
-    ledMatrix, FRAMES_PER_SECOND);
-LedDisplay ledDisplay(scanningModule);
-...
-
-void setupScanningModule() {
-  spiInterface.begin();
-  ledMatrix.begin();
-  scanningModule.begin();
-}
-```
-
-The `LedMatrixSingleHc595` configuration using hardware SPI is *exactly*
-the same as above but with `HardSpiInterface` replacing `SoftSpiInterface`.
-
-<a name="LedMatrixDualHc595"></a>
-#### Digits and Segments on Two Shift Registers
-
-In this wiring, both the segment pins and the digit pins are wired to
-two 74HC595 chips so that both sets of pins are set through SPI.
-
-```
-MCU                 74HC595             LED display (Common Cathode)
-+--------+          +---------+         +------------------------+
-|        |          |       Q0|--- R ---|a -------.              |
-|        |          |       Q1|--- R ---|b -------|--------.     |
-|     D10|--+-------|ST_CP  Q2|--- R ---|c        |        |     |
-|MOSI/D11|--|-------|DS     Q3|--- R ---|d      -----    -----   |
-| SCK/D13|--|---+---|SH_CP  Q4|--- R ---|e       \ /      \ /    |
-|        |  |   |   |       Q5|--- R ---|f      --v--    --v--   |
-|        |  |   |   |       Q6|--- R ---|g        |        |     |
-|        |  |   | +-|Q7'    Q7|--- R ---|h        |        |     |
-|        |  |   | | +---------+         |         |        |     |
-|        |  |   | |                     |         |        |     |
-|        |  |   | | 74HC595             |         |        |     |
-|        |  |   | | +---------+         |         |        |     |
-|        |  |   | | |       Q0|- R - T -|D1 ------+--------+     |
-|        |  |   | | |       Q1|- R - T -|D2                      |
-|        |  +---|-|-|ST_CP  Q2|- R - T -|D3                      |
-|        |      | +-|DS     Q3|- R - T -|D4                      |
-|        |      +---|SH_CP  Q4|         |                        |
-|        |          |       Q5|         |                        |
-|        |          |       Q6|         |                        |
-+--------+          |       Q7|         +------------------------+
-                    +---------+
-```
-
-The `LedMatrixDualHc595` configuration is the following. Let's use
-`HardSpiInterface` this time:
-
-```C++
-const uint8_t NUM_DIGITS = 4;
-const uint8_t LATCH_PIN = 10; // ST_CP on 74HC595
-const uint8_t DATA_PIN = 11; // DS on 74HC595
-const uint8_t CLOCK_PIN = 13; // SH_CP on 74HC595
-const uint16_t FRAMES_PER_SECOND = 60;
-
-HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-using LedMatrix = LedMatrixSingleHc595<HardSpiInterface>;
-LedMatrix ledMatrix(
-    spiInterface,
-    LedMatrix::kActiveHighPattern /*elementOnPattern*/,
-    LedMatrix::kActiveHighPattern /*groupOnPattern*/);
-ScanningModule<LedMatrix, NUM_DIGITS> scanningModule(
-    ledMatrix, FRAMES_PER_SECOND);
-LedDisplay ledDisplay(scanningModule);
-...
-
-void setupScanningModule() {
-  spiInterface.begin();
-  ledMatrix.begin();
-  scanningModule.begin();
-}
-```
-
-<a name="UsingScanningModule"></a>
-### Using the ScanningModule
-
-<a name="DigitBitPatterns"></a>
-#### Writing Digit Bit Patterns
-
-The `ScanningModule` contains a number of methods to write the bit patterns of
-the seven segment display:
-* `void writePatternAt(uint8_t pos, uint8_t pattern)`
-* `void writeDecimalPointAt(uint8_t pos, bool state = true)`
-* `void setBrightnessAt(uint8_t pos, uint8_t brightness)`
-
-The `pos` is the index into the LED digit array, from `0` to `NUM_DIGITS-1`
-where `0` represents the left-most digit. The `pattern` is an 8-bit integer
-which maps to the LED segments using the usual convention for a seven-segment
-LED ('a' is the least significant bit 0, decimal point 'dp' is the most
-seignificant bit 7):
-```
-7-segment map:
-      aaa       000
-     f   b     5   1
-     f   b     5   1
-      ggg       666
-     e   c     4   2
-     e   c     4   2
-      ddd  dp   333  77
 
 Segment: dp g f e d c b a
-   Bits: 7  6 5 4 3 2 1 0
-```
-(Sometimes, the decimal point `dp` is labeled as an `h`).
-
-The `writeDecimalPointAt()` is a special method that sets the bit corresponding
-to the decimal point ('h', bit 7), no matter what previous pattern was there in
-initially. The `state` variable controls whether the decimal point should
-be turned on (default) or off (false).
-
-The `brightness` is an integer constant (0-255) associated with the digit. It
-requires the `ScanningModule` object to be configured to support PWM on the
-digit pins. Otherwise, the brightness is ignored.
-
-<a name="GlobalBrightness"></a>
-#### Global Brightness
-
-If the `ScanningModule` supports it, we can control the global brightness of
-the entire LED display using:
-
-```
-scanningModule.setBrightness(value);
+   Bit:  7  6 5 4 3 2 1 0
 ```
 
-Note that the `value` is an integer from `[0, NUM_DIGITS]`, and represents the
-brightness of the display, where 0 means OFF and `NUM_DIGITS` means 100% ON.
+Some 4-digit LED modules are designed to be used in a clock to display the hour
+and minute components of the time as `HH:MM`. In these modules, it is common for
+the decimal point on Digit 1 to be replaced with the `colon` segment between
+Digit 1 and Digit 2. In these modules, sometimes the decimal points for the
+other digits work normally, but sometimes, the remaining decimal points do not
+work at all.
 
-The global brightness is enabled only if the `NUM_SUBFIELDS` template parameter
-of the `ScanningModule` was set to be `> 1`. By default, this is set to 1. For
-example, this creates a `ScanningModule` using hardware SPI, setting the
-`NUM_SUBFIELDS` to be 16:
+Sometimes the LED modules are hardwired to the controller chip so that the
+positions of the digits (and sometimes segments) do not not match the logical
+arrangement described above. Fortunately, we can rearrange the digit and segment
+bits in software so that everything is remapped to their correct places. For
+example, the diymore.cc 6-digit TM1637 LED module is wired so that the digits
+are displayed like this:
 
 ```
+2, 1, 0, 5, 4, 3
+```
+
+The `Tm1637Module` class can remap these digits into their correct order:
+
+```
+0, 1, 2, 3, 4, 5
+```
+
+Since it is impossible to predict all the different ways that the LED modules
+can be wired, various classes in the AceSegment library allow the remapping
+array to be supplied by the library user.
+
+<a name="Usage"></a>
+## Usage
+
+<a name="HeaderAndNamespace"></a>
+### Include Header and Namespace
+
+Only a single header file `AceSegment.h` is required to use this library.
+To prevent name clashes with other libraries that the calling code may use, all
+classes are defined in the `ace_segment` namespace. To use the code without
+prepending the `ace_segment::` prefix, use the `using` directive:
+
+```C++
+#include <AceSegment.h>
+using namespace ace_segment;
+```
+
+<a name="Tm1637Module"></a>
+### Tm1637Module
+
+LED modules based on the Titan TM1637 controller chips are abundant on Amazon
+and eBay. The controller chip supports up to 6 digits. Consumer LED modules
+seem have either 4 digits or 6 digits.
+
+![TM1637 LED Module](docs/tm1637/TM1637_4_digits.png)
+
+The TM1637 controller uses a wire protocol that is very close to, but not quite
+the same as, I2C. Unfortunately this means that we cannot use the usual `Wire`
+library. The `Tm1637Module` class uses bit-banging to send the correct bits in
+the right order with the right timing to the chip.
+
+The `BIT_DELAY` parameter below is the number of microseconds to wait between
+each bit transition (0 to 1, or 1 to 0). According the datasheet of the TM1637
+chip, it can support oscillator frequencies as high as 450 kHz, which means that
+theoretically, the `BIT_DELAY` could be as low as 1 microseconds.
+
+However, the LED modules manufactured by diymore.cc (shown above) contains a 20
+nF capacitor and a 4.7k ohm pullup resistor on each of the `DIO` and `CLK`
+lines. This seems to be a design flaw, because the capacitor is about 100X
+larger than it should be, it should have been only be about 200 pF. The effect
+of the large capacitor is that bit transitions on these lines take an incredibly
+long time due the `RC` time constant of 94 microseconds. After experimenting
+with various values, it seems like a `BIT_DELAY` of 100 microseconds will
+usually work.
+
+A `BIT_DELAY` of 100 microseconds means that the time to transmit 4 digits to
+the TM1637 chip becomes about 22 milliseconds. The time to transmit a single
+digit is about 10 milliseconds due to the overhead in the protocol. Since these
+durations are so large, the `Tm1637Module` class does not send the segment bit
+patterns directly to the TM1637 controller when `Tm1637Module::setPattern()`
+method is called. Instead, the class holds a buffer of segment patterns, and
+keeps track of a set of dirty bits. The buffer is sent to the TM1637 controller
+upon the execution of the `Tm1637Module::flush()` or
+Tm1637Module::flushIncremental()` method.
+
+The `flush()` method unconditionally sends all digits and the brightness
+information to the TM1637 chip in a single protocol transmission. For 4 digits,
+using a `BIT_DELAY` of 100 micros, the entire tranmission takes about 22 millis.
+For 6 digits, this method takes about 27 millis. The `flush()` method is a
+blocking call, nothing else can be done during this time (outside of
+interrupts). This can be a problem for processors like the ESP8266 which must
+yield back to the main loop every 20-40 milliseconds to keep its WiFi stack
+working. Otherwise, the watch dog timer performs a system reboot.
+
+The `flushIncremental()` method was created to reduce the amount of time spent
+in the blocking call to `flush()`. The `Tm1637Module` class contains a set of
+dirty bits which keeps track of which digits have been modified since the last
+flush to the TM1637 chip. It also keeps a reference counter that keeps track of
+the digit that `flushIncremental()` handled previously. When
+`flushIncremental()` is called, only a single digit is sent to the TM1637, and
+only if that digit was marked to be dirty. Each subsequent call to
+`flushIncremental()` examines the next digit. When the last digit is handled,
+the next call to `flushIncremental()` looks at the brightness level, and sends
+that information to the TM1637 chip if the brightness dirty bit is set.
+
+The configuration of the `Tm1637Module` class for the 4-digit module looks like
+this:
+
+```C++
+#include <AceSegment.h>
+using namespace ace_segment;
+
+const uint8_t CLK_PIN = 10;
+const uint8_t DIO_PIN = 9;
+const uint16_t BIT_DELAY = 100;
 const uint8_t NUM_DIGITS = 4;
-const uint8_t LATCH_PIN = 10; // ST_CP on 74HC595
-const uint8_t DATA_PIN = 11; // DS on 74HC595
-const uint8_t CLOCK_PIN = 13; // SH_CP on 74HC595
-const uint16_t FRAMES_PER_SECOND = 60;
-const uint8_t NUM_SUBFIELDS = 16;
 
-HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-using LedMatrix = LedMatrixSingleHc595<HardSpiInterface>;
-LedMatrix ledMatrix(
-    spiInterface,
-    LedMatrix::kActiveHighPattern /*elementOnPattern*/,
-    LedMatrix::kActiveHighPattern /*groupOnPattern*/);
-ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
-    ledMatrix, FRAMES_PER_SECOND);
-LedDisplay ledDisplay(scanningModule);
-```
+using WireInterface = SoftWireInterface;
+WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
+Tm1637Module<WireInterface, NUM_DIGITS> ledModule(wireInterface);
 
-Each digit is rendered 16 times within a single field, and modulated using pulse
-width modulation to control the width of that signal. The given digit will be
-on only a fraction of the full interval of the entire rendering of the  field
-and will appear dimmer to the human eye.
+LedDisplay display(ledModule);
 
-<a name="FramesAndFields"></a>
-#### Frames and Fields
-
-To understand how to the `ScanningModule` supports brightness, we first need to
-explain a couple of terms that we borrowed from the field of
-[video processing](https://en.wikipedia.org/wiki/Field_(video)):
-
-* **Frame**: A frame is a complete rendering of all digits of the seven segment
-  display. A frame is intended to be a single, conceptually static image of the
-  LED display. Any changes in bit patterns or brightness of the digits happens
-  through the rendering of multiple frames.
-* **Field**: A field is a partial rendering of a frame. If the current limiting
-  resistors are on the segments (recommended), then the `ScanningModule`
-  multiplexes through the digits. Each rendering of the digit is a *field* and
-  for a 4-digit display, there are 4 fields per frame.
-
-A *frame* rate of about 60Hz is recommended to eliminate obvious visual
-flickering. If the LED display has 4 digits, and we use "resistors on segments"
-configuration, then we need to have a *field* rate of 240Hz. We will see later
-that if we want dimmable digits using PWM, then we need about 8-16 subfields
-within a field, giving a total *field* rate of about 2000-4000Hz. That's abaout
-250-500 microseconds per field, which is surprisingly doable using an 8-bit
-processor like an Arduino UNO or Nano on an ATmega328 running at 16MHz.
-
-The primary unit of rendering in `ScanningModule` is a single field,
-implemented in `ScanningModule::renderFieldNow()`. The `ScanningModule` class
-keeps track of the current digit, the current frame, and the current field, and
-each successive call to `renderFieldNow()` sends the appropriate bit pattern to
-the LED module.
-
-For a given requested frame rate, are 2 ways to render the fields at the correct
-time, and they are explained below:
-
-* Polling
-* Interrupts
-
-<a name="RenderingByPolling"></a>
-#### Rendering By Polling
-
-The `ScanningModule::renderFieldWhenReady()` is meant to be called at a
-frequency somewhat higher than that needed to sustain the actual frame rate. It
-keeps an internal variable containing the time (in `micros()`) of the previous
-rendering of the field. When the time is up, it calls `renderFieldNow()` and
-updates the internal clock to be ready for the next call.
-
-The code looks like this:
-
-```
-void loop() {
-  scanningModule.renderFieldWhenReady();
+void setupAceSegment() {
+  wireInterface.begin();
+  ledModule.begin();
 }
-```
 
-The problem with using this method is that it's difficult to get much else done
-in the `loop()` method. If those other side things take up too much time, then
-the refreshing rate of the LED module will wander, and the eyes will notice
-flickering of the LED module.
+// Flush to LED module every 50 millis.
+void flushModule() {
+  static uint16_t prevFlushMillis;
 
-Using this polling method is the easiest way to get AceSegment working. But many
-non-trivial project will want to use the timer interrupt method to avoid the
-flickering problem.
-
-<a name="RenderingUsingInterrupts"></a>
-#### Rendering Using Interrupts
-
-The calling code sets up an interrupt service routine (ISR) which calls
-`ScanningModule::renderFieldNow()` at exactly the periodic frequency needed to
-achieve the desired frames per second and fields per second.
-
-Unfortunately, timer interrupts are not part of the Arduino API (probably
-because every microcontroller handles interrupts in a slightly different way).
-For example, an ATmega328 (e.g. Arduino UNO, Nano, Mini), using an 8-bit timer
-on Timer 2 looks like this:
-```
-ISR(TIMER2_COMPA_vect) {
-  scanningModule.renderFieldNow();
+  uint16_t nowMillis = millis();
+  if ((uint16_t) (nowMillis - prevFlushMillis) >= 50) {
+    prevFlushMillis = nowMillis;
+    //ledModule.flush();
+    ledModule.flushIncremental();
+  }
 }
 
 void setup() {
-  ...
-  // set up Timer 2
-  uint8_t timerCompareValue =
-      (unsigned long) F_CPU / 1024 / scanningModul.getFieldsPerSecond() - 1;
-  noInterrupts();
-  TCNT2  = 0;	// Initialize counter value to 0
-  TCCR2A = 0;
-  TCCR2B = 0;
-  TCCR2A |= bit(WGM21); // CTC
-  TCCR2B |= bit(CS22) | bit(CS21) | bit(CS20); // prescale 1024
-  TIMSK2 |= bit(OCIE2A); // interrupt on Compare A Match
-  OCR2A =  timerCompareValue;
-  interrupts();
+  setupAceSegment();
   ...
 }
 
 void loop() {
- ...do other stuff here...
+  flushModule();
+  ...
 }
 ```
+
+The configuration of the `Tm1637Module` class for the 6-digit module is slightly
+more complicated because the digits are wired to be in the order of `2, 1, 0, 5,
+4, 3`. A predefined remap array `kDigitRemapArray6Tm1637` must be given to the
+`Tm1637Module` constructor, like this:
+
+```C++
+#include <Arduino.h>
+#include <AceSegment.h>
+
+using namespace ace_segment;
+
+const uint8_t CLK_PIN = 10;
+const uint8_t DIO_PIN = 9;
+const uint16_t BIT_DELAY = 100;
+const uint8_t NUM_DIGITS = 4;
+
+using WireInterface = SoftWireInterface;
+WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
+Tm1637Module<WireInterface, NUM_DIGITS> ledModule(
+    wireInterface, kDigitRemapArray6Tm1637);
+
+LedDisplay display(ledModule);
+
+void setupAceSegment() {
+  wireInterface.begin();
+  ledModule.begin();
+}
+
+// Flush to LED module every 50 millis.
+void flushModule() {
+  static uint16_t prevFlushMillis;
+  uint16_t nowMillis = millis();
+  if ((uint16_t) (nowMillis - prevFlushMillis) >= 50) {
+    prevFlushMillis = nowMillis;
+    //ledModule.flush();
+    ledModule.flushIncremental();
+  }
+}
+
+void setup() {
+  setupAceSegment();
+  ...
+}
+
+void loop() {
+  flushModule();
+  ...
+}
+```
+
+<a name="Max7219Module"></a>
+### Max7219Module
+
+These LED modules use the MAX7219 controller chip which communicate using SPI. A
+single chip supports 8 segments of up to 8 digits. Multiple controller chips can
+be daisychained to support more than 8 digits. The 8-digit module is readily
+available commercially from multiple suppliers on Amazon and eBay, and they look
+like this:
+
+![MAX7219 LED Module](docs/max7219/MAX7219_8_digits.png)
+
+The configuration of the `Max7219Module` class for the 8-digit module looks like
+this:
+
+```C++
+#include <Arduino.h>
+#include <AceSegment.h>
+
+using namespace ace_segment;
+
+const uint8_t LATCH_PIN = 10;
+const uint8_t DATA_PIN = MOSI;
+const uint8_t CLOCK_PIN = SCK;
+const uint8_t NUM_DIGITS = 8;
+
+using SpiInterface = HardSpiInterface;
+SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+
+Max7219Module<SpiInterface, NUM_DIGITS> ledModule(
+    spiInterface, kDigitRemapArray8Max7219);
+LedDisplay display(ledModule);
+
+void setupAceSegment() {
+  spiInterface.begin();
+  ledModule.begin();
+}
+
+// Flush to LED module every 100 millis.
+void flushModule() {
+  static uint16_t prevFlushMillis;
+  uint16_t nowMillis = millis();
+  if ((uint16_t) (nowMillis - prevFlushMillis) >= 100) {
+    prevFlushMillis = nowMillis;
+    ledModule.flush();
+  }
+}
+
+void setup() {
+  setupAceSegment();
+  ...
+}
+
+void loop() {
+  flushModule();
+  ...
+}
+```
+
+<a name="Hc595Module"></a>
+### Hc595Module
+
+The 74HC595 shift register is a well-known chip that can be used to control
+seven-segment LED modules. Each chip converts 8 serial bits into 8 parallel pins
+which can source or sink about 12 mA of current each. With two 74HC595 chips,
+one chip can control the segment pins, the other can control the common digit
+pins, and the two chips can be daisy chained together. The chips can be
+programmed using the straighforward SPI protocol.
+
+Recently (since about Aug 2020?), off-the-shelf 8-digit LED modules using two
+74HC595 have become common on Amazon and eBay, in multiple colors. They look
+like this:
+
+![HC595 LED Module](docs/hc595/HC595_8_digits.png)
+
+The configuration of the `Hc595Module` class for the 8-digit module looks like
+this:
+
+```C++
+#include <Arduino.h>
+#include <AceSegment.h>
+
+using namespace ace_segment;
+
+const uint8_t LATCH_PIN = 10;
+const uint8_t DATA_PIN = MOSI;
+const uint8_t CLOCK_PIN = SCK;
+
+const uint8_t NUM_DIGITS = 8;
+const uint8_t FRAMES_PER_SECOND = 60;
+
+const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
+const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
+const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
+
+using SpiInterface = HardSpiInterface;
+SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+
+Hc595Module<SpiInterface, NUM_DIGITS> ledModule(
+    spiInterface,
+    SEGMENT_ON_PATTERN,
+    DIGIT_ON_PATTERN,
+    FRAMES_PER_SECOND,
+    HC595_BYTE_ORDER,
+    REMAP_ARRAY
+);
+
+LedDisplay display(ledModule);
+
+void setupAceSegment() {
+  spiInterface.begin();
+  ledModule.begin();
+}
+
+// Flush to LED module when ready. Call this as fast as possible, allowing
+// the internal counters to figure out when to actually render.
+void flushModule() {
+  ledModule.renderFieldWhenReady();
+}
+
+void setup() {
+  setupAceSegment();
+  ...
+}
+
+void loop() {
+  flushModule();
+  ...
+}
+```
+
+<a name="RenderingHc595Module"></a>
+#### Rendering the Hc595Module
+
+Unlike the TM1637 and the MAX7219 chips, the 74HC595 does not automatically
+multiplex through the digits of the LED module, giving the appearance that all
+the digits are on at the same time. The scanning must be performed by the
+microcontroller itself. The `Hc595Module::renderFieldWhenReady()` performs that
+task. It should be called as quickly as possible, usually faster than `60 *
+NUM_DIGITS` times per second, so for a 4-digit LED module, that's 240 times a
+second, or every 5 milliseconds.
+
+The rendering the LED module is split into 2 parts:
+
+* a *frame* is one complete rendering of the LED display (4 digits),
+* a *field* is a partial rendering of a single frame (a single digit).
+
+A frame rate of about 60Hz will be sufficient to prevent obvious flickering of
+the LED. For a 4-digit LED, that requires rendering 240 fields per second. The
+`Hc595Module::renderFieldNow()` is meant to be used inside an interrupt service
+routine (ISR) which is configured to execute exactly at the requested frequency.
+It will immediately render the given field (a single digit) to the 74HC595 shift
+registers. When it is called a second time, it will render the next digit. The
+`Hc595Module::renderFieldWhenReady()` is designed to give an effective rendering
+rate of 240 Hz using a polling method. It should be called as fast as possible
+in the global `loop()` function. It keeps an internal timing variable that
+remembers the last time that it was called. When the correct amount of time has
+passed, it then calls `renderFieldNow()`, and resets the timing variable.
+
+<a name="LedDisplay"></a>
+### LedDisplay
+
+The `LedDisplay` object is a thin-wrapper around an `LedModule` object which
+provides a unified API to write bit patterns to the LED module at specific
+positions. The `LedDisplay` also provides an API to set and clear the decimal
+point on the LED module if available, and it provides the ability to control the
+brightness of the LED module.
+
+The public methods of class looks like this (not all public methods shown):
+
+```C++
+class LedDisplay {
+  public:
+    explicit LedDisplay(LedModule& ledModule);
+
+    uint8_t getNumDigits() const;
+    void writePatternAt(uint8_t pos, uint8_t pattern);
+    void writePatternsAt(uint8_t pos, const uint8_t patterns[], uint8_t len);
+    void writePatternsAt_P(uint8_t pos, const uint8_t patterns[], uint8_t len);
+    void writeDecimalPointAt(uint8_t pos, bool state = true);
+
+    void clear();
+    void clearToEnd(uint8_t pos);
+
+    void setBrightness(uint8_t brightness);
+};
+```
+
+The decimal point is stored as bit 7 (the most significant bit) of the `uint8_t`
+byte for a given digit. This bit is cleared by the other `writePatternAt()` or
+`writePatternsAt()` functions. So the `writeDecimalPointAt()` should be called
+**after** the other write methods are called.
+
+The brightness value of an LED module is determine by the underlying controller
+chip, and the range of values are different for each chip:
+
+* The TM1637 chip supports 8 levels from 0 to 7, with 0 turning off the
+  display and 7 being the brightest.
+* The MAX7219 chip supports 16 levels from 0 to 15, with 0 being the dimmest
+  level (which does not turn off the display), and 15 being the brightest.
+* The brightness of 74HC595 module is controlled entirely by the
+  microcontroller using pulse width modulation (PWM). The range of values could
+  theoretically be from 0 to 255, but in practice, it is limited by the speed
+  of the SPI protocol to the 74HC595 chip. A brightness range of 0-7 or 0-15
+  seems practical for most configurations.
+
+After a specific, hardware-dependent instance of `LedModule` is created, the
+`LedDisplay` is created by wrapping around the `LedModule`:
+
+```C++
+LedDisplay display(ledModule);
+```
+
+Various Writer classes build upon the `LedDisplay` class to provide additional
+ways of printing numbers and letters to the LED module.
 
 <a name="NumberWriter"></a>
 ### NumberWriter
 
-While it is exciting to be able to write any bit patterns to the LED display, we
-often want to just write numbers to the LED display. The `NumberWriter` can
-print integers to the `ScanningModule` using decimal or hexadecimal formats. On
-platforms that support it (ATmega and ESP8266), the bit mapping table is stored
-in flash memory to conserve static memory.
+The `NumberWriter` can print integers to the `LedDisplay` using decimal (0-9) or
+hexadecimal (0-9A-F) formats. On platforms that support it (ATmega and ESP8266),
+the bit mapping table is stored in flash memory to conserve static memory.
 
-The class supports the following methods:
+The public methods of this class looks something like this:
 
-* `LedDisplay& display()`
-* `void writeHexCharAt(uint8_t pos, hexchar_t c)`
-* `void writeHexByteAt(uint8_t pos, uint8_t b)`
-* `void writeHexWordAt(uint8_t pos, uint16_t w)`
-* `void writeUnsignedDecimalAt(uint8_t pos, uint16_t num, int8_t boxSize = 0)`
-* `void writeSignedDecimalAt(uint8_t pos, int16_t num, int8_t boxSize = 0)`
+```C++
+class NumberWriter {
+  public:
+    typedef uint8_t hexchar_t;
+    static const hexchar_t kCharSpace = 0x10;
+    static const hexchar_t kCharMinus = 0x11;
+
+    explicit NumberWriter(LedDisplay& ledDisplay);
+
+    LedDisplay& display();
+
+    void writeHexCharAt(uint8_t pos, hexchar_t c);
+    void writeHexCharsAt(uint8_t pos, hexchar_t [], uint8_t len);
+
+    void writeHexByteAt(uint8_t pos, uint8_t b);
+    void writeHexWordAt(uint8_t pos, uint16_t w);
+
+    void writeUnsignedDecimalAt(uint8_t pos, uint16_t num, int8_t boxSize = 0);
+    void writeSignedDecimalAt(uint8_t pos, int16_t num, int8_t boxSize = 0);
+    void writeUnsignedDecimal2At(uint8_t pos, uint8_t num);
+
+    void clearToEnd(uint8_t pos);
+};
+```
 
 The `hexchar_t` type semantically represents the character set supported by this
 class. It is implemented as an alias for `uint8_t`, which unfortunately means
@@ -877,15 +746,31 @@ There are special, 4 digit,  seven segment LED displays which replace the
 decimal point with the colon symbol ":" between the 2 digits on either side so
 that it can display a time in the format "hh:mm".
 
-The class supports the following methods:
+The public methods of this class look like this:
 
-* `LedDisplay& display()`
-* `void writeCharAt(uint8_t pos, hexchar_t c)`
-* `void writeBcd2At(uint8_t pos, uint8_t bcd);
-* `void writeDec2At(uint8_t pos, uint8_t d);
-* `void writeDec4At(uint8_t pos, uint16_t dd);
-* `void writeHourMinute(uint8_t hh, uint8_t mm)`
-* `void writeColon(bool state = true)`
+```C++
+class ClockWriter {
+  public:
+    using hexchar_t = NumberWriter::hexchar_t;
+    static const hexchar_t kCharSpace = NumberWriter::kCharSpace;
+    static const hexchar_t kCharMinus = NumberWriter::kCharMinus;
+    static const uint8_t kPatternA = 0b01110111;
+    static const uint8_t kPatternP = 0b01110011;
+
+    explicit ClockWriter(LedDisplay& ledDisplay, uint8_t colonDigit = 1);
+
+    LedDisplay& display() const;
+    void writeCharAt(uint8_t pos, hexchar_t c);
+    void writeChar2At(uint8_t pos, hexchar_t c0, hexchar_t c1);
+
+    void writeBcd2At(uint8_t pos, uint8_t bcd);
+    void writeDec2At(uint8_t pos, uint8_t d);
+    void writeDec4At(uint8_t pos, uint16_t dd);
+
+    void writeHourMinute(uint8_t hh, uint8_t mm);
+    void writeColon(bool state = true);
+};
+```
 
 A `ClockWriter` consumes about 250 bytes of flash memory on an AVR, which
 includes an instance of a `NumberWriter`.
@@ -893,12 +778,26 @@ includes an instance of a `NumberWriter`.
 <a name="TemperatureWriter"></a>
 ### TemperatureWriter
 
-The class supports the following methods:
+This class supports writing out temperatures in degrees Celcius or Fahrenheit.
+The public methods of this class looks something like this:
 
-* `LedDisplay& display()`
-* `uint8_t writeTempDegAt(uint8_t pos, int16_t temp, boxSize = 0);`
-* `uint8_t writeTempDegCAt(uint8_t pos, int16_t temp, boxSize = 0);`
-* `uint8_t writeTempDegFAt(uint8_t pos, int16_t temp, boxSize = 0);`
+```C++
+class TemperatureWriter {
+  public:
+    static const uint8_t kPatternDegree = 0b01100011;
+    static const uint8_t kPatternC = 0b00111001;
+    static const uint8_t kPatternF = 0b01110001;
+
+    explicit TemperatureWriter(LedDisplay& ledDisplay);
+
+    LedDisplay& display();
+
+    uint8_t writeTempAt(uint8_t pos, int16_t temp, boxSize = 0);
+    uint8_t writeTempDegAt(uint8_t pos, int16_t temp, boxSize = 0);
+    uint8_t writeTempDegCAt(uint8_t pos, int16_t temp, boxSize = 0);
+    uint8_t writeTempDegFAt(uint8_t pos, int16_t temp, boxSize = 0);
+};
+```
 
 A `TemperatureWriter` consumes about 270 bytes of flash memory on an AVR, which
 includes an instance of a `NumberWriter`.
@@ -914,10 +813,28 @@ to seven-segment bit patterns. On platforms that support it (ATmega and
 ESP8266), the bit pattern array is stored in flash memory to conserve static
 memory.
 
-The class supports the following methods:
+The public methods of this class looks like thid:
 
-* `LedDisplay& display()`
-* `void writeCharAt(uint8_t pos, char c)`
+```C++
+class CharWriter {
+  public:
+    static const uint8_t kCharPatterns[];
+    static const uint8_t kNumChars = 128;
+
+    explicit CharWriter(
+        LedDisplay& ledDisplay,
+        const uint8_t charPatterns[] = kCharPatterns,
+        uint8_t numChars = kNumChars
+    );
+
+    LedDisplay& display();
+
+    void writeCharAt(uint8_t pos, char c);
+
+    uint8_t getNumChars() const;
+    uint8_t getPattern(char c) const;
+};
+```
 
 A `CharWriter` consumes about 250 bytes of flash memory on an AVR.
 
@@ -925,13 +842,23 @@ A `CharWriter` consumes about 250 bytes of flash memory on an AVR.
 ### StringWriter
 
 A `StringWriter` is a class that builds on top of the `CharWriter`. It knows how
-to write entirely strings into the LED display. It provides the following
-methods:
+to write entirely strings into the LED display. The public methods look like:
 
-* `LedDisplay& display()`
-* `uint8_t writeStringAt(uint8_t pos, const char* cs, uint8_t numChar = 255)`
-* `uint8_t writeStringAt(uint8_t pos, const __FlashStringHelper* fs, uint8_t numChar = 255)`
-* `void clearToEnd(uint8_t pos)`
+```C++
+class StringWriter {
+  public:
+    explicit StringWriter(CharWriter& charWriter);
+
+    LedDisplay& display();
+
+    uint8_t writeStringAt(uint8_t pos, const char* cs, uint8_t numChar = 255);
+
+    uint8_t writeStringAt(uint8_t pos, const __FlashStringHelper* fs,
+            uint8_t numChar = 255);
+
+    void clearToEnd(uint8_t pos);
+};
+```
 
 The implementation of `writeStringAt()` is straightforward except for the
 handling of a decimal point. A seven segment LED digit contains a small LED for
@@ -961,6 +888,31 @@ uint8_t written = stringWriter.writeStringAt(0, s);
 stringWriter.clearToEnd(written);
 ```
 
+<a name="StringScroller"></a>
+### StringScroller
+
+A `StringScroller` is a class that builds on top of the `CharWriter`. It knows
+how to write entirely strings into the LED display. The public methods look
+like:
+
+```C++
+class StringScroller {
+  public:
+    explicit StringScroller(LedDisplay& ledDisplay);
+
+    LedDisplay& display() const;
+
+    void initScrollLeft(const char* s);
+    bool scrollLeft();
+
+    void initScrollRight(const char* s);
+    bool scrollRight();
+};
+```
+
+To scroll a string to the left, first initialize the string, then call
+`scrollLeft()` to shift left. Similarly to the right.
+
 <a name="AdvancedUsage"></a>
 ## Advanced Usage
 
@@ -982,7 +934,12 @@ I have written versions of some lower-level classes to take advantage of
 * `scanning/LedMatrixDirectFast4.h`
     * Variant of `LedMatrixDirect` using `digitalWriteFast()`
 * `hw/SoftSpiFastInterface.h`
-    * Variant of `SoftSpiInterface.h` using  `digitalWriteFast()`
+    * Variant of `SoftSpiInterface.h` using  `digitalWriteFast()` for the
+      `MOSI`, `SCK` and `LATCH` pins
+* `hw/HardSpiFastInterface.h`
+    * Variant of `HardSpiInterface.h` using  `digitalWriteFast()` to toggle
+      the `LATCH` pin, while the hardware SPI code controls the `MOSI` and `SCK`
+      pins
 * `hw/SoftWireFastInterface.h`
     * Variant of `SoftWireInterface.h` using `digitalWriteFast()`
 
@@ -993,13 +950,23 @@ need to include these headers manually, like this:
 
 ```C++
 #include <AceSegment.h> // do this first
+
 #if defined(ARDUINO_ARCH_AVR)
   #include <digitalWriteFast.h> // from 3rd party library
   #include <ace_segment/hw/SoftSpiFastInterface.h>
+  #include <ace_segment/hw/HardSpiFastInterface.h>
   #include <ace_segment/hw/SoftWireFastInterface.h>
-  #include <ace_segment/scanning/LedMatrixDirectFast4.h>
+  #include <ace_segment/direct/DirectFast4Module.h>
 #endif
 ```
+
+<a name="ScanningModule"></a>
+### Custom Configuration of ScanningModule
+
+The 3 convenience classes (`DirectModule`, `HybridModule`, and `Hc595Module`)
+are subclasses of the `ScanningModule` parent class. If you want to know how the
+`ScanningModule` is implemented, I have some notes in
+[docs/scanning_module.md](docs/scanning_module.md).
 
 <a name="ResourceConsumption"></a>
 ## Resource Consumption
@@ -1238,10 +1205,10 @@ microseconds.
 <a name="Hardware"></a>
 ### Hardware
 
-The library is extensively tested on the following boards:
+The library has Tier 1 support on the following boards:
 
-* Arduino Nano clone (16 MHz ATmega328P)
-* SparkFun Pro Micro clone (16 MHz ATmega32U4)
+* Arduino Nano (16 MHz ATmega328P)
+* SparkFun Pro Micro (16 MHz ATmega32U4)
 * SAMD21 M0 Mini (48 MHz ARM Cortex-M0+)
 * STM32 Blue Pill (STM32F103C8, 72 MHz ARM Cortex-M3)
 * NodeMCU 1.0 (ESP-12E module, 80MHz ESP8266)
@@ -1249,16 +1216,25 @@ The library is extensively tested on the following boards:
 * ESP32 dev board (ESP-WROOM-32 module, 240 MHz dual core Tensilica LX6)
 * Teensy 3.2 (72 MHz ARM Cortex-M4)
 
-I will occasionally test on the following hardware as a sanity check:
+Tier 2 support can be expected on the following boards, mostly because I don't
+test these as often:
 
+* ATtiny85 (8 MHz ATtiny85)
 * Teensy LC (48 MHz ARM Cortex-M0+)
 * Mini Mega 2560 (Arduino Mega 2560 compatible, 16 MHz ATmega2560)
+
+The following boards are **not** supported:
+
+* Any platform using the ArduinoCore-API
+  (https://github.com/arduino/ArduinoCore-api). For example, Nano Every,
+  MKRZero, and Raspberry Pi Pico RP2040.
 
 <a name="ToolChain"></a>
 ### Tool Chain
 
 * [Arduino IDE 1.8.13](https://www.arduino.cc/en/Main/Software)
 * [Arduino CLI 0.14.0](https://arduino.github.io/arduino-cli)
+* [SpenceKonde ATTinyCore 1.5.2](https://github.com/SpenceKonde/ATTinyCore)
 * [Arduino AVR Boards 1.8.3](https://github.com/arduino/ArduinoCore-avr)
 * [Arduino SAMD Boards 1.8.9](https://github.com/arduino/ArduinoCore-samd)
 * [SparkFun AVR Boards 1.1.13](https://github.com/sparkfun/Arduino_Boards)
@@ -1271,8 +1247,8 @@ I will occasionally test on the following hardware as a sanity check:
 <a name="OperatingSystem"></a>
 ### Operating System
 
-I use Ubuntu 18.04 and 20.04 for the vast majority of my development. I expect
-that the library will work fine under MacOS and Windows, but I have not tested
+I use Ubuntu 20.04 for the vast majority of my development. I expect that the
+library will work fine under MacOS and Windows, but I have not explicitly tested
 them.
 
 <a name="License"></a>
@@ -1283,12 +1259,18 @@ them.
 <a name="FeedbackAndSupport"></a>
 ## Feedback and Support
 
-If you have any questions, comments, bug reports, or feature requests, please
-file a GitHub ticket instead of emailing me unless the content is sensitive.
-(The problem with email is that I cannot reference the email conversation when
-other people ask similar questions later.) I'd love to hear about how this
-software and its documentation can be improved. I can't promise that I will
-incorporate everything, but I will give your ideas serious consideration.
+If you have any questions, comments and other support questions about how to
+use this library, use the
+[GitHub Discussions](https://github.com/bxparks/AceSegment/discussions)
+for this project. If you have bug reports or feature requests, file a ticket in
+[GitHub Issues](https://github.com/bxparks/AceSegment/issues). I'd love to hear
+about how this software and its documentation can be improved. I can't promise
+that I will incorporate everything, but I will give your ideas serious
+consideration.
+
+Please refrain from emailing me directly unless the content is sensitive. The
+problem with email is that I cannot reference the email conversation when other
+people ask similar questions later.
 
 <a name="Authors"></a>
 ## Authors

@@ -55,6 +55,10 @@ SOFTWARE.
 #include "ace_segment/writer/StringWriter.h"
 #include "ace_segment/writer/StringScroller.h"
 
+#if defined(ARDUINO_API_VERSION)
+#error Platforms using ArduinoCore-API not supported
+#endif
+
 // Version format: xxyyzz == "xx.yy.zz"
 #define ACE_SEGMENT_VERSION 400
 #define ACE_SEGMENT_VERSION_STRING "0.4"
