@@ -532,10 +532,6 @@ void runTm1637Benchmark(
     uint8_t numDigits,
     bool useFlushIncremental
 ) {
-  for (uint8_t i = 0; i < numDigits; ++i) {
-    ledModule.setPatternAt(i, kTm1637Patterns[i]);
-  }
-
   // Run through 10 full cycles to eliminate any variances.
   // The flush() method sends all digits (and brightness) to the LED module in a
   // single call. The flushIncremental() sends only a single digit or the
@@ -546,6 +542,11 @@ void runTm1637Benchmark(
 
   timingStats.reset();
   for (uint16_t i = 0; i < numSamples; ++i) {
+    // Update patterns, to mark all digits as dirty.
+    for (uint8_t i = 0; i < numDigits; ++i) {
+      ledModule.setPatternAt(i, kTm1637Patterns[i]);
+    }
+
     uint16_t startMicros;
     uint16_t endMicros;
     if (useFlushIncremental) {
