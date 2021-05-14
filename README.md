@@ -177,14 +177,21 @@ depend on the lower-level classes:
     * Base interface for all hardware dependent implementation of a
       seven-segment LED module.
     * `Tm1637Module`
-        * An implementation of `LedModule` using a TM1637 controller.
+        * An implementation using a TM1637 controller.
     * `Max7219Module`
-        * An implementation of `LedModule` using a MAX7219 controller.
+        * An implementation using a MAX7219 controller.
     * `Hc595Module`
-        * An implementation of `LedModule` using two 74HC595 shift registers.
+        * An implementation using two 74HC595 shift registers.
+    * `HybridModule`
+        * An implementation using one 74HC595 shift registers
+          to handle the 8 segment lines, with the digit lines directly connected
+          to the GPIO pins of the micrcontroller.
+    * `DirectModule`
+        * An implementation with all segment and digit pins connected directly
+          to the microcontroller.
 * `LedDisplay`
     * Class that knows how to write segment bit patterns to an `LedModule`.
-    * Provides a common API to the various Writer classes.
+    * Provides a single, common API to the various Writer classes.
 * Writers
     * Helper classes built on top of the `LedDisplay` which provide higher-level
       interface to the LED module, such as printing numbers, time (hh:mm),
@@ -218,30 +225,31 @@ The dependency diagram among these classes looks something like this
 (simplified for ease of understanding):
 
 ```
-         StringScroller
-         StringWriter      ClockWriter  TemperatureWriter
-                |              \           /
-                V               v         v
-             CharWriter         NumberWriter
-                     \            /
-                      v          v
-                       LedDisplay
-                           |            (hardware independent)
----------------------------|-------------------------------------
-                           |            (hardware dependent)
-                           v
-                        LedModule
-                           ^
-                           |
-      +--------------------+-----------------+
-      |                    |                 |
-Tm1637Module           Max7219Module     Hc595Module
-      |                      \            /
-      v                       v          v
-SoftWireInterface           SoftSpiInterface
-SoftWireFastInterface       SoftSpiFastInterface
-                            HardSpiInterface
-                            HardSpiFastInterface
+        StringScroller
+        StringWriter      ClockWriter  TemperatureWriter
+               |              \           /
+               V               v         v
+            CharWriter         NumberWriter
+                    \            /
+                     v          v
+                      LedDisplay
+                          |            (hardware independent)
+--------------------------|-------------------------------------
+                          |            (hardware dependent)
+                          v
+                       LedModule
+                          ^
+                          |
+      +-------------------+-----------------+--------------+--------------+
+      |                   |                 |              |              |
+Tm1637Module          Max7219Module     Hc595Module  HybridModule  DirectModule
+      |                         \           |         /
+      |                          \          |        /
+      v                           v         v       v
+SoftWireInterface                 SoftSpiInterface
+SoftWireFastInterface             SoftSpiFastInterface
+                                  HardSpiInterface
+                                  HardSpiFastInterface
 ```
 
 <a name="DigitAndSegmentAddressing"></a>
