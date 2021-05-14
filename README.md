@@ -552,6 +552,44 @@ like this:
 
 ![HC595 LED Module](docs/hc595/HC595_8_digits.png)
 
+The `Hc595Module` class looks roughly like this (simplified for ease of
+understanding):
+
+```C++
+template <
+    typename T_SPII,
+    uint8_t T_DIGITS,
+>
+class Hc595Module : public ScanningModule<[snip]> {
+
+    Hc595Module(
+        const T_SPII& spiInterface,
+        uint8_t segmentOnPattern,
+        uint8_t digitOnPattern,
+        uint8_t framesPerSecond,
+        uint8_t byteOrder,
+        const uint8_t* remapArray = nullptr
+    );
+
+    void begin();
+    void end();
+
+    uint16_t getFramesPerSecond() const;
+    uint16_t getFieldsPerSecond() const;
+    uint16_t getFieldsPerFrame() const;
+
+    uint8_t getNumDigits() const;
+    void setPatternAt(uint8_t pos, uint8_t pattern) override;
+    uint8_t getPatternAt(uint8_t pos) override;
+
+    void setBrightness(uint8_t brightness) override;
+    void setBrightnessAt(uint8_t pos, uint8_t brightness);
+
+    bool renderFieldWhenReady();
+    void renderFieldNow();
+};
+```
+
 The configuration of the `Hc595Module` class for the 8-digit module looks like
 this:
 
@@ -608,6 +646,50 @@ void loop() {
   ...
 }
 ```
+
+There are 2 template parameters. The `T_SPII` specifies the SPI interface which
+will be used to communicate with the 74HC595 chips. There are 4 options:
+`SoftSpiInterface`, `SoftSpiFastInterface` (on AVR), `HardSpiInterface` and
+`HardSpiFastInterface` (on AVR).
+
+The `T_DIGITS` is the number of digits in the LED module. Since this is a
+compile-time constant, the `Hc595Module` class uses it to allocate a buffer of 8
+bytes to hold the LED segment bit patterns. This allocation is done at
+compile-time.
+
+The `spiInstance` object is an instance of the `T_SPII` class.
+
+The `segmentOnPattern` and `digitOnPattern` specify the bit patterns needed to
+turn on the LED at the specified segment and digit. This is determine by the
+polarity of the wiring of LED segments. The 8-digit LED modules from diymore.cc
+seem to be using Common Anode LEDs, connected directly to the 74HC595 chips,
+without driver transistors. That means that the segment pins are active low
+(requires a 0 to turn sink current from the LEDs) and the digit pins are active
+high (requires a 1 to send current into the LEDs). We can use the pre-defined
+constants `LedMatrixBase::kActiveLowPattern` and
+`LedMatrixBase::kActiveHighPattern` for these parameters.
+
+The `framesPerSecond` is the desired refresh rate. A frame is one full rendering
+of all digits in the LED display. A value of 60 is good enough for most people,
+but some people can see flickering at this rate, so maybe 90 or 120 would be
+better choices for those people. Higher frame rate means that
+`renderFieldWhenReady()` or `renderFieldNow()` must be called faster.
+
+With two 74HC595 shift registers daisy chained together, one of the 74HC595
+controls the segments, and the other controls the digits. We sent 16-bits to the
+chips using SPI, and the `byteOrder` determines whether whether the digits pins
+or segment pins are on the high byte. The library predefines 2 constants:
+`ace_segment::kByteOrderSegmentHighDigitLow` and
+`ace_segment::kByteOrderDigitHighSegmentLow` which specify this option.
+
+The `remapArray` is optional in the general case, but for the 8-digit LED
+modules  manufactured by diymore.cc, it seems to be required , because the 4
+left-digits and 4 right-digits are swapped (appearing as "4 5 6 7 0 1 2 3"). The
+library defines the `ace_segment::kDigitRemapArray8Hc595` array to remap these
+digits to handle this LED module.
+
+There are 2 rendering methods: `renderFieldNow()` and `renderFieldWhenReady()`.
+See the section below for an explanation.
 
 <a name="RenderingHc595Module"></a>
 #### Rendering the Hc595Module
