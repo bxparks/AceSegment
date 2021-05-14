@@ -121,7 +121,9 @@ class Hc595Module : public ScanningModule<
         )
     {
       // LedMatrixDualHc595 needs the inverted mapping.
-      internal::invertRemapArray(mRemapArrayInverted, remapArray, T_DIGITS);
+      if (remapArray) {
+        internal::invertRemapArray(mRemapArrayInverted, remapArray, T_DIGITS);
+      }
     }
 
     void begin() {
