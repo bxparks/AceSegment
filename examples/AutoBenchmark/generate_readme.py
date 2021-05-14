@@ -42,7 +42,7 @@ configurations:
 We then measure the time taken by the methods used to render the digit to the
 LED module:
 
-* Subclasses of `ScanningModule`
+* Subclasses of `ScanningModule` (`Hc595Module`, `HybridModule`, `DirectModule`)
     * Measure the time taken by `ScanningModule::renderFieldNow()` which renders
       a single digit (multiple fields make up a frame (a single frame is the
       complete rendering of all digits on the display module).
@@ -51,7 +51,7 @@ LED module:
 * `Max7219Module::flush()`
     * Sends out the buffered digits using SPI.
 
-**Version**: AceSegment v0.4+
+**Version**: AceSegment v0.5
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -110,7 +110,7 @@ number of `TimingStats::update()` calls that were made.
 * Huge refactoring of core AceSegment classes. Rewrote AutoBenchmark
   to match similar programs in the AceButton, AceCrc and AceTime libraries.
 
-**v0.4+:**
+**v0.5:**
 
 * Add benchmarks for `Tm1637Module`.
     * The CPU time is mostly determined by the calls to `delayMicroseconds()`,

@@ -36,7 +36,7 @@ by the runtime environment of the processor. For example, it often seems like
 the ESP8266 allocates flash memory in blocks of a certain quantity, so the
 calculated flash size can jump around in unexpected ways.
 
-**Version**: AceSegment v0.4+
+**Version**: AceSegment v0.5
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -127,7 +127,7 @@ before substantional refactoring in 2021.
   causes the code for the `TimingStats` class to be pulled in, even if it is not
   used.
 
-**v0.4+**
+**v0.5**
 
 * Slight increase in memory usage (20-30 bytes) on some processors (AVR,
   ESP8266, ESP8266), but slight decrease on others (STM32, Teensy), I think the

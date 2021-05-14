@@ -1,6 +1,7 @@
 # Changelog
 
 * Unreleased
+* 0.5 (2021-05-14)
     * Extract hardware dependent API from `LedDisplay` into `LedModule`.
     * Create convenience subclasses of `LedModule`:
         * Add `Tm1637Module` class to support LED modules using the TM1637 chip.
