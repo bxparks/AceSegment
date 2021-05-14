@@ -25,7 +25,7 @@ into hardware-dependent components and hardware-independent components to allow
 application code to be written without worrying too much about the low-level
 details of the specific LED module.
 
-**Version**: 0.4+ (2021-04-17)
+**Version**: 0.4+ (2021-05-14)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
@@ -47,10 +47,12 @@ consumption.
     * [Include Header and Namespace](#HeaderAndNamespace)
     * [LedModule](#LedModule)
     * [Tm1637Module](#Tm1637Module)
-        * [Tm1637 With 4 Digits](#Tm1637Module4)
-        * [Tm1637 With 6 Digits](#Tm1637Module6)
+        * [TM1637 Module With 4 Digits](#Tm1637Module4)
+        * [TM1637 Module With 6 Digits](#Tm1637Module6)
     * [Max7219Module](#Max7219Module)
+        * [MAX7219 Module With 8 Digits](#Max7219Module8)
     * [Hc595Module](#Hc595Module)
+        * [74HC595 Module With 8 Digits](#Hc595Module8)
         * [Rendering the Hc595Module](#RenderingHc595Module)
     * [LedDisplay](#LedDisplay)
     * [NumberWriter](#NumberWriter)
@@ -298,13 +300,13 @@ example, the diymore.cc 6-digit TM1637 LED module is wired so that the digits
 are displayed like this:
 
 ```
-2, 1, 0, 5, 4, 3
+2 1 0 5 4 3
 ```
 
 The `Tm1637Module` class can remap these digits into their correct order:
 
 ```
-0, 1, 2, 3, 4, 5
+0 1 2 3 4 5
 ```
 
 Since it is impossible to predict all the different ways that the LED modules
@@ -435,7 +437,7 @@ the next call to `flushIncremental()` looks at the brightness level, and sends
 that information to the TM1637 chip if the brightness dirty bit is set.
 
 <a name="Tm1637Module4"></a>
-#### TM1637 With 4 Digits
+#### TM1637 Module With 4 Digits
 
 The configuration of the `Tm1637Module` class for the 4-digit module looks like
 this:
@@ -508,7 +510,7 @@ upon the execution of the `Tm1637Module::flush()` or
 `Tm1637Module::flushIncremental()` method.
 
 <a name="Tm1637Module6"></a>
-#### TM1637 With 6 Digits
+#### TM1637 Module With 6 Digits
 
 The configuration of the `Tm1637Module` class for the 6-digit module is slightly
 more complicated because the digits are wired to be in the order of `2 1 0 5 4
@@ -571,6 +573,46 @@ like this:
 
 ![MAX7219 LED Module](docs/max7219/MAX7219_8_digits.png)
 
+The `Max7219Module` class looks like this:
+
+```C++
+template <typename T_SPII, uint8_t T_DIGITS>
+class Max7219Module : public LedModule {
+  public:
+    Max7219Module(
+        const T_SPII& spiInterface,
+        const uint8_t* remapArray = nullptr
+    );
+
+    void begin();
+    void end();
+
+    uint8_t getNumDigits() const { return T_DIGITS; }
+    void setPatternAt(uint8_t pos, uint8_t pattern) override;
+    uint8_t getPatternAt(uint8_t pos) override;
+    void setBrightness(uint8_t brightness) override;
+
+    void flush();
+};
+```
+
+The `T_SPII` template parameter is one of the SPI interface classes. The library
+provides 4 implementations: `SoftSpiInterface`, `SoftSpiFastInterface` (on AVR),
+`HardSpiInterface` and `HardSpiFastInterface` (on AVR).
+
+The `T_DIGITS` is the number of digits in the LED module. Since this is a
+compile-time constant, the `Hc595Module` class uses it to allocate a buffer of 8
+bytes to hold the LED segment bit patterns. This allocation is done at
+compile-time.
+
+Most of the methods of the class are implementations of the virtual methods in
+the parent `LedModule` class.
+
+The `flush()` method sends the bit patterns to the MAX7219 controller using SPI.
+
+<a name="Max7219Module8"></a>
+#### MAX7219 Module with 8 Digits
+
 The configuration of the `Max7219Module` class for the 8-digit module looks like
 this:
 
@@ -618,6 +660,12 @@ void loop() {
 }
 ```
 
+The 8-digit LED modules that seem to be readily available on Amazon and eBay
+seem to have their digits wired in the opposite orientation compared to the one
+used in this library. In other words, digit 0 is on the far right, and digit 7
+is on the far left. The `kDigitRemapArray8Max7219` array tells the
+`Max7219Module` class to remap those digits so that they appear correct.
+
 <a name="Hc595Module"></a>
 ### Hc595Module
 
@@ -638,10 +686,7 @@ The `Hc595Module` class looks roughly like this (simplified for ease of
 understanding):
 
 ```C++
-template <
-    typename T_SPII,
-    uint8_t T_DIGITS,
->
+template <typename T_SPII, uint8_t T_DIGITS >
 class Hc595Module : public ScanningModule<[snip]> {
 
     Hc595Module(
@@ -671,6 +716,53 @@ class Hc595Module : public ScanningModule<[snip]> {
     void renderFieldNow();
 };
 ```
+
+There are 2 template parameters. The `T_SPII` specifies the SPI interface which
+will be used to communicate with the 74HC595 chips. There are 4 options:
+`SoftSpiInterface`, `SoftSpiFastInterface` (on AVR), `HardSpiInterface` and
+`HardSpiFastInterface` (on AVR).
+
+The `T_DIGITS` is the number of digits in the LED module. Since this is a
+compile-time constant, the `Hc595Module` class uses it to allocate a buffer of 8
+bytes to hold the LED segment bit patterns. This allocation is done at
+compile-time.
+
+The `spiInstance` object is an instance of the `T_SPII` class.
+
+The `segmentOnPattern` and `digitOnPattern` specify the bit patterns needed to
+turn on the LED at the specified segment and digit. This is determine by the
+polarity of the wiring of LED segments. The 8-digit LED modules from diymore.cc
+seem to be using Common Anode LEDs, connected directly to the 74HC595 chips,
+without driver transistors. That means that the segment pins are active low
+(requires a 0 to turn sink current from the LEDs) and the digit pins are active
+high (requires a 1 to send current into the LEDs). We can use the pre-defined
+constants `LedMatrixBase::kActiveLowPattern` and
+`LedMatrixBase::kActiveHighPattern` for these parameters.
+
+The `framesPerSecond` is the desired refresh rate. A frame is one full rendering
+of all digits in the LED display. A value of 60 is good enough for most people,
+but some people can see flickering at this rate, so maybe 90 or 120 would be
+better choices for those people. Higher frame rate means that
+`renderFieldWhenReady()` or `renderFieldNow()` must be called faster.
+
+With two 74HC595 shift registers daisy chained together, one of the 74HC595
+controls the segments, and the other controls the digits. We sent 16-bits to the
+chips using SPI, and the `byteOrder` determines whether whether the digits pins
+or segment pins are on the high byte. The library predefines 2 constants:
+`ace_segment::kByteOrderSegmentHighDigitLow` and
+`ace_segment::kByteOrderDigitHighSegmentLow` which specify this option.
+
+The `remapArray` is optional in the general case, but for the 8-digit LED
+modules  manufactured by diymore.cc, it seems to be required , because the 4
+left-digits and 4 right-digits are swapped (appearing as "4 5 6 7 0 1 2 3"). The
+library defines the `ace_segment::kDigitRemapArray8Hc595` array to remap these
+digits to handle this LED module.
+
+There are 2 rendering methods: `renderFieldNow()` and `renderFieldWhenReady()`.
+See the section below for an explanation.
+
+<a name="Hc595Module8"></a>
+### 74HC595 Module With 8 Digits
 
 The configuration of the `Hc595Module` class for the 8-digit module looks like
 this:
@@ -728,50 +820,6 @@ void loop() {
   ...
 }
 ```
-
-There are 2 template parameters. The `T_SPII` specifies the SPI interface which
-will be used to communicate with the 74HC595 chips. There are 4 options:
-`SoftSpiInterface`, `SoftSpiFastInterface` (on AVR), `HardSpiInterface` and
-`HardSpiFastInterface` (on AVR).
-
-The `T_DIGITS` is the number of digits in the LED module. Since this is a
-compile-time constant, the `Hc595Module` class uses it to allocate a buffer of 8
-bytes to hold the LED segment bit patterns. This allocation is done at
-compile-time.
-
-The `spiInstance` object is an instance of the `T_SPII` class.
-
-The `segmentOnPattern` and `digitOnPattern` specify the bit patterns needed to
-turn on the LED at the specified segment and digit. This is determine by the
-polarity of the wiring of LED segments. The 8-digit LED modules from diymore.cc
-seem to be using Common Anode LEDs, connected directly to the 74HC595 chips,
-without driver transistors. That means that the segment pins are active low
-(requires a 0 to turn sink current from the LEDs) and the digit pins are active
-high (requires a 1 to send current into the LEDs). We can use the pre-defined
-constants `LedMatrixBase::kActiveLowPattern` and
-`LedMatrixBase::kActiveHighPattern` for these parameters.
-
-The `framesPerSecond` is the desired refresh rate. A frame is one full rendering
-of all digits in the LED display. A value of 60 is good enough for most people,
-but some people can see flickering at this rate, so maybe 90 or 120 would be
-better choices for those people. Higher frame rate means that
-`renderFieldWhenReady()` or `renderFieldNow()` must be called faster.
-
-With two 74HC595 shift registers daisy chained together, one of the 74HC595
-controls the segments, and the other controls the digits. We sent 16-bits to the
-chips using SPI, and the `byteOrder` determines whether whether the digits pins
-or segment pins are on the high byte. The library predefines 2 constants:
-`ace_segment::kByteOrderSegmentHighDigitLow` and
-`ace_segment::kByteOrderDigitHighSegmentLow` which specify this option.
-
-The `remapArray` is optional in the general case, but for the 8-digit LED
-modules  manufactured by diymore.cc, it seems to be required , because the 4
-left-digits and 4 right-digits are swapped (appearing as "4 5 6 7 0 1 2 3"). The
-library defines the `ace_segment::kDigitRemapArray8Hc595` array to remap these
-digits to handle this LED module.
-
-There are 2 rendering methods: `renderFieldNow()` and `renderFieldWhenReady()`.
-See the section below for an explanation.
 
 <a name="RenderingHc595Module"></a>
 #### Rendering the Hc595Module
@@ -1129,7 +1177,7 @@ need to include these headers manually, like this:
 
 The 3 convenience classes (`DirectModule`, `HybridModule`, and `Hc595Module`)
 are subclasses of the `ScanningModule` parent class. If you want to know how the
-`ScanningModule` is implemented, I have some notes in
+`ScanningModule` is implemented, there are some notes in
 [docs/scanning_module.md](docs/scanning_module.md).
 
 <a name="ResourceConsumption"></a>
