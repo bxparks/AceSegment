@@ -58,19 +58,20 @@ class LedMatrixDualHc595: public LedMatrixBase {
      * @param elementOnPattern bit pattern that turns on the elements
      * @param groupOnpattern bit pattern that turns on the groups
      * @param byteOrder determine order of group and element bytes
-     * @param remapArray (optional, nullable) a map of the logical positions to
-     *    their physical positions
+     * @param remapArrayInverted (optional, nullable) a map of the physical
+     *    positions to their logical positions, which is the inverse of
+     *    the remapArray used by Tm1637Module and Max7219Module
      */
     LedMatrixDualHc595(
         const T_SPII& spiInterface,
         uint8_t elementOnPattern,
         uint8_t groupOnPattern,
         uint8_t byteOrder,
-        const uint8_t* remapArray = nullptr
+        const uint8_t* remapArrayInverted = nullptr
     ) :
         LedMatrixBase(elementOnPattern, groupOnPattern),
         mSpiInterface(spiInterface),
-        mRemapArray(remapArray),
+        mRemapArrayInverted(remapArrayInverted),
         mByteOrder(byteOrder)
     {}
 
@@ -80,14 +81,34 @@ class LedMatrixDualHc595: public LedMatrixBase {
 
     /**
      * Write out the group and element patterns in a single 16-bit stream.
-     * If the `remap` array exists, then the logical group number is converted
-     * to its physical group number. The byteOrder parameter determines whether
-     * the group bits are in the high byte and element bits in the low byte, or
-     * flipped around.
+     *
+     * The byteOrder parameter determines whether the group bits are in the high
+     * byte and element bits in the low byte, or flipped around.
+     *
+     * The `group` is the *desired* physical location of `elementPattern`. We
+     * need to send that pattern to the logical position which will cause it to
+     * appear in the correct physical position. That turns out to be a mapping
+     * of the physical-to-logical address, which is the inverse of the remapping
+     * operation performed in Tm1636Module and Max7219Module. In those classes,
+     * we have random access to all the logical segment/element patterns. In
+     * this class, we are given just a single digit, but we don't have random
+     * access to the other digit patterns, so the remapArray must go the other
+     * way. The direction of the remapArray conversion is quite subtle, and it
+     * took me 2-3 attempts to get this right. In many (most?) cases, the
+     * remapArray and the remapArrayInverted are identical because the digit
+     * reordering is caused by pair-wise swapping of the LED modules pins to the
+     * controller chip pins. But in the general case, this class needs the
+     * inverted mapping.
+     *
+     * @param group the desired physical position of the elementPattern
+     * @param elementPattern the element (i.e. segment) pattern
      */
     void draw(uint8_t group, uint8_t elementPattern) const {
-      uint8_t physicalGroup = remapLogicalToPhysical(group);
-      uint8_t groupPattern = 0x1 << physicalGroup;
+      // Find the logical address which will cause this pattern to appear in
+      // the correct physical position.
+      uint8_t logicalGroup = remapPhysicalToLogical(group);
+      uint8_t groupPattern = 0x1 << logicalGroup;
+
       drawPatterns(groupPattern, elementPattern);
       mPrevElementPattern = elementPattern;
     }
@@ -130,8 +151,8 @@ class LedMatrixDualHc595: public LedMatrixBase {
     }
 
     /** Convert a logical position into its physical position. */
-    uint8_t remapLogicalToPhysical(uint8_t pos) const {
-      return mRemapArray ? mRemapArray[pos] : pos;
+    uint8_t remapPhysicalToLogical(uint8_t pos) const {
+      return mRemapArrayInverted ? mRemapArrayInverted[pos] : pos;
     }
 
   private:
@@ -141,8 +162,11 @@ class LedMatrixDualHc595: public LedMatrixBase {
 
     const T_SPII& mSpiInterface;
 
-    /** Mapping of the physical digit to the logical digit of the LED module. */
-    const uint8_t* const mRemapArray;
+    /**
+     * Mapping of the physical-to-logical addresses, which is the inverse of the
+     * mapping needed by Tm1637Module and Max7219Module.
+     */
+    const uint8_t* const mRemapArrayInverted;
 
     /** Determine order of group and element bytes. */
     const uint8_t mByteOrder;

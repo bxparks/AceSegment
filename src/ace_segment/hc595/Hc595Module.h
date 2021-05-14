@@ -25,6 +25,7 @@ SOFTWARE.
 #ifndef ACE_SEGMENT_HC595_MODULE_H
 #define ACE_SEGMENT_HC595_MODULE_H
 
+#include "../hw/remap.h"
 #include "../scanning/ScanningModule.h"
 #include "../scanning/LedMatrixDualHc595.h"
 
@@ -116,9 +117,12 @@ class Hc595Module : public ScanningModule<
             segmentOnPattern /*elementOnPattern*/,
             digitOnPattern /*groupOnPattern*/,
             byteOrder,
-            remapArray
+            remapArray ? mRemapArrayInverted : nullptr
         )
-    {}
+    {
+      // LedMatrixDualHc595 needs the inverted mapping.
+      internal::invertRemapArray(mRemapArrayInverted, remapArray, T_DIGITS);
+    }
 
     void begin() {
       mLedMatrix.begin();
@@ -132,6 +136,9 @@ class Hc595Module : public ScanningModule<
 
   private:
     LedMatrixDualHc595<T_SPII> mLedMatrix;
+
+    /** The inverted mapping, from physical to logical positions. */
+    uint8_t mRemapArrayInverted[T_DIGITS];
 };
 
 } // ace_segment
