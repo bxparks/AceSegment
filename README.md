@@ -264,16 +264,17 @@ addressing the digits and segments:
   decimal point assigned to bit 7
 
 ```
-+------------+  +------------+  +------------+  +------------+
-|   aaaa     |  |   aaaa     |  |   aaaa     |  |   aaaa     |
-|  f    b    |  |  f    b    |  |  f    b    |  |  f    b    |
-|  f    b    |  |  f    b    |  |  f    b    |  |  f    b    |
-|   gggg     |  |   gggg     |  |   gggg     |  |   gggg     |  *  *  *  *
-|  e    c    |  |  e    c    |  |  e    c    |  |  e    c    |
-|  e    c    |  |  e    c    |  |  e    c    |  |  e    c    |
-|   dddd  dp |  |   dddd  dp |  |   dddd  dp |  |   dddd  dp |
-+------------+  +------------+  +------------+  +------------+
-  Digit 0         Digit 1         Digit 2         Digit 3       Digit N
++------------+  +------------+           +------------+
+|   aaaa     |  |   aaaa     |           |   aaaa     |
+|  f    b    |  |  f    b    |           |  f    b    |
+|  f    b    |  |  f    b    |           |  f    b    |
+|   gggg     |  |   gggg     |  *  *  *  |   gggg     |
+|  e    c    |  |  e    c    |           |  e    c    |
+|  e    c    |  |  e    c    |           |  e    c    |
+|   dddd  dp |  |   dddd  dp |           |   dddd  dp |
++------------+  +------------+           +------------+
+  Digit 0         Digit 1                 Digit {N-1}
+
 
 Segment: dp g f e d c b a
    Bit:  7  6 5 4 3 2 1 0
