@@ -14,7 +14,7 @@ sizeof(ScanningModule<LedMatrixBase, 4>): 22
 sizeof(DirectModule<4>): 31
 sizeof(DirectFast4Module<...>): 25
 sizeof(HybridModule<SoftSpiInterface, 4>): 30
-sizeof(Hc595Module<SoftSpiInterface, 4>): 30
+sizeof(Hc595Module<SoftSpiInterface, 8>): 46
 sizeof(Tm1637Module<SoftWireInterface, 4>): 14
 sizeof(Tm1637Module<SoftWireInterface, 6>): 16
 sizeof(Max7219Module<SoftSpiInterface, 8>): 16
@@ -24,38 +24,38 @@ sizeof(ClockWriter): 3
 sizeof(TemperatureWriter): 2
 sizeof(CharWriter): 5
 sizeof(StringWriter): 2
-sizeof(StringScroller): 10
+sizeof(StringScroller): 11
 BENCHMARKS
-Direct 68 74 88 240
-Direct(subfields) 4 12 88 3840
-DirectFast4 24 28 36 240
-DirectFast4(subfields) 4 8 40 3840
-Hybrid(SoftSpi) 156 159 188 240
-Hybrid(SoftSpi,subfields) 4 22 188 3840
-Hybrid(SoftSpiFast) 28 31 40 240
-Hybrid(SoftSpiFast,subfields) 4 8 40 3840
-Hybrid(HardSpi) 36 39 52 240
-Hybrid(HardSpi,subfields) 4 9 52 3840
-Hybrid(HardSpiFast) 24 27 36 240
-Hybrid(HardSpiFast,subfields) 4 7 36 3840
-Hc595(SoftSpi) 268 271 304 240
-Hc595(SoftSpi,subfields) 4 35 308 3840
-Hc595(SoftSpiFast) 24 25 36 240
-Hc595(SoftSpiFast,subfields) 4 7 36 3840
-Hc595(HardSpi) 28 29 40 240
-Hc595(HardSpi,subfields) 4 8 36 3840
-Hc595(HardSpiFast) 12 15 24 240
-Hc595(HardSpiFast,subfields) 4 6 24 3840
-Tm1637(SoftWire) 22312 22342 22584 10
-Tm1637(SoftWire,incremental) 4 817 10296 50
-Tm1637(SoftWireFast) 21060 21086 21284 10
-Tm1637(SoftWireFast,incremental) 4 772 9756 50
-Tm1637(6,SoftWire) 28052 28078 28304 10
-Tm1637(6,SoftWire,incremental) 4 874 10308 70
-Tm1637(6,SoftWireFast) 26476 26504 26716 10
-Tm1637(6,SoftWireFast,incremental) 4 825 9772 70
-Max7219(SoftSpi) 1320 1333 1468 20
-Max7219(SoftSpiFast) 112 120 136 20
-Max7219(HardSpi) 120 130 140 20
-Max7219(HardSpiFast) 56 64 72 20
+Direct(4) 76 82 88 40
+Direct(4,subfields) 4 13 88 640
+DirectFast4(4) 28 31 36 40
+DirectFast4(4,subfields) 4 8 36 640
+Hybrid(4,SoftSpi) 152 161 176 40
+Hybrid(4,SoftSpi,subfields) 4 22 176 640
+Hybrid(4,SoftSpiFast) 28 34 40 40
+Hybrid(4,SoftSpiFast,subfields) 4 8 40 640
+Hybrid(4,HardSpi) 36 41 52 40
+Hybrid(4,HardSpi,subfields) 4 9 48 640
+Hybrid(4,HardSpiFast) 24 29 36 40
+Hybrid(4,HardSpiFast,subfields) 4 8 36 640
+Hc595(8,SoftSpi) 268 273 308 80
+Hc595(8,SoftSpi,subfields) 4 36 304 1280
+Hc595(8,SoftSpiFast) 24 27 36 80
+Hc595(8,SoftSpiFast,subfields) 4 8 36 1280
+Hc595(8,HardSpi) 28 30 40 80
+Hc595(8,HardSpi,subfields) 4 8 36 1280
+Hc595(8,HardSpiFast) 12 18 28 80
+Hc595(8,HardSpiFast,subfields) 4 7 32 1280
+Tm1637(4,SoftWire) 22316 22348 22568 10
+Tm1637(4,SoftWire,incremental) 3616 8810 10320 50
+Tm1637(4,SoftWireFast) 21064 21092 21316 10
+Tm1637(4,SoftWireFast,incremental) 3412 8315 9776 50
+Tm1637(6,SoftWire) 28060 28092 28344 10
+Tm1637(6,SoftWire,incremental) 3616 9178 10316 70
+Tm1637(6,SoftWireFast) 26484 26511 26732 10
+Tm1637(6,SoftWireFast,incremental) 3412 8663 9768 70
+Max7219(8,SoftSpi) 2380 2395 2600 20
+Max7219(8,SoftSpiFast) 208 218 240 20
+Max7219(8,HardSpi) 220 232 248 20
+Max7219(8,HardSpiFast) 108 117 124 20
 END
