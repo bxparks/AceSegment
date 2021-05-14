@@ -308,24 +308,6 @@ Since it is impossible to predict all the different ways that the LED modules
 can be wired, various classes in the AceSegment library allow the remapping
 array to be supplied by the library user.
 
-<a name="Modularity"></a>
-### Modularity
-
-The framework splits the responsibility of displaying LED digits into several
-components:
-
-* The `SpiInterface` is a thin wrapper around either a software SPI or hardware
-  SPI.
-* The `LedMatrix` knows how to enable or disable LED segments on various digit
-  groups. Different subclasses the `LedMatrix` are provided to support:
-    * resistors on segments
-    * transistors on digits or segments
-    * using 74HC595 with `shiftOut()` or hardware SPI
-* The `LedModule` class and subclasses such as `ScanningModule` know how to
-  render the array of digit patterns to the LED module using multiplexing.
-* The `LedDisplay` knows how to write the segment bit patterns to an
-  `LedModule`.
-
 <a name="Usage"></a>
 ## Usage
 
@@ -337,7 +319,7 @@ To prevent name clashes with other libraries that the calling code may use, all
 classes are defined in the `ace_segment` namespace. To use the code without
 prepending the `ace_segment::` prefix, use the `using` directive:
 
-```
+```C++
 #include <AceSegment.h>
 using namespace ace_segment;
 ```
