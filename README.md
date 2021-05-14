@@ -69,6 +69,7 @@ consumption.
     * [Hardware](#Hardware)
     * [Tool Chain](#ToolChain)
     * [Operating System](#OperatingSystem)
+* [Bugs And Limitations](#BugsAndLimitations)
 * [License](#License)
 * [Feedback and Support](#FeedbackAndSupport)
 * [Authors](#Authors)
@@ -1462,6 +1463,13 @@ The following boards are **not** supported:
 I use Ubuntu 20.04 for the vast majority of my development. I expect that the
 library will work fine under MacOS and Windows, but I have not explicitly tested
 them.
+
+<a name="BugsAndLimitations"></a>
+## Bugs and Limitations
+
+* This library does not currently support daisy-chaining of the MAX7219
+  controller or the 74HC595 controller to create LED modules with more than 8
+  digits.
 
 <a name="License"></a>
 ## License
