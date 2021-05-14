@@ -790,12 +790,12 @@ class TemperatureWriter {
 
     explicit TemperatureWriter(LedDisplay& ledDisplay);
 
-    LedDisplay& display()`
+    LedDisplay& display();
 
-    uint8_t writeTempAt(uint8_t pos, int16_t temp, boxSize = 0);`
-    uint8_t writeTempDegAt(uint8_t pos, int16_t temp, boxSize = 0);`
-    uint8_t writeTempDegCAt(uint8_t pos, int16_t temp, boxSize = 0);`
-    uint8_t writeTempDegFAt(uint8_t pos, int16_t temp, boxSize = 0);`
+    uint8_t writeTempAt(uint8_t pos, int16_t temp, boxSize = 0);
+    uint8_t writeTempDegAt(uint8_t pos, int16_t temp, boxSize = 0);
+    uint8_t writeTempDegCAt(uint8_t pos, int16_t temp, boxSize = 0);
+    uint8_t writeTempDegFAt(uint8_t pos, int16_t temp, boxSize = 0);
 };
 ```
 
