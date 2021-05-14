@@ -175,12 +175,12 @@ TimingStats timingStats;
 template <typename LM>
 void runScanningBenchmark(const __FlashStringHelper* name, LM& scanningModule) {
 
-  scanningModule.setPatternAt(0, 0x13);
-  scanningModule.setPatternAt(0, 0x37);
-  scanningModule.setPatternAt(0, 0x7F);
-  scanningModule.setPatternAt(0, 0xFF);
+  for (uint8_t i = 0; i < scanningModule.getNumDigits(); ++i) {
+    scanningModule.setPatternAt(i, i);
+  }
 
-  uint16_t numSamples = scanningModule.getFieldsPerSecond();
+  // Sample for 10 frames
+  uint16_t numSamples = scanningModule.getFieldsPerFrame() * 10;
   timingStats.reset();
   for (uint16_t i = 0; i < numSamples; i++) {
     uint16_t startMicros = micros();
@@ -212,8 +212,8 @@ void runDirect() {
 
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark(F("Direct"), scanningModule);
-  runScanningBenchmark(F("Direct(subfields)"), scanningModuleSubfields);
+  runScanningBenchmark(F("Direct(4)"), scanningModule);
+  runScanningBenchmark(F("Direct(4,subfields)"), scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
 }
@@ -242,8 +242,8 @@ void runDirectFast4() {
 
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark(F("DirectFast4"), scanningModule);
-  runScanningBenchmark(F("DirectFast4(subfields)"), scanningModuleSubfields);
+  runScanningBenchmark(F("DirectFast4(4)"), scanningModule);
+  runScanningBenchmark(F("DirectFast4(4,subfields)"), scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
 }
@@ -275,8 +275,8 @@ void runHybridSoftSpi() {
   spiInterface.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark(F("Hybrid(SoftSpi)"), scanningModule);
-  runScanningBenchmark(F("Hybrid(SoftSpi,subfields)"),
+  runScanningBenchmark(F("Hybrid(4,SoftSpi)"), scanningModule);
+  runScanningBenchmark(F("Hybrid(4,SoftSpi,subfields)"),
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -308,8 +308,8 @@ void runHybridSoftSpiFast() {
   spiInterface.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark(F("Hybrid(SoftSpiFast)"), scanningModule);
-  runScanningBenchmark(F("Hybrid(SoftSpiFast,subfields)"),
+  runScanningBenchmark(F("Hybrid(4,SoftSpiFast)"), scanningModule);
+  runScanningBenchmark(F("Hybrid(4,SoftSpiFast,subfields)"),
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -341,8 +341,9 @@ void runHybridHardSpi() {
   spiInterface.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark(F("Hybrid(HardSpi)"), scanningModule);
-  runScanningBenchmark(F("Hybrid(HardSpi,subfields)"), scanningModuleSubfields);
+  runScanningBenchmark(F("Hybrid(4,HardSpi)"), scanningModule);
+  runScanningBenchmark(
+      F("Hybrid(4,HardSpi,subfields)"), scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
   spiInterface.end();
@@ -373,8 +374,8 @@ void runHybridHardSpiFast() {
   spiInterface.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark(F("Hybrid(HardSpiFast)"), scanningModule);
-  runScanningBenchmark(F("Hybrid(HardSpiFast,subfields)"),
+  runScanningBenchmark(F("Hybrid(4,HardSpiFast)"), scanningModule);
+  runScanningBenchmark(F("Hybrid(4,HardSpiFast,subfields)"),
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -389,7 +390,7 @@ void runHc595SoftSpi() {
   using SpiInterface = SoftSpiInterface;
   SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
 
-  Hc595Module<SpiInterface, NUM_DIGITS> scanningModule(
+  Hc595Module<SpiInterface, 8> scanningModule(
       spiInterface,
       LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
       LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
@@ -397,9 +398,7 @@ void runHc595SoftSpi() {
       kByteOrderDigitHighSegmentLow
   );
 
-  Hc595Module<
-      SpiInterface, NUM_DIGITS, NUM_SUBFIELDS
-  > scanningModuleSubfields(
+  Hc595Module<SpiInterface, 8, NUM_SUBFIELDS> scanningModuleSubfields(
       spiInterface,
       LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
       LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
@@ -410,8 +409,9 @@ void runHc595SoftSpi() {
   spiInterface.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark(F("Hc595(SoftSpi)"), scanningModule);
-  runScanningBenchmark(F("Hc595(SoftSpi,subfields)"), scanningModuleSubfields);
+  runScanningBenchmark(F("Hc595(8,SoftSpi)"), scanningModule);
+  runScanningBenchmark(
+      F("Hc595(8,SoftSpi,subfields)"), scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
   spiInterface.end();
@@ -423,7 +423,7 @@ void runHc595SoftSpiFast() {
   using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
 
-  Hc595Module<SpiInterface, NUM_DIGITS> scanningModule(
+  Hc595Module<SpiInterface, 8> scanningModule(
       spiInterface,
       LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
       LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
@@ -431,7 +431,7 @@ void runHc595SoftSpiFast() {
       kByteOrderDigitHighSegmentLow
   );
 
-  Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS>
+  Hc595Module<SpiInterface, 8, NUM_SUBFIELDS>
       scanningModuleSubfields(
           spiInterface,
           LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
@@ -443,8 +443,8 @@ void runHc595SoftSpiFast() {
   spiInterface.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark(F("Hc595(SoftSpiFast)"), scanningModule);
-  runScanningBenchmark(F("Hc595(SoftSpiFast,subfields)"),
+  runScanningBenchmark(F("Hc595(8,SoftSpiFast)"), scanningModule);
+  runScanningBenchmark(F("Hc595(8,SoftSpiFast,subfields)"),
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -457,7 +457,7 @@ void runHc595HardSpi() {
   using SpiInterface = HardSpiInterface;
   SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
 
-  Hc595Module<SpiInterface, NUM_DIGITS> scanningModule(
+  Hc595Module<SpiInterface, 8> scanningModule(
       spiInterface,
       LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
       LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
@@ -465,20 +465,19 @@ void runHc595HardSpi() {
       kByteOrderDigitHighSegmentLow
   );
 
-  Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS>
-      scanningModuleSubfields(
-          spiInterface,
-          LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-          LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
-          FRAMES_PER_SECOND,
-          kByteOrderDigitHighSegmentLow
-      );
+  Hc595Module<SpiInterface, 8, NUM_SUBFIELDS> scanningModuleSubfields(
+      spiInterface,
+      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
+      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+      FRAMES_PER_SECOND,
+      kByteOrderDigitHighSegmentLow
+  );
 
   spiInterface.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark(F("Hc595(HardSpi)"), scanningModule);
-  runScanningBenchmark(F("Hc595(HardSpi,subfields)"), scanningModuleSubfields);
+  runScanningBenchmark(F("Hc595(8,HardSpi)"), scanningModule);
+  runScanningBenchmark(F("Hc595(8,HardSpi,subfields)"), scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
   spiInterface.end();
@@ -490,7 +489,7 @@ void runHc595HardSpiFast() {
   using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
 
-  Hc595Module<SpiInterface, NUM_DIGITS> scanningModule(
+  Hc595Module<SpiInterface, 8> scanningModule(
       spiInterface,
       LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
       LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
@@ -498,20 +497,19 @@ void runHc595HardSpiFast() {
       kByteOrderDigitHighSegmentLow
   );
 
-  Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS>
-      scanningModuleSubfields(
-          spiInterface,
-          LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-          LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
-          FRAMES_PER_SECOND,
-          kByteOrderDigitHighSegmentLow
-      );
+  Hc595Module<SpiInterface, 8, NUM_SUBFIELDS> scanningModuleSubfields(
+      spiInterface,
+      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
+      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+      FRAMES_PER_SECOND,
+      kByteOrderDigitHighSegmentLow
+  );
 
   spiInterface.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark(F("Hc595(HardSpiFast)"), scanningModule);
-  runScanningBenchmark(F("Hc595(HardSpiFast,subfields)"),
+  runScanningBenchmark(F("Hc595(8,HardSpiFast)"), scanningModule);
+  runScanningBenchmark(F("Hc595(8,HardSpiFast,subfields)"),
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -542,10 +540,12 @@ void runTm1637Benchmark(
 
   timingStats.reset();
   for (uint16_t i = 0; i < numSamples; ++i) {
-    // Update patterns, to mark all digits as dirty.
+
+    // Update patterns and brightness to mark them dirty.
     for (uint8_t i = 0; i < numDigits; ++i) {
       ledModule.setPatternAt(i, kTm1637Patterns[i]);
     }
+    ledModule.setBrightness(1);
 
     uint16_t startMicros;
     uint16_t endMicros;
@@ -572,8 +572,9 @@ void runTm1637SoftWire() {
 
   Tm1637Module<WireInterface, 4> tm1637Module(wireInterface);
   tm1637Module.begin();
-  runTm1637Benchmark(F("Tm1637(SoftWire)"), tm1637Module, 4, false);
-  runTm1637Benchmark(F("Tm1637(SoftWire,incremental)"), tm1637Module, 4, true);
+  runTm1637Benchmark(F("Tm1637(4,SoftWire)"), tm1637Module, 4, false);
+  runTm1637Benchmark(
+      F("Tm1637(4,SoftWire,incremental)"), tm1637Module, 4, true);
   tm1637Module.end();
 
   wireInterface.end();
@@ -587,9 +588,9 @@ void runTm1637SoftWireFast() {
 
   Tm1637Module<WireInterface, 4> tm1637Module(wireInterface);
   tm1637Module.begin();
-  runTm1637Benchmark(F("Tm1637(SoftWireFast)"), tm1637Module, 4, false);
+  runTm1637Benchmark(F("Tm1637(4,SoftWireFast)"), tm1637Module, 4, false);
   runTm1637Benchmark(
-      F("Tm1637(SoftWireFast,incremental)"), tm1637Module, 4, true);
+      F("Tm1637(4,SoftWireFast,incremental)"), tm1637Module, 4, true);
   tm1637Module.end();
 
   wireInterface.end();
@@ -653,12 +654,12 @@ void runMax7219Benchmark(const __FlashStringHelper* name, LM& ledModule) {
 void runMax7219SoftSpi() {
   using SpiInterface = SoftSpiInterface;
   SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
+  Max7219Module<SpiInterface, 8> max7219Module(
       spiInterface, kDigitRemapArray8Max7219);
 
   spiInterface.begin();
   max7219Module.begin();
-  runMax7219Benchmark(F("Max7219(SoftSpi)"), max7219Module);
+  runMax7219Benchmark(F("Max7219(8,SoftSpi)"), max7219Module);
   max7219Module.end();
   spiInterface.end();
 }
@@ -667,12 +668,12 @@ void runMax7219SoftSpi() {
 void runMax7219SoftSpiFast() {
   using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
-  Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
+  Max7219Module<SpiInterface, 8> max7219Module(
       spiInterface, kDigitRemapArray8Max7219);
 
   spiInterface.begin();
   max7219Module.begin();
-  runMax7219Benchmark(F("Max7219(SoftSpiFast)"), max7219Module);
+  runMax7219Benchmark(F("Max7219(8,SoftSpiFast)"), max7219Module);
   max7219Module.end();
   spiInterface.end();
 }
@@ -681,12 +682,12 @@ void runMax7219SoftSpiFast() {
 void runMax7219HardSpi() {
   using SpiInterface = HardSpiInterface;
   SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
+  Max7219Module<SpiInterface, 8> max7219Module(
       spiInterface, kDigitRemapArray8Max7219);
 
   spiInterface.begin();
   max7219Module.begin();
-  runMax7219Benchmark(F("Max7219(HardSpi)"), max7219Module);
+  runMax7219Benchmark(F("Max7219(8,HardSpi)"), max7219Module);
   max7219Module.end();
   spiInterface.end();
 }
@@ -695,12 +696,12 @@ void runMax7219HardSpi() {
 void runMax7219HardSpiFast() {
   using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
-  Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
+  Max7219Module<SpiInterface, 8> max7219Module(
       spiInterface, kDigitRemapArray8Max7219);
 
   spiInterface.begin();
   max7219Module.begin();
-  runMax7219Benchmark(F("Max7219(HardSpiFast)"), max7219Module);
+  runMax7219Benchmark(F("Max7219(8,HardSpiFast)"), max7219Module);
   max7219Module.end();
   spiInterface.end();
 }
@@ -822,8 +823,8 @@ void printSizeOf() {
   SERIAL_PORT_MONITOR.print(F("sizeof(HybridModule<SoftSpiInterface, 4>): "));
   SERIAL_PORT_MONITOR.println(sizeof(HybridModule<SoftSpiInterface, 4>));
 
-  SERIAL_PORT_MONITOR.print(F("sizeof(Hc595Module<SoftSpiInterface, 4>): "));
-  SERIAL_PORT_MONITOR.println(sizeof(Hc595Module<SoftSpiInterface, 4>));
+  SERIAL_PORT_MONITOR.print(F("sizeof(Hc595Module<SoftSpiInterface, 8>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(Hc595Module<SoftSpiInterface, 8>));
 
   SERIAL_PORT_MONITOR.print(F("sizeof(Tm1637Module<SoftWireInterface, 4>): "));
   SERIAL_PORT_MONITOR.println(sizeof(Tm1637Module<SoftWireInterface, 4>));
@@ -872,7 +873,7 @@ void setup() {
   SERIAL_PORT_MONITOR.println(F("BENCHMARKS"));
   runBenchmarks();
 
-  SERIAL_PORT_MONITOR.println("END");
+  SERIAL_PORT_MONITOR.println(F("END"));
 
 #if defined(EPOXY_DUINO)
   exit(0);

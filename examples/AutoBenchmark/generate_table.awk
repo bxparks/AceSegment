@@ -60,10 +60,10 @@ END {
   printf("| Functionality                          |   min/  avg/  max | samples |\n")
   for (i = 0; i < TOTAL_BENCHMARKS; i++) {
     if (u[i]["name"] ~ /^Direct$/ \
-        || u[i]["name"] ~ /^Hybrid\(SoftSpi\)/ \
-        || u[i]["name"] ~ /^Hc595\(SoftSpi\)/ \
-        || u[i]["name"] ~ /^Tm1637\(SoftWire\)/ \
-        || u[i]["name"] ~ /^Max7219\(SoftSpi\)/ \
+        || u[i]["name"] ~ /^Hybrid\(4,SoftSpi\)/ \
+        || u[i]["name"] ~ /^Hc595\(8,SoftSpi\)/ \
+        || u[i]["name"] ~ /^Tm1637\(4,SoftWire\)/ \
+        || u[i]["name"] ~ /^Max7219\(8,SoftSpi\)/ \
     ) {
       printf("|----------------------------------------+-------------------+---------|\n")
     }

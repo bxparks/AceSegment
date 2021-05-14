@@ -127,9 +127,13 @@ number of `TimingStats::update()` calls that were made.
       which uncomfortably close to the maximum amount of time before an ESP8266
       resets via the watch dog timer. On ESP8266 (and maybe others), the
       `flushIncremental()` should be used.
-* Add benchmarks for `Max7219Module`.
-* Add benchmarks for `DirectModule`, `DirectFast4Module`, `HybridModule`,
-  and `Hc595Module`.
+* Add benchmarks for `DirectModule`, `DirectFast4Module`, `HybridModule` with 4
+  digits, because these are custom made by hand.
+* Add `Max7219Module` with 8 digits as found on off-the-shelf LED modules.
+  Duration of `flush()` almost doubles from 4 digits to 8 digits obviously.
+* Add `Hc595Module` with 8 digits as found on off-the-shelf LED modules.
+  Duration of `renderFieldWhenReady()` does not change from 4 digits to 8 digits
+  because it renders a single digit at time.
 * Upgrade from ESP32 Core v1.0.4 to v1.0.6.
 * Adding `byteOrder` and `remapArray` parameters to `Hc595Module` increases
   the CPU time of `renderFieldsNow()` by a tiny amount, maybe a microsecond on a
