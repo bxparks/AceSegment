@@ -45,7 +45,10 @@ consumption.
     * [Digit and Segment Addressing](#DigitAndSegmentAddressing)
 * [Usage](#Usage)
     * [Include Header and Namespace](#HeaderAndNamespace)
+    * [LedModule](#LedModule)
     * [Tm1637Module](#Tm1637Module)
+        * [Tm1637 With 4 Digits](#Tm1637Module4)
+        * [Tm1637 With 6 Digits](#Tm1637Module6)
     * [Max7219Module](#Max7219Module)
     * [Hc595Module](#Hc595Module)
         * [Rendering the Hc595Module](#RenderingHc595Module)
@@ -324,6 +327,37 @@ prepending the `ace_segment::` prefix, use the `using` directive:
 using namespace ace_segment;
 ```
 
+<a name="LedModule"></a>
+### LedModule
+
+The `LedModule` class is the general interface (with mostly pure virtual
+functions) which is the parent class of all hardware-dependent classes which are
+targetted for specific controller chips. It looks like this:
+
+```C++
+class LedModule {
+  public:
+    LedModule(uint8_t numDigits);
+
+    uint8_t getNumDigits() const;
+    virtual void setPatternAt(uint8_t pos, uint8_t pattern) = 0;
+    virtual uint8_t getPatternAt(uint8_t pos) = 0;
+    virtual void setBrightness(uint8_t brightness) = 0;
+};
+```
+
+It assumes that each subclass has an internal buffer of bit patterns which
+will be sent out to the LED module at the appropriate time. Some LED controllers
+(e.g. TM1637, MAX7219) handle the multiplexing and refreshing of the LED
+segments, so the host microcontroller needs only to send out the bit patterns to
+the controller chips over SPI or some other prococol. Other controller chips,
+particulary the 74HC595, is a fairly dumb controller chip that requires the host
+microcontroller to perform the multiplexing itself. The bit patterns must be
+sent out to the controller chip with precise timing intervals.
+
+Because each controller chip has slightly different rendering requirements, the
+`LedModule` class pushes the rendering logic down into the specific subclasses.
+
 <a name="Tm1637Module"></a>
 ### Tm1637Module
 
@@ -333,34 +367,52 @@ seem have either 4 digits or 6 digits.
 
 ![TM1637 LED Module](docs/tm1637/TM1637_4_digits.png)
 
-The TM1637 controller uses a wire protocol that is very close to, but not quite
-the same as, I2C. Unfortunately this means that we cannot use the usual `Wire`
-library. The `Tm1637Module` class uses bit-banging to send the correct bits in
-the right order with the right timing to the chip.
+The `Tm1637Module` class looks like this:
 
-The `BIT_DELAY` parameter below is the number of microseconds to wait between
-each bit transition (0 to 1, or 1 to 0). According the datasheet of the TM1637
-chip, it can support oscillator frequencies as high as 450 kHz, which means that
-theoretically, the `BIT_DELAY` could be as low as 1 microseconds.
+```C++
+template <typename T_WI, uint8_t T_DIGITS>
+class Tm1637Module : public LedModule {
+  public:
+    explicit Tm1637Module(
+        const T_WI& wireInterface,
+        const uint8_t* remapArray = nullptr
+    );
 
-However, the LED modules manufactured by diymore.cc (shown above) contains a 20
-nF capacitor and a 4.7k ohm pullup resistor on each of the `DIO` and `CLK`
-lines. This seems to be a design flaw, because the capacitor is about 100X
-larger than it should be, it should have been only be about 200 pF. The effect
-of the large capacitor is that bit transitions on these lines take an incredibly
-long time due the `RC` time constant of 94 microseconds. After experimenting
-with various values, it seems like a `BIT_DELAY` of 100 microseconds will
-usually work.
+    void begin();
+    void end();
 
-A `BIT_DELAY` of 100 microseconds means that the time to transmit 4 digits to
-the TM1637 chip becomes about 22 milliseconds. The time to transmit a single
-digit is about 10 milliseconds due to the overhead in the protocol. Since these
-durations are so large, the `Tm1637Module` class does not send the segment bit
-patterns directly to the TM1637 controller when `Tm1637Module::setPattern()`
-method is called. Instead, the class holds a buffer of segment patterns, and
-keeps track of a set of dirty bits. The buffer is sent to the TM1637 controller
-upon the execution of the `Tm1637Module::flush()` or
-Tm1637Module::flushIncremental()` method.
+    uint8_t getNumDigits() const { return T_DIGITS; }
+    void setPatternAt(uint8_t pos, uint8_t pattern) override;
+    uint8_t getPatternAt(uint8_t pos) override;
+    void setBrightness(uint8_t brightness) override;
+
+    void setDisplayOn(bool on = true);
+
+    void flush();
+    void flushIncremental();
+};
+```
+
+The `T_WI` template parameter is a class that implements the 2-wire protocol
+used by the TM1637 controller. It is a protocol that is very close to, but not
+quite the same as, I2C. This means that we cannot use the usual `Wire` library,
+but must implement a custom version. The library provides 2 implementations: the
+`SoftWireInterface` compatible with all platforms, and `SoftWireFastInterface`
+useful on AVR processors.
+
+The `wireInterface` is an instance of `T_WI`, which is either
+`SoftWireInterface` or `SoftWireFastInterface`.
+
+The `remapArray` is an array of addresses which map the physical positions to
+their logical positions. This is not needed by the 4-digit TM1637 LED modules,
+but the 6-digit TM1637 LED modules commonly available on Amazon or eBay are
+wired so that the digits need remapping.
+
+Most of the methods of the class are inherited from the `LedModule`.
+
+The `setDisplayOn()` method exposes the feature of the TM1637 chip where the
+display can be turned on and off independent of the brightness. When the display
+is turned back on, it resumes the previous brightness.
 
 The `flush()` method unconditionally sends all digits and the brightness
 information to the TM1637 chip in a single protocol transmission. For 4 digits,
@@ -381,6 +433,9 @@ only if that digit was marked to be dirty. Each subsequent call to
 `flushIncremental()` examines the next digit. When the last digit is handled,
 the next call to `flushIncremental()` looks at the brightness level, and sends
 that information to the TM1637 chip if the brightness dirty bit is set.
+
+<a name="Tm1637Module4"></a>
+#### TM1637 With 4 Digits
 
 The configuration of the `Tm1637Module` class for the 4-digit module looks like
 this:
@@ -428,9 +483,36 @@ void loop() {
 }
 ```
 
+The `BIT_DELAY` parameter below is the number of microseconds to wait between
+each bit transition (0 to 1, or 1 to 0). According the datasheet of the TM1637
+chip, it can support oscillator frequencies as high as 450 kHz, which means that
+theoretically, the `BIT_DELAY` could be as low as 1 microseconds.
+
+However, the LED modules manufactured by diymore.cc (shown above) contains a 20
+nF capacitor and a 4.7k ohm pullup resistor on each of the `DIO` and `CLK`
+lines. This seems to be a design flaw, because the capacitor is about 100X
+larger than it should be, it should have been only be about 200 pF. The effect
+of the large capacitor is that bit transitions on these lines take an incredibly
+long time due the `RC` time constant of 94 microseconds. After experimenting
+with various values, it seems like a `BIT_DELAY` of 100 microseconds will
+usually work.
+
+A `BIT_DELAY` of 100 microseconds means that the time to transmit 4 digits to
+the TM1637 chip becomes about 22 milliseconds. The time to transmit a single
+digit is about 10 milliseconds due to the overhead in the protocol. Since these
+durations are so large, the `Tm1637Module` class does not send the segment bit
+patterns directly to the TM1637 controller when `Tm1637Module::setPattern()`
+method is called. Instead, the class holds a buffer of segment patterns, and
+keeps track of a set of dirty bits. The buffer is sent to the TM1637 controller
+upon the execution of the `Tm1637Module::flush()` or
+`Tm1637Module::flushIncremental()` method.
+
+<a name="Tm1637Module6"></a>
+#### TM1637 With 6 Digits
+
 The configuration of the `Tm1637Module` class for the 6-digit module is slightly
-more complicated because the digits are wired to be in the order of `2, 1, 0, 5,
-4, 3`. A predefined remap array `kDigitRemapArray6Tm1637` must be given to the
+more complicated because the digits are wired to be in the order of `2 1 0 5 4
+3`. A predefined remap array `kDigitRemapArray6Tm1637` must be given to the
 `Tm1637Module` constructor, like this:
 
 ```C++
