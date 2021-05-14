@@ -26,7 +26,7 @@ SOFTWARE.
 #define ACE_SEGMENT_STRING_SCROLLER_H
 
 #include <stdint.h>
-#include <AceCommon.h> // FlashString
+#include <Arduino.h> // pgm_read_byte(), strlen_P()
 #include "StringWriter.h"
 
 class __FlashStringHelper;
@@ -49,8 +49,18 @@ class StringScroller {
     /** Set scroll string, clear the display, and prepare to scroll left. */
     void initScrollLeft(const char* s) {
       mString = s;
+      mIsFlashString = false;
       mStringLength = strlen(s);
-      mStringPos = - display().getNumDigits();
+      mStringPos = (-display().getNumDigits()); // start with clear display
+      display().clear();
+    }
+
+    /** Set scroll string, clear the display, and prepare to scroll left. */
+    void initScrollLeft(const __FlashStringHelper* fs) {
+      mString = fs;
+      mIsFlashString = true;
+      mStringLength = strlen_P((const char*) fs);
+      mStringPos = (-display().getNumDigits()); // start with clear display
       display().clear();
     }
 
@@ -70,8 +80,18 @@ class StringScroller {
     /** Set scroll string, clear the display, and prepare to scroll right. */
     void initScrollRight(const char* s) {
       mString = s;
+      mIsFlashString = false;
       mStringLength = strlen(s);
-      mStringPos = mStringLength;
+      mStringPos = mStringLength; // start with clear display
+      display().clear();
+    }
+
+    /** Set scroll string, clear the display, and prepare to scroll right. */
+    void initScrollRight(const __FlashStringHelper* fs) {
+      mString = fs;
+      mIsFlashString = true;
+      mStringLength = strlen_P((const char*) fs);
+      mStringPos = mStringLength; // start with clear display
       display().clear();
     }
 
@@ -102,7 +122,16 @@ class StringScroller {
         if (stringPos < 0 || stringPos >= mStringLength) {
           c = ' ';
         } else {
-          c = mString[stringPos];
+          // Normally inserting an if-conditional inside a for-loop is not a
+          // good idea. But this is not a speed-critical loop and it loops over
+          // only the number of digits, which will almost always be <= 8. So I
+          // think this is better than creating a duplicate version of this
+          // function using a template function.
+          if (mIsFlashString) {
+            c = pgm_read_byte((const uint8_t*) mString + stringPos);
+          } else {
+            c = *((const char*) mString + stringPos);
+          }
         }
         mCharWriter.writeCharAt(pos, c);
         stringPos++;
@@ -110,10 +139,13 @@ class StringScroller {
     }
 
   private:
+    // The order of these fields is partially motivated to reduce memory
+    // consumption on 32-bit processors.
     CharWriter mCharWriter;
-    const char* mString;
-    int16_t mStringPos;
+    const void* mString;
+    int16_t mStringPos; // can become negative
     uint8_t mStringLength;
+    bool mIsFlashString;
 };
 
 } // ace_segment

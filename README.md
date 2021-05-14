@@ -1116,9 +1116,11 @@ class StringScroller {
     LedDisplay& display() const;
 
     void initScrollLeft(const char* s);
+    void initScrollLeft(const __FlashStringHelper* s);
     bool scrollLeft();
 
     void initScrollRight(const char* s);
+    void initScrollRight(const __FlashStringHelper* s);
     bool scrollRight();
 };
 ```

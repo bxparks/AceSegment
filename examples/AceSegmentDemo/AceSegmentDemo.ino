@@ -806,18 +806,20 @@ void writeChars() {
 
 //-----------------------------------------------------------------------------
 
-static const __FlashStringHelper* STRINGS[] = {
-  F("0123"),
-  F("0.123"),
-  F("0.1 "),
-  F("0.1.2.3."),
-  F("a.b.c.d"),
-  F(".1.2.3"),
-  F("brian"),
-};
-static const uint8_t NUM_STRINGS = sizeof(STRINGS) / sizeof(STRINGS[0]);
-
 void writeStrings() {
+  // These are defined in the function because the F() works only inside
+  // functions.
+  static const __FlashStringHelper* STRINGS[] = {
+    F("0123"),
+    F("0.123"),
+    F("0.1 "),
+    F("0.1.2.3."),
+    F("a.b.c.d"),
+    F(".1.2.3"),
+    F("brian"),
+  };
+  static const uint8_t NUM_STRINGS = sizeof(STRINGS) / sizeof(STRINGS[0]);
+
   static uint8_t i = 0;
 
   uint8_t written = stringWriter.writeStringAt(0, STRINGS[i]);
@@ -829,7 +831,8 @@ void writeStrings() {
 //-----------------------------------------------------------------------------
 
 StringScroller stringScroller(ledDisplay);
-static const char SCROLL_STRING[] =
+
+static const char SCROLL_STRING[] PROGMEM =
 "the quick brown fox jumps over the lazy dog, "
 "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG. "
 "[0123456789]";
@@ -840,9 +843,11 @@ void scrollString() {
 
   if (! isInit) {
     if (scrollLeft) {
-      stringScroller.initScrollLeft(SCROLL_STRING);
+      stringScroller.initScrollLeft(
+          (const __FlashStringHelper*) SCROLL_STRING);
     } else {
-      stringScroller.initScrollRight(SCROLL_STRING);
+      stringScroller.initScrollRight(
+          (const __FlashStringHelper*) SCROLL_STRING);
     }
     isInit = true;
   }
