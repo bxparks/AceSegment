@@ -2,5 +2,5 @@
 # Makefile to compile and run Arduino programs natively on Linux or MacOS.
 
 APP_NAME := AceSegmentDemo
-ARDUINO_LIBS := AceSegment AceButton AUnit AceCommon
+ARDUINO_LIBS := EpoxyMockDigitalWriteFast AceSegment AceButton AUnit AceCommon
 include ../../../EpoxyDuino/EpoxyDuino.mk

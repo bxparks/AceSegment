@@ -6,38 +6,50 @@
 # Datatypes (KEYWORD1)
 #######################################
 
-Hardware	KEYWORD1
-HwSpiAdapter	KEYWORD1
-SwSpiAdapter	KEYWORD1
-SwSpiAdapterFast	KEYWORD1
+HardSpiInterface	KEYWORD1
+HardSpiFastInterface	KEYWORD1
+SoftSpiInterface	KEYWORD1
+SoftSpiFastInterface	KEYWORD1
+SoftWireInterface	KEYWORD1
+SoftWireFastInterface	KEYWORD1
 LedMatrixBase	KEYWORD1
 LedMatrixDirect	KEYWORD1
-LedMatrixDirectFast	KEYWORD1
-LedMatrixSingleShiftRegister	KEYWORD1
-LedMatrixDualShiftRegister	KEYWORD1
+LedMatrixDirectFast4	KEYWORD1
+LedMatrixSingleHc595	KEYWORD1
+LedMatrixDualHc595	KEYWORD1
+LedModule	KEYWORD1
+ScanningModule	KEYWORD1
+DirectModule	KEYWORD1
+DirectFast4Module	KEYWORD1
+HybridModule	KEYWORD1
+Hc595Module	KEYWORD1
+Tm1637Module	KEYWORD1
+Max7219Module	KEYWORD1
 LedDisplay	KEYWORD1
-ScanningDisplay	KEYWORD1
 NumberWriter	KEYWORD1
+TemperatureWriter	KEYWORD1
 ClockWriter	KEYWORD1
 CharWriter	KEYWORD1
 StringWriter	KEYWORD1
+StringScroller	KEYWORD1
 hexchar_t	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
 
-# Hardware.h
-digitalWrite	KEYWORD2
-pinMode	KEYWORD2
-micros	KEYWORD2
-millis	KEYWORD2
-
-# SwSpiAdapter.h, HwSpiAdapter.h
+# SoftSpiInterface.h, HardSpiInterface.h
 begin	KEYWORD2
 end	KEYWORD2
-transfer	KEYWORD2
-transfer16	KEYWORD2
+send8	KEYWORD2
+send16	KEYWORD2
+
+# SoftWireInterface
+begin	KEYWORD2
+end	KEYWORD2
+startCondition	KEYWORD2
+stopCondition	KEYWORD2
+sendByte	KEYWORD2
 
 # LedMatrix.h
 begin	KEYWORD2
@@ -47,17 +59,27 @@ clear	KEYWORD2
 enableGroup	KEYWORD2
 disableGroup	KEYWORD2
 
-# ScanningDisplay
+# LedModule.h
+getNumDigits	KEYWORD2
+setPatternAt	KEYWORD2
+setBrightness	KEYWORD2
+getPatternAt	KEYWORD2
+
+# LedDisplay.h
+writePatternAt	KEYWORD2
+writePatternsAt	KEYWORD2
+writePatternsAt_P	KEYWORD2
+writeDecimalPointAt	KEYWORD2
+setBrightness	KEYWORD2
+clear	KEYWORD2
+clearToEnd	KEYWORD2
+
+# ScanningModule
 begin	KEYWORD2
 end	KEYWORD2
-getNumDigits	KEYWORD2
 getFramesPerSecond	KEYWORD2
 getFieldsPerSecond	KEYWORD2
-writePatternAt	KEYWORD2
-writeDecimalPointAt	KEYWORD2
 setBrightnessAt	KEYWORD2
-setGlobalBrightness	KEYWORD2
-clear	KEYWORD2
 renderFieldNow	KEYWORD2
 renderFieldWhenReady	KEYWORD2
 prepareToSleep	KEYWORD2
@@ -71,6 +93,13 @@ writeHexWordAt	KEYWORD2
 writeUnsignedDecimalAt	KEYWORD2
 writeSignedDecimalAt	KEYWORD2
 clearToEnd	KEYWORD2
+display	KEYWORD2
+
+# TemperatureWriter.h
+writeTempAt	KEYWORD2
+writeTempDegAt	KEYWORD2
+writeTempDegCAt	KEYWORD2
+writeTempDegFAt	KEYWORD2
 display	KEYWORD2
 
 # ClockWriter.h
@@ -88,6 +117,14 @@ display	KEYWORD2
 
 # StringWriter.
 writeStringAt	KEYWORD2
+clearToEnd	KEYWORD2
+display	KEYWORD2
+
+# StringScroller
+initScrollLeft	KEYWORD2
+initScrollRight	KEYWORD2
+scrollLeft	KEYWORD2
+scrollRight	KEYWORD2
 display	KEYWORD2
 
 #######################################
@@ -104,11 +141,13 @@ kCharSpace	LITERAL1
 kCharMinus	LITERAL1
 
 # ClockWriter.h
-kCharSpace	LITERAL1
-kCharMinus	LITERAL1
 kPatternA	LITERAL1
 kPatternP	LITERAL1
+
+# TemperatureWriter.h
 kPatternDegree	LITERAL1
+kPatternC	LITERAL1
+kPatternF	LITERAL1
 
 # CharWriter.h
 kNumCharacters	LITERAL1

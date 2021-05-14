@@ -32,20 +32,36 @@ SOFTWARE.
 #ifndef ACE_SEGMENT_ACE_SEGMENT_H
 #define ACE_SEGMENT_ACE_SEGMENT_H
 
-#include "ace_segment/Hardware.h"
-#include "ace_segment/SwSpiAdapter.h"
-#include "ace_segment/HwSpiAdapter.h"
-#include "ace_segment/LedMatrixDirect.h"
-#include "ace_segment/LedMatrixSingleShiftRegister.h"
-#include "ace_segment/LedMatrixDualShiftRegister.h"
-#include "ace_segment/ScanningDisplay.h"
-#include "ace_segment/NumberWriter.h"
-#include "ace_segment/ClockWriter.h"
-#include "ace_segment/CharWriter.h"
-#include "ace_segment/StringWriter.h"
+#include "ace_segment/hw/ClockInterface.h"
+#include "ace_segment/hw/GpioInterface.h"
+#include "ace_segment/hw/SoftSpiInterface.h"
+#include "ace_segment/hw/HardSpiInterface.h"
+#include "ace_segment/hw/SoftWireInterface.h"
+#include "ace_segment/hw/remap.h"
+#include "ace_segment/scanning/LedMatrixDirect.h"
+#include "ace_segment/scanning/LedMatrixSingleHc595.h"
+#include "ace_segment/scanning/LedMatrixDualHc595.h"
+#include "ace_segment/LedModule.h"
+#include "ace_segment/scanning/ScanningModule.h"
+#include "ace_segment/direct/DirectModule.h"
+#include "ace_segment/hybrid/HybridModule.h"
+#include "ace_segment/hc595/Hc595Module.h"
+#include "ace_segment/tm1637/Tm1637Module.h"
+#include "ace_segment/max7219/Max7219Module.h"
+#include "ace_segment/LedDisplay.h"
+#include "ace_segment/writer/NumberWriter.h"
+#include "ace_segment/writer/ClockWriter.h"
+#include "ace_segment/writer/TemperatureWriter.h"
+#include "ace_segment/writer/CharWriter.h"
+#include "ace_segment/writer/StringWriter.h"
+#include "ace_segment/writer/StringScroller.h"
+
+#if defined(ARDUINO_API_VERSION)
+#error Platforms using ArduinoCore-API not supported
+#endif
 
 // Version format: xxyyzz == "xx.yy.zz"
-#define ACE_SEGMENT_VERSION 400
-#define ACE_SEGMENT_VERSION_STRING "0.4"
+#define ACE_SEGMENT_VERSION 500
+#define ACE_SEGMENT_VERSION_STRING "0.5"
 
 #endif

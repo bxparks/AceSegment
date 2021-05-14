@@ -1,25 +1,40 @@
 SIZEOF
-sizeof(Hardware): 1
-sizeof(SwSpiAdapter): 3
-sizeof(HwSpiAdapter): 3
-sizeof(LedMatrixDirect<Hardware>): 20
-sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 20
-sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 12
-sizeof(LedDisplay): 8
-sizeof(ScanningDisplay<Hardware, LedMatrixBase, 4, 1>): 36
+sizeof(SoftWireInterface): 4
+sizeof(SoftSpiInterface): 3
+sizeof(HardSpiInterface): 3
+sizeof(LedMatrixDirect<>): 16
+sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 16
+sizeof(LedMatrixDualHc595<HardSpiInterface>): 16
+sizeof(LedModule): 8
+sizeof(ScanningModule<LedMatrixBase, 4>): 32
+sizeof(DirectModule<4>): 48
+sizeof(HybridModule<SoftSpiInterface, 4>): 48
+sizeof(Hc595Module<SoftSpiInterface, 8>): 64
+sizeof(Tm1637Module<SoftWireInterface, 4>): 24
+sizeof(Tm1637Module<SoftWireInterface, 6>): 28
+sizeof(Max7219Module<SoftSpiInterface, 8>): 28
+sizeof(LedDisplay): 4
 sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
-sizeof(CharWriter): 4
+sizeof(TemperatureWriter): 4
+sizeof(CharWriter): 12
 sizeof(StringWriter): 4
+sizeof(StringScroller): 20
 BENCHMARKS
-direct 12 12 48 240
-direct(subfields) 0 2 28 3840
-single_sw_spi 29 29 37 240
-single_sw_spi(subfields) 0 4 41 3840
-single_hw_spi 11 11 25 240
-single_hw_spi(subfields) 0 2 23 3840
-dual_sw_spi 50 50 58 240
-dual_sw_spi(subfields) 1 7 67 3840
-dual_hw_spi 12 12 28 240
-dual_hw_spi(subfields) 1 2 28 3840
+Direct(4) 12 13 40 40
+Direct(4,subfields) 0 2 20 640
+Hybrid(4,SoftSpi) 29 29 41 40
+Hybrid(4,SoftSpi,subfields) 0 3 42 640
+Hybrid(4,HardSpi) 11 11 27 40
+Hybrid(4,HardSpi,subfields) 0 2 23 640
+Hc595(8,SoftSpi) 50 50 62 80
+Hc595(8,SoftSpi,subfields) 0 6 62 1280
+Hc595(8,HardSpi) 12 12 25 80
+Hc595(8,HardSpi,subfields) 0 2 25 1280
+Tm1637(4,SoftWire) 21497 21506 21541 10
+Tm1637(4,SoftWire,incremental) 3481 8479 9749 50
+Tm1637(6,SoftWire) 27025 27035 27049 10
+Tm1637(6,SoftWire,incremental) 3481 8838 9762 70
+Max7219(8,SoftSpi) 460 461 474 20
+Max7219(8,HardSpi) 111 111 120 20
 END

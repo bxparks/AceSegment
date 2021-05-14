@@ -1,33 +1,61 @@
 SIZEOF
-sizeof(Hardware): 1
-sizeof(SwSpiAdapter): 3
-sizeof(SwSpiAdapterFast<1,2,3>): 1
-sizeof(HwSpiAdapter): 3
-sizeof(LedMatrixDirect<Hardware>): 11
-sizeof(LedMatrixDirectFast<0..3, 0..7>): 3
-sizeof(LedMatrixSingleShiftRegister<Hardware, SwSpiAdapter>): 10
-sizeof(LedMatrixDualShiftRegister<HwSpiAdapter>): 5
-sizeof(LedDisplay): 3
-sizeof(ScanningDisplay<Hardware, LedMatrixBase, 4, 1>): 25
+sizeof(SoftWireInterface): 4
+sizeof(SoftWireFastInterface<4, 5, 100>): 1
+sizeof(SoftSpiInterface): 3
+sizeof(SoftSpiFastInterface<11, 12, 13>): 1
+sizeof(HardSpiInterface): 3
+sizeof(HardSpiFastInterface<11, 12, 13>): 1
+sizeof(LedMatrixDirect<>): 9
+sizeof(LedMatrixDirectFast4<6..13, 2..5>): 3
+sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 8
+sizeof(LedMatrixDualHc595<HardSpiInterface>): 8
+sizeof(LedModule): 3
+sizeof(ScanningModule<LedMatrixBase, 4>): 22
+sizeof(DirectModule<4>): 31
+sizeof(DirectFast4Module<...>): 25
+sizeof(HybridModule<SoftSpiInterface, 4>): 30
+sizeof(Hc595Module<SoftSpiInterface, 8>): 46
+sizeof(Tm1637Module<SoftWireInterface, 4>): 14
+sizeof(Tm1637Module<SoftWireInterface, 6>): 16
+sizeof(Max7219Module<SoftSpiInterface, 8>): 16
+sizeof(LedDisplay): 2
 sizeof(NumberWriter): 2
 sizeof(ClockWriter): 3
-sizeof(CharWriter): 2
+sizeof(TemperatureWriter): 2
+sizeof(CharWriter): 5
 sizeof(StringWriter): 2
+sizeof(StringScroller): 11
 BENCHMARKS
-direct 60 66 80 240
-direct(subfields) 4 13 72 3840
-single_sw_spi 124 129 152 240
-single_sw_spi(subfields) 4 21 144 3840
-single_hw_spi 32 34 44 240
-single_hw_spi(subfields) 4 9 44 3840
-dual_sw_spi 212 216 244 240
-dual_sw_spi(subfields) 4 32 240 3840
-dual_hw_spi 20 24 36 240
-dual_hw_spi(subfields) 4 8 32 3840
-direct_fast 28 28 36 240
-direct_fast(subfields) 4 8 44 3840
-single_sw_spi_fast 24 28 40 240
-single_sw_spi_fast(subfields) 4 8 44 3840
-dual_sw_spi_fast 20 24 40 240
-dual_sw_spi_fast(subfields) 4 8 36 3840
+Direct(4) 76 82 88 40
+Direct(4,subfields) 4 13 88 640
+DirectFast4(4) 28 31 36 40
+DirectFast4(4,subfields) 4 8 36 640
+Hybrid(4,SoftSpi) 152 161 176 40
+Hybrid(4,SoftSpi,subfields) 4 22 176 640
+Hybrid(4,SoftSpiFast) 28 34 40 40
+Hybrid(4,SoftSpiFast,subfields) 4 8 40 640
+Hybrid(4,HardSpi) 36 41 52 40
+Hybrid(4,HardSpi,subfields) 4 9 48 640
+Hybrid(4,HardSpiFast) 24 29 36 40
+Hybrid(4,HardSpiFast,subfields) 4 8 36 640
+Hc595(8,SoftSpi) 268 273 308 80
+Hc595(8,SoftSpi,subfields) 4 36 304 1280
+Hc595(8,SoftSpiFast) 24 27 36 80
+Hc595(8,SoftSpiFast,subfields) 4 8 36 1280
+Hc595(8,HardSpi) 28 30 40 80
+Hc595(8,HardSpi,subfields) 4 8 36 1280
+Hc595(8,HardSpiFast) 12 18 28 80
+Hc595(8,HardSpiFast,subfields) 4 7 32 1280
+Tm1637(4,SoftWire) 22316 22348 22568 10
+Tm1637(4,SoftWire,incremental) 3616 8810 10320 50
+Tm1637(4,SoftWireFast) 21064 21092 21316 10
+Tm1637(4,SoftWireFast,incremental) 3412 8315 9776 50
+Tm1637(6,SoftWire) 28060 28092 28344 10
+Tm1637(6,SoftWire,incremental) 3616 9178 10316 70
+Tm1637(6,SoftWireFast) 26484 26511 26732 10
+Tm1637(6,SoftWireFast,incremental) 3412 8663 9768 70
+Max7219(8,SoftSpi) 2380 2395 2600 20
+Max7219(8,SoftSpiFast) 208 218 240 20
+Max7219(8,HardSpi) 220 232 248 20
+Max7219(8,HardSpiFast) 108 117 124 20
 END

@@ -1,6 +1,30 @@
 # Changelog
 
 * Unreleased
+* 0.5 (2021-05-14)
+    * Extract hardware dependent API from `LedDisplay` into `LedModule`.
+    * Create convenience subclasses of `LedModule`:
+        * Add `Tm1637Module` class to support LED modules using the TM1637 chip.
+        * Add `Max7219Module` class that supports an 8-digit LED modules using a
+          single MAX7219 chip.
+        * Add `Hc595Module` class to support 8-digit LED modules using dual
+          74HC595 shift register chips.
+        * Add `HybridModule` class to support modules using a single 74HC595
+          shift regsiter on segments, with direct connects to the digit pins.
+        * Add `DirectModule` class to support modules whose segment and digit
+          pins are directly connected to the GPIO pins.
+    * Add support for `remapArray` that maps logical positions to physical
+      positions.
+        * Handles off-the-shelf LED modules whose digits are wired out of order.
+          This includes the 6-digit TM1637 module, the 8-digit MAX7219 module,
+          and the 8-digit 74HC595 module.
+    * Simplify `LedDisplay` base class API.
+    * Add `TemperatureWriter` and `StringScroller`.
+    * Huge rewrite of README.md.
+        * Move low-level description of `ScanningModule` and `LedMatrixXxx` to
+          `docs/scanning_module.md`.
+    * Upgrade ESP32 Core from 1.0.4 to 1.0.6. No signficant change detected.
+    * Add preliminary support for ATtiny85.
 * 0.4 (2021-04-09)
     * A complete refactoring of the previous v0.3 version, which I could not
       understand anymore.
@@ -21,13 +45,13 @@
     * New, vastly simplified class hierarchy.
         * `Hardware`
             * low-level accessors to GPIO pins and timers
-        * SpiAdapter
-            * `SwSpiAdapter`
-            * `HwSpiAdapter`
+        * SpiInterface
+            * `SoftSpiInterface`
+            * `HardSpiInterface`
         * LedMatrix
             * `LedMatrixDirect`
-            * `LedMatrixSingleShiftRegister`
-            * `LedMatrixDualShiftRegister`
+            * `LedMatrixSingleHc595`
+            * `LedMatrixDualHc595`
         * `LedDisplay`
             * `ScanningDisplay`
         * Writers
@@ -66,8 +90,9 @@
           be easier to maintain.
         * Since these classes depend on an external library, the headers must be
           manually included:
-            * `#include <ace_segment/fast/LedMatrixDirectFast.h>`
-            * `#include <ace_segment/fast/SwSpiAdapterFast.h>`
+            * `#include <ace_segment/hw/SoftSpiFastInterface.h>`
+            * `#include <ace_segment/hw/SoftWireFastInterface.h>`
+            * `#include <ace_segment/scanning/LedMatrixDirectFast4.h>`
     * Resource consumption
         * Reduce flash consumption on AVR by 70-80%, from 4-4.3 kB down
           to 700-1200 bytes.

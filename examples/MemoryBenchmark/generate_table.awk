@@ -7,19 +7,28 @@
 
 BEGIN {
   labels[0] = "baseline"
-  labels[1] = "direct";
-  labels[2] = "single_sw_spi";
-  labels[3] = "single_hw_spi";
-  labels[4] = "dual_sw_spi";
-  labels[5] = "dual_hw_spi";
-  labels[6] = "direct_fast";
-  labels[7] = "single_sw_fast";
-  labels[8] = "dual_sw_fast";
-  labels[9] = "StubDisplay";
-  labels[10] = "NumberWriter+Stub";
-  labels[11] = "ClockWriter+Stub";
-  labels[12] = "CharWriter+Stub";
-  labels[13] = "StringWriter+Stub";
+  labels[1] = "DirectModule";
+  labels[2] = "DirectFast4Module";
+  labels[3] = "Hybrid(SoftSpi)";
+  labels[4] = "Hybrid(SoftSpiFast)";
+  labels[5] = "Hybrid(HardSpi)";
+  labels[6] = "Hybrid(HardSpiFast)";
+  labels[7] = "Hc595(SoftSpi)";
+  labels[8] = "Hc595(SoftSpiFast)";
+  labels[9] = "Hc595(HardSpi)";
+  labels[10] = "Hc595(HardSpiFast)";
+  labels[11] = "Tm1637(SoftWire)";
+  labels[12] = "Tm1637(SoftWireFast)";
+  labels[13] = "Max7219(SoftSpi)";
+  labels[14] = "Max7219(SoftSpiFast)";
+  labels[15] = "Max7219(HardSpi)";
+  labels[16] = "Max7219(HardSpiFast)";
+  labels[17] = "StubModule+LedDisplay";
+  labels[18] = "NumberWriter+Stub";
+  labels[19] = "ClockWriter+Stub";
+  labels[20] = "TemperatureWriter+Stub";
+  labels[21] = "CharWriter+Stub";
+  labels[22] = "StringWriter+Stub";
   record_index = 0
 }
 {
@@ -48,9 +57,13 @@ END {
   printf("|---------------------------------+--------------+-------------|\n")
   printf("| %-31s | %6d/%5d | %5d/%5d |\n",
     labels[0], u[0]["flash"], u[0]["ram"], u[0]["d_flash"], u[0]["d_ram"])
-  printf("|---------------------------------+--------------+-------------|\n")
   for (i = 1 ; i < NUM_ENTRIES; i++) {
-    if (labels[i] == "direct_fast" || labels[i] == "StubDisplay") {
+    if (labels[i] ~ /DirectModule/ \
+        || labels[i] ~ /Hybrid\(SoftSpi\)/ \
+        || labels[i] ~ /Hc595\(SoftSpi\)/ \
+        || labels[i] ~ /Tm1637\(SoftWire\)/ \
+        || labels[i] ~ /Max7219\(SoftSpi\)/ \
+        || labels[i] == "StubModule+LedDisplay") {
       printf(\
         "|---------------------------------+--------------+-------------|\n")
     }

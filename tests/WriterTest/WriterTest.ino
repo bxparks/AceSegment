@@ -9,7 +9,7 @@
 #include <Arduino.h>
 #include <AUnit.h>
 #include <AceSegment.h>
-#include <ace_segment/testing/TestableLedDisplay.h>
+#include <ace_segment/testing/TestableLedModule.h>
 
 using aunit::TestRunner;
 using aunit::TestOnce;
@@ -20,9 +20,11 @@ const uint8_t NUM_DIGITS = 4;
 const uint8_t CUSTOM_BRIGHTNESS = 64;
 const uint8_t DIFFERENT_BRIGHTNESS = 32;
 
-TestableLedDisplay<NUM_DIGITS> ledDisplay;
+TestableLedModule<NUM_DIGITS> ledModule;
+LedDisplay ledDisplay(ledModule);
 NumberWriter numberWriter(ledDisplay);
 ClockWriter clockWriter(ledDisplay);
+TemperatureWriter temperatureWriter(ledDisplay);
 CharWriter charWriter(ledDisplay);
 StringWriter stringWriter(charWriter);
 
@@ -34,7 +36,7 @@ class CharWriterTest : public TestOnce {
   protected:
     void setup() override {
       ledDisplay.clear();
-      mPatterns = ledDisplay.getPatterns();
+      mPatterns = ledModule.getPatterns();
     }
 
     uint8_t* mPatterns;
@@ -60,7 +62,7 @@ class StringWriterTest : public TestOnce {
   protected:
     void setup() override {
       ledDisplay.clear();
-      mPatterns = ledDisplay.getPatterns();
+      mPatterns = ledModule.getPatterns();
     }
 
     void assertPatternsEqual(int n, ...) {
@@ -97,7 +99,7 @@ class NumberWriterTest : public TestOnce {
   protected:
     void setup() override {
       ledDisplay.clear();
-      mPatterns = ledDisplay.getPatterns();
+      mPatterns = ledModule.getPatterns();
     }
 
     uint8_t* mPatterns;
@@ -187,7 +189,7 @@ class ClockWriterTest: public TestOnce {
   protected:
     void setup() override {
       ledDisplay.clear();
-      mPatterns = ledDisplay.getPatterns();
+      mPatterns = ledModule.getPatterns();
     }
 
     uint8_t* mPatterns;
@@ -239,6 +241,66 @@ testF(ClockWriterTest, writeHourMinute) {
   assertEqual(0b01011011 | 0x80, mPatterns[1]); // colon on by default
   assertEqual(0b01001111, mPatterns[2]);
   assertEqual(0b01100110, mPatterns[3]);
+}
+
+testF(ClockWriterTest, writeChars2At) {
+  clockWriter.writeChars2At(0, 1, 2);
+  assertEqual(0b00000110, mPatterns[0]);
+  assertEqual(0b01011011, mPatterns[1]);
+
+  clockWriter.writeChars2At(
+      0, ClockWriter::kCharSpace, ClockWriter::kCharSpace);
+  assertEqual(0b0, mPatterns[0]);
+  assertEqual(0b0, mPatterns[1]);
+}
+
+// ----------------------------------------------------------------------
+// Tests for TemperatureWriter.
+// ----------------------------------------------------------------------
+
+class TemperatureWriterTest: public TestOnce {
+  protected:
+    void setup() override {
+      ledDisplay.clear();
+      mPatterns = ledModule.getPatterns();
+    }
+
+    uint8_t* mPatterns;
+};
+
+testF(TemperatureWriterTest, writeTempDegAt) {
+  uint8_t written = temperatureWriter.writeTempDegAt(0, -9);
+  assertEqual(3, written);
+  assertEqual(0b01000000, mPatterns[0]); // -
+  assertEqual(0b01101111, mPatterns[1]); // 9
+  assertEqual(0b01100011, mPatterns[2]); // deg
+
+  written = temperatureWriter.writeTempDegAt(0, -9 /*temp*/, 4 /*boxSize*/);
+  assertEqual(4, written);
+  assertEqual(0b00000000, mPatterns[0]); // space
+  assertEqual(0b01000000, mPatterns[1]); // -
+  assertEqual(0b01101111, mPatterns[2]); // 9
+  assertEqual(0b01100011, mPatterns[3]); // deg
+}
+
+testF(TemperatureWriterTest, writeTempDegCAt) {
+  uint8_t written = temperatureWriter.writeTempDegCAt(
+      0, -9 /*temp*/, 4 /*boxSize*/);
+  assertEqual(4, written);
+  assertEqual(0b01000000, mPatterns[0]); // -
+  assertEqual(0b01101111, mPatterns[1]); // 9
+  assertEqual(0b01100011, mPatterns[2]); // deg
+  assertEqual(0b00111001, mPatterns[3]); // C
+}
+
+testF(TemperatureWriterTest, writeTempDegFAt) {
+  uint8_t written = temperatureWriter.writeTempDegFAt(
+      0, -9 /*temp*/, 4 /*boxSize*/);
+  assertEqual(4, written);
+  assertEqual(0b01000000, mPatterns[0]); // -
+  assertEqual(0b01101111, mPatterns[1]); // 9
+  assertEqual(0b01100011, mPatterns[2]); // deg
+  assertEqual(0b01110001, mPatterns[3]); // F
 }
 
 //-----------------------------------------------------------------------------

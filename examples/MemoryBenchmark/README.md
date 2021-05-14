@@ -12,7 +12,7 @@ by the runtime environment of the processor. For example, it often seems like
 the ESP8266 allocates flash memory in blocks of a certain quantity, so the
 calculated flash size can jump around in unexpected ways.
 
-**Version**: AceSegment v0.4
+**Version**: AceSegment v0.5
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -53,15 +53,6 @@ will be invoked by the following command:
 $ make README.md
 ```
 
-## Algorithms
-
-* 0 `baseline`: program does (almost) nothing
-* 1 `direct`: segment and digit pins are wired directly
-* 2 `split_sw_spi`: segment pins wired directly, digit pins through SW SPI
-* 3 `split_hw_spi`: segment pins wired directly, digit pins through HW SPI
-* 4 `merged_sw_spi`: segment and digit pins both controlled through SW SPI
-* 5 `merged_hw_spi`: segment and digit pins both controlled through HW SPI
-
 ## Library Size Changes
 
 **v0.3**
@@ -72,7 +63,7 @@ before substantional refactoring in 2021.
 **v0.4**
 
 * Reduce flash size from 4.0-4.4kB by about 200-500 bytes on AVR by
-  simplifying `LedMatrix` class hierarchy by extracting out the `SpiAdapter`
+  simplifying `LedMatrix` class hierarchy by extracting out the `SpiInterface`
   class to handle both hardware and software SPI, instead of calling
   `shiftOut()` directly.
 * Reduce flash size from 3.8-4.2kB down 800-1000 bytes on AVR by
@@ -80,23 +71,23 @@ before substantional refactoring in 2021.
   making the `LedMatrix` class into a better abstraction and unifying the API
   into a single `draw(group, elementPattern)` method.
 * Reduce flash by 20-50 bytes on AVR by merging `Renderer` into
-  `ScanningDisplay`.
+  `ScanningModule`.
 * Reduce flash by 100-200 bytes on AVR, SAMD21, STM32 and ESP8266 by
-  templatizing the `ScanningDisplay` on `NUM_DIGITS` and `NUM_SUBFIELDS`, and
-  merging `patterns` and `brightnesses` arrays directly into `ScanningDisplay`.
+  templatizing the `ScanningModule` on `NUM_DIGITS` and `NUM_SUBFIELDS`, and
+  merging `patterns` and `brightnesses` arrays directly into `ScanningModule`.
   Flash usage actually goes up by ~40 bytes on Teensy3.2, but it has enough
   flash memory.
 * Reduce flash by 300-350 bytes on AVR (~150 on SAMD, 150-500 bytes on STM32,
   ~250 bytes on ESP8266, 300-600 bytes on ESP32) by templatizing LedMatrix
-  and ScanningDisplay on `NUM_DIGITS`, `NUM_SUBFIELDS`, `Hardware` class,
-  `SwSpiAdapter` and `HwSpiAdapter`.
+  and ScanningModule on `NUM_DIGITS`, `NUM_SUBFIELDS`, `SoftSpiInterface` and
+  `HardSpiInterface`.
 * Reduce flash by flattening the `LedMatrix` hierarchy into templatized
   classes, and removing virtual methods. Saves 250-300 bytes on AVR, 150-200 on
   SAMD, 150-300 on STM32, 200-300 on ESP8266, 300-1300 bytes on ESP32, 800-1300
   bytes on Teensy 3.2.
 * Reduce flash by 250-400 bytes on AVR by providing ability to use
   `digitalWriteFast()` (https://github.com/NicksonYap/digitalWriteFast) using
-  the `fast/LedMatrixDirectFast.h` and `fast/SwSpiAdapterFast.h` classes.
+  the `scanning/LedMatrixDirectFast4.h` and `hw/SoftSpiFastInterface.h` classes.
 * Total flash size saved is around 2kB for AVR, from (4 to 4.4) kB to (2 to 2.5)
   kB.
 * Reduce flash size by 828 bytes on AVR, 3kB on ESP8266, 5kB on ESP32 in commit
@@ -108,22 +99,60 @@ before substantional refactoring in 2021.
   HardwareSerial class. (I will make a fix to AUnit so that the `HardwareSerial`
   will not be pulled in by other libraries in the future.)
 * Reduce flash size by ~130 bytes on AVR and 70-80 bytes on 32-bit processors
-  by removing the pointer to `TimingStats` from `ScanningDisplay`. The pointer
+  by removing the pointer to `TimingStats` from `ScanningModule`. The pointer
   causes the code for the `TimingStats` class to be pulled in, even if it is not
   used.
+
+**v0.5**
+
+* Slight increase in memory usage (20-30 bytes) on some processors (AVR,
+  ESP8266, ESP8266), but slight decrease on others (STM32, Teensy), I think the
+  changes are due to some removal/addition of some methods in `LedDisplay`.
+* Add memory usage for `Tm1637Module`. Seems to consume something in between
+  similar to the `ScanningModule` w/ SW SPI and `ScanningModule` with HW SPI.
+* Add memory usage for `Tm1637Module` using `SoftWireFastInterface` which uses
+  `digitalWriteFast` library for AVR processors. Saves 662 - 776 bytes of flash
+  on AVR processors compared to `Tm1637Module` using normal `SoftWireInterface`.
+* Save 150-200 bytes of flash on AVR processors by lifting all of the
+  `LedDisplay::writePatternAt()` type of methods to `LedDisplay`, making them
+  non-virtual, then funneling these methods through just 2 lower-level virtual
+  methods: `setPatternAt()` and `getPatternAt()`. It also made the
+  implementation of `Tm1637Module` position remapping easier.
+* Extracting `LedModule` from `LedDisplay` saves 10-40 bytes on AVR for
+  `ScanningModule` and `Tm1637Module`, but add about that many bytes for various
+  Writer classes (probably because they have to go though one additional layer
+  of indirection through the `LedModule`). So overall, I think it's a wash.
+* Add `HardSpiFastInterface` which saves 70 bytes for `ScanningModule(Single)`,
+  90 bytes for `ScanningModule(Dual)`, and 250 bytes for `Max7219Module`.
+* Hide implementation details involving `LedMatrixXxx` and `ScanningModule` by
+  using the convenience classes (`DirectModule`, `DirectFast4Module`,
+  `HybridModule`, `Hc595Module`).
+* Enabling user-defined character sets in `CharWriter` causes the flash memory
+  consumption to increase by 30 bytes on AVR processors, and 36 bytes on 32-bit
+  processors. Similar increase in `StringWriter` which now explicitly depends on
+  CharWriter. But I think the additional configurability is worth it since
+  different people have different aesthetic standards and want different fonts.
+* Adding `byteOrder` and `remapArray` parameters to `Hc595Module` increases the
+  memory consumption by 60 bytes on AVR and about 20-40 bytes on 32-bit
+  processors.
 
 ## Results
 
 The following shows the flash and static memory sizes of the `MemoryBenchmark`
-program that includes the resources needed to perform a
-`ScanningDisplay::renderFieldWhenReady()`. This includes:
+program for various `LedModule` configurations and various Writer classes.
 
-* `Hardware` (which is opimized away by the compiler)
-* `SwSpiAdapter` or `HwSpiAdapter`
-* `LedMatrixXxx`
-* `ScanningDisplay`
+* `ClockInterface`, `GpioInterface` (usually optimized away by the compiler)
+* `SoftSpiInterface`, `SoftSpiFastInterface`, `HardSpiInterface`,
+  `HardSpiFastInterface`
+* `DirectModule`
+* `DirectFast4Module`
+* `HybridModule`
+* `Hc595Module`
+* `Tm1637Module`
+* `Max7219Module`
 * `NumberWriter`
 * `ClockWriter`
+* `TemperatureWriter`
 * `CharWriter`
 * `StringWriter`
 
@@ -146,21 +175,33 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        |    456/   11 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| direct                          |   1674/   78 |  1218/   67 |
-| single_sw_spi                   |   1680/   72 |  1224/   61 |
-| single_hw_spi                   |   1742/   73 |  1286/   62 |
-| dual_sw_spi                     |   1564/   63 |  1108/   52 |
-| dual_hw_spi                     |   1638/   64 |  1182/   53 |
+| DirectModule                    |   1486/   64 |  1030/   53 |
+| DirectFast4Module               |   1250/   94 |   794/   83 |
 |---------------------------------+--------------+-------------|
-| direct_fast                     |   1410/  106 |   954/   95 |
-| single_sw_fast                  |   1572/   70 |  1116/   59 |
-| dual_sw_fast                    |   1172/   61 |   716/   50 |
+| Hybrid(SoftSpi)                 |   1508/   58 |  1052/   47 |
+| Hybrid(SoftSpiFast)             |   1400/   56 |   944/   45 |
+| Hybrid(HardSpi)                 |   1570/   59 |  1114/   48 |
+| Hybrid(HardSpiFast)             |   1498/   57 |  1042/   46 |
 |---------------------------------+--------------+-------------|
-| StubDisplay                     |    522/   11 |    66/    0 |
-| NumberWriter+Stub               |    678/   34 |   222/   23 |
-| ClockWriter+Stub                |    778/   35 |   322/   24 |
-| CharWriter+Stub                 |    778/   34 |   322/   23 |
-| StringWriter+Stub               |    926/   42 |   470/   31 |
+| Hc595(SoftSpi)                  |   1528/   58 |  1072/   47 |
+| Hc595(SoftSpiFast)              |   1120/   56 |   664/   45 |
+| Hc595(HardSpi)                  |   1598/   59 |  1142/   48 |
+| Hc595(HardSpiFast)              |   1510/   57 |  1054/   46 |
+|---------------------------------+--------------+-------------|
+| Tm1637(SoftWire)                |   1582/   39 |  1126/   28 |
+| Tm1637(SoftWireFast)            |    924/   36 |   468/   25 |
+|---------------------------------+--------------+-------------|
+| Max7219(SoftSpi)                |   1214/   44 |   758/   33 |
+| Max7219(SoftSpiFast)            |    774/   42 |   318/   31 |
+| Max7219(HardSpi)                |   1298/   45 |   842/   34 |
+| Max7219(HardSpiFast)            |   1072/   43 |   616/   32 |
+|---------------------------------+--------------+-------------|
+| StubModule+LedDisplay           |    578/   24 |   122/   13 |
+| NumberWriter+Stub               |    682/   28 |   226/   17 |
+| ClockWriter+Stub                |    766/   29 |   310/   18 |
+| TemperatureWriter+Stub          |    764/   28 |   308/   17 |
+| CharWriter+Stub                 |    788/   31 |   332/   20 |
+| StringWriter+Stub               |    988/   39 |   532/   28 |
 +--------------------------------------------------------------+
 
 ```
@@ -177,21 +218,33 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        |   3472/  151 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| direct                          |   4668/  218 |  1196/   67 |
-| single_sw_spi                   |   4676/  212 |  1204/   61 |
-| single_hw_spi                   |   4738/  213 |  1266/   62 |
-| dual_sw_spi                     |   4560/  203 |  1088/   52 |
-| dual_hw_spi                     |   4634/  204 |  1162/   53 |
+| DirectModule                    |   4482/  204 |  1010/   53 |
+| DirectFast4Module               |   4132/  234 |   660/   83 |
 |---------------------------------+--------------+-------------|
-| direct_fast                     |   4290/  246 |   818/   95 |
-| single_sw_fast                  |   4568/  210 |  1096/   59 |
-| dual_sw_fast                    |   4052/  201 |   580/   50 |
+| Hybrid(SoftSpi)                 |   4504/  198 |  1032/   47 |
+| Hybrid(SoftSpiFast)             |   4396/  196 |   924/   45 |
+| Hybrid(HardSpi)                 |   4566/  199 |  1094/   48 |
+| Hybrid(HardSpiFast)             |   4494/  197 |  1022/   46 |
 |---------------------------------+--------------+-------------|
-| StubDisplay                     |   3536/  151 |    64/    0 |
-| NumberWriter+Stub               |   3634/  174 |   162/   23 |
-| ClockWriter+Stub                |   3734/  175 |   262/   24 |
-| CharWriter+Stub                 |   3734/  174 |   262/   23 |
-| StringWriter+Stub               |   3882/  182 |   410/   31 |
+| Hc595(SoftSpi)                  |   4540/  198 |  1068/   47 |
+| Hc595(SoftSpiFast)              |   4018/  196 |   546/   45 |
+| Hc595(HardSpi)                  |   4610/  199 |  1138/   48 |
+| Hc595(HardSpiFast)              |   4510/  197 |  1038/   46 |
+|---------------------------------+--------------+-------------|
+| Tm1637(SoftWire)                |   4652/  179 |  1180/   28 |
+| Tm1637(SoftWireFast)            |   3880/  176 |   408/   25 |
+|---------------------------------+--------------+-------------|
+| Max7219(SoftSpi)                |   4284/  184 |   812/   33 |
+| Max7219(SoftSpiFast)            |   3730/  182 |   258/   31 |
+| Max7219(HardSpi)                |   4368/  185 |   896/   34 |
+| Max7219(HardSpiFast)            |   4130/  183 |   658/   32 |
+|---------------------------------+--------------+-------------|
+| StubModule+LedDisplay           |   3534/  164 |    62/   13 |
+| NumberWriter+Stub               |   3638/  168 |   166/   17 |
+| ClockWriter+Stub                |   3722/  169 |   250/   18 |
+| TemperatureWriter+Stub          |   3720/  168 |   248/   17 |
+| CharWriter+Stub                 |   3744/  171 |   272/   20 |
+| StringWriter+Stub               |   3944/  179 |   472/   28 |
 +--------------------------------------------------------------+
 
 ```
@@ -208,21 +261,33 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        |  10064/    0 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| direct                          |  10912/    0 |   848/    0 |
-| single_sw_spi                   |  10968/    0 |   904/    0 |
-| single_hw_spi                   |  11416/    0 |  1352/    0 |
-| dual_sw_spi                     |  10856/    0 |   792/    0 |
-| dual_hw_spi                     |  11376/    0 |  1312/    0 |
+| DirectModule                    |  10816/    0 |   752/    0 |
+| DirectFast4Module               |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| direct_fast                     |     -1/   -1 |    -1/   -1 |
-| single_sw_fast                  |     -1/   -1 |    -1/   -1 |
-| dual_sw_fast                    |     -1/   -1 |    -1/   -1 |
+| Hybrid(SoftSpi)                 |  10856/    0 |   792/    0 |
+| Hybrid(SoftSpiFast)             |     -1/   -1 |    -1/   -1 |
+| Hybrid(HardSpi)                 |  11304/    0 |  1240/    0 |
+| Hybrid(HardSpiFast)             |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| StubDisplay                     |  10360/    0 |   296/    0 |
-| NumberWriter+Stub               |  10688/    0 |   624/    0 |
-| ClockWriter+Stub                |  10464/    0 |   400/    0 |
-| CharWriter+Stub                 |  10536/    0 |   472/    0 |
-| StringWriter+Stub               |  10688/    0 |   624/    0 |
+| Hc595(SoftSpi)                  |  10800/    0 |   736/    0 |
+| Hc595(SoftSpiFast)              |     -1/   -1 |    -1/   -1 |
+| Hc595(HardSpi)                  |  11320/    0 |  1256/    0 |
+| Hc595(HardSpiFast)              |     -1/   -1 |    -1/   -1 |
+|---------------------------------+--------------+-------------|
+| Tm1637(SoftWire)                |  10808/    0 |   744/    0 |
+| Tm1637(SoftWireFast)            |     -1/   -1 |    -1/   -1 |
+|---------------------------------+--------------+-------------|
+| Max7219(SoftSpi)                |  10616/    0 |   552/    0 |
+| Max7219(SoftSpiFast)            |     -1/   -1 |    -1/   -1 |
+| Max7219(HardSpi)                |  11136/    0 |  1072/    0 |
+| Max7219(HardSpiFast)            |     -1/   -1 |    -1/   -1 |
+|---------------------------------+--------------+-------------|
+| StubModule+LedDisplay           |  10336/    0 |   272/    0 |
+| NumberWriter+Stub               |  10672/    0 |   608/    0 |
+| ClockWriter+Stub                |  10480/    0 |   416/    0 |
+| TemperatureWriter+Stub          |  10736/    0 |   672/    0 |
+| CharWriter+Stub                 |  10544/    0 |   480/    0 |
+| StringWriter+Stub               |  10728/    0 |   664/    0 |
 +--------------------------------------------------------------+
 
 ```
@@ -239,21 +304,33 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        |  19136/ 3788 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| direct                          |  21644/ 4016 |  2508/  228 |
-| single_sw_spi                   |  21708/ 4020 |  2572/  232 |
-| single_hw_spi                   |  23448/ 4020 |  4312/  232 |
-| dual_sw_spi                     |  21604/ 4012 |  2468/  224 |
-| dual_hw_spi                     |  23388/ 4012 |  4252/  224 |
+| DirectModule                    |  21532/ 4392 |  2396/  604 |
+| DirectFast4Module               |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| direct_fast                     |     -1/   -1 |    -1/   -1 |
-| single_sw_fast                  |     -1/   -1 |    -1/   -1 |
-| dual_sw_fast                    |     -1/   -1 |    -1/   -1 |
+| Hybrid(SoftSpi)                 |  21588/ 4396 |  2452/  608 |
+| Hybrid(SoftSpiFast)             |     -1/   -1 |    -1/   -1 |
+| Hybrid(HardSpi)                 |  23336/ 4396 |  4200/  608 |
+| Hybrid(HardSpiFast)             |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| StubDisplay                     |  19352/ 3948 |   216/  160 |
-| NumberWriter+Stub               |  19628/ 3952 |   492/  164 |
-| ClockWriter+Stub                |  19480/ 3956 |   344/  168 |
-| CharWriter+Stub                 |  19524/ 3952 |   388/  164 |
-| StringWriter+Stub               |  19668/ 3956 |   532/  168 |
+| Hc595(SoftSpi)                  |  21524/ 4400 |  2388/  612 |
+| Hc595(SoftSpiFast)              |     -1/   -1 |    -1/   -1 |
+| Hc595(HardSpi)                  |  23304/ 4400 |  4168/  612 |
+| Hc595(HardSpiFast)              |     -1/   -1 |    -1/   -1 |
+|---------------------------------+--------------+-------------|
+| Tm1637(SoftWire)                |  21628/ 4372 |  2492/  584 |
+| Tm1637(SoftWireFast)            |     -1/   -1 |    -1/   -1 |
+|---------------------------------+--------------+-------------|
+| Max7219(SoftSpi)                |  21404/ 4372 |  2268/  584 |
+| Max7219(SoftSpiFast)            |     -1/   -1 |    -1/   -1 |
+| Max7219(HardSpi)                |  23192/ 4372 |  4056/  584 |
+| Max7219(HardSpiFast)            |     -1/   -1 |    -1/   -1 |
+|---------------------------------+--------------+-------------|
+| StubModule+LedDisplay           |  19328/ 4340 |   192/  552 |
+| NumberWriter+Stub               |  19616/ 4344 |   480/  556 |
+| ClockWriter+Stub                |  19496/ 4348 |   360/  560 |
+| TemperatureWriter+Stub          |  19712/ 4344 |   576/  556 |
+| CharWriter+Stub                 |  19536/ 4352 |   400/  564 |
+| StringWriter+Stub               |  19708/ 4356 |   572/  568 |
 +--------------------------------------------------------------+
 
 ```
@@ -270,21 +347,33 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        | 256700/26784 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| direct                          | 257924/26860 |  1224/   76 |
-| single_sw_spi                   | 258012/26868 |  1312/   84 |
-| single_hw_spi                   | 259116/26876 |  2416/   92 |
-| dual_sw_spi                     | 257864/26848 |  1164/   64 |
-| dual_hw_spi                     | 259064/26856 |  2364/   72 |
+| DirectModule                    | 257772/27260 |  1072/  476 |
+| DirectFast4Module               |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| direct_fast                     |     -1/   -1 |    -1/   -1 |
-| single_sw_fast                  |     -1/   -1 |    -1/   -1 |
-| dual_sw_fast                    |     -1/   -1 |    -1/   -1 |
+| Hybrid(SoftSpi)                 | 257860/27244 |  1160/  460 |
+| Hybrid(SoftSpiFast)             |     -1/   -1 |    -1/   -1 |
+| Hybrid(HardSpi)                 | 258964/27252 |  2264/  468 |
+| Hybrid(HardSpiFast)             |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| StubDisplay                     | 256900/26792 |   200/    8 |
-| NumberWriter+Stub               | 257396/26792 |   696/    8 |
-| ClockWriter+Stub                | 257140/26800 |   440/   16 |
-| CharWriter+Stub                 | 257108/26792 |   408/    8 |
-| StringWriter+Stub               | 257308/26816 |   608/   32 |
+| Hc595(SoftSpi)                  | 257792/27256 |  1092/  472 |
+| Hc595(SoftSpiFast)              |     -1/   -1 |    -1/   -1 |
+| Hc595(HardSpi)                  | 258992/27264 |  2292/  480 |
+| Hc595(HardSpiFast)              |     -1/   -1 |    -1/   -1 |
+|---------------------------------+--------------+-------------|
+| Tm1637(SoftWire)                | 257920/27224 |  1220/  440 |
+| Tm1637(SoftWireFast)            |     -1/   -1 |    -1/   -1 |
+|---------------------------------+--------------+-------------|
+| Max7219(SoftSpi)                | 257656/27224 |   956/  440 |
+| Max7219(SoftSpiFast)            |     -1/   -1 |    -1/   -1 |
+| Max7219(HardSpi)                | 258856/27232 |  2156/  448 |
+| Max7219(HardSpiFast)            |     -1/   -1 |    -1/   -1 |
+|---------------------------------+--------------+-------------|
+| StubModule+LedDisplay           | 256876/27200 |   176/  416 |
+| NumberWriter+Stub               | 257372/27200 |   672/  416 |
+| ClockWriter+Stub                | 257196/27208 |   496/  424 |
+| TemperatureWriter+Stub          | 257484/27200 |   784/  416 |
+| CharWriter+Stub                 | 257116/27208 |   416/  424 |
+| StringWriter+Stub               | 257364/27216 |   664/  432 |
 +--------------------------------------------------------------+
 
 ```
@@ -293,29 +382,41 @@ other `MemoryBenchmark` programs.)
 
 * ESP32-01 Dev Board, 240 MHz Tensilica LX6
 * Arduino IDE 1.8.13
-* ESP32 Boards 1.0.4
+* ESP32 Boards 1.0.6
 
 ```
 +--------------------------------------------------------------+
 | functionality                   |  flash/  ram |       delta |
 |---------------------------------+--------------+-------------|
-| baseline                        | 197730/13100 |     0/    0 |
+| baseline                        | 197748/13084 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| direct                          | 200604/13396 |  2874/  296 |
-| single_sw_spi                   | 200664/13396 |  2934/  296 |
-| single_hw_spi                   | 202956/13444 |  5226/  344 |
-| dual_sw_spi                     | 200532/13388 |  2802/  288 |
-| dual_hw_spi                     | 202896/13436 |  5166/  336 |
+| DirectModule                    | 200474/13760 |  2726/  676 |
+| DirectFast4Module               |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| direct_fast                     |     -1/   -1 |    -1/   -1 |
-| single_sw_fast                  |     -1/   -1 |    -1/   -1 |
-| dual_sw_fast                    |     -1/   -1 |    -1/   -1 |
+| Hybrid(SoftSpi)                 | 200514/13768 |  2766/  684 |
+| Hybrid(SoftSpiFast)             |     -1/   -1 |    -1/   -1 |
+| Hybrid(HardSpi)                 | 202806/13816 |  5058/  732 |
+| Hybrid(HardSpiFast)             |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| StubDisplay                     | 199210/13168 |  1480/   68 |
-| NumberWriter+Stub               | 199586/13176 |  1856/   76 |
-| ClockWriter+Stub                | 199450/13176 |  1720/   76 |
-| CharWriter+Stub                 | 199434/13176 |  1704/   76 |
-| StringWriter+Stub               | 199582/13176 |  1852/   76 |
+| Hc595(SoftSpi)                  | 200438/13768 |  2690/  684 |
+| Hc595(SoftSpiFast)              |     -1/   -1 |    -1/   -1 |
+| Hc595(HardSpi)                  | 202810/13816 |  5062/  732 |
+| Hc595(HardSpiFast)              |     -1/   -1 |    -1/   -1 |
+|---------------------------------+--------------+-------------|
+| Tm1637(SoftWire)                | 200702/13744 |  2954/  660 |
+| Tm1637(SoftWireFast)            |     -1/   -1 |    -1/   -1 |
+|---------------------------------+--------------+-------------|
+| Max7219(SoftSpi)                | 200308/13728 |  2560/  644 |
+| Max7219(SoftSpiFast)            |     -1/   -1 |    -1/   -1 |
+| Max7219(HardSpi)                | 202700/13776 |  4952/  692 |
+| Max7219(HardSpiFast)            |     -1/   -1 |    -1/   -1 |
+|---------------------------------+--------------+-------------|
+| StubModule+LedDisplay           | 199228/13560 |  1480/  476 |
+| NumberWriter+Stub               | 199616/13560 |  1868/  476 |
+| ClockWriter+Stub                | 199560/13568 |  1812/  484 |
+| TemperatureWriter+Stub          | 199736/13560 |  1988/  476 |
+| CharWriter+Stub                 | 199500/13568 |  1752/  484 |
+| StringWriter+Stub               | 199696/13576 |  1948/  492 |
 +--------------------------------------------------------------+
 
 ```
@@ -333,21 +434,33 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        |   7624/ 3048 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| direct                          |  12112/ 4204 |  4488/ 1156 |
-| single_sw_spi                   |  12164/ 4208 |  4540/ 1160 |
-| single_hw_spi                   |  13404/ 4264 |  5780/ 1216 |
-| dual_sw_spi                     |  12088/ 4200 |  4464/ 1152 |
-| dual_hw_spi                     |  13292/ 4256 |  5668/ 1208 |
+| DirectModule                    |  11896/ 4584 |  4272/ 1536 |
+| DirectFast4Module               |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| direct_fast                     |     -1/   -1 |    -1/   -1 |
-| single_sw_fast                  |     -1/   -1 |    -1/   -1 |
-| dual_sw_fast                    |     -1/   -1 |    -1/   -1 |
+| Hybrid(SoftSpi)                 |  11940/ 4588 |  4316/ 1540 |
+| Hybrid(SoftSpiFast)             |     -1/   -1 |    -1/   -1 |
+| Hybrid(HardSpi)                 |  13012/ 4644 |  5388/ 1596 |
+| Hybrid(HardSpiFast)             |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| StubDisplay                     |  10940/ 4156 |  3316/ 1108 |
-| NumberWriter+Stub               |  11344/ 4160 |  3720/ 1112 |
-| ClockWriter+Stub                |  11068/ 4164 |  3444/ 1116 |
-| CharWriter+Stub                 |  11112/ 4160 |  3488/ 1112 |
-| StringWriter+Stub               |  11280/ 4164 |  3656/ 1116 |
+| Hc595(SoftSpi)                  |  11892/ 4592 |  4268/ 1544 |
+| Hc595(SoftSpiFast)              |     -1/   -1 |    -1/   -1 |
+| Hc595(HardSpi)                  |  12956/ 4648 |  5332/ 1600 |
+| Hc595(HardSpiFast)              |     -1/   -1 |    -1/   -1 |
+|---------------------------------+--------------+-------------|
+| Tm1637(SoftWire)                |  12556/ 4564 |  4932/ 1516 |
+| Tm1637(SoftWireFast)            |     -1/   -1 |    -1/   -1 |
+|---------------------------------+--------------+-------------|
+| Max7219(SoftSpi)                |  11832/ 4564 |  4208/ 1516 |
+| Max7219(SoftSpiFast)            |     -1/   -1 |    -1/   -1 |
+| Max7219(HardSpi)                |  13276/ 4620 |  5652/ 1572 |
+| Max7219(HardSpiFast)            |     -1/   -1 |    -1/   -1 |
+|---------------------------------+--------------+-------------|
+| StubModule+LedDisplay           |  10924/ 4552 |  3300/ 1504 |
+| NumberWriter+Stub               |  11400/ 4556 |  3776/ 1508 |
+| ClockWriter+Stub                |  11112/ 4560 |  3488/ 1512 |
+| TemperatureWriter+Stub          |  11556/ 4556 |  3932/ 1508 |
+| CharWriter+Stub                 |  11124/ 4564 |  3500/ 1516 |
+| StringWriter+Stub               |  11328/ 4568 |  3704/ 1520 |
 +--------------------------------------------------------------+
 
 ```

@@ -16,7 +16,7 @@
 set -eu
 
 PROGRAM_NAME='MemoryBenchmark.ino'
-NUM_FEATURES=13  # excluding FEATURE_BASELINE
+NUM_FEATURES=22  # excluding FEATURE_BASELINE
 
 # Assume that https://github.com/bxparks/AUniter is installed as a
 # sibling project to AceSegment.
@@ -74,7 +74,6 @@ function collect_for_board() {
             exit 1
         fi
     done
-
 }
 
 function extract_memory() {
