@@ -65,6 +65,9 @@ consumption.
     * [DigitalWriteFast on AVR](#DigitalWriteFast)
     * [ScanningModule](#ScanningModule)
 * [Resource Consumption](#ResourceConsumption)
+    * [SizeOf Classes](#SizeOfClasses)
+    * [Flash And Static Memory](#FlashAndStaticMemory)
+    * [CPU Cycles](#CpuCycles)
 * [System Requirements](#SystemRequirements)
     * [Hardware](#Hardware)
     * [Tool Chain](#ToolChain)
@@ -1186,7 +1189,8 @@ are subclasses of the `ScanningModule` parent class. If you want to know how the
 <a name="ResourceConsumption"></a>
 ## Resource Consumption
 
-### Static Memory
+<a name="SizeOfClasses"></a>
+### SizeOf Classes
 
 Here are the sizes of the various classes on the 8-bit AVR microcontrollers
 (Arduino Uno, Nano, etc):
@@ -1201,22 +1205,23 @@ sizeof(HardSpiFastInterface<11, 12, 13>): 1
 sizeof(LedMatrixDirect<>): 9
 sizeof(LedMatrixDirectFast4<6..13, 2..5>): 3
 sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 8
-sizeof(LedMatrixDualHc595<HardSpiInterface>): 5
+sizeof(LedMatrixDualHc595<HardSpiInterface>): 8
 sizeof(LedModule): 3
 sizeof(ScanningModule<LedMatrixBase, 4>): 22
 sizeof(DirectModule<4>): 31
 sizeof(DirectFast4Module<...>): 25
 sizeof(HybridModule<SoftSpiInterface, 4>): 30
-sizeof(Hc595Module<SoftSpiInterface, 4>): 27
+sizeof(Hc595Module<SoftSpiInterface, 8>): 46
 sizeof(Tm1637Module<SoftWireInterface, 4>): 14
+sizeof(Tm1637Module<SoftWireInterface, 6>): 16
 sizeof(Max7219Module<SoftSpiInterface, 8>): 16
 sizeof(LedDisplay): 2
 sizeof(NumberWriter): 2
 sizeof(ClockWriter): 3
 sizeof(TemperatureWriter): 2
-sizeof(CharWriter): 2
+sizeof(CharWriter): 5
 sizeof(StringWriter): 2
-sizeof(StringScroller): 7
+sizeof(StringScroller): 11
 ```
 
 On 32-bit processors, these numbers look like this:
@@ -1227,24 +1232,26 @@ sizeof(SoftSpiInterface): 3
 sizeof(HardSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
 sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 16
-sizeof(LedMatrixDualHc595<HardSpiInterface>): 12
+sizeof(LedMatrixDualHc595<HardSpiInterface>): 16
 sizeof(LedModule): 8
 sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(DirectModule<4>): 48
 sizeof(HybridModule<SoftSpiInterface, 4>): 48
-sizeof(Hc595Module<SoftSpiInterface, 4>): 44
+sizeof(Hc595Module<SoftSpiInterface, 8>): 64
 sizeof(Tm1637Module<SoftWireInterface, 4>): 24
+sizeof(Tm1637Module<SoftWireInterface, 6>): 28
 sizeof(Max7219Module<SoftSpiInterface, 8>): 28
 sizeof(LedDisplay): 4
 sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
 sizeof(TemperatureWriter): 4
-sizeof(CharWriter): 4
+sizeof(CharWriter): 12
 sizeof(StringWriter): 4
-sizeof(StringScroller): 12
+sizeof(StringScroller): 20
 ```
 
-### Flash Memory
+<a name="FlashAndStaticMemory"></a>
+### Flash And Static Memory
 
 For the most part, the user pays only for the feature that is being used. For
 example, if the `CharWriter` (which consumes 312 bytes of flash) is not used, it
@@ -1269,16 +1276,16 @@ static memory consumptions for various configurations on an Arduino Nano
 | Hybrid(HardSpi)                 |   1570/   59 |  1114/   48 |
 | Hybrid(HardSpiFast)             |   1498/   57 |  1042/   46 |
 |---------------------------------+--------------+-------------|
-| Hc595(SoftSpi)                  |   1422/   51 |   966/   40 |
-| Hc595(SoftSpiFast)              |   1012/   49 |   556/   38 |
-| Hc595(HardSpi)                  |   1496/   52 |  1040/   41 |
-| Hc595(HardSpiFast)              |   1404/   50 |   948/   39 |
+| Hc595(SoftSpi)                  |   1528/   58 |  1072/   47 |
+| Hc595(SoftSpiFast)              |   1120/   56 |   664/   45 |
+| Hc595(HardSpi)                  |   1598/   59 |  1142/   48 |
+| Hc595(HardSpiFast)              |   1510/   57 |  1054/   46 |
 |---------------------------------+--------------+-------------|
 | Tm1637(SoftWire)                |   1582/   39 |  1126/   28 |
 | Tm1637(SoftWireFast)            |    924/   36 |   468/   25 |
 |---------------------------------+--------------+-------------|
-| Max7219(SoftSpi)                |   1218/   44 |   762/   33 |
-| Max7219(SoftSpiFast)            |    778/   42 |   322/   31 |
+| Max7219(SoftSpi)                |   1214/   44 |   758/   33 |
+| Max7219(SoftSpiFast)            |    774/   42 |   318/   31 |
 | Max7219(HardSpi)                |   1298/   45 |   842/   34 |
 | Max7219(HardSpiFast)            |   1072/   43 |   616/   32 |
 |---------------------------------+--------------+-------------|
@@ -1286,8 +1293,8 @@ static memory consumptions for various configurations on an Arduino Nano
 | NumberWriter+Stub               |    682/   28 |   226/   17 |
 | ClockWriter+Stub                |    766/   29 |   310/   18 |
 | TemperatureWriter+Stub          |    764/   28 |   308/   17 |
-| CharWriter+Stub                 |    758/   28 |   302/   17 |
-| StringWriter+Stub               |    974/   34 |   518/   23 |
+| CharWriter+Stub                 |    788/   31 |   332/   20 |
+| StringWriter+Stub               |    988/   39 |   532/   28 |
 +--------------------------------------------------------------+
 ```
 
@@ -1307,15 +1314,15 @@ And here are the memory consumption numbers for an ESP8266:
 | Hybrid(HardSpi)                 | 258964/27252 |  2264/  468 |
 | Hybrid(HardSpiFast)             |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Hc595(SoftSpi)                  | 257728/27248 |  1028/  464 |
+| Hc595(SoftSpi)                  | 257792/27256 |  1092/  472 |
 | Hc595(SoftSpiFast)              |     -1/   -1 |    -1/   -1 |
-| Hc595(HardSpi)                  | 258928/27256 |  2228/  472 |
+| Hc595(HardSpi)                  | 258992/27264 |  2292/  480 |
 | Hc595(HardSpiFast)              |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | Tm1637(SoftWire)                | 257920/27224 |  1220/  440 |
 | Tm1637(SoftWireFast)            |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Max7219(SoftSpi)                | 257640/27224 |   940/  440 |
+| Max7219(SoftSpi)                | 257656/27224 |   956/  440 |
 | Max7219(SoftSpiFast)            |     -1/   -1 |    -1/   -1 |
 | Max7219(HardSpi)                | 258856/27232 |  2156/  448 |
 | Max7219(HardSpiFast)            |     -1/   -1 |    -1/   -1 |
@@ -1324,11 +1331,12 @@ And here are the memory consumption numbers for an ESP8266:
 | NumberWriter+Stub               | 257372/27200 |   672/  416 |
 | ClockWriter+Stub                | 257196/27208 |   496/  424 |
 | TemperatureWriter+Stub          | 257484/27200 |   784/  416 |
-| CharWriter+Stub                 | 257084/27200 |   384/  416 |
-| StringWriter+Stub               | 257316/27200 |   616/  416 |
+| CharWriter+Stub                 | 257116/27208 |   416/  424 |
+| StringWriter+Stub               | 257364/27216 |   664/  432 |
 +--------------------------------------------------------------+
 ```
 
+<a name="CpuCycles"></a>
 ### CPU Cycles
 
 The CPU benchmark numbers can be seen in
@@ -1340,42 +1348,47 @@ Here are the CPU numbers for an AVR processor:
 +----------------------------------------+-------------------+---------+
 | Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Direct                                 |    68/   74/   88 |     240 |
-| Direct(subfields)                      |     4/   12/   84 |    3840 |
-| DirectFast4                            |    24/   28/   36 |     240 |
-| DirectFast4(subfields)                 |     4/    8/   40 |    3840 |
+| Direct(4)                              |    76/   82/   88 |      40 |
+| Direct(4,subfields)                    |     4/   13/   88 |     640 |
+| DirectFast4(4)                         |    28/   31/   36 |      40 |
+| DirectFast4(4,subfields)               |     4/    8/   36 |     640 |
 |----------------------------------------+-------------------+---------|
-| Hybrid(SoftSpi)                        |   156/  159/  180 |     240 |
-| Hybrid(SoftSpi,subfields)              |     4/   22/  180 |    3840 |
-| Hybrid(SoftSpiFast)                    |    28/   30/   44 |     240 |
-| Hybrid(SoftSpiFast,subfields)          |     4/    8/   40 |    3840 |
-| Hybrid(HardSpi)                        |    36/   39/   52 |     240 |
-| Hybrid(HardSpi,subfields)              |     4/    9/   52 |    3840 |
-| Hybrid(HardSpiFast)                    |    24/   27/   44 |     240 |
-| Hybrid(HardSpiFast,subfields)          |     4/    7/   36 |    3840 |
+| Hybrid(4,SoftSpi)                      |   152/  161/  176 |      40 |
+| Hybrid(4,SoftSpi,subfields)            |     4/   22/  176 |     640 |
+| Hybrid(4,SoftSpiFast)                  |    28/   34/   40 |      40 |
+| Hybrid(4,SoftSpiFast,subfields)        |     4/    8/   40 |     640 |
+| Hybrid(4,HardSpi)                      |    36/   41/   52 |      40 |
+| Hybrid(4,HardSpi,subfields)            |     4/    9/   48 |     640 |
+| Hybrid(4,HardSpiFast)                  |    24/   29/   36 |      40 |
+| Hybrid(4,HardSpiFast,subfields)        |     4/    8/   36 |     640 |
 |----------------------------------------+-------------------+---------|
-| Hc595(SoftSpi)                         |   264/  269/  304 |     240 |
-| Hc595(SoftSpi,subfields)               |     4/   35/  304 |    3840 |
-| Hc595(SoftSpiFast)                     |    20/   24/   36 |     240 |
-| Hc595(SoftSpiFast,subfields)           |     4/    7/   32 |    3840 |
-| Hc595(HardSpi)                         |    24/   27/   40 |     240 |
-| Hc595(HardSpi,subfields)               |     4/    8/   36 |    3840 |
-| Hc595(HardSpiFast)                     |    12/   14/   28 |     240 |
-| Hc595(HardSpiFast,subfields)           |     4/    6/   24 |    3840 |
+| Hc595(8,SoftSpi)                       |   268/  273/  308 |      80 |
+| Hc595(8,SoftSpi,subfields)             |     4/   36/  304 |    1280 |
+| Hc595(8,SoftSpiFast)                   |    24/   27/   36 |      80 |
+| Hc595(8,SoftSpiFast,subfields)         |     4/    8/   36 |    1280 |
+| Hc595(8,HardSpi)                       |    28/   30/   40 |      80 |
+| Hc595(8,HardSpi,subfields)             |     4/    8/   36 |    1280 |
+| Hc595(8,HardSpiFast)                   |    12/   18/   28 |      80 |
+| Hc595(8,HardSpiFast,subfields)         |     4/    7/   32 |    1280 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(SoftWire)                       | 22308/22328/22576 |      20 |
-| Tm1637(SoftWireFast)                   | 21060/21073/21212 |      20 |
+| Tm1637(4,SoftWire)                     | 22316/22348/22568 |      10 |
+| Tm1637(4,SoftWire,incremental)         |  3616/ 8810/10320 |      50 |
+| Tm1637(4,SoftWireFast)                 | 21064/21092/21316 |      10 |
+| Tm1637(4,SoftWireFast,incremental)     |  3412/ 8315/ 9776 |      50 |
+| Tm1637(6,SoftWire)                     | 28060/28092/28344 |      10 |
+| Tm1637(6,SoftWire,incremental)         |  3616/ 9178/10316 |      70 |
+| Tm1637(6,SoftWireFast)                 | 26484/26511/26732 |      10 |
+| Tm1637(6,SoftWireFast,incremental)     |  3412/ 8663/ 9768 |      70 |
 |----------------------------------------+-------------------+---------|
-| Max7219(SoftSpi)                       |  1320/ 1329/ 1448 |      20 |
-| Max7219(SoftSpiFast)                   |   112/  120/  136 |      20 |
-| Max7219(HardSpi)                       |   120/  129/  144 |      20 |
-| Max7219(HardSpiFast)                   |    56/   63/   72 |      20 |
+| Max7219(8,SoftSpi)                     |  2380/ 2395/ 2600 |      20 |
+| Max7219(8,SoftSpiFast)                 |   208/  218/  240 |      20 |
+| Max7219(8,HardSpi)                     |   220/  232/  248 |      20 |
+| Max7219(8,HardSpiFast)                 |   108/  117/  124 |      20 |
 +----------------------------------------+-------------------+---------+
 ```
 
 What is amazing is that if you use `digitalWriteFast()`, the software SPI is
-just as fast as hardware SPI, **and** consumes 500 bytes of less flash memory
-space.
+just as fast as hardware SPI, **and** consumes 500 bytes of less flash memory.
 
 Here are the CPU numbers for an ESP8266:
 
@@ -1383,36 +1396,32 @@ Here are the CPU numbers for an ESP8266:
 +----------------------------------------+-------------------+---------+
 | Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Direct                                 |    12/   12/   25 |     240 |
-| Direct(subfields)                      |     0/    2/   25 |    3840 |
+| Direct(4)                              |    12/   13/   40 |      40 |
+| Direct(4,subfields)                    |     0/    2/   20 |     640 |
 |----------------------------------------+-------------------+---------|
-| Hybrid(SoftSpi)                        |    29/   29/   37 |     240 |
-| Hybrid(SoftSpi,subfields)              |     0/    4/   42 |    3840 |
-| Hybrid(HardSpi)                        |    11/   11/   19 |     240 |
-| Hybrid(HardSpi,subfields)              |     0/    2/   23 |    3840 |
+| Hybrid(4,SoftSpi)                      |    29/   29/   41 |      40 |
+| Hybrid(4,SoftSpi,subfields)            |     0/    3/   42 |     640 |
+| Hybrid(4,HardSpi)                      |    11/   11/   27 |      40 |
+| Hybrid(4,HardSpi,subfields)            |     0/    2/   23 |     640 |
 |----------------------------------------+-------------------+---------|
-| Hc595(SoftSpi)                         |    50/   50/   63 |     240 |
-| Hc595(SoftSpi,subfields)               |     0/    7/   67 |    3840 |
-| Hc595(HardSpi)                         |    12/   12/   19 |     240 |
-| Hc595(HardSpi,subfields)               |     0/    2/   32 |    3840 |
+| Hc595(8,SoftSpi)                       |    50/   50/   62 |      80 |
+| Hc595(8,SoftSpi,subfields)             |     0/    6/   62 |    1280 |
+| Hc595(8,HardSpi)                       |    12/   12/   25 |      80 |
+| Hc595(8,HardSpi,subfields)             |     0/    2/   25 |    1280 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(SoftWire)                       | 21496/21505/21552 |      20 |
+| Tm1637(4,SoftWire)                     | 21497/21506/21541 |      10 |
+| Tm1637(4,SoftWire,incremental)         |  3481/ 8479/ 9749 |      50 |
+| Tm1637(6,SoftWire)                     | 27025/27035/27049 |      10 |
+| Tm1637(6,SoftWire,incremental)         |  3481/ 8838/ 9762 |      70 |
 |----------------------------------------+-------------------+---------|
-| Max7219(SoftSpi)                       |   254/  256/  271 |      20 |
-| Max7219(HardSpi)                       |    61/   61/   70 |      20 |
+| Max7219(8,SoftSpi)                     |   460/  461/  474 |      20 |
+| Max7219(8,HardSpi)                     |   111/  111/  120 |      20 |
 +----------------------------------------+-------------------+---------+
 ```
 
-On the ESP8266, the hardware SPI is about 4X after, but it does consume 1200
+On the ESP8266, the hardware SPI is about 4X faster, but it does consume 1200
 bytes for flash space. But on the ESP8266 flash memory is usually not a concern,
 so it seems to make sense to use hardware SPI on the ESP8266.
-
-If we want to drive a 4 digit LED display at 60 frames per second, using a
-subfield modulation of 16 subfields per field, we get a field rate of 3.84 kHz,
-or 260 microseconds per field. We see from
-[examples/AutoBenchmark](examples/AutoBenchmark) that all hardware platforms are
-capable of providing a rendering time between fields of less than 260
-microseconds.
 
 <a name="SystemRequirements"></a>
 ## System Requirements
