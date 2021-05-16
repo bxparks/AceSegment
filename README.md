@@ -371,7 +371,9 @@ LED modules based on the Titan TM1637 controller chips are abundant on Amazon
 and eBay. The controller chip supports up to 6 digits. Consumer LED modules
 seem have either 4 digits or 6 digits.
 
-![TM1637 LED Module](docs/tm1637/TM1637_4_digits.png)
+![TM1637 LED Module](docs/tm1637/tm1637_4_digits.png)
+
+![TM1637 LED Module](docs/tm1637/tm1637_6_digits.png)
 
 The `Tm1637Module` class looks like this:
 
@@ -575,7 +577,7 @@ be daisychained to support more than 8 digits. The 8-digit module is readily
 available commercially from multiple suppliers on Amazon and eBay, and they look
 like this:
 
-![MAX7219 LED Module](docs/max7219/MAX7219_8_digits.png)
+![MAX7219 LED Module](docs/max7219/max7219_8_digits.png)
 
 The `Max7219Module` class looks like this:
 
@@ -684,7 +686,7 @@ Recently (since about Aug 2020?), off-the-shelf 8-digit LED modules using two
 74HC595 have become common on Amazon and eBay, in multiple colors. They look
 like this:
 
-![HC595 LED Module](docs/hc595/HC595_8_digits.png)
+![HC595 LED Module](docs/hc595/hc595_8_digits.png)
 
 The `Hc595Module` class looks roughly like this (simplified for ease of
 understanding):
