@@ -28,9 +28,10 @@ using namespace ace_button;
 #define LED_DISPLAY_TYPE_SCANNING 0
 #define LED_DISPLAY_TYPE_TM1637 1
 #define LED_DISPLAY_TYPE_MAX7219 2
-#define LED_DISPLAY_TYPE_DIRECT 3
-#define LED_DISPLAY_TYPE_HC595_SINGLE 4
-#define LED_DISPLAY_TYPE_HC595_DUAL 5
+#define LED_DISPLAY_TYPE_HC595 3
+#define LED_DISPLAY_TYPE_DIRECT 4
+#define LED_DISPLAY_TYPE_HYBRID 5
+#define LED_DISPLAY_TYPE_FULL 6
 
 // Used by LED_DISPLAY_TYPE_SCANNING
 #define LED_MATRIX_MODE_NONE 0
@@ -49,7 +50,8 @@ using namespace ace_button;
 #define DIRECT_INTERFACE_TYPE_NORMAL 0
 #define DIRECT_INTERFACE_TYPE_FAST_4 1
 
-// Used by LED_DISPLAY_TYPE_HC595_SINGLE and LED_DISPLAY_TYPE_HC595_DUAL
+// Used by LED_DISPLAY_TYPE_HC595, LED_DISPLAY_TYPE_HYBRID,
+// and LED_DISPLAY_TYPE_FULL
 #define INTERFACE_TYPE_SOFT_SPI 0
 #define INTERFACE_TYPE_SOFT_SPI_FAST 1
 #define INTERFACE_TYPE_HARD_SPI 2
@@ -87,9 +89,6 @@ using namespace ace_button;
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
-  const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
-  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
 
   // Choose one of the following variants:
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
@@ -142,9 +141,6 @@ using namespace ace_button;
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
-  const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
-  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
 
   // Choose one of the following variants:
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SOFT_SPI
@@ -172,7 +168,7 @@ using namespace ace_button;
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
 
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_SINGLE
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HYBRID
   const uint8_t NUM_DIGITS = 4;
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
   const uint8_t LATCH_PIN = 10;
@@ -190,15 +186,11 @@ using namespace ace_button;
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
 
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_FULL
   const uint8_t NUM_DIGITS = 4;
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
-  const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
-  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t* const REMAP_ARRAY = nullptr;
 
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
@@ -247,15 +239,11 @@ using namespace ace_button;
   const uint8_t MODE_BUTTON_PIN = A2;
   const uint8_t CHANGE_BUTTON_PIN = A3;
 
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595
   const uint8_t NUM_DIGITS = 8;
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
-  const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
-  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
-  const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
@@ -301,15 +289,11 @@ using namespace ace_button;
   const uint8_t MODE_BUTTON_PIN = PA0;
   const uint8_t CHANGE_BUTTON_PIN = PA1;
 
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595
   const uint8_t NUM_DIGITS = 8;
   const uint8_t LATCH_PIN = SS;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
-  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
-  const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
-  const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
@@ -355,15 +339,11 @@ using namespace ace_button;
   #define ANALOG_BUTTON_COUNT 4
   #define ANALOG_BUTTON_PIN A0
 
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595
   const uint8_t NUM_DIGITS = 8;
   const uint8_t LATCH_PIN = SS;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
-  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
-  const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
-  const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
@@ -529,6 +509,31 @@ const uint8_t NUM_SUBFIELDS = 1;
   Max7219Module<SpiInterface, NUM_DIGITS> ledModule(
       spiInterface, kDigitRemapArray8Max7219);
 
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595
+  // Common Anode, with transistors on Group pins
+  #if INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI
+    using SpiInterface = SoftSpiInterface;
+    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  #elif INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI_FAST
+    using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    SpiInterface spiInterface;
+  #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
+    using SpiInterface = HardSpiInterface;
+    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
+    using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    SpiInterface spiInterface;
+  #endif
+
+  Hc595Module<SpiInterface, NUM_DIGITS> ledModule(
+      spiInterface,
+      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
+      LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
+      FRAMES_PER_SECOND,
+      kByteOrderSegmentHighDigitLow,
+      kDigitRemapArray8Hc595
+  );
+
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_DIRECT
   // Common Anode, with transitors on Group pins
   #if DIRECT_INTERFACE_TYPE == DIRECT_INTERFACE_TYPE_NORMAL
@@ -549,7 +554,7 @@ const uint8_t NUM_SUBFIELDS = 1;
         FRAMES_PER_SECOND);
   #endif
 
-#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_SINGLE
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HYBRID
   // Common Cathode, with transistors on Group pins
   #if INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI
     using SpiInterface = SoftSpiInterface;
@@ -572,7 +577,7 @@ const uint8_t NUM_SUBFIELDS = 1;
       DIGIT_PINS
   );
 
-#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_DUAL
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_FULL
   // Common Anode, with transistors on Group pins
   #if INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI
     using SpiInterface = SoftSpiInterface;
@@ -587,13 +592,14 @@ const uint8_t NUM_SUBFIELDS = 1;
     using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
   #endif
+
   Hc595Module<SpiInterface, NUM_DIGITS> ledModule(
       spiInterface,
-      SEGMENT_ON_PATTERN,
-      DIGIT_ON_PATTERN,
+      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
+      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
       FRAMES_PER_SECOND,
-      HC595_BYTE_ORDER,
-      REMAP_ARRAY
+      kByteOrderDigitHighSegmentLow,
+      nullptr /*remapArray*/
   );
 
 #else
@@ -635,12 +641,7 @@ void setupAceSegment() {
   ledModule.begin();
   ledModule.setBrightness(2); // 0-15
 
-#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_DUAL
-  spiInterface.begin();
-  ledModule.begin();
-  ledModule.setBrightness(1); // 0-1
-
-#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_SINGLE
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595
   spiInterface.begin();
   ledModule.begin();
   ledModule.setBrightness(1); // 0-1
@@ -648,6 +649,19 @@ void setupAceSegment() {
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_DIRECT
   ledModule.begin();
   ledModule.setBrightness(1); // 0-1
+
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HYBRID
+  spiInterface.begin();
+  ledModule.begin();
+  ledModule.setBrightness(1); // 0-1
+
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_FULL
+  spiInterface.begin();
+  ledModule.begin();
+  ledModule.setBrightness(1); // 0-1
+
+#else
+  #error Unknown LED_DISPLAY_TYPE
 
 #endif
 
@@ -959,8 +973,9 @@ void demoLoop() {
 void renderField() {
   #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_SCANNING \
       || LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_DIRECT \
-      || LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_SINGLE \
-      || LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_DUAL
+      || LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HYBRID \
+      || LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_FULL \
+      || LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595
     ledModule.renderFieldWhenReady();
   #else
     #if TM_FLUSH_METHOD == TM_FLUSH_METHOD_FLUSH
