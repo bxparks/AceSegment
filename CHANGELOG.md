@@ -1,6 +1,8 @@
 # Changelog
 
 * Unreleased
+    * Fix bug in `Tm1637Module::flushIncremental()` introduced in 0c37b29a which
+      prevented mFlushStage from incrementing properly.
 * 0.5 (2021-05-14)
     * Extract hardware dependent API from `LedDisplay` into `LedModule`.
     * Create convenience subclasses of `LedModule`:

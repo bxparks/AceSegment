@@ -29,6 +29,9 @@ SOFTWARE.
 #include <AceCommon.h> // incrementMod()
 #include "../LedModule.h"
 
+class Tm1637ModuleTest_flushIncremental;
+class Tm1637ModuleTest_flush;
+
 namespace ace_segment {
 
 /**
@@ -244,11 +247,12 @@ class Tm1637Module : public LedModule {
     void flushIncremental() {
       if (mFlushStage == T_DIGITS) {
         // Update brightness.
-        if (! isDirtyBit(T_DIGITS)) return;
-        mWireInterface.startCondition();
-        mWireInterface.sendByte(mBrightness);
-        mWireInterface.stopCondition();
-        clearDirtyBit(T_DIGITS);
+        if (isDirtyBit(T_DIGITS)) {
+          mWireInterface.startCondition();
+          mWireInterface.sendByte(mBrightness);
+          mWireInterface.stopCondition();
+          clearDirtyBit(T_DIGITS);
+        }
       } else {
         // Remap the logical position used by the controller to the actual
         // position. For example, if the controller digit 0 appears at physical
@@ -256,18 +260,18 @@ class Tm1637Module : public LedModule {
         // position 2 when sending the byte to controller digit 0.
         const uint8_t chipPos = mFlushStage;
         const uint8_t physicalPos = remapLogicalToPhysical(chipPos);
-        if (! isDirtyBit(physicalPos)) return;
+        if (isDirtyBit(physicalPos)) {
+          // Update changed digit.
+          mWireInterface.startCondition();
+          mWireInterface.sendByte(kDataCmdFixedAddress);
+          mWireInterface.stopCondition();
 
-        // Update changed digit.
-        mWireInterface.startCondition();
-        mWireInterface.sendByte(kDataCmdFixedAddress);
-        mWireInterface.stopCondition();
-
-        mWireInterface.startCondition();
-        mWireInterface.sendByte(kAddressCmd | chipPos);
-        mWireInterface.sendByte(mPatterns[physicalPos]);
-        mWireInterface.stopCondition();
-        clearDirtyBit(physicalPos);
+          mWireInterface.startCondition();
+          mWireInterface.sendByte(kAddressCmd | chipPos);
+          mWireInterface.sendByte(mPatterns[physicalPos]);
+          mWireInterface.stopCondition();
+          clearDirtyBit(physicalPos);
+        }
       }
 
       // An extra dirty bit is used for the brightness so use `T_DIGITS + 1`.
@@ -293,6 +297,10 @@ class Tm1637Module : public LedModule {
     }
 
   private:
+    // Give access to mIsDirty and mFlushStage
+    friend class ::Tm1637ModuleTest_flushIncremental;
+    friend class ::Tm1637ModuleTest_flush;
+
     static uint8_t const kDataCmdWriteDisplay = 0b01000000;
     static uint8_t const kDataCmdReadKeys =     0b01000010;
     static uint8_t const kDataCmdAutoAddress =  0b01000000;
