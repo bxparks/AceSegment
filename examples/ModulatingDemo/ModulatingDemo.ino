@@ -33,10 +33,15 @@ using namespace ace_segment;
 // Hardware environment configuration.
 //------------------------------------------------------------------
 
+// Type of LED Module
 #define LED_DISPLAY_TYPE_SCANNING 0
-#define LED_DISPLAY_TYPE_DIRECT 3
-#define LED_DISPLAY_TYPE_HC595_SINGLE 4
-#define LED_DISPLAY_TYPE_HC595_DUAL 5
+#define LED_DISPLAY_TYPE_TM1637 1
+#define LED_DISPLAY_TYPE_MAX7219 2
+#define LED_DISPLAY_TYPE_HC595 3
+#define LED_DISPLAY_TYPE_DIRECT 4
+#define LED_DISPLAY_TYPE_HYBRID 5
+#define LED_DISPLAY_TYPE_FULL 6
+
 
 // Used by LED_DISPLAY_TYPE_SCANNING
 #define LED_MATRIX_MODE_NONE 0
@@ -55,7 +60,8 @@ using namespace ace_segment;
 #define DIRECT_INTERFACE_TYPE_NORMAL 0
 #define DIRECT_INTERFACE_TYPE_FAST_4 1
 
-// Used by LED_DISPLAY_TYPE_HC595_SINGLE and LED_DISPLAY_TYPE_HC595_DUAL
+// Used by LED_DISPLAY_TYPE_PARTIAL, LED_DISPLAY_TYPE_FULL, and
+// LED_DISPLAY_TYPE_HC595.
 #define INTERFACE_TYPE_SOFT_SPI 0
 #define INTERFACE_TYPE_SOFT_SPI_FAST 1
 #define INTERFACE_TYPE_HARD_SPI 2
@@ -133,7 +139,7 @@ using namespace ace_segment;
   #define DIRECT_INTERFACE_TYPE DIRECT_INTERFACE_TYPE_FAST
 
 #elif defined(AUNITER_MICRO_CUSTOM_SINGLE)
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_SINGLE
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_PARTIAL
   const uint8_t NUM_DIGITS = 4;
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
   const uint8_t LATCH_PIN = 10;
@@ -147,7 +153,7 @@ using namespace ace_segment;
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
 
 #elif defined(AUNITER_MICRO_CUSTOM_DUAL)
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_FULL
   const uint8_t NUM_DIGITS = 4;
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
@@ -164,7 +170,7 @@ using namespace ace_segment;
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
 
 #elif defined(AUNITER_MICRO_HC595)
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595
   const uint8_t NUM_DIGITS = 8;
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
@@ -181,7 +187,7 @@ using namespace ace_segment;
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
 
 #elif defined(AUNITER_STM32_HC595)
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595
   const uint8_t NUM_DIGITS = 8;
   const uint8_t LATCH_PIN = SS;
   const uint8_t DATA_PIN = MOSI;
@@ -196,7 +202,7 @@ using namespace ace_segment;
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
 
 #elif defined(AUNITER_D1MINI_LARGE_HC595)
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595
   const uint8_t NUM_DIGITS = 8;
   const uint8_t LATCH_PIN = SS;
   const uint8_t DATA_PIN = MOSI;
@@ -368,7 +374,7 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
         FRAMES_PER_SECOND);
   #endif
 
-#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_SINGLE
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_PARTIAL
   // Common Cathode, with transistors on Group pins
   #if INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI
     using SpiInterface = SoftSpiInterface;
@@ -391,7 +397,9 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
       DIGIT_PINS
   );
 
-#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_DUAL
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_FULL \
+    || LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595
+
   // Common Anode, with transistors on Group pins
   #if INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI
     using SpiInterface = SoftSpiInterface;
@@ -435,12 +443,13 @@ void setupAceSegment() {
   ledMatrix.begin();
   ledModule.begin();
 
-#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_DUAL
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_FULL \
+    || LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_PARTIAL \
+    || LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595
   spiInterface.begin();
   ledModule.begin();
   ledModule.setBrightness(1); // 0-1
 
-#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595_SINGLE
   spiInterface.begin();
   ledModule.begin();
   ledModule.setBrightness(1); // 0-1

@@ -26,18 +26,20 @@ using ace_segment::LedDisplay;
 // Hardware configuration.
 //----------------------------------------------------------------------------
 
+// Type of LED Module
 #define LED_DISPLAY_TYPE_SCANNING 0
 #define LED_DISPLAY_TYPE_TM1637 1
 #define LED_DISPLAY_TYPE_MAX7219 2
-#define LED_DISPLAY_TYPE_HC595_DUAL 3
-#define LED_DISPLAY_TYPE_HC595_SINGLE 4
-#define LED_DISPLAY_TYPE_DIRECT 5
+#define LED_DISPLAY_TYPE_HC595 3
+#define LED_DISPLAY_TYPE_DIRECT 4
+#define LED_DISPLAY_TYPE_HYBRID 5
+#define LED_DISPLAY_TYPE_FULL 6
 
 #if defined(EPOXY_DUINO)
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_SINGLE
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HYBRID
 
-#elif defined(AUNITER_MICRO_HC595_SINGLE)
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_SINGLE
+#elif defined(AUNITER_MICRO_CUSTOM_DUAL)
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HYBRID
 
 #else
   #error Unknown environment

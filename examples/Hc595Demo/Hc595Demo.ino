@@ -30,11 +30,12 @@ using namespace ace_segment;
 #define LED_DISPLAY_TYPE_SCANNING 0
 #define LED_DISPLAY_TYPE_TM1637 1
 #define LED_DISPLAY_TYPE_MAX7219 2
-#define LED_DISPLAY_TYPE_HC595_DUAL 3
-#define LED_DISPLAY_TYPE_HC595_SINGLE 4
-#define LED_DISPLAY_TYPE_DIRECT 5
+#define LED_DISPLAY_TYPE_HC595 3
+#define LED_DISPLAY_TYPE_DIRECT 4
+#define LED_DISPLAY_TYPE_HYBRID 5
+#define LED_DISPLAY_TYPE_FULL 6
 
-// Used by LED_DISPLAY_TYPE_HC595_SINGLE and LED_DISPLAY_TYPE_HC595_DUAL
+// Used by LED_DISPLAY_TYPE_PARTIAL and LED_DISPLAY_TYPE_FULL
 #define INTERFACE_TYPE_SOFT_SPI 0
 #define INTERFACE_TYPE_SOFT_SPI_FAST 1
 #define INTERFACE_TYPE_HARD_SPI 2
@@ -43,7 +44,7 @@ using namespace ace_segment;
 #define INTERFACE_TYPE_SOFT_WIRE_FAST 5
 
 #if defined(EPOXY_DUINO)
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_FULL
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
   const uint8_t NUM_DIGITS = 4;
   const uint8_t LATCH_PIN = 10;
@@ -55,7 +56,7 @@ using namespace ace_segment;
   const uint8_t* const REMAP_ARRAY = nullptr;
 
 #elif defined(AUNITER_MICRO_CUSTOM_DUAL)
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_FULL
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
   const uint8_t NUM_DIGITS = 4;
   const uint8_t LATCH_PIN = 10;
@@ -67,7 +68,7 @@ using namespace ace_segment;
   const uint8_t* const REMAP_ARRAY = nullptr;
 
 #elif defined(AUNITER_MICRO_HC595)
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_FULL
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
   const uint8_t NUM_DIGITS = 8;
   const uint8_t LATCH_PIN = 10;
@@ -79,7 +80,7 @@ using namespace ace_segment;
   const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 
 #elif defined(AUNITER_STM32_HC595)
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_FULL
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   const uint8_t NUM_DIGITS = 8;
   const uint8_t LATCH_PIN = SS;
@@ -91,7 +92,7 @@ using namespace ace_segment;
   const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 
 #elif defined(AUNITER_D1MINI_LARGE_HC595)
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595_DUAL
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_FULL
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   const uint8_t NUM_DIGITS = 8;
   const uint8_t LATCH_PIN = SS;
