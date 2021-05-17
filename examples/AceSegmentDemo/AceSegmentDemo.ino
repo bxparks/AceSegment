@@ -68,8 +68,8 @@ using namespace ace_button;
 #define BUTTON_TYPE_ANALOG 1
 
 // Select the TM1637Module flush() method
-#define TM_FLUSH_METHOD_FLUSH 0
-#define TM_FLUSH_METHOD_FLUSH_INCREMENTAL 1
+#define TM_FLUSH_METHOD_NORMAL 0
+#define TM_FLUSH_METHOD_INCREMENTAL 1
 
 // Pro Micro dev board buttons are now hardwared to A2 and A3, instead of being
 // configured with dip switches to either (2,3) or (8,9). Since (2,3) are used
@@ -214,8 +214,8 @@ using namespace ace_button;
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE_FAST
 
   // Select one of the flush methods.
-  //#define TM_FLUSH_METHOD TM_FLUSH_METHOD_FLUSH
-  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_FLUSH_INCREMENTAL
+  //#define TM_FLUSH_METHOD TM_FLUSH_METHOD_NORMAL
+  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
 
 #elif defined(AUNITER_MICRO_MAX7219)
   #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
@@ -266,8 +266,8 @@ using namespace ace_button;
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE
 
   // Select one of the flush methods.
-  //#define TM_FLUSH_METHOD TM_FLUSH_METHOD_FLUSH
-  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_FLUSH_INCREMENTAL
+  //#define TM_FLUSH_METHOD TM_FLUSH_METHOD_NORMAL
+  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
 
 #elif defined(AUNITER_STM32_MAX7219)
   #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
@@ -978,9 +978,9 @@ void renderField() {
       || LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595
     ledModule.renderFieldWhenReady();
   #else
-    #if TM_FLUSH_METHOD == TM_FLUSH_METHOD_FLUSH
+    #if TM_FLUSH_METHOD == TM_FLUSH_METHOD_NORMAL
       ledModule.flush();
-    #elif TM_FLUSH_METHOD == TM_FLUSH_METHOD_FLUSH_INCREMENTAL
+    #elif TM_FLUSH_METHOD == TM_FLUSH_METHOD_INCREMENTAL
       ledModule.flushIncremental();
     #endif
   #endif
