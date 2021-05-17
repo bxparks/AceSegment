@@ -89,7 +89,7 @@ class SoftWireInterface {
     }
 
     /** Set pins to INPUT mode. */
-    void end() {
+    void end() const {
       clockHigh();
       dataHigh();
     }
