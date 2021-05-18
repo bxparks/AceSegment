@@ -204,6 +204,12 @@ class ScanningModule : public LedModule {
     uint16_t getFieldsPerFrame() const { return T_DIGITS * T_SUBFIELDS; }
 
     /**
+     * Return micros per field. This is how often renderFieldNow() must be
+     * called from a timer interrupt.
+     */
+    uint16_t getMicrosPerField() const { return mMicrosPerField; }
+
+    /**
      * Display one field of a frame when the time is right. This is a polling
      * method, so call this slightly more frequently than getFieldsPerSecond()
      * per second.
@@ -295,10 +301,10 @@ class ScanningModule : public LedModule {
     const T_LM& mLedMatrix;
 
     /** Pattern for each digit. */
-    uint8_t mPatterns[T_DIGITS];
+    volatile uint8_t mPatterns[T_DIGITS];
 
     /** Brightness for each digit. Unused if T_SUBFIELDS <= 1. */
-    uint8_t mBrightnesses[T_DIGITS];
+    volatile uint8_t mBrightnesses[T_DIGITS];
 
     //-----------------------------------------------------------------------
     // Variables needed by renderFieldWhenReady() to render frames and fields at
