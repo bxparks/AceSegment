@@ -134,13 +134,13 @@ The following example sketches are provided:
     * [Tm1637Demo.ino](examples/Tm1637Demo)
     * [Max7219Demo.ino](examples/Max7219Demo)
     * [Hc595Demo.ino](examples/Hc595Demo)
-    * [DirectModuleDemo.ino](examples/DirectModuleDemo)
+    * [DirectDemo.ino](examples/DirectDemo)
     * [HybridDemo.ino](examples/HybridDemo)
 * Advanced
     * [Tm1637DualDemo.ino](examples/Tm1637DualDemo)
     * [ModulatingDemo.ino](examples/ModulatingDemo)
     * [ScanningDirectDemo.ino](examples/ScanningDirectDemo)
-    * [DirectFast4ModuleDemo.ino](examples/DirectModuleDemo)
+    * [DirectFast4Demo.ino](examples/DirectFast4Demo)
     * [AceSegmentDemo.ino](examples/AceSegmentDemo)
         * runs through some features of the library
         * uses 2 buttons for "single step" debugging mode
