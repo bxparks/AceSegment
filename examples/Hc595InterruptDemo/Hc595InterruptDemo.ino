@@ -1,12 +1,12 @@
 /*
- * A demo of a 4-digit LED module with the segment pins connected to a 74HC595
- * shift register and the digit pins also connected to a 74HC595 shift regstier.
- * Uses the Hc595Module class.
+ * Same as Hc595Demo, but using timer interrupts (through TimerOne library) to
+ * render the LED display.
  */
 
 #include <Arduino.h>
 #include <AceCommon.h> // incrementMod()
 #include <AceSegment.h> // Hc595Module, LedDisplay
+#include <TimerOne.h> // Timer1
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 #include <digitalWriteFast.h>
@@ -66,7 +66,7 @@ using namespace ace_segment;
   const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
   const uint8_t* const REMAP_ARRAY = nullptr;
 
-#elif defined(AUNITER_MICRO_HC595)
+#elif defined(AUNITER_MICRO_HC595) || defined(AUNITER_NANO)
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
   const uint8_t NUM_DIGITS = 8;
   const uint8_t LATCH_PIN = 10;
@@ -200,27 +200,14 @@ void updateDisplay() {
   }
 }
 
-// Call renderFieldWhenReady() as fast as possible. It uses an internal timer to
-// do the actual rendering when ready. Limit timing samples to every 10 ms to
-// limit number of samples over 5 seconds to less than UINT16_MAX (i.e. 65535).
+// Call renderFieldNow() through a timer interrupt.
 void flushModule() {
-#if ENABLE_SERIAL_DEBUG >= 1
-  static uint16_t prevSampleMillis;
+  ledModule.renderFieldNow();
+}
 
-  uint16_t nowMillis = millis();
-  if ((uint16_t) (nowMillis - prevSampleMillis) >= 10) {
-    prevSampleMillis = nowMillis;
-
-    uint16_t startMicros = micros();
-    ledModule.renderFieldWhenReady();
-    uint16_t elapsedMicros = (uint16_t) micros() - startMicros;
-    stats.update(elapsedMicros);
-  } else {
-    ledModule.renderFieldWhenReady();
-  }
-#else
-  ledModule.renderFieldWhenReady();
-#endif
+void setupTimer() {
+  Timer1.initialize(ledModule.getMicrosPerField());
+  Timer1.attachInterrupt(flushModule);
 }
 
 // Every 5 seconds, print stats about how long flushModule() took.
@@ -254,10 +241,10 @@ void setup() {
 #endif
 
   setupAceSegment();
+  setupTimer();
 }
 
 void loop() {
   updateDisplay();
-  flushModule();
   printStats();
 }
