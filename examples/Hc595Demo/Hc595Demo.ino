@@ -173,6 +173,8 @@ void setupAceSegment() {
   ledModule.begin();
 }
 
+//----------------------------------------------------------------------------
+
 TimingStats stats;
 uint8_t digitIndex = 0;
 uint8_t brightnessIndex = 0;
@@ -202,13 +204,27 @@ void updateDisplay() {
   }
 }
 
-// Call renderFieldWhenReady() as fast as possible. It keeps an internal timer
-// that performs the actual rendering when ready.
+// Call renderFieldWhenReady() as fast as possible. It uses an internal timer to
+// do the actual rendering when ready. Limit timing samples to every 10 ms to
+// limit number of samples over 5 seconds to less than UINT16_MAX (i.e. 65535).
 void flushModule() {
-  uint16_t startMicros = micros();
+#if ENABLE_SERIAL_DEBUG >= 1
+  static uint16_t prevSampleMillis;
+
+  uint16_t nowMillis = millis();
+  if ((uint16_t) (nowMillis - prevSampleMillis) >= 10) {
+    prevSampleMillis = nowMillis;
+
+    uint16_t startMicros = micros();
+    ledModule.renderFieldWhenReady();
+    uint16_t elapsedMicros = (uint16_t) micros() - startMicros;
+    stats.update(elapsedMicros);
+  } else {
+    ledModule.renderFieldWhenReady();
+  }
+#else
   ledModule.renderFieldWhenReady();
-  uint16_t elapsedMicros = (uint16_t) micros() - startMicros;
-  stats.update(elapsedMicros);
+#endif
 }
 
 // Every 5 seconds, print stats about how long flushModule() took.

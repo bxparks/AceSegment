@@ -1124,6 +1124,8 @@ void setupAceButton() {
   buttonConfig.setFeature(ButtonConfig::kFeatureSuppressClickBeforeDoubleClick);
 }
 
+// Check AceButtons, limiting sampling rate to about 200/seconds to avoid
+// problems on ESP8266 using analogRead().
 void checkButtons() {
   static uint16_t prevMillis;
 

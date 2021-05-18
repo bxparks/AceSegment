@@ -61,8 +61,16 @@ Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module2(wireInterface2);
 LedDisplay display1(tm1637Module1);
 LedDisplay display2(tm1637Module2);
 
-TimingStats stats;
+void setupAceSegment() {
+  wireInterface1.begin();
+  wireInterface2.begin();
+  tm1637Module1.begin();
+  tm1637Module2.begin();
+}
 
+//----------------------------------------------------------------------------
+
+TimingStats stats;
 uint8_t digitIndex = 0;
 uint8_t brightness = 1;
 
@@ -171,10 +179,7 @@ void setup() {
   while (!Serial);
 #endif
 
-  wireInterface1.begin();
-  wireInterface2.begin();
-  tm1637Module1.begin();
-  tm1637Module2.begin();
+  setupAceSegment();
 }
 
 

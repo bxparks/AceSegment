@@ -100,17 +100,6 @@ void setupAceSegment() {
 
 //----------------------------------------------------------------------------
 
-void setup() {
-  delay(1000);
-
-#if ENABLE_SERIAL_DEBUG >= 1
-  Serial.begin(115200);
-  while (!Serial);
-#endif
-
-  setupAceSegment();
-}
-
 // loop() state variables
 TimingStats stats;
 uint8_t digitIndex = 0;
@@ -138,27 +127,64 @@ void updateDisplay() {
   incrementMod(brightnessIndex, NUM_BRIGHTNESSES);
 }
 
-void loop() {
-  uint16_t nowMillis = millis();
-
-  // Update the display with new pattern every second.
-  if (nowMillis - prevUpdateMillis >= 1000) {
-    prevUpdateMillis = nowMillis;
-    updateDisplay();
-  }
-
-  // Use renderFieldWhenReady() to multiplex the digits in the LED module.
-  uint16_t startMicros = micros();
-  ledModule.renderFieldWhenReady();
-  uint16_t elapsedMicros = (uint16_t) micros() - startMicros;
-  stats.update(elapsedMicros);
-
-  // Print the stats every 5 seconds.
+// Call renderFieldWhenReady() as fast as possible. It uses an internal timer to
+// do the actual rendering when ready. Limit timing samples to every 10 ms to
+// limit number of samples over 5 seconds to less than UINT16_MAX (i.e. 65535).
+void flushModule() {
 #if ENABLE_SERIAL_DEBUG >= 1
-  if (nowMillis - prevStatsMillis >= 5000) {
+  static uint16_t prevSampleMillis;
+
+  uint16_t nowMillis = millis();
+  if ((uint16_t) (nowMillis - prevSampleMillis) >= 10) {
+    prevSampleMillis = nowMillis;
+
+    uint16_t startMicros = micros();
+    ledModule.renderFieldWhenReady();
+    uint16_t elapsedMicros = (uint16_t) micros() - startMicros;
+    stats.update(elapsedMicros);
+  } else {
+    ledModule.renderFieldWhenReady();
+  }
+#else
+  ledModule.renderFieldWhenReady();
+#endif
+}
+
+// Every 5 seconds, print stats about how long flushModule() took.
+void printStats() {
+#if ENABLE_SERIAL_DEBUG >= 1
+  static uint16_t prevStatsMillis;
+
+  uint16_t nowMillis = millis();
+  if ((uint16_t) (nowMillis - prevStatsMillis) >= 5000) {
     prevStatsMillis = nowMillis;
-    Serial.print("ExpAvg:");
-    Serial.println(stats.getExpDecayAvg());
+
+    Serial.print("min/avg/max:");
+    Serial.print(stats.getMin());
+    Serial.print('/');
+    Serial.print(stats.getAvg());
+    Serial.print('/');
+    Serial.println(stats.getMax());
+    stats.reset();
   }
 #endif
+}
+
+//----------------------------------------------------------------------------
+
+void setup() {
+  delay(1000);
+
+#if ENABLE_SERIAL_DEBUG >= 1
+  Serial.begin(115200);
+  while (!Serial);
+#endif
+
+  setupAceSegment();
+}
+
+void loop() {
+  updateDisplay();
+  flushModule();
+  printStats();
 }

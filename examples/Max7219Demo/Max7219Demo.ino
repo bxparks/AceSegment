@@ -100,8 +100,14 @@ Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
     spiInterface, kDigitRemapArray8Max7219);
 LedDisplay display(max7219Module);
 
-TimingStats stats;
+void setupAceSegment() {
+  spiInterface.begin();
+  max7219Module.begin();
+}
 
+//----------------------------------------------------------------------------
+
+TimingStats stats;
 uint8_t digitIndex = 0;
 uint8_t brightness = 1;
 
@@ -171,13 +177,13 @@ void printStats() {
 
 void setup() {
   delay(1000);
+
 #if ENABLE_SERIAL_DEBUG >= 1
   Serial.begin(115200);
   while (!Serial);
 #endif
 
-  spiInterface.begin();
-  max7219Module.begin();
+  setupAceSegment();
 }
 
 void loop() {

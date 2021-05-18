@@ -104,17 +104,6 @@ void setupAceSegment() {
 
 //----------------------------------------------------------------------------
 
-void setup() {
-  delay(1000);
-
-#if ENABLE_SERIAL_DEBUG >= 1
-  Serial.begin(115200);
-  while (!Serial);
-#endif
-
-  setupAceSegment();
-}
-
 // loop() state variables
 TimingStats stats;
 uint8_t digitIndex = 0;
@@ -141,29 +130,67 @@ void updateDisplay() {
   incrementMod(brightness, NUM_BRIGHTNESSES);
 }
 
+// Call renderFieldWhenReady() as fast as possible. It uses an internal timer to
+// do the actual rendering when ready. Limit timing samples to every 10 ms to
+// limit number of samples over 5 seconds to less than UINT16_MAX (i.e. 65535).
+void flushModule() {
+#if ENABLE_SERIAL_DEBUG >= 1
+  static uint16_t prevFlushMillis;
+
+  uint16_t nowMillis = millis();
+  if ((uint16_t) (nowMillis - prevFlushMillis) >= 100) {
+    prevFlushMillis = nowMillis;
+
+    // Flush the change to the LED Module, and measure the time.
+    uint16_t startMicros = micros();
+    ledModule.renderFieldWhenReady();
+    uint16_t elapsedMicros = (uint16_t) micros() - startMicros;
+    stats.update(elapsedMicros);
+  } else {
+    ledModule.renderFieldWhenReady();
+  }
+#else
+    ledModule.renderFieldWhenReady();
+#endif
+}
+
+// Every 5 seconds, print stats about how long flush() took.
+void printStats() {
+#if ENABLE_SERIAL_DEBUG >= 1
+  static uint16_t prevStatsMillis;
+
+  uint16_t nowMillis = millis();
+  if ((uint16_t) (nowMillis - prevStatsMillis) >= 5000) {
+    prevStatsMillis = nowMillis;
+
+    Serial.print("min/avg/max:");
+    Serial.print(stats.getMin());
+    Serial.print('/');
+    Serial.print(stats.getAvg());
+    Serial.print('/');
+    Serial.println(stats.getMax());
+    stats.reset();
+  }
+#endif
+}
+
+//----------------------------------------------------------------------------
+
+void setup() {
+  delay(1000);
+
+#if ENABLE_SERIAL_DEBUG >= 1
+  Serial.begin(115200);
+  while (!Serial);
+#endif
+
+  setupAceSegment();
+}
+
 // Use the Max7219Module::flush() method to update all digits in a single dump
 // to the LED module, taking about ~170 microseconds per flush().
 void loop() {
-  uint16_t nowMillis = millis();
-
-  // Update the display with new pattern every second.
-  if ((uint16_t) (nowMillis - prevUpdateMillis) >= 1000) {
-    prevUpdateMillis = nowMillis;
-    updateDisplay();
-  }
-
-  // Continually render the LED module to multiplex all digits.
-  uint16_t startMicros = micros();
-  ledModule.renderFieldWhenReady();
-  uint16_t elapsedMicros = (uint16_t) micros() - startMicros;
-  stats.update(elapsedMicros);
-
-  // Print the stats every 5 seconds.
-#if ENABLE_SERIAL_DEBUG >= 1
-  if ((uint16_t) (nowMillis - prevStatsMillis) >= 5000) {
-    prevStatsMillis = nowMillis;
-    Serial.print("ExpAvg:");
-    Serial.println(stats.getExpDecayAvg());
-  }
-#endif
+  updateDisplay();
+  flushModule();
+  printStats();
 }

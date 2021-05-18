@@ -110,8 +110,14 @@ const uint16_t BIT_DELAY = 100;
 Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module(wireInterface, remapArray);
 LedDisplay display(tm1637Module);
 
-TimingStats stats;
+void setupAceSegment() {
+  wireInterface.begin();
+  tm1637Module.begin();
+}
 
+//----------------------------------------------------------------------------
+
+TimingStats stats;
 uint8_t digitIndex = 0;
 uint8_t brightness = 1;
 
@@ -202,13 +208,13 @@ void printStats() {
 
 void setup() {
   delay(1000);
+
 #if ENABLE_SERIAL_DEBUG >= 1
   Serial.begin(115200);
   while (!Serial);
 #endif
 
-  wireInterface.begin();
-  tm1637Module.begin();
+  setupAceSegment();
 }
 
 

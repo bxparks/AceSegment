@@ -459,32 +459,7 @@ void setupAceSegment() {
   ledModule.setBrightness(1); // 0-1
 
 #endif
-
-#if USE_INTERRUPT == 1
-  setupInterupt(ledDisplay.getFieldsPerSecond());
-#endif
 }
-
-#if USE_INTERRUPT == 1
-void setupInterupt(uint16_t fieldsPerSecond) {
-  // set up Timer 2
-  uint8_t timerCompareValue = (long) F_CPU / 1024 / fieldsPerSecond - 1;
-  if (ENABLE_SERIAL_DEBUG >= 1) {
-    Serial.print(F("Timer 2, Compare A: "));
-    Serial.println(timerCompareValue);
-  }
-
-  noInterrupts();
-  TCNT2  = 0;	// Initialize counter value to 0
-  TCCR2A = 0;
-  TCCR2B = 0;
-  TCCR2A |= bit(WGM21); // CTC
-  TCCR2B |= bit(CS22) | bit(CS21) | bit(CS20); // prescale 1024
-  TIMSK2 |= bit(OCIE2A); // interrupt on Compare A Match
-  OCR2A =  timerCompareValue;
-  interrupts();
-}
-#endif
 
 //------------------------------------------------------------------
 // Configurations for ModulationDemo
@@ -506,43 +481,38 @@ void setBrightnesses(int brightnessIndex) {
   }
 }
 
+// Change the brightness every 200 ms.
 void pulseDisplay() {
-  static uint8_t brightnessIndex = 0;
-  static unsigned long lastUpdateTime = millis();
+  static uint8_t brightnessIndex;
+  static uint16_t lastUpdateMillis;
 
-  unsigned long now = millis();
-  if (now - lastUpdateTime > 200) {
-    lastUpdateTime = now;
+  uint16_t nowMillis = millis();
+  if ((uint16_t) (nowMillis - lastUpdateMillis) >= 200) {
+    lastUpdateMillis = nowMillis;
     incrementMod(brightnessIndex, NUM_BRIGHTNESSES);
     setBrightnesses(brightnessIndex);
   }
 }
 
+void flushModule() {
+  ledModule.renderFieldWhenReady();
+}
+
 //-----------------------------------------------------------------------------
 
 void setup() {
-#if ! defined(EPOXY_DUINO)
   delay(1000); // Wait for stability on some boards, otherwise garage on Serial
-#endif
 
-  if (ENABLE_SERIAL_DEBUG >= 1) {
-    Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
-    while (!Serial); // Wait until Serial is ready - Leonardo/Micro
-    Serial.println(F("setup(): begin"));
-  }
+#if ENABLE_SERIAL_DEBUG >= 1
+  Serial.begin(115200); // ESP8266 default of 74880 not supported on Linux
+  while (!Serial); // Wait until Serial is ready - Leonardo/Micro
+#endif
 
   setupAceSegment();
   setupPulseDisplay();
-
-  if (ENABLE_SERIAL_DEBUG >= 1) {
-    Serial.println(F("setup(): end"));
-  }
 }
 
 void loop() {
   pulseDisplay();
-
-  #if USE_INTERRUPT == 0
-    ledModule.renderFieldWhenReady();
-  #endif
+  flushModule();
 }
