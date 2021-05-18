@@ -20,6 +20,13 @@ using namespace ace_button;
 #define ENABLE_SERIAL_DEBUG 0
 #endif
 
+// Use polling or interrupt.
+#define USE_INTERRUPT 0
+
+#if USE_INTERRUPT
+  #include <TimerOne.h>
+#endif
+
 //------------------------------------------------------------------
 // Hardware configuration.
 //------------------------------------------------------------------
@@ -357,9 +364,6 @@ using namespace ace_button;
 // Configurations for AceSegment
 //------------------------------------------------------------------
 
-// Use polling or interrupt.
-#define USE_INTERRUPT 0
-
 // Total fields/second
 //      = FRAMES_PER_SECOND * NUM_SUBFIELDS * NUM_DIGITS
 //      = 60 * 1 * 4
@@ -664,37 +668,16 @@ void setupAceSegment() {
   #error Unknown LED_DISPLAY_TYPE
 
 #endif
-
-#if USE_INTERRUPT == 1
-  setupInterupt(ledDisplay.getFieldsPerSecond());
-#endif
 }
 
 #if USE_INTERRUPT == 1
-void setupInterupt(uint16_t fieldsPerSecond) {
-  // set up Timer 2
-  uint8_t timerCompareValue = (long) F_CPU / 1024 / fieldsPerSecond - 1;
-  if (ENABLE_SERIAL_DEBUG >= 1) {
-    Serial.print(F("Timer 2, Compare A: "));
-    Serial.println(timerCompareValue);
-  }
-
-  noInterrupts();
-  TCNT2  = 0;	// Initialize counter value to 0
-  TCCR2A = 0;
-  TCCR2B = 0;
-  TCCR2A |= bit(WGM21); // CTC
-  TCCR2B |= bit(CS22) | bit(CS21) | bit(CS20); // prescale 1024
-  TIMSK2 |= bit(OCIE2A); // interrupt on Compare A Match
-  OCR2A =  timerCompareValue;
-  interrupts();
-}
-#endif
-
-#if USE_INTERRUPT == 1
-// interrupt handler for timer 2
-ISR(TIMER2_COMPA_vect) {
+void renderNow() {
   ledModule.renderFieldNow();
+}
+
+void setupInterupt() {
+  Timer1.initialize(ledModule.getMicrosPerField());
+  Timer1.attachInterrupt(renderNow);
 }
 #endif
 
@@ -1084,6 +1067,9 @@ void handleEvent(AceButton* button, uint8_t eventType, uint8_t buttonState) {
       case AceButton::kEventReleased:
       case AceButton::kEventClicked:
         if (renderMode == RENDER_MODE_AUTO) {
+        #if USE_INTERRUPT
+          Timer1.stop();
+        #endif
           renderMode = RENDER_MODE_PAUSED;
           if (ENABLE_SERIAL_DEBUG >= 1) {
             Serial.println(F("handleEvent(): paused"));
@@ -1101,6 +1087,9 @@ void handleEvent(AceButton* button, uint8_t eventType, uint8_t buttonState) {
           if (ENABLE_SERIAL_DEBUG >= 1) {
             Serial.println(F("handleEvent(): switching to auto rendering"));
           }
+        #if USE_INTERRUPT
+          Timer1.start();
+        #endif
           renderMode = RENDER_MODE_AUTO;
         }
         break;
@@ -1157,6 +1146,9 @@ void setup() {
 
   setupAceButton();
   setupAceSegment();
+#if USE_INTERRUPT
+  setupInterupt();
+#endif
 
   if (ENABLE_SERIAL_DEBUG >= 1) {
     Serial.println(F("setup(): end"));
@@ -1166,9 +1158,11 @@ void setup() {
 }
 
 void loop() {
+#if ! USE_INTERRUPT
   if (renderMode == RENDER_MODE_AUTO) {
     renderField();
   }
+#endif
 
   if (demoLoopMode == DEMO_LOOP_MODE_AUTO) {
     demoLoop();
