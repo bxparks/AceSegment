@@ -44,6 +44,11 @@ using namespace ace_segment;
 #define INTERFACE_TYPE_SOFT_WIRE 4
 #define INTERFACE_TYPE_SOFT_WIRE_FAST 5
 
+// Configuration for Arduino IDE
+#if ! defined(EPOXY_DUINO) && ! defined(AUNITER)
+  #define AUNITER_MICRO_HC595
+#endif
+
 #if defined(EPOXY_DUINO)
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
   const uint8_t NUM_DIGITS = 4;
@@ -94,6 +99,17 @@ using namespace ace_segment;
   const uint8_t LATCH_PIN = SS;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
+  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
+  const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
+  const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
+
+#elif defined(AUNITER_ESP32_HC595)
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  const uint8_t NUM_DIGITS = 8;
+  const uint8_t LATCH_PIN = 15;
+  const uint8_t DATA_PIN = 13;
+  const uint8_t CLOCK_PIN = 14;
   const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
   const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
