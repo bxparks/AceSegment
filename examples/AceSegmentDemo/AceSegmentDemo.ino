@@ -113,12 +113,12 @@ using namespace ace_button;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
   const uint8_t NUM_DIGITS = 4;
   const uint8_t NUM_SEGMENTS = 8;
-  const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
-  const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
 
   // Choose one of the following variants:
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT_FAST
+  const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
+  const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
 
 #elif defined(AUNITER_MICRO_SCANNING_SINGLE)
   #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
@@ -128,15 +128,15 @@ using namespace ace_button;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
   const uint8_t NUM_DIGITS = 4;
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
-  const uint8_t LATCH_PIN = 10;
-  const uint8_t DATA_PIN = MOSI;
-  const uint8_t CLOCK_PIN = SCK;
 
   // Choose one of the following variants:
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_SOFT_SPI
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_SOFT_SPI_FAST
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_HARD_SPI
   #define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_HARD_SPI_FAST
+  const uint8_t LATCH_PIN = 10;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
 
 #elif defined(AUNITER_MICRO_SCANNING_DUAL)
   #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
@@ -145,15 +145,15 @@ using namespace ace_button;
 
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_SCANNING
   const uint8_t NUM_DIGITS = 4;
-  const uint8_t LATCH_PIN = 10;
-  const uint8_t DATA_PIN = MOSI;
-  const uint8_t CLOCK_PIN = SCK;
 
   // Choose one of the following variants:
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SOFT_SPI
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SOFT_SPI_FAST
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HARD_SPI
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HARD_SPI_FAST
+  const uint8_t LATCH_PIN = 10;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
 
 #elif defined(AUNITER_MICRO_CUSTOM_DIRECT)
   #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
@@ -163,12 +163,12 @@ using namespace ace_button;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_DIRECT
   const uint8_t NUM_DIGITS = 4;
   const uint8_t NUM_SEGMENTS = 8;
-  const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
-  const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
 
   // Choose one of the following variants:
   //#define DIRECT_INTERFACE_TYPE DIRECT_INTERFACE_TYPE_NORMAL
   #define DIRECT_INTERFACE_TYPE DIRECT_INTERFACE_TYPE_FAST
+  const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
+  const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
 
 #elif defined(AUNITER_MICRO_CUSTOM_SINGLE)
   #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
@@ -178,15 +178,15 @@ using namespace ace_button;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HYBRID
   const uint8_t NUM_DIGITS = 4;
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
-  const uint8_t LATCH_PIN = 10;
-  const uint8_t DATA_PIN = MOSI;
-  const uint8_t CLOCK_PIN = SCK;
 
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
+  const uint8_t LATCH_PIN = 10;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
 
 #elif defined(AUNITER_MICRO_CUSTOM_DUAL)
   #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
@@ -195,15 +195,15 @@ using namespace ace_button;
 
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_FULL
   const uint8_t NUM_DIGITS = 4;
-  const uint8_t LATCH_PIN = 10;
-  const uint8_t DATA_PIN = MOSI;
-  const uint8_t CLOCK_PIN = SCK;
 
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
+  const uint8_t LATCH_PIN = 10;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
 
 #elif defined(AUNITER_MICRO_TM1637)
   #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
@@ -212,13 +212,13 @@ using namespace ace_button;
 
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_TM1637
   const uint8_t NUM_DIGITS = 4;
-  const uint8_t CLK_PIN = A0;
-  const uint8_t DIO_PIN = 9;
-  const uint16_t BIT_DELAY = 100;
 
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE_FAST
+  const uint8_t CLK_PIN = A0;
+  const uint8_t DIO_PIN = 9;
+  const uint16_t BIT_DELAY = 100;
 
   // Select one of the flush methods.
   //#define TM_FLUSH_METHOD TM_FLUSH_METHOD_NORMAL
@@ -231,15 +231,15 @@ using namespace ace_button;
 
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_MAX7219
   const uint8_t NUM_DIGITS = 8;
-  const uint8_t LATCH_PIN = 10;
-  const uint8_t DATA_PIN = MOSI;
-  const uint8_t CLOCK_PIN = SCK;
 
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
+  const uint8_t LATCH_PIN = 10;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
 
 #elif defined(AUNITER_MICRO_HC595)
   #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
@@ -248,15 +248,15 @@ using namespace ace_button;
 
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595
   const uint8_t NUM_DIGITS = 8;
-  const uint8_t LATCH_PIN = 10;
-  const uint8_t DATA_PIN = MOSI;
-  const uint8_t CLOCK_PIN = SCK;
 
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
+  const uint8_t LATCH_PIN = 10;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
 
 #elif defined(AUNITER_STM32_TM1637)
   #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
@@ -265,12 +265,12 @@ using namespace ace_button;
 
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_TM1637
   const uint8_t NUM_DIGITS = 4;
-  const uint8_t CLK_PIN = PB3;
-  const uint8_t DIO_PIN = PB4;
-  const uint16_t BIT_DELAY = 100;
 
   // Choose one of the following variants:
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE
+  const uint8_t CLK_PIN = PB3;
+  const uint8_t DIO_PIN = PB4;
+  const uint16_t BIT_DELAY = 100;
 
   // Select one of the flush methods.
   //#define TM_FLUSH_METHOD TM_FLUSH_METHOD_NORMAL
@@ -283,13 +283,21 @@ using namespace ace_button;
 
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_MAX7219
   const uint8_t NUM_DIGITS = 8;
-  const uint8_t LATCH_PIN = SS;
-  const uint8_t DATA_PIN = MOSI;
-  const uint8_t CLOCK_PIN = SCK;
 
   // Choose one of the following variants:
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+
+  // SPI1 pins (default)
+  const uint8_t LATCH_PIN = SS;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+  /*
+  // SPI2 pins
+  const uint8_t LATCH_PIN = PB12;
+  const uint8_t DATA_PIN = PB15;
+  const uint8_t CLOCK_PIN = PB13;
+  */
 
 #elif defined(AUNITER_STM32_HC595)
   #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
@@ -298,13 +306,21 @@ using namespace ace_button;
 
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595
   const uint8_t NUM_DIGITS = 8;
-  const uint8_t LATCH_PIN = SS;
-  const uint8_t DATA_PIN = MOSI;
-  const uint8_t CLOCK_PIN = SCK;
 
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+
+  // SPI1 pins (default)
+  const uint8_t LATCH_PIN = SS;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+  /*
+  // SPI2 pins
+  const uint8_t LATCH_PIN = PB12;
+  const uint8_t DATA_PIN = PB15;
+  const uint8_t CLOCK_PIN = PB13;
+  */
 
 #elif defined(AUNITER_D1MINI_LARGE_TM1637)
   #define BUTTON_TYPE BUTTON_TYPE_ANALOG
@@ -321,12 +337,12 @@ using namespace ace_button;
 
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_TM1637
   const uint8_t NUM_DIGITS = 4;
-  const uint8_t CLK_PIN = D5;
-  const uint8_t DIO_PIN = D7;
-  const uint16_t BIT_DELAY = 100;
 
   // Choose one of the following variants:
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE
+  const uint8_t CLK_PIN = D5;
+  const uint8_t DIO_PIN = D7;
+  const uint16_t BIT_DELAY = 100;
 
 #elif defined(AUNITER_D1MINI_LARGE_MAX7219)
   #define BUTTON_TYPE BUTTON_TYPE_ANALOG
@@ -343,13 +359,13 @@ using namespace ace_button;
 
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_MAX7219
   const uint8_t NUM_DIGITS = 8;
-  const uint8_t LATCH_PIN = SS;
-  const uint8_t DATA_PIN = MOSI;
-  const uint8_t CLOCK_PIN = SCK;
 
   // Choose one of the following variants:
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  const uint8_t LATCH_PIN = SS;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
 
 #elif defined(AUNITER_D1MINI_LARGE_HC595)
   #define BUTTON_TYPE BUTTON_TYPE_ANALOG
@@ -366,13 +382,13 @@ using namespace ace_button;
 
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595
   const uint8_t NUM_DIGITS = 8;
-  const uint8_t LATCH_PIN = SS;
-  const uint8_t DATA_PIN = MOSI;
-  const uint8_t CLOCK_PIN = SCK;
 
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  const uint8_t LATCH_PIN = SS;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
 
 #elif defined(AUNITER_ESP32_TM1637)
   #define BUTTON_TYPE BUTTON_TYPE_ANALOG
@@ -383,12 +399,12 @@ using namespace ace_button;
 
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_TM1637
   const uint8_t NUM_DIGITS = 4;
-  const uint8_t CLK_PIN = 14;
-  const uint8_t DIO_PIN = 13;
-  const uint16_t BIT_DELAY = 100;
 
   // Choose one of the following variants:
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE
+  const uint8_t CLK_PIN = 14;
+  const uint8_t DIO_PIN = 13;
+  const uint16_t BIT_DELAY = 100;
 
 #elif defined(AUNITER_ESP32_MAX7219)
   #define BUTTON_TYPE BUTTON_TYPE_ANALOG
@@ -399,13 +415,21 @@ using namespace ace_button;
 
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_MAX7219
   const uint8_t NUM_DIGITS = 8;
-  const uint8_t LATCH_PIN = 15;
-  const uint8_t DATA_PIN = 13;
-  const uint8_t CLOCK_PIN = 14;
 
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+
+  /*
+  // VSPI pins (default)
+  const uint8_t LATCH_PIN = SS;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+  */
+  // HSPI pins
+  const uint8_t LATCH_PIN = 15;
+  const uint8_t DATA_PIN = 13;
+  const uint8_t CLOCK_PIN = 14;
 
 #elif defined(AUNITER_ESP32_HC595)
   #define BUTTON_TYPE BUTTON_TYPE_ANALOG
@@ -416,13 +440,21 @@ using namespace ace_button;
 
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595
   const uint8_t NUM_DIGITS = 8;
-  const uint8_t LATCH_PIN = 15;
-  const uint8_t DATA_PIN = 13;
-  const uint8_t CLOCK_PIN = 14;
 
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+
+  /*
+  // VSPI pins (default)
+  const uint8_t LATCH_PIN = SS;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+  */
+  // HSPI pins
+  const uint8_t LATCH_PIN = 15;
+  const uint8_t DATA_PIN = 13;
+  const uint8_t CLOCK_PIN = 14;
 
 #else
   #error Unknown AUNITER environment

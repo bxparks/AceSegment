@@ -50,10 +50,16 @@ using ace_segment::kDigitRemapArray8Max7219;
 #elif defined(AUNITER_STM32_MAX7219)
   #define SPI_INTERFACE_TYPE SPI_INTERFACE_TYPE_HARD_SPI
 
-  // SPI pins
-  const uint8_t LATCH_PIN = PA4;
+  // SPI1 pins (default)
+  const uint8_t LATCH_PIN = SS;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
+  /*
+  // SPI2 pins
+  const uint8_t LATCH_PIN = PB12;
+  const uint8_t DATA_PIN = PB15;
+  const uint8_t CLOCK_PIN = PB13;
+  */
 
 #elif defined(AUNITER_D1MINI_LARGE_MAX7219)
   #define SPI_INTERFACE_TYPE SPI_INTERFACE_TYPE_HARD_SPI
@@ -66,7 +72,13 @@ using ace_segment::kDigitRemapArray8Max7219;
 #elif defined(AUNITER_ESP32_MAX7219)
   #define SPI_INTERFACE_TYPE SPI_INTERFACE_TYPE_HARD_SPI
 
-  // SPI pins
+  // VSPI pins (default)
+  /*
+  const uint8_t LATCH_PIN = SS;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+  */
+  // HSPI pins
   const uint8_t LATCH_PIN = 15;
   const uint8_t DATA_PIN = 13;
   const uint8_t CLOCK_PIN = 14;
