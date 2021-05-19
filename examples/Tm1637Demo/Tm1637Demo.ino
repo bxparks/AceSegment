@@ -21,15 +21,14 @@ using namespace ace_segment;
 #define TM_FLUSH_METHOD_NORMAL 0
 #define TM_FLUSH_METHOD_INCREMENTAL 1
 
-// The TM1637 controller supports up to 6 digits.
-const uint8_t PATTERNS[6] = {
-  0b00111111, // 0
-  0b00000110, // 1
-  0b01011011, // 2
-  0b01001111, // 3
-  0b01100110, // 4
-  0b01101101, // 5
-};
+//----------------------------------------------------------------------------
+// Hardware configuration.
+//----------------------------------------------------------------------------
+
+// Configuration for Arduino IDE
+#if ! defined(EPOXY_DUINO) && ! defined(AUNITER)
+  #define AUNITER_MICRO_TM1637
+#endif
 
 #if defined(EPOXY_DUINO)
   #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_NORMAL
@@ -37,7 +36,6 @@ const uint8_t PATTERNS[6] = {
 
   const uint8_t CLK_PIN = A0;
   const uint8_t DIO_PIN = 9;
-
   const uint8_t NUM_DIGITS = 4;
 
 #elif defined(AUNITER_MICRO_TM1637)
@@ -46,7 +44,6 @@ const uint8_t PATTERNS[6] = {
 
   const uint8_t CLK_PIN = A0;
   const uint8_t DIO_PIN = 9;
-
   const uint8_t NUM_DIGITS = 4;
 
 #elif defined(AUNITER_MICRO_TM1637_6)
@@ -55,7 +52,6 @@ const uint8_t PATTERNS[6] = {
 
   const uint8_t CLK_PIN = A0;
   const uint8_t DIO_PIN = 9;
-
   const uint8_t NUM_DIGITS = 6;
 
 #elif defined(AUNITER_STM32_TM1637)
@@ -64,7 +60,6 @@ const uint8_t PATTERNS[6] = {
 
   const uint8_t CLK_PIN = PB3;
   const uint8_t DIO_PIN = PB4;
-
   const uint8_t NUM_DIGITS = 4;
 
 #elif defined(AUNITER_D1MINI_LARGE_TM1637)
@@ -73,12 +68,23 @@ const uint8_t PATTERNS[6] = {
 
   const uint8_t CLK_PIN = D5;
   const uint8_t DIO_PIN = D7;
+  const uint8_t NUM_DIGITS = 4;
 
+#elif defined(AUNITER_ESP32_TM1637)
+  #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_NORMAL
+  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
+
+  const uint8_t CLK_PIN = 14;
+  const uint8_t DIO_PIN = 13;
   const uint8_t NUM_DIGITS = 4;
 
 #else
   #error Unknown AUNITER environment
 #endif
+
+//------------------------------------------------------------------
+// AceSegment Configuration
+//------------------------------------------------------------------
 
 // For a SoftWireInterface (non-fast), time to send 4 digits:
 // * 12 ms at 50 us delay, but does not work.
@@ -116,6 +122,16 @@ void setupAceSegment() {
 }
 
 //----------------------------------------------------------------------------
+
+// The TM1637 controller supports up to 6 digits.
+const uint8_t PATTERNS[6] = {
+  0b00111111, // 0
+  0b00000110, // 1
+  0b01011011, // 2
+  0b01001111, // 3
+  0b01100110, // 4
+  0b01101101, // 5
+};
 
 TimingStats stats;
 uint8_t digitIndex = 0;

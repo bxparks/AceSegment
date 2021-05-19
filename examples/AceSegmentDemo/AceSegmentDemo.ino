@@ -310,8 +310,14 @@ using namespace ace_button;
   #define BUTTON_TYPE BUTTON_TYPE_ANALOG
   const uint8_t MODE_BUTTON_PIN = 0;
   const uint8_t CHANGE_BUTTON_PIN = 2;
-  #define ANALOG_BUTTON_COUNT 4
   #define ANALOG_BUTTON_PIN A0
+  #define ANALOG_BUTTON_LEVELS { \
+      0 /*short to ground*/, \
+      327 /*32%, 4.7k*/, \
+      512 /*50%, 10k*/, \
+      844 /*82%, 47k*/, \
+      1023 /*100%, open*/ \
+    }
 
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_TM1637
   const uint8_t NUM_DIGITS = 4;
@@ -326,8 +332,14 @@ using namespace ace_button;
   #define BUTTON_TYPE BUTTON_TYPE_ANALOG
   const uint8_t MODE_BUTTON_PIN = 0;
   const uint8_t CHANGE_BUTTON_PIN = 2;
-  #define ANALOG_BUTTON_COUNT 4
   #define ANALOG_BUTTON_PIN A0
+  #define ANALOG_BUTTON_LEVELS { \
+      0 /*short to ground*/, \
+      327 /*32%, 4.7k*/, \
+      512 /*50%, 10k*/, \
+      844 /*82%, 47k*/, \
+      1023 /*100%, open*/ \
+    }
 
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_MAX7219
   const uint8_t NUM_DIGITS = 8;
@@ -343,14 +355,70 @@ using namespace ace_button;
   #define BUTTON_TYPE BUTTON_TYPE_ANALOG
   const uint8_t MODE_BUTTON_PIN = 0;
   const uint8_t CHANGE_BUTTON_PIN = 2;
-  #define ANALOG_BUTTON_COUNT 4
   #define ANALOG_BUTTON_PIN A0
+  #define ANALOG_BUTTON_LEVELS { \
+      0 /*short to ground*/, \
+      327 /*32%, 4.7k*/, \
+      512 /*50%, 10k*/, \
+      844 /*82%, 47k*/, \
+      1023 /*100%, open*/ \
+    }
 
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595
   const uint8_t NUM_DIGITS = 8;
   const uint8_t LATCH_PIN = SS;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
+
+  // Choose one of the following variants:
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+
+#elif defined(AUNITER_ESP32_TM1637)
+  #define BUTTON_TYPE BUTTON_TYPE_ANALOG
+  const uint8_t MODE_BUTTON_PIN = 0;
+  const uint8_t CHANGE_BUTTON_PIN = 1;
+  #define ANALOG_BUTTON_LEVELS {0, 2048, 4095}
+  #define ANALOG_BUTTON_PIN A10
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_TM1637
+  const uint8_t NUM_DIGITS = 4;
+  const uint8_t CLK_PIN = 14;
+  const uint8_t DIO_PIN = 13;
+  const uint16_t BIT_DELAY = 100;
+
+  // Choose one of the following variants:
+  #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE
+
+#elif defined(AUNITER_ESP32_MAX7219)
+  #define BUTTON_TYPE BUTTON_TYPE_ANALOG
+  const uint8_t MODE_BUTTON_PIN = 0;
+  const uint8_t CHANGE_BUTTON_PIN = 1;
+  #define ANALOG_BUTTON_LEVELS {0, 2048, 4095}
+  #define ANALOG_BUTTON_PIN A10
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_MAX7219
+  const uint8_t NUM_DIGITS = 8;
+  const uint8_t LATCH_PIN = 15;
+  const uint8_t DATA_PIN = 13;
+  const uint8_t CLOCK_PIN = 14;
+
+  // Choose one of the following variants:
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+
+#elif defined(AUNITER_ESP32_HC595)
+  #define BUTTON_TYPE BUTTON_TYPE_ANALOG
+  const uint8_t MODE_BUTTON_PIN = 0;
+  const uint8_t CHANGE_BUTTON_PIN = 1;
+  #define ANALOG_BUTTON_LEVELS {0, 2048, 4095}
+  #define ANALOG_BUTTON_PIN A10
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595
+  const uint8_t NUM_DIGITS = 8;
+  const uint8_t LATCH_PIN = 15;
+  const uint8_t DATA_PIN = 13;
+  const uint8_t CLOCK_PIN = 14;
 
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
@@ -994,20 +1062,7 @@ uint8_t renderMode = RENDER_MODE_AUTO;
   AceButton modeButton((uint8_t) MODE_BUTTON_PIN);
   AceButton changeButton((uint8_t) CHANGE_BUTTON_PIN);
   AceButton* const BUTTONS[] = {&modeButton, &changeButton};
-
-  #if ANALOG_BUTTON_COUNT == 2
-    const uint16_t LEVELS[] = {0, 512, 1023};
-  #elif ANALOG_BUTTON_COUNT == 4
-    const uint16_t LEVELS[] = {
-      0 /*short to ground*/,
-      327 /*32%, 4.7k*/,
-      512 /*50%, 10k*/,
-      844 /*82%, 47k*/,
-      1023 /*100%, open*/
-    };
-  #else
-    #error Unknown ANALOG_BUTTON_COUNT
-  #endif
+  const uint16_t LEVELS[] = ANALOG_BUTTON_LEVELS;
 
   LadderButtonConfig buttonConfig(
       ANALOG_BUTTON_PIN,

@@ -37,6 +37,19 @@ namespace ace_segment {
  * general-purpose SPI interface. For different SPI configurations, it is
  * probably easiest to just copy this file, make the necessary changes, then
  * substitute the new class in places where this class is used.
+ *
+ * The maximum speed of MAX7219 is 16MHz so this class sets the SPI speed to
+ * 8MHz. It's not clear if the SPI speed is worth making into a configurable
+ * parameter. Such a change needs to done a bit carefully, because it should
+ * be a template parameter so that `SPISettings` is a compile-time constant
+ * which allows compile-time optimizations to happen.
+ *
+ * The ESP32 has 2 user-accessible SPI buses: HSPI and VSPI. The default `SPI`
+ * instance uses the VSPI bus with default pins on (mosi=23, miso=19, clk=18,
+ * ss=5). To use the HSPI bus with default pins on (mosi=13, miso=12, clk=14,
+ * ss=15), make a copy this class, create a manual instance of `SPIClass SPI1 =
+ * SPIClass(HSPI)` and replace every instance of `SPI` below with `SPI1`. (TODO:
+ * Maybe `SPI` should be a template parameter.)
  */
 class HardSpiInterface {
   public:
@@ -54,7 +67,11 @@ class HardSpiInterface {
       pinMode(mLatchPin, OUTPUT);
       pinMode(mDataPin, OUTPUT);
       pinMode(mClockPin, OUTPUT);
+    #if defined(ESP32)
+      SPI.begin(mClockPin, -1 /*miso*/, mDataPin, mLatchPin);
+    #else
       SPI.begin();
+    #endif
     }
 
     void end() const {
@@ -66,22 +83,26 @@ class HardSpiInterface {
 
     /** Send 8 bits, including latching LOW and HIGH. */
     void send8(uint8_t value) const {
+      SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
       digitalWrite(mLatchPin, LOW);
-      SPI.beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
       SPI.transfer(value);
-      SPI.endTransaction();
       digitalWrite(mLatchPin, HIGH);
+      SPI.endTransaction();
     }
 
     /** Send 16 bits, including latching LOW and HIGH. */
     void send16(uint16_t value) const {
+      SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
       digitalWrite(mLatchPin, LOW);
-      SPI.beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
       SPI.transfer16(value);
-      SPI.endTransaction();
       digitalWrite(mLatchPin, HIGH);
+      SPI.endTransaction();
     }
 
+    /**
+     * Send two 8-bit bytes as a single 16-bit stream, including latching LOW
+     * and HIGH.
+     */
     void send16(uint8_t msb, uint8_t lsb) const {
       uint16_t value = ((uint16_t) msb) << 8 | (uint16_t) lsb;
       send16(value);

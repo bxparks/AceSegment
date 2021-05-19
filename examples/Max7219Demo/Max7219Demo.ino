@@ -22,6 +22,15 @@ using ace_segment::kDigitRemapArray8Max7219;
 #define SPI_INTERFACE_TYPE_SOFT_SPI 2
 #define SPI_INTERFACE_TYPE_SOFT_SPI_FAST 3
 
+//----------------------------------------------------------------------------
+// Hardware configuration.
+//----------------------------------------------------------------------------
+
+// Configuration for Arduino IDE
+#if ! defined(EPOXY_DUINO) && ! defined(AUNITER)
+  #define AUNITER_MICRO_MAX7219
+#endif
+
 #if defined(EPOXY_DUINO)
   #define SPI_INTERFACE_TYPE SPI_INTERFACE_TYPE_HARD_SPI_FAST
 
@@ -54,9 +63,21 @@ using ace_segment::kDigitRemapArray8Max7219;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
 
+#elif defined(AUNITER_ESP32_MAX7219)
+  #define SPI_INTERFACE_TYPE SPI_INTERFACE_TYPE_HARD_SPI
+
+  // SPI pins
+  const uint8_t LATCH_PIN = 15;
+  const uint8_t DATA_PIN = 13;
+  const uint8_t CLOCK_PIN = 14;
+
 #else
   #error Unknown environment
 #endif
+
+//------------------------------------------------------------------
+// AceSegment Configuration
+//------------------------------------------------------------------
 
 #if SPI_INTERFACE_TYPE == SPI_INTERFACE_TYPE_HARD_SPI_FAST \
     || SPI_INTERFACE_TYPE == SPI_INTERFACE_TYPE_SOFT_SPI_FAST
