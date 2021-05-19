@@ -38,6 +38,12 @@ namespace ace_segment {
  * probably easiest to just copy this file, make the necessary changes, then
  * substitute the new class in places where this class is used.
  *
+ * The maximum speed of MAX7219 is 16MHz so this class sets the SPI speed to
+ * 8MHz. It's not clear if the SPI speed is worth making into a configurable
+ * parameter. Such a change needs to done a bit carefully, because it should
+ * be a template parameter so that `SPISettings` is a compile-time constant
+ * which allows compile-time optimizations to happen.
+ *
  * This class is functionally identical to HardSpiInterface except that the GPIO
  * pins are controlled by digitalWriteFast() and pinModeFast() methods. This
  * decreases flash memory consumption by 70 bytes (ScanningModule) to 250
@@ -68,20 +74,20 @@ class HardSpiFastInterface {
 
     /** Send 8 bits, including latching LOW and HIGH. */
     void send8(uint8_t value) const {
+      SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
       digitalWriteFast(T_LATCH_PIN, LOW);
-      SPI.beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
       SPI.transfer(value);
-      SPI.endTransaction();
       digitalWriteFast(T_LATCH_PIN, HIGH);
+      SPI.endTransaction();
     }
 
     /** Send 16 bits, including latching LOW and HIGH. */
     void send16(uint16_t value) const {
+      SPI.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
       digitalWriteFast(T_LATCH_PIN, LOW);
-      SPI.beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
       SPI.transfer16(value);
-      SPI.endTransaction();
       digitalWriteFast(T_LATCH_PIN, HIGH);
+      SPI.endTransaction();
     }
 
     void send16(uint8_t msb, uint8_t lsb) const {
