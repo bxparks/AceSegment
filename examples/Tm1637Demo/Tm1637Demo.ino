@@ -11,7 +11,10 @@
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
-using namespace ace_segment;
+using ace_segment::Tm1637Module;
+using ace_segment::LedDisplay;
+using ace_segment::SoftWireInterface;
+using ace_segment::kDigitRemapArray6Tm1637;
 
 // Select driver version, either normal digitalWrite() or digitalWriteFast()
 #define WIRE_INTERFACE_TYPE_NORMAL 0

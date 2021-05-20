@@ -10,6 +10,7 @@
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 #include <digitalWriteFast.h>
+#include <ace_segment/hw/HardSpiFastInterface.h>
 #include <ace_segment/hw/SoftSpiFastInterface.h>
 #include <ace_segment/hw/SoftWireFastInterface.h>
 #endif
@@ -18,28 +19,38 @@ using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
 using ace_segment::LedMatrixBase;
+using ace_segment::SoftSpiInterface;
+using ace_segment::HardSpiInterface;
 using ace_segment::SoftSpiFastInterface;
+using ace_segment::HardSpiFastInterface;
 using ace_segment::HybridModule;
 using ace_segment::LedDisplay;
+
+// Select interface protocol.
+#define INTERFACE_TYPE_SOFT_SPI 0
+#define INTERFACE_TYPE_SOFT_SPI_FAST 1
+#define INTERFACE_TYPE_HARD_SPI 2
+#define INTERFACE_TYPE_HARD_SPI_FAST 3
+#define INTERFACE_TYPE_SOFT_WIRE 4
+#define INTERFACE_TYPE_SOFT_WIRE_FAST 5
+
+// Some microcontrollers have 2 or more SPI buses. PRIMARY selects the default.
+// SECONDARY selects the alternate. I don't have a board with more than 2, but
+// we could add additional options here if needed.
+#define SPI_INSTANCE_TYPE_PRIMARY 0
+#define SPI_INSTANCE_TYPE_SECONDARY 1
 
 //----------------------------------------------------------------------------
 // Hardware configuration.
 //----------------------------------------------------------------------------
 
-// Type of LED Module
-#define LED_DISPLAY_TYPE_SCANNING 0
-#define LED_DISPLAY_TYPE_TM1637 1
-#define LED_DISPLAY_TYPE_MAX7219 2
-#define LED_DISPLAY_TYPE_HC595 3
-#define LED_DISPLAY_TYPE_DIRECT 4
-#define LED_DISPLAY_TYPE_HYBRID 5
-#define LED_DISPLAY_TYPE_FULL 6
-
 #if defined(EPOXY_DUINO)
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HYBRID
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
+  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
 
-#elif defined(AUNITER_MICRO_CUSTOM_DUAL)
-  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HYBRID
+#elif defined(AUNITER_MICRO_CUSTOM_SINGLE)
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
+  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
 
 #else
   #error Unknown environment
@@ -73,9 +84,33 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   15, 9, 5, 2
 };
 
+#if INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI
+  using SpiInterface = SoftSpiInterface;
+  SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+#elif INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI_FAST
+  using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  SpiInterface spiInterface;
+#elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
+  using SpiInterface = HardSpiInterface;
+  #if SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_PRIMARY
+    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
+    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN, SPISecondary);
+  #endif
+#elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
+  using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  #if SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_PRIMARY
+    SpiInterface spiInterface;
+  #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
+    SpiInterface spiInterface(SPISecondary);
+  #else
+    #error Unknown SPI_INSTANCE_TYPE
+  #endif
+#else
+  #error Unknown INTERFACE_TYPE
+#endif
+
 // Common Cathode, with transistors on Group pins
-using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
-SpiInterface spiInterface;
 HybridModule<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
     spiInterface,
     LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
