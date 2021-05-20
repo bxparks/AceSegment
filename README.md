@@ -132,18 +132,44 @@ The following example sketches are provided:
 
 * Basic
     * [Tm1637Demo.ino](examples/Tm1637Demo)
+        * Demo of a TM1637 LED module using `Tm1637Module`
     * [Max7219Demo.ino](examples/Max7219Demo)
+        * Demo of a MAX7219 LED module using `Max7219Module`
     * [Hc595Demo.ino](examples/Hc595Demo)
-    * [DirectDemo.ino](examples/DirectDemo)
-    * [HybridDemo.ino](examples/HybridDemo)
-* Advanced
-    * [Tm1637DualDemo.ino](examples/Tm1637DualDemo)
-    * [ModulatingDemo.ino](examples/ModulatingDemo)
-    * [ScanningDirectDemo.ino](examples/ScanningDirectDemo)
-    * [DirectFast4Demo.ino](examples/DirectFast4Demo)
+        * Demo of a 74HC595 LED module using `Hc595Module`
     * [AceSegmentDemo.ino](examples/AceSegmentDemo)
         * runs through some features of the library
         * uses 2 buttons for "single step" debugging mode
+        * depends on AceButton (https://github.com/bxparks/AceButton) library
+* Advanced
+    * [DirectDemo.ino](examples/DirectDemo)
+        * Demo of an LED module with no controller, all digit and segment pins
+          wired directly to the microcontroller
+        * Uses `DirectModule` class
+    * [DirectFast4Demo.ino](examples/DirectFast4Demo)
+        * same as `DirectDemo` but using `DirectFast4Module` which uses
+          `digitalWriteFast()`
+    * [HybridDemo.ino](examples/HybridDemo)
+        * Demo of an LED module that uses a single 74HC595 shift register on the
+          segment pins, but the digit pins are wired directly to the
+          microcontroller
+        * Uses `HybridModule` class
+    * [Tm1637DualDemo.ino](examples/Tm1637DualDemo)
+        * render two TM1637 LED modules at the same time using two
+          `Tm1637Module` instances
+    * [ModulatingDemo.ino](examples/ModulatingDemo)
+        * demo of brightness control on a per-digit basis using `DirectModule`,
+          `HybridModule`, or `Hc595Module`
+    * [ScanningDemo.ino](examples/ScanningDemo)
+        * Low-level demo `ScanningModule` combined with various
+          `LedMatrixDirect`, `LedMatrixSingleHc595` and `LedMatrixDualHc595`
+          classes
+        * Not intended for general public consumption.
+    * [Hc59Interrupt5Demo.ino](examples/Hc595Demo)
+        * Same as Hc595Demo, but using an interrupt service routine
+          to render the LED display.
+        * Uses the `TimerOne` (https://github.com/PaulStoffregen/TimerOne)
+          library
 * Benchmarks
     * [AutoBenchmark.ino](examples/AutoBenchmark): performs CPU benchmarking of
       most of the supported configurations of the framework
