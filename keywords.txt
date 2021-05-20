@@ -10,8 +10,8 @@ HardSpiInterface	KEYWORD1
 HardSpiFastInterface	KEYWORD1
 SoftSpiInterface	KEYWORD1
 SoftSpiFastInterface	KEYWORD1
-SoftWireInterface	KEYWORD1
-SoftWireFastInterface	KEYWORD1
+SoftTmiInterface	KEYWORD1
+SoftTmiFastInterface	KEYWORD1
 LedMatrixBase	KEYWORD1
 LedMatrixDirect	KEYWORD1
 LedMatrixDirectFast4	KEYWORD1
@@ -44,7 +44,7 @@ end	KEYWORD2
 send8	KEYWORD2
 send16	KEYWORD2
 
-# SoftWireInterface
+# SoftTmiInterface
 begin	KEYWORD2
 end	KEYWORD2
 startCondition	KEYWORD2

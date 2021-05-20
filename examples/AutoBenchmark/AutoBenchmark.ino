@@ -45,7 +45,7 @@ SOFTWARE.
 #include <digitalWriteFast.h>
 #include <ace_segment/hw/SoftSpiFastInterface.h>
 #include <ace_segment/hw/HardSpiFastInterface.h>
-#include <ace_segment/hw/SoftWireFastInterface.h>
+#include <ace_segment/hw/SoftTmiFastInterface.h>
 #include <ace_segment/direct/DirectFast4Module.h>
 #endif
 
@@ -565,67 +565,67 @@ void runTm1637Benchmark(
   printStats(name, timingStats, numSamples);
 }
 
-void runTm1637SoftWire() {
-  using WireInterface = SoftWireInterface;
-  WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
-  wireInterface.begin();
+void runTm1637SoftTmi() {
+  using TmiInterface = SoftTmiInterface;
+  TmiInterface tmiInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
+  tmiInterface.begin();
 
-  Tm1637Module<WireInterface, 4> tm1637Module(wireInterface);
+  Tm1637Module<TmiInterface, 4> tm1637Module(tmiInterface);
   tm1637Module.begin();
-  runTm1637Benchmark(F("Tm1637(4,SoftWire)"), tm1637Module, 4, false);
+  runTm1637Benchmark(F("Tm1637(4,SoftTmi)"), tm1637Module, 4, false);
   runTm1637Benchmark(
-      F("Tm1637(4,SoftWire,incremental)"), tm1637Module, 4, true);
+      F("Tm1637(4,SoftTmi,incremental)"), tm1637Module, 4, true);
   tm1637Module.end();
 
-  wireInterface.end();
+  tmiInterface.end();
 }
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-void runTm1637SoftWireFast() {
-  using WireInterface = SoftWireFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
-  WireInterface wireInterface;
-  wireInterface.begin();
+void runTm1637SoftTmiFast() {
+  using TmiInterface = SoftTmiFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
+  TmiInterface tmiInterface;
+  tmiInterface.begin();
 
-  Tm1637Module<WireInterface, 4> tm1637Module(wireInterface);
+  Tm1637Module<TmiInterface, 4> tm1637Module(tmiInterface);
   tm1637Module.begin();
-  runTm1637Benchmark(F("Tm1637(4,SoftWireFast)"), tm1637Module, 4, false);
+  runTm1637Benchmark(F("Tm1637(4,SoftTmiFast)"), tm1637Module, 4, false);
   runTm1637Benchmark(
-      F("Tm1637(4,SoftWireFast,incremental)"), tm1637Module, 4, true);
+      F("Tm1637(4,SoftTmiFast,incremental)"), tm1637Module, 4, true);
   tm1637Module.end();
 
-  wireInterface.end();
+  tmiInterface.end();
 }
 #endif
 
-void runTm1637SixSoftWire() {
-  using WireInterface = SoftWireInterface;
-  WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
-  wireInterface.begin();
+void runTm1637SixSoftTmi() {
+  using TmiInterface = SoftTmiInterface;
+  TmiInterface tmiInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
+  tmiInterface.begin();
 
-  Tm1637Module<WireInterface, 6> tm1637SixModule(wireInterface);
+  Tm1637Module<TmiInterface, 6> tm1637SixModule(tmiInterface);
   tm1637SixModule.begin();
-  runTm1637Benchmark(F("Tm1637(6,SoftWire)"), tm1637SixModule, 6, false);
+  runTm1637Benchmark(F("Tm1637(6,SoftTmi)"), tm1637SixModule, 6, false);
   runTm1637Benchmark(
-      F("Tm1637(6,SoftWire,incremental)"), tm1637SixModule, 6, true);
+      F("Tm1637(6,SoftTmi,incremental)"), tm1637SixModule, 6, true);
   tm1637SixModule.end();
 
-  wireInterface.end();
+  tmiInterface.end();
 }
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-void runTm1637SixSoftWireFast() {
-  using WireInterface = SoftWireFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
-  WireInterface wireInterface;
-  wireInterface.begin();
+void runTm1637SixSoftTmiFast() {
+  using TmiInterface = SoftTmiFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
+  TmiInterface tmiInterface;
+  tmiInterface.begin();
 
-  Tm1637Module<WireInterface, 6> tm1637SixModule(wireInterface);
+  Tm1637Module<TmiInterface, 6> tm1637SixModule(tmiInterface);
   tm1637SixModule.begin();
-  runTm1637Benchmark(F("Tm1637(6,SoftWireFast)"), tm1637SixModule, 6, false);
+  runTm1637Benchmark(F("Tm1637(6,SoftTmiFast)"), tm1637SixModule, 6, false);
   runTm1637Benchmark(
-      F("Tm1637(6,SoftWireFast,incremental)"), tm1637SixModule, 6, true);
+      F("Tm1637(6,SoftTmiFast,incremental)"), tm1637SixModule, 6, true);
   tm1637SixModule.end();
 
-  wireInterface.end();
+  tmiInterface.end();
 }
 #endif
 
@@ -735,14 +735,14 @@ void runBenchmarks() {
   runHc595HardSpiFast();
 #endif
 
-  runTm1637SoftWire();
+  runTm1637SoftTmi();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  runTm1637SoftWireFast();
+  runTm1637SoftTmiFast();
 #endif
 
-  runTm1637SixSoftWire();
+  runTm1637SixSoftTmi();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  runTm1637SixSoftWireFast();
+  runTm1637SixSoftTmiFast();
 #endif
 
   runMax7219SoftSpi();
@@ -759,12 +759,12 @@ void runBenchmarks() {
 //-----------------------------------------------------------------------------
 
 void printSizeOf() {
-  SERIAL_PORT_MONITOR.print(F("sizeof(SoftWireInterface): "));
-  SERIAL_PORT_MONITOR.println(sizeof(SoftWireInterface));
+  SERIAL_PORT_MONITOR.print(F("sizeof(SoftTmiInterface): "));
+  SERIAL_PORT_MONITOR.println(sizeof(SoftTmiInterface));
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  SERIAL_PORT_MONITOR.print(F("sizeof(SoftWireFastInterface<4, 5, 100>): "));
-  SERIAL_PORT_MONITOR.println(sizeof(SoftWireFastInterface<4, 5, 100>));
+  SERIAL_PORT_MONITOR.print(F("sizeof(SoftTmiFastInterface<4, 5, 100>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(SoftTmiFastInterface<4, 5, 100>));
 #endif
 
   SERIAL_PORT_MONITOR.print(F("sizeof(SoftSpiInterface): "));
@@ -826,11 +826,11 @@ void printSizeOf() {
   SERIAL_PORT_MONITOR.print(F("sizeof(Hc595Module<SoftSpiInterface, 8>): "));
   SERIAL_PORT_MONITOR.println(sizeof(Hc595Module<SoftSpiInterface, 8>));
 
-  SERIAL_PORT_MONITOR.print(F("sizeof(Tm1637Module<SoftWireInterface, 4>): "));
-  SERIAL_PORT_MONITOR.println(sizeof(Tm1637Module<SoftWireInterface, 4>));
+  SERIAL_PORT_MONITOR.print(F("sizeof(Tm1637Module<SoftTmiInterface, 4>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(Tm1637Module<SoftTmiInterface, 4>));
 
-  SERIAL_PORT_MONITOR.print(F("sizeof(Tm1637Module<SoftWireInterface, 6>): "));
-  SERIAL_PORT_MONITOR.println(sizeof(Tm1637Module<SoftWireInterface, 6>));
+  SERIAL_PORT_MONITOR.print(F("sizeof(Tm1637Module<SoftTmiInterface, 6>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(Tm1637Module<SoftTmiInterface, 6>));
 
   SERIAL_PORT_MONITOR.print(F("sizeof(Max7219Module<SoftSpiInterface, 8>): "));
   SERIAL_PORT_MONITOR.println(sizeof(Max7219Module<SoftSpiInterface, 8>));

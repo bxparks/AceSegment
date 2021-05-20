@@ -1,6 +1,6 @@
 SIZEOF
-sizeof(SoftWireInterface): 4
-sizeof(SoftWireFastInterface<4, 5, 100>): 1
+sizeof(SoftTmiInterface): 4
+sizeof(SoftTmiFastInterface<4, 5, 100>): 1
 sizeof(SoftSpiInterface): 3
 sizeof(SoftSpiFastInterface<11, 12, 13>): 1
 sizeof(HardSpiInterface): 3
@@ -15,8 +15,8 @@ sizeof(DirectModule<4>): 31
 sizeof(DirectFast4Module<...>): 25
 sizeof(HybridModule<SoftSpiInterface, 4>): 30
 sizeof(Hc595Module<SoftSpiInterface, 8>): 46
-sizeof(Tm1637Module<SoftWireInterface, 4>): 14
-sizeof(Tm1637Module<SoftWireInterface, 6>): 16
+sizeof(Tm1637Module<SoftTmiInterface, 4>): 14
+sizeof(Tm1637Module<SoftTmiInterface, 6>): 16
 sizeof(Max7219Module<SoftSpiInterface, 8>): 16
 sizeof(LedDisplay): 2
 sizeof(NumberWriter): 2
@@ -46,14 +46,14 @@ Hc595(8,HardSpi) 28 30 40 80
 Hc595(8,HardSpi,subfields) 4 8 36 1280
 Hc595(8,HardSpiFast) 12 18 28 80
 Hc595(8,HardSpiFast,subfields) 4 7 32 1280
-Tm1637(4,SoftWire) 22316 22348 22568 10
-Tm1637(4,SoftWire,incremental) 3616 8810 10320 50
-Tm1637(4,SoftWireFast) 21064 21092 21316 10
-Tm1637(4,SoftWireFast,incremental) 3412 8315 9776 50
-Tm1637(6,SoftWire) 28060 28092 28344 10
-Tm1637(6,SoftWire,incremental) 3616 9178 10316 70
-Tm1637(6,SoftWireFast) 26484 26511 26732 10
-Tm1637(6,SoftWireFast,incremental) 3412 8663 9768 70
+Tm1637(4,SoftTmi) 22316 22348 22568 10
+Tm1637(4,SoftTmi,incremental) 3616 8810 10320 50
+Tm1637(4,SoftTmiFast) 21064 21092 21316 10
+Tm1637(4,SoftTmiFast,incremental) 3412 8315 9776 50
+Tm1637(6,SoftTmi) 28060 28092 28344 10
+Tm1637(6,SoftTmi,incremental) 3616 9178 10316 70
+Tm1637(6,SoftTmiFast) 26484 26511 26732 10
+Tm1637(6,SoftTmiFast,incremental) 3412 8663 9768 70
 Max7219(8,SoftSpi) 2380 2395 2600 20
 Max7219(8,SoftSpiFast) 208 218 240 20
 Max7219(8,HardSpi) 220 232 248 20

@@ -11,7 +11,7 @@
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 #include <digitalWriteFast.h>
 #include <ace_segment/hw/SoftSpiFastInterface.h>
-#include <ace_segment/hw/SoftWireFastInterface.h>
+#include <ace_segment/hw/SoftTmiFastInterface.h>
 #include <ace_segment/direct/DirectFast4Module.h>
 #endif
 

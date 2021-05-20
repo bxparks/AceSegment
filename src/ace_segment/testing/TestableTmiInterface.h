@@ -1,12 +1,12 @@
-#ifndef ACE_SEGMENT_TESTABLE_WIRE_INTERFACE_H
-#define ACE_SEGMENT_TESTABLE_WIRE_INTERFACE_H
+#ifndef ACE_SEGMENT_TESTABLE_TMI_INTERFACE_H
+#define ACE_SEGMENT_TESTABLE_TMI_INTERFACE_H
 
 #include "EventLog.h" // EventLog
 
 namespace ace_segment {
 namespace testing {
 
-class TestableWireInterface {
+class TestableTmiInterface {
   public:
     void begin() const {
       mEventLog.addWireBegin();

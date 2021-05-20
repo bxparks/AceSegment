@@ -43,7 +43,7 @@ const uint8_t PATTERNS[6] = {
   #error Unknown AUNITER environment
 #endif
 
-// For a SoftWireInterface (non-fast), time to send 4 digits using flush():
+// For a SoftTmiInterface (non-fast), time to send 4 digits using flush():
 //
 // * 12 ms at 50 us delay, but does not work.
 // * 17 ms at 75 us delay.
@@ -53,17 +53,17 @@ const uint8_t PATTERNS[6] = {
 // Using flushIncremental() is about 1/2 these numbers.
 const uint16_t BIT_DELAY = 100;
 
-using WireInterface = SoftWireInterface;
-WireInterface wireInterface1(CLK_PIN, DIO1_PIN, BIT_DELAY);
-WireInterface wireInterface2(CLK_PIN, DIO2_PIN, BIT_DELAY);
-Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module1(wireInterface1);
-Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module2(wireInterface2);
+using TmiInterface = SoftTmiInterface;
+TmiInterface tmiInterface1(CLK_PIN, DIO1_PIN, BIT_DELAY);
+TmiInterface tmiInterface2(CLK_PIN, DIO2_PIN, BIT_DELAY);
+Tm1637Module<TmiInterface, NUM_DIGITS> tm1637Module1(tmiInterface1);
+Tm1637Module<TmiInterface, NUM_DIGITS> tm1637Module2(tmiInterface2);
 LedDisplay display1(tm1637Module1);
 LedDisplay display2(tm1637Module2);
 
 void setupAceSegment() {
-  wireInterface1.begin();
-  wireInterface2.begin();
+  tmiInterface1.begin();
+  tmiInterface2.begin();
   tm1637Module1.begin();
   tm1637Module2.begin();
 }

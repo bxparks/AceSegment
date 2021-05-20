@@ -173,14 +173,14 @@ depend on the lower-level classes:
             * Hardware SPI using `digitalWrite()` to control the latch pin.
         * `HardSpiFastInterface`
             * Hardware SPI using `digitalWriteFast()` to control the latch pin.
-* WireInterface
+* TmiInterface
     * Thin-wrapper classes to communicating with LED modules using the TM1637
       protocol. Similar to I2C but not exactly the same.
     * Used by `Tm1637Module`.
     * There are 2 implementations:
-        * `SoftWireInterface`
+        * `SoftTmiInterface`
             * Implement the TM1637 protocol using `digitalWrite()`.
-        * `SoftWireFastInterface`
+        * `SoftTmiFastInterface`
             * Implement the TM1637 protocol using `digitalWriteFast()`.
 * `LedModule`
     * Base interface for all hardware dependent implementation of a
@@ -255,8 +255,8 @@ Tm1637Module          Max7219Module     Hc595Module  HybridModule  DirectModule
       |                         \           |         /
       |                          \          |        /
       v                           v         v       v
-SoftWireInterface                 SoftSpiInterface
-SoftWireFastInterface             SoftSpiFastInterface
+SoftTmiInterface                  SoftSpiInterface
+SoftTmiFastInterface              SoftSpiFastInterface
                                   HardSpiInterface
                                   HardSpiFastInterface
 ```
@@ -378,11 +378,11 @@ seem have either 4 digits or 6 digits.
 The `Tm1637Module` class looks like this:
 
 ```C++
-template <typename T_WI, uint8_t T_DIGITS>
+template <typename T_TMII, uint8_t T_DIGITS>
 class Tm1637Module : public LedModule {
   public:
     explicit Tm1637Module(
-        const T_WI& wireInterface,
+        const T_TMII& tmiInterface,
         const uint8_t* remapArray = nullptr
     );
 
@@ -401,15 +401,15 @@ class Tm1637Module : public LedModule {
 };
 ```
 
-The `T_WI` template parameter is a class that implements the 2-wire protocol
+The `T_TMII` template parameter is a class that implements the 2-wire protocol
 used by the TM1637 controller. It is a protocol that is very close to, but not
 quite the same as, I2C. This means that we cannot use the usual `Wire` library,
 but must implement a custom version. The library provides 2 implementations: the
-`SoftWireInterface` compatible with all platforms, and `SoftWireFastInterface`
+`SoftTmiInterface` compatible with all platforms, and `SoftTmiFastInterface`
 useful on AVR processors.
 
-The `wireInterface` is an instance of `T_WI`, which is either
-`SoftWireInterface` or `SoftWireFastInterface`.
+The `tmiInterface` is an instance of `T_TMII`, which is either
+`SoftTmiInterface` or `SoftTmiFastInterface`.
 
 The `remapArray` is an array of addresses which map the physical positions to
 their logical positions. This is not needed by the 4-digit TM1637 LED modules,
@@ -457,14 +457,14 @@ const uint8_t DIO_PIN = 9;
 const uint16_t BIT_DELAY = 100;
 const uint8_t NUM_DIGITS = 4;
 
-using WireInterface = SoftWireInterface;
-WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
-Tm1637Module<WireInterface, NUM_DIGITS> ledModule(wireInterface);
+using TmiInterface = SoftTmiInterface;
+TmiInterface tmiInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
+Tm1637Module<TmiInterface, NUM_DIGITS> ledModule(tmiInterface);
 
 LedDisplay display(ledModule);
 
 void setupAceSegment() {
-  wireInterface.begin();
+  tmiInterface.begin();
   ledModule.begin();
 }
 
@@ -534,15 +534,15 @@ const uint8_t DIO_PIN = 9;
 const uint16_t BIT_DELAY = 100;
 const uint8_t NUM_DIGITS = 4;
 
-using WireInterface = SoftWireInterface;
-WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
-Tm1637Module<WireInterface, NUM_DIGITS> ledModule(
-    wireInterface, kDigitRemapArray6Tm1637);
+using TmiInterface = SoftTmiInterface;
+TmiInterface tmiInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
+Tm1637Module<TmiInterface, NUM_DIGITS> ledModule(
+    tmiInterface, kDigitRemapArray6Tm1637);
 
 LedDisplay display(ledModule);
 
 void setupAceSegment() {
-  wireInterface.begin();
+  tmiInterface.begin();
   ledModule.begin();
 }
 
@@ -1160,8 +1160,8 @@ I have written versions of some lower-level classes to take advantage of
     * Variant of `HardSpiInterface.h` using  `digitalWriteFast()` to toggle
       the `LATCH` pin, while the hardware SPI code controls the `MOSI` and `SCK`
       pins
-* `hw/SoftWireFastInterface.h`
-    * Variant of `SoftWireInterface.h` using `digitalWriteFast()`
+* `hw/SoftTmiFastInterface.h`
+    * Variant of `SoftTmiInterface.h` using `digitalWriteFast()`
 
 Since these header files require an external `digitalWriteFast` library to be
 installed, and they are only valid for AVR processors, these header files are
@@ -1175,7 +1175,7 @@ need to include these headers manually, like this:
   #include <digitalWriteFast.h> // from 3rd party library
   #include <ace_segment/hw/SoftSpiFastInterface.h>
   #include <ace_segment/hw/HardSpiFastInterface.h>
-  #include <ace_segment/hw/SoftWireFastInterface.h>
+  #include <ace_segment/hw/SoftTmiFastInterface.h>
   #include <ace_segment/direct/DirectFast4Module.h>
 #endif
 ```
@@ -1198,8 +1198,8 @@ Here are the sizes of the various classes on the 8-bit AVR microcontrollers
 (Arduino Uno, Nano, etc):
 
 ```
-sizeof(SoftWireInterface): 4
-sizeof(SoftWireFastInterface<4, 5, 100>): 1
+sizeof(SoftTmiInterface): 4
+sizeof(SoftTmiFastInterface<4, 5, 100>): 1
 sizeof(SoftSpiInterface): 3
 sizeof(SoftSpiFastInterface<11, 12, 13>): 1
 sizeof(HardSpiInterface): 3
@@ -1214,8 +1214,8 @@ sizeof(DirectModule<4>): 31
 sizeof(DirectFast4Module<...>): 25
 sizeof(HybridModule<SoftSpiInterface, 4>): 30
 sizeof(Hc595Module<SoftSpiInterface, 8>): 46
-sizeof(Tm1637Module<SoftWireInterface, 4>): 14
-sizeof(Tm1637Module<SoftWireInterface, 6>): 16
+sizeof(Tm1637Module<SoftTmiInterface, 4>): 14
+sizeof(Tm1637Module<SoftTmiInterface, 6>): 16
 sizeof(Max7219Module<SoftSpiInterface, 8>): 16
 sizeof(LedDisplay): 2
 sizeof(NumberWriter): 2
@@ -1229,7 +1229,7 @@ sizeof(StringScroller): 11
 On 32-bit processors, these numbers look like this:
 
 ```
-sizeof(SoftWireInterface): 4
+sizeof(SoftTmiInterface): 4
 sizeof(SoftSpiInterface): 3
 sizeof(HardSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
@@ -1240,8 +1240,8 @@ sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(DirectModule<4>): 48
 sizeof(HybridModule<SoftSpiInterface, 4>): 48
 sizeof(Hc595Module<SoftSpiInterface, 8>): 64
-sizeof(Tm1637Module<SoftWireInterface, 4>): 24
-sizeof(Tm1637Module<SoftWireInterface, 6>): 28
+sizeof(Tm1637Module<SoftTmiInterface, 4>): 24
+sizeof(Tm1637Module<SoftTmiInterface, 6>): 28
 sizeof(Max7219Module<SoftSpiInterface, 8>): 28
 sizeof(LedDisplay): 4
 sizeof(NumberWriter): 4
@@ -1283,8 +1283,8 @@ static memory consumptions for various configurations on an Arduino Nano
 | Hc595(HardSpi)                  |   1598/   59 |  1142/   48 |
 | Hc595(HardSpiFast)              |   1510/   57 |  1054/   46 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SoftWire)                |   1582/   39 |  1126/   28 |
-| Tm1637(SoftWireFast)            |    924/   36 |   468/   25 |
+| Tm1637(SoftTmi)                 |   1582/   39 |  1126/   28 |
+| Tm1637(SoftTmiFast)             |    924/   36 |   468/   25 |
 |---------------------------------+--------------+-------------|
 | Max7219(SoftSpi)                |   1214/   44 |   758/   33 |
 | Max7219(SoftSpiFast)            |    774/   42 |   318/   31 |
@@ -1321,8 +1321,8 @@ And here are the memory consumption numbers for an ESP8266:
 | Hc595(HardSpi)                  | 258992/27264 |  2292/  480 |
 | Hc595(HardSpiFast)              |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SoftWire)                | 257920/27224 |  1220/  440 |
-| Tm1637(SoftWireFast)            |     -1/   -1 |    -1/   -1 |
+| Tm1637(SoftTmi)                 | 257920/27224 |  1220/  440 |
+| Tm1637(SoftTmiFast)             |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | Max7219(SoftSpi)                | 257656/27224 |   956/  440 |
 | Max7219(SoftSpiFast)            |     -1/   -1 |    -1/   -1 |
@@ -1373,14 +1373,14 @@ Here are the CPU numbers for an AVR processor:
 | Hc595(8,HardSpiFast)                   |    12/   18/   28 |      80 |
 | Hc595(8,HardSpiFast,subfields)         |     4/    7/   32 |    1280 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(4,SoftWire)                     | 22316/22348/22568 |      10 |
-| Tm1637(4,SoftWire,incremental)         |  3616/ 8810/10320 |      50 |
-| Tm1637(4,SoftWireFast)                 | 21064/21092/21316 |      10 |
-| Tm1637(4,SoftWireFast,incremental)     |  3412/ 8315/ 9776 |      50 |
-| Tm1637(6,SoftWire)                     | 28060/28092/28344 |      10 |
-| Tm1637(6,SoftWire,incremental)         |  3616/ 9178/10316 |      70 |
-| Tm1637(6,SoftWireFast)                 | 26484/26511/26732 |      10 |
-| Tm1637(6,SoftWireFast,incremental)     |  3412/ 8663/ 9768 |      70 |
+| Tm1637(4,SoftTmi)                      | 22316/22348/22568 |      10 |
+| Tm1637(4,SoftTmi,incremental)          |  3616/ 8810/10320 |      50 |
+| Tm1637(4,SoftTmiFast)                  | 21064/21092/21316 |      10 |
+| Tm1637(4,SoftTmiFast,incremental)      |  3412/ 8315/ 9776 |      50 |
+| Tm1637(6,SoftTmi)                      | 28060/28092/28344 |      10 |
+| Tm1637(6,SoftTmi,incremental)          |  3616/ 9178/10316 |      70 |
+| Tm1637(6,SoftTmiFast)                  | 26484/26511/26732 |      10 |
+| Tm1637(6,SoftTmiFast,incremental)      |  3412/ 8663/ 9768 |      70 |
 |----------------------------------------+-------------------+---------|
 | Max7219(8,SoftSpi)                     |  2380/ 2395/ 2600 |      20 |
 | Max7219(8,SoftSpiFast)                 |   208/  218/  240 |      20 |
@@ -1411,10 +1411,10 @@ Here are the CPU numbers for an ESP8266:
 | Hc595(8,HardSpi)                       |    12/   12/   25 |      80 |
 | Hc595(8,HardSpi,subfields)             |     0/    2/   25 |    1280 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(4,SoftWire)                     | 21497/21506/21541 |      10 |
-| Tm1637(4,SoftWire,incremental)         |  3481/ 8479/ 9749 |      50 |
-| Tm1637(6,SoftWire)                     | 27025/27035/27049 |      10 |
-| Tm1637(6,SoftWire,incremental)         |  3481/ 8838/ 9762 |      70 |
+| Tm1637(4,SoftTmi)                      | 21497/21506/21541 |      10 |
+| Tm1637(4,SoftTmi,incremental)          |  3481/ 8479/ 9749 |      50 |
+| Tm1637(6,SoftTmi)                      | 27025/27035/27049 |      10 |
+| Tm1637(6,SoftTmi,incremental)          |  3481/ 8838/ 9762 |      70 |
 |----------------------------------------+-------------------+---------|
 | Max7219(8,SoftSpi)                     |   460/  461/  474 |      20 |
 | Max7219(8,HardSpi)                     |   111/  111/  120 |      20 |

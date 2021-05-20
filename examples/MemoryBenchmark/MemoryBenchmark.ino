@@ -27,8 +27,8 @@
 #define FEATURE_HC595_SOFT_SPI_FAST 8
 #define FEATURE_HC595_HARD_SPI 9
 #define FEATURE_HC595_HARD_SPI_FAST 10
-#define FEATURE_TM1637_WIRE 11
-#define FEATURE_TM1637_WIRE_FAST 12
+#define FEATURE_TM1637_TMI 11
+#define FEATURE_TM1637_TMI_FAST 12
 #define FEATURE_MAX7219_SOFT_SPI 13
 #define FEATURE_MAX7219_SOFT_SPI_FAST 14
 #define FEATURE_MAX7219_HARD_SPI 15
@@ -50,7 +50,7 @@ volatile int disableCompilerOptimization = 0;
     #include <digitalWriteFast.h>
     #include <ace_segment/hw/SoftSpiFastInterface.h>
     #include <ace_segment/hw/HardSpiFastInterface.h>
-    #include <ace_segment/hw/SoftWireFastInterface.h>
+    #include <ace_segment/hw/SoftTmiFastInterface.h>
     #include <ace_segment/direct/DirectFast4Module.h>
   #endif
   using namespace ace_segment;
@@ -230,19 +230,19 @@ volatile int disableCompilerOptimization = 0;
         kByteOrderDigitHighSegmentLow
     );
 
-  #elif FEATURE == FEATURE_TM1637_WIRE
-    using WireInterface = SoftWireInterface;
-    WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
-    Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module(wireInterface);
+  #elif FEATURE == FEATURE_TM1637_TMI
+    using TmiInterface = SoftTmiInterface;
+    TmiInterface tmiInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
+    Tm1637Module<TmiInterface, NUM_DIGITS> tm1637Module(tmiInterface);
 
-  #elif FEATURE == FEATURE_TM1637_WIRE_FAST
+  #elif FEATURE == FEATURE_TM1637_TMI_FAST
     #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
       #error Unsupported FEATURE on this platform
     #endif
 
-    using WireInterface = SoftWireFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
-    WireInterface wireInterface;
-    Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module(wireInterface);
+    using TmiInterface = SoftTmiFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
+    TmiInterface tmiInterface;
+    Tm1637Module<TmiInterface, NUM_DIGITS> tm1637Module(tmiInterface);
 
   #elif FEATURE == FEATURE_MAX7219_SOFT_SPI
     using SpiInterface = SoftSpiInterface;
@@ -358,12 +358,12 @@ void setup() {
   spiInterface.begin();
   scanningModule.begin();
 
-#elif FEATURE == FEATURE_TM1637_WIRE
-  wireInterface.begin();
+#elif FEATURE == FEATURE_TM1637_TMI
+  tmiInterface.begin();
   tm1637Module.begin();
 
-#elif FEATURE == FEATURE_TM1637_WIRE_FAST
-  wireInterface.begin();
+#elif FEATURE == FEATURE_TM1637_TMI_FAST
+  tmiInterface.begin();
   tm1637Module.begin();
 
 #elif FEATURE == FEATURE_MAX7219_SOFT_SPI
@@ -389,15 +389,15 @@ void setup() {
 }
 
 void loop() {
-#if FEATURE > FEATURE_BASELINE && FEATURE < FEATURE_TM1637_WIRE
+#if FEATURE > FEATURE_BASELINE && FEATURE < FEATURE_TM1637_TMI
   scanningModule.setPatternAt(0, 0x3A);
   scanningModule.renderFieldWhenReady();
 
-#elif FEATURE == FEATURE_TM1637_WIRE
+#elif FEATURE == FEATURE_TM1637_TMI
   tm1637Module.setPatternAt(0, 0xff);
   tm1637Module.flush();
 
-#elif FEATURE == FEATURE_TM1637_WIRE_FAST
+#elif FEATURE == FEATURE_TM1637_TMI_FAST
   tm1637Module.setPatternAt(0, 0xff);
   tm1637Module.flush();
 

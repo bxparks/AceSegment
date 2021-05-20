@@ -62,7 +62,7 @@ END {
     if (u[i]["name"] ~ /^Direct\(4\)$/ \
         || u[i]["name"] ~ /^Hybrid\(4,SoftSpi\)/ \
         || u[i]["name"] ~ /^Hc595\(8,SoftSpi\)/ \
-        || u[i]["name"] ~ /^Tm1637\(4,SoftWire\)/ \
+        || u[i]["name"] ~ /^Tm1637\(4,SoftTmi\)/ \
         || u[i]["name"] ~ /^Max7219\(8,SoftSpi\)/ \
     ) {
       printf("|----------------------------------------+-------------------+---------|\n")

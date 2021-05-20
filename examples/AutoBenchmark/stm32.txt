@@ -1,5 +1,5 @@
 SIZEOF
-sizeof(SoftWireInterface): 4
+sizeof(SoftTmiInterface): 4
 sizeof(SoftSpiInterface): 3
 sizeof(HardSpiInterface): 3
 sizeof(LedMatrixDirect<>): 16
@@ -10,8 +10,8 @@ sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(DirectModule<4>): 48
 sizeof(HybridModule<SoftSpiInterface, 4>): 48
 sizeof(Hc595Module<SoftSpiInterface, 8>): 64
-sizeof(Tm1637Module<SoftWireInterface, 4>): 24
-sizeof(Tm1637Module<SoftWireInterface, 6>): 28
+sizeof(Tm1637Module<SoftTmiInterface, 4>): 24
+sizeof(Tm1637Module<SoftTmiInterface, 6>): 28
 sizeof(Max7219Module<SoftSpiInterface, 8>): 28
 sizeof(LedDisplay): 4
 sizeof(NumberWriter): 4
@@ -31,10 +31,10 @@ Hc595(8,SoftSpi) 53 53 57 80
 Hc595(8,SoftSpi,subfields) 1 7 63 1280
 Hc595(8,HardSpi) 40 40 45 80
 Hc595(8,HardSpi,subfields) 1 6 45 1280
-Tm1637(4,SoftWire) 22382 22383 22385 10
-Tm1637(4,SoftWire,incremental) 3623 8825 10140 50
-Tm1637(6,SoftWire) 28136 28141 28144 10
-Tm1637(6,SoftWire,incremental) 3623 9197 10136 70
+Tm1637(4,SoftTmi) 22382 22383 22385 10
+Tm1637(4,SoftTmi,incremental) 3623 8825 10140 50
+Tm1637(6,SoftTmi) 28136 28141 28144 10
+Tm1637(6,SoftTmi,incremental) 3623 9197 10136 70
 Max7219(8,SoftSpi) 478 481 484 20
 Max7219(8,HardSpi) 361 363 367 20
 END

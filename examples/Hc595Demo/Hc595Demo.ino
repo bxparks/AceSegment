@@ -25,8 +25,8 @@ using ace_segment::LedMatrixBase;
 #define INTERFACE_TYPE_SOFT_SPI_FAST 1
 #define INTERFACE_TYPE_HARD_SPI 2
 #define INTERFACE_TYPE_HARD_SPI_FAST 3
-#define INTERFACE_TYPE_SOFT_WIRE 4
-#define INTERFACE_TYPE_SOFT_WIRE_FAST 5
+#define INTERFACE_TYPE_SOFT_TMI 4
+#define INTERFACE_TYPE_SOFT_TMI_FAST 5
 
 // Some microcontrollers have 2 or more SPI buses. PRIMARY selects the default.
 // SECONDARY selects the alternate. I don't have a board with more than 2, but

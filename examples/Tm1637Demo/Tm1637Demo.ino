@@ -13,12 +13,12 @@ using ace_common::incrementModOffset;
 using ace_common::TimingStats;
 using ace_segment::Tm1637Module;
 using ace_segment::LedDisplay;
-using ace_segment::SoftWireInterface;
+using ace_segment::SoftTmiInterface;
 using ace_segment::kDigitRemapArray6Tm1637;
 
 // Select driver version, either normal digitalWrite() or digitalWriteFast()
-#define WIRE_INTERFACE_TYPE_NORMAL 0
-#define WIRE_INTERFACE_TYPE_FAST 1
+#define TMI_INTERFACE_TYPE_NORMAL 0
+#define TMI_INTERFACE_TYPE_FAST 1
 
 // Select the TM1637Module flush() method.
 #define TM_FLUSH_METHOD_NORMAL 0
@@ -34,7 +34,7 @@ using ace_segment::kDigitRemapArray6Tm1637;
 #endif
 
 #if defined(EPOXY_DUINO)
-  #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_NORMAL
+  #define TMI_INTERFACE_TYPE TMI_INTERFACE_TYPE_NORMAL
   #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
 
   const uint8_t CLK_PIN = A0;
@@ -42,7 +42,7 @@ using ace_segment::kDigitRemapArray6Tm1637;
   const uint8_t NUM_DIGITS = 4;
 
 #elif defined(AUNITER_MICRO_TM1637)
-  #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_FAST
+  #define TMI_INTERFACE_TYPE TMI_INTERFACE_TYPE_FAST
   #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
 
   const uint8_t CLK_PIN = A0;
@@ -50,7 +50,7 @@ using ace_segment::kDigitRemapArray6Tm1637;
   const uint8_t NUM_DIGITS = 4;
 
 #elif defined(AUNITER_MICRO_TM1637_6)
-  #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_FAST
+  #define TMI_INTERFACE_TYPE TMI_INTERFACE_TYPE_FAST
   #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
 
   const uint8_t CLK_PIN = A0;
@@ -58,7 +58,7 @@ using ace_segment::kDigitRemapArray6Tm1637;
   const uint8_t NUM_DIGITS = 6;
 
 #elif defined(AUNITER_STM32_TM1637)
-  #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_NORMAL
+  #define TMI_INTERFACE_TYPE TMI_INTERFACE_TYPE_NORMAL
   #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
 
   const uint8_t CLK_PIN = PB3;
@@ -66,7 +66,7 @@ using ace_segment::kDigitRemapArray6Tm1637;
   const uint8_t NUM_DIGITS = 4;
 
 #elif defined(AUNITER_D1MINI_LARGE_TM1637)
-  #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_NORMAL
+  #define TMI_INTERFACE_TYPE TMI_INTERFACE_TYPE_NORMAL
   #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
 
   const uint8_t CLK_PIN = D5;
@@ -74,7 +74,7 @@ using ace_segment::kDigitRemapArray6Tm1637;
   const uint8_t NUM_DIGITS = 4;
 
 #elif defined(AUNITER_ESP32_TM1637)
-  #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_NORMAL
+  #define TMI_INTERFACE_TYPE TMI_INTERFACE_TYPE_NORMAL
   #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
 
   const uint8_t CLK_PIN = 14;
@@ -89,25 +89,25 @@ using ace_segment::kDigitRemapArray6Tm1637;
 // AceSegment Configuration
 //------------------------------------------------------------------
 
-// For a SoftWireInterface (non-fast), time to send 4 digits:
+// For a SoftTmiInterface (non-fast), time to send 4 digits:
 // * 12 ms at 50 us delay, but does not work.
 // * 17 ms at 75 us delay.
 // * 22 ms at 100 us delay.
 // * 43 ms at 200 us delay.
 const uint16_t BIT_DELAY = 100;
 
-#if WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_NORMAL
-  using WireInterface = SoftWireInterface;
-  WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
-#elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_FAST
+#if TMI_INTERFACE_TYPE == TMI_INTERFACE_TYPE_NORMAL
+  using TmiInterface = SoftTmiInterface;
+  TmiInterface tmiInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
+#elif TMI_INTERFACE_TYPE == TMI_INTERFACE_TYPE_FAST
   #include <digitalWriteFast.h>
-  #include <ace_segment/hw/SoftWireFastInterface.h>
-  using ace_segment::SoftWireFastInterface;
+  #include <ace_segment/hw/SoftTmiFastInterface.h>
+  using ace_segment::SoftTmiFastInterface;
 
-  using WireInterface = SoftWireFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
-  WireInterface wireInterface;
+  using TmiInterface = SoftTmiFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
+  TmiInterface tmiInterface;
 #else
-  #error Unknown WIRE_INTERFACE_TYPE
+  #error Unknown TMI_INTERFACE_TYPE
 #endif
 
 #if defined(AUNITER_MICRO_TM1637_6)
@@ -116,11 +116,11 @@ const uint16_t BIT_DELAY = 100;
   const uint8_t* const remapArray = nullptr;
 #endif
 
-Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module(wireInterface, remapArray);
+Tm1637Module<TmiInterface, NUM_DIGITS> tm1637Module(tmiInterface, remapArray);
 LedDisplay display(tm1637Module);
 
 void setupAceSegment() {
-  wireInterface.begin();
+  tmiInterface.begin();
   tm1637Module.begin();
 }
 

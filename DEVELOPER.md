@@ -44,8 +44,8 @@ ace_segment/direct/ ace_segment/hc595/  ace_segment/tm1637/ ace_segment/max7219/
                              SoftSpiFastInterface.h
                              HardSpiInterface.h
                              HardSpiFastInterface.h
-                             SoftWireInterface.h
-                             SoftWireFastInterface.h
+                             SoftTmiInterface.h
+                             SoftTmiFastInterface.h
 ```
 
 ## Hardware and Communcation Abstraction
@@ -73,10 +73,10 @@ called directly. ("Zero-cost abstraction").
     * hardware SPI
 * `HardSpiFastInterface`
     * hardware SPI using `digitalWriteFast` for controlling the LatchPin
-* `SoftWireInterface`
+* `SoftTmiInterface`
     * software implmentation of the TM1637 protocol similar to I2C
-* `SoftWireFastInterface`
-    * same as `SoftWireInterface` but using `digitalWriteFast` library
+* `SoftTmiFastInterface`
+    * same as `SoftTmiInterface` but using `digitalWriteFast` library
 
 ## LED Modules
 

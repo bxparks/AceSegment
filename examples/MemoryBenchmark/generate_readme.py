@@ -134,9 +134,9 @@ before substantional refactoring in 2021.
   changes are due to some removal/addition of some methods in `LedDisplay`.
 * Add memory usage for `Tm1637Module`. Seems to consume something in between
   similar to the `ScanningModule` w/ SW SPI and `ScanningModule` with HW SPI.
-* Add memory usage for `Tm1637Module` using `SoftWireFastInterface` which uses
+* Add memory usage for `Tm1637Module` using `SoftTmiFastInterface` which uses
   `digitalWriteFast` library for AVR processors. Saves 662 - 776 bytes of flash
-  on AVR processors compared to `Tm1637Module` using normal `SoftWireInterface`.
+  on AVR processors compared to `Tm1637Module` using normal `SoftTmiInterface`.
 * Save 150-200 bytes of flash on AVR processors by lifting all of the
   `LedDisplay::writePatternAt()` type of methods to `LedDisplay`, making them
   non-virtual, then funneling these methods through just 2 lower-level virtual

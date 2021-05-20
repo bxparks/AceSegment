@@ -110,9 +110,9 @@ before substantional refactoring in 2021.
   changes are due to some removal/addition of some methods in `LedDisplay`.
 * Add memory usage for `Tm1637Module`. Seems to consume something in between
   similar to the `ScanningModule` w/ SW SPI and `ScanningModule` with HW SPI.
-* Add memory usage for `Tm1637Module` using `SoftWireFastInterface` which uses
+* Add memory usage for `Tm1637Module` using `SoftTmiFastInterface` which uses
   `digitalWriteFast` library for AVR processors. Saves 662 - 776 bytes of flash
-  on AVR processors compared to `Tm1637Module` using normal `SoftWireInterface`.
+  on AVR processors compared to `Tm1637Module` using normal `SoftTmiInterface`.
 * Save 150-200 bytes of flash on AVR processors by lifting all of the
   `LedDisplay::writePatternAt()` type of methods to `LedDisplay`, making them
   non-virtual, then funneling these methods through just 2 lower-level virtual
@@ -188,8 +188,8 @@ other `MemoryBenchmark` programs.)
 | Hc595(HardSpi)                  |   1598/   59 |  1142/   48 |
 | Hc595(HardSpiFast)              |   1510/   57 |  1054/   46 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SoftWire)                |   1582/   39 |  1126/   28 |
-| Tm1637(SoftWireFast)            |    924/   36 |   468/   25 |
+| Tm1637(SoftTmi)                 |   1582/   39 |  1126/   28 |
+| Tm1637(SoftTmiFast)             |    924/   36 |   468/   25 |
 |---------------------------------+--------------+-------------|
 | Max7219(SoftSpi)                |   1214/   44 |   758/   33 |
 | Max7219(SoftSpiFast)            |    774/   42 |   318/   31 |
@@ -231,8 +231,8 @@ other `MemoryBenchmark` programs.)
 | Hc595(HardSpi)                  |   4610/  199 |  1138/   48 |
 | Hc595(HardSpiFast)              |   4510/  197 |  1038/   46 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SoftWire)                |   4652/  179 |  1180/   28 |
-| Tm1637(SoftWireFast)            |   3880/  176 |   408/   25 |
+| Tm1637(SoftTmi)                 |   4652/  179 |  1180/   28 |
+| Tm1637(SoftTmiFast)             |   3880/  176 |   408/   25 |
 |---------------------------------+--------------+-------------|
 | Max7219(SoftSpi)                |   4284/  184 |   812/   33 |
 | Max7219(SoftSpiFast)            |   3730/  182 |   258/   31 |
@@ -274,8 +274,8 @@ other `MemoryBenchmark` programs.)
 | Hc595(HardSpi)                  |  11320/    0 |  1256/    0 |
 | Hc595(HardSpiFast)              |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SoftWire)                |  10808/    0 |   744/    0 |
-| Tm1637(SoftWireFast)            |     -1/   -1 |    -1/   -1 |
+| Tm1637(SoftTmi)                 |  10808/    0 |   744/    0 |
+| Tm1637(SoftTmiFast)             |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | Max7219(SoftSpi)                |  10616/    0 |   552/    0 |
 | Max7219(SoftSpiFast)            |     -1/   -1 |    -1/   -1 |
@@ -317,8 +317,8 @@ other `MemoryBenchmark` programs.)
 | Hc595(HardSpi)                  |  23304/ 4400 |  4168/  612 |
 | Hc595(HardSpiFast)              |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SoftWire)                |  21628/ 4372 |  2492/  584 |
-| Tm1637(SoftWireFast)            |     -1/   -1 |    -1/   -1 |
+| Tm1637(SoftTmi)                 |  21628/ 4372 |  2492/  584 |
+| Tm1637(SoftTmiFast)             |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | Max7219(SoftSpi)                |  21404/ 4372 |  2268/  584 |
 | Max7219(SoftSpiFast)            |     -1/   -1 |    -1/   -1 |
@@ -360,8 +360,8 @@ other `MemoryBenchmark` programs.)
 | Hc595(HardSpi)                  | 258992/27264 |  2292/  480 |
 | Hc595(HardSpiFast)              |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SoftWire)                | 257920/27224 |  1220/  440 |
-| Tm1637(SoftWireFast)            |     -1/   -1 |    -1/   -1 |
+| Tm1637(SoftTmi)                 | 257920/27224 |  1220/  440 |
+| Tm1637(SoftTmiFast)             |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | Max7219(SoftSpi)                | 257656/27224 |   956/  440 |
 | Max7219(SoftSpiFast)            |     -1/   -1 |    -1/   -1 |
@@ -403,8 +403,8 @@ other `MemoryBenchmark` programs.)
 | Hc595(HardSpi)                  | 202810/13816 |  5062/  732 |
 | Hc595(HardSpiFast)              |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SoftWire)                | 200702/13744 |  2954/  660 |
-| Tm1637(SoftWireFast)            |     -1/   -1 |    -1/   -1 |
+| Tm1637(SoftTmi)                 | 200702/13744 |  2954/  660 |
+| Tm1637(SoftTmiFast)             |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | Max7219(SoftSpi)                | 200308/13728 |  2560/  644 |
 | Max7219(SoftSpiFast)            |     -1/   -1 |    -1/   -1 |
@@ -447,8 +447,8 @@ other `MemoryBenchmark` programs.)
 | Hc595(HardSpi)                  |  12956/ 4648 |  5332/ 1600 |
 | Hc595(HardSpiFast)              |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SoftWire)                |  12556/ 4564 |  4932/ 1516 |
-| Tm1637(SoftWireFast)            |     -1/   -1 |    -1/   -1 |
+| Tm1637(SoftTmi)                 |  12556/ 4564 |  4932/ 1516 |
+| Tm1637(SoftTmiFast)             |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | Max7219(SoftSpi)                |  11832/ 4564 |  4208/ 1516 |
 | Max7219(SoftSpiFast)            |     -1/   -1 |    -1/   -1 |

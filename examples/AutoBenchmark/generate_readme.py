@@ -179,7 +179,7 @@ On AVR processors, the "fast" options are available using the
 `digitalWriteFast()` functions can be up to 50X faster if the `pin` number and
 `value` parameters are compile-time constants. In addition, the
 `digitalWriteFast` functions reduce flash memory consumption by 600-700 bytes
-for `SoftWireFastInterface`, `SoftSpiFastInterface`, and `HardSpiFastInterface`
+for `SoftTmiFastInterface`, `SoftSpiFastInterface`, and `HardSpiFastInterface`
 compared to their non-fast equivalents.
 
 ### Arduino Nano

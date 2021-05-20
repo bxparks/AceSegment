@@ -22,56 +22,56 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_SOFT_WIRE_INTERFACE_H
-#define ACE_SEGMENT_SOFT_WIRE_INTERFACE_H
+#ifndef ACE_SEGMENT_SOFT_TMI_FAST_INTERFACE_H
+#define ACE_SEGMENT_SOFT_TMI_FAST_INTERFACE_H
 
+// This header file requires the digitalWriteFast library on AVR, or the
+// EpoxyMockDigitalWriteFast library on EpoxyDuino.
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+
+#include <stdint.h>
 #include <Arduino.h>
 
 namespace ace_segment {
 
 /**
- * Class that knows how to communicate with a TM1637 chip. It uses a 2-wire
- * (Clock and a bidirectional DIO) protocol that is similar to I2C electrically.
- * Both the Clock and Data pins are open-drain which means a single transitor on
- * either the master or slave can pull the line LOW, but a pull-up resisotr is
- * required to set the line HIGH. Because these are open-drain, we must make
- * sure that the microcontroller does *not* actively drive these lines HIGH,
- * otherwise, the output pin of the MCU at 5V (HIGH) becomes directly connected
- * to the 0V (LOW) of the transistor on the device pulling it LOW, with no
- * current limiting resistor. Either of MCU or the device can become damaged. To
- * set the line HIGH or LOW, we set the output level to LOW, then use the
- * pinMode() function to either INPUT (to get a HIGH value) or OUTPUT (to get a
- * LOW value).
+ * Exactly the same as SoftTmiInterface except that this uses the
+ * `digitalWriteFast` library on AVR processors. Normally, the digitalWriteFast
+ * library is used to get faster speeds over `digitalWrite()` and `pinMode()`
+ * functions. But speed of the `digitalWrite()` functions is not the limiting
+ * factor in this library because every bit flip is followed by a
+ * `delayMicroseconds()` which is far longer than the CPU cycle savings from
+ * `digitalWritFast()`.
  *
- * The logical protocol of the TM1637 is similar to I2C in the following ways:
+ * The reason that you may want to use `digitalWriteFast` library is because it
+ * consumes far less flash memory than normal `digitalWrite()`. The benchmarks
+ * in MemoryBenchmark shows that using this `SoftTmiFastInterface` instead of
+ * `SoftTmiInterface` saves 650-770 bytes of flash on an AVR processor.
  *
- *    * The start and stop conditions are the same.
- *    * Data transfer happens on the rising edge of the CLK signal.
- *    * The slave sends back a one-bit ACK/NACK after the 8th bit of the CLK.
+ * Word of caution: There is a use-case where the normal `SoftTmiInterface`
+ * might consume less flash memory. If your application uses more than one
+ * TM1637 LED Module, you will need to create multiple instances of the
+ * `Tm1637Module`. But the pin numbers of this class must be a compile-time
+ * constants, so different pins means that a different template class is
+ * generated. Since the `Tm1637Module` class takes a `SoftTmiFastInterface` as
+ * a template argument, each LED Module generate a new template instance of the
+ * `Tm1637Module` class.
  *
- * The difference is:
- *
- *    * There is no I2C address byte, so only a single TM1637 device can be on
- *      the bus.
- *    * The first byte sent to the TM1637 is a command byte.
- *
- * Since the protocol does not match I2C, we cannot use the hardware I2C
- * capabilities of the microcontroller, so we have to implement a software
- * version of this protocol.
+ * When there are more than some number of TM1636 LED modules, it may actually
+ * be more efficient to use the non-fast `SoftTmiInterface`, because you will
+ * generate only a single template instantiation. I have not currently done any
+ * experimentation to see where the break-even point would be.
  *
  * This class is stateless. It is thread-safe.
  */
-class SoftWireInterface {
+template <
+    uint8_t T_CLK_PIN,
+    uint8_t T_DIO_PIN,
+    uint16_t T_DELAY_MICROS
+>
+class SoftTmiFastInterface {
   public:
-    explicit SoftWireInterface(
-        uint8_t clkPin,
-        uint8_t dioPin,
-        uint16_t delayMicros
-    ) :
-        mClkPin(clkPin),
-        mDioPin(dioPin),
-        mDelayMicros(delayMicros)
-    {}
+    explicit SoftTmiFastInterface() = default;
 
     /** Initialize the GPIO pins. */
     void begin() const {
@@ -80,8 +80,8 @@ class SoftWireInterface {
       // end of the line pulling LOW. Instead, we go into INPUT mode to let the
       // line to HIGH through the pullup resistor, then go to OUTPUT mode only
       // to pull down.
-      digitalWrite(mClkPin, LOW);
-      digitalWrite(mDioPin, LOW);
+      digitalWriteFast(T_CLK_PIN, LOW);
+      digitalWriteFast(T_DIO_PIN, LOW);
 
       // Begin with both lines at HIGH.
       clockHigh();
@@ -128,9 +128,9 @@ class SoftWireInterface {
 
       // Device places the ACK/NACK bit upon the falling edge of the 8th CLK,
       // which happens in the loop above.
-      pinMode(mDioPin, INPUT);
+      pinModeFast(T_DIO_PIN, INPUT);
       bitDelay();
-      uint8_t ack = digitalRead(mDioPin);
+      uint8_t ack = digitalReadFast(T_DIO_PIN);
 
       // Device releases DIO upon falling edge of the 9th CLK.
       clockHigh();
@@ -139,22 +139,19 @@ class SoftWireInterface {
     }
 
   private:
-    void bitDelay() const { delayMicroseconds(mDelayMicros); }
+    void bitDelay() const { delayMicroseconds(T_DELAY_MICROS); }
 
-    void clockHigh() const { pinMode(mClkPin, INPUT); bitDelay(); }
+    void clockHigh() const { pinModeFast(T_CLK_PIN, INPUT); bitDelay(); }
 
-    void clockLow() const { pinMode(mClkPin, OUTPUT); bitDelay(); }
+    void clockLow() const { pinModeFast(T_CLK_PIN, OUTPUT); bitDelay(); }
 
-    void dataHigh() const { pinMode(mDioPin, INPUT); bitDelay(); }
+    void dataHigh() const { pinModeFast(T_DIO_PIN, INPUT); bitDelay(); }
 
-    void dataLow() const { pinMode(mDioPin, OUTPUT); bitDelay(); }
-
-  private:
-    uint8_t const mClkPin;
-    uint8_t const mDioPin;
-    uint16_t const mDelayMicros;
+    void dataLow() const { pinModeFast(T_DIO_PIN, OUTPUT); bitDelay(); }
 };
 
 } // ace_segment
+
+#endif // defined(ARDUINO_ARCH_AVR)
 
 #endif

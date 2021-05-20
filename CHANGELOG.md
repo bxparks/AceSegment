@@ -93,7 +93,7 @@
         * Since these classes depend on an external library, the headers must be
           manually included:
             * `#include <ace_segment/hw/SoftSpiFastInterface.h>`
-            * `#include <ace_segment/hw/SoftWireFastInterface.h>`
+            * `#include <ace_segment/hw/SoftTmiFastInterface.h>`
             * `#include <ace_segment/scanning/LedMatrixDirectFast4.h>`
     * Resource consumption
         * Reduce flash consumption on AVR by 70-80%, from 4-4.3 kB down

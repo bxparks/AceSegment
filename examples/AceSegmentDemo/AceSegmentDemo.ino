@@ -7,7 +7,7 @@
 #include <digitalWriteFast.h>
 #include <ace_segment/hw/SoftSpiFastInterface.h>
 #include <ace_segment/hw/HardSpiFastInterface.h>
-#include <ace_segment/hw/SoftWireFastInterface.h>
+#include <ace_segment/hw/SoftTmiFastInterface.h>
 #include <ace_segment/scanning/LedMatrixDirectFast4.h>
 #include <ace_segment/direct/DirectFast4Module.h>
 #endif
@@ -59,8 +59,8 @@ using namespace ace_button;
 #define INTERFACE_TYPE_SOFT_SPI_FAST 1
 #define INTERFACE_TYPE_HARD_SPI 2
 #define INTERFACE_TYPE_HARD_SPI_FAST 3
-#define INTERFACE_TYPE_SOFT_WIRE 4
-#define INTERFACE_TYPE_SOFT_WIRE_FAST 5
+#define INTERFACE_TYPE_SOFT_TMI 4
+#define INTERFACE_TYPE_SOFT_TMI_FAST 5
 
 // Some microcontrollers have 2 or more SPI buses. PRIMARY selects the default.
 // SECONDARY selects the alternate. I don't have a board with more than 2, but
@@ -227,8 +227,8 @@ using namespace ace_button;
   const uint8_t NUM_DIGITS = 4;
 
   // Choose one of the following variants:
-  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE
-  #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE_FAST
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_TMI
+  #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_TMI_FAST
   const uint8_t CLK_PIN = A0;
   const uint8_t DIO_PIN = 9;
   const uint16_t BIT_DELAY = 100;
@@ -282,7 +282,7 @@ using namespace ace_button;
   const uint8_t NUM_DIGITS = 4;
 
   // Choose one of the following variants:
-  #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE
+  #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_TMI
   const uint8_t CLK_PIN = PB3;
   const uint8_t DIO_PIN = PB4;
   const uint16_t BIT_DELAY = 100;
@@ -364,7 +364,7 @@ using namespace ace_button;
   const uint8_t NUM_DIGITS = 4;
 
   // Choose one of the following variants:
-  #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE
+  #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_TMI
   const uint8_t CLK_PIN = D5;
   const uint8_t DIO_PIN = D7;
   const uint16_t BIT_DELAY = 100;
@@ -428,7 +428,7 @@ using namespace ace_button;
   const uint8_t NUM_DIGITS = 4;
 
   // Choose one of the following variants:
-  #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE
+  #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_TMI
   const uint8_t CLK_PIN = 14;
   const uint8_t DIO_PIN = 13;
   const uint16_t BIT_DELAY = 100;
@@ -626,14 +626,14 @@ const uint8_t NUM_SUBFIELDS = 1;
       ledModule(ledMatrix, FRAMES_PER_SECOND);
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_TM1637
-  #if INTERFACE_TYPE == INTERFACE_TYPE_SOFT_WIRE
-    using WireInterface = SoftWireInterface;
-    WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
-  #elif INTERFACE_TYPE == INTERFACE_TYPE_SOFT_WIRE_FAST
-    using WireInterface = SoftWireFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
-    WireInterface wireInterface;
+  #if INTERFACE_TYPE == INTERFACE_TYPE_SOFT_TMI
+    using TmiInterface = SoftTmiInterface;
+    TmiInterface tmiInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
+  #elif INTERFACE_TYPE == INTERFACE_TYPE_SOFT_TMI_FAST
+    using TmiInterface = SoftTmiFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
+    TmiInterface tmiInterface;
   #endif
-  Tm1637Module<WireInterface, NUM_DIGITS> ledModule(wireInterface);
+  Tm1637Module<TmiInterface, NUM_DIGITS> ledModule(tmiInterface);
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_MAX7219
   #if INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI
@@ -775,7 +775,7 @@ void setupAceSegment() {
   ledModule.begin();
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_TM1637
-  wireInterface.begin();
+  tmiInterface.begin();
   ledModule.begin();
   ledModule.setBrightness(2); // 1-7
 

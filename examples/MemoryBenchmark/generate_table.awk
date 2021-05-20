@@ -17,8 +17,8 @@ BEGIN {
   labels[8] = "Hc595(SoftSpiFast)";
   labels[9] = "Hc595(HardSpi)";
   labels[10] = "Hc595(HardSpiFast)";
-  labels[11] = "Tm1637(SoftWire)";
-  labels[12] = "Tm1637(SoftWireFast)";
+  labels[11] = "Tm1637(SoftTmi)";
+  labels[12] = "Tm1637(SoftTmiFast)";
   labels[13] = "Max7219(SoftSpi)";
   labels[14] = "Max7219(SoftSpiFast)";
   labels[15] = "Max7219(HardSpi)";
@@ -61,7 +61,7 @@ END {
     if (labels[i] ~ /DirectModule/ \
         || labels[i] ~ /Hybrid\(SoftSpi\)/ \
         || labels[i] ~ /Hc595\(SoftSpi\)/ \
-        || labels[i] ~ /Tm1637\(SoftWire\)/ \
+        || labels[i] ~ /Tm1637\(SoftTmi\)/ \
         || labels[i] ~ /Max7219\(SoftSpi\)/ \
         || labels[i] == "StubModule+LedDisplay") {
       printf(\
