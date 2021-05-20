@@ -27,10 +27,6 @@ using namespace ace_button;
   #include <TimerOne.h>
 #endif
 
-//------------------------------------------------------------------
-// Hardware configuration.
-//------------------------------------------------------------------
-
 // Type of LED Module
 #define LED_DISPLAY_TYPE_SCANNING 0
 #define LED_DISPLAY_TYPE_TM1637 1
@@ -66,6 +62,12 @@ using namespace ace_button;
 #define INTERFACE_TYPE_SOFT_WIRE 4
 #define INTERFACE_TYPE_SOFT_WIRE_FAST 5
 
+// Some microcontrollers have 2 or more SPI buses. PRIMARY selects the default.
+// SECONDARY selects the alternate. I don't have a board with more than 2, but
+// we could add additional options here if needed.
+#define SPI_INSTANCE_TYPE_PRIMARY 0
+#define SPI_INSTANCE_TYPE_SECONDARY 1
+
 // Button options: either digital buttons using ButtonConfig, 2 analog buttons
 // using LadderButtonConfig, or 4 analog buttons using LadderButtonConfig:
 //  * AVR: 10-bit analog pin
@@ -77,6 +79,15 @@ using namespace ace_button;
 // Select the TM1637Module flush() method
 #define TM_FLUSH_METHOD_NORMAL 0
 #define TM_FLUSH_METHOD_INCREMENTAL 1
+
+//------------------------------------------------------------------
+// Hardware configuration.
+//------------------------------------------------------------------
+
+// Configuration for Arduino IDE
+#if ! defined(EPOXY_DUINO) && ! defined(AUNITER)
+  #define AUNITER_MICRO_TM1637
+#endif
 
 // Pro Micro dev board buttons are now hardwared to A2 and A3, instead of being
 // configured with dip switches to either (2,3) or (8,9). Since (2,3) are used
@@ -184,6 +195,7 @@ using namespace ace_button;
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
+  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
@@ -201,6 +213,7 @@ using namespace ace_button;
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
+  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
@@ -237,6 +250,7 @@ using namespace ace_button;
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
+  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
@@ -254,6 +268,7 @@ using namespace ace_button;
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
+  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
@@ -287,17 +302,22 @@ using namespace ace_button;
   // Choose one of the following variants:
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
 
-  // SPI1 pins (default)
-  const uint8_t LATCH_PIN = SS;
-  const uint8_t DATA_PIN = MOSI;
-  const uint8_t CLOCK_PIN = SCK;
-  /*
-  // SPI2 pins
-  const uint8_t LATCH_PIN = PB12;
-  const uint8_t DATA_PIN = PB15;
-  const uint8_t CLOCK_PIN = PB13;
-  */
+  #if SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_PRIMARY
+    // SPI1 pins (default)
+    const uint8_t LATCH_PIN = SS;
+    const uint8_t DATA_PIN = MOSI;
+    const uint8_t CLOCK_PIN = SCK;
+  #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
+    // SPI2 pins
+    const uint8_t LATCH_PIN = PB12;
+    const uint8_t DATA_PIN = PB15;
+    const uint8_t CLOCK_PIN = PB13;
+    SPIClass SPISecondary(DATA_PIN, PB14 /*miso*/, CLOCK_PIN);
+  #else
+    #error Unknown SPI_INSTANCE_TYPE
+  #endif
 
 #elif defined(AUNITER_STM32_HC595)
   #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
@@ -310,17 +330,22 @@ using namespace ace_button;
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
 
-  // SPI1 pins (default)
-  const uint8_t LATCH_PIN = SS;
-  const uint8_t DATA_PIN = MOSI;
-  const uint8_t CLOCK_PIN = SCK;
-  /*
-  // SPI2 pins
-  const uint8_t LATCH_PIN = PB12;
-  const uint8_t DATA_PIN = PB15;
-  const uint8_t CLOCK_PIN = PB13;
-  */
+  #if SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_PRIMARY
+    // SPI1 pins (default)
+    const uint8_t LATCH_PIN = SS;
+    const uint8_t DATA_PIN = MOSI;
+    const uint8_t CLOCK_PIN = SCK;
+  #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
+    // SPI2 pins
+    const uint8_t LATCH_PIN = PB12;
+    const uint8_t DATA_PIN = PB15;
+    const uint8_t CLOCK_PIN = PB13;
+    SPIClass SPISecondary(DATA_PIN, PB14 /*miso*/, CLOCK_PIN);
+  #else
+    #error Unknown SPI_INSTANCE_TYPE
+  #endif
 
 #elif defined(AUNITER_D1MINI_LARGE_TM1637)
   #define BUTTON_TYPE BUTTON_TYPE_ANALOG
@@ -363,6 +388,7 @@ using namespace ace_button;
   // Choose one of the following variants:
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
   const uint8_t LATCH_PIN = SS;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
@@ -386,6 +412,7 @@ using namespace ace_button;
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
   const uint8_t LATCH_PIN = SS;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
@@ -419,17 +446,23 @@ using namespace ace_button;
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  // My dev board uses HSPI.
+  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_SECONDARY
 
-  /*
-  // VSPI pins (default)
-  const uint8_t LATCH_PIN = SS;
-  const uint8_t DATA_PIN = MOSI;
-  const uint8_t CLOCK_PIN = SCK;
-  */
-  // HSPI pins
-  const uint8_t LATCH_PIN = 15;
-  const uint8_t DATA_PIN = 13;
-  const uint8_t CLOCK_PIN = 14;
+  #if SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_PRIMARY
+    // VSPI pins (default)
+    const uint8_t LATCH_PIN = SS;
+    const uint8_t DATA_PIN = MOSI;
+    const uint8_t CLOCK_PIN = SCK;
+  #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
+    // HSPI pins
+    const uint8_t LATCH_PIN = 15;
+    const uint8_t DATA_PIN = 13;
+    const uint8_t CLOCK_PIN = 14;
+    SPIClass SPISecondary(HSPI);
+  #else
+    #error Unknown SPI_INSTANCE_TYPE
+  #endif
 
 #elif defined(AUNITER_ESP32_HC595)
   #define BUTTON_TYPE BUTTON_TYPE_ANALOG
@@ -444,17 +477,23 @@ using namespace ace_button;
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  // My dev board uses HSPI.
+  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_SECONDARY
 
-  /*
-  // VSPI pins (default)
-  const uint8_t LATCH_PIN = SS;
-  const uint8_t DATA_PIN = MOSI;
-  const uint8_t CLOCK_PIN = SCK;
-  */
-  // HSPI pins
-  const uint8_t LATCH_PIN = 15;
-  const uint8_t DATA_PIN = 13;
-  const uint8_t CLOCK_PIN = 14;
+  #if SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_PRIMARY
+    // VSPI pins (default)
+    const uint8_t LATCH_PIN = SS;
+    const uint8_t DATA_PIN = MOSI;
+    const uint8_t CLOCK_PIN = SCK;
+  #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
+    // HSPI pins
+    const uint8_t LATCH_PIN = 15;
+    const uint8_t DATA_PIN = 13;
+    const uint8_t CLOCK_PIN = 14;
+    SPIClass SPISecondary(HSPI);
+  #else
+    #error Unknown SPI_INSTANCE_TYPE
+  #endif
 
 #else
   #error Unknown AUNITER environment
