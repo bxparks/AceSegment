@@ -36,7 +36,7 @@ by the runtime environment of the processor. For example, it often seems like
 the ESP8266 allocates flash memory in blocks of a certain quantity, so the
 calculated flash size can jump around in unexpected ways.
 
-**Version**: AceSegment v0.5
+**Version**: AceSegment v0.5+
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -159,6 +159,11 @@ before substantional refactoring in 2021.
 * Adding `byteOrder` and `remapArray` parameters to `Hc595Module` increases the
   memory consumption by 60 bytes on AVR and about 20-40 bytes on 32-bit
   processors.
+
+**v0.5+**
+
+* Add support for multiple SPI buses in `HardSpiInterface` and
+  `HardSpiFastInterface`. Increases flash memory by 10-30 bytes.
 
 ## Results
 
