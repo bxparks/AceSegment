@@ -3,6 +3,17 @@
 * Unreleased
     * Fix bug in `Tm1637Module::flushIncremental()` introduced in 0c37b29a which
       prevented mFlushStage from incrementing properly.
+    * Add support for microcontrollers with 2 SPI buses (ESP32 and STM32F1).
+    * Reduce maximum SPI speed from 20 MHz to 8 MHz, since the MAX7219 chip
+      cannot handle greater than 16 MHz. Makes no difference with the slower
+      processors. On the fastest processors (ESP8266, ES32, and Teensy 3.2),
+      this makes the AutoBenchmark for `HardSpiInterace` 5-10% slower. But those
+      faster numbers were fake, because they would not have worked on a real
+      MAX7219 chip.
+    * Rename `WireInterface` to `TmiInterface` (and `WireFastInterface` to
+      `TmiFastInteface`). The `Tmi` stands for `TM1637 Interface`. This avoid
+      confusion with a future `WireInterface` which uses the actual I2C
+      protocol.
 * 0.5 (2021-05-14)
     * Extract hardware dependent API from `LedDisplay` into `LedModule`.
     * Create convenience subclasses of `LedModule`:
