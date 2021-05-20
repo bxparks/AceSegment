@@ -23,7 +23,6 @@
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
-using ace_segment::LedMatrixBase;
 using ace_segment::LedMatrixDirect;
 using ace_segment::LedMatrixDirectFast4;
 using ace_segment::LedMatrixSingleHc595;
@@ -31,6 +30,8 @@ using ace_segment::LedMatrixDualHc595;
 using ace_segment::ScanningModule;
 using ace_segment::LedDisplay;
 using ace_segment::kByteOrderDigitHighSegmentLow;
+using ace_segment::kActiveLowPattern;
+using ace_segment::kActiveHighPattern;
 
 //----------------------------------------------------------------------------
 // Hardware configuration.
@@ -85,8 +86,8 @@ using ace_segment::kByteOrderDigitHighSegmentLow;
 #elif defined(AUNITER_MICRO_SCANNING_DUAL)
   const uint8_t NUM_DIGITS = 4;
   const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
-  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = kActiveLowPattern;
 
   // Choose one of the following variants:
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SOFT_SPI
@@ -121,8 +122,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   // Common Anode, with transitors on Group pins
   using LedMatrix = LedMatrixDirect<>;
   LedMatrix ledMatrix(
-      LedMatrix::kActiveLowPattern /*elementOnPattern*/,
-      LedMatrix::kActiveLowPattern /*groupOnPattern*/,
+      kActiveLowPattern /*elementOnPattern*/,
+      kActiveLowPattern /*groupOnPattern*/,
       NUM_SEGMENTS,
       SEGMENT_PINS,
       NUM_DIGITS,
@@ -135,8 +136,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
     4, 5, 6, 7
   >;
   LedMatrix ledMatrix(
-      LedMatrix::kActiveLowPattern /*elementOnPattern*/,
-      LedMatrix::kActiveLowPattern /*groupOnPattern*/);
+      kActiveLowPattern /*elementOnPattern*/,
+      kActiveLowPattern /*groupOnPattern*/);
 
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SOFT_SPI
   // Common Cathode, with transistors on Group pins
@@ -144,8 +145,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   using LedMatrix = LedMatrixSingleHc595<SoftSpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
-      LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
-      LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
+      kActiveHighPattern /*elementOnPattern*/,
+      kActiveHighPattern /*groupOnPattern*/,
       NUM_DIGITS,
       DIGIT_PINS):
 
@@ -156,8 +157,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   using LedMatrix = LedMatrixSingleHc595<SpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
-      LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
-      LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
+      kActiveHighPattern /*elementOnPattern*/,
+      kActiveHighPattern /*groupOnPattern*/,
       NUM_DIGITS,
       DIGIT_PINS);
 
@@ -167,8 +168,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   using LedMatrix = LedMatrixSingleHc595<HardSpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
-      LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
-      LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
+      kActiveHighPattern /*elementOnPattern*/,
+      kActiveHighPattern /*groupOnPattern*/,
       NUM_DIGITS,
       DIGIT_PINS);
 
@@ -179,8 +180,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   using LedMatrix = LedMatrixSingleHc595<SpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
-      LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
-      LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
+      kActiveHighPattern /*elementOnPattern*/,
+      kActiveHighPattern /*groupOnPattern*/,
       NUM_DIGITS,
       DIGIT_PINS);
 
@@ -190,8 +191,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   using LedMatrix = LedMatrixDualHc595<SoftSpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
-      LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
-      LedMatrixBase::kActiveLowPattern /*groupOnPattern*/,
+      kActiveLowPattern /*elementOnPattern*/,
+      kActiveLowPattern /*groupOnPattern*/,
       HC595_BYTE_ORDER);
 
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SOFT_SPI_FAST
@@ -201,8 +202,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   using LedMatrix = LedMatrixDualHc595<SpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
-      LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
-      LedMatrixBase::kActiveLowPattern /*groupOnPattern*/,
+      kActiveLowPattern /*elementOnPattern*/,
+      kActiveLowPattern /*groupOnPattern*/,
       HC595_BYTE_ORDER);
 
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HARD_SPI
@@ -211,8 +212,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   using LedMatrix = LedMatrixDualHc595<HardSpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
-      LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
-      LedMatrixBase::kActiveLowPattern /*groupOnPattern*/,
+      kActiveLowPattern /*elementOnPattern*/,
+      kActiveLowPattern /*groupOnPattern*/,
       HC595_BYTE_ORDER);
 
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HARD_SPI_FAST
@@ -222,8 +223,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   using LedMatrix = LedMatrixDualHc595<SpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
-      LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
-      LedMatrixBase::kActiveLowPattern /*groupOnPattern*/,
+      kActiveLowPattern /*elementOnPattern*/,
+      kActiveLowPattern /*groupOnPattern*/,
       HC595_BYTE_ORDER);
 
 #else

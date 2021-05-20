@@ -9,9 +9,9 @@
 
 using ace_common::incrementMod;
 using ace_common::TimingStats;
-using ace_segment::LedMatrixBase;
 using ace_segment::DirectModule;
 using ace_segment::LedDisplay;
+using ace_segment::kActiveLowPattern;
 
 //----------------------------------------------------------------------------
 // Hardware configuration.
@@ -57,8 +57,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 
 // Common Anode, with transitors on Group pins
 DirectModule<NUM_DIGITS, NUM_SUBFIELDS> ledModule(
-    LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-    LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+    kActiveLowPattern /*segmentOnPattern*/,
+    kActiveLowPattern /*digitOnPattern*/,
     FRAMES_PER_SECOND,
     SEGMENT_PINS,
     DIGIT_PINS);

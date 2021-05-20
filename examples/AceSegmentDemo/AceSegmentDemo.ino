@@ -18,7 +18,6 @@ using ace_common::incrementMod;
 using ace_button::AceButton;
 using ace_button::ButtonConfig;
 using ace_button::LadderButtonConfig;
-using ace_segment::LedMatrixBase;
 using ace_segment::DirectModule;
 using ace_segment::DirectFast4Module;
 using ace_segment::HybridModule;
@@ -39,6 +38,8 @@ using ace_segment::kDigitRemapArray8Max7219;
 using ace_segment::kDigitRemapArray8Hc595;
 using ace_segment::kByteOrderSegmentHighDigitLow;
 using ace_segment::kByteOrderDigitHighSegmentLow;
+using ace_segment::kActiveLowPattern;
+using ace_segment::kActiveHighPattern;
 
 #ifndef ENABLE_SERIAL_DEBUG
 #define ENABLE_SERIAL_DEBUG 0
@@ -513,8 +514,8 @@ const uint8_t NUM_SUBFIELDS = 1;
 
   Hc595Module<SpiInterface, NUM_DIGITS> ledModule(
       spiInterface,
-      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-      LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
+      kActiveLowPattern /*segmentOnPattern*/,
+      kActiveHighPattern /*digitOnPattern*/,
       FRAMES_PER_SECOND,
       kByteOrderSegmentHighDigitLow,
       kDigitRemapArray8Hc595
@@ -524,8 +525,8 @@ const uint8_t NUM_SUBFIELDS = 1;
   // Common Anode, with transitors on Group pins
   #if DIRECT_INTERFACE_TYPE == DIRECT_INTERFACE_TYPE_NORMAL
     DirectModule<NUM_DIGITS> ledModule(
-        LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-        LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+        kActiveLowPattern /*segmentOnPattern*/,
+        kActiveLowPattern /*digitOnPattern*/,
         FRAMES_PER_SECOND,
         SEGMENT_PINS,
         DIGIT_PINS);
@@ -535,8 +536,8 @@ const uint8_t NUM_SUBFIELDS = 1;
         4, 5, 6, 7, // digit pins
         NUM_DIGITS
     > ledModule(
-        LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-        LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+        kActiveLowPattern /*segmentOnPattern*/,
+        kActiveLowPattern /*digitOnPattern*/,
         FRAMES_PER_SECOND);
   #endif
 
@@ -557,8 +558,8 @@ const uint8_t NUM_SUBFIELDS = 1;
   #endif
   HybridModule<SpiInterface, NUM_DIGITS> ledModule(
       spiInterface,
-      LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
-      LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
+      kActiveHighPattern /*segmentOnPattern*/,
+      kActiveHighPattern /*digitOnPattern*/,
       FRAMES_PER_SECOND,
       DIGIT_PINS
   );
@@ -581,8 +582,8 @@ const uint8_t NUM_SUBFIELDS = 1;
 
   Hc595Module<SpiInterface, NUM_DIGITS> ledModule(
       spiInterface,
-      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+      kActiveLowPattern /*segmentOnPattern*/,
+      kActiveLowPattern /*digitOnPattern*/,
       FRAMES_PER_SECOND,
       kByteOrderDigitHighSegmentLow,
       nullptr /*remapArray*/

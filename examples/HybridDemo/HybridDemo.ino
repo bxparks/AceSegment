@@ -18,13 +18,13 @@
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
-using ace_segment::LedMatrixBase;
 using ace_segment::SoftSpiInterface;
 using ace_segment::HardSpiInterface;
 using ace_segment::SoftSpiFastInterface;
 using ace_segment::HardSpiFastInterface;
 using ace_segment::HybridModule;
 using ace_segment::LedDisplay;
+using ace_segment::kActiveHighPattern;
 
 // Select interface protocol.
 #define INTERFACE_TYPE_SOFT_SPI 0
@@ -113,8 +113,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 // Common Cathode, with transistors on Group pins
 HybridModule<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
     spiInterface,
-    LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
-    LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
+    kActiveHighPattern /*segmentOnPattern*/,
+    kActiveHighPattern /*digitOnPattern*/,
     FRAMES_PER_SECOND,
     DIGIT_PINS
 );

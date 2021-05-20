@@ -24,7 +24,8 @@
 using ace_common::incrementMod;
 using ace_segment::kByteOrderSegmentHighDigitLow;
 using ace_segment::kDigitRemapArray8Hc595;
-using ace_segment::LedMatrixBase;
+using ace_segment::kActiveLowPattern;
+using ace_segment::kActiveHighPattern;
 using ace_segment::DirectModule;
 using ace_segment::HybridModule;
 using ace_segment::Hc595Module;
@@ -64,8 +65,8 @@ using ace_segment::NumberWriter;
 #if defined(EPOXY_DUINO)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595
   const uint8_t NUM_DIGITS = 4;
-  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
+  const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = kActiveHighPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
   const uint8_t* const REMAP_ARRAY = nullptr;
 
@@ -107,8 +108,8 @@ using ace_segment::NumberWriter;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_FULL
   const uint8_t NUM_DIGITS = 4;
   const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
-  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = kActiveLowPattern;
   const uint8_t* const REMAP_ARRAY = nullptr;
 
   // Choose one of the following variants:
@@ -124,8 +125,8 @@ using ace_segment::NumberWriter;
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595
   const uint8_t NUM_DIGITS = 8;
   const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
-  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
+  const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = kActiveHighPattern;
   const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 
   // Choose one of the following variants:
@@ -140,8 +141,8 @@ using ace_segment::NumberWriter;
 #elif defined(AUNITER_STM32_HC595)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595
   const uint8_t NUM_DIGITS = 8;
-  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
+  const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = kActiveHighPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
   const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 
@@ -155,8 +156,8 @@ using ace_segment::NumberWriter;
 #elif defined(AUNITER_D1MINI_LARGE_HC595)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595
   const uint8_t NUM_DIGITS = 8;
-  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
+  const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = kActiveHighPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
   const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 
@@ -170,8 +171,8 @@ using ace_segment::NumberWriter;
 #elif defined(AUNITER_ESP32_HC595)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595
   const uint8_t NUM_DIGITS = 8;
-  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
+  const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = kActiveHighPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
   const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 
@@ -221,8 +222,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   // Common Anode, with transitors on Group pins
   #if DIRECT_INTERFACE_TYPE == DIRECT_INTERFACE_TYPE_NORMAL
     DirectModule<NUM_DIGITS, NUM_SUBFIELDS> ledModule(
-        LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-        LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+        kActiveLowPattern /*segmentOnPattern*/,
+        kActiveLowPattern /*digitOnPattern*/,
         FRAMES_PER_SECOND,
         SEGMENT_PINS,
         DIGIT_PINS);
@@ -233,8 +234,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
         NUM_DIGITS,
         NUM_SUBFIELDS
     > ledModule(
-        LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-        LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+        kActiveLowPattern /*segmentOnPattern*/,
+        kActiveLowPattern /*digitOnPattern*/,
         FRAMES_PER_SECOND);
   #endif
 
@@ -255,8 +256,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   #endif
   HybridModule<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
       spiInterface,
-      LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
-      LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
+      kActiveHighPattern /*segmentOnPattern*/,
+      kActiveHighPattern /*digitOnPattern*/,
       FRAMES_PER_SECOND,
       DIGIT_PINS
   );

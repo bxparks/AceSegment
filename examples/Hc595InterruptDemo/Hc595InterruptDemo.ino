@@ -20,7 +20,15 @@ using ace_segment::HardSpiFastInterface;
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
-using namespace ace_segment;
+using ace_segment::Hc595Module;
+using ace_segment::LedDisplay;
+using ace_segment::HardSpiInterface;
+using ace_segment::SoftSpiInterface;
+using ace_segment::kDigitRemapArray8Hc595;
+using ace_segment::kByteOrderDigitHighSegmentLow;
+using ace_segment::kByteOrderSegmentHighDigitLow;
+using ace_segment::kActiveLowPattern;
+using ace_segment::kActiveHighPattern;
 
 //----------------------------------------------------------------------------
 // Hardware configuration.
@@ -50,8 +58,8 @@ using namespace ace_segment;
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
-  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = kActiveLowPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
   const uint8_t* const REMAP_ARRAY = nullptr;
 
@@ -61,8 +69,8 @@ using namespace ace_segment;
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
-  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = kActiveLowPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
   const uint8_t* const REMAP_ARRAY = nullptr;
 
@@ -72,8 +80,8 @@ using namespace ace_segment;
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
-  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
+  const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = kActiveHighPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
   const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 
@@ -83,8 +91,8 @@ using namespace ace_segment;
   const uint8_t LATCH_PIN = SS;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
-  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
+  const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = kActiveHighPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
   const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 
@@ -94,8 +102,8 @@ using namespace ace_segment;
   const uint8_t LATCH_PIN = SS;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
-  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
+  const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = kActiveHighPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
   const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 

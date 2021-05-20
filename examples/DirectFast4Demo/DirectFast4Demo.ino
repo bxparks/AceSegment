@@ -17,9 +17,9 @@
 
 using ace_common::incrementMod;
 using ace_common::TimingStats;
-using ace_segment::LedMatrixBase;
 using ace_segment::DirectFast4Module;
 using ace_segment::LedDisplay;
+using ace_segment::kActiveLowPattern;
 
 //----------------------------------------------------------------------------
 // Hardware configuration.
@@ -67,8 +67,8 @@ DirectFast4Module<
     NUM_DIGITS,
     NUM_SUBFIELDS
 > ledModule(
-    LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-    LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+    kActiveLowPattern /*segmentOnPattern*/,
+    kActiveLowPattern /*digitOnPattern*/,
     FRAMES_PER_SECOND);
 
 LedDisplay display(ledModule);

@@ -18,7 +18,8 @@ using ace_segment::SoftSpiInterface;
 using ace_segment::kDigitRemapArray8Hc595;
 using ace_segment::kByteOrderDigitHighSegmentLow;
 using ace_segment::kByteOrderSegmentHighDigitLow;
-using ace_segment::LedMatrixBase;
+using ace_segment::kActiveLowPattern;
+using ace_segment::kActiveHighPattern;
 
 // Select interface protocol.
 #define INTERFACE_TYPE_SOFT_SPI 0
@@ -45,8 +46,8 @@ using ace_segment::LedMatrixBase;
 
 #if defined(EPOXY_DUINO)
   const uint8_t NUM_DIGITS = 8;
-  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
+  const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = kActiveLowPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
   const uint8_t* const REMAP_ARRAY = nullptr;
 
@@ -58,8 +59,8 @@ using ace_segment::LedMatrixBase;
 
 #elif defined(AUNITER_MICRO_HC595)
   const uint8_t NUM_DIGITS = 8;
-  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
+  const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = kActiveHighPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
   const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 
@@ -71,8 +72,8 @@ using ace_segment::LedMatrixBase;
 
 #elif defined(AUNITER_STM32_HC595)
   const uint8_t NUM_DIGITS = 8;
-  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
+  const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = kActiveHighPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
   const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 
@@ -96,8 +97,8 @@ using ace_segment::LedMatrixBase;
 
 #elif defined(AUNITER_D1MINI_LARGE_HC595)
   const uint8_t NUM_DIGITS = 8;
-  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
+  const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = kActiveHighPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
   const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 
@@ -109,8 +110,8 @@ using ace_segment::LedMatrixBase;
 
 #elif defined(AUNITER_ESP32_HC595)
   const uint8_t NUM_DIGITS = 8;
-  const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-  const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
+  const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = kActiveHighPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
   const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 

@@ -742,8 +742,8 @@ seem to be using Common Anode LEDs, connected directly to the 74HC595 chips,
 without driver transistors. That means that the segment pins are active low
 (requires a 0 to turn sink current from the LEDs) and the digit pins are active
 high (requires a 1 to send current into the LEDs). We can use the pre-defined
-constants `LedMatrixBase::kActiveLowPattern` and
-`LedMatrixBase::kActiveHighPattern` for these parameters.
+constants `kActiveLowPattern` and
+`kActiveHighPattern` for these parameters.
 
 The `framesPerSecond` is the desired refresh rate. A frame is one full rendering
 of all digits in the LED display. A value of 60 is good enough for most people,
@@ -786,8 +786,8 @@ const uint8_t CLOCK_PIN = SCK;
 const uint8_t NUM_DIGITS = 8;
 const uint8_t FRAMES_PER_SECOND = 60;
 
-const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
+const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
+const uint8_t DIGIT_ON_PATTERN = kActiveHighPattern;
 const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
 const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 

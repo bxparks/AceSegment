@@ -27,6 +27,12 @@ SOFTWARE.
 
 namespace ace_segment {
 
+/** Bit pattern to indicate that logical 1 activates group or element. */
+static const uint8_t kActiveHighPattern = 0xFF;
+
+/** Bit pattern to indicate that logical 0 activates group or element. */
+static const uint8_t kActiveLowPattern = 0x00;
+
 /**
  * Class that represents the abstraction of a particular LED display wiring, and
  * knows how to turn off and turn on a specific group of LEDs with a specific
@@ -72,12 +78,6 @@ namespace ace_segment {
  */
 class LedMatrixBase {
   public:
-
-    /** Bit pattern to indicate that logical 1 activates group or element. */
-    static const uint8_t kActiveHighPattern = 0xFF;
-
-    /** Bit pattern to indicate that logical 0 activates group or element. */
-    static const uint8_t kActiveLowPattern = 0x00;
 
     /**
      * @param elementOnPattern bit pattern that turns on the elements on group

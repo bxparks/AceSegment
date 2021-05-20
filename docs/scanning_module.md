@@ -183,8 +183,8 @@ const uint16_t FRAMES_PER_SECOND = 60;
 
 using LedMatrix = LedMatrixDirect<>;
 LedMatrix ledMatrix(
-    LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
-    LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
+    kActiveHighPattern /*elementOnPattern*/,
+    kActiveHighPattern /*groupOnPattern*/,
     NUM_SEGMENTS,
     SEGMENT_PINS,
     NUM_DIGITS,
@@ -273,8 +273,8 @@ SoftSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
 using LedMatrix = LedMatrixSingleHc595<SoftSpiInterface>;
 LedMatrix ledMatrix(
     spiInterface,
-    LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
-    LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
+    kActiveHighPattern /*elementOnPattern*/,
+    kActiveHighPattern /*groupOnPattern*/,
     NUM_DIGITS,
     DIGIT_PINS):
 ScanningModule<LedMatrix, NUM_DIGITS> scanningModule(
@@ -338,8 +338,8 @@ HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
 using LedMatrix = LedMatrixSingleHc595<HardSpiInterface>;
 LedMatrix ledMatrix(
     spiInterface,
-    LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
-    LedMatrixBase::kActiveHighPattern /*groupOnPattern*/);
+    kActiveHighPattern /*elementOnPattern*/,
+    kActiveHighPattern /*groupOnPattern*/);
 ScanningModule<LedMatrix, NUM_DIGITS> scanningModule(
     ledMatrix, FRAMES_PER_SECOND);
 LedDisplay ledDisplay(scanningModule);
@@ -425,8 +425,8 @@ const uint16_t FRAMES_PER_SECOND = 60;
 // The chain of resources.
 using LedMatrix = LedMatrixDirect<>;
 LedMatrix ledMatrix(
-    LedMatrixBase::kActiveLowPattern /*elementOnPattern*/,
-    LedMatrixBase::kActiveLowPattern /*groupOnPattern*/,
+    kActiveLowPattern /*elementOnPattern*/,
+    kActiveLowPattern /*groupOnPattern*/,
     NUM_SEGMENTS,
     SEGMENT_PINS,
     NUM_DIGITS,
@@ -508,8 +508,8 @@ HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
 using LedMatrix = LedMatrixSingleHc595<HardSpiInterface>;
 LedMatrix ledMatrix(
     spiInterface,
-    LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
-    LedMatrixBase::kActiveHighPattern /*groupOnPattern*/);
+    kActiveHighPattern /*elementOnPattern*/,
+    kActiveHighPattern /*groupOnPattern*/);
 ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
     ledMatrix, FRAMES_PER_SECOND);
 LedDisplay ledDisplay(scanningModule);

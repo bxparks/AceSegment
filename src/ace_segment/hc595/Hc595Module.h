@@ -88,11 +88,11 @@ class Hc595Module : public ScanningModule<
     /**
      * @param spiInterface object that knows how to send SPI packets
      * @param segmentOnPattern the bit pattern that indicates whether the
-     *    segment pins are wired to be active high (LedMatrixBase::kActiveHigh)
-     *    or active low (LedMatrixBase::kActiveLow)
+     *    segment pins are wired to be active high (kActiveHighPattern)
+     *    or active low (kActiveLowPattern)
      * @param digitOnPattern the bit pattern that indicates whether the digit
-     *    pins are wired to be active high (LedMatrixBase::kActiveHigh)
-     *    or active low (LedMatrixBase::kActiveLow)
+     *    pins are wired to be active high (kActiveHighPattern)
+     *    or active low (kActiveLowPattern)
      * @param framesPerSecond desired number of frames per second (usually
      *    greater than or equal to 60 to avoid flickering)
      * @param byteOrder whether to send the digit patterns first

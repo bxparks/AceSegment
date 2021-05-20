@@ -198,14 +198,14 @@ void runScanningBenchmark(const __FlashStringHelper* name, LM& scanningModule) {
 // Common Anode, with transistors on Group pins
 void runDirect() {
   DirectModule<NUM_DIGITS> scanningModule(
-      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+      kActiveLowPattern /*segmentOnPattern*/,
+      kActiveLowPattern /*digitOnPattern*/,
       FRAMES_PER_SECOND,
       SEGMENT_PINS,
       DIGIT_PINS);
   DirectModule<NUM_DIGITS, NUM_SUBFIELDS> scanningModuleSubfields(
-      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+      kActiveLowPattern /*segmentOnPattern*/,
+      kActiveLowPattern /*digitOnPattern*/,
       FRAMES_PER_SECOND,
       SEGMENT_PINS,
       DIGIT_PINS);
@@ -226,8 +226,8 @@ void runDirectFast4() {
       4, 5, 6, 7, // digit pins
       NUM_DIGITS
   > scanningModule(
-      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+      kActiveLowPattern /*segmentOnPattern*/,
+      kActiveLowPattern /*digitOnPattern*/,
       FRAMES_PER_SECOND);
 
   DirectFast4Module<
@@ -236,8 +236,8 @@ void runDirectFast4() {
       NUM_DIGITS,
       NUM_SUBFIELDS
   > scanningModuleSubfields(
-      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+      kActiveLowPattern /*segmentOnPattern*/,
+      kActiveLowPattern /*digitOnPattern*/,
       FRAMES_PER_SECOND);
 
   scanningModule.begin();
@@ -258,16 +258,16 @@ void runHybridSoftSpi() {
 
   HybridModule<SpiInterface, NUM_DIGITS> scanningModule(
       spiInterface,
-      LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
-      LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
+      kActiveHighPattern /*segmentOnPattern*/,
+      kActiveHighPattern /*digitOnPattern*/,
       FRAMES_PER_SECOND,
       DIGIT_PINS
   );
 
   HybridModule<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModuleSubfields(
       spiInterface,
-      LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
-      LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
+      kActiveHighPattern /*segmentOnPattern*/,
+      kActiveHighPattern /*digitOnPattern*/,
       FRAMES_PER_SECOND,
       DIGIT_PINS
   );
@@ -291,16 +291,16 @@ void runHybridSoftSpiFast() {
 
   HybridModule<SpiInterface, NUM_DIGITS> scanningModule(
       spiInterface,
-      LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
-      LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
+      kActiveHighPattern /*segmentOnPattern*/,
+      kActiveHighPattern /*digitOnPattern*/,
       FRAMES_PER_SECOND,
       DIGIT_PINS
   );
 
   HybridModule<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModuleSubfields(
       spiInterface,
-      LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
-      LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
+      kActiveHighPattern /*segmentOnPattern*/,
+      kActiveHighPattern /*digitOnPattern*/,
       FRAMES_PER_SECOND,
       DIGIT_PINS
   );
@@ -324,16 +324,16 @@ void runHybridHardSpi() {
 
   HybridModule<SpiInterface, NUM_DIGITS> scanningModule(
       spiInterface,
-      LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
-      LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
+      kActiveHighPattern /*segmentOnPattern*/,
+      kActiveHighPattern /*digitOnPattern*/,
       FRAMES_PER_SECOND,
       DIGIT_PINS
   );
 
   HybridModule<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModuleSubfields(
       spiInterface,
-      LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
-      LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
+      kActiveHighPattern /*segmentOnPattern*/,
+      kActiveHighPattern /*digitOnPattern*/,
       FRAMES_PER_SECOND,
       DIGIT_PINS
   );
@@ -357,16 +357,16 @@ void runHybridHardSpiFast() {
 
   HybridModule<SpiInterface, NUM_DIGITS> scanningModule(
       spiInterface,
-      LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
-      LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
+      kActiveHighPattern /*segmentOnPattern*/,
+      kActiveHighPattern /*digitOnPattern*/,
       FRAMES_PER_SECOND,
       DIGIT_PINS
   );
 
   HybridModule<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModuleSubfields(
       spiInterface,
-      LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
-      LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
+      kActiveHighPattern /*segmentOnPattern*/,
+      kActiveHighPattern /*digitOnPattern*/,
       FRAMES_PER_SECOND,
       DIGIT_PINS
   );
@@ -392,16 +392,16 @@ void runHc595SoftSpi() {
 
   Hc595Module<SpiInterface, 8> scanningModule(
       spiInterface,
-      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+      kActiveLowPattern /*segmentOnPattern*/,
+      kActiveLowPattern /*digitOnPattern*/,
       FRAMES_PER_SECOND,
       kByteOrderDigitHighSegmentLow
   );
 
   Hc595Module<SpiInterface, 8, NUM_SUBFIELDS> scanningModuleSubfields(
       spiInterface,
-      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+      kActiveLowPattern /*segmentOnPattern*/,
+      kActiveLowPattern /*digitOnPattern*/,
       FRAMES_PER_SECOND,
       kByteOrderDigitHighSegmentLow
   );
@@ -425,8 +425,8 @@ void runHc595SoftSpiFast() {
 
   Hc595Module<SpiInterface, 8> scanningModule(
       spiInterface,
-      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+      kActiveLowPattern /*segmentOnPattern*/,
+      kActiveLowPattern /*digitOnPattern*/,
       FRAMES_PER_SECOND,
       kByteOrderDigitHighSegmentLow
   );
@@ -434,8 +434,8 @@ void runHc595SoftSpiFast() {
   Hc595Module<SpiInterface, 8, NUM_SUBFIELDS>
       scanningModuleSubfields(
           spiInterface,
-          LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-          LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+          kActiveLowPattern /*segmentOnPattern*/,
+          kActiveLowPattern /*digitOnPattern*/,
           FRAMES_PER_SECOND,
           kByteOrderDigitHighSegmentLow
       );
@@ -459,16 +459,16 @@ void runHc595HardSpi() {
 
   Hc595Module<SpiInterface, 8> scanningModule(
       spiInterface,
-      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+      kActiveLowPattern /*segmentOnPattern*/,
+      kActiveLowPattern /*digitOnPattern*/,
       FRAMES_PER_SECOND,
       kByteOrderDigitHighSegmentLow
   );
 
   Hc595Module<SpiInterface, 8, NUM_SUBFIELDS> scanningModuleSubfields(
       spiInterface,
-      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+      kActiveLowPattern /*segmentOnPattern*/,
+      kActiveLowPattern /*digitOnPattern*/,
       FRAMES_PER_SECOND,
       kByteOrderDigitHighSegmentLow
   );
@@ -491,16 +491,16 @@ void runHc595HardSpiFast() {
 
   Hc595Module<SpiInterface, 8> scanningModule(
       spiInterface,
-      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+      kActiveLowPattern /*segmentOnPattern*/,
+      kActiveLowPattern /*digitOnPattern*/,
       FRAMES_PER_SECOND,
       kByteOrderDigitHighSegmentLow
   );
 
   Hc595Module<SpiInterface, 8, NUM_SUBFIELDS> scanningModuleSubfields(
       spiInterface,
-      LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-      LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+      kActiveLowPattern /*segmentOnPattern*/,
+      kActiveLowPattern /*digitOnPattern*/,
       FRAMES_PER_SECOND,
       kByteOrderDigitHighSegmentLow
   );
