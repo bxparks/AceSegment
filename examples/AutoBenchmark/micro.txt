@@ -3,8 +3,8 @@ sizeof(SoftTmiInterface): 4
 sizeof(SoftTmiFastInterface<4, 5, 100>): 1
 sizeof(SoftSpiInterface): 3
 sizeof(SoftSpiFastInterface<11, 12, 13>): 1
-sizeof(HardSpiInterface): 3
-sizeof(HardSpiFastInterface<11, 12, 13>): 1
+sizeof(HardSpiInterface): 5
+sizeof(HardSpiFastInterface<11, 12, 13>): 2
 sizeof(LedMatrixDirect<>): 9
 sizeof(LedMatrixDirectFast4<6..13, 2..5>): 3
 sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 8
@@ -28,34 +28,34 @@ sizeof(StringScroller): 11
 BENCHMARKS
 Direct(4) 72 78 88 40
 Direct(4,subfields) 4 13 84 640
-DirectFast4(4) 24 28 32 40
-DirectFast4(4,subfields) 4 8 40 640
-Hybrid(4,SoftSpi) 148 152 156 40
+DirectFast4(4) 24 28 36 40
+DirectFast4(4,subfields) 4 8 36 640
+Hybrid(4,SoftSpi) 148 152 160 40
 Hybrid(4,SoftSpi,subfields) 4 21 160 640
-Hybrid(4,SoftSpiFast) 28 32 36 40
+Hybrid(4,SoftSpiFast) 28 33 40 40
 Hybrid(4,SoftSpiFast,subfields) 4 8 40 640
-Hybrid(4,HardSpi) 36 40 48 40
+Hybrid(4,HardSpi) 36 41 48 40
 Hybrid(4,HardSpi,subfields) 4 9 48 640
-Hybrid(4,HardSpiFast) 24 28 36 40
+Hybrid(4,HardSpiFast) 24 27 32 40
 Hybrid(4,HardSpiFast,subfields) 4 7 36 640
 Hc595(8,SoftSpi) 252 255 264 80
 Hc595(8,SoftSpi,subfields) 4 35 264 1280
 Hc595(8,SoftSpiFast) 24 25 32 80
-Hc595(8,SoftSpiFast,subfields) 4 8 32 1280
+Hc595(8,SoftSpiFast,subfields) 4 8 36 1280
 Hc595(8,HardSpi) 28 30 36 80
 Hc595(8,HardSpi,subfields) 4 8 36 1280
-Hc595(8,HardSpiFast) 16 16 20 80
+Hc595(8,HardSpiFast) 12 16 24 80
 Hc595(8,HardSpiFast,subfields) 4 7 24 1280
-Tm1637(4,SoftTmi) 22440 22450 22460 10
-Tm1637(4,SoftTmi,incremental) 3632 8853 10164 50
-Tm1637(4,SoftTmiFast) 21172 21182 21196 10
-Tm1637(4,SoftTmiFast,incremental) 3428 8354 9592 50
-Tm1637(6,SoftTmi) 28212 28223 28232 10
-Tm1637(6,SoftTmi,incremental) 3628 9226 10164 70
-Tm1637(6,SoftTmiFast) 26620 26628 26636 10
+Tm1637(4,SoftTmi) 22444 22450 22460 10
+Tm1637(4,SoftTmi,incremental) 3632 8854 10168 50
+Tm1637(4,SoftTmiFast) 21172 21181 21196 10
+Tm1637(4,SoftTmiFast,incremental) 3428 8353 9596 50
+Tm1637(6,SoftTmi) 28212 28224 28236 10
+Tm1637(6,SoftTmi,incremental) 3632 9226 10168 70
+Tm1637(6,SoftTmiFast) 26620 26628 26644 10
 Tm1637(6,SoftTmiFast,incremental) 3428 8705 9592 70
-Max7219(8,SoftSpi) 2244 2247 2256 20
-Max7219(8,SoftSpiFast) 208 211 216 20
+Max7219(8,SoftSpi) 2244 2247 2260 20
+Max7219(8,SoftSpiFast) 208 211 220 20
 Max7219(8,HardSpi) 232 235 244 20
-Max7219(8,HardSpiFast) 108 109 120 20
+Max7219(8,HardSpiFast) 104 107 120 20
 END

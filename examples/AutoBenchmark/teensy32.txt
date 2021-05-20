@@ -1,7 +1,7 @@
 SIZEOF
 sizeof(SoftTmiInterface): 4
 sizeof(SoftSpiInterface): 3
-sizeof(HardSpiInterface): 3
+sizeof(HardSpiInterface): 8
 sizeof(LedMatrixDirect<>): 16
 sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 16
 sizeof(LedMatrixDualHc595<HardSpiInterface>): 16
@@ -21,20 +21,20 @@ sizeof(CharWriter): 12
 sizeof(StringWriter): 4
 sizeof(StringScroller): 20
 BENCHMARKS
-Direct(4) 6 6 10 40
+Direct(4) 5 6 9 40
 Direct(4,subfields) 0 1 9 640
 Hybrid(4,SoftSpi) 10 10 11 40
-Hybrid(4,SoftSpi,subfields) 0 1 13 640
-Hybrid(4,HardSpi) 3 3 4 40
-Hybrid(4,HardSpi,subfields) 0 1 7 640
+Hybrid(4,SoftSpi,subfields) 0 1 14 640
+Hybrid(4,HardSpi) 4 4 6 40
+Hybrid(4,HardSpi,subfields) 0 1 5 640
 Hc595(8,SoftSpi) 16 16 19 80
-Hc595(8,SoftSpi,subfields) 0 2 20 1280
-Hc595(8,HardSpi) 3 3 5 80
+Hc595(8,SoftSpi,subfields) 0 2 21 1280
+Hc595(8,HardSpi) 4 4 5 80
 Hc595(8,HardSpi,subfields) 0 1 6 1280
-Tm1637(4,SoftTmi) 21179 21180 21185 10
-Tm1637(4,SoftTmi,incremental) 3423 8338 9573 50
-Tm1637(6,SoftTmi) 26612 26614 26617 10
-Tm1637(6,SoftTmi,incremental) 3423 8689 9573 70
-Max7219(8,SoftSpi) 152 152 154 20
-Max7219(8,HardSpi) 30 30 34 20
+Tm1637(4,SoftTmi) 21149 21150 21154 10
+Tm1637(4,SoftTmi,incremental) 3424 8339 9574 50
+Tm1637(6,SoftTmi) 26592 26593 26599 10
+Tm1637(6,SoftTmi,incremental) 3424 8690 9574 70
+Max7219(8,SoftSpi) 152 152 155 20
+Max7219(8,HardSpi) 38 39 42 20
 END

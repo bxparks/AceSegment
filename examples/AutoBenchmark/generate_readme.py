@@ -139,6 +139,14 @@ number of `TimingStats::update()` calls that were made.
   the CPU time of `renderFieldsNow()` by a tiny amount, maybe a microsecond on a
   AVR. For 32-bit processors, the difference seems to be within the noise.
 
+**v0.5+:**
+
+* `HardSpiInterface` is slightly slower on the fastest processors (e.g. ESP8266,
+  ESP32, Teensy 3.2), because the SPI frequency was reduced from 20 MHz to 8
+  MHz. No difference on the slower processors. Those fast processors can
+  actually sustain a 20 MHz SPI, which breaks the MAX7219 chip because it can
+  handle only 16 MHz.
+
 ## Results
 
 The following tables show the number of microseconds taken by:
