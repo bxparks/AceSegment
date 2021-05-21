@@ -1,3 +1,43 @@
+/*
+ * This program is used to test the AceSegment feature matrix composed of:
+ *
+ *    * varous AceSegment feature classes,
+ *    * various supported microcontrollers (e.g. AVR, STM32, ESP8266, etc),
+ *    * various supported LED modules (TM1637, MAX7219, 74HC595).
+ *
+ * This program is primarily intended for my own testing and debugging. The
+ * other demo programs under the examples/ directory are better suited for
+ * demonstration purposes. The program contains series of demo-reels. Each demo
+ * reel loops continously, for example, incrementing a number from -99 to 1000.
+ * Each increment is a "frame".
+ *
+ * The program depends on the AceButton library to handle 2 buttons, let's call
+ * them "Mode" and "Change", to select the features that I want to test. Some of
+ * my development boards use buttons wired to digital pins. Others use buttons
+ * connected to an analog pin through a resistor ladder. This program supports
+ * both configurations.
+ *
+ * The "Mode" button controls the progression of the demo-reel. Clicking on
+ * "Mode" button button stops the auto-play of the demo reel at a specific
+ * frame. Clicking on the "Mode" button again in the paused mode causes a
+ * single-step through the demo-reel, frame by frame. For example, a number is
+ * incremented by one each time the "Mode" button is pressed. To revert back
+ * auto-play mode, perform a LongPress of the "Mode" button by holding it down
+ * for more than 1 second. When the demo-reel is in the auto-play mode,
+ * performing a LongPress changes to the next demo-reel. For example, it goes
+ * from incrementing the temperature in degrees Celcius to incrementing the
+ * temperature in degrees Fahrenheit.
+ *
+ * The "Change" button controls the rendering of the LED segment patterns to the
+ * LED module. Clicking on the "Change" button pauses the auto rendering of the
+ * display. Clicking on the "Change" button again performs a single-step through
+ * each iteration of the LED module rendering logic, i.e. the
+ * Tm1637Module::flush(), Tm1637Module::flushIncremental(),
+ * Max7219Module::flush(), or Hc595Module::renderFieldNow() methods. While in
+ * single-step mode, performing a LongPress on "Change" causes the program to
+ * revert back to auto-rendering mode.
+ */
+
 #include <Arduino.h>
 #include <AceButton.h>
 #include <AceCommon.h> // incrementMod()
@@ -984,12 +1024,13 @@ void handleEvent(AceButton* button, uint8_t eventType, uint8_t buttonState) {
   if (pin == MODE_BUTTON_PIN) {
     switch (eventType) {
       case AceButton::kEventReleased:
-      case AceButton::kEventClicked:
+        // Single click pauses the demo-reel.
         if (demoLoopMode == DEMO_LOOP_MODE_AUTO) {
           demoLoopMode = DEMO_LOOP_MODE_PAUSED;
           if (ENABLE_SERIAL_DEBUG >= 1) {
             Serial.println(F("handleEvent(): demo loop paused"));
           }
+        // If already paused, single-step to the next demo frame.
         } else if (demoLoopMode == DEMO_LOOP_MODE_PAUSED) {
           if (ENABLE_SERIAL_DEBUG >= 1) {
             Serial.println(F("handleEvent(): demo stepped"));
@@ -999,16 +1040,14 @@ void handleEvent(AceButton* button, uint8_t eventType, uint8_t buttonState) {
         break;
 
       case AceButton::kEventLongPressed:
+        // Long press goes back to auto loop mode if paused.
         if (demoLoopMode == DEMO_LOOP_MODE_PAUSED) {
           if (ENABLE_SERIAL_DEBUG >= 1) {
             Serial.println(F("handleEvent(): demo loop enabled"));
           }
           demoLoopMode = DEMO_LOOP_MODE_AUTO;
-        }
-        break;
-
-      case AceButton::kEventDoubleClicked:
-        if (demoLoopMode == DEMO_LOOP_MODE_AUTO) {
+        // If currently in auto mode, goes to the next demo reel.
+        } else if (demoLoopMode == DEMO_LOOP_MODE_AUTO) {
           if (ENABLE_SERIAL_DEBUG >= 1) {
             Serial.println(F("handleEvent(): next demo"));
           }
@@ -1019,7 +1058,7 @@ void handleEvent(AceButton* button, uint8_t eventType, uint8_t buttonState) {
   } else if (pin == CHANGE_BUTTON_PIN) {
     switch (eventType) {
       case AceButton::kEventReleased:
-      case AceButton::kEventClicked:
+        // Single click pauses the rendering/flushing.
         if (renderMode == RENDER_MODE_AUTO) {
         #if USE_INTERRUPT
           Timer1.stop();
@@ -1028,6 +1067,7 @@ void handleEvent(AceButton* button, uint8_t eventType, uint8_t buttonState) {
           if (ENABLE_SERIAL_DEBUG >= 1) {
             Serial.println(F("handleEvent(): paused"));
           }
+        // If already paused, single click single-steps through the rendering.
         } else if (renderMode == RENDER_MODE_PAUSED) {
           if (ENABLE_SERIAL_DEBUG >= 1) {
             Serial.println(F("handleEvent(): stepping"));
@@ -1037,6 +1077,7 @@ void handleEvent(AceButton* button, uint8_t eventType, uint8_t buttonState) {
         break;
 
       case AceButton::kEventLongPressed:
+        // LongPress resumes auto rendering/flushing.
         if (renderMode == RENDER_MODE_PAUSED) {
           if (ENABLE_SERIAL_DEBUG >= 1) {
             Serial.println(F("handleEvent(): switching to auto rendering"));
@@ -1060,11 +1101,6 @@ void setupAceButton() {
   buttonConfig.setEventHandler(handleEvent);
   buttonConfig.setFeature(ButtonConfig::kFeatureLongPress);
   buttonConfig.setFeature(ButtonConfig::kFeatureSuppressAfterLongPress);
-  buttonConfig.setFeature(ButtonConfig::kFeatureClick);
-  buttonConfig.setFeature(ButtonConfig::kFeatureSuppressAfterClick);
-  buttonConfig.setFeature(ButtonConfig::kFeatureDoubleClick);
-  buttonConfig.setFeature(ButtonConfig::kFeatureSuppressAfterDoubleClick);
-  buttonConfig.setFeature(ButtonConfig::kFeatureSuppressClickBeforeDoubleClick);
 }
 
 // Check AceButtons, limiting sampling rate to about 200/seconds to avoid
