@@ -1,19 +1,39 @@
 # Changelog
 
 * Unreleased
-    * Fix bug in `Tm1637Module::flushIncremental()` introduced in 0c37b29a which
-      prevented mFlushStage from incrementing properly.
-    * Add support for microcontrollers with 2 SPI buses (ESP32 and STM32F1).
-    * Reduce maximum SPI speed from 20 MHz to 8 MHz, since the MAX7219 chip
-      cannot handle greater than 16 MHz. Makes no difference with the slower
-      processors. On the fastest processors (ESP8266, ES32, and Teensy 3.2),
-      this makes the AutoBenchmark for `HardSpiInterace` 5-10% slower. But those
-      faster numbers were fake, because they would not have worked on a real
-      MAX7219 chip.
-    * Rename `WireInterface` to `TmiInterface` (and `WireFastInterface` to
-      `TmiFastInteface`). The `Tmi` stands for `TM1637 Interface`. This avoid
-      confusion with a future `WireInterface` which uses the actual I2C
-      protocol.
+    * HardSpiInterface
+        * Add support for microcontrollers with 2 SPI buses (ESP32 and STM32F1).
+        * Reduce maximum SPI speed from 20 MHz to 8 MHz, since the MAX7219 chip
+          cannot handle greater than 16 MHz. Makes no difference with the slower
+          processors. On the fastest processors (ESP8266, ES32, and Teensy 3.2),
+          this makes the AutoBenchmark for `HardSpiInterace` 5-10% slower. But
+          those faster numbers were fake, because they would not have worked on
+          a real MAX7219 chip.
+        * Move `digitalWrite()` calls to the `CS/SS/Latch` pin inside the
+          `beginTransaction()` and `endTransaction()` code block.
+    * TM1637
+        * Rename `WireInterface` to `TmiInterface` (and `WireFastInterface` to
+          `TmiFastInteface`). The `Tmi` stands for `TM1637 Interface`. This
+          avoid confusion with a future `WireInterface` which uses the actual
+          I2C protocol.
+        * Fix bug in `Tm1637Module::flushIncremental()` introduced in 0c37b29a
+          which prevented mFlushStage from incrementing properly.
+        * Verify that the 20 nF capacitors on the DIO and CLK lines of the
+          TM1637 LED modules from diymore.cc can be removed. This allows the
+          `bitDelay` to be reduced from 100 microseconds to 1-2 microseconds,
+          allowing `Tm1637Module::flush()` and `flushIncremental()` to be
+          50-100X faster.
+    * `examples/AceSegmentTester`
+        * Renamed from `AceSegmentDemo` to make it more obvious that this is an
+          internal testing tool, not a demo program.
+        * Simplify button handling to use only Clicked and LongPressed events.
+          Using DoubleClicked caused too many usability issues with these
+          buttons.
+    * `examples/Hc595InterruptDemo`
+        * Use `TimerOne` library (https://github.com/PaulStoffregen/TimerOne)
+          instead of manual interrupt configuration code. The manual
+          configuration was unmaintainable across different architectures
+          because every microcontroller does it slightly differently.
 * 0.5 (2021-05-14)
     * Extract hardware dependent API from `LedDisplay` into `LedModule`.
     * Create convenience subclasses of `LedModule`:
