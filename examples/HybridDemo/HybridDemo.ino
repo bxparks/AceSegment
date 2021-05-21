@@ -44,6 +44,11 @@ using ace_segment::kActiveHighPattern;
 // Hardware configuration.
 //----------------------------------------------------------------------------
 
+// Configuration for Arduino IDE
+#if ! defined(EPOXY_DUINO) && ! defined(AUNITER)
+  #define AUNITER_MICRO_CUSTOM_SINGLE
+#endif
+
 #if defined(EPOXY_DUINO)
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
   #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY

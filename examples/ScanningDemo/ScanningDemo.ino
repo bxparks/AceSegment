@@ -50,6 +50,11 @@ using ace_segment::kActiveHighPattern;
 #define LED_MATRIX_MODE_DUAL_HARD_SPI 9
 #define LED_MATRIX_MODE_DUAL_HARD_SPI_FAST 10
 
+// Configuration for Arduino IDE
+#if ! defined(EPOXY_DUINO) && ! defined(AUNITER)
+  #define AUNITER_MICRO_SCANNING_DIRECT
+#endif
+
 #if defined(EPOXY_DUINO)
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT_FAST

@@ -16,7 +16,8 @@ using ace_segment::LedDisplay;
 using ace_segment::SoftTmiInterface;
 using ace_segment::kDigitRemapArray6Tm1637;
 
-// Select driver version, either normal digitalWrite() or digitalWriteFast()
+// Select TM1637 protocol version, either SoftTmiInterface or
+// SoftTmiFastInterface.
 #define TMI_INTERFACE_TYPE_NORMAL 0
 #define TMI_INTERFACE_TYPE_FAST 1
 
@@ -90,7 +91,7 @@ using ace_segment::kDigitRemapArray6Tm1637;
 //------------------------------------------------------------------
 
 // For a SoftTmiInterface (non-fast), time to send 4 digits:
-// * 12 ms at 50 us delay, but does not work.
+// * 12 ms at 50 us delay, but does not work with off-the-shelf TM1637 module.
 // * 17 ms at 75 us delay.
 // * 22 ms at 100 us delay.
 // * 43 ms at 200 us delay.
@@ -236,7 +237,6 @@ void setup() {
 
   setupAceSegment();
 }
-
 
 void loop() {
   updateDisplay();

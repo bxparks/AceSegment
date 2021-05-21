@@ -25,6 +25,11 @@ using ace_segment::kActiveLowPattern;
 #define LED_DISPLAY_TYPE_HYBRID 5
 #define LED_DISPLAY_TYPE_FULL 6
 
+// Configuration for Arduino IDE
+#if ! defined(EPOXY_DUINO) && ! defined(AUNITER)
+  #define AUNITER_MICRO_CUSTOM_DIRECT
+#endif
+
 #if defined(EPOXY_DUINO)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_DIRECT
 

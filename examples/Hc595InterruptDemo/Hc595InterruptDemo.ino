@@ -52,6 +52,11 @@ using ace_segment::kActiveHighPattern;
 #define INTERFACE_TYPE_SOFT_TMI 4
 #define INTERFACE_TYPE_SOFT_TMI_FAST 5
 
+// Configuration for Arduino IDE
+#if ! defined(EPOXY_DUINO) && ! defined(AUNITER)
+  #define AUNITER_MICRO_HC595
+#endif
+
 #if defined(EPOXY_DUINO)
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
   const uint8_t NUM_DIGITS = 4;
@@ -74,7 +79,7 @@ using ace_segment::kActiveHighPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
   const uint8_t* const REMAP_ARRAY = nullptr;
 
-#elif defined(AUNITER_MICRO_HC595) || defined(AUNITER_NANO)
+#elif defined(AUNITER_MICRO_HC595)
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
   const uint8_t NUM_DIGITS = 8;
   const uint8_t LATCH_PIN = 10;
