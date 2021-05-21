@@ -690,7 +690,7 @@ void setupInterupt() {
 #endif
 
 //------------------------------------------------------------------
-// Configurations for AceSegmentDemo
+// Configurations for various demo-reels.
 //------------------------------------------------------------------
 
 // State of loop, whether paused or not.
@@ -698,7 +698,8 @@ const uint8_t DEMO_LOOP_MODE_AUTO = 0;
 const uint8_t DEMO_LOOP_MODE_PAUSED = 1;
 uint8_t demoLoopMode = DEMO_LOOP_MODE_AUTO;
 
-// Selection of demo.
+// A DEMO_MODE represents a demo-reel that demonstrates a specific AceSegment
+// feature.
 const uint8_t DEMO_MODE_HEX_NUMBERS = 0;
 const uint8_t DEMO_MODE_CLOCK = 1;
 const uint8_t DEMO_MODE_UNSIGNED_DEC_NUMBERS = 2;
