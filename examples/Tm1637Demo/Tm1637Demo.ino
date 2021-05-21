@@ -209,6 +209,7 @@ void printStats() {
   static uint16_t prevStatsMillis;
 
   // Every 5 seconds, print out the statistics.
+  uint16_t nowMillis = millis();
   if ((uint16_t) (nowMillis - prevStatsMillis) >= 5000) {
     prevStatsMillis = nowMillis;
 
