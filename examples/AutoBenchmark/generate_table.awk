@@ -63,6 +63,7 @@ END {
         || u[i]["name"] ~ /^Hybrid\(4,SoftSpi\)/ \
         || u[i]["name"] ~ /^Hc595\(8,SoftSpi\)/ \
         || u[i]["name"] ~ /^Tm1637\(4,SoftTmi\)/ \
+        || u[i]["name"] ~ /^Tm1637\(4,SoftTmi,5us\)/ \
         || u[i]["name"] ~ /^Max7219\(8,SoftSpi\)/ \
     ) {
       printf("|----------------------------------------+-------------------+---------|\n")

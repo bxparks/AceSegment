@@ -66,6 +66,9 @@ const uint8_t NUM_SUBFIELDS = 16;
 const uint8_t NUM_DIGITS = 4;
 const uint8_t NUM_SEGMENTS = 8;
 
+const uint16_t BIT_DELAY = 100;
+const uint16_t BIT_DELAY_SHORT = 5;
+
 #if defined(EPOXY_DUINO)
   // numbers don't matter
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {1, 2, 3, 4};
@@ -74,7 +77,6 @@ const uint8_t NUM_SEGMENTS = 8;
   // TM1637
   const uint8_t CLK_PIN = 1;
   const uint8_t DIO_PIN = 2;
-  const uint16_t BIT_DELAY = 100;
 
 #elif defined(ARDUINO_ARCH_AVR)
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
@@ -83,7 +85,6 @@ const uint8_t NUM_SEGMENTS = 8;
   // TM1637
   const uint8_t CLK_PIN = 4;
   const uint8_t DIO_PIN = 5;
-  const uint16_t BIT_DELAY = 100;
 
 #elif defined(ARDUINO_ARCH_SAMD)
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {2, 3, 4, 5};
@@ -92,7 +93,6 @@ const uint8_t NUM_SEGMENTS = 8;
   // TM1637
   const uint8_t CLK_PIN = 2;
   const uint8_t DIO_PIN = 3;
-  const uint16_t BIT_DELAY = 100;
 
 #elif defined(ARDUINO_ARCH_STM32)
   // I think this is the F1, because there exists a ARDUINO_ARCH_STM32F4
@@ -102,7 +102,6 @@ const uint8_t NUM_SEGMENTS = 8;
   // TM1637
   const uint8_t CLK_PIN = 2;
   const uint8_t DIO_PIN = 3;
-  const uint16_t BIT_DELAY = 100;
 
 #elif defined(ESP8266)
   // Don't have enough pins so reuse some.
@@ -112,7 +111,6 @@ const uint8_t NUM_SEGMENTS = 8;
   // TM1637
   const uint8_t CLK_PIN = D4;
   const uint8_t DIO_PIN = D5;
-  const uint16_t BIT_DELAY = 100;
 
 #elif defined(ESP32)
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {21, 22, 23, 24};
@@ -121,7 +119,6 @@ const uint8_t NUM_SEGMENTS = 8;
   // TM1637
   const uint8_t CLK_PIN = 21;
   const uint8_t DIO_PIN = 22;
-  const uint16_t BIT_DELAY = 100;
 
 #elif defined(TEENSYDUINO)
   // Teensy 3.2
@@ -131,7 +128,6 @@ const uint8_t NUM_SEGMENTS = 8;
   // TM1637
   const uint8_t CLK_PIN = 2;
   const uint8_t DIO_PIN = 3;
-  const uint16_t BIT_DELAY = 100;
 
 #else
   #warning Unknown hardware, using defaults which may interfere with Serial
@@ -141,11 +137,10 @@ const uint8_t NUM_SEGMENTS = 8;
   // TM1637
   const uint8_t CLK_PIN = 2;
   const uint8_t DIO_PIN = 3;
-  const uint16_t BIT_DELAY = 100;
 
 #endif
 
-  // 74HC595
+// 74HC595
 const uint8_t LATCH_PIN = 10; // ST_CP on 74HC595
 const uint8_t DATA_PIN = MOSI; // DS on 74HC595
 const uint8_t CLOCK_PIN = SCK; // SH_CP on 74HC595
@@ -597,6 +592,38 @@ void runTm1637SoftTmiFast() {
 }
 #endif
 
+void runTm1637SoftTmiShort() {
+  using TmiInterface = SoftTmiInterface;
+  TmiInterface tmiInterface(CLK_PIN, DIO_PIN, BIT_DELAY_SHORT);
+  tmiInterface.begin();
+
+  Tm1637Module<TmiInterface, 4> tm1637Module(tmiInterface);
+  tm1637Module.begin();
+  runTm1637Benchmark(F("Tm1637(4,SoftTmi,5us)"), tm1637Module, 4, false);
+  runTm1637Benchmark(
+      F("Tm1637(4,SoftTmi,incremental,5us)"), tm1637Module, 4, true);
+  tm1637Module.end();
+
+  tmiInterface.end();
+}
+
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+void runTm1637SoftTmiFastShort() {
+  using TmiInterface = SoftTmiFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY_SHORT>;
+  TmiInterface tmiInterface;
+  tmiInterface.begin();
+
+  Tm1637Module<TmiInterface, 4> tm1637Module(tmiInterface);
+  tm1637Module.begin();
+  runTm1637Benchmark(F("Tm1637(4,SoftTmiFast,5us)"), tm1637Module, 4, false);
+  runTm1637Benchmark(
+      F("Tm1637(4,SoftTmiFast,incremental,5us)"), tm1637Module, 4, true);
+  tm1637Module.end();
+
+  tmiInterface.end();
+}
+#endif
+
 void runTm1637SixSoftTmi() {
   using TmiInterface = SoftTmiInterface;
   TmiInterface tmiInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
@@ -743,6 +770,11 @@ void runBenchmarks() {
   runTm1637SixSoftTmi();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
   runTm1637SixSoftTmiFast();
+#endif
+
+  runTm1637SoftTmiShort();
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+  runTm1637SoftTmiFastShort();
 #endif
 
   runMax7219SoftSpi();

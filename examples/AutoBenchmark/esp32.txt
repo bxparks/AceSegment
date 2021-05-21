@@ -21,20 +21,22 @@ sizeof(CharWriter): 12
 sizeof(StringWriter): 4
 sizeof(StringScroller): 20
 BENCHMARKS
-Direct(4) 2 2 9 40
-Direct(4,subfields) 0 1 9 640
+Direct(4) 2 2 8 40
+Direct(4,subfields) 0 1 10 640
 Hybrid(4,SoftSpi) 4 4 8 40
 Hybrid(4,SoftSpi,subfields) 0 1 13 640
-Hybrid(4,HardSpi) 9 10 17 40
+Hybrid(4,HardSpi) 9 10 14 40
 Hybrid(4,HardSpi,subfields) 0 1 14 640
 Hc595(8,SoftSpi) 7 7 15 80
 Hc595(8,SoftSpi,subfields) 0 1 15 1280
-Hc595(8,HardSpi) 11 11 19 80
-Hc595(8,HardSpi,subfields) 0 2 20 1280
-Tm1637(4,SoftTmi) 21226 21237 21248 10
-Tm1637(4,SoftTmi,incremental) 3436 8375 9617 50
-Tm1637(6,SoftTmi) 26684 26699 26705 10
-Tm1637(6,SoftTmi,incremental) 3435 8727 9617 70
+Hc595(8,HardSpi) 11 11 14 80
+Hc595(8,HardSpi,subfields) 0 2 19 1280
+Tm1637(4,SoftTmi) 21230 21240 21247 10
+Tm1637(4,SoftTmi,incremental) 3436 8375 9616 50
+Tm1637(6,SoftTmi) 26684 26697 26705 10
+Tm1637(6,SoftTmi,incremental) 3437 8727 9616 70
+Tm1637(4,SoftTmi,5us) 1274 1278 1284 10
+Tm1637(4,SoftTmi,incremental,5us) 205 504 586 50
 Max7219(8,SoftSpi) 60 60 68 20
-Max7219(8,HardSpi) 90 91 97 20
+Max7219(8,HardSpi) 90 91 98 20
 END
