@@ -1,7 +1,7 @@
 # Changelog
 
 * Unreleased
-    * HardSpiInterface
+    * `HardSpiInterface`
         * Add support for microcontrollers with 2 SPI buses (ESP32 and STM32F1).
         * Reduce maximum SPI speed from 20 MHz to 8 MHz, since the MAX7219 chip
           cannot handle greater than 16 MHz. Makes no difference with the slower
@@ -34,6 +34,9 @@
           instead of manual interrupt configuration code. The manual
           configuration was unmaintainable across different architectures
           because every microcontroller does it slightly differently.
+    * `HorizontalLevelWriter`
+        * Write the specified number of vertical bars (2 bars per digit) to the
+          LED display.
 * 0.5 (2021-05-14)
     * Extract hardware dependent API from `LedDisplay` into `LedModule`.
     * Create convenience subclasses of `LedModule`:

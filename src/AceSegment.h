@@ -55,6 +55,7 @@ SOFTWARE.
 #include "ace_segment/writer/CharWriter.h"
 #include "ace_segment/writer/StringWriter.h"
 #include "ace_segment/writer/StringScroller.h"
+#include "ace_segment/writer/HorizontalLevelWriter.h"
 
 #if defined(ARDUINO_API_VERSION)
 #error Platforms using ArduinoCore-API not supported

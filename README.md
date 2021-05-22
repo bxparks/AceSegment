@@ -61,6 +61,7 @@ consumption.
     * [CharWriter](#CharWriter)
     * [StringWriter](#StringWriter)
     * [StringScroller](#StringScroller)
+    * [HorizontalLevelWriter](#HorizontalLevelWriter)
 * [Advanced Usage](#AdvancedUsage)
     * [DigitalWriteFast on AVR](#DigitalWriteFast)
     * [ScanningModule](#ScanningModule)
@@ -260,13 +261,15 @@ The dependency diagram among these classes looks something like this
 (simplified for ease of understanding):
 
 ```
-        StringScroller
-        StringWriter      ClockWriter  TemperatureWriter
-               |              \           /
-               V               v         v
-            CharWriter         NumberWriter
-                    \            /
-                     v          v
+   StringScroller
+   StringWriter    ClockWriter TemperatureWriter
+          |            \           /
+          V             v         v
+       CharWriter       NumberWriter     HorizontalLevelWriter
+            \              |             /
+             --------      |     --------
+                     \     |    /
+                      v    v   v
                       LedDisplay
                           |            (hardware independent)
 --------------------------|-------------------------------------
@@ -1164,6 +1167,24 @@ class StringScroller {
 
 To scroll a string to the left, first initialize the string, then call
 `scrollLeft()` to shift left. Similarly to the right.
+
+<a name="HorizontalLevelWriter"></a>
+### HorizontalLevelWriter
+
+A `HorizontalLevelWriter` writes a specified number of vertical bars (2 vertical
+bar per digit) to the LED display, emulating a level meter LED module.
+
+```C++
+class HorizontalLevelWriter {
+  public:
+    explicit HorizontalLevelWriter(LedDisplay& ledDisplay);
+
+    LedDisplay& display() const;
+
+    uint8_t getMaxLevel() const;
+    void setLevel(uint8_t level);
+};
+```
 
 <a name="AdvancedUsage"></a>
 ## Advanced Usage
