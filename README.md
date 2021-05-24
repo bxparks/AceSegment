@@ -1352,6 +1352,8 @@ static memory consumptions for various configurations on an Arduino Nano
 | TemperatureWriter+Stub          |    764/   28 |   308/   17 |
 | CharWriter+Stub                 |    788/   31 |   332/   20 |
 | StringWriter+Stub               |    988/   39 |   532/   28 |
+| StringScroller+Stub             |   1036/   45 |   580/   34 |
+| HorizontalLevelWriter+Stub      |    716/   28 |   260/   17 |
 +--------------------------------------------------------------+
 ```
 
@@ -1390,6 +1392,8 @@ And here are the memory consumption numbers for an ESP8266:
 | TemperatureWriter+Stub          | 257484/27200 |   784/  416 |
 | CharWriter+Stub                 | 257116/27208 |   416/  424 |
 | StringWriter+Stub               | 257364/27216 |   664/  432 |
+| StringScroller+Stub             | 257316/27224 |   616/  440 |
+| HorizontalLevelWriter+Stub      | 257020/27200 |   320/  416 |
 +--------------------------------------------------------------+
 ```
 
