@@ -93,7 +93,6 @@ while [[ $# -gt 0 ]]; do
     case $1 in
         --ide) AUNITER_FLAG='--ide' ;;
         --cli) AUNITER_FLAG='--cli' ;;
-        --num) shift; NUM_FEATURES=$1 ;;
         --help|-h) usage ;;
         --) shift; break ;;
         -*) echo "Unknown flag '$1'" 1>&2; usage 1>&2 ;;
