@@ -171,6 +171,51 @@ stub class should be subtracted from the numbers below. (Ideally, the
 that script more general to avoid maintenance overhead when it is copied into
 other `MemoryBenchmark` programs.)
 
+### ATtiny85
+
+* 8MHz ATtiny85
+* Arduino IDE 1.8.13
+* SpenceKonde/ATTinyCore 1.5.2
+
+```
++--------------------------------------------------------------+
+| functionality                   |  flash/  ram |       delta |
+|---------------------------------+--------------+-------------|
+| baseline                        |    260/   11 |     0/    0 |
+|---------------------------------+--------------+-------------|
+| DirectModule                    |   1248/   64 |   988/   53 |
+| DirectFast4Module               |   1012/   94 |   752/   83 |
+|---------------------------------+--------------+-------------|
+| Hybrid(SoftSpi)                 |   1282/   58 |  1022/   47 |
+| Hybrid(SoftSpiFast)             |   1168/   56 |   908/   45 |
+| Hybrid(HardSpi)                 |   1674/   66 |  1414/   55 |
+| Hybrid(HardSpiFast)             |   1606/   63 |  1346/   52 |
+|---------------------------------+--------------+-------------|
+| Hc595(SoftSpi)                  |   1262/   58 |  1002/   47 |
+| Hc595(SoftSpiFast)              |    856/   56 |   596/   45 |
+| Hc595(HardSpi)                  |   1642/   66 |  1382/   55 |
+| Hc595(HardSpiFast)              |   1318/   63 |  1058/   52 |
+|---------------------------------+--------------+-------------|
+| Tm1637(SoftTmi)                 |   1290/   39 |  1030/   28 |
+| Tm1637(SoftTmiFast)             |    642/   36 |   382/   25 |
+|---------------------------------+--------------+-------------|
+| Max7219(SoftSpi)                |    992/   44 |   732/   33 |
+| Max7219(SoftSpiFast)            |    558/   42 |   298/   31 |
+| Max7219(HardSpi)                |   1370/   52 |  1110/   41 |
+| Max7219(HardSpiFast)            |    914/   49 |   654/   38 |
+|---------------------------------+--------------+-------------|
+| StubModule+LedDisplay           |    378/   24 |   118/   13 |
+| NumberWriter+Stub               |    474/   28 |   214/   17 |
+| ClockWriter+Stub                |    554/   29 |   294/   18 |
+| TemperatureWriter+Stub          |    552/   28 |   292/   17 |
+| CharWriter+Stub                 |    592/   31 |   332/   20 |
+| StringWriter+Stub               |    774/   39 |   514/   28 |
+| StringScroller+Stub             |    836/   45 |   576/   34 |
+| HorizontalLevelWriter+Stub      |    510/   28 |   250/   17 |
++--------------------------------------------------------------+
+
+```
+
 ### Arduino Nano
 
 * 16MHz ATmega328P

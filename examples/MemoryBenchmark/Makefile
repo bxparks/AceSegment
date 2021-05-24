@@ -8,13 +8,16 @@ include ../../../EpoxyDuino/EpoxyDuino.mk
 
 .PHONY: benchmarks
 
-TARGETS := nano.txt micro.txt samd.txt stm32.txt esp8266.txt esp32.txt \
-teensy32.txt
+TARGETS := attiny.txt nano.txt micro.txt samd.txt stm32.txt \
+	esp8266.txt esp32.txt teensy32.txt
 
 README.md: $(TARGETS) generate_readme.py generate_table.awk
 	./generate_readme.py > $@
 
 benchmarks: $(TARGETS)
+
+attiny.txt:
+	./collect.sh --cli attiny $@
 
 nano.txt:
 	./collect.sh --cli nano $@
