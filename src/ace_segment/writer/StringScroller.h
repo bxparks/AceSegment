@@ -39,8 +39,8 @@ namespace ace_segment {
 class StringScroller {
   public:
     /** Constructor. */
-    explicit StringScroller(LedDisplay& ledDisplay) :
-        mCharWriter(ledDisplay)
+    explicit StringScroller(CharWriter& charWriter) :
+        mCharWriter(charWriter)
     {}
 
     /** Get the underlying LedDisplay. */
@@ -141,7 +141,7 @@ class StringScroller {
   private:
     // The order of these fields is partially motivated to reduce memory
     // consumption on 32-bit processors.
-    CharWriter mCharWriter;
+    CharWriter& mCharWriter;
     const void* mString;
     int16_t mStringPos; // can become negative
     uint8_t mStringLength;

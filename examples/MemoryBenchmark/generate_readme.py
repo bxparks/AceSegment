@@ -6,6 +6,8 @@
 
 from subprocess import check_output
 
+attiny_results = check_output(
+    "./generate_table.awk < attiny.txt", shell=True, text=True)
 nano_results = check_output(
     "./generate_table.awk < nano.txt", shell=True, text=True)
 micro_results = check_output(
@@ -164,6 +166,7 @@ before substantional refactoring in 2021.
 
 * Add support for multiple SPI buses in `HardSpiInterface` and
   `HardSpiFastInterface`. Increases flash memory by 10-30 bytes.
+* Add benchmarks for `StringScroller` and `HorizontalLevelWriter`.
 
 ## Results
 
@@ -184,6 +187,8 @@ program for various `LedModule` configurations and various Writer classes.
 * `TemperatureWriter`
 * `CharWriter`
 * `StringWriter`
+* `StringScroller`
+* `HorizontalLevelWriter`
 
 The `StubDisplay` is a dummy subclass of `LedDisplay` needed to create the
 various Writers. To get a better flash consumption of the Writer classes, this
@@ -191,6 +196,16 @@ stub class should be subtracted from the numbers below. (Ideally, the
 `generate_table.awk` script should do this automatically, but I'm trying to keep
 that script more general to avoid maintenance overhead when it is copied into
 other `MemoryBenchmark` programs.)
+
+### ATtiny85
+
+* 8MHz ATtiny85
+* Arduino IDE 1.8.13
+* SpenceKonde/ATTinyCore 1.5.2
+
+```
+{attiny_results}
+```
 
 ### Arduino Nano
 

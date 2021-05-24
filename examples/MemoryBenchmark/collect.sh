@@ -16,7 +16,7 @@
 set -eu
 
 PROGRAM_NAME='MemoryBenchmark.ino'
-NUM_FEATURES=22  # excluding FEATURE_BASELINE
+NUM_FEATURES=24  # excluding FEATURE_BASELINE
 
 # Assume that https://github.com/bxparks/AUniter is installed as a
 # sibling project to AceSegment.
@@ -93,7 +93,6 @@ while [[ $# -gt 0 ]]; do
     case $1 in
         --ide) AUNITER_FLAG='--ide' ;;
         --cli) AUNITER_FLAG='--cli' ;;
-        --num) shift; NUM_FEATURES=$1 ;;
         --help|-h) usage ;;
         --) shift; break ;;
         -*) echo "Unknown flag '$1'" 1>&2; usage 1>&2 ;;

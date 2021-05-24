@@ -29,6 +29,8 @@ BEGIN {
   labels[20] = "TemperatureWriter+Stub";
   labels[21] = "CharWriter+Stub";
   labels[22] = "StringWriter+Stub";
+  labels[23] = "StringScroller+Stub";
+  labels[24] = "HorizontalLevelWriter+Stub";
   record_index = 0
 }
 {
