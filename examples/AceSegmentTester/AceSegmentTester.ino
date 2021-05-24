@@ -640,6 +640,7 @@ ClockWriter clockWriter(ledDisplay);
 TemperatureWriter temperatureWriter(ledDisplay);
 CharWriter charWriter(ledDisplay);
 StringWriter stringWriter(charWriter);
+StringScroller stringScroller(charWriter);
 HorizontalLevelWriter horizontalLevelWriter(ledDisplay);
 
 // Setup the various resources.
@@ -839,8 +840,6 @@ void writeStrings() {
 }
 
 //-----------------------------------------------------------------------------
-
-StringScroller stringScroller(ledDisplay);
 
 static const char SCROLL_STRING[] PROGMEM =
 "the quick brown fox jumps over the lazy dog, "

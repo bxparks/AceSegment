@@ -138,8 +138,8 @@ The following example sketches are provided:
         * Demo of a MAX7219 LED module using `Max7219Module`
     * [Hc595Demo.ino](examples/Hc595Demo)
         * Demo of a 74HC595 LED module using `Hc595Module`
-    * [AceSegmentDemo.ino](examples/AceSegmentDemo)
-        * runs through some features of the library
+    * [AceSegmentTester.ino](examples/AceSegmentTester)
+        * demo-reel through most of the features of the library
         * uses 2 buttons for "single step" debugging mode
         * depends on AceButton (https://github.com/bxparks/AceButton) library
 * Advanced
@@ -253,6 +253,8 @@ depend on the lower-level classes:
           turns, prints to the `LedDisplay`.
     * `StringScoller`
         * Scroll a string left and right.
+    * `HorizontalLevelWriter`
+        * Display specified number of bars from left to right, 2 bars per digit.
 
 <a name="DependencyDiagram"></a>
 ### Dependency Diagram
@@ -1151,7 +1153,7 @@ like:
 ```C++
 class StringScroller {
   public:
-    explicit StringScroller(LedDisplay& ledDisplay);
+    explicit StringScroller(CharWriter& charWriter);
 
     LedDisplay& display() const;
 
