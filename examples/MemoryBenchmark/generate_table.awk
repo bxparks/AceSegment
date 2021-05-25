@@ -30,7 +30,7 @@ BEGIN {
   labels[21] = "CharWriter+Stub";
   labels[22] = "StringWriter+Stub";
   labels[23] = "StringScroller+Stub";
-  labels[24] = "HorizontalLevelWriter+Stub";
+  labels[24] = "LevelWriter+Stub";
   record_index = 0
 }
 {

@@ -34,7 +34,7 @@
           instead of manual interrupt configuration code. The manual
           configuration was unmaintainable across different architectures
           because every microcontroller does it slightly differently.
-    * `HorizontalLevelWriter`
+    * `LevelWriter`
         * Write the specified number of vertical bars (2 bars per digit) to the
           LED display.
 * 0.5 (2021-05-14)

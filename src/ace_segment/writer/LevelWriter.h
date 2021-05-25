@@ -22,8 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_HORIZONTAL_LEVEL_WRITER_H
-#define ACE_SEGMENT_HORIZONTAL_LEVEL_WRITER_H
+#ifndef ACE_SEGMENT_LEVEL_WRITER_H
+#define ACE_SEGMENT_LEVEL_WRITER_H
 
 #include <stdint.h>
 #include "../LedDisplay.h"
@@ -31,11 +31,11 @@ SOFTWARE.
 namespace ace_segment {
 
 /**
- * Emulate a horizontal level led module using a left vertical bar and a right
+ * Emulate a level led module using a left vertical bar and a right
  * vertical bar on each digit. Since each digit can represent 2 levels, the
  * range of levels for the entire LED display is `[0, 2*numDigits]`.
  */
-class HorizontalLevelWriter {
+class LevelWriter {
   private:
     // left vertical bar
     static const uint8_t kLevelLeftPattern = 0b00110000;
@@ -44,7 +44,7 @@ class HorizontalLevelWriter {
 
   public:
     /** Constructor. */
-    explicit HorizontalLevelWriter(LedDisplay& ledDisplay) :
+    explicit LevelWriter(LedDisplay& ledDisplay) :
         mLedDisplay(ledDisplay)
         {}
 
@@ -59,7 +59,7 @@ class HorizontalLevelWriter {
       return mLedDisplay.getNumDigits() * 2;
     }
 
-    /** Write out the horizontal level bar, 2 levels per digit. */
+    /** Write out the level bar, 2 levels per digit. */
     void setLevel(uint8_t level) {
       uint8_t fullDigits = level / 2;
       uint8_t partialDigit = level & 0x1;
@@ -78,8 +78,8 @@ class HorizontalLevelWriter {
 
   private:
     // disable copy-constructor and assignment operator
-    HorizontalLevelWriter(const HorizontalLevelWriter&) = delete;
-    HorizontalLevelWriter& operator=(const HorizontalLevelWriter&) = delete;
+    LevelWriter(const LevelWriter&) = delete;
+    LevelWriter& operator=(const LevelWriter&) = delete;
 
   private:
     LedDisplay& mLedDisplay;

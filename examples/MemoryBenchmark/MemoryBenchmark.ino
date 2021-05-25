@@ -40,7 +40,7 @@
 #define FEATURE_CHAR_WRITER 21
 #define FEATURE_STRING_WRITER 22
 #define FEATURE_STRING_SCROLLER 23
-#define FEATURE_HORIZONTAL_LEVEL_WRITER 24
+#define FEATURE_LEVEL_WRITER 24
 
 // A volatile integer to prevent the compiler from optimizing away the entire
 // program.
@@ -314,10 +314,10 @@ volatile int disableCompilerOptimization = 0;
     CharWriter charWriter(ledDisplay);
     StringScroller stringScroller(charWriter);
 
-  #elif FEATURE == FEATURE_HORIZONTAL_LEVEL_WRITER
+  #elif FEATURE == FEATURE_LEVEL_WRITER
     StubModule stubModule;
     LedDisplay ledDisplay(stubModule);
-    HorizontalLevelWriter horizontalLevelWriter(ledDisplay);
+    LevelWriter levelWriter(ledDisplay);
 
   #endif
 #endif
@@ -448,8 +448,8 @@ void loop() {
   stringScroller.initScrollLeft("Hello");
   stringScroller.scrollLeft();
 
-#elif FEATURE == FEATURE_HORIZONTAL_LEVEL_WRITER
-  horizontalLevelWriter.setLevel(3);
+#elif FEATURE == FEATURE_LEVEL_WRITER
+  levelWriter.setLevel(3);
 
 #endif
 }

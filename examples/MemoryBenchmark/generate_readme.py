@@ -166,7 +166,7 @@ before substantional refactoring in 2021.
 
 * Add support for multiple SPI buses in `HardSpiInterface` and
   `HardSpiFastInterface`. Increases flash memory by 10-30 bytes.
-* Add benchmarks for `StringScroller` and `HorizontalLevelWriter`.
+* Add benchmarks for `StringScroller` and `LevelWriter`.
 
 ## Results
 
@@ -188,7 +188,7 @@ program for various `LedModule` configurations and various Writer classes.
 * `CharWriter`
 * `StringWriter`
 * `StringScroller`
-* `HorizontalLevelWriter`
+* `LevelWriter`
 
 The `StubDisplay` is a dummy subclass of `LedDisplay` needed to create the
 various Writers. To get a better flash consumption of the Writer classes, this

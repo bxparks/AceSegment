@@ -62,7 +62,7 @@ consumption.
     * [CharWriter](#CharWriter)
     * [StringWriter](#StringWriter)
     * [StringScroller](#StringScroller)
-    * [HorizontalLevelWriter](#HorizontalLevelWriter)
+    * [LevelWriter](#LevelWriter)
 * [Advanced Usage](#AdvancedUsage)
     * [DigitalWriteFast on AVR](#DigitalWriteFast)
     * [ScanningModule](#ScanningModule)
@@ -254,7 +254,7 @@ depend on the lower-level classes:
           turns, prints to the `LedDisplay`.
     * `StringScoller`
         * Scroll a string left and right.
-    * `HorizontalLevelWriter`
+    * `LevelWriter`
         * Display specified number of bars from left to right, 2 bars per digit.
 
 <a name="DependencyDiagram"></a>
@@ -268,7 +268,7 @@ The dependency diagram among these classes looks something like this
    StringWriter    ClockWriter TemperatureWriter
           |            \           /
           V             v         v
-       CharWriter       NumberWriter     HorizontalLevelWriter
+       CharWriter       NumberWriter     LevelWriter
             \              |             /
              --------      |     --------
                      \     |    /
@@ -1174,16 +1174,16 @@ class StringScroller {
 To scroll a string to the left, first initialize the string, then call
 `scrollLeft()` to shift left. Similarly to the right.
 
-<a name="HorizontalLevelWriter"></a>
-### HorizontalLevelWriter
+<a name="LevelWriter"></a>
+### LevelWriter
 
-A `HorizontalLevelWriter` writes a specified number of vertical bars (2 vertical
+A `LevelWriter` writes a specified number of vertical bars (2 vertical
 bar per digit) to the LED display, emulating a level meter LED module.
 
 ```C++
-class HorizontalLevelWriter {
+class LevelWriter {
   public:
-    explicit HorizontalLevelWriter(LedDisplay& ledDisplay);
+    explicit LevelWriter(LedDisplay& ledDisplay);
 
     LedDisplay& display() const;
 
@@ -1357,7 +1357,7 @@ static memory consumptions for various configurations on an Arduino Nano
 | CharWriter+Stub                 |    788/   31 |   332/   20 |
 | StringWriter+Stub               |    988/   39 |   532/   28 |
 | StringScroller+Stub             |   1036/   45 |   580/   34 |
-| HorizontalLevelWriter+Stub      |    716/   28 |   260/   17 |
+| LevelWriter+Stub      |    716/   28 |   260/   17 |
 +--------------------------------------------------------------+
 ```
 
@@ -1397,7 +1397,7 @@ And here are the memory consumption numbers for an ESP8266:
 | CharWriter+Stub                 | 257116/27208 |   416/  424 |
 | StringWriter+Stub               | 257364/27216 |   664/  432 |
 | StringScroller+Stub             | 257316/27224 |   616/  440 |
-| HorizontalLevelWriter+Stub      | 257020/27200 |   320/  416 |
+| LevelWriter+Stub                | 257020/27200 |   320/  416 |
 +--------------------------------------------------------------+
 ```
 

@@ -74,7 +74,7 @@ using ace_segment::ClockWriter;
 using ace_segment::TemperatureWriter;
 using ace_segment::StringWriter;
 using ace_segment::StringScroller;
-using ace_segment::HorizontalLevelWriter;
+using ace_segment::LevelWriter;
 using ace_segment::kDigitRemapArray8Max7219;
 using ace_segment::kDigitRemapArray8Hc595;
 using ace_segment::kByteOrderSegmentHighDigitLow;
@@ -641,7 +641,7 @@ TemperatureWriter temperatureWriter(ledDisplay);
 CharWriter charWriter(ledDisplay);
 StringWriter stringWriter(charWriter);
 StringScroller stringScroller(charWriter);
-HorizontalLevelWriter horizontalLevelWriter(ledDisplay);
+LevelWriter levelWriter(ledDisplay);
 
 // Setup the various resources.
 void setupAceSegment() {
@@ -714,7 +714,7 @@ const uint8_t DEMO_MODE_STRINGS = 7;
 const uint8_t DEMO_MODE_SCROLL = 8;
 const uint8_t DEMO_MODE_SPIN = 9;
 const uint8_t DEMO_MODE_SPIN_2 = 10;
-const uint8_t DEMO_MODE_HORIZONTAL_LEVEL = 11;
+const uint8_t DEMO_MODE_LEVEL = 11;
 const uint8_t DEMO_MODE_COUNT = 12;
 uint8_t demoMode = DEMO_MODE_HEX_NUMBERS;
 uint8_t prevDemoMode = demoMode - 1;
@@ -731,7 +731,7 @@ static const uint16_t DEMO_INTERNAL_DELAY[DEMO_MODE_COUNT] = {
   300, // DEMO_MODE_SCROLL
   100, // DEMO_MODE_SPIN
   100, // DEMO_MODE_SPIN2
-  200, // DEMO_MODE_HORIZONTAL_LEVEL
+  200, // DEMO_MODE_LEVEL
 };
 
 
@@ -915,11 +915,11 @@ void spinDisplay2() {
 
 //-----------------------------------------------------------------------------
 
-void horizontalLevel() {
+void randomLevels() {
   static uint8_t level;
 
   // Do a random walk, with reflection on the left and right boundaries.
-  uint8_t maxLevel = horizontalLevelWriter.getMaxLevel();
+  uint8_t maxLevel = levelWriter.getMaxLevel();
   uint8_t delta = random(3);
   level += delta - 1;
   if (level == 0xff) {
@@ -928,7 +928,7 @@ void horizontalLevel() {
     level = maxLevel - 1;
   }
 
-  horizontalLevelWriter.setLevel(level);
+  levelWriter.setLevel(level);
 }
 
 //-----------------------------------------------------------------------------
@@ -957,8 +957,8 @@ void updateDemo() {
     spinDisplay();
   } else if (demoMode == DEMO_MODE_SPIN_2) {
     spinDisplay2();
-  } else if (demoMode == DEMO_MODE_HORIZONTAL_LEVEL) {
-    horizontalLevel();
+  } else if (demoMode == DEMO_MODE_LEVEL) {
+    randomLevels();
   }
 }
 
