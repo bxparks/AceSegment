@@ -115,7 +115,7 @@ number of `TimingStats::update()` calls that were made.
 * Add benchmarks for `Tm1637Module`.
     * The CPU time is mostly determined by the calls to `delayMicroseconds()`,
       which is must be about 100 microseconds due to the unusually large
-      capacitors (20 nF) installed on the DIO and CLK lines. They should have
+      capacitors (10 nF) installed on the DIO and CLK lines. They should have
       been about 100X smaller (200 pF).
     * Benchmarks both 4-digit and 6-digit LED modules given separately
       because the `Tm1637::flush()` method is roughtly proportional to the
@@ -146,7 +146,7 @@ number of `TimingStats::update()` calls that were made.
   MHz. No difference on the slower processors. Those fast processors can
   actually sustain a 20 MHz SPI, which breaks the MAX7219 chip because it can
   handle only 16 MHz.
-* Verified that removing the 20 nF capacitors from the CLK and DIO lines of the
+* Verified that removing the 10 nF capacitors from the CLK and DIO lines of the
   TM1637 modules allows a much shorter `BIT_DELAY`. Added CPU benchmark numbers
   for `BIT_DELAY = 5` microseconds (e.g. `Tm1637(4,SoftTmi,5us)` and
   `Tm1637(4,SoftTmiFast,5us)`). The `flush()` or `flushIncremental()` durations

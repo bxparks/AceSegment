@@ -18,7 +18,7 @@
           I2C protocol.
         * Fix bug in `Tm1637Module::flushIncremental()` introduced in 0c37b29a
           which prevented mFlushStage from incrementing properly.
-        * Verify that the 20 nF capacitors on the DIO and CLK lines of the
+        * Verify that the 10 nF capacitors on the DIO and CLK lines of the
           TM1637 LED modules from diymore.cc can be removed. This allows the
           `bitDelay` to be reduced from 100 microseconds to 1-2 microseconds,
           allowing `Tm1637Module::flush()` and `flushIncremental()` to be
