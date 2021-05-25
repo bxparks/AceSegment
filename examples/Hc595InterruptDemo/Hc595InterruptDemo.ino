@@ -132,7 +132,7 @@ const uint8_t NUM_SEGMENTS = 8;
 // Fortunately, according to AutoBenchmark, the "fast" versions of LedMatrix can
 // render a single field in about 20-30 micros.
 const uint8_t FRAMES_PER_SECOND = 60;
-const uint8_t NUM_SUBFIELDS = 1;
+const uint8_t NUM_SUBFIELDS = 16;
 const uint8_t NUM_BRIGHTNESSES = 8;
 const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   1, 2, 4, 8,
