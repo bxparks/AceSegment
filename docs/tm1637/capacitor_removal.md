@@ -27,22 +27,24 @@ The capacitors are located in different places depending on the size of the LED
 segments and the number of LED segments. The best way to identify the correct
 capacitors is to use a multimeter and find the capacitors where one end of the
 capacitor is connected to `GND` and the other end of the capacitor is connected
-to either the `DIO` pin or the `CLK` pin.
+to either the `DIO` pin or the `CLK` pin. When these capacitors are removed,
+I have verified that `BIT_DELAY` as low as 1 microsecond will work.
 
 Here are the photos of the LED modules that I modified, where the red box marks
 the place where the capacitors were removed:
 
-**4-digit 0.36" module**
+## 4-digit 0.36" module
+
 ![TM1637 4-digit 0.36"](TM1637-4-36-marked.jpg)
 
-**4-digit 0.56" module**
+## 4-digit 0.56" module
+
 ![TM1637 4-digit 0.56"](TM1637-4-56-marked.jpg)
 
-**6-digit 0.36" module**
+## 6-digit 0.36" module
+
 ![TM1637 6-digit 0.36"](TM1637-6-36-marked.jpg)
 
-**6-digit 0.56" module**
-![TM1637 6-digit 0.56"](TM1637-6-56-marked.jpg)
+## 6-digit 0.56" module
 
-With these capacitors removed, I have verified that `BIT_DELAY` as low as 1
-microsecond will work.
+![TM1637 6-digit 0.56"](TM1637-6-56-marked.jpg)
