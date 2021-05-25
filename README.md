@@ -49,6 +49,7 @@ consumption.
     * [Tm1637Module](#Tm1637Module)
         * [TM1637 Module With 4 Digits](#Tm1637Module4)
         * [TM1637 Module With 6 Digits](#Tm1637Module6)
+        * [TM1637 Capacitor Removal](#Tm1637CapacitorRemoval)
     * [Max7219Module](#Max7219Module)
         * [MAX7219 Module With 8 Digits](#Max7219Module8)
     * [Hc595Module](#Hc595Module)
@@ -402,10 +403,6 @@ LED modules based on the Titan TM1637 controller chips are abundant on Amazon
 and eBay. The controller chip supports up to 6 digits. Consumer LED modules
 seem have either 4 digits or 6 digits.
 
-![TM1637 LED Module](docs/tm1637/tm1637_4_digits.png)
-
-![TM1637 LED Module](docs/tm1637/tm1637_6_digits.png)
-
 The `Tm1637Module` class looks like this:
 
 ```C++
@@ -453,28 +450,33 @@ The `setDisplayOn()` method exposes the feature of the TM1637 chip where the
 display can be turned on and off independent of the brightness. When the display
 is turned back on, it resumes the previous brightness.
 
-The `flush()` method unconditionally sends all digits and the brightness
-information to the TM1637 chip in a single protocol transmission. For 4 digits,
-using a `BIT_DELAY` of 100 micros, the entire tranmission takes about 22 millis.
-For 6 digits, this method takes about 27 millis. The `flush()` method is a
-blocking call, nothing else can be done during this time (outside of
-interrupts). This can be a problem for processors like the ESP8266 which must
-yield back to the main loop every 20-40 milliseconds to keep its WiFi stack
-working. Otherwise, the watch dog timer performs a system reboot.
+The `flush()` method sends all digits and the brightness information to the
+TM1637 chip in a single transmission. The total amount of time needed to
+complete the `flush()` method is mostly dependent on the value of the
+`BIT_DELAY` parameter.
+
+Some TM1637 LED modules requires a large `BIT_DELAY` value as high as 100
+microseconds, which causes `flush()` to take about about 22 millis. For 6
+digits, this method takes about 27 millis. The `flush()` method is a blocking
+call, nothing else can be done during this time (outside of interrupts). This
+can be a problem for processors like the ESP8266 which must yield back to the
+main loop every 20-40 milliseconds to keep its WiFi stack working. Otherwise,
+the watch dog timer performs a system reboot.
 
 The `flushIncremental()` method was created to reduce the amount of time spent
-in the blocking call to `flush()`. The `Tm1637Module` class contains a set of
-dirty bits which keeps track of which digits have been modified since the last
-flush to the TM1637 chip. It also keeps a reference counter that keeps track of
-the digit that `flushIncremental()` handled previously. When
-`flushIncremental()` is called, only a single digit is sent to the TM1637, and
-only if that digit was marked to be dirty. Each subsequent call to
-`flushIncremental()` examines the next digit. When the last digit is handled,
-the next call to `flushIncremental()` looks at the brightness level, and sends
-that information to the TM1637 chip if the brightness dirty bit is set.
+in the blocking call to `flush()`. This method sends only a single digit for
+each iteration. The next time `flushIncremental()` is called, it sends the next
+digit to the LED module. After all the digits are sent, one more iteration sends
+the brightness information to the module. So the total number of iteration to
+update the entire LED module is `NUM_DIGITS + 1`. For `BIT_DELAY` of 100
+microseconds, `flushIncremental()` takes around 10 milliseconds per iteration.
 
 <a name="Tm1637Module4"></a>
 #### TM1637 Module With 4 Digits
+
+![TM1637 LED Module](docs/tm1637/tm1637_4_digits.jpg)
+
+![TM1637 LED Module Alt](docs/tm1637/tm1637_4_digits_alt.jpg)
 
 The configuration of the `Tm1637Module` class for the 4-digit module looks like
 this:
@@ -499,12 +501,12 @@ void setupAceSegment() {
   ledModule.begin();
 }
 
-// Flush to LED module every 50 millis.
+// Flush to LED module every 20 millis.
 void flushModule() {
   static uint16_t prevFlushMillis;
 
   uint16_t nowMillis = millis();
-  if ((uint16_t) (nowMillis - prevFlushMillis) >= 50) {
+  if ((uint16_t) (nowMillis - prevFlushMillis) >= 20) {
     prevFlushMillis = nowMillis;
     //ledModule.flush();
     ledModule.flushIncremental();
@@ -527,33 +529,17 @@ each bit transition (0 to 1, or 1 to 0). According the datasheet of the TM1637
 chip, it can support oscillator frequencies as high as 500 kHz, which means that
 theoretically, the `BIT_DELAY` could be as low as 1 microseconds.
 
-However, the LED modules manufactured by diymore.cc (shown above) contains a 20
-nF capacitor and a 10k ohm pullup resistor on each of the `DIO` and `CLK`
-lines. This seems to be a design flaw, because the capacitor is about 100X
-larger than it should be, it should have been only be about 200 pF. The effect
-of the large capacitor is that bit transitions on these lines take an incredibly
-long time due the `RC` time constant of 94 microseconds. After experimenting
-with various values, it seems like a `BIT_DELAY` of 100 microseconds will
-usually work.
+The black LED modules manufactured by diymore.cc (shown above)
+contains a 10 nF capacitor and a 10k ohm pullup resistor on each of the `DIO`
+and `CLK` lines. This requires a `BIT_DELAY` of 100 microseconds.
 
-A `BIT_DELAY` of 100 microseconds means that the time to transmit 4 digits to
-the TM1637 chip becomes about 22 milliseconds. The time to transmit a single
-digit is about 10 milliseconds due to the overhead in the protocol. Since these
-durations are so large, the `Tm1637Module` class does not send the segment bit
-patterns directly to the TM1637 controller when `Tm1637Module::setPattern()`
-method is called. Instead, the class holds a buffer of segment patterns, and
-keeps track of a set of dirty bits. The buffer is sent to the TM1637 controller
-upon the execution of the `Tm1637Module::flush()` or
-`Tm1637Module::flushIncremental()` method.
-
-If the 20 nF capacitors on the DIO and CLK lines are removed with a soldering
-iron, I have verified that these TM1637 LED modules will work with a `BIT_DELAY`
-as low 1 microseconds (sometimes even a 0 microsecond delay will work). The
-transmission time for `flush()` becomes proportionally faster (e.g. for a 5
-microsecond delay, almost 20X faster).
+The blue LED modules (shown above) seem to use much smaller filtering
+capacitors. These modules seem to work with a `BIT_DELAY` of 7 microseconds.
 
 <a name="Tm1637Module6"></a>
 #### TM1637 Module With 6 Digits
+
+![TM1637 LED Module](docs/tm1637/tm1637_6_digits.jpg)
 
 The configuration of the `Tm1637Module` class for the 6-digit module is slightly
 more complicated because the digits are wired to be in the order of `2 1 0 5 4
@@ -583,11 +569,11 @@ void setupAceSegment() {
   ledModule.begin();
 }
 
-// Flush to LED module every 50 millis.
+// Flush to LED module every 20 millis.
 void flushModule() {
   static uint16_t prevFlushMillis;
   uint16_t nowMillis = millis();
-  if ((uint16_t) (nowMillis - prevFlushMillis) >= 50) {
+  if ((uint16_t) (nowMillis - prevFlushMillis) >= 20) {
     prevFlushMillis = nowMillis;
     //ledModule.flush();
     ledModule.flushIncremental();
@@ -605,6 +591,24 @@ void loop() {
 }
 ```
 
+<a name="Tm1637CapacitorRemoval"></a>
+#### TM1637 Capacitor Removal
+
+The black TM1637 LED modules from diymore.cc come with 10 nF filtering
+capacitors on the `CLK` and `DIO` lines. This forces us to use a `BIT_DELAY` of
+100 microseconds, which means that `flush()` on a 4-digit module takes 22
+milliseconds. We can do far better by removing those filtering capacitors with a
+soldering iron:
+
+* See [docs/tm1637/capacitor_removal.md](docs/tm1637/capacitor_removal.md) for
+  information on how to remove the 10 nF capacitors.
+
+After removing them, I verified that these TM1637 LED modules will work with a
+`BIT_DELAY` as low 1 microseconds (sometimes even a 0 microsecond delay will
+work). The transmission time for `flush()` becomes proportionally faster. For
+example, using 5 microsecond `BIT_DELAY` allows `flush()` to take only 1 to 2.3
+milliseconds instead of 22 milliseconds.
+
 <a name="Max7219Module"></a>
 ### Max7219Module
 
@@ -614,7 +618,7 @@ be daisychained to support more than 8 digits. The 8-digit module is readily
 available commercially from multiple suppliers on Amazon and eBay, and they look
 like this:
 
-![MAX7219 LED Module](docs/max7219/max7219_8_digits.png)
+![MAX7219 LED Module](docs/max7219/max7219_8_digits.jpg)
 
 The `Max7219Module` class looks like this:
 
@@ -622,7 +626,7 @@ The `Max7219Module` class looks like this:
 template <typename T_SPII, uint8_t T_DIGITS>
 class Max7219Module : public LedModule {
   public:
-    Max7219Module(
+    explicit Max7219Module(
         const T_SPII& spiInterface,
         const uint8_t* remapArray = nullptr
     );
@@ -723,16 +727,16 @@ Recently (since about Aug 2020?), off-the-shelf 8-digit LED modules using two
 74HC595 have become common on Amazon and eBay, in multiple colors. They look
 like this:
 
-![HC595 LED Module](docs/hc595/hc595_8_digits.png)
+![HC595 LED Module](docs/hc595/hc595_8_digits.jpg)
 
 The `Hc595Module` class looks roughly like this (simplified for ease of
 understanding):
 
 ```C++
-template <typename T_SPII, uint8_t T_DIGITS >
+template <typename T_SPII, uint8_t T_DIGITS>
 class Hc595Module : public ScanningModule<[snip]> {
-
-    Hc595Module(
+  public:
+    explicit Hc595Module(
         const T_SPII& spiInterface,
         uint8_t segmentOnPattern,
         uint8_t digitOnPattern,
