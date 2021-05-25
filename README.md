@@ -166,8 +166,8 @@ The following example sketches are provided:
           `LedMatrixDirect`, `LedMatrixSingleHc595` and `LedMatrixDualHc595`
           classes
         * Not intended for general public consumption.
-    * [Hc59Interrupt5Demo.ino](examples/Hc595Demo)
-        * Same as Hc595Demo, but using an interrupt service routine
+    * [Hc595InterruptDemo.ino](examples/Hc595InterruptDemo)
+        * Same as Hc595Demo, but using an interrupt service routine (ISR)
           to render the LED display.
         * Uses the `TimerOne` (https://github.com/PaulStoffregen/TimerOne)
           library
