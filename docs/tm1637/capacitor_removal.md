@@ -3,7 +3,7 @@
 There are at least two types of TM1637 LED modules which seem to be readily
 available on Amazon and eBay currently. 
 
-* One type is labeled as being manufactured by diymore.cc and is availabe is 5
+* One type is labeled as being manufactured by diymore.cc and is available is 5
   different colors (white, red, yellow, green, and blue).  They manufactured on
   black printed circuit board, and come in 4-digit and 6-digit variations.
 * Another type is a 4-digit a blue printed circuit board, but does not have any
@@ -17,9 +17,9 @@ the schematic below:
 ![TM1637 LED Module Schematic](tm1637-led-module-schematic.png)
 
 The capacitors for `CLK` and `DIO` lines are 10 nF, which is about 50-100X
-larger than it should be. It causes the RC time constant to be about 100
+larger than they should be. It causes the RC time constant to be about 100
 microseconds, which forces the `BIT_DELAY` parameter in the `SoftTmiInterface`
-and `SoftTmiFastInterface` classes to be 100 microseoncds. According to the
+and `SoftTmiFastInterface` classes to be 100 microseconds. According to the
 TM1637 datasheet, the controller chip should be able to handle a `BIT_DELAY` as
 low as 1 microsecond (i.e. 2 microseconds per full cycle, or 500 kHz).
 
@@ -30,7 +30,7 @@ capacitors is to use a multimeter and find the capacitors where one end of the
 capacitor is connected to `GND` and the other end of the capacitor is connected
 to either the `DIO` pin or the `CLK` pin.
 
-In theory, these capacitors should be replaced with capacitor somewhere in the
+In theory, these capacitors should be replaced with ones in the
 range of 100 to 500 pF , to prevent interference from high frequency noise on
 the `CLK` and `DIO` lines. However, I have tested these modules with **no**
 capacitors on the `DIO` and `CLK` lines, and was able to use a `BIT_DELAY` as
