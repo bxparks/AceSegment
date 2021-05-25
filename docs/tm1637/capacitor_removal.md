@@ -9,26 +9,32 @@ available on Amazon and eBay currently.
 * Another type is a 4-digit a blue printed circuit board, but does not have any
   labels on it.
 
-The LED modules from diymore.cc come with 2 power capacitors across the `VCC`
-and `GND` lines, and 2 capacitors on the `DIO` and `CLK` pins to ground, as
-shown in the schematic below:
+The LED modules from diymore.cc come with a 1 uF smoothing capacitor and a 0.1
+uF filter capacitor across the `VCC` and `GND` lines. In addition, there are 2
+noise rejection capacitors on the `DIO` and `CLK` pins to ground, as shown in
+the schematic below:
 
 ![TM1637 LED Module Schematic](tm1637-led-module-schematic.png)
 
-The capacitors for `CLK` and `DIO` lines are 10 nF, which is about 100X larger
-than it should be. It causes the RC time constant to be about 100 microseconds,
-which forces the `BIT_DELAY` parameter in the `SoftTmiInterface` and
-`SoftTmiFastInterface` classes to be 100 microseoncds. According to the TM1637
-datasheet, the controller chip should be able to handle a bit delay as low as 1
-microsecond (i.e. 500 kHz).
+The capacitors for `CLK` and `DIO` lines are 10 nF, which is about 50-100X
+larger than it should be. It causes the RC time constant to be about 100
+microseconds, which forces the `BIT_DELAY` parameter in the `SoftTmiInterface`
+and `SoftTmiFastInterface` classes to be 100 microseoncds. According to the
+TM1637 datasheet, the controller chip should be able to handle a `BIT_DELAY` as
+low as 1 microsecond (i.e. 2 microseconds per full cycle, or 500 kHz).
 
 If you are handy with a soldering iron, you can remove the two 10 nF capacitors.
 The capacitors are located in different places depending on the size of the LED
 segments and the number of LED segments. The best way to identify the correct
 capacitors is to use a multimeter and find the capacitors where one end of the
 capacitor is connected to `GND` and the other end of the capacitor is connected
-to either the `DIO` pin or the `CLK` pin. When these capacitors are removed,
-I have verified that `BIT_DELAY` as low as 1 microsecond will work.
+to either the `DIO` pin or the `CLK` pin.
+
+In theory, these capacitors should be replaced with capacitor somewhere in the
+range of 100 to 500 pF , to prevent interference from high frequency noise on
+the `CLK` and `DIO` lines. However, I have tested these modules with **no**
+capacitors on the `DIO` and `CLK` lines, and was able to use a `BIT_DELAY` as
+low as 1 microsecond.
 
 Here are the photos of the LED modules that I modified, where the red box marks
 the place where the capacitors were removed:
