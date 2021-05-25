@@ -591,32 +591,84 @@ achieve the desired frames per second and fields per second.
 
 Unfortunately, timer interrupts are not part of the Arduino API (probably
 because every microcontroller handles interrupts in a slightly different way).
-For example, an ATmega328 (e.g. Arduino UNO, Nano, Mini), using an 8-bit timer
-on Timer 2 looks like this:
-```
-ISR(TIMER2_COMPA_vect) {
-  scanningModule.renderFieldNow();
+An easy way to run an ISR periodically is to use one of the TimerXxx libraries:
+
+* TimerOne (https://github.com/PaulStoffregen/TimerOne)
+* TimerThree (https://github.com/PaulStoffregen/TimerThree)
+* TimerFour (https://github.com/VincentLim/TimerFour)
+* TimerFour (https://github.com/VincentLim/TimerFour)
+* TimerFive (https://github.com/VincentLim/TimerFive)
+
+(I'm not sure why there is no TimerTwo library.)
+
+An example code is given in
+[examples/Hc595InterruptDemo](../examples/Hc595InterruptDemo), and looks like
+this:
+
+```C++
+#include <Arduino.h>
+#include <AceCommon.h> // incrementMod()
+#include <AceSegment.h> // Hc595Module, LedDisplay
+#include <TimerOne.h> // Timer1
+
+using namespace ace_segment;
+
+const uint8_t NUM_DIGITS = 4;
+const uint8_t LATCH_PIN = 10;
+const uint8_t DATA_PIN = MOSI;
+const uint8_t CLOCK_PIN = SCK;
+const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
+const uint8_t DIGIT_ON_PATTERN = kActiveHighPattern;
+const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
+const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
+const uint8_t FRAMES_PER_SECOND = 60;
+
+const uint8_t NUM_SUBFIELDS = 8;
+const uint8_t NUM_BRIGHTNESSES = 8;
+const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
+  1, 2, 4, 8,
+  15, 9, 5, 2
+};
+
+using SpiInterface = SoftSpiInterface;
+SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+
+Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
+    spiInterface,
+    SEGMENT_ON_PATTERN,
+    DIGIT_ON_PATTERN,
+    FRAMES_PER_SECOND,
+    HC595_BYTE_ORDER,
+    REMAP_ARRAY
+);
+LedDisplay display(ledModule);
+
+void setupAceSegment() {
+  spiInterface.begin();
+  ledModule.begin();
+}
+
+void flushModule() {
+  ledModule.renderFieldNow();
+}
+
+void setupTimer() {
+  Timer1.initialize(ledModule.getMicrosPerField());
+  Timer1.attachInterrupt(flushModule);
+}
+
+void updateDisplay() {
+  // Update the 'display' with LED segment patterns.
 }
 
 void setup() {
   ...
-  // set up Timer 2
-  uint8_t timerCompareValue =
-      (unsigned long) F_CPU / 1024 / scanningModul.getFieldsPerSecond() - 1;
-  noInterrupts();
-  TCNT2  = 0;	// Initialize counter value to 0
-  TCCR2A = 0;
-  TCCR2B = 0;
-  TCCR2A |= bit(WGM21); // CTC
-  TCCR2B |= bit(CS22) | bit(CS21) | bit(CS20); // prescale 1024
-  TIMSK2 |= bit(OCIE2A); // interrupt on Compare A Match
-  OCR2A =  timerCompareValue;
-  interrupts();
+  setupAceSegment();
+  setupTimer();
   ...
 }
 
 void loop() {
- ...do other stuff here...
+  updateDisplay();
 }
 ```
-
