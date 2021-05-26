@@ -370,7 +370,7 @@ using namespace ace_segment;
 
 The `LedModule` class is the general interface (with mostly pure virtual
 functions) which is the parent class of all hardware-dependent classes which are
-targetted for specific controller chips. It looks like this:
+targeted for specific controller chips. It looks like this:
 
 ```C++
 class LedModule {
@@ -388,10 +388,10 @@ It assumes that each subclass has an internal buffer of bit patterns which
 will be sent out to the LED module at the appropriate time. Some LED controllers
 (e.g. TM1637, MAX7219) handle the multiplexing and refreshing of the LED
 segments, so the host microcontroller needs only to send out the bit patterns to
-the controller chips over SPI or some other prococol. Other controller chips,
-particulary the 74HC595, is a fairly dumb controller chip that requires the host
-microcontroller to perform the multiplexing itself. The bit patterns must be
-sent out to the controller chip with precise timing intervals.
+the controller chips over SPI or some other protocol. Other controller chips,
+particularly the 74HC595, is a fairly dumb controller chip that requires the
+host microcontroller to perform the multiplexing itself. The bit patterns must
+be sent out to the controller chip with precise timing intervals.
 
 Because each controller chip has slightly different rendering requirements, the
 `LedModule` class pushes the rendering logic down into the specific subclasses.
@@ -721,7 +721,7 @@ seven-segment LED modules. Each chip converts 8 serial bits into 8 parallel pins
 which can source or sink about 12 mA of current each. With two 74HC595 chips,
 one chip can control the segment pins, the other can control the common digit
 pins, and the two chips can be daisy chained together. The chips can be
-programmed using the straighforward SPI protocol.
+programmed using the straightforward SPI protocol.
 
 Recently (since about Aug 2020?), off-the-shelf 8-digit LED modules using two
 74HC595 have become common on Amazon and eBay, in multiple colors. They look
@@ -957,7 +957,7 @@ ways of printing numbers and letters to the LED module.
 ### NumberWriter
 
 The `NumberWriter` can print integers to the `LedDisplay` using decimal (0-9) or
-hexadecimal (0-9A-F) formats. On platforms that support it (ATmega and ESP8266),
+hexadecimal (0-9A-F) formats. On platforms that support it (AVR and ESP8266),
 the bit mapping table is stored in flash memory to conserve static memory.
 
 The public methods of this class looks something like this:
@@ -1037,7 +1037,7 @@ includes an instance of a `NumberWriter`.
 <a name="TemperatureWriter"></a>
 ### TemperatureWriter
 
-This class supports writing out temperatures in degrees Celcius or Fahrenheit.
+This class supports writing out temperatures in degrees Celsius or Fahrenheit.
 The public methods of this class looks something like this:
 
 ```C++
@@ -1068,11 +1068,11 @@ It is possible to represent many of the ASCII characters in the range `[0,127]`
 on a seven-segment LED display, although some of the characters will necessarily
 be crude given the limited number of segments. The `CharWriter` contains a
 [mapping of ASCII](https://github.com/dmadison/LED-Segment-ASCII) characters
-to seven-segment bit patterns. On platforms that support it (ATmega and
+to seven-segment bit patterns. On platforms that support it (AVR and
 ESP8266), the bit pattern array is stored in flash memory to conserve static
 memory.
 
-The public methods of this class looks like thid:
+The public methods of this class looks like this:
 
 ```C++
 class CharWriter {
@@ -1238,6 +1238,10 @@ need to include these headers manually, like this:
   #include <ace_segment/direct/DirectFast4Module.h>
 #endif
 ```
+
+The amount of flash memory saved can be between 100 to 700 bytes. This can make
+meaningful differences on AVR processors, especially on the ATtiny85 with only
+8kB of flash. See [MemoryBenchmark](examples/MemoryBenchmark) for full details.
 
 <a name="ScanningModule"></a>
 ### Custom Configuration of ScanningModule
@@ -1502,7 +1506,7 @@ so it seems to make sense to use hardware SPI on the ESP8266.
 <a name="Hardware"></a>
 ### Hardware
 
-The library has Tier 1 support on the following boards:
+This library has Tier 1 support on the following boards:
 
 * Arduino Nano (16 MHz ATmega328P)
 * SparkFun Pro Micro (16 MHz ATmega32U4)
@@ -1517,14 +1521,15 @@ Tier 2 support can be expected on the following boards, mostly because I don't
 test these as often:
 
 * ATtiny85 (8 MHz ATtiny85)
+* Arduino Pro Mini (16 MHz ATmega328P)
 * Teensy LC (48 MHz ARM Cortex-M0+)
 * Mini Mega 2560 (Arduino Mega 2560 compatible, 16 MHz ATmega2560)
 
 The following boards are **not** supported:
 
 * Any platform using the ArduinoCore-API
-  (https://github.com/arduino/ArduinoCore-api). For example, Nano Every,
-  MKRZero, and Raspberry Pi Pico RP2040.
+  (https://github.com/arduino/ArduinoCore-api).
+    * For example, Nano Every, MKRZero, and Raspberry Pi Pico RP2040.
 
 <a name="ToolChain"></a>
 ### Tool Chain
@@ -1539,7 +1544,7 @@ The following boards are **not** supported:
 * [STM32duino 1.9.0](https://github.com/stm32duino/Arduino_Core_STM32)
 * [ESP8266 Arduino 2.7.4](https://github.com/esp8266/Arduino)
 * [ESP32 Arduino 1.0.6](https://github.com/espressif/arduino-esp32)
-* [Teensydino 1.53](https://www.pjrc.com/teensy/td_download.html)
+* [Teensyduino 1.53](https://www.pjrc.com/teensy/td_download.html)
 
 <a name="OperatingSystem"></a>
 ### Operating System
