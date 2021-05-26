@@ -22,9 +22,9 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.4.0</span>
+   &#160;<span id="projectnumber">0.6.0</span>
    </div>
-   <div id="projectbrief">An adjustable, configurable, and extensible framework for rendering seven segment LED displays.</div>
+   <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, and 74HC595 controller chips</div>
   </td>
  </tr>
  </tbody>
@@ -77,7 +77,7 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>The <a class="el" href="classace__segment_1_1NumberWriter.html" title="The NumberWriter supports converting decimal and hexadecimal numbers to segment patterns expected by ...">NumberWriter</a> supports converting decimal and hexadecimal numbers to segment patterns expected by <a class="el" href="classace__segment_1_1LedDisplay.html" title="General interface for writing LED segment patterns to the LED display module.">LedDisplay</a>.  
+<p>The <a class="el" href="classace__segment_1_1NumberWriter.html" title="The NumberWriter supports converting decimal and hexadecimal numbers to segment patterns expected by ...">NumberWriter</a> supports converting decimal and hexadecimal numbers to segment patterns expected by <a class="el" href="classace__segment_1_1LedDisplay.html" title="General interface for writing segment patterns to the underlying LedModule.">LedDisplay</a>.  
  <a href="classace__segment_1_1NumberWriter.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="NumberWriter_8h_source.html">NumberWriter.h</a>&gt;</code></p>
@@ -96,7 +96,7 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:afd63f269907c5dee9fb6a41a00eb3d37"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3c57c816ce39986bbc508eddb2e0ac3c"><td class="memItemLeft" align="right" valign="top"><a id="a3c57c816ce39986bbc508eddb2e0ac3c"></a>
 <a class="el" href="classace__segment_1_1LedDisplay.html">LedDisplay</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1NumberWriter.html#a3c57c816ce39986bbc508eddb2e0ac3c">display</a> () const</td></tr>
-<tr class="memdesc:a3c57c816ce39986bbc508eddb2e0ac3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the underlying <a class="el" href="classace__segment_1_1LedDisplay.html" title="General interface for writing LED segment patterns to the LED display module.">LedDisplay</a>. <br /></td></tr>
+<tr class="memdesc:a3c57c816ce39986bbc508eddb2e0ac3c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the underlying <a class="el" href="classace__segment_1_1LedDisplay.html" title="General interface for writing segment patterns to the underlying LedModule.">LedDisplay</a>. <br /></td></tr>
 <tr class="separator:a3c57c816ce39986bbc508eddb2e0ac3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7a0faa29a22763770d3f36c85a487108"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1NumberWriter.html#a7a0faa29a22763770d3f36c85a487108">writeHexCharAt</a> (uint8_t pos, <a class="el" href="classace__segment_1_1NumberWriter.html#abf1fc3ae5c324d1de2e3d5f196e5a0a8">hexchar_t</a> c)</td></tr>
 <tr class="memdesc:a7a0faa29a22763770d3f36c85a487108"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write the hex character <code>c</code> at position <code>pos</code>.  <a href="classace__segment_1_1NumberWriter.html#a7a0faa29a22763770d3f36c85a487108">More...</a><br /></td></tr>
@@ -120,6 +120,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1NumberWriter.html#a69b7ab86dea585c95e5547e231827b12">writeSignedDecimalAt</a> (uint8_t pos, int16_t num, int8_t boxSize=0)</td></tr>
 <tr class="memdesc:a69b7ab86dea585c95e5547e231827b12"><td class="mdescLeft">&#160;</td><td class="mdescRight">Same as <a class="el" href="classace__segment_1_1NumberWriter.html#a5e663f325225b40b51c3669d82add022" title="Write the 16-bit unsigned number num as a decimal number at pos.">writeUnsignedDecimalAt()</a> but prepends a '-' sign if negative. <br /></td></tr>
 <tr class="separator:a69b7ab86dea585c95e5547e231827b12"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7023ce832df4e783001e042f72ae6828"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1NumberWriter.html#a7023ce832df4e783001e042f72ae6828">writeUnsignedDecimal2At</a> (uint8_t pos, uint8_t num)</td></tr>
+<tr class="memdesc:a7023ce832df4e783001e042f72ae6828"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write the 2 digit decimal number at pos.  <a href="classace__segment_1_1NumberWriter.html#a7023ce832df4e783001e042f72ae6828">More...</a><br /></td></tr>
+<tr class="separator:a7023ce832df4e783001e042f72ae6828"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae842af42786cc9bd078f5a40d0f7c6ca"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1NumberWriter.html#ae842af42786cc9bd078f5a40d0f7c6ca">clearToEnd</a> (uint8_t pos)</td></tr>
 <tr class="memdesc:ae842af42786cc9bd078f5a40d0f7c6ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the display from <code>pos</code> to the end.  <a href="classace__segment_1_1NumberWriter.html#ae842af42786cc9bd078f5a40d0f7c6ca">More...</a><br /></td></tr>
 <tr class="separator:ae842af42786cc9bd078f5a40d0f7c6ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -140,7 +143,7 @@ static const <a class="el" href="classace__segment_1_1NumberWriter.html#abf1fc3a
 <tr class="separator:a039ac6a2528399ac73b384f6227d3e6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The <a class="el" href="classace__segment_1_1NumberWriter.html" title="The NumberWriter supports converting decimal and hexadecimal numbers to segment patterns expected by ...">NumberWriter</a> supports converting decimal and hexadecimal numbers to segment patterns expected by <a class="el" href="classace__segment_1_1LedDisplay.html" title="General interface for writing LED segment patterns to the LED display module.">LedDisplay</a>. </p>
+<div class="textblock"><p>The <a class="el" href="classace__segment_1_1NumberWriter.html" title="The NumberWriter supports converting decimal and hexadecimal numbers to segment patterns expected by ...">NumberWriter</a> supports converting decimal and hexadecimal numbers to segment patterns expected by <a class="el" href="classace__segment_1_1LedDisplay.html" title="General interface for writing segment patterns to the underlying LedModule.">LedDisplay</a>. </p>
 <p>The character set includes 0 to F, and a few other characters which should be self-explanatory: kCharSpace and kCharMinus. </p>
 
 <p class="definition">Definition at line <a class="el" href="NumberWriter_8h_source.html#l00039">39</a> of file <a class="el" href="NumberWriter_8h_source.html">NumberWriter.h</a>.</p>
@@ -197,7 +200,7 @@ static const <a class="el" href="classace__segment_1_1NumberWriter.html#abf1fc3a
 <p>Clear the display from <code>pos</code> to the end. </p>
 <p>Useful after calling <a class="el" href="classace__segment_1_1NumberWriter.html#a69b7ab86dea585c95e5547e231827b12" title="Same as writeUnsignedDecimalAt() but prepends a &#39;-&#39; sign if negative.">writeSignedDecimalAt()</a> and <a class="el" href="classace__segment_1_1NumberWriter.html#a5e663f325225b40b51c3669d82add022" title="Write the 16-bit unsigned number num as a decimal number at pos.">writeUnsignedDecimalAt()</a> which prints a variable number of digits. </p>
 
-<p class="definition">Definition at line <a class="el" href="NumberWriter_8h_source.html#l00142">142</a> of file <a class="el" href="NumberWriter_8h_source.html">NumberWriter.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="NumberWriter_8h_source.html#l00152">152</a> of file <a class="el" href="NumberWriter_8h_source.html">NumberWriter.h</a>.</p>
 
 </div>
 </div>
@@ -242,6 +245,40 @@ static const <a class="el" href="classace__segment_1_1NumberWriter.html#abf1fc3a
 
 </div>
 </div>
+<a id="a7023ce832df4e783001e042f72ae6828"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7023ce832df4e783001e042f72ae6828">&#9670;&nbsp;</a></span>writeUnsignedDecimal2At()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void ace_segment::NumberWriter::writeUnsignedDecimal2At </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>pos</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>num</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Write the 2 digit decimal number at pos. </p>
+<p>This method always writes 2 characters. The padding is always a space, so 9 is printed as " 9" not "09". If num &gt;= 100, then this prints "99".</p>
+<p>This method is meant to be a lighter version of <a class="el" href="classace__segment_1_1NumberWriter.html#a5e663f325225b40b51c3669d82add022" title="Write the 16-bit unsigned number num as a decimal number at pos.">writeUnsignedDecimalAt()</a> when only 2 digits are needed. Seems to save about 110 bytes of flash. </p>
+
+<p class="definition">Definition at line <a class="el" href="NumberWriter_8cpp_source.html#l00134">134</a> of file <a class="el" href="NumberWriter_8cpp_source.html">NumberWriter.cpp</a>.</p>
+
+</div>
+</div>
 <a id="a5e663f325225b40b51c3669d82add022"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5e663f325225b40b51c3669d82add022">&#9670;&nbsp;</a></span>writeUnsignedDecimalAt()</h2>
 
@@ -279,7 +316,7 @@ static const <a class="el" href="classace__segment_1_1NumberWriter.html#abf1fc3a
   <table class="params">
     <tr><td class="paramname">pos</td><td>start position of the number </td></tr>
     <tr><td class="paramname">num</td><td>unsigned decimal number, 0-65535 </td></tr>
-    <tr><td class="paramname">boxSize</td><td>size of box. This is meant to be similar to the "%-5d" or "%5d" specifier to the printf() function)<ul>
+    <tr><td class="paramname">boxSize</td><td>size of box. This is meant to be similar to the "%-5d" or "%5d" specifier to the printf() function<ul>
 <li>0 means no boxing, printing from left</li>
 <li>&gt; 0 means right justified inside box</li>
 <li>&lt; 0 means left justified inside box</li>
@@ -295,8 +332,8 @@ static const <a class="el" href="classace__segment_1_1NumberWriter.html#abf1fc3a
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following files:<ul>
-<li>/home/brian/src/AceSegment/src/ace_segment/<a class="el" href="NumberWriter_8h_source.html">NumberWriter.h</a></li>
-<li>/home/brian/src/AceSegment/src/ace_segment/<a class="el" href="NumberWriter_8cpp_source.html">NumberWriter.cpp</a></li>
+<li>/home/brian/src/AceSegment/src/ace_segment/writer/<a class="el" href="NumberWriter_8h_source.html">NumberWriter.h</a></li>
+<li>/home/brian/src/AceSegment/src/ace_segment/writer/<a class="el" href="NumberWriter_8cpp_source.html">NumberWriter.cpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

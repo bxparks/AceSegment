@@ -38,56 +38,65 @@ namespace ace_segment {
  * probably easiest to just copy this file, make the necessary changes, then
  * substitute the new class in places where this class is used.
  *
+ * The maximum speed of MAX7219 is 16MHz so this class sets the SPI speed to
+ * 8MHz. It's not clear if the SPI speed is worth making into a configurable
+ * parameter. Such a change needs to done a bit carefully, because it should
+ * be a template parameter so that `SPISettings` is a compile-time constant
+ * which allows compile-time optimizations to happen.
+ *
  * This class is functionally identical to HardSpiInterface except that the GPIO
  * pins are controlled by digitalWriteFast() and pinModeFast() methods. This
- * decreases flash memory consumption by 70 bytes (ScanningModule) to 250
- * (Max7219Module) bytes. However, if multiple LED modules are used, using
- * different LatchPins, the HardSpiInterface might ultimately consume less flash
- * memory because it avoids generating different template instantiations of the
- * ScanningModule, HybridModule, or Hc595Module classes. Users are
- * advised to try both and compare the difference.
+ * decreases flash memory consumption by 70 bytes (HybridModule) to 250
+ * (Max7219Module, Hc595Module) bytes. However, if multiple LED modules are
+ * used, using different LatchPins, the HardSpiInterface might ultimately
+ * consume less flash memory because it avoids generating different template
+ * instantiations of the HybridModule, Max7219Module, or Hc595Module classes.
+ * Users are advised to try both and compare the difference.
  */
 template <uint8_t T_LATCH_PIN, uint8_t T_DATA_PIN, uint8_t T_CLOCK_PIN>
 class HardSpiFastInterface {
   public:
-    HardSpiFastInterface() {}
+    HardSpiFastInterface(SPIClass& spi = SPI) : mSpi(spi) {}
 
     void begin() const {
       pinModeFast(T_LATCH_PIN, OUTPUT);
       pinModeFast(T_DATA_PIN, OUTPUT);
       pinModeFast(T_CLOCK_PIN, OUTPUT);
-      SPI.begin();
+      mSpi.begin();
     }
 
     void end() const {
       pinModeFast(T_LATCH_PIN, INPUT);
       pinModeFast(T_DATA_PIN, INPUT);
       pinModeFast(T_CLOCK_PIN, INPUT);
-      SPI.end();
+      mSpi.end();
     }
 
     /** Send 8 bits, including latching LOW and HIGH. */
     void send8(uint8_t value) const {
+      mSpi.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
       digitalWriteFast(T_LATCH_PIN, LOW);
-      SPI.beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
-      SPI.transfer(value);
-      SPI.endTransaction();
+      mSpi.transfer(value);
       digitalWriteFast(T_LATCH_PIN, HIGH);
+      mSpi.endTransaction();
     }
 
     /** Send 16 bits, including latching LOW and HIGH. */
     void send16(uint16_t value) const {
+      mSpi.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
       digitalWriteFast(T_LATCH_PIN, LOW);
-      SPI.beginTransaction(SPISettings(20000000, MSBFIRST, SPI_MODE0));
-      SPI.transfer16(value);
-      SPI.endTransaction();
+      mSpi.transfer16(value);
       digitalWriteFast(T_LATCH_PIN, HIGH);
+      mSpi.endTransaction();
     }
 
     void send16(uint8_t msb, uint8_t lsb) const {
       uint16_t value = ((uint16_t) msb) << 8 | (uint16_t) lsb;
       send16(value);
     }
+
+  private:
+    SPIClass& mSpi;
 };
 
 } // ace_segment

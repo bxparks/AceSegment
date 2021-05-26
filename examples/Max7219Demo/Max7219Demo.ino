@@ -16,14 +16,32 @@ using ace_segment::HardSpiInterface;
 using ace_segment::SoftSpiInterface;
 using ace_segment::kDigitRemapArray8Max7219;
 
-// Select SPI interface type.
-#define SPI_INTERFACE_TYPE_HARD_SPI 0
-#define SPI_INTERFACE_TYPE_HARD_SPI_FAST 1
-#define SPI_INTERFACE_TYPE_SOFT_SPI 2
-#define SPI_INTERFACE_TYPE_SOFT_SPI_FAST 3
+// Select interface protocol.
+#define INTERFACE_TYPE_SOFT_SPI 0
+#define INTERFACE_TYPE_SOFT_SPI_FAST 1
+#define INTERFACE_TYPE_HARD_SPI 2
+#define INTERFACE_TYPE_HARD_SPI_FAST 3
+#define INTERFACE_TYPE_SOFT_TMI 4
+#define INTERFACE_TYPE_SOFT_TMI_FAST 5
+
+// Some microcontrollers have 2 or more SPI buses. PRIMARY selects the default.
+// SECONDARY selects the alternate. I don't have a board with more than 2, but
+// we could add additional options here if needed.
+#define SPI_INSTANCE_TYPE_PRIMARY 0
+#define SPI_INSTANCE_TYPE_SECONDARY 1
+
+//----------------------------------------------------------------------------
+// Hardware configuration.
+//----------------------------------------------------------------------------
+
+// Configuration for Arduino IDE
+#if ! defined(EPOXY_DUINO) && ! defined(AUNITER)
+  #define AUNITER_MICRO_MAX7219
+#endif
 
 #if defined(EPOXY_DUINO)
-  #define SPI_INTERFACE_TYPE SPI_INTERFACE_TYPE_HARD_SPI_FAST
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
+  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
 
   // SPI pins
   const uint8_t LATCH_PIN = 10;
@@ -31,7 +49,8 @@ using ace_segment::kDigitRemapArray8Max7219;
   const uint8_t CLOCK_PIN = SCK;
 
 #elif defined(AUNITER_MICRO_MAX7219)
-  #define SPI_INTERFACE_TYPE SPI_INTERFACE_TYPE_HARD_SPI_FAST
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
+  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
 
   // SPI pins
   const uint8_t LATCH_PIN = 10;
@@ -39,27 +58,63 @@ using ace_segment::kDigitRemapArray8Max7219;
   const uint8_t CLOCK_PIN = SCK;
 
 #elif defined(AUNITER_STM32_MAX7219)
-  #define SPI_INTERFACE_TYPE SPI_INTERFACE_TYPE_HARD_SPI
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
 
-  // SPI pins
-  const uint8_t LATCH_PIN = PA4;
-  const uint8_t DATA_PIN = MOSI;
-  const uint8_t CLOCK_PIN = SCK;
+  #if SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_PRIMARY
+    // SPI1 pins (default)
+    const uint8_t LATCH_PIN = SS;
+    const uint8_t DATA_PIN = MOSI;
+    const uint8_t CLOCK_PIN = SCK;
+  #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
+    // SPI2 pins
+    const uint8_t LATCH_PIN = PB12;
+    const uint8_t DATA_PIN = PB15;
+    const uint8_t CLOCK_PIN = PB13;
+    SPIClass SPISecondary(DATA_PIN, PB14 /*miso*/, CLOCK_PIN);
+  #else
+    #error Unknown SPI_INSTANCE_TYPE
+  #endif
 
 #elif defined(AUNITER_D1MINI_LARGE_MAX7219)
-  #define SPI_INTERFACE_TYPE SPI_INTERFACE_TYPE_HARD_SPI
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
 
   // SPI pins
   const uint8_t LATCH_PIN = SS;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
 
+#elif defined(AUNITER_ESP32_MAX7219)
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  // My dev board uses HSPI.
+  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_SECONDARY
+
+  #if SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_PRIMARY
+    // VSPI pins (default)
+    const uint8_t LATCH_PIN = SS;
+    const uint8_t DATA_PIN = MOSI;
+    const uint8_t CLOCK_PIN = SCK;
+  #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
+    // HSPI pins
+    const uint8_t LATCH_PIN = 15;
+    const uint8_t DATA_PIN = 13;
+    const uint8_t CLOCK_PIN = 14;
+    SPIClass SPISecondary(HSPI);
+  #else
+    #error Unknown SPI_INSTANCE_TYPE
+  #endif
+
 #else
   #error Unknown environment
 #endif
 
-#if SPI_INTERFACE_TYPE == SPI_INTERFACE_TYPE_HARD_SPI_FAST \
-    || SPI_INTERFACE_TYPE == SPI_INTERFACE_TYPE_SOFT_SPI_FAST
+//------------------------------------------------------------------
+// AceSegment Configuration
+//------------------------------------------------------------------
+
+#if INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST \
+    || INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI_FAST
   #include <digitalWriteFast.h>
   #include <ace_segment/hw/HardSpiFastInterface.h>
   #include <ace_segment/hw/SoftSpiFastInterface.h>
@@ -80,28 +135,46 @@ const uint8_t PATTERNS[NUM_DIGITS] = {
   0b00000111, // 7
 };
 
-#if SPI_INTERFACE_TYPE == SPI_INTERFACE_TYPE_HARD_SPI
+#if INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
   using SpiInterface = HardSpiInterface;
-  SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-#elif SPI_INTERFACE_TYPE == SPI_INTERFACE_TYPE_HARD_SPI_FAST
+  #if SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_PRIMARY
+    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
+    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN, SPISecondary);
+  #else
+    #error Unknown SPI_INSTANCE_TYPE
+  #endif
+#elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
   using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
-  SpiInterface spiInterface;
-#elif SPI_INTERFACE_TYPE == SPI_INTERFACE_TYPE_SOFT_SPI
+  #if SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_PRIMARY
+    SpiInterface spiInterface;
+  #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
+    SpiInterface spiInterface(SPISecondary);
+  #else
+    #error Unknown SPI_INSTANCE_TYPE
+  #endif
+#elif INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI
   using SpiInterface = SoftSpiInterface;
   SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-#elif SPI_INTERFACE_TYPE == SPI_INTERFACE_TYPE_SOFT_SPI_FAST
+#elif INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI_FAST
   using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
 #else
-  #error Unknown SPI_INTERFACE_TYPE
+  #error Unknown INTERFACE_TYPE
 #endif
 
 Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
     spiInterface, kDigitRemapArray8Max7219);
 LedDisplay display(max7219Module);
 
-TimingStats stats;
+void setupAceSegment() {
+  spiInterface.begin();
+  max7219Module.begin();
+}
 
+//----------------------------------------------------------------------------
+
+TimingStats stats;
 uint8_t digitIndex = 0;
 uint8_t brightness = 1;
 
@@ -171,13 +244,13 @@ void printStats() {
 
 void setup() {
   delay(1000);
+
 #if ENABLE_SERIAL_DEBUG >= 1
   Serial.begin(115200);
   while (!Serial);
 #endif
 
-  spiInterface.begin();
-  max7219Module.begin();
+  setupAceSegment();
 }
 
 void loop() {

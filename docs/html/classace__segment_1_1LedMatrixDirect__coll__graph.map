@@ -1,4 +1,4 @@
-<map id="ace_segment::LedMatrixDirect&lt; H &gt;" name="ace_segment::LedMatrixDirect&lt; H &gt;">
-<area shape="rect" id="node1" title="An LedMatrixBase that whose group pins and element pins are wired directly to the MCU." alt="" coords="5,80,267,107"/>
-<area shape="rect" id="node2" href="$classace__segment_1_1LedMatrixBase.html" title="Class that represents the abstraction of a particular LED display wiring, and knows how to turn off a..." alt="" coords="29,5,243,32"/>
+<map id="ace_segment::LedMatrixDirect&lt; T_GPIOI &gt;" name="ace_segment::LedMatrixDirect&lt; T_GPIOI &gt;">
+<area shape="rect" id="node1" title="An LedMatrixBase that whose group pins and element pins are wired directly to the MCU." alt="" coords="5,80,227,121"/>
+<area shape="rect" id="node2" href="$classace__segment_1_1LedMatrixBase.html" title="Class that represents the abstraction of a particular LED display wiring, and knows how to turn off a..." alt="" coords="9,5,223,32"/>
 </map>

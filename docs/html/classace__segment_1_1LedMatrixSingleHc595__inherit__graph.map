@@ -1,0 +1,4 @@
+<map id="ace_segment::LedMatrixSingleHc595&lt; T_SPII, T_GPIOI &gt;" name="ace_segment::LedMatrixSingleHc595&lt; T_SPII, T_GPIOI &gt;">
+<area shape="rect" id="node1" title="An implementation of LedMatrixBase with an 74HC595 Shift Register chip on the segment pins,..." alt="" coords="5,80,228,121"/>
+<area shape="rect" id="node2" href="$classace__segment_1_1LedMatrixBase.html" title="Class that represents the abstraction of a particular LED display wiring, and knows how to turn off a..." alt="" coords="9,5,224,32"/>
+</map>

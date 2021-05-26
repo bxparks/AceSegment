@@ -38,6 +38,11 @@ enum class EventType : uint8_t {
   kSpiEnd,
   kSpiSend8,
   kSpiSend16,
+  kWireBegin,
+  kWireEnd,
+  kWireStartCondition,
+  kWireStopCondition,
+  kWireSendByte,
   kLedMatrixDraw,
   kLedMatrixEnableGroup,
   kLedMatrixDisableGroup,
@@ -77,6 +82,8 @@ class EventLog {
       mNumRecords++;
     }
 
+    //-------------------------------------------------------------------------
+
     void addSpiBegin() {
       if (mNumRecords >= kMaxRecords) return;
 
@@ -110,6 +117,51 @@ class EventLog {
       event.arg5 = value;
       mNumRecords++;
     }
+
+    //-------------------------------------------------------------------------
+
+    void addWireBegin() {
+      if (mNumRecords >= kMaxRecords) return;
+
+      Event& event = mEvents[mNumRecords];
+      event.type = EventType::kWireBegin;
+      mNumRecords++;
+    }
+
+    void addWireEnd() {
+      if (mNumRecords >= kMaxRecords) return;
+
+      Event& event = mEvents[mNumRecords];
+      event.type = EventType::kWireEnd;
+      mNumRecords++;
+    }
+
+    void addWireStartCondition() {
+      if (mNumRecords >= kMaxRecords) return;
+
+      Event& event = mEvents[mNumRecords];
+      event.type = EventType::kWireStartCondition;
+      mNumRecords++;
+    }
+
+    void addWireStopCondition() {
+      if (mNumRecords >= kMaxRecords) return;
+
+      Event& event = mEvents[mNumRecords];
+      event.type = EventType::kWireStopCondition;
+      mNumRecords++;
+    }
+
+    void addWireSendByte(uint8_t data) {
+      if (mNumRecords >= kMaxRecords) return;
+
+      Event& event = mEvents[mNumRecords];
+      event.type = EventType::kWireSendByte;
+      event.arg1 = data;
+      mNumRecords++;
+    }
+
+    //-------------------------------------------------------------------------
 
     void addLedMatrixDraw(uint8_t group, uint8_t elementPattern) {
       if (mNumRecords >= kMaxRecords) return;
@@ -146,6 +198,8 @@ class EventLog {
       event.type = EventType::kLedMatrixClear;
       mNumRecords++;
     }
+
+    //-------------------------------------------------------------------------
 
     uint8_t getNumRecords() { return mNumRecords; }
 
@@ -196,6 +250,24 @@ class EventLog {
           case EventType::kSpiSend16: {
               uint16_t value = va_arg(args, int);
               if (value != event.arg5) return false;
+            }
+            break;
+
+          case EventType::kWireBegin:
+            break;
+
+          case EventType::kWireEnd:
+            break;
+
+          case EventType::kWireStopCondition:
+            break;
+
+          case EventType::kWireStartCondition:
+            break;
+
+          case EventType::kWireSendByte: {
+              uint8_t value = va_arg(args, int);
+              if (value != event.arg1) return false;
             }
             break;
 

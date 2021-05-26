@@ -1,0 +1,5 @@
+<map id="ace_segment::DirectFast4Module&lt; e0, e1, e2, e3, e4, e5, e6, e7, g0, g1, g2, g3, T_DIGITS, T_SUBFIELDS, T_CI &gt;" name="ace_segment::DirectFast4Module&lt; e0, e1, e2, e3, e4, e5, e6, e7, g0, g1, g2, g3, T_DIGITS, T_SUBFIELDS, T_CI &gt;">
+<area shape="rect" id="node1" title="An implementation of LedModule whose segment and digit pins are directly connected to the GPIO pins o..." alt="" coords="513,5,745,91"/>
+<area shape="rect" id="node2" href="$classace__segment_1_1ScanningModule.html" title=" " alt="" coords="241,5,465,91"/>
+<area shape="rect" id="node3" href="$classace__segment_1_1LedModule.html" title="General interface that represents a generic seven&#45;segment LED module with multiple digits." alt="" coords="5,35,193,61"/>
+</map>

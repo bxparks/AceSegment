@@ -25,8 +25,8 @@ const uint8_t SEGMENT_PINS[8] = {4, 5, 6, 7, 8, 9, 10, 11};
 
 // Common Cathode, with transistors on Group pins
 LedMatrixDirect<TestableGpioInterface> ledMatrixDirect(
-    LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
-    LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
+    kActiveHighPattern /*elementOnPattern*/,
+    kActiveHighPattern /*groupOnPattern*/,
     NUM_SEGMENTS,
     SEGMENT_PINS,
     NUM_DIGITS,
@@ -37,16 +37,16 @@ TestableSpiInterface spiInterface;
 LedMatrixSingleHc595<TestableSpiInterface, TestableGpioInterface>
   ledMatrixSingleHc595(
     spiInterface,
-    LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
-    LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
+    kActiveHighPattern /*elementOnPattern*/,
+    kActiveHighPattern /*groupOnPattern*/,
     NUM_DIGITS,
     DIGIT_PINS);
 
 // Common Cathode, with transistors on Group pins
 LedMatrixDualHc595<TestableSpiInterface> ledMatrixDualHc595(
     spiInterface,
-    LedMatrixBase::kActiveHighPattern /*elementOnPattern*/,
-    LedMatrixBase::kActiveHighPattern /*groupOnPattern*/,
+    kActiveHighPattern /*elementOnPattern*/,
+    kActiveHighPattern /*groupOnPattern*/,
     kByteOrderGroupHighElementLow);
 
 // ----------------------------------------------------------------------

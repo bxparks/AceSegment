@@ -1,0 +1,5 @@
+<map id="ace_segment::Hc595Module&lt; T_SPII, T_DIGITS, T_SUBFIELDS, T_CI &gt;" name="ace_segment::Hc595Module&lt; T_SPII, T_DIGITS, T_SUBFIELDS, T_CI &gt;">
+<area shape="rect" id="node1" title="An implementation of LedModule class that supports an LED module using 2 74HC595 Shift Register chips..." alt="" coords="557,5,800,61"/>
+<area shape="rect" id="node2" href="$classace__segment_1_1ScanningModule.html" title=" " alt="" coords="241,5,509,61"/>
+<area shape="rect" id="node3" href="$classace__segment_1_1LedModule.html" title="General interface that represents a generic seven&#45;segment LED module with multiple digits." alt="" coords="5,20,193,47"/>
+</map>

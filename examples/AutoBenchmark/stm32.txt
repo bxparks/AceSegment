@@ -1,7 +1,7 @@
 SIZEOF
-sizeof(SoftWireInterface): 4
+sizeof(SoftTmiInterface): 4
 sizeof(SoftSpiInterface): 3
-sizeof(HardSpiInterface): 3
+sizeof(HardSpiInterface): 8
 sizeof(LedMatrixDirect<>): 16
 sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 16
 sizeof(LedMatrixDualHc595<HardSpiInterface>): 16
@@ -10,8 +10,8 @@ sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(DirectModule<4>): 48
 sizeof(HybridModule<SoftSpiInterface, 4>): 48
 sizeof(Hc595Module<SoftSpiInterface, 8>): 64
-sizeof(Tm1637Module<SoftWireInterface, 4>): 24
-sizeof(Tm1637Module<SoftWireInterface, 6>): 28
+sizeof(Tm1637Module<SoftTmiInterface, 4>): 24
+sizeof(Tm1637Module<SoftTmiInterface, 6>): 28
 sizeof(Max7219Module<SoftSpiInterface, 8>): 28
 sizeof(LedDisplay): 4
 sizeof(NumberWriter): 4
@@ -21,20 +21,22 @@ sizeof(CharWriter): 12
 sizeof(StringWriter): 4
 sizeof(StringScroller): 20
 BENCHMARKS
-Direct(4) 14 14 15 40
+Direct(4) 14 14 14 40
 Direct(4,subfields) 1 2 15 640
-Hybrid(4,SoftSpi) 31 31 36 40
-Hybrid(4,SoftSpi,subfields) 1 4 50 640
-Hybrid(4,HardSpi) 40 40 45 40
-Hybrid(4,HardSpi,subfields) 1 5 50 640
-Hc595(8,SoftSpi) 53 53 57 80
-Hc595(8,SoftSpi,subfields) 1 7 63 1280
-Hc595(8,HardSpi) 40 40 45 80
-Hc595(8,HardSpi,subfields) 1 6 45 1280
-Tm1637(4,SoftWire) 22382 22383 22385 10
-Tm1637(4,SoftWire,incremental) 3623 8825 10140 50
-Tm1637(6,SoftWire) 28136 28141 28144 10
-Tm1637(6,SoftWire,incremental) 3623 9197 10136 70
-Max7219(8,SoftSpi) 478 481 484 20
-Max7219(8,HardSpi) 361 363 367 20
+Hybrid(4,SoftSpi) 30 30 34 40
+Hybrid(4,SoftSpi,subfields) 1 4 40 640
+Hybrid(4,HardSpi) 41 42 46 40
+Hybrid(4,HardSpi,subfields) 1 6 64 640
+Hc595(8,SoftSpi) 51 52 57 80
+Hc595(8,SoftSpi,subfields) 1 7 62 1280
+Hc595(8,HardSpi) 43 43 48 80
+Hc595(8,HardSpi,subfields) 1 6 53 1280
+Tm1637(4,SoftTmi) 22393 22396 22400 10
+Tm1637(4,SoftTmi,incremental) 3625 8830 10138 50
+Tm1637(6,SoftTmi) 28153 28156 28161 10
+Tm1637(6,SoftTmi,incremental) 3625 9203 10146 70
+Tm1637(4,SoftTmi,5us) 2436 2440 2447 10
+Tm1637(4,SoftTmi,incremental,5us) 394 964 1111 50
+Max7219(8,SoftSpi) 463 465 469 20
+Max7219(8,HardSpi) 386 388 392 20
 END

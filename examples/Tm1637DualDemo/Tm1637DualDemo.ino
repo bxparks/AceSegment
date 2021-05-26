@@ -4,9 +4,8 @@
  *
  * Results: Works great except at high levels of brightness, there is a
  * noticeable flicker of the LEDs. My guess is that the LEDs are drawing more
- * current than the Arduino MCU can provide stably, so the voltage fluctuates. I
- * think the solution is to wire the LED Modules directly to the USB 5V, instead
- * of being powered through the Arduino Vcc.
+ * current than the Arduino MCU can provide stably, so the voltage fluctuates.
+ * Maybe I need to add a smoothing capacitor across the power line? Not tested.
  */
 
 #include <Arduino.h>
@@ -16,12 +15,98 @@
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
-using namespace ace_segment;
+using ace_segment::Tm1637Module;
+using ace_segment::LedDisplay;
+using ace_segment::SoftTmiInterface;
+
+// Select TM1637 protocol version, either SoftTmiInterface or
+// SoftTmiFastInterface.
+#define TMI_INTERFACE_TYPE_NORMAL 0
+#define TMI_INTERFACE_TYPE_FAST 1
 
 // Select the TM1637Module flush() method
 #define TM_FLUSH_METHOD_NORMAL 0
 #define TM_FLUSH_METHOD_INCREMENTAL 1
-#define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
+
+//----------------------------------------------------------------------------
+// Hardware configuration.
+//----------------------------------------------------------------------------
+
+// Configuration for Arduino IDE
+#if ! defined(EPOXY_DUINO) && ! defined(AUNITER)
+  #define AUNITER_MICRO_TM1637_DUAL
+#endif
+
+#if defined(EPOXY_DUINO)
+  #define TMI_INTERFACE_TYPE TMI_INTERFACE_TYPE_FAST
+  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
+
+  const uint8_t CLK_PIN = A0;
+  const uint8_t DIO1_PIN = 9;
+  const uint8_t DIO2_PIN = 8;
+  const uint8_t NUM_DIGITS = 4;
+
+#elif defined(AUNITER_MICRO_TM1637_DUAL)
+  #define TMI_INTERFACE_TYPE TMI_INTERFACE_TYPE_NORMAL
+  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
+
+  const uint8_t CLK_PIN = A0;
+  const uint8_t DIO1_PIN = 9;
+  const uint8_t DIO2_PIN = 8;
+  const uint8_t NUM_DIGITS = 4;
+
+#else
+  #error Unknown AUNITER environment
+#endif
+
+//------------------------------------------------------------------
+// AceSegment Configuration
+//------------------------------------------------------------------
+
+// For a SoftTmiInterface (non-fast), time needed to send 4 digits using
+// flush():
+//
+// * 12 ms at 50 us delay, but does not work.
+// * 17 ms at 75 us delay.
+// * 22 ms at 100 us delay.
+// * 43 ms at 200 us delay.
+//
+// Using flushIncremental(), the duration is about 1/2 these numbers.
+const uint16_t BIT_DELAY = 100;
+
+#if TMI_INTERFACE_TYPE == TMI_INTERFACE_TYPE_NORMAL
+  using TmiInterface = SoftTmiInterface;
+  TmiInterface tmiInterface1(CLK_PIN, DIO1_PIN, BIT_DELAY);
+  TmiInterface tmiInterface2(CLK_PIN, DIO2_PIN, BIT_DELAY);
+  Tm1637Module<TmiInterface, NUM_DIGITS> tm1637Module1(tmiInterface1);
+  Tm1637Module<TmiInterface, NUM_DIGITS> tm1637Module2(tmiInterface2);
+
+#elif TMI_INTERFACE_TYPE == TMI_INTERFACE_TYPE_FAST
+  #include <digitalWriteFast.h>
+  #include <ace_segment/hw/SoftTmiFastInterface.h>
+  using ace_segment::SoftTmiFastInterface;
+  using TmiInterface1 = SoftTmiFastInterface<CLK_PIN, DIO1_PIN, BIT_DELAY>;
+  using TmiInterface2 = SoftTmiFastInterface<CLK_PIN, DIO2_PIN, BIT_DELAY>;
+  TmiInterface1 tmiInterface1;
+  TmiInterface2 tmiInterface2;
+  Tm1637Module<TmiInterface1, NUM_DIGITS> tm1637Module1(tmiInterface1);
+  Tm1637Module<TmiInterface2, NUM_DIGITS> tm1637Module2(tmiInterface2);
+
+#else
+  #error Unknown TMI_INTERFACE_TYPE
+#endif
+
+LedDisplay display1(tm1637Module1);
+LedDisplay display2(tm1637Module2);
+
+void setupAceSegment() {
+  tmiInterface1.begin();
+  tmiInterface2.begin();
+  tm1637Module1.begin();
+  tm1637Module2.begin();
+}
+
+//----------------------------------------------------------------------------
 
 // The TM1637 controller supports up to 6 digits.
 const uint8_t PATTERNS[6] = {
@@ -33,36 +118,7 @@ const uint8_t PATTERNS[6] = {
   0b01101101, // 5
 };
 
-#if defined(AUNITER_MICRO_TM1637_DUAL) || defined(EPOXY_DUINO)
-  const uint8_t CLK_PIN = A0;
-  const uint8_t DIO1_PIN = 9;
-  const uint8_t DIO2_PIN = 8;
-
-  const uint8_t NUM_DIGITS = 4;
-#else
-  #error Unknown AUNITER environment
-#endif
-
-// For a SoftWireInterface (non-fast), time to send 4 digits using flush():
-//
-// * 12 ms at 50 us delay, but does not work.
-// * 17 ms at 75 us delay.
-// * 22 ms at 100 us delay.
-// * 43 ms at 200 us delay.
-//
-// Using flushIncremental() is about 1/2 these numbers.
-const uint16_t BIT_DELAY = 100;
-
-using WireInterface = SoftWireInterface;
-WireInterface wireInterface1(CLK_PIN, DIO1_PIN, BIT_DELAY);
-WireInterface wireInterface2(CLK_PIN, DIO2_PIN, BIT_DELAY);
-Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module1(wireInterface1);
-Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module2(wireInterface2);
-LedDisplay display1(tm1637Module1);
-LedDisplay display2(tm1637Module2);
-
 TimingStats stats;
-
 uint8_t digitIndex = 0;
 uint8_t brightness = 1;
 
@@ -147,6 +203,7 @@ void printStats() {
   static uint16_t prevStatsMillis;
 
   // Every 5 seconds, print out the statistics.
+  uint16_t nowMillis = millis();
   if ((uint16_t) (nowMillis - prevStatsMillis) >= 5000) {
     prevStatsMillis = nowMillis;
 
@@ -171,12 +228,8 @@ void setup() {
   while (!Serial);
 #endif
 
-  wireInterface1.begin();
-  wireInterface2.begin();
-  tm1637Module1.begin();
-  tm1637Module2.begin();
+  setupAceSegment();
 }
-
 
 void loop() {
   updateDisplay();

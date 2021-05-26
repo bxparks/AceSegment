@@ -25,7 +25,7 @@ into hardware-dependent components and hardware-independent components to allow
 application code to be written without worrying too much about the low-level
 details of the specific LED module.
 
-**Version**: 0.5 (2021-05-14)
+**Version**: 0.6 (2021-05-26)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
@@ -49,6 +49,7 @@ consumption.
     * [Tm1637Module](#Tm1637Module)
         * [TM1637 Module With 4 Digits](#Tm1637Module4)
         * [TM1637 Module With 6 Digits](#Tm1637Module6)
+        * [TM1637 Capacitor Removal](#Tm1637CapacitorRemoval)
     * [Max7219Module](#Max7219Module)
         * [MAX7219 Module With 8 Digits](#Max7219Module8)
     * [Hc595Module](#Hc595Module)
@@ -61,10 +62,14 @@ consumption.
     * [CharWriter](#CharWriter)
     * [StringWriter](#StringWriter)
     * [StringScroller](#StringScroller)
+    * [LevelWriter](#LevelWriter)
 * [Advanced Usage](#AdvancedUsage)
     * [DigitalWriteFast on AVR](#DigitalWriteFast)
     * [ScanningModule](#ScanningModule)
 * [Resource Consumption](#ResourceConsumption)
+    * [SizeOf Classes](#SizeOfClasses)
+    * [Flash And Static Memory](#FlashAndStaticMemory)
+    * [CPU Cycles](#CpuCycles)
 * [System Requirements](#SystemRequirements)
     * [Hardware](#Hardware)
     * [Tool Chain](#ToolChain)
@@ -114,13 +119,21 @@ The unit tests depend on:
 Some of the examples may depend on:
 
 * AceButton (https://github.com/bxparks/AceButton)
+* TimerOne (https://github.com/PaulStoffregen/TimerOne)
+* one of the DigitalWriteFast libraries
+    * https://github.com/watterott/Arduino-Libs/tree/master/digitalWriteFast
+    * https://github.com/NicksonYap/digitalWriteFast
 
 <a name="Documentation"></a>
 ## Documentation
 
 * this `README.md` file
-* [advanced.md](docs/advanced.md): Advanced Usage Guide
-* [Doxygen docs published on GitHub Pages](https://bxparks.github.io/AceSegment/html).
+* [scanning_module.md](docs/scanning_module.md)
+    * ScanningModule usage
+* [capacitor_removal.md](docs/tm1637/capacitor_removal.md)
+    * Removing the 10 nF capacitors on certain TM1637 LED modules
+* [Doxygen docs](https://bxparks.github.io/AceSegment/html)
+    * On Github pages.
 
 <a name="Examples"></a>
 ### Examples
@@ -129,18 +142,44 @@ The following example sketches are provided:
 
 * Basic
     * [Tm1637Demo.ino](examples/Tm1637Demo)
+        * Demo of a TM1637 LED module using `Tm1637Module`
     * [Max7219Demo.ino](examples/Max7219Demo)
+        * Demo of a MAX7219 LED module using `Max7219Module`
     * [Hc595Demo.ino](examples/Hc595Demo)
-    * [DirectModuleDemo.ino](examples/DirectModuleDemo)
-    * [HybridDemo.ino](examples/HybridDemo)
-* Advanced
-    * [Tm1637DualDemo.ino](examples/Tm1637DualDemo)
-    * [ModulatingDemo.ino](examples/ModulatingDemo)
-    * [ScanningDirectDemo.ino](examples/ScanningDirectDemo)
-    * [DirectFast4ModuleDemo.ino](examples/DirectModuleDemo)
-    * [AceSegmentDemo.ino](examples/AceSegmentDemo)
-        * runs through some features of the library
+        * Demo of a 74HC595 LED module using `Hc595Module`
+    * [AceSegmentTester.ino](examples/AceSegmentTester)
+        * demo-reel through most of the features of the library
         * uses 2 buttons for "single step" debugging mode
+        * depends on AceButton (https://github.com/bxparks/AceButton) library
+* Advanced
+    * [DirectDemo.ino](examples/DirectDemo)
+        * Demo of an LED module with no controller, all digit and segment pins
+          wired directly to the microcontroller
+        * Uses `DirectModule` class
+    * [DirectFast4Demo.ino](examples/DirectFast4Demo)
+        * same as `DirectDemo` but using `DirectFast4Module` which uses
+          `digitalWriteFast()`
+    * [HybridDemo.ino](examples/HybridDemo)
+        * Demo of an LED module that uses a single 74HC595 shift register on the
+          segment pins, but the digit pins are wired directly to the
+          microcontroller
+        * Uses `HybridModule` class
+    * [Tm1637DualDemo.ino](examples/Tm1637DualDemo)
+        * render two TM1637 LED modules at the same time using two
+          `Tm1637Module` instances
+    * [ModulatingDemo.ino](examples/ModulatingDemo)
+        * demo of brightness control on a per-digit basis using `DirectModule`,
+          `HybridModule`, or `Hc595Module`
+    * [ScanningDemo.ino](examples/ScanningDemo)
+        * Low-level demo `ScanningModule` combined with various
+          `LedMatrixDirect`, `LedMatrixSingleHc595` and `LedMatrixDualHc595`
+          classes
+        * Not intended for general public consumption.
+    * [Hc595InterruptDemo.ino](examples/Hc595InterruptDemo)
+        * Same as Hc595Demo, but using an interrupt service routine (ISR)
+          to render the LED display.
+        * Uses the `TimerOne` (https://github.com/PaulStoffregen/TimerOne)
+          library
 * Benchmarks
     * [AutoBenchmark.ino](examples/AutoBenchmark): performs CPU benchmarking of
       most of the supported configurations of the framework
@@ -157,7 +196,7 @@ Here are the classes in the library which will be most useful to the
 end-users, listed roughly from low-level to higher-level classes which often
 depend on the lower-level classes:
 
-* SpiInterface
+* `SpiInterface`
     * Thin-wrapper classes for communicating with the LED module that support
       SPI
     * Used by `Max7219Module` and `Hc595Module`.
@@ -170,14 +209,14 @@ depend on the lower-level classes:
             * Hardware SPI using `digitalWrite()` to control the latch pin.
         * `HardSpiFastInterface`
             * Hardware SPI using `digitalWriteFast()` to control the latch pin.
-* WireInterface
+* `TmiInterface`
     * Thin-wrapper classes to communicating with LED modules using the TM1637
       protocol. Similar to I2C but not exactly the same.
     * Used by `Tm1637Module`.
     * There are 2 implementations:
-        * `SoftWireInterface`
+        * `SoftTmiInterface`
             * Implement the TM1637 protocol using `digitalWrite()`.
-        * `SoftWireFastInterface`
+        * `SoftTmiFastInterface`
             * Implement the TM1637 protocol using `digitalWriteFast()`.
 * `LedModule`
     * Base interface for all hardware dependent implementation of a
@@ -223,6 +262,8 @@ depend on the lower-level classes:
           turns, prints to the `LedDisplay`.
     * `StringScoller`
         * Scroll a string left and right.
+    * `LevelWriter`
+        * Display specified number of bars from left to right, 2 bars per digit.
 
 <a name="DependencyDiagram"></a>
 ### Dependency Diagram
@@ -231,13 +272,15 @@ The dependency diagram among these classes looks something like this
 (simplified for ease of understanding):
 
 ```
-        StringScroller
-        StringWriter      ClockWriter  TemperatureWriter
-               |              \           /
-               V               v         v
-            CharWriter         NumberWriter
-                    \            /
-                     v          v
+   StringScroller
+   StringWriter    ClockWriter TemperatureWriter
+          |            \           /
+          V             v         v
+       CharWriter       NumberWriter     LevelWriter
+            \              |             /
+             --------      |     --------
+                     \     |    /
+                      v    v   v
                       LedDisplay
                           |            (hardware independent)
 --------------------------|-------------------------------------
@@ -252,8 +295,8 @@ Tm1637Module          Max7219Module     Hc595Module  HybridModule  DirectModule
       |                         \           |         /
       |                          \          |        /
       v                           v         v       v
-SoftWireInterface                 SoftSpiInterface
-SoftWireFastInterface             SoftSpiFastInterface
+SoftTmiInterface                  SoftSpiInterface
+SoftTmiFastInterface              SoftSpiFastInterface
                                   HardSpiInterface
                                   HardSpiFastInterface
 ```
@@ -335,7 +378,7 @@ using namespace ace_segment;
 
 The `LedModule` class is the general interface (with mostly pure virtual
 functions) which is the parent class of all hardware-dependent classes which are
-targetted for specific controller chips. It looks like this:
+targeted for specific controller chips. It looks like this:
 
 ```C++
 class LedModule {
@@ -353,10 +396,10 @@ It assumes that each subclass has an internal buffer of bit patterns which
 will be sent out to the LED module at the appropriate time. Some LED controllers
 (e.g. TM1637, MAX7219) handle the multiplexing and refreshing of the LED
 segments, so the host microcontroller needs only to send out the bit patterns to
-the controller chips over SPI or some other prococol. Other controller chips,
-particulary the 74HC595, is a fairly dumb controller chip that requires the host
-microcontroller to perform the multiplexing itself. The bit patterns must be
-sent out to the controller chip with precise timing intervals.
+the controller chips over SPI or some other protocol. Other controller chips,
+particularly the 74HC595, is a fairly dumb controller chip that requires the
+host microcontroller to perform the multiplexing itself. The bit patterns must
+be sent out to the controller chip with precise timing intervals.
 
 Because each controller chip has slightly different rendering requirements, the
 `LedModule` class pushes the rendering logic down into the specific subclasses.
@@ -368,16 +411,14 @@ LED modules based on the Titan TM1637 controller chips are abundant on Amazon
 and eBay. The controller chip supports up to 6 digits. Consumer LED modules
 seem have either 4 digits or 6 digits.
 
-![TM1637 LED Module](docs/tm1637/TM1637_4_digits.png)
-
 The `Tm1637Module` class looks like this:
 
 ```C++
-template <typename T_WI, uint8_t T_DIGITS>
+template <typename T_TMII, uint8_t T_DIGITS>
 class Tm1637Module : public LedModule {
   public:
     explicit Tm1637Module(
-        const T_WI& wireInterface,
+        const T_TMII& tmiInterface,
         const uint8_t* remapArray = nullptr
     );
 
@@ -396,15 +437,15 @@ class Tm1637Module : public LedModule {
 };
 ```
 
-The `T_WI` template parameter is a class that implements the 2-wire protocol
+The `T_TMII` template parameter is a class that implements the 2-wire protocol
 used by the TM1637 controller. It is a protocol that is very close to, but not
 quite the same as, I2C. This means that we cannot use the usual `Wire` library,
 but must implement a custom version. The library provides 2 implementations: the
-`SoftWireInterface` compatible with all platforms, and `SoftWireFastInterface`
+`SoftTmiInterface` compatible with all platforms, and `SoftTmiFastInterface`
 useful on AVR processors.
 
-The `wireInterface` is an instance of `T_WI`, which is either
-`SoftWireInterface` or `SoftWireFastInterface`.
+The `tmiInterface` is an instance of `T_TMII`, which is either
+`SoftTmiInterface` or `SoftTmiFastInterface`.
 
 The `remapArray` is an array of addresses which map the physical positions to
 their logical positions. This is not needed by the 4-digit TM1637 LED modules,
@@ -417,28 +458,33 @@ The `setDisplayOn()` method exposes the feature of the TM1637 chip where the
 display can be turned on and off independent of the brightness. When the display
 is turned back on, it resumes the previous brightness.
 
-The `flush()` method unconditionally sends all digits and the brightness
-information to the TM1637 chip in a single protocol transmission. For 4 digits,
-using a `BIT_DELAY` of 100 micros, the entire tranmission takes about 22 millis.
-For 6 digits, this method takes about 27 millis. The `flush()` method is a
-blocking call, nothing else can be done during this time (outside of
-interrupts). This can be a problem for processors like the ESP8266 which must
-yield back to the main loop every 20-40 milliseconds to keep its WiFi stack
-working. Otherwise, the watch dog timer performs a system reboot.
+The `flush()` method sends all digits and the brightness information to the
+TM1637 chip in a single transmission. The total amount of time needed to
+complete the `flush()` method is mostly dependent on the value of the
+`BIT_DELAY` parameter.
+
+Some TM1637 LED modules requires a large `BIT_DELAY` value as high as 100
+microseconds, which causes `flush()` to take about about 22 millis. For 6
+digits, this method takes about 27 millis. The `flush()` method is a blocking
+call, nothing else can be done during this time (outside of interrupts). This
+can be a problem for processors like the ESP8266 which must yield back to the
+main loop every 20-40 milliseconds to keep its WiFi stack working. Otherwise,
+the watch dog timer performs a system reboot.
 
 The `flushIncremental()` method was created to reduce the amount of time spent
-in the blocking call to `flush()`. The `Tm1637Module` class contains a set of
-dirty bits which keeps track of which digits have been modified since the last
-flush to the TM1637 chip. It also keeps a reference counter that keeps track of
-the digit that `flushIncremental()` handled previously. When
-`flushIncremental()` is called, only a single digit is sent to the TM1637, and
-only if that digit was marked to be dirty. Each subsequent call to
-`flushIncremental()` examines the next digit. When the last digit is handled,
-the next call to `flushIncremental()` looks at the brightness level, and sends
-that information to the TM1637 chip if the brightness dirty bit is set.
+in the blocking call to `flush()`. This method sends only a single digit for
+each iteration. The next time `flushIncremental()` is called, it sends the next
+digit to the LED module. After all the digits are sent, one more iteration sends
+the brightness information to the module. So the total number of iteration to
+update the entire LED module is `NUM_DIGITS + 1`. For `BIT_DELAY` of 100
+microseconds, `flushIncremental()` takes around 10 milliseconds per iteration.
 
 <a name="Tm1637Module4"></a>
 #### TM1637 Module With 4 Digits
+
+![TM1637 LED Module](docs/tm1637/tm1637_4_digits.jpg)
+
+![TM1637 LED Module Alt](docs/tm1637/tm1637_4_digits_alt.jpg)
 
 The configuration of the `Tm1637Module` class for the 4-digit module looks like
 this:
@@ -452,23 +498,23 @@ const uint8_t DIO_PIN = 9;
 const uint16_t BIT_DELAY = 100;
 const uint8_t NUM_DIGITS = 4;
 
-using WireInterface = SoftWireInterface;
-WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
-Tm1637Module<WireInterface, NUM_DIGITS> ledModule(wireInterface);
+using TmiInterface = SoftTmiInterface;
+TmiInterface tmiInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
+Tm1637Module<TmiInterface, NUM_DIGITS> ledModule(tmiInterface);
 
 LedDisplay display(ledModule);
 
 void setupAceSegment() {
-  wireInterface.begin();
+  tmiInterface.begin();
   ledModule.begin();
 }
 
-// Flush to LED module every 50 millis.
+// Flush to LED module every 20 millis.
 void flushModule() {
   static uint16_t prevFlushMillis;
 
   uint16_t nowMillis = millis();
-  if ((uint16_t) (nowMillis - prevFlushMillis) >= 50) {
+  if ((uint16_t) (nowMillis - prevFlushMillis) >= 20) {
     prevFlushMillis = nowMillis;
     //ledModule.flush();
     ledModule.flushIncremental();
@@ -486,32 +532,22 @@ void loop() {
 }
 ```
 
-The `BIT_DELAY` parameter below is the number of microseconds to wait between
+The `BIT_DELAY` parameter above is the number of microseconds to wait between
 each bit transition (0 to 1, or 1 to 0). According the datasheet of the TM1637
-chip, it can support oscillator frequencies as high as 450 kHz, which means that
+chip, it can support oscillator frequencies as high as 500 kHz, which means that
 theoretically, the `BIT_DELAY` could be as low as 1 microseconds.
 
-However, the LED modules manufactured by diymore.cc (shown above) contains a 20
-nF capacitor and a 4.7k ohm pullup resistor on each of the `DIO` and `CLK`
-lines. This seems to be a design flaw, because the capacitor is about 100X
-larger than it should be, it should have been only be about 200 pF. The effect
-of the large capacitor is that bit transitions on these lines take an incredibly
-long time due the `RC` time constant of 94 microseconds. After experimenting
-with various values, it seems like a `BIT_DELAY` of 100 microseconds will
-usually work.
+The black LED modules manufactured by diymore.cc (shown above)
+contains a 10 nF capacitor and a 10k ohm pullup resistor on each of the `DIO`
+and `CLK` lines. This requires a `BIT_DELAY` of 100 microseconds.
 
-A `BIT_DELAY` of 100 microseconds means that the time to transmit 4 digits to
-the TM1637 chip becomes about 22 milliseconds. The time to transmit a single
-digit is about 10 milliseconds due to the overhead in the protocol. Since these
-durations are so large, the `Tm1637Module` class does not send the segment bit
-patterns directly to the TM1637 controller when `Tm1637Module::setPattern()`
-method is called. Instead, the class holds a buffer of segment patterns, and
-keeps track of a set of dirty bits. The buffer is sent to the TM1637 controller
-upon the execution of the `Tm1637Module::flush()` or
-`Tm1637Module::flushIncremental()` method.
+The blue LED modules (shown above) seem to use much smaller filtering
+capacitors. These modules seem to work with a `BIT_DELAY` of 7 microseconds.
 
 <a name="Tm1637Module6"></a>
 #### TM1637 Module With 6 Digits
+
+![TM1637 LED Module](docs/tm1637/tm1637_6_digits.jpg)
 
 The configuration of the `Tm1637Module` class for the 6-digit module is slightly
 more complicated because the digits are wired to be in the order of `2 1 0 5 4
@@ -529,23 +565,23 @@ const uint8_t DIO_PIN = 9;
 const uint16_t BIT_DELAY = 100;
 const uint8_t NUM_DIGITS = 4;
 
-using WireInterface = SoftWireInterface;
-WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
-Tm1637Module<WireInterface, NUM_DIGITS> ledModule(
-    wireInterface, kDigitRemapArray6Tm1637);
+using TmiInterface = SoftTmiInterface;
+TmiInterface tmiInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
+Tm1637Module<TmiInterface, NUM_DIGITS> ledModule(
+    tmiInterface, kDigitRemapArray6Tm1637);
 
 LedDisplay display(ledModule);
 
 void setupAceSegment() {
-  wireInterface.begin();
+  tmiInterface.begin();
   ledModule.begin();
 }
 
-// Flush to LED module every 50 millis.
+// Flush to LED module every 20 millis.
 void flushModule() {
   static uint16_t prevFlushMillis;
   uint16_t nowMillis = millis();
-  if ((uint16_t) (nowMillis - prevFlushMillis) >= 50) {
+  if ((uint16_t) (nowMillis - prevFlushMillis) >= 20) {
     prevFlushMillis = nowMillis;
     //ledModule.flush();
     ledModule.flushIncremental();
@@ -563,6 +599,24 @@ void loop() {
 }
 ```
 
+<a name="Tm1637CapacitorRemoval"></a>
+#### TM1637 Capacitor Removal
+
+The black TM1637 LED modules from diymore.cc come with 10 nF filtering
+capacitors on the `CLK` and `DIO` lines. This forces us to use a `BIT_DELAY` of
+100 microseconds, which means that `flush()` on a 4-digit module takes 22
+milliseconds. We can do far better by removing those filtering capacitors with a
+soldering iron:
+
+* See [docs/tm1637/capacitor_removal.md](docs/tm1637/capacitor_removal.md) for
+  information on how to remove the 10 nF capacitors.
+
+After removing them, I verified that these TM1637 LED modules will work with a
+`BIT_DELAY` as low 1 microseconds (sometimes even a 0 microsecond delay will
+work). The transmission time for `flush()` becomes proportionally faster. For
+example, using 5 microsecond `BIT_DELAY` allows `flush()` to take only 1 to 2.3
+milliseconds instead of 22 milliseconds.
+
 <a name="Max7219Module"></a>
 ### Max7219Module
 
@@ -572,7 +626,7 @@ be daisychained to support more than 8 digits. The 8-digit module is readily
 available commercially from multiple suppliers on Amazon and eBay, and they look
 like this:
 
-![MAX7219 LED Module](docs/max7219/MAX7219_8_digits.png)
+![MAX7219 LED Module](docs/max7219/max7219_8_digits.jpg)
 
 The `Max7219Module` class looks like this:
 
@@ -580,7 +634,7 @@ The `Max7219Module` class looks like this:
 template <typename T_SPII, uint8_t T_DIGITS>
 class Max7219Module : public LedModule {
   public:
-    Max7219Module(
+    explicit Max7219Module(
         const T_SPII& spiInterface,
         const uint8_t* remapArray = nullptr
     );
@@ -675,22 +729,22 @@ seven-segment LED modules. Each chip converts 8 serial bits into 8 parallel pins
 which can source or sink about 12 mA of current each. With two 74HC595 chips,
 one chip can control the segment pins, the other can control the common digit
 pins, and the two chips can be daisy chained together. The chips can be
-programmed using the straighforward SPI protocol.
+programmed using the straightforward SPI protocol.
 
 Recently (since about Aug 2020?), off-the-shelf 8-digit LED modules using two
 74HC595 have become common on Amazon and eBay, in multiple colors. They look
 like this:
 
-![HC595 LED Module](docs/hc595/HC595_8_digits.png)
+![HC595 LED Module](docs/hc595/hc595_8_digits.jpg)
 
 The `Hc595Module` class looks roughly like this (simplified for ease of
 understanding):
 
 ```C++
-template <typename T_SPII, uint8_t T_DIGITS >
+template <typename T_SPII, uint8_t T_DIGITS>
 class Hc595Module : public ScanningModule<[snip]> {
-
-    Hc595Module(
+  public:
+    explicit Hc595Module(
         const T_SPII& spiInterface,
         uint8_t segmentOnPattern,
         uint8_t digitOnPattern,
@@ -737,8 +791,8 @@ seem to be using Common Anode LEDs, connected directly to the 74HC595 chips,
 without driver transistors. That means that the segment pins are active low
 (requires a 0 to turn sink current from the LEDs) and the digit pins are active
 high (requires a 1 to send current into the LEDs). We can use the pre-defined
-constants `LedMatrixBase::kActiveLowPattern` and
-`LedMatrixBase::kActiveHighPattern` for these parameters.
+constants `kActiveLowPattern` and
+`kActiveHighPattern` for these parameters.
 
 The `framesPerSecond` is the desired refresh rate. A frame is one full rendering
 of all digits in the LED display. A value of 60 is good enough for most people,
@@ -781,8 +835,8 @@ const uint8_t CLOCK_PIN = SCK;
 const uint8_t NUM_DIGITS = 8;
 const uint8_t FRAMES_PER_SECOND = 60;
 
-const uint8_t SEGMENT_ON_PATTERN = LedMatrixBase::kActiveLowPattern;
-const uint8_t DIGIT_ON_PATTERN = LedMatrixBase::kActiveHighPattern;
+const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
+const uint8_t DIGIT_ON_PATTERN = kActiveHighPattern;
 const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
 const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 
@@ -911,7 +965,7 @@ ways of printing numbers and letters to the LED module.
 ### NumberWriter
 
 The `NumberWriter` can print integers to the `LedDisplay` using decimal (0-9) or
-hexadecimal (0-9A-F) formats. On platforms that support it (ATmega and ESP8266),
+hexadecimal (0-9A-F) formats. On platforms that support it (AVR and ESP8266),
 the bit mapping table is stored in flash memory to conserve static memory.
 
 The public methods of this class looks something like this:
@@ -991,7 +1045,7 @@ includes an instance of a `NumberWriter`.
 <a name="TemperatureWriter"></a>
 ### TemperatureWriter
 
-This class supports writing out temperatures in degrees Celcius or Fahrenheit.
+This class supports writing out temperatures in degrees Celsius or Fahrenheit.
 The public methods of this class looks something like this:
 
 ```C++
@@ -1022,11 +1076,11 @@ It is possible to represent many of the ASCII characters in the range `[0,127]`
 on a seven-segment LED display, although some of the characters will necessarily
 be crude given the limited number of segments. The `CharWriter` contains a
 [mapping of ASCII](https://github.com/dmadison/LED-Segment-ASCII) characters
-to seven-segment bit patterns. On platforms that support it (ATmega and
+to seven-segment bit patterns. On platforms that support it (AVR and
 ESP8266), the bit pattern array is stored in flash memory to conserve static
 memory.
 
-The public methods of this class looks like thid:
+The public methods of this class looks like this:
 
 ```C++
 class CharWriter {
@@ -1111,7 +1165,7 @@ like:
 ```C++
 class StringScroller {
   public:
-    explicit StringScroller(LedDisplay& ledDisplay);
+    explicit StringScroller(CharWriter& charWriter);
 
     LedDisplay& display() const;
 
@@ -1127,6 +1181,24 @@ class StringScroller {
 
 To scroll a string to the left, first initialize the string, then call
 `scrollLeft()` to shift left. Similarly to the right.
+
+<a name="LevelWriter"></a>
+### LevelWriter
+
+A `LevelWriter` writes a specified number of vertical bars (2 vertical
+bar per digit) to the LED display, emulating a level meter LED module.
+
+```C++
+class LevelWriter {
+  public:
+    explicit LevelWriter(LedDisplay& ledDisplay);
+
+    LedDisplay& display() const;
+
+    uint8_t getMaxLevel() const;
+    void writeLevel(uint8_t level);
+};
+```
 
 <a name="AdvancedUsage"></a>
 ## Advanced Usage
@@ -1155,8 +1227,8 @@ I have written versions of some lower-level classes to take advantage of
     * Variant of `HardSpiInterface.h` using  `digitalWriteFast()` to toggle
       the `LATCH` pin, while the hardware SPI code controls the `MOSI` and `SCK`
       pins
-* `hw/SoftWireFastInterface.h`
-    * Variant of `SoftWireInterface.h` using `digitalWriteFast()`
+* `hw/SoftTmiFastInterface.h`
+    * Variant of `SoftTmiInterface.h` using `digitalWriteFast()`
 
 Since these header files require an external `digitalWriteFast` library to be
 installed, and they are only valid for AVR processors, these header files are
@@ -1170,10 +1242,14 @@ need to include these headers manually, like this:
   #include <digitalWriteFast.h> // from 3rd party library
   #include <ace_segment/hw/SoftSpiFastInterface.h>
   #include <ace_segment/hw/HardSpiFastInterface.h>
-  #include <ace_segment/hw/SoftWireFastInterface.h>
+  #include <ace_segment/hw/SoftTmiFastInterface.h>
   #include <ace_segment/direct/DirectFast4Module.h>
 #endif
 ```
+
+The amount of flash memory saved can be between 100 to 700 bytes. This can make
+meaningful differences on AVR processors, especially on the ATtiny85 with only
+8kB of flash. See [MemoryBenchmark](examples/MemoryBenchmark) for full details.
 
 <a name="ScanningModule"></a>
 ### Custom Configuration of ScanningModule
@@ -1186,65 +1262,69 @@ are subclasses of the `ScanningModule` parent class. If you want to know how the
 <a name="ResourceConsumption"></a>
 ## Resource Consumption
 
-### Static Memory
+<a name="SizeOfClasses"></a>
+### SizeOf Classes
 
 Here are the sizes of the various classes on the 8-bit AVR microcontrollers
 (Arduino Uno, Nano, etc):
 
 ```
-sizeof(SoftWireInterface): 4
-sizeof(SoftWireFastInterface<4, 5, 100>): 1
+sizeof(SoftTmiInterface): 4
+sizeof(SoftTmiFastInterface<4, 5, 100>): 1
 sizeof(SoftSpiInterface): 3
 sizeof(SoftSpiFastInterface<11, 12, 13>): 1
-sizeof(HardSpiInterface): 3
-sizeof(HardSpiFastInterface<11, 12, 13>): 1
+sizeof(HardSpiInterface): 5
+sizeof(HardSpiFastInterface<11, 12, 13>): 2
 sizeof(LedMatrixDirect<>): 9
 sizeof(LedMatrixDirectFast4<6..13, 2..5>): 3
 sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 8
-sizeof(LedMatrixDualHc595<HardSpiInterface>): 5
+sizeof(LedMatrixDualHc595<HardSpiInterface>): 8
 sizeof(LedModule): 3
 sizeof(ScanningModule<LedMatrixBase, 4>): 22
 sizeof(DirectModule<4>): 31
 sizeof(DirectFast4Module<...>): 25
 sizeof(HybridModule<SoftSpiInterface, 4>): 30
-sizeof(Hc595Module<SoftSpiInterface, 4>): 27
-sizeof(Tm1637Module<SoftWireInterface, 4>): 14
+sizeof(Hc595Module<SoftSpiInterface, 8>): 46
+sizeof(Tm1637Module<SoftTmiInterface, 4>): 14
+sizeof(Tm1637Module<SoftTmiInterface, 6>): 16
 sizeof(Max7219Module<SoftSpiInterface, 8>): 16
 sizeof(LedDisplay): 2
 sizeof(NumberWriter): 2
 sizeof(ClockWriter): 3
 sizeof(TemperatureWriter): 2
-sizeof(CharWriter): 2
+sizeof(CharWriter): 5
 sizeof(StringWriter): 2
-sizeof(StringScroller): 7
+sizeof(StringScroller): 11
 ```
 
 On 32-bit processors, these numbers look like this:
 
 ```
-sizeof(SoftWireInterface): 4
+sizeof(SoftTmiInterface): 4
 sizeof(SoftSpiInterface): 3
-sizeof(HardSpiInterface): 3
+sizeof(HardSpiInterface): 8
 sizeof(LedMatrixDirect<>): 16
 sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 16
-sizeof(LedMatrixDualHc595<HardSpiInterface>): 12
+sizeof(LedMatrixDualHc595<HardSpiInterface>): 16
 sizeof(LedModule): 8
 sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(DirectModule<4>): 48
 sizeof(HybridModule<SoftSpiInterface, 4>): 48
-sizeof(Hc595Module<SoftSpiInterface, 4>): 44
-sizeof(Tm1637Module<SoftWireInterface, 4>): 24
+sizeof(Hc595Module<SoftSpiInterface, 8>): 64
+sizeof(Tm1637Module<SoftTmiInterface, 4>): 24
+sizeof(Tm1637Module<SoftTmiInterface, 6>): 28
 sizeof(Max7219Module<SoftSpiInterface, 8>): 28
 sizeof(LedDisplay): 4
 sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
 sizeof(TemperatureWriter): 4
-sizeof(CharWriter): 4
+sizeof(CharWriter): 12
 sizeof(StringWriter): 4
-sizeof(StringScroller): 12
+sizeof(StringScroller): 20
 ```
 
-### Flash Memory
+<a name="FlashAndStaticMemory"></a>
+### Flash And Static Memory
 
 For the most part, the user pays only for the feature that is being used. For
 example, if the `CharWriter` (which consumes 312 bytes of flash) is not used, it
@@ -1269,16 +1349,16 @@ static memory consumptions for various configurations on an Arduino Nano
 | Hybrid(HardSpi)                 |   1570/   59 |  1114/   48 |
 | Hybrid(HardSpiFast)             |   1498/   57 |  1042/   46 |
 |---------------------------------+--------------+-------------|
-| Hc595(SoftSpi)                  |   1422/   51 |   966/   40 |
-| Hc595(SoftSpiFast)              |   1012/   49 |   556/   38 |
-| Hc595(HardSpi)                  |   1496/   52 |  1040/   41 |
-| Hc595(HardSpiFast)              |   1404/   50 |   948/   39 |
+| Hc595(SoftSpi)                  |   1528/   58 |  1072/   47 |
+| Hc595(SoftSpiFast)              |   1120/   56 |   664/   45 |
+| Hc595(HardSpi)                  |   1598/   59 |  1142/   48 |
+| Hc595(HardSpiFast)              |   1510/   57 |  1054/   46 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SoftWire)                |   1582/   39 |  1126/   28 |
-| Tm1637(SoftWireFast)            |    924/   36 |   468/   25 |
+| Tm1637(SoftTmi)                 |   1582/   39 |  1126/   28 |
+| Tm1637(SoftTmiFast)             |    924/   36 |   468/   25 |
 |---------------------------------+--------------+-------------|
-| Max7219(SoftSpi)                |   1218/   44 |   762/   33 |
-| Max7219(SoftSpiFast)            |    778/   42 |   322/   31 |
+| Max7219(SoftSpi)                |   1214/   44 |   758/   33 |
+| Max7219(SoftSpiFast)            |    774/   42 |   318/   31 |
 | Max7219(HardSpi)                |   1298/   45 |   842/   34 |
 | Max7219(HardSpiFast)            |   1072/   43 |   616/   32 |
 |---------------------------------+--------------+-------------|
@@ -1286,8 +1366,10 @@ static memory consumptions for various configurations on an Arduino Nano
 | NumberWriter+Stub               |    682/   28 |   226/   17 |
 | ClockWriter+Stub                |    766/   29 |   310/   18 |
 | TemperatureWriter+Stub          |    764/   28 |   308/   17 |
-| CharWriter+Stub                 |    758/   28 |   302/   17 |
-| StringWriter+Stub               |    974/   34 |   518/   23 |
+| CharWriter+Stub                 |    788/   31 |   332/   20 |
+| StringWriter+Stub               |    988/   39 |   532/   28 |
+| StringScroller+Stub             |   1036/   45 |   580/   34 |
+| LevelWriter+Stub                |    716/   28 |   260/   17 |
 +--------------------------------------------------------------+
 ```
 
@@ -1307,15 +1389,15 @@ And here are the memory consumption numbers for an ESP8266:
 | Hybrid(HardSpi)                 | 258964/27252 |  2264/  468 |
 | Hybrid(HardSpiFast)             |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Hc595(SoftSpi)                  | 257728/27248 |  1028/  464 |
+| Hc595(SoftSpi)                  | 257792/27256 |  1092/  472 |
 | Hc595(SoftSpiFast)              |     -1/   -1 |    -1/   -1 |
-| Hc595(HardSpi)                  | 258928/27256 |  2228/  472 |
+| Hc595(HardSpi)                  | 258992/27264 |  2292/  480 |
 | Hc595(HardSpiFast)              |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SoftWire)                | 257920/27224 |  1220/  440 |
-| Tm1637(SoftWireFast)            |     -1/   -1 |    -1/   -1 |
+| Tm1637(SoftTmi)                 | 257920/27224 |  1220/  440 |
+| Tm1637(SoftTmiFast)             |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Max7219(SoftSpi)                | 257640/27224 |   940/  440 |
+| Max7219(SoftSpi)                | 257656/27224 |   956/  440 |
 | Max7219(SoftSpiFast)            |     -1/   -1 |    -1/   -1 |
 | Max7219(HardSpi)                | 258856/27232 |  2156/  448 |
 | Max7219(HardSpiFast)            |     -1/   -1 |    -1/   -1 |
@@ -1324,11 +1406,14 @@ And here are the memory consumption numbers for an ESP8266:
 | NumberWriter+Stub               | 257372/27200 |   672/  416 |
 | ClockWriter+Stub                | 257196/27208 |   496/  424 |
 | TemperatureWriter+Stub          | 257484/27200 |   784/  416 |
-| CharWriter+Stub                 | 257084/27200 |   384/  416 |
-| StringWriter+Stub               | 257316/27200 |   616/  416 |
+| CharWriter+Stub                 | 257116/27208 |   416/  424 |
+| StringWriter+Stub               | 257364/27216 |   664/  432 |
+| StringScroller+Stub             | 257316/27224 |   616/  440 |
+| LevelWriter+Stub                | 257020/27200 |   320/  416 |
 +--------------------------------------------------------------+
 ```
 
+<a name="CpuCycles"></a>
 ### CPU Cycles
 
 The CPU benchmark numbers can be seen in
@@ -1340,42 +1425,52 @@ Here are the CPU numbers for an AVR processor:
 +----------------------------------------+-------------------+---------+
 | Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Direct                                 |    68/   74/   88 |     240 |
-| Direct(subfields)                      |     4/   12/   84 |    3840 |
-| DirectFast4                            |    24/   28/   36 |     240 |
-| DirectFast4(subfields)                 |     4/    8/   40 |    3840 |
+| Direct(4)                              |    80/   82/   92 |      40 |
+| Direct(4,subfields)                    |     4/   13/   84 |     640 |
+| DirectFast4(4)                         |    24/   30/   36 |      40 |
+| DirectFast4(4,subfields)               |     4/    8/   36 |     640 |
 |----------------------------------------+-------------------+---------|
-| Hybrid(SoftSpi)                        |   156/  159/  180 |     240 |
-| Hybrid(SoftSpi,subfields)              |     4/   22/  180 |    3840 |
-| Hybrid(SoftSpiFast)                    |    28/   30/   44 |     240 |
-| Hybrid(SoftSpiFast,subfields)          |     4/    8/   40 |    3840 |
-| Hybrid(HardSpi)                        |    36/   39/   52 |     240 |
-| Hybrid(HardSpi,subfields)              |     4/    9/   52 |    3840 |
-| Hybrid(HardSpiFast)                    |    24/   27/   44 |     240 |
-| Hybrid(HardSpiFast,subfields)          |     4/    7/   36 |    3840 |
+| Hybrid(4,SoftSpi)                      |   152/  161/  180 |      40 |
+| Hybrid(4,SoftSpi,subfields)            |     4/   22/  176 |     640 |
+| Hybrid(4,SoftSpiFast)                  |    28/   35/   44 |      40 |
+| Hybrid(4,SoftSpiFast,subfields)        |     4/    8/   40 |     640 |
+| Hybrid(4,HardSpi)                      |    36/   42/   52 |      40 |
+| Hybrid(4,HardSpi,subfields)            |     4/    9/   52 |     640 |
+| Hybrid(4,HardSpiFast)                  |    24/   29/   36 |      40 |
+| Hybrid(4,HardSpiFast,subfields)        |     4/    7/   36 |     640 |
 |----------------------------------------+-------------------+---------|
-| Hc595(SoftSpi)                         |   264/  269/  304 |     240 |
-| Hc595(SoftSpi,subfields)               |     4/   35/  304 |    3840 |
-| Hc595(SoftSpiFast)                     |    20/   24/   36 |     240 |
-| Hc595(SoftSpiFast,subfields)           |     4/    7/   32 |    3840 |
-| Hc595(HardSpi)                         |    24/   27/   40 |     240 |
-| Hc595(HardSpi,subfields)               |     4/    8/   36 |    3840 |
-| Hc595(HardSpiFast)                     |    12/   14/   28 |     240 |
-| Hc595(HardSpiFast,subfields)           |     4/    6/   24 |    3840 |
+| Hc595(8,SoftSpi)                       |   268/  272/  308 |      80 |
+| Hc595(8,SoftSpi,subfields)             |     4/   36/  304 |    1280 |
+| Hc595(8,SoftSpiFast)                   |    24/   27/   36 |      80 |
+| Hc595(8,SoftSpiFast,subfields)         |     4/    8/   36 |    1280 |
+| Hc595(8,HardSpi)                       |    28/   30/   40 |      80 |
+| Hc595(8,HardSpi,subfields)             |     4/    8/   40 |    1280 |
+| Hc595(8,HardSpiFast)                   |    12/   17/   24 |      80 |
+| Hc595(8,HardSpiFast,subfields)         |     4/    7/   24 |    1280 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(SoftWire)                       | 22308/22328/22576 |      20 |
-| Tm1637(SoftWireFast)                   | 21060/21073/21212 |      20 |
+| Tm1637(4,SoftTmi)                      | 22316/22346/22568 |      10 |
+| Tm1637(4,SoftTmi,incremental)          |  3612/ 8809/10308 |      50 |
+| Tm1637(4,SoftTmiFast)                  | 21064/21093/21312 |      10 |
+| Tm1637(4,SoftTmiFast,incremental)      |  3412/ 8314/ 9756 |      50 |
+| Tm1637(6,SoftTmi)                      | 28060/28090/28328 |      10 |
+| Tm1637(6,SoftTmi,incremental)          |  3612/ 9179/10304 |      70 |
+| Tm1637(6,SoftTmiFast)                  | 26484/26511/26728 |      10 |
+| Tm1637(6,SoftTmiFast,incremental)      |  3412/ 8663/ 9764 |      70 |
 |----------------------------------------+-------------------+---------|
-| Max7219(SoftSpi)                       |  1320/ 1329/ 1448 |      20 |
-| Max7219(SoftSpiFast)                   |   112/  120/  136 |      20 |
-| Max7219(HardSpi)                       |   120/  129/  144 |      20 |
-| Max7219(HardSpiFast)                   |    56/   63/   72 |      20 |
+| Tm1637(4,SoftTmi,5us)                  |  2252/ 2284/ 2480 |      10 |
+| Tm1637(4,SoftTmi,incremental,5us)      |   364/  897/ 1140 |      50 |
+| Tm1637(4,SoftTmiFast,5us)              |   996/ 1029/ 1104 |      10 |
+| Tm1637(4,SoftTmiFast,incremental,5us)  |   164/  402/  508 |      50 |
+|----------------------------------------+-------------------+---------|
+| Max7219(8,SoftSpi)                     |  2380/ 2397/ 2632 |      20 |
+| Max7219(8,SoftSpiFast)                 |   208/  216/  236 |      20 |
+| Max7219(8,HardSpi)                     |   220/  231/  252 |      20 |
+| Max7219(8,HardSpiFast)                 |   104/  113/  120 |      20 |
 +----------------------------------------+-------------------+---------+
 ```
 
 What is amazing is that if you use `digitalWriteFast()`, the software SPI is
-just as fast as hardware SPI, **and** consumes 500 bytes of less flash memory
-space.
+just as fast as hardware SPI, **and** consumes 500 bytes of less flash memory.
 
 Here are the CPU numbers for an ESP8266:
 
@@ -1383,36 +1478,35 @@ Here are the CPU numbers for an ESP8266:
 +----------------------------------------+-------------------+---------+
 | Functionality                          |   min/  avg/  max | samples |
 |----------------------------------------+-------------------+---------|
-| Direct                                 |    12/   12/   25 |     240 |
-| Direct(subfields)                      |     0/    2/   25 |    3840 |
+| Direct(4)                              |    12/   12/   36 |      40 |
+| Direct(4,subfields)                    |     0/    2/   20 |     640 |
 |----------------------------------------+-------------------+---------|
-| Hybrid(SoftSpi)                        |    29/   29/   37 |     240 |
-| Hybrid(SoftSpi,subfields)              |     0/    4/   42 |    3840 |
-| Hybrid(HardSpi)                        |    11/   11/   19 |     240 |
-| Hybrid(HardSpi,subfields)              |     0/    2/   23 |    3840 |
+| Hybrid(4,SoftSpi)                      |    29/   29/   41 |      40 |
+| Hybrid(4,SoftSpi,subfields)            |     0/    4/   41 |     640 |
+| Hybrid(4,HardSpi)                      |    12/   12/   28 |      40 |
+| Hybrid(4,HardSpi,subfields)            |     0/    2/   24 |     640 |
 |----------------------------------------+-------------------+---------|
-| Hc595(SoftSpi)                         |    50/   50/   63 |     240 |
-| Hc595(SoftSpi,subfields)               |     0/    7/   67 |    3840 |
-| Hc595(HardSpi)                         |    12/   12/   19 |     240 |
-| Hc595(HardSpi,subfields)               |     0/    2/   32 |    3840 |
+| Hc595(8,SoftSpi)                       |    50/   51/   66 |      80 |
+| Hc595(8,SoftSpi,subfields)             |     0/    6/   62 |    1280 |
+| Hc595(8,HardSpi)                       |    14/   14/   26 |      80 |
+| Hc595(8,HardSpi,subfields)             |     0/    2/   26 |    1280 |
 |----------------------------------------+-------------------+---------|
-| Tm1637(SoftWire)                       | 21496/21505/21552 |      20 |
+| Tm1637(4,SoftTmi)                      | 21494/21501/21530 |      10 |
+| Tm1637(4,SoftTmi,incremental)          |  3480/ 8478/ 9744 |      50 |
+| Tm1637(6,SoftTmi)                      | 27022/27039/27096 |      10 |
+| Tm1637(6,SoftTmi,incremental)          |  3480/ 8836/ 9811 |      70 |
 |----------------------------------------+-------------------+---------|
-| Max7219(SoftSpi)                       |   254/  256/  271 |      20 |
-| Max7219(HardSpi)                       |    61/   61/   70 |      20 |
+| Tm1637(4,SoftTmi,5us)                  |  1523/ 1527/ 1542 |      10 |
+| Tm1637(4,SoftTmi,incremental,5us)      |   247/  601/  701 |      50 |
+|----------------------------------------+-------------------+---------|
+| Max7219(8,SoftSpi)                     |   460/  461/  469 |      20 |
+| Max7219(8,HardSpi)                     |   125/  126/  134 |      20 |
 +----------------------------------------+-------------------+---------+
 ```
 
-On the ESP8266, the hardware SPI is about 4X after, but it does consume 1200
+On the ESP8266, the hardware SPI is about 4X faster, but it does consume 1200
 bytes for flash space. But on the ESP8266 flash memory is usually not a concern,
 so it seems to make sense to use hardware SPI on the ESP8266.
-
-If we want to drive a 4 digit LED display at 60 frames per second, using a
-subfield modulation of 16 subfields per field, we get a field rate of 3.84 kHz,
-or 260 microseconds per field. We see from
-[examples/AutoBenchmark](examples/AutoBenchmark) that all hardware platforms are
-capable of providing a rendering time between fields of less than 260
-microseconds.
 
 <a name="SystemRequirements"></a>
 ## System Requirements
@@ -1420,7 +1514,7 @@ microseconds.
 <a name="Hardware"></a>
 ### Hardware
 
-The library has Tier 1 support on the following boards:
+This library has Tier 1 support on the following boards:
 
 * Arduino Nano (16 MHz ATmega328P)
 * SparkFun Pro Micro (16 MHz ATmega32U4)
@@ -1435,14 +1529,15 @@ Tier 2 support can be expected on the following boards, mostly because I don't
 test these as often:
 
 * ATtiny85 (8 MHz ATtiny85)
+* Arduino Pro Mini (16 MHz ATmega328P)
 * Teensy LC (48 MHz ARM Cortex-M0+)
 * Mini Mega 2560 (Arduino Mega 2560 compatible, 16 MHz ATmega2560)
 
 The following boards are **not** supported:
 
 * Any platform using the ArduinoCore-API
-  (https://github.com/arduino/ArduinoCore-api). For example, Nano Every,
-  MKRZero, and Raspberry Pi Pico RP2040.
+  (https://github.com/arduino/ArduinoCore-api).
+    * For example, Nano Every, MKRZero, and Raspberry Pi Pico RP2040.
 
 <a name="ToolChain"></a>
 ### Tool Chain
@@ -1457,7 +1552,7 @@ The following boards are **not** supported:
 * [STM32duino 1.9.0](https://github.com/stm32duino/Arduino_Core_STM32)
 * [ESP8266 Arduino 2.7.4](https://github.com/esp8266/Arduino)
 * [ESP32 Arduino 1.0.6](https://github.com/espressif/arduino-esp32)
-* [Teensydino 1.53](https://www.pjrc.com/teensy/td_download.html)
+* [Teensyduino 1.53](https://www.pjrc.com/teensy/td_download.html)
 
 <a name="OperatingSystem"></a>
 ### Operating System

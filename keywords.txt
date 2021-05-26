@@ -10,8 +10,8 @@ HardSpiInterface	KEYWORD1
 HardSpiFastInterface	KEYWORD1
 SoftSpiInterface	KEYWORD1
 SoftSpiFastInterface	KEYWORD1
-SoftWireInterface	KEYWORD1
-SoftWireFastInterface	KEYWORD1
+SoftTmiInterface	KEYWORD1
+SoftTmiFastInterface	KEYWORD1
 LedMatrixBase	KEYWORD1
 LedMatrixDirect	KEYWORD1
 LedMatrixDirectFast4	KEYWORD1
@@ -32,6 +32,7 @@ ClockWriter	KEYWORD1
 CharWriter	KEYWORD1
 StringWriter	KEYWORD1
 StringScroller	KEYWORD1
+LevelWriter	KEYWORD1
 hexchar_t	KEYWORD1
 
 #######################################
@@ -44,7 +45,7 @@ end	KEYWORD2
 send8	KEYWORD2
 send16	KEYWORD2
 
-# SoftWireInterface
+# SoftTmiInterface
 begin	KEYWORD2
 end	KEYWORD2
 startCondition	KEYWORD2
@@ -82,8 +83,6 @@ getFieldsPerSecond	KEYWORD2
 setBrightnessAt	KEYWORD2
 renderFieldNow	KEYWORD2
 renderFieldWhenReady	KEYWORD2
-prepareToSleep	KEYWORD2
-wakeFromSleep	KEYWORD2
 
 # NumberWriter.h
 writeHexCharAt	KEYWORD2
@@ -126,6 +125,11 @@ initScrollRight	KEYWORD2
 scrollLeft	KEYWORD2
 scrollRight	KEYWORD2
 display	KEYWORD2
+
+# LevelWriter
+display	KEYWORD2
+getMaxLevel	KEYWORD2
+writeLevel	KEYWORD2
 
 #######################################
 # Instances (KEYWORD2)

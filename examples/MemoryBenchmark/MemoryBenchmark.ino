@@ -27,8 +27,8 @@
 #define FEATURE_HC595_SOFT_SPI_FAST 8
 #define FEATURE_HC595_HARD_SPI 9
 #define FEATURE_HC595_HARD_SPI_FAST 10
-#define FEATURE_TM1637_WIRE 11
-#define FEATURE_TM1637_WIRE_FAST 12
+#define FEATURE_TM1637_TMI 11
+#define FEATURE_TM1637_TMI_FAST 12
 #define FEATURE_MAX7219_SOFT_SPI 13
 #define FEATURE_MAX7219_SOFT_SPI_FAST 14
 #define FEATURE_MAX7219_HARD_SPI 15
@@ -39,6 +39,8 @@
 #define FEATURE_TEMPERATURE_WRITER 20
 #define FEATURE_CHAR_WRITER 21
 #define FEATURE_STRING_WRITER 22
+#define FEATURE_STRING_SCROLLER 23
+#define FEATURE_LEVEL_WRITER 24
 
 // A volatile integer to prevent the compiler from optimizing away the entire
 // program.
@@ -50,7 +52,7 @@ volatile int disableCompilerOptimization = 0;
     #include <digitalWriteFast.h>
     #include <ace_segment/hw/SoftSpiFastInterface.h>
     #include <ace_segment/hw/HardSpiFastInterface.h>
-    #include <ace_segment/hw/SoftWireFastInterface.h>
+    #include <ace_segment/hw/SoftTmiFastInterface.h>
     #include <ace_segment/direct/DirectFast4Module.h>
   #endif
   using namespace ace_segment;
@@ -97,8 +99,8 @@ volatile int disableCompilerOptimization = 0;
   #if FEATURE == FEATURE_DIRECT_MODULE
     // Common Anode, with transitions on Group pins
     DirectModule<NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
-        LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-        LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+        kActiveLowPattern /*segmentOnPattern*/,
+        kActiveLowPattern /*digitOnPattern*/,
         FRAMES_PER_SECOND,
         SEGMENT_PINS,
         DIGIT_PINS);
@@ -114,8 +116,8 @@ volatile int disableCompilerOptimization = 0;
         NUM_DIGITS,
         NUM_SUBFIELDS
     > scanningModule(
-        LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-        LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+        kActiveLowPattern /*segmentOnPattern*/,
+        kActiveLowPattern /*digitOnPattern*/,
         FRAMES_PER_SECOND);
 
   #elif FEATURE == FEATURE_HYBRID_SOFT_SPI
@@ -124,8 +126,8 @@ volatile int disableCompilerOptimization = 0;
     SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
     HybridModule<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
-        LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
-        LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
+        kActiveHighPattern /*segmentOnPattern*/,
+        kActiveHighPattern /*digitOnPattern*/,
         FRAMES_PER_SECOND,
         DIGIT_PINS
     );
@@ -140,8 +142,8 @@ volatile int disableCompilerOptimization = 0;
     SpiInterface spiInterface;
     HybridModule<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
-        LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
-        LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
+        kActiveHighPattern /*segmentOnPattern*/,
+        kActiveHighPattern /*digitOnPattern*/,
         FRAMES_PER_SECOND,
         DIGIT_PINS
     );
@@ -152,8 +154,8 @@ volatile int disableCompilerOptimization = 0;
     SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
     HybridModule<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
-        LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
-        LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
+        kActiveHighPattern /*segmentOnPattern*/,
+        kActiveHighPattern /*digitOnPattern*/,
         FRAMES_PER_SECOND,
         DIGIT_PINS
     );
@@ -168,8 +170,8 @@ volatile int disableCompilerOptimization = 0;
     SpiInterface spiInterface;
     HybridModule<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
-        LedMatrixBase::kActiveHighPattern /*segmentOnPattern*/,
-        LedMatrixBase::kActiveHighPattern /*digitOnPattern*/,
+        kActiveHighPattern /*segmentOnPattern*/,
+        kActiveHighPattern /*digitOnPattern*/,
         FRAMES_PER_SECOND,
         DIGIT_PINS
     );
@@ -180,8 +182,8 @@ volatile int disableCompilerOptimization = 0;
     SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
     Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
-        LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-        LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+        kActiveLowPattern /*segmentOnPattern*/,
+        kActiveLowPattern /*digitOnPattern*/,
         FRAMES_PER_SECOND,
         kByteOrderDigitHighSegmentLow
     );
@@ -196,8 +198,8 @@ volatile int disableCompilerOptimization = 0;
     SpiInterface spiInterface;
     Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
-        LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-        LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+        kActiveLowPattern /*segmentOnPattern*/,
+        kActiveLowPattern /*digitOnPattern*/,
         FRAMES_PER_SECOND,
         kByteOrderDigitHighSegmentLow
     );
@@ -208,8 +210,8 @@ volatile int disableCompilerOptimization = 0;
     SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
     Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
-        LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-        LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+        kActiveLowPattern /*segmentOnPattern*/,
+        kActiveLowPattern /*digitOnPattern*/,
         FRAMES_PER_SECOND,
         kByteOrderDigitHighSegmentLow
     );
@@ -224,25 +226,25 @@ volatile int disableCompilerOptimization = 0;
     SpiInterface spiInterface;
     Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
-        LedMatrixBase::kActiveLowPattern /*segmentOnPattern*/,
-        LedMatrixBase::kActiveLowPattern /*digitOnPattern*/,
+        kActiveLowPattern /*segmentOnPattern*/,
+        kActiveLowPattern /*digitOnPattern*/,
         FRAMES_PER_SECOND,
         kByteOrderDigitHighSegmentLow
     );
 
-  #elif FEATURE == FEATURE_TM1637_WIRE
-    using WireInterface = SoftWireInterface;
-    WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
-    Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module(wireInterface);
+  #elif FEATURE == FEATURE_TM1637_TMI
+    using TmiInterface = SoftTmiInterface;
+    TmiInterface tmiInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
+    Tm1637Module<TmiInterface, NUM_DIGITS> tm1637Module(tmiInterface);
 
-  #elif FEATURE == FEATURE_TM1637_WIRE_FAST
+  #elif FEATURE == FEATURE_TM1637_TMI_FAST
     #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
       #error Unsupported FEATURE on this platform
     #endif
 
-    using WireInterface = SoftWireFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
-    WireInterface wireInterface;
-    Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module(wireInterface);
+    using TmiInterface = SoftTmiFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
+    TmiInterface tmiInterface;
+    Tm1637Module<TmiInterface, NUM_DIGITS> tm1637Module(tmiInterface);
 
   #elif FEATURE == FEATURE_MAX7219_SOFT_SPI
     using SpiInterface = SoftSpiInterface;
@@ -306,6 +308,17 @@ volatile int disableCompilerOptimization = 0;
     CharWriter charWriter(ledDisplay);
     StringWriter stringWriter(charWriter);
 
+  #elif FEATURE == FEATURE_STRING_SCROLLER
+    StubModule stubModule;
+    LedDisplay ledDisplay(stubModule);
+    CharWriter charWriter(ledDisplay);
+    StringScroller stringScroller(charWriter);
+
+  #elif FEATURE == FEATURE_LEVEL_WRITER
+    StubModule stubModule;
+    LedDisplay ledDisplay(stubModule);
+    LevelWriter levelWriter(ledDisplay);
+
   #endif
 #endif
 
@@ -358,12 +371,12 @@ void setup() {
   spiInterface.begin();
   scanningModule.begin();
 
-#elif FEATURE == FEATURE_TM1637_WIRE
-  wireInterface.begin();
+#elif FEATURE == FEATURE_TM1637_TMI
+  tmiInterface.begin();
   tm1637Module.begin();
 
-#elif FEATURE == FEATURE_TM1637_WIRE_FAST
-  wireInterface.begin();
+#elif FEATURE == FEATURE_TM1637_TMI_FAST
+  tmiInterface.begin();
   tm1637Module.begin();
 
 #elif FEATURE == FEATURE_MAX7219_SOFT_SPI
@@ -389,15 +402,15 @@ void setup() {
 }
 
 void loop() {
-#if FEATURE > FEATURE_BASELINE && FEATURE < FEATURE_TM1637_WIRE
+#if FEATURE > FEATURE_BASELINE && FEATURE < FEATURE_TM1637_TMI
   scanningModule.setPatternAt(0, 0x3A);
   scanningModule.renderFieldWhenReady();
 
-#elif FEATURE == FEATURE_TM1637_WIRE
+#elif FEATURE == FEATURE_TM1637_TMI
   tm1637Module.setPatternAt(0, 0xff);
   tm1637Module.flush();
 
-#elif FEATURE == FEATURE_TM1637_WIRE_FAST
+#elif FEATURE == FEATURE_TM1637_TMI_FAST
   tm1637Module.setPatternAt(0, 0xff);
   tm1637Module.flush();
 
@@ -430,6 +443,13 @@ void loop() {
 
 #elif FEATURE == FEATURE_STRING_WRITER
   stringWriter.writeStringAt(0, "Hello");
+
+#elif FEATURE == FEATURE_STRING_SCROLLER
+  stringScroller.initScrollLeft("Hello");
+  stringScroller.scrollLeft();
+
+#elif FEATURE == FEATURE_LEVEL_WRITER
+  levelWriter.writeLevel(3);
 
 #endif
 }

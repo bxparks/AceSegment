@@ -29,6 +29,9 @@ SOFTWARE.
 #include <AceCommon.h> // incrementMod()
 #include "../LedModule.h"
 
+class Tm1637ModuleTest_flushIncremental;
+class Tm1637ModuleTest_flush;
+
 namespace ace_segment {
 
 /**
@@ -78,28 +81,28 @@ constexpr uint8_t initialDirtyBits(uint8_t numBits) {
  * address byte at the beginning of the protocol. We can use a software-based
  * I2C interface.
  *
- * @tparam T_WI wire protocol interface, either SoftWireInterface or
- *    SoftWireFastInterface
+ * @tparam T_TMII two wire protocol interface for TM1637, either
+ *    SoftTmiInterface or SoftTmiFastInterface
  * @tparam T_DIGITS number of digits in the LED module (usually 4 or 6)
  */
-template <typename T_WI, uint8_t T_DIGITS>
+template <typename T_TMII, uint8_t T_DIGITS>
 class Tm1637Module : public LedModule {
   public:
 
     /**
      * Constructor.
-     * @param wireInterface instance of either SoftWireInterface or
-     *    SoftWireFastInterface
+     * @param tmiInterface instance of either SoftTmiInterface or
+     *    SoftTmiFastInterface
      * @param remapArray (optional, nullable) a mapping of the logical digit
      *    positions to their physical positions, useful for 6-digt LED modules
      *    using the TM1637 chip whose digits are wired out of order
      */
     explicit Tm1637Module(
-        const T_WI& wireInterface,
+        const T_TMII& tmiInterface,
         const uint8_t* remapArray = nullptr
     ) :
         LedModule(T_DIGITS),
-        mWireInterface(wireInterface),
+        mTmiInterface(tmiInterface),
         mRemapArray(remapArray)
     {}
 
@@ -108,7 +111,7 @@ class Tm1637Module : public LedModule {
     //-----------------------------------------------------------------------
 
     /**
-     * Initialize the module. The SoftWireInterface object must be initialized
+     * Initialize the module. The SoftTmiInterface object must be initialized
      * separately.
      *
      * @param remapArray optional array of positions to handle LED modules whose
@@ -183,17 +186,17 @@ class Tm1637Module : public LedModule {
       if (! mIsDirty) return;
 
       // Update the brightness first
-      mWireInterface.startCondition();
-      mWireInterface.sendByte(mBrightness);
-      mWireInterface.stopCondition();
+      mTmiInterface.startCondition();
+      mTmiInterface.sendByte(mBrightness);
+      mTmiInterface.stopCondition();
 
       // Update the digits using auto incrementing mode.
-      mWireInterface.startCondition();
-      mWireInterface.sendByte(kDataCmdAutoAddress);
-      mWireInterface.stopCondition();
+      mTmiInterface.startCondition();
+      mTmiInterface.sendByte(kDataCmdAutoAddress);
+      mTmiInterface.stopCondition();
 
-      mWireInterface.startCondition();
-      mWireInterface.sendByte(kAddressCmd);
+      mTmiInterface.startCondition();
+      mTmiInterface.sendByte(kAddressCmd);
       for (uint8_t chipPos = 0; chipPos < T_DIGITS; ++chipPos) {
         // Remap the logical position used by the controller to the actual
         // position. For example, if the controller digit 0 appears at physical
@@ -201,9 +204,9 @@ class Tm1637Module : public LedModule {
         // position 2 when sending the byte to controller digit 0.
         uint8_t physicalPos = remapLogicalToPhysical(chipPos);
         uint8_t effectivePattern = mPatterns[physicalPos];
-        mWireInterface.sendByte(effectivePattern);
+        mTmiInterface.sendByte(effectivePattern);
       }
-      mWireInterface.stopCondition();
+      mTmiInterface.stopCondition();
 
       mIsDirty = 0x0;
     }
@@ -244,11 +247,12 @@ class Tm1637Module : public LedModule {
     void flushIncremental() {
       if (mFlushStage == T_DIGITS) {
         // Update brightness.
-        if (! isDirtyBit(T_DIGITS)) return;
-        mWireInterface.startCondition();
-        mWireInterface.sendByte(mBrightness);
-        mWireInterface.stopCondition();
-        clearDirtyBit(T_DIGITS);
+        if (isDirtyBit(T_DIGITS)) {
+          mTmiInterface.startCondition();
+          mTmiInterface.sendByte(mBrightness);
+          mTmiInterface.stopCondition();
+          clearDirtyBit(T_DIGITS);
+        }
       } else {
         // Remap the logical position used by the controller to the actual
         // position. For example, if the controller digit 0 appears at physical
@@ -256,18 +260,18 @@ class Tm1637Module : public LedModule {
         // position 2 when sending the byte to controller digit 0.
         const uint8_t chipPos = mFlushStage;
         const uint8_t physicalPos = remapLogicalToPhysical(chipPos);
-        if (! isDirtyBit(physicalPos)) return;
+        if (isDirtyBit(physicalPos)) {
+          // Update changed digit.
+          mTmiInterface.startCondition();
+          mTmiInterface.sendByte(kDataCmdFixedAddress);
+          mTmiInterface.stopCondition();
 
-        // Update changed digit.
-        mWireInterface.startCondition();
-        mWireInterface.sendByte(kDataCmdFixedAddress);
-        mWireInterface.stopCondition();
-
-        mWireInterface.startCondition();
-        mWireInterface.sendByte(kAddressCmd | chipPos);
-        mWireInterface.sendByte(mPatterns[physicalPos]);
-        mWireInterface.stopCondition();
-        clearDirtyBit(physicalPos);
+          mTmiInterface.startCondition();
+          mTmiInterface.sendByte(kAddressCmd | chipPos);
+          mTmiInterface.sendByte(mPatterns[physicalPos]);
+          mTmiInterface.stopCondition();
+          clearDirtyBit(physicalPos);
+        }
       }
 
       // An extra dirty bit is used for the brightness so use `T_DIGITS + 1`.
@@ -293,6 +297,10 @@ class Tm1637Module : public LedModule {
     }
 
   private:
+    // Give access to mIsDirty and mFlushStage
+    friend class ::Tm1637ModuleTest_flushIncremental;
+    friend class ::Tm1637ModuleTest_flush;
+
     static uint8_t const kDataCmdWriteDisplay = 0b01000000;
     static uint8_t const kDataCmdReadKeys =     0b01000010;
     static uint8_t const kDataCmdAutoAddress =  0b01000000;
@@ -307,7 +315,7 @@ class Tm1637Module : public LedModule {
 
     // The ordering of these fields is partially determined to save memory on
     // 32-bit processors.
-    const T_WI& mWireInterface;
+    const T_TMII& mTmiInterface;
     const uint8_t* const mRemapArray;
     uint8_t mPatterns[T_DIGITS]; // maps to dirty bits [0, T_DIGITS-1]
     uint8_t mBrightness; // maps to dirty bit at T_DIGITS

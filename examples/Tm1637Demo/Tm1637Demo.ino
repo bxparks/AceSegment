@@ -11,15 +11,121 @@
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
-using namespace ace_segment;
+using ace_segment::Tm1637Module;
+using ace_segment::LedDisplay;
+using ace_segment::SoftTmiInterface;
+using ace_segment::kDigitRemapArray6Tm1637;
 
-// Select driver version, either normal digitalWrite() or digitalWriteFast()
-#define WIRE_INTERFACE_TYPE_NORMAL 0
-#define WIRE_INTERFACE_TYPE_FAST 1
+// Select TM1637 protocol version, either SoftTmiInterface or
+// SoftTmiFastInterface.
+#define TMI_INTERFACE_TYPE_NORMAL 0
+#define TMI_INTERFACE_TYPE_FAST 1
 
 // Select the TM1637Module flush() method.
 #define TM_FLUSH_METHOD_NORMAL 0
 #define TM_FLUSH_METHOD_INCREMENTAL 1
+
+//----------------------------------------------------------------------------
+// Hardware configuration.
+//----------------------------------------------------------------------------
+
+// Configuration for Arduino IDE
+#if ! defined(EPOXY_DUINO) && ! defined(AUNITER)
+  #define AUNITER_MICRO_TM1637
+#endif
+
+#if defined(EPOXY_DUINO)
+  #define TMI_INTERFACE_TYPE TMI_INTERFACE_TYPE_NORMAL
+  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
+
+  const uint8_t CLK_PIN = A0;
+  const uint8_t DIO_PIN = 9;
+  const uint8_t NUM_DIGITS = 4;
+
+#elif defined(AUNITER_MICRO_TM1637)
+  #define TMI_INTERFACE_TYPE TMI_INTERFACE_TYPE_FAST
+  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
+
+  const uint8_t CLK_PIN = A0;
+  const uint8_t DIO_PIN = 9;
+  const uint8_t NUM_DIGITS = 4;
+
+#elif defined(AUNITER_MICRO_TM1637_6)
+  #define TMI_INTERFACE_TYPE TMI_INTERFACE_TYPE_FAST
+  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
+
+  const uint8_t CLK_PIN = A0;
+  const uint8_t DIO_PIN = 9;
+  const uint8_t NUM_DIGITS = 6;
+
+#elif defined(AUNITER_STM32_TM1637)
+  #define TMI_INTERFACE_TYPE TMI_INTERFACE_TYPE_NORMAL
+  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
+
+  const uint8_t CLK_PIN = PB3;
+  const uint8_t DIO_PIN = PB4;
+  const uint8_t NUM_DIGITS = 4;
+
+#elif defined(AUNITER_D1MINI_LARGE_TM1637)
+  #define TMI_INTERFACE_TYPE TMI_INTERFACE_TYPE_NORMAL
+  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
+
+  const uint8_t CLK_PIN = D5;
+  const uint8_t DIO_PIN = D7;
+  const uint8_t NUM_DIGITS = 4;
+
+#elif defined(AUNITER_ESP32_TM1637)
+  #define TMI_INTERFACE_TYPE TMI_INTERFACE_TYPE_NORMAL
+  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
+
+  const uint8_t CLK_PIN = 14;
+  const uint8_t DIO_PIN = 13;
+  const uint8_t NUM_DIGITS = 4;
+
+#else
+  #error Unknown AUNITER environment
+#endif
+
+//------------------------------------------------------------------
+// AceSegment Configuration
+//------------------------------------------------------------------
+
+// For a SoftTmiInterface (non-fast), time to send 4 digits:
+// * 12 ms at 50 us delay, but does not work with off-the-shelf TM1637 module.
+// * 17 ms at 75 us delay.
+// * 22 ms at 100 us delay.
+// * 43 ms at 200 us delay.
+const uint16_t BIT_DELAY = 100;
+
+#if TMI_INTERFACE_TYPE == TMI_INTERFACE_TYPE_NORMAL
+  using TmiInterface = SoftTmiInterface;
+  TmiInterface tmiInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
+#elif TMI_INTERFACE_TYPE == TMI_INTERFACE_TYPE_FAST
+  #include <digitalWriteFast.h>
+  #include <ace_segment/hw/SoftTmiFastInterface.h>
+  using ace_segment::SoftTmiFastInterface;
+
+  using TmiInterface = SoftTmiFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
+  TmiInterface tmiInterface;
+#else
+  #error Unknown TMI_INTERFACE_TYPE
+#endif
+
+#if defined(AUNITER_MICRO_TM1637_6)
+  const uint8_t* const remapArray = ace_segment::kDigitRemapArray6Tm1637;
+#else
+  const uint8_t* const remapArray = nullptr;
+#endif
+
+Tm1637Module<TmiInterface, NUM_DIGITS> tm1637Module(tmiInterface, remapArray);
+LedDisplay display(tm1637Module);
+
+void setupAceSegment() {
+  tmiInterface.begin();
+  tm1637Module.begin();
+}
+
+//----------------------------------------------------------------------------
 
 // The TM1637 controller supports up to 6 digits.
 const uint8_t PATTERNS[6] = {
@@ -31,87 +137,7 @@ const uint8_t PATTERNS[6] = {
   0b01101101, // 5
 };
 
-#if defined(EPOXY_DUINO)
-  #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_NORMAL
-  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
-
-  const uint8_t CLK_PIN = A0;
-  const uint8_t DIO_PIN = 9;
-
-  const uint8_t NUM_DIGITS = 4;
-
-#elif defined(AUNITER_MICRO_TM1637)
-  #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_FAST
-  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
-
-  const uint8_t CLK_PIN = A0;
-  const uint8_t DIO_PIN = 9;
-
-  const uint8_t NUM_DIGITS = 4;
-
-#elif defined(AUNITER_MICRO_TM1637_6)
-  #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_FAST
-  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
-
-  const uint8_t CLK_PIN = A0;
-  const uint8_t DIO_PIN = 9;
-
-  const uint8_t NUM_DIGITS = 6;
-
-#elif defined(AUNITER_STM32_TM1637)
-  #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_NORMAL
-  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
-
-  const uint8_t CLK_PIN = PB3;
-  const uint8_t DIO_PIN = PB4;
-
-  const uint8_t NUM_DIGITS = 4;
-
-#elif defined(AUNITER_D1MINI_LARGE_TM1637)
-  #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_NORMAL
-  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
-
-  const uint8_t CLK_PIN = D5;
-  const uint8_t DIO_PIN = D7;
-
-  const uint8_t NUM_DIGITS = 4;
-
-#else
-  #error Unknown AUNITER environment
-#endif
-
-// For a SoftWireInterface (non-fast), time to send 4 digits:
-// * 12 ms at 50 us delay, but does not work.
-// * 17 ms at 75 us delay.
-// * 22 ms at 100 us delay.
-// * 43 ms at 200 us delay.
-const uint16_t BIT_DELAY = 100;
-
-#if WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_NORMAL
-  using WireInterface = SoftWireInterface;
-  WireInterface wireInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
-#elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_FAST
-  #include <digitalWriteFast.h>
-  #include <ace_segment/hw/SoftWireFastInterface.h>
-  using ace_segment::SoftWireFastInterface;
-
-  using WireInterface = SoftWireFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
-  WireInterface wireInterface;
-#else
-  #error Unknown WIRE_INTERFACE_TYPE
-#endif
-
-#if defined(AUNITER_MICRO_TM1637_6)
-  const uint8_t* const remapArray = ace_segment::kDigitRemapArray6Tm1637;
-#else
-  const uint8_t* const remapArray = nullptr;
-#endif
-
-Tm1637Module<WireInterface, NUM_DIGITS> tm1637Module(wireInterface, remapArray);
-LedDisplay display(tm1637Module);
-
 TimingStats stats;
-
 uint8_t digitIndex = 0;
 uint8_t brightness = 1;
 
@@ -184,6 +210,7 @@ void printStats() {
   static uint16_t prevStatsMillis;
 
   // Every 5 seconds, print out the statistics.
+  uint16_t nowMillis = millis();
   if ((uint16_t) (nowMillis - prevStatsMillis) >= 5000) {
     prevStatsMillis = nowMillis;
 
@@ -202,15 +229,14 @@ void printStats() {
 
 void setup() {
   delay(1000);
+
 #if ENABLE_SERIAL_DEBUG >= 1
   Serial.begin(115200);
   while (!Serial);
 #endif
 
-  wireInterface.begin();
-  tm1637Module.begin();
+  setupAceSegment();
 }
-
 
 void loop() {
   updateDisplay();

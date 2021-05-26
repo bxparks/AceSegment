@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['renderfieldnow_97',['renderFieldNow',['../classace__segment_1_1ScanningDisplay.html#a48c8935aa8e324232121e0347eac05e5',1,'ace_segment::ScanningDisplay']]],
-  ['renderfieldwhenready_98',['renderFieldWhenReady',['../classace__segment_1_1ScanningDisplay.html#a60936c942b1171380fb69fb796082932',1,'ace_segment::ScanningDisplay']]]
+  ['max7219module_166',['Max7219Module',['../classace__segment_1_1Max7219Module.html#a3ba94c7d5ba3583dfc22999c22d86f12',1,'ace_segment::Max7219Module']]],
+  ['micros_167',['micros',['../classace__segment_1_1ClockInterface.html#afe559a873d3dae65e6430162702a5ee6',1,'ace_segment::ClockInterface']]],
+  ['millis_168',['millis',['../classace__segment_1_1ClockInterface.html#a53a5faea52b0eaeca0bfcb78c554a8d4',1,'ace_segment::ClockInterface']]]
 ];

@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['micros_92',['micros',['../classace__segment_1_1Hardware.html#a4b7dea04208c5c5e26c0eecc80446919',1,'ace_segment::Hardware']]],
-  ['millis_93',['millis',['../classace__segment_1_1Hardware.html#ab47c069174be081648408c656438f5a9',1,'ace_segment::Hardware']]]
+  ['hc595module_158',['Hc595Module',['../classace__segment_1_1Hc595Module.html#ae3ce4d5d32c92c01df7a424c6e5e56cc',1,'ace_segment::Hc595Module']]]
 ];

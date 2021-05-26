@@ -6,6 +6,8 @@
 
 from subprocess import check_output
 
+attiny_results = check_output(
+    "./generate_table.awk < attiny.txt", shell=True, text=True)
 nano_results = check_output(
     "./generate_table.awk < nano.txt", shell=True, text=True)
 micro_results = check_output(
@@ -36,7 +38,7 @@ by the runtime environment of the processor. For example, it often seems like
 the ESP8266 allocates flash memory in blocks of a certain quantity, so the
 calculated flash size can jump around in unexpected ways.
 
-**Version**: AceSegment v0.5
+**Version**: AceSegment v0.6
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -134,9 +136,9 @@ before substantional refactoring in 2021.
   changes are due to some removal/addition of some methods in `LedDisplay`.
 * Add memory usage for `Tm1637Module`. Seems to consume something in between
   similar to the `ScanningModule` w/ SW SPI and `ScanningModule` with HW SPI.
-* Add memory usage for `Tm1637Module` using `SoftWireFastInterface` which uses
+* Add memory usage for `Tm1637Module` using `SoftTmiFastInterface` which uses
   `digitalWriteFast` library for AVR processors. Saves 662 - 776 bytes of flash
-  on AVR processors compared to `Tm1637Module` using normal `SoftWireInterface`.
+  on AVR processors compared to `Tm1637Module` using normal `SoftTmiInterface`.
 * Save 150-200 bytes of flash on AVR processors by lifting all of the
   `LedDisplay::writePatternAt()` type of methods to `LedDisplay`, making them
   non-virtual, then funneling these methods through just 2 lower-level virtual
@@ -160,6 +162,12 @@ before substantional refactoring in 2021.
   memory consumption by 60 bytes on AVR and about 20-40 bytes on 32-bit
   processors.
 
+**v0.6**
+
+* Add support for multiple SPI buses in `HardSpiInterface` and
+  `HardSpiFastInterface`. Increases flash memory by 10-30 bytes.
+* Add benchmarks for `StringScroller` and `LevelWriter`.
+
 ## Results
 
 The following shows the flash and static memory sizes of the `MemoryBenchmark`
@@ -179,6 +187,8 @@ program for various `LedModule` configurations and various Writer classes.
 * `TemperatureWriter`
 * `CharWriter`
 * `StringWriter`
+* `StringScroller`
+* `LevelWriter`
 
 The `StubDisplay` is a dummy subclass of `LedDisplay` needed to create the
 various Writers. To get a better flash consumption of the Writer classes, this
@@ -186,6 +196,16 @@ stub class should be subtracted from the numbers below. (Ideally, the
 `generate_table.awk` script should do this automatically, but I'm trying to keep
 that script more general to avoid maintenance overhead when it is copied into
 other `MemoryBenchmark` programs.)
+
+### ATtiny85
+
+* 8MHz ATtiny85
+* Arduino IDE 1.8.13
+* SpenceKonde/ATTinyCore 1.5.2
+
+```
+{attiny_results}
+```
 
 ### Arduino Nano
 

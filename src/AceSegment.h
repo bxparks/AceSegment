@@ -36,7 +36,7 @@ SOFTWARE.
 #include "ace_segment/hw/GpioInterface.h"
 #include "ace_segment/hw/SoftSpiInterface.h"
 #include "ace_segment/hw/HardSpiInterface.h"
-#include "ace_segment/hw/SoftWireInterface.h"
+#include "ace_segment/hw/SoftTmiInterface.h"
 #include "ace_segment/hw/remap.h"
 #include "ace_segment/scanning/LedMatrixDirect.h"
 #include "ace_segment/scanning/LedMatrixSingleHc595.h"
@@ -55,13 +55,14 @@ SOFTWARE.
 #include "ace_segment/writer/CharWriter.h"
 #include "ace_segment/writer/StringWriter.h"
 #include "ace_segment/writer/StringScroller.h"
+#include "ace_segment/writer/LevelWriter.h"
 
 #if defined(ARDUINO_API_VERSION)
 #error Platforms using ArduinoCore-API not supported
 #endif
 
 // Version format: xxyyzz == "xx.yy.zz"
-#define ACE_SEGMENT_VERSION 500
-#define ACE_SEGMENT_VERSION_STRING "0.5"
+#define ACE_SEGMENT_VERSION 600
+#define ACE_SEGMENT_VERSION_STRING "0.6"
 
 #endif

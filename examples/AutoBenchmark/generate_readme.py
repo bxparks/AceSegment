@@ -51,7 +51,7 @@ LED module:
 * `Max7219Module::flush()`
     * Sends out the buffered digits using SPI.
 
-**Version**: AceSegment v0.5
+**Version**: AceSegment v0.6
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -115,7 +115,7 @@ number of `TimingStats::update()` calls that were made.
 * Add benchmarks for `Tm1637Module`.
     * The CPU time is mostly determined by the calls to `delayMicroseconds()`,
       which is must be about 100 microseconds due to the unusually large
-      capacitors (20 nF) installed on the DIO and CLK lines. They should have
+      capacitors (10 nF) installed on the DIO and CLK lines. They should have
       been about 100X smaller (200 pF).
     * Benchmarks both 4-digit and 6-digit LED modules given separately
       because the `Tm1637::flush()` method is roughtly proportional to the
@@ -139,47 +139,50 @@ number of `TimingStats::update()` calls that were made.
   the CPU time of `renderFieldsNow()` by a tiny amount, maybe a microsecond on a
   AVR. For 32-bit processors, the difference seems to be within the noise.
 
+**v0.6:**
+
+* `HardSpiInterface` is slightly slower on the fastest processors (e.g. ESP8266,
+  ESP32, Teensy 3.2), because the SPI frequency was reduced from 20 MHz to 8
+  MHz. No difference on the slower processors. Those fast processors can
+  actually sustain a 20 MHz SPI, which breaks the MAX7219 chip because it can
+  handle only 16 MHz.
+* Verified that removing the 10 nF capacitors from the CLK and DIO lines of the
+  TM1637 modules allows a much shorter `BIT_DELAY`. Added CPU benchmark numbers
+  for `BIT_DELAY = 5` microseconds (e.g. `Tm1637(4,SoftTmi,5us)` and
+  `Tm1637(4,SoftTmiFast,5us)`). The `flush()` or `flushIncremental()` durations
+  are almost a factor of 10X to 20X shorter compared to `BIT_DELAY = 100`.
+
 ## Results
 
 The following tables show the number of microseconds taken by:
 
-* `ScanningModule::renderFieldNow()`
-    * renders the 8 segments of a single LED digit. If the LED module has 4
-      digits, then `renderFieldNow()` must be called 4 times to render the light
-      pattern of the entire LED module. The entire rendering is then called a
-      frame.
-* `Tm1637Module::flush()`
-    * sends all digits in the buffer to the TM1637 LED module using the I2C-like
+* `DirectModule::renderFieldNow()`, `HybridModule::renderFieldNow()`,
+  `Hc595Module::renderFieldNow()`
+    * renders the 8 segments of a single LED digit.
+    * If the LED module has 4 digits, then `renderFieldNow()` must be called 4
+      times to render the light pattern of the entire LED module. The entire
+      rendering is then called a frame.
+    * Most people can no longer see flickering of the display at about 60 frames
+      a second. To achieve that, the `renderFieldNow()` method must be called
+      240 times a second for a module with 4 digits, or every 4.17 milliseconds.
+    * The results below show that every processor, even the slowest AVR
+      processor, is able to meet this threshhold.
+* `Tm1637Module::flush()` or `Tm1637Module::flushIncremental()`
+    * sends digits in the buffer to the TM1637 LED module using the I2C-like
       protocol
-    * a bitDelay of 100 microseconds is used
+    * results for two values of `BIT_DELAY` are collected
+        * 100 microseconds (e.g. `Tm1637(4,SoftTmi)`)
+        * 5 microseconds (e.g. `Tm1637(4,SoftTmi,5us)`)
 * `Max7219Module::flush()`
-    * sends all digits in the buffer to the MAX7219 LED module using standard
-      software or hardware SPI
-
-Most people can no longer see flickering of the display at about 60 frames a
-second. To achieve that, the `renderFieldNow()` method must be called 240
-times a second for a module with 4 digits, or every 4.17 milliseconds. The
-results below show that every processor, even the slowest AVR processor, is able
-to meet this threshhold.
-
-* For the `BaseModule` and `DirectFast4Module`, this involves turning off the
-  previous digit, sending the 8 bits for the current digit's 8 LED segments in a
-  loop, then turning on the current digit. The `digitalWrite()` function is
-  called 10 times.
-* For the `HybridModule` type, the 8 LED segment bits are sent
-  using software SPI or hardware SPI. (Software SPI uses the `shiftOut()`
-  method, which is implemented using a loop of `digitalWrite()`.
-* For the `Hc595Module` type, the LED digit pins and the LED
-  segment pins are using conceptually a single SPI transaction. For software
-  SPI, this is implemented using 2 `shiftOut()` operations. For hardware SPI,
-  this uses a single `SPI::transfer16()` command.
+    * sends all digits in the buffer to the MAX7219 LED module using
+      software SPI or hardware SPI
 
 On AVR processors, the "fast" options are available using the
 [digitalWriteFast](https://github.com/NicksonYap/digitalWriteFast) library whose
 `digitalWriteFast()` functions can be up to 50X faster if the `pin` number and
 `value` parameters are compile-time constants. In addition, the
 `digitalWriteFast` functions reduce flash memory consumption by 600-700 bytes
-for `SoftWireFastInterface`, `SoftSpiFastInterface`, and `HardSpiFastInterface`
+for `SoftTmiFastInterface`, `SoftSpiFastInterface`, and `HardSpiFastInterface`
 compared to their non-fast equivalents.
 
 ### Arduino Nano
