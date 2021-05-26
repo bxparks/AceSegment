@@ -124,8 +124,12 @@ Some of the examples may depend on:
 ## Documentation
 
 * this `README.md` file
-* [advanced.md](docs/advanced.md): Advanced Usage Guide
-* [Doxygen docs published on GitHub Pages](https://bxparks.github.io/AceSegment/html).
+* [scanning_module.md](docs/scanning_module.md)
+    * ScanningModule usage
+* [capacitor_removal.md](docs/tm1637/capacitor_removal.md)
+    * Removing the 10 nF capacitors on certain TM1637 LED modules
+* [Doxygen docs](https://bxparks.github.io/AceSegment/html)
+    * On Github pages.
 
 <a name="Examples"></a>
 ### Examples
@@ -188,7 +192,7 @@ Here are the classes in the library which will be most useful to the
 end-users, listed roughly from low-level to higher-level classes which often
 depend on the lower-level classes:
 
-* SpiInterface
+* `SpiInterface`
     * Thin-wrapper classes for communicating with the LED module that support
       SPI
     * Used by `Max7219Module` and `Hc595Module`.
@@ -201,7 +205,7 @@ depend on the lower-level classes:
             * Hardware SPI using `digitalWrite()` to control the latch pin.
         * `HardSpiFastInterface`
             * Hardware SPI using `digitalWriteFast()` to control the latch pin.
-* TmiInterface
+* `TmiInterface`
     * Thin-wrapper classes to communicating with LED modules using the TM1637
       protocol. Similar to I2C but not exactly the same.
     * Used by `Tm1637Module`.
@@ -1361,7 +1365,7 @@ static memory consumptions for various configurations on an Arduino Nano
 | CharWriter+Stub                 |    788/   31 |   332/   20 |
 | StringWriter+Stub               |    988/   39 |   532/   28 |
 | StringScroller+Stub             |   1036/   45 |   580/   34 |
-| LevelWriter+Stub      |    716/   28 |   260/   17 |
+| LevelWriter+Stub                |    716/   28 |   260/   17 |
 +--------------------------------------------------------------+
 ```
 
