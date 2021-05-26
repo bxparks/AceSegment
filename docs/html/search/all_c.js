@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['pinmode_36',['pinMode',['../classace__segment_1_1Hardware.html#a4b7fd68c76b1091a0686d673a05eecd2',1,'ace_segment::Hardware']]],
-  ['preparetosleep_37',['prepareToSleep',['../classace__segment_1_1ScanningDisplay.html#af00d6c084cded6d3161806f5fa577260',1,'ace_segment::ScanningDisplay']]]
+  ['numberwriter_54',['NumberWriter',['../classace__segment_1_1NumberWriter.html',1,'ace_segment::NumberWriter'],['../classace__segment_1_1NumberWriter.html#afd63f269907c5dee9fb6a41a00eb3d37',1,'ace_segment::NumberWriter::NumberWriter()']]]
 ];

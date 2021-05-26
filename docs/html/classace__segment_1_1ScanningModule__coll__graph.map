@@ -1,0 +1,4 @@
+<map id="ace_segment::ScanningModule&lt; T_LM, T_DIGITS, T_SUBFIELDS, T_CI &gt;" name="ace_segment::ScanningModule&lt; T_LM, T_DIGITS, T_SUBFIELDS, T_CI &gt;">
+<area shape="rect" id="node1" title="An implementation of LedModule for display modules which do not have hardware controller chips,..." alt="" coords="5,80,243,136"/>
+<area shape="rect" id="node2" href="$classace__segment_1_1LedModule.html" title="General interface that represents a generic seven&#45;segment LED module with multiple digits." alt="" coords="30,5,218,32"/>
+</map>

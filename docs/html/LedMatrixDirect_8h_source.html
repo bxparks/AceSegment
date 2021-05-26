@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.17"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>AceSegment: /home/brian/src/AceSegment/src/ace_segment/LedMatrixDirect.h Source File</title>
+<title>AceSegment: /home/brian/src/AceSegment/src/ace_segment/scanning/LedMatrixDirect.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,9 +22,9 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.4.0</span>
+   &#160;<span id="projectnumber">0.6.0</span>
    </div>
-   <div id="projectbrief">An adjustable, configurable, and extensible framework for rendering seven segment LED displays.</div>
+   <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, and 74HC595 controller chips</div>
   </td>
  </tr>
  </tbody>
@@ -63,7 +63,7 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_25fe9c7bbfbe3420a1b6cf93f8b304ef.html">ace_segment</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_25fe9c7bbfbe3420a1b6cf93f8b304ef.html">ace_segment</a></li><li class="navelem"><a class="el" href="dir_fe652edbd2fe618e77745b393f7a7157.html">scanning</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -99,61 +99,60 @@ $(function() {
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#define ACE_SEGMENT_LED_MATRIX_DIRECT_H</span></div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#include &lt;Arduino.h&gt;</span> <span class="comment">// OUTPUT, INPUT</span></div>
-<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#include &quot;LedMatrixBase.h&quot;</span></div>
-<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
-<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">class </span>LedMatrixDirectTest_drawElements;</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="keyword">namespace </span>ace_segment {</div>
-<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="keyword">template</span>&lt;<span class="keyword">typename</span> H&gt;</div>
-<div class="line"><a name="l00042"></a><span class="lineno"><a class="line" href="classace__segment_1_1LedMatrixDirect.html">   42</a></span>&#160;<span class="keyword">class </span><a class="code" href="classace__segment_1_1LedMatrixDirect.html">LedMatrixDirect</a> : <span class="keyword">public</span> <a class="code" href="classace__segment_1_1LedMatrixBase.html">LedMatrixBase</a> {</div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;  <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;    <a class="code" href="classace__segment_1_1LedMatrixDirect.html">LedMatrixDirect</a>(</div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        <span class="keyword">const</span> H&amp; hardware,</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        uint8_t groupOnPattern,</div>
+<div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="preprocessor">#include &quot;../hw/GpioInterface.h&quot;</span></div>
+<div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;<span class="preprocessor">#include &quot;LedMatrixBase.h&quot;</span></div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160; </div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;<span class="keyword">class </span>LedMatrixDirectTest_drawElements;</div>
+<div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160; </div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="keyword">namespace </span>ace_segment {</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;<span class="keyword">template</span> &lt;<span class="keyword">typename</span> T_GPIOI = GpioInterface&gt;</div>
+<div class="line"><a name="l00044"></a><span class="lineno"><a class="line" href="classace__segment_1_1LedMatrixDirect.html">   44</a></span>&#160;<span class="keyword">class </span><a class="code" href="classace__segment_1_1LedMatrixDirect.html">LedMatrixDirect</a> : <span class="keyword">public</span> <a class="code" href="classace__segment_1_1LedMatrixBase.html">LedMatrixBase</a> {</div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;  <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;    <a class="code" href="classace__segment_1_1LedMatrixDirect.html">LedMatrixDirect</a>(</div>
 <div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        uint8_t elementOnPattern,</div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        uint8_t numGroups,</div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        <span class="keyword">const</span> uint8_t* groupPins,</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        uint8_t numElements,</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;        <span class="keyword">const</span> uint8_t* elementPins</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    ) :</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        <a class="code" href="classace__segment_1_1LedMatrixBase.html#ab53a3edaa944f19196c9170c3830bb6f">LedMatrixBase</a>(groupOnPattern, elementOnPattern),</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        mHardware(hardware),</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        mGroupPins(groupPins),</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        mElementPins(elementPins),</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        mNumGroups(numGroups),</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        mNumElements(numElements)</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        uint8_t groupOnPattern,</div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;        uint8_t numElements,</div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;        <span class="keyword">const</span> uint8_t* elementPins,</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;        uint8_t numGroups,</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;        <span class="keyword">const</span> uint8_t* groupPins</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    ) :</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        <a class="code" href="classace__segment_1_1LedMatrixBase.html#ae46efc84d412faff4617fe461b912131">LedMatrixBase</a>(elementOnPattern, groupOnPattern),</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        mElementPins(elementPins),</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        mGroupPins(groupPins),</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        mNumElements(numElements),</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;        mNumGroups(numGroups)</div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    {}</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160; </div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    <span class="keywordtype">void</span> begin()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;      <span class="comment">// Set pins to OUTPUT mode but set LEDs to OFF.</span></div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;      uint8_t output = (0x00 ^ mGroupXorMask) &amp; 0x1;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;      <span class="keywordflow">for</span> (uint8_t group = 0; group &lt; mNumGroups; group++) {</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        uint8_t pin = mGroupPins[group];</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        mHardware.pinMode(pin, OUTPUT);</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        mHardware.digitalWrite(pin, output);</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;      <span class="comment">// Set element pins to OUTPUT mode but set LEDs to OFF.</span></div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;      uint8_t output = (0x00 ^ mElementXorMask) &amp; 0x1;</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;      <span class="keywordflow">for</span> (uint8_t element = 0; element &lt; mNumElements; element++) {</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        uint8_t elementPin = mElementPins[element];</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        T_GPIOI::pinMode(elementPin, OUTPUT);</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        T_GPIOI::digitalWrite(elementPin, output);</div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;      }</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160; </div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;      <span class="comment">// Set pins to OUTPUT mode but set LEDs to OFF.</span></div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;      output = (0x00 ^ mElementXorMask) &amp; 0x1;</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;      <span class="keywordflow">for</span> (uint8_t element = 0; element &lt; mNumElements; element++) {</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        uint8_t elementPin = mElementPins[element];</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        mHardware.pinMode(elementPin, OUTPUT);</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        mHardware.digitalWrite(elementPin, output);</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;      <span class="comment">// Set group pins to OUTPUT mode but set LEDs to OFF.</span></div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;      output = (0x00 ^ mGroupXorMask) &amp; 0x1;</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;      <span class="keywordflow">for</span> (uint8_t group = 0; group &lt; mNumGroups; group++) {</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        uint8_t pin = mGroupPins[group];</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        T_GPIOI::pinMode(pin, OUTPUT);</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        T_GPIOI::digitalWrite(pin, output);</div>
 <div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;      }</div>
 <div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    }</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <span class="keywordtype">void</span> end()<span class="keyword"> const </span>{</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;      <span class="comment">// Set pins to INPUT mode.</span></div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;      <span class="keywordflow">for</span> (uint8_t group = 0; group &lt; mNumGroups; group++) {</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        uint8_t pin = mGroupPins[group];</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        mHardware.pinMode(pin, INPUT);</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;      <span class="comment">// Set element pins to INPUT mode.</span></div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;      <span class="keywordflow">for</span> (uint8_t element = 0; element &lt; mNumElements; element++) {</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        uint8_t elementPin = mElementPins[element];</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        T_GPIOI::pinMode(elementPin, INPUT);</div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;      }</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160; </div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;      <span class="comment">// Set pins to INPUT mode.</span></div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;      <span class="keywordflow">for</span> (uint8_t element = 0; element &lt; mNumElements; element++) {</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        uint8_t elementPin = mElementPins[element];</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        mHardware.pinMode(elementPin, INPUT);</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;      <span class="comment">// Set group pins to INPUT mode.</span></div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;      <span class="keywordflow">for</span> (uint8_t group = 0; group &lt; mNumGroups; group++) {</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        uint8_t pin = mGroupPins[group];</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        T_GPIOI::pinMode(pin, INPUT);</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;      }</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    }</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160; </div>
@@ -196,31 +195,30 @@ $(function() {
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160; </div>
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="keywordtype">void</span> writeElementPin(uint8_t element, uint8_t output)<span class="keyword"> const </span>{</div>
 <div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;      uint8_t elementPin = mElementPins[element];</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;      mHardware.digitalWrite(elementPin, (output ^ mElementXorMask) &amp; 0x1);</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;      T_GPIOI::digitalWrite(elementPin, (output ^ mElementXorMask) &amp; 0x1);</div>
 <div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    }</div>
 <div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160; </div>
 <div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    <span class="keywordtype">void</span> writeGroupPin(uint8_t group, uint8_t output)<span class="keyword"> const </span>{</div>
 <div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;      uint8_t groupPin = mGroupPins[group];</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;      mHardware.digitalWrite(groupPin, (output ^ mGroupXorMask) &amp; 0x1);</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;      T_GPIOI::digitalWrite(groupPin, (output ^ mGroupXorMask) &amp; 0x1);</div>
 <div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    }</div>
 <div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160; </div>
 <div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;  <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    <span class="keyword">const</span> H&amp; mHardware;</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    <span class="keyword">const</span> uint8_t* <span class="keyword">const</span> mElementPins;</div>
 <div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    <span class="keyword">const</span> uint8_t* <span class="keyword">const</span> mGroupPins;</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    <span class="keyword">const</span> uint8_t* <span class="keyword">const</span> mElementPins;</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    uint8_t <span class="keyword">const</span> mNumElements;</div>
 <div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    uint8_t <span class="keyword">const</span> mNumGroups;</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    uint8_t <span class="keyword">const</span> mNumElements;</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160; </div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    <span class="keyword">mutable</span> uint8_t mPrevGroup = 0;</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;};</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160; </div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;} <span class="comment">// ace_segment</span></div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160; </div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160; </div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    <span class="keyword">mutable</span> uint8_t mPrevGroup = 0;</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;};</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160; </div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;} <span class="comment">// ace_segment</span></div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160; </div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="aclassace__segment_1_1LedMatrixBase_html"><div class="ttname"><a href="classace__segment_1_1LedMatrixBase.html">ace_segment::LedMatrixBase</a></div><div class="ttdoc">Class that represents the abstraction of a particular LED display wiring, and knows how to turn off a...</div><div class="ttdef"><b>Definition:</b> <a href="LedMatrixBase_8h_source.html#l00072">LedMatrixBase.h:72</a></div></div>
-<div class="ttc" id="aclassace__segment_1_1LedMatrixBase_html_ab53a3edaa944f19196c9170c3830bb6f"><div class="ttname"><a href="classace__segment_1_1LedMatrixBase.html#ab53a3edaa944f19196c9170c3830bb6f">ace_segment::LedMatrixBase::LedMatrixBase</a></div><div class="ttdeci">LedMatrixBase(uint8_t groupOnPattern, uint8_t elementOnPattern)</div><div class="ttdef"><b>Definition:</b> <a href="LedMatrixBase_8h_source.html#l00085">LedMatrixBase.h:85</a></div></div>
-<div class="ttc" id="aclassace__segment_1_1LedMatrixDirect_html"><div class="ttname"><a href="classace__segment_1_1LedMatrixDirect.html">ace_segment::LedMatrixDirect</a></div><div class="ttdoc">An LedMatrixBase that whose group pins and element pins are wired directly to the MCU.</div><div class="ttdef"><b>Definition:</b> <a href="LedMatrixDirect_8h_source.html#l00042">LedMatrixDirect.h:42</a></div></div>
+<div class="ttc" id="aclassace__segment_1_1LedMatrixBase_html"><div class="ttname"><a href="classace__segment_1_1LedMatrixBase.html">ace_segment::LedMatrixBase</a></div><div class="ttdoc">Class that represents the abstraction of a particular LED display wiring, and knows how to turn off a...</div><div class="ttdef"><b>Definition:</b> <a href="LedMatrixBase_8h_source.html#l00079">LedMatrixBase.h:79</a></div></div>
+<div class="ttc" id="aclassace__segment_1_1LedMatrixBase_html_ae46efc84d412faff4617fe461b912131"><div class="ttname"><a href="classace__segment_1_1LedMatrixBase.html#ae46efc84d412faff4617fe461b912131">ace_segment::LedMatrixBase::LedMatrixBase</a></div><div class="ttdeci">LedMatrixBase(uint8_t elementOnPattern, uint8_t groupOnPattern)</div><div class="ttdef"><b>Definition:</b> <a href="LedMatrixBase_8h_source.html#l00086">LedMatrixBase.h:86</a></div></div>
+<div class="ttc" id="aclassace__segment_1_1LedMatrixDirect_html"><div class="ttname"><a href="classace__segment_1_1LedMatrixDirect.html">ace_segment::LedMatrixDirect</a></div><div class="ttdoc">An LedMatrixBase that whose group pins and element pins are wired directly to the MCU.</div><div class="ttdef"><b>Definition:</b> <a href="LedMatrixDirect_8h_source.html#l00044">LedMatrixDirect.h:44</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

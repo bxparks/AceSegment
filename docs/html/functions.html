@@ -22,9 +22,9 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.4.0</span>
+   &#160;<span id="projectnumber">0.6.0</span>
    </div>
-   <div id="projectbrief">An adjustable, configurable, and extensible framework for rendering seven segment LED displays.</div>
+   <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, and 74HC595 controller chips</div>
   </td>
  </tr>
  </tbody>
@@ -68,22 +68,26 @@ $(function() {
 <h3><a id="index_b"></a>- b -</h3><ul>
 <li>begin()
 : <a class="el" href="classace__segment_1_1LedMatrixBase.html#a5c068db5e59b80d0884a1af616177f0e">ace_segment::LedMatrixBase</a>
-, <a class="el" href="classace__segment_1_1ScanningDisplay.html#ae0461b26beb5510849d12f114da77c07">ace_segment::ScanningDisplay&lt; HW, LM, DIGITS, SUBFIELDS &gt;</a>
+, <a class="el" href="classace__segment_1_1ScanningModule.html#ac0cf47c36ecb0529da5f99a0a8d1d503">ace_segment::ScanningModule&lt; T_LM, T_DIGITS, T_SUBFIELDS, T_CI &gt;</a>
+, <a class="el" href="classace__segment_1_1SoftTmiInterface.html#ace97eafae5b0867c6506b850125269e4">ace_segment::SoftTmiInterface</a>
+, <a class="el" href="classace__segment_1_1Tm1637Module.html#a4d398081a200564a787b2ebee1e7a699">ace_segment::Tm1637Module&lt; T_TMII, T_DIGITS &gt;</a>
 </li>
 </ul>
 
 
 <h3><a id="index_c"></a>- c -</h3><ul>
 <li>CharWriter()
-: <a class="el" href="classace__segment_1_1CharWriter.html#a9643e7e815b01e0559b11d6c39da9873">ace_segment::CharWriter</a>
+: <a class="el" href="classace__segment_1_1CharWriter.html#a1355d72b1af631d2dd66b6e2461e36ef">ace_segment::CharWriter</a>
 </li>
 <li>clear()
-: <a class="el" href="classace__segment_1_1LedDisplay.html#ac0e3a7ed16c3fb6ee044bf6b2789eaff">ace_segment::LedDisplay</a>
+: <a class="el" href="classace__segment_1_1LedDisplay.html#a71fa8c01438ce1d209cfd3efdae95c3a">ace_segment::LedDisplay</a>
 , <a class="el" href="classace__segment_1_1LedMatrixBase.html#aa5fb153442f0504f93461b9d9f6f9a3e">ace_segment::LedMatrixBase</a>
-, <a class="el" href="classace__segment_1_1ScanningDisplay.html#a3dc5ca0a1a9b1b42f353769fc33d6973">ace_segment::ScanningDisplay&lt; HW, LM, DIGITS, SUBFIELDS &gt;</a>
+, <a class="el" href="classace__segment_1_1LedMatrixDualHc595.html#a44985ef9c455ef8bbffd43c7c8761f50">ace_segment::LedMatrixDualHc595&lt; T_SPII &gt;</a>
 </li>
 <li>clearToEnd()
-: <a class="el" href="classace__segment_1_1NumberWriter.html#ae842af42786cc9bd078f5a40d0f7c6ca">ace_segment::NumberWriter</a>
+: <a class="el" href="classace__segment_1_1LedDisplay.html#a1ec32723fa45c0d9fbc58e3650cdd6fe">ace_segment::LedDisplay</a>
+, <a class="el" href="classace__segment_1_1NumberWriter.html#ae842af42786cc9bd078f5a40d0f7c6ca">ace_segment::NumberWriter</a>
+, <a class="el" href="classace__segment_1_1StringWriter.html#a6e693c99b63051f851bcd7d819cdd850">ace_segment::StringWriter</a>
 </li>
 <li>ClockWriter()
 : <a class="el" href="classace__segment_1_1ClockWriter.html#a504ea19a36214a365ee6ad0f55233c4f">ace_segment::ClockWriter</a>
@@ -93,20 +97,24 @@ $(function() {
 
 <h3><a id="index_d"></a>- d -</h3><ul>
 <li>digitalWrite()
-: <a class="el" href="classace__segment_1_1Hardware.html#a70c4de3d109c84b434a08a8d921ab164">ace_segment::Hardware</a>
+: <a class="el" href="classace__segment_1_1GpioInterface.html#ae87dcb5fa1c1245fc5747abfeebac7b4">ace_segment::GpioInterface</a>
 </li>
 <li>disableGroup()
 : <a class="el" href="classace__segment_1_1LedMatrixBase.html#a392418ec3a4e763920e21acc763e8848">ace_segment::LedMatrixBase</a>
+, <a class="el" href="classace__segment_1_1LedMatrixDualHc595.html#a0a08cfdd1de0cbdb20b9e66b22627c86">ace_segment::LedMatrixDualHc595&lt; T_SPII &gt;</a>
 </li>
 <li>display()
 : <a class="el" href="classace__segment_1_1CharWriter.html#a040fedebff2340e6a7435de64ececf91">ace_segment::CharWriter</a>
 , <a class="el" href="classace__segment_1_1ClockWriter.html#ae94575a04a919a06149f778f1b3fca30">ace_segment::ClockWriter</a>
+, <a class="el" href="classace__segment_1_1LevelWriter.html#a3f9d8b51d183563535d65d9118236fd3">ace_segment::LevelWriter</a>
 , <a class="el" href="classace__segment_1_1NumberWriter.html#a3c57c816ce39986bbc508eddb2e0ac3c">ace_segment::NumberWriter</a>
+, <a class="el" href="classace__segment_1_1StringScroller.html#a4ccc5fc42ac5044761201cde293f4a86">ace_segment::StringScroller</a>
 , <a class="el" href="classace__segment_1_1StringWriter.html#a4bb5339f4f67bd406366684ed1fae2ed">ace_segment::StringWriter</a>
+, <a class="el" href="classace__segment_1_1TemperatureWriter.html#a57014b17ff8a59c8da79151d24741e76">ace_segment::TemperatureWriter</a>
 </li>
 <li>draw()
 : <a class="el" href="classace__segment_1_1LedMatrixBase.html#ad9d2bc50b50ab4b2c16c1ef53b3397d2">ace_segment::LedMatrixBase</a>
-, <a class="el" href="classace__segment_1_1LedMatrixDualShiftRegister.html#ae5306fb89d5db7b817a4c923c00a3fd4">ace_segment::LedMatrixDualShiftRegister&lt; SA &gt;</a>
+, <a class="el" href="classace__segment_1_1LedMatrixDualHc595.html#ac191206242ca55ebb31652de7993277e">ace_segment::LedMatrixDualHc595&lt; T_SPII &gt;</a>
 </li>
 </ul>
 
@@ -114,45 +122,87 @@ $(function() {
 <h3><a id="index_e"></a>- e -</h3><ul>
 <li>enableGroup()
 : <a class="el" href="classace__segment_1_1LedMatrixBase.html#ae2443123d487980dc87a59dc61f0c3bb">ace_segment::LedMatrixBase</a>
+, <a class="el" href="classace__segment_1_1LedMatrixDualHc595.html#aa29c776a0c087c7c2337735510a98379">ace_segment::LedMatrixDualHc595&lt; T_SPII &gt;</a>
 </li>
 <li>end()
 : <a class="el" href="classace__segment_1_1LedMatrixBase.html#a36c163f093b05a7a25daf40d5842186f">ace_segment::LedMatrixBase</a>
-, <a class="el" href="classace__segment_1_1ScanningDisplay.html#a23ecfd1e45e8c3a1d6f2c1634d9223bf">ace_segment::ScanningDisplay&lt; HW, LM, DIGITS, SUBFIELDS &gt;</a>
+, <a class="el" href="classace__segment_1_1ScanningModule.html#a1bc81a7c5ac4c1d5ee6e2d90259e606c">ace_segment::ScanningModule&lt; T_LM, T_DIGITS, T_SUBFIELDS, T_CI &gt;</a>
+, <a class="el" href="classace__segment_1_1SoftTmiInterface.html#a346fed9646fe25898b912cacab23364c">ace_segment::SoftTmiInterface</a>
+, <a class="el" href="classace__segment_1_1Tm1637Module.html#a7d731aa467e81a7be1f06bcffb2a5f64">ace_segment::Tm1637Module&lt; T_TMII, T_DIGITS &gt;</a>
+</li>
+</ul>
+
+
+<h3><a id="index_f"></a>- f -</h3><ul>
+<li>flush()
+: <a class="el" href="classace__segment_1_1Max7219Module.html#af8b588c48e73e6883948eb8159982a1c">ace_segment::Max7219Module&lt; T_SPII, T_DIGITS &gt;</a>
+, <a class="el" href="classace__segment_1_1Tm1637Module.html#af3a100b0d07125af76aaf8ea10bc597c">ace_segment::Tm1637Module&lt; T_TMII, T_DIGITS &gt;</a>
+</li>
+<li>flushIncremental()
+: <a class="el" href="classace__segment_1_1Tm1637Module.html#a1bf9dcdafb5b1a08a18da697d29e5235">ace_segment::Tm1637Module&lt; T_TMII, T_DIGITS &gt;</a>
 </li>
 </ul>
 
 
 <h3><a id="index_g"></a>- g -</h3><ul>
 <li>getFieldsPerFrame()
-: <a class="el" href="classace__segment_1_1ScanningDisplay.html#a989b0087fdb591f4e35ae15317067d2a">ace_segment::ScanningDisplay&lt; HW, LM, DIGITS, SUBFIELDS &gt;</a>
+: <a class="el" href="classace__segment_1_1ScanningModule.html#ad9388b85594d5a74038045b642938286">ace_segment::ScanningModule&lt; T_LM, T_DIGITS, T_SUBFIELDS, T_CI &gt;</a>
 </li>
 <li>getFieldsPerSecond()
-: <a class="el" href="classace__segment_1_1ScanningDisplay.html#aa21e88f28f9544fa6fa9aab13475dd0a">ace_segment::ScanningDisplay&lt; HW, LM, DIGITS, SUBFIELDS &gt;</a>
+: <a class="el" href="classace__segment_1_1ScanningModule.html#a11de5fb5716aa5650406994ca827a7c7">ace_segment::ScanningModule&lt; T_LM, T_DIGITS, T_SUBFIELDS, T_CI &gt;</a>
 </li>
 <li>getFramesPerSecond()
-: <a class="el" href="classace__segment_1_1ScanningDisplay.html#a0debd78bbf4fa97327c8e4c0166c3cb5">ace_segment::ScanningDisplay&lt; HW, LM, DIGITS, SUBFIELDS &gt;</a>
+: <a class="el" href="classace__segment_1_1ScanningModule.html#a8a41adc98b3e608923975e432e4e5683">ace_segment::ScanningModule&lt; T_LM, T_DIGITS, T_SUBFIELDS, T_CI &gt;</a>
+</li>
+<li>getMaxLevel()
+: <a class="el" href="classace__segment_1_1LevelWriter.html#a691f02aa87e9777d4c5eb36674447662">ace_segment::LevelWriter</a>
+</li>
+<li>getMicrosPerField()
+: <a class="el" href="classace__segment_1_1ScanningModule.html#a8ff2aad4bd53b7da4490c6e349e8b0a2">ace_segment::ScanningModule&lt; T_LM, T_DIGITS, T_SUBFIELDS, T_CI &gt;</a>
+</li>
+<li>getNumChars()
+: <a class="el" href="classace__segment_1_1CharWriter.html#a5c1e7fb689f2e52ff923a272bc44923a">ace_segment::CharWriter</a>
 </li>
 <li>getNumDigits()
 : <a class="el" href="classace__segment_1_1LedDisplay.html#a9aef98e79c8f2b95d93938c8d4d4fcc8">ace_segment::LedDisplay</a>
-, <a class="el" href="classace__segment_1_1ScanningDisplay.html#a949b1944965cf0751ff85a398df4e8db">ace_segment::ScanningDisplay&lt; HW, LM, DIGITS, SUBFIELDS &gt;</a>
+, <a class="el" href="classace__segment_1_1LedModule.html#a5b458f082ece47f08d0640ad3168cab1">ace_segment::LedModule</a>
+, <a class="el" href="classace__segment_1_1Max7219Module.html#a88f9a7cfd7f4239346d9b3e852d6f109">ace_segment::Max7219Module&lt; T_SPII, T_DIGITS &gt;</a>
+, <a class="el" href="classace__segment_1_1ScanningModule.html#afd217b4f96eec772b4046ab847b4737c">ace_segment::ScanningModule&lt; T_LM, T_DIGITS, T_SUBFIELDS, T_CI &gt;</a>
+, <a class="el" href="classace__segment_1_1Tm1637Module.html#ae1783b845117e4d10960794d4c14bdda">ace_segment::Tm1637Module&lt; T_TMII, T_DIGITS &gt;</a>
+</li>
+<li>getPattern()
+: <a class="el" href="classace__segment_1_1CharWriter.html#af469ebfa358b4d7dfb4093e36aa4e7eb">ace_segment::CharWriter</a>
+</li>
+<li>getPatternAt()
+: <a class="el" href="classace__segment_1_1LedModule.html#a9ca6aa3cf8c126c908fc4bb1a7a1a394">ace_segment::LedModule</a>
+, <a class="el" href="classace__segment_1_1Max7219Module.html#a50c2d08758650ae15e32dd0cb697424d">ace_segment::Max7219Module&lt; T_SPII, T_DIGITS &gt;</a>
+, <a class="el" href="classace__segment_1_1ScanningModule.html#a252a96e7f48aa499d93fbc6c45f28927">ace_segment::ScanningModule&lt; T_LM, T_DIGITS, T_SUBFIELDS, T_CI &gt;</a>
+, <a class="el" href="classace__segment_1_1Tm1637Module.html#a06fccb55acd2957f6dcbe45f97a1600c">ace_segment::Tm1637Module&lt; T_TMII, T_DIGITS &gt;</a>
 </li>
 </ul>
 
 
 <h3><a id="index_h"></a>- h -</h3><ul>
+<li>Hc595Module()
+: <a class="el" href="classace__segment_1_1Hc595Module.html#ae3ce4d5d32c92c01df7a424c6e5e56cc">ace_segment::Hc595Module&lt; T_SPII, T_DIGITS, T_SUBFIELDS, T_CI &gt;</a>
+</li>
 <li>hexchar_t
 : <a class="el" href="classace__segment_1_1NumberWriter.html#abf1fc3ae5c324d1de2e3d5f196e5a0a8">ace_segment::NumberWriter</a>
 </li>
 </ul>
 
 
+<h3><a id="index_i"></a>- i -</h3><ul>
+<li>initScrollLeft()
+: <a class="el" href="classace__segment_1_1StringScroller.html#ae776ccdf7789ff01b13da06579322396">ace_segment::StringScroller</a>
+</li>
+<li>initScrollRight()
+: <a class="el" href="classace__segment_1_1StringScroller.html#a72210a4181d9ae0266f9a0932a5a63d5">ace_segment::StringScroller</a>
+</li>
+</ul>
+
+
 <h3><a id="index_k"></a>- k -</h3><ul>
-<li>kActiveHighPattern
-: <a class="el" href="classace__segment_1_1LedMatrixBase.html#ade3ca76e0a5f73f36eb17d533799f627">ace_segment::LedMatrixBase</a>
-</li>
-<li>kActiveLowPattern
-: <a class="el" href="classace__segment_1_1LedMatrixBase.html#af30041c0cd3a4f12c8ad857c3ac478d7">ace_segment::LedMatrixBase</a>
-</li>
 <li>kCharMinus
 : <a class="el" href="classace__segment_1_1ClockWriter.html#ab535943b0a616a41bf686b74f9a9fc31">ace_segment::ClockWriter</a>
 , <a class="el" href="classace__segment_1_1NumberWriter.html#a039ac6a2528399ac73b384f6227d3e6a">ace_segment::NumberWriter</a>
@@ -167,8 +217,14 @@ $(function() {
 <li>kPatternA
 : <a class="el" href="classace__segment_1_1ClockWriter.html#a53759004793ba6bcc90408725829434f">ace_segment::ClockWriter</a>
 </li>
+<li>kPatternC
+: <a class="el" href="classace__segment_1_1TemperatureWriter.html#ab708932843ab2f48fe22f1a95a1ea156">ace_segment::TemperatureWriter</a>
+</li>
 <li>kPatternDegree
-: <a class="el" href="classace__segment_1_1ClockWriter.html#a20d2d9bf8f2716e2159f853ae6493537">ace_segment::ClockWriter</a>
+: <a class="el" href="classace__segment_1_1TemperatureWriter.html#a1be9f982f9466b3afa0d01051dc04855">ace_segment::TemperatureWriter</a>
+</li>
+<li>kPatternF
+: <a class="el" href="classace__segment_1_1TemperatureWriter.html#aab41ee81d8fe308c9d0c0d9c1e3c381d">ace_segment::TemperatureWriter</a>
 </li>
 <li>kPatternP
 : <a class="el" href="classace__segment_1_1ClockWriter.html#aba763a1a69889af49dc7a34c972a309b">ace_segment::ClockWriter</a>
@@ -177,18 +233,33 @@ $(function() {
 
 
 <h3><a id="index_l"></a>- l -</h3><ul>
+<li>LedDisplay()
+: <a class="el" href="classace__segment_1_1LedDisplay.html#a6cda5f98bdfbc8dd1661dc41e1e94d02">ace_segment::LedDisplay</a>
+</li>
 <li>LedMatrixBase()
-: <a class="el" href="classace__segment_1_1LedMatrixBase.html#ab53a3edaa944f19196c9170c3830bb6f">ace_segment::LedMatrixBase</a>
+: <a class="el" href="classace__segment_1_1LedMatrixBase.html#ae46efc84d412faff4617fe461b912131">ace_segment::LedMatrixBase</a>
+</li>
+<li>LedMatrixDualHc595()
+: <a class="el" href="classace__segment_1_1LedMatrixDualHc595.html#aa32dd16e69cd42930243c083ee4dc287">ace_segment::LedMatrixDualHc595&lt; T_SPII &gt;</a>
+</li>
+<li>LedModule()
+: <a class="el" href="classace__segment_1_1LedModule.html#a5941f3f6bcee5c757cb3983a4542b61f">ace_segment::LedModule</a>
+</li>
+<li>LevelWriter()
+: <a class="el" href="classace__segment_1_1LevelWriter.html#a262b1aa9d2f28c8c82eb96f52f438189">ace_segment::LevelWriter</a>
 </li>
 </ul>
 
 
 <h3><a id="index_m"></a>- m -</h3><ul>
+<li>Max7219Module()
+: <a class="el" href="classace__segment_1_1Max7219Module.html#a3ba94c7d5ba3583dfc22999c22d86f12">ace_segment::Max7219Module&lt; T_SPII, T_DIGITS &gt;</a>
+</li>
 <li>micros()
-: <a class="el" href="classace__segment_1_1Hardware.html#a4b7dea04208c5c5e26c0eecc80446919">ace_segment::Hardware</a>
+: <a class="el" href="classace__segment_1_1ClockInterface.html#afe559a873d3dae65e6430162702a5ee6">ace_segment::ClockInterface</a>
 </li>
 <li>millis()
-: <a class="el" href="classace__segment_1_1Hardware.html#ab47c069174be081648408c656438f5a9">ace_segment::Hardware</a>
+: <a class="el" href="classace__segment_1_1ClockInterface.html#a53a5faea52b0eaeca0bfcb78c554a8d4">ace_segment::ClockInterface</a>
 </li>
 </ul>
 
@@ -202,35 +273,71 @@ $(function() {
 
 <h3><a id="index_p"></a>- p -</h3><ul>
 <li>pinMode()
-: <a class="el" href="classace__segment_1_1Hardware.html#a4b7fd68c76b1091a0686d673a05eecd2">ace_segment::Hardware</a>
-</li>
-<li>prepareToSleep()
-: <a class="el" href="classace__segment_1_1ScanningDisplay.html#af00d6c084cded6d3161806f5fa577260">ace_segment::ScanningDisplay&lt; HW, LM, DIGITS, SUBFIELDS &gt;</a>
+: <a class="el" href="classace__segment_1_1GpioInterface.html#a75e29a37bdcfdfdc2e42a7d556ef945b">ace_segment::GpioInterface</a>
 </li>
 </ul>
 
 
 <h3><a id="index_r"></a>- r -</h3><ul>
 <li>renderFieldNow()
-: <a class="el" href="classace__segment_1_1ScanningDisplay.html#a48c8935aa8e324232121e0347eac05e5">ace_segment::ScanningDisplay&lt; HW, LM, DIGITS, SUBFIELDS &gt;</a>
+: <a class="el" href="classace__segment_1_1ScanningModule.html#ac6a00935339bb99f7a13e514a7252c77">ace_segment::ScanningModule&lt; T_LM, T_DIGITS, T_SUBFIELDS, T_CI &gt;</a>
 </li>
 <li>renderFieldWhenReady()
-: <a class="el" href="classace__segment_1_1ScanningDisplay.html#a60936c942b1171380fb69fb796082932">ace_segment::ScanningDisplay&lt; HW, LM, DIGITS, SUBFIELDS &gt;</a>
+: <a class="el" href="classace__segment_1_1ScanningModule.html#a31c1fcc0f98a937137752914398de85b">ace_segment::ScanningModule&lt; T_LM, T_DIGITS, T_SUBFIELDS, T_CI &gt;</a>
 </li>
 </ul>
 
 
 <h3><a id="index_s"></a>- s -</h3><ul>
-<li>ScanningDisplay()
-: <a class="el" href="classace__segment_1_1ScanningDisplay.html#a305f5f73be623475ad4d8d39c0a780d0">ace_segment::ScanningDisplay&lt; HW, LM, DIGITS, SUBFIELDS &gt;</a>
+<li>ScanningModule()
+: <a class="el" href="classace__segment_1_1ScanningModule.html#aa4e9ffaca62613fa76e885565716e5a4">ace_segment::ScanningModule&lt; T_LM, T_DIGITS, T_SUBFIELDS, T_CI &gt;</a>
+</li>
+<li>scrollLeft()
+: <a class="el" href="classace__segment_1_1StringScroller.html#a0caa03a42a4cd64794e379cdf7662742">ace_segment::StringScroller</a>
+</li>
+<li>scrollRight()
+: <a class="el" href="classace__segment_1_1StringScroller.html#a1922aa83b67028a1f1dcf079abae0c8a">ace_segment::StringScroller</a>
+</li>
+<li>send16()
+: <a class="el" href="classace__segment_1_1HardSpiFastInterface.html#a7c4e272788f23bd062b45d2e8457e6ce">ace_segment::HardSpiFastInterface&lt; T_LATCH_PIN, T_DATA_PIN, T_CLOCK_PIN &gt;</a>
+, <a class="el" href="classace__segment_1_1HardSpiInterface.html#a22312be5ba559d369c2fe850a4f7adc2">ace_segment::HardSpiInterface</a>
+, <a class="el" href="classace__segment_1_1SoftSpiInterface.html#a50cbb4c7e056fa527e8b3904f2cf1f8c">ace_segment::SoftSpiInterface</a>
+</li>
+<li>send8()
+: <a class="el" href="classace__segment_1_1HardSpiFastInterface.html#ad11fffacbb1ebf47bf002c171986c227">ace_segment::HardSpiFastInterface&lt; T_LATCH_PIN, T_DATA_PIN, T_CLOCK_PIN &gt;</a>
+, <a class="el" href="classace__segment_1_1HardSpiInterface.html#afcb778902107c59cc32bbb12f0114b3c">ace_segment::HardSpiInterface</a>
+, <a class="el" href="classace__segment_1_1SoftSpiInterface.html#a9d59bbfd70a5366b2e6ce00c0c6443c0">ace_segment::SoftSpiInterface</a>
+</li>
+<li>sendByte()
+: <a class="el" href="classace__segment_1_1SoftTmiInterface.html#ad9b4c3a8a068b94449655b8633d13927">ace_segment::SoftTmiInterface</a>
+</li>
+<li>setBrightness()
+: <a class="el" href="classace__segment_1_1LedDisplay.html#a15fea01035f86acbd1fb1a53df55cfbe">ace_segment::LedDisplay</a>
+, <a class="el" href="classace__segment_1_1LedModule.html#af14827ce8d21f44bd65b02f0880244fc">ace_segment::LedModule</a>
+, <a class="el" href="classace__segment_1_1Max7219Module.html#a02d352bc047f92c99600a21d84e232f4">ace_segment::Max7219Module&lt; T_SPII, T_DIGITS &gt;</a>
+, <a class="el" href="classace__segment_1_1ScanningModule.html#ae494091ac9aa47d84b47cc77f068ee89">ace_segment::ScanningModule&lt; T_LM, T_DIGITS, T_SUBFIELDS, T_CI &gt;</a>
+, <a class="el" href="classace__segment_1_1Tm1637Module.html#a8332f872f1dead39572668f6bf70d579">ace_segment::Tm1637Module&lt; T_TMII, T_DIGITS &gt;</a>
 </li>
 <li>setBrightnessAt()
-: <a class="el" href="classace__segment_1_1LedDisplay.html#ab8cdbdeb458ed2c9ae8d8656ead3e7b8">ace_segment::LedDisplay</a>
-, <a class="el" href="classace__segment_1_1ScanningDisplay.html#a7057d9e7cc8dc489fd7d2599441efba7">ace_segment::ScanningDisplay&lt; HW, LM, DIGITS, SUBFIELDS &gt;</a>
+: <a class="el" href="classace__segment_1_1ScanningModule.html#aea3b11435229958e33321c6e1d0e8553">ace_segment::ScanningModule&lt; T_LM, T_DIGITS, T_SUBFIELDS, T_CI &gt;</a>
 </li>
-<li>setGlobalBrightness()
-: <a class="el" href="classace__segment_1_1LedDisplay.html#af1a17006b07949cbe859684b235bcb84">ace_segment::LedDisplay</a>
-, <a class="el" href="classace__segment_1_1ScanningDisplay.html#a51b9707f89d323d481feea9ae94d6029">ace_segment::ScanningDisplay&lt; HW, LM, DIGITS, SUBFIELDS &gt;</a>
+<li>setDisplayOn()
+: <a class="el" href="classace__segment_1_1Tm1637Module.html#ae86f7df1dc791d44feaad9253f6df184">ace_segment::Tm1637Module&lt; T_TMII, T_DIGITS &gt;</a>
+</li>
+<li>setPatternAt()
+: <a class="el" href="classace__segment_1_1LedModule.html#a0c3836b5db41bc7a2c7d49f15a7e300d">ace_segment::LedModule</a>
+, <a class="el" href="classace__segment_1_1Max7219Module.html#ab3ffdc2a383450671de2e294023db587">ace_segment::Max7219Module&lt; T_SPII, T_DIGITS &gt;</a>
+, <a class="el" href="classace__segment_1_1ScanningModule.html#ad8d910b9f0e97711faf19a899b6eded8">ace_segment::ScanningModule&lt; T_LM, T_DIGITS, T_SUBFIELDS, T_CI &gt;</a>
+, <a class="el" href="classace__segment_1_1Tm1637Module.html#a6e651be7571cb0a68b4f15b7aef487b8">ace_segment::Tm1637Module&lt; T_TMII, T_DIGITS &gt;</a>
+</li>
+<li>startCondition()
+: <a class="el" href="classace__segment_1_1SoftTmiInterface.html#ab2e4679310300461994d520d443223ce">ace_segment::SoftTmiInterface</a>
+</li>
+<li>stopCondition()
+: <a class="el" href="classace__segment_1_1SoftTmiInterface.html#a47c4b4d5e5eb0434916939ddea3ce86e">ace_segment::SoftTmiInterface</a>
+</li>
+<li>StringScroller()
+: <a class="el" href="classace__segment_1_1StringScroller.html#a87dd6ef5474a30bd4f022f690423e72c">ace_segment::StringScroller</a>
 </li>
 <li>StringWriter()
 : <a class="el" href="classace__segment_1_1StringWriter.html#af63058f8d90de08fa54c725d2c9f92b5">ace_segment::StringWriter</a>
@@ -238,16 +345,26 @@ $(function() {
 </ul>
 
 
-<h3><a id="index_w"></a>- w -</h3><ul>
-<li>wakeFromSleep()
-: <a class="el" href="classace__segment_1_1ScanningDisplay.html#a5cf21f6ef4a68b400b3e2c3130443635">ace_segment::ScanningDisplay&lt; HW, LM, DIGITS, SUBFIELDS &gt;</a>
+<h3><a id="index_t"></a>- t -</h3><ul>
+<li>TemperatureWriter()
+: <a class="el" href="classace__segment_1_1TemperatureWriter.html#a7ff33a2cf83fcfbf411d048d5b522982">ace_segment::TemperatureWriter</a>
 </li>
+<li>Tm1637Module()
+: <a class="el" href="classace__segment_1_1Tm1637Module.html#a9cc401ceeed8292b26a93d5dcc08312e">ace_segment::Tm1637Module&lt; T_TMII, T_DIGITS &gt;</a>
+</li>
+</ul>
+
+
+<h3><a id="index_w"></a>- w -</h3><ul>
 <li>writeBcd2At()
 : <a class="el" href="classace__segment_1_1ClockWriter.html#afc4dd796b50deda456b4319134a47030">ace_segment::ClockWriter</a>
 </li>
 <li>writeCharAt()
 : <a class="el" href="classace__segment_1_1CharWriter.html#a99a411fbfb2fb6abf42fcd5149222cf7">ace_segment::CharWriter</a>
 , <a class="el" href="classace__segment_1_1ClockWriter.html#a38a81ddc4dae8fa1a0367b53950da5ed">ace_segment::ClockWriter</a>
+</li>
+<li>writeChars2At()
+: <a class="el" href="classace__segment_1_1ClockWriter.html#a0588c78a91203c8e982934f6d79bc140">ace_segment::ClockWriter</a>
 </li>
 <li>writeColon()
 : <a class="el" href="classace__segment_1_1ClockWriter.html#a096853e66769296fd48242fc2fe343a5">ace_segment::ClockWriter</a>
@@ -259,8 +376,7 @@ $(function() {
 : <a class="el" href="classace__segment_1_1ClockWriter.html#a5c742e5c5f0110b49b8e72f8d5ede5b5">ace_segment::ClockWriter</a>
 </li>
 <li>writeDecimalPointAt()
-: <a class="el" href="classace__segment_1_1LedDisplay.html#a0f339305ac7432fbfb4e38b9599dcaae">ace_segment::LedDisplay</a>
-, <a class="el" href="classace__segment_1_1ScanningDisplay.html#acb67a747588d5e77be374e543f5e148a">ace_segment::ScanningDisplay&lt; HW, LM, DIGITS, SUBFIELDS &gt;</a>
+: <a class="el" href="classace__segment_1_1LedDisplay.html#a9b4d88c8cab7d0be22cc949460e8875f">ace_segment::LedDisplay</a>
 </li>
 <li>writeHexByteAt()
 : <a class="el" href="classace__segment_1_1NumberWriter.html#a51927f150ecf2d51c3788a9eb5107c3f">ace_segment::NumberWriter</a>
@@ -277,23 +393,38 @@ $(function() {
 <li>writeHourMinute()
 : <a class="el" href="classace__segment_1_1ClockWriter.html#a22fe4aa56a8881fdf7d12de3e077cc0a">ace_segment::ClockWriter</a>
 </li>
+<li>writeLevel()
+: <a class="el" href="classace__segment_1_1LevelWriter.html#a6f5e2b03f00fa0cc44bd9535a09ce975">ace_segment::LevelWriter</a>
+</li>
 <li>writePatternAt()
-: <a class="el" href="classace__segment_1_1LedDisplay.html#a7739b860133bab0e924b57ed0c55d0bd">ace_segment::LedDisplay</a>
-, <a class="el" href="classace__segment_1_1ScanningDisplay.html#a43d69c95d835d9b02c0f7e80064f7fe2">ace_segment::ScanningDisplay&lt; HW, LM, DIGITS, SUBFIELDS &gt;</a>
+: <a class="el" href="classace__segment_1_1LedDisplay.html#a95f92778e0adc463d1c57da3902c0676">ace_segment::LedDisplay</a>
 </li>
 <li>writePatternsAt()
-: <a class="el" href="classace__segment_1_1LedDisplay.html#a33592c6357d17837836307eb2f88fdf0">ace_segment::LedDisplay</a>
-, <a class="el" href="classace__segment_1_1ScanningDisplay.html#a09d79c60fcd579e24d20d662979bc6d0">ace_segment::ScanningDisplay&lt; HW, LM, DIGITS, SUBFIELDS &gt;</a>
+: <a class="el" href="classace__segment_1_1LedDisplay.html#acfbaf262c2a49631e069558cc03deecd">ace_segment::LedDisplay</a>
 </li>
 <li>writePatternsAt_P()
-: <a class="el" href="classace__segment_1_1LedDisplay.html#aaf92e9b380ea432a532b51383c76ffa4">ace_segment::LedDisplay</a>
-, <a class="el" href="classace__segment_1_1ScanningDisplay.html#a50e3b78e1e8fd020958ee2deb177fef6">ace_segment::ScanningDisplay&lt; HW, LM, DIGITS, SUBFIELDS &gt;</a>
+: <a class="el" href="classace__segment_1_1LedDisplay.html#ae2341eef2cecc7bb2c1aed4248e6e4c1">ace_segment::LedDisplay</a>
 </li>
 <li>writeSignedDecimalAt()
 : <a class="el" href="classace__segment_1_1NumberWriter.html#a69b7ab86dea585c95e5547e231827b12">ace_segment::NumberWriter</a>
 </li>
 <li>writeStringAt()
-: <a class="el" href="classace__segment_1_1StringWriter.html#adedde0122089d0f754758013c4a12d42">ace_segment::StringWriter</a>
+: <a class="el" href="classace__segment_1_1StringWriter.html#a6bd1098f384b81edc53f8ce33896cbcc">ace_segment::StringWriter</a>
+</li>
+<li>writeTempAt()
+: <a class="el" href="classace__segment_1_1TemperatureWriter.html#a01a15703c0396f4c3bb619fc43a935f5">ace_segment::TemperatureWriter</a>
+</li>
+<li>writeTempDegAt()
+: <a class="el" href="classace__segment_1_1TemperatureWriter.html#a3b45e733d675e0e9936b6ff1b7b2f668">ace_segment::TemperatureWriter</a>
+</li>
+<li>writeTempDegCAt()
+: <a class="el" href="classace__segment_1_1TemperatureWriter.html#ae32976c2d5c029b7179c8cd4772ecdb1">ace_segment::TemperatureWriter</a>
+</li>
+<li>writeTempDegFAt()
+: <a class="el" href="classace__segment_1_1TemperatureWriter.html#a5e8d3bf6108c17b05a58b5750681c508">ace_segment::TemperatureWriter</a>
+</li>
+<li>writeUnsignedDecimal2At()
+: <a class="el" href="classace__segment_1_1NumberWriter.html#a7023ce832df4e783001e042f72ae6828">ace_segment::NumberWriter</a>
 </li>
 <li>writeUnsignedDecimalAt()
 : <a class="el" href="classace__segment_1_1NumberWriter.html#a5e663f325225b40b51c3669d82add022">ace_segment::NumberWriter</a>

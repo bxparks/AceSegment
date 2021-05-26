@@ -1,8 +1,11 @@
 var searchData=
 [
-  ['leddisplay_28',['LedDisplay',['../classace__segment_1_1LedDisplay.html',1,'ace_segment']]],
-  ['ledmatrixbase_29',['LedMatrixBase',['../classace__segment_1_1LedMatrixBase.html',1,'ace_segment::LedMatrixBase'],['../classace__segment_1_1LedMatrixBase.html#ab53a3edaa944f19196c9170c3830bb6f',1,'ace_segment::LedMatrixBase::LedMatrixBase()']]],
-  ['ledmatrixdirect_30',['LedMatrixDirect',['../classace__segment_1_1LedMatrixDirect.html',1,'ace_segment']]],
-  ['ledmatrixdualshiftregister_31',['LedMatrixDualShiftRegister',['../classace__segment_1_1LedMatrixDualShiftRegister.html',1,'ace_segment']]],
-  ['ledmatrixsingleshiftregister_32',['LedMatrixSingleShiftRegister',['../classace__segment_1_1LedMatrixSingleShiftRegister.html',1,'ace_segment']]]
+  ['kcharminus_34',['kCharMinus',['../classace__segment_1_1ClockWriter.html#ab535943b0a616a41bf686b74f9a9fc31',1,'ace_segment::ClockWriter::kCharMinus()'],['../classace__segment_1_1NumberWriter.html#a039ac6a2528399ac73b384f6227d3e6a',1,'ace_segment::NumberWriter::kCharMinus()']]],
+  ['kcharspace_35',['kCharSpace',['../classace__segment_1_1ClockWriter.html#a5432977b4275f45adcc3764296a7c8ce',1,'ace_segment::ClockWriter::kCharSpace()'],['../classace__segment_1_1NumberWriter.html#ad5907a93c3f37b3cef81d3427688d18c',1,'ace_segment::NumberWriter::kCharSpace()']]],
+  ['knumhexchars_36',['kNumHexChars',['../classace__segment_1_1NumberWriter.html#a2da066eed77d440c8d2df88ad38407bb',1,'ace_segment::NumberWriter']]],
+  ['kpatterna_37',['kPatternA',['../classace__segment_1_1ClockWriter.html#a53759004793ba6bcc90408725829434f',1,'ace_segment::ClockWriter']]],
+  ['kpatternc_38',['kPatternC',['../classace__segment_1_1TemperatureWriter.html#ab708932843ab2f48fe22f1a95a1ea156',1,'ace_segment::TemperatureWriter']]],
+  ['kpatterndegree_39',['kPatternDegree',['../classace__segment_1_1TemperatureWriter.html#a1be9f982f9466b3afa0d01051dc04855',1,'ace_segment::TemperatureWriter']]],
+  ['kpatternf_40',['kPatternF',['../classace__segment_1_1TemperatureWriter.html#aab41ee81d8fe308c9d0c0d9c1e3c381d',1,'ace_segment::TemperatureWriter']]],
+  ['kpatternp_41',['kPatternP',['../classace__segment_1_1ClockWriter.html#aba763a1a69889af49dc7a34c972a309b',1,'ace_segment::ClockWriter']]]
 ];

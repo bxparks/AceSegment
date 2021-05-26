@@ -22,9 +22,9 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.4.0</span>
+   &#160;<span id="projectnumber">0.6.0</span>
    </div>
-   <div id="projectbrief">An adjustable, configurable, and extensible framework for rendering seven segment LED displays.</div>
+   <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, and 74HC595 controller chips</div>
   </td>
  </tr>
  </tbody>
@@ -74,15 +74,15 @@ $(function() {
 
 <p>This is the complete list of members for <a class="el" href="classace__segment_1_1LedDisplay.html">ace_segment::LedDisplay</a>, including all inherited members.</p>
 <table class="directory">
-  <tr class="even"><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html#ac0e3a7ed16c3fb6ee044bf6b2789eaff">clear</a>()=0</td><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html">ace_segment::LedDisplay</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html#a9aef98e79c8f2b95d93938c8d4d4fcc8">getNumDigits</a>() const</td><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html">ace_segment::LedDisplay</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>LedDisplay</b>(uint8_t numDigits) (defined in <a class="el" href="classace__segment_1_1LedDisplay.html">ace_segment::LedDisplay</a>)</td><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html">ace_segment::LedDisplay</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html#ab8cdbdeb458ed2c9ae8d8656ead3e7b8">setBrightnessAt</a>(uint8_t pos, uint8_t brightness)=0</td><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html">ace_segment::LedDisplay</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html#af1a17006b07949cbe859684b235bcb84">setGlobalBrightness</a>(uint8_t brightness)=0</td><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html">ace_segment::LedDisplay</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html#a0f339305ac7432fbfb4e38b9599dcaae">writeDecimalPointAt</a>(uint8_t pos, bool state=true)=0</td><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html">ace_segment::LedDisplay</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html#a7739b860133bab0e924b57ed0c55d0bd">writePatternAt</a>(uint8_t pos, uint8_t pattern)=0</td><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html">ace_segment::LedDisplay</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html#a33592c6357d17837836307eb2f88fdf0">writePatternsAt</a>(uint8_t pos, const uint8_t patterns[], uint8_t len)=0</td><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html">ace_segment::LedDisplay</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
-  <tr class="even"><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html#aaf92e9b380ea432a532b51383c76ffa4">writePatternsAt_P</a>(uint8_t pos, const uint8_t patterns[], uint8_t len)=0</td><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html">ace_segment::LedDisplay</a></td><td class="entry"><span class="mlabel">pure virtual</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html#a71fa8c01438ce1d209cfd3efdae95c3a">clear</a>()</td><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html">ace_segment::LedDisplay</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html#a1ec32723fa45c0d9fbc58e3650cdd6fe">clearToEnd</a>(uint8_t pos)</td><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html">ace_segment::LedDisplay</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html#a9aef98e79c8f2b95d93938c8d4d4fcc8">getNumDigits</a>() const</td><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html">ace_segment::LedDisplay</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html#a6cda5f98bdfbc8dd1661dc41e1e94d02">LedDisplay</a>(LedModule &amp;ledModule)</td><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html">ace_segment::LedDisplay</a></td><td class="entry"><span class="mlabel">inline</span><span class="mlabel">explicit</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html#a15fea01035f86acbd1fb1a53df55cfbe">setBrightness</a>(uint8_t brightness)</td><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html">ace_segment::LedDisplay</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html#a9b4d88c8cab7d0be22cc949460e8875f">writeDecimalPointAt</a>(uint8_t pos, bool state=true)</td><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html">ace_segment::LedDisplay</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html#a95f92778e0adc463d1c57da3902c0676">writePatternAt</a>(uint8_t pos, uint8_t pattern)</td><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html">ace_segment::LedDisplay</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html#acfbaf262c2a49631e069558cc03deecd">writePatternsAt</a>(uint8_t pos, const uint8_t patterns[], uint8_t len)</td><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html">ace_segment::LedDisplay</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html#ae2341eef2cecc7bb2c1aed4248e6e4c1">writePatternsAt_P</a>(uint8_t pos, const uint8_t patterns[], uint8_t len)</td><td class="entry"><a class="el" href="classace__segment_1_1LedDisplay.html">ace_segment::LedDisplay</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
 </table></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

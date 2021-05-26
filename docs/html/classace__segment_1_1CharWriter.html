@@ -22,9 +22,9 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.4.0</span>
+   &#160;<span id="projectnumber">0.6.0</span>
    </div>
-   <div id="projectbrief">An adjustable, configurable, and extensible framework for rendering seven segment LED displays.</div>
+   <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, and 74HC595 controller chips</div>
   </td>
  </tr>
  </tbody>
@@ -76,39 +76,105 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p>The <a class="el" href="classace__segment_1_1CharWriter.html" title="The CharWriter supports mapping of ASCII (0 - 127) characters to segment patterns supported by LedDis...">CharWriter</a> supports mapping of ASCII (0 - 127) characters to segment patterns supported by <a class="el" href="classace__segment_1_1LedDisplay.html" title="General interface for writing LED segment patterns to the LED display module.">LedDisplay</a>.  
+<p>The <a class="el" href="classace__segment_1_1CharWriter.html" title="The CharWriter supports mapping of an 8-bit character set to segment patterns supported by LedDisplay...">CharWriter</a> supports mapping of an 8-bit character set to segment patterns supported by <a class="el" href="classace__segment_1_1LedDisplay.html" title="General interface for writing segment patterns to the underlying LedModule.">LedDisplay</a>.  
  <a href="classace__segment_1_1CharWriter.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="CharWriter_8h_source.html">CharWriter.h</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a9643e7e815b01e0559b11d6c39da9873"><td class="memItemLeft" align="right" valign="top"><a id="a9643e7e815b01e0559b11d6c39da9873"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1CharWriter.html#a9643e7e815b01e0559b11d6c39da9873">CharWriter</a> (<a class="el" href="classace__segment_1_1LedDisplay.html">LedDisplay</a> &amp;ledDisplay)</td></tr>
-<tr class="memdesc:a9643e7e815b01e0559b11d6c39da9873"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br /></td></tr>
-<tr class="separator:a9643e7e815b01e0559b11d6c39da9873"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1355d72b1af631d2dd66b6e2461e36ef"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1CharWriter.html#a1355d72b1af631d2dd66b6e2461e36ef">CharWriter</a> (<a class="el" href="classace__segment_1_1LedDisplay.html">LedDisplay</a> &amp;ledDisplay, const uint8_t charPatterns[]=kCharPatterns, uint8_t numChars=kNumChars)</td></tr>
+<tr class="memdesc:a1355d72b1af631d2dd66b6e2461e36ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="classace__segment_1_1CharWriter.html#a1355d72b1af631d2dd66b6e2461e36ef">More...</a><br /></td></tr>
+<tr class="separator:a1355d72b1af631d2dd66b6e2461e36ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a99a411fbfb2fb6abf42fcd5149222cf7"><td class="memItemLeft" align="right" valign="top"><a id="a99a411fbfb2fb6abf42fcd5149222cf7"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1CharWriter.html#a99a411fbfb2fb6abf42fcd5149222cf7">writeCharAt</a> (uint8_t pos, char c)</td></tr>
 <tr class="memdesc:a99a411fbfb2fb6abf42fcd5149222cf7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write the character at the specified position. <br /></td></tr>
 <tr class="separator:a99a411fbfb2fb6abf42fcd5149222cf7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a040fedebff2340e6a7435de64ececf91"><td class="memItemLeft" align="right" valign="top"><a id="a040fedebff2340e6a7435de64ececf91"></a>
 <a class="el" href="classace__segment_1_1LedDisplay.html">LedDisplay</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1CharWriter.html#a040fedebff2340e6a7435de64ececf91">display</a> () const</td></tr>
-<tr class="memdesc:a040fedebff2340e6a7435de64ececf91"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the underlying <a class="el" href="classace__segment_1_1LedDisplay.html" title="General interface for writing LED segment patterns to the LED display module.">LedDisplay</a>. <br /></td></tr>
+<tr class="memdesc:a040fedebff2340e6a7435de64ececf91"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the underlying <a class="el" href="classace__segment_1_1LedDisplay.html" title="General interface for writing segment patterns to the underlying LedModule.">LedDisplay</a>. <br /></td></tr>
 <tr class="separator:a040fedebff2340e6a7435de64ececf91"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c1e7fb689f2e52ff923a272bc44923a"><td class="memItemLeft" align="right" valign="top"><a id="a5c1e7fb689f2e52ff923a272bc44923a"></a>
+uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1CharWriter.html#a5c1e7fb689f2e52ff923a272bc44923a">getNumChars</a> () const</td></tr>
+<tr class="memdesc:a5c1e7fb689f2e52ff923a272bc44923a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get number of characters in current character set, 0 means 256. <br /></td></tr>
+<tr class="separator:a5c1e7fb689f2e52ff923a272bc44923a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af469ebfa358b4d7dfb4093e36aa4e7eb"><td class="memItemLeft" align="right" valign="top"><a id="af469ebfa358b4d7dfb4093e36aa4e7eb"></a>
+uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1CharWriter.html#af469ebfa358b4d7dfb4093e36aa4e7eb">getPattern</a> (char c) const</td></tr>
+<tr class="memdesc:af469ebfa358b4d7dfb4093e36aa4e7eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get segment pattern for character 'c'. <br /></td></tr>
+<tr class="separator:af469ebfa358b4d7dfb4093e36aa4e7eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
-<tr class="memitem:a628f60290e022adba954800ef1b74277"><td class="memItemLeft" align="right" valign="top"><a id="a628f60290e022adba954800ef1b74277"></a>
-static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>kNumCharacters</b> = 128</td></tr>
-<tr class="separator:a628f60290e022adba954800ef1b74277"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a93caf999e913a067c09ce80816c16156"><td class="memItemLeft" align="right" valign="top"><a id="a93caf999e913a067c09ce80816c16156"></a>
+static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>kCharPatterns</b> []</td></tr>
+<tr class="separator:a93caf999e913a067c09ce80816c16156"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac6f7960eba81f9233743fd1bbf29b8ce"><td class="memItemLeft" align="right" valign="top"><a id="ac6f7960eba81f9233743fd1bbf29b8ce"></a>
+static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><b>kNumChars</b> = 128</td></tr>
+<tr class="separator:ac6f7960eba81f9233743fd1bbf29b8ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>The <a class="el" href="classace__segment_1_1CharWriter.html" title="The CharWriter supports mapping of ASCII (0 - 127) characters to segment patterns supported by LedDis...">CharWriter</a> supports mapping of ASCII (0 - 127) characters to segment patterns supported by <a class="el" href="classace__segment_1_1LedDisplay.html" title="General interface for writing LED segment patterns to the LED display module.">LedDisplay</a>. </p>
+<div class="textblock"><p>The <a class="el" href="classace__segment_1_1CharWriter.html" title="The CharWriter supports mapping of an 8-bit character set to segment patterns supported by LedDisplay...">CharWriter</a> supports mapping of an 8-bit character set to segment patterns supported by <a class="el" href="classace__segment_1_1LedDisplay.html" title="General interface for writing segment patterns to the underlying LedModule.">LedDisplay</a>. </p>
+<p>By default, the ASCII characters (0-127) is provided, but can be overridden with a user-defined character set. </p>
 
-<p class="definition">Definition at line <a class="el" href="CharWriter_8h_source.html#l00037">37</a> of file <a class="el" href="CharWriter_8h_source.html">CharWriter.h</a>.</p>
-</div><hr/>The documentation for this class was generated from the following files:<ul>
-<li>/home/brian/src/AceSegment/src/ace_segment/<a class="el" href="CharWriter_8h_source.html">CharWriter.h</a></li>
-<li>/home/brian/src/AceSegment/src/ace_segment/<a class="el" href="CharWriter_8cpp_source.html">CharWriter.cpp</a></li>
+<p class="definition">Definition at line <a class="el" href="CharWriter_8h_source.html#l00038">38</a> of file <a class="el" href="CharWriter_8h_source.html">CharWriter.h</a>.</p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a1355d72b1af631d2dd66b6e2461e36ef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1355d72b1af631d2dd66b6e2461e36ef">&#9670;&nbsp;</a></span>CharWriter()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">ace_segment::CharWriter::CharWriter </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classace__segment_1_1LedDisplay.html">LedDisplay</a> &amp;&#160;</td>
+          <td class="paramname"><em>ledDisplay</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint8_t&#160;</td>
+          <td class="paramname"><em>charPatterns</em>[] = <code>kCharPatterns</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>numChars</em> = <code>kNumChars</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ledDisplay</td><td>reference to <a class="el" href="classace__segment_1_1LedDisplay.html" title="General interface for writing segment patterns to the underlying LedModule.">LedDisplay</a> </td></tr>
+    <tr><td class="paramname">charPatterns</td><td>(optional) array of 7-segment character patterns in PROGMEM (default: an ASCII character set) </td></tr>
+    <tr><td class="paramname">numChars</td><td>(optional) number of characters in charPatterns, 0 means 256 (default: 128) </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="CharWriter_8h_source.html#l00054">54</a> of file <a class="el" href="CharWriter_8h_source.html">CharWriter.h</a>.</p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following files:<ul>
+<li>/home/brian/src/AceSegment/src/ace_segment/writer/<a class="el" href="CharWriter_8h_source.html">CharWriter.h</a></li>
+<li>/home/brian/src/AceSegment/src/ace_segment/writer/<a class="el" href="CharWriter_8cpp_source.html">CharWriter.cpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

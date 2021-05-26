@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.17"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>AceSegment: /home/brian/src/AceSegment/src/ace_segment/LedMatrixBase.h Source File</title>
+<title>AceSegment: /home/brian/src/AceSegment/src/ace_segment/scanning/LedMatrixBase.h Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,9 +22,9 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.4.0</span>
+   &#160;<span id="projectnumber">0.6.0</span>
    </div>
-   <div id="projectbrief">An adjustable, configurable, and extensible framework for rendering seven segment LED displays.</div>
+   <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, and 74HC595 controller chips</div>
   </td>
  </tr>
  </tbody>
@@ -63,7 +63,7 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_25fe9c7bbfbe3420a1b6cf93f8b304ef.html">ace_segment</a></li>  </ul>
+<li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_25fe9c7bbfbe3420a1b6cf93f8b304ef.html">ace_segment</a></li><li class="navelem"><a class="el" href="dir_fe652edbd2fe618e77745b393f7a7157.html">scanning</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -100,52 +100,50 @@ $(function() {
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
 <div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="keyword">namespace </span>ace_segment {</div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
-<div class="line"><a name="l00072"></a><span class="lineno"><a class="line" href="classace__segment_1_1LedMatrixBase.html">   72</a></span>&#160;<span class="keyword">class </span><a class="code" href="classace__segment_1_1LedMatrixBase.html">LedMatrixBase</a> {</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;  <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160; </div>
-<div class="line"><a name="l00076"></a><span class="lineno"><a class="line" href="classace__segment_1_1LedMatrixBase.html#ade3ca76e0a5f73f36eb17d533799f627">   76</a></span>&#160;    <span class="keyword">static</span> constexpr uint8_t <a class="code" href="classace__segment_1_1LedMatrixBase.html#ade3ca76e0a5f73f36eb17d533799f627">kActiveHighPattern</a> = 0xFF;</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; </div>
-<div class="line"><a name="l00079"></a><span class="lineno"><a class="line" href="classace__segment_1_1LedMatrixBase.html#af30041c0cd3a4f12c8ad857c3ac478d7">   79</a></span>&#160;    <span class="keyword">static</span> constexpr uint8_t <a class="code" href="classace__segment_1_1LedMatrixBase.html#af30041c0cd3a4f12c8ad857c3ac478d7">kActiveLowPattern</a> = 0x00;</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160; </div>
-<div class="line"><a name="l00085"></a><span class="lineno"><a class="line" href="classace__segment_1_1LedMatrixBase.html#ab53a3edaa944f19196c9170c3830bb6f">   85</a></span>&#160;    <a class="code" href="classace__segment_1_1LedMatrixBase.html#ab53a3edaa944f19196c9170c3830bb6f">LedMatrixBase</a>(</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        uint8_t groupOnPattern,</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        uint8_t elementOnPattern</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    ) :</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        mGroupXorMask(~groupOnPattern),</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        mElementXorMask(~elementOnPattern)</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    {}</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160; </div>
-<div class="line"><a name="l00094"></a><span class="lineno"><a class="line" href="classace__segment_1_1LedMatrixBase.html#a5c068db5e59b80d0884a1af616177f0e">   94</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classace__segment_1_1LedMatrixBase.html#a5c068db5e59b80d0884a1af616177f0e">begin</a>()<span class="keyword"> const </span>{}</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160; </div>
-<div class="line"><a name="l00097"></a><span class="lineno"><a class="line" href="classace__segment_1_1LedMatrixBase.html#a36c163f093b05a7a25daf40d5842186f">   97</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classace__segment_1_1LedMatrixBase.html#a36c163f093b05a7a25daf40d5842186f">end</a>()<span class="keyword"> const </span>{}</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160; </div>
-<div class="line"><a name="l00100"></a><span class="lineno"><a class="line" href="classace__segment_1_1LedMatrixBase.html#ad9d2bc50b50ab4b2c16c1ef53b3397d2">  100</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classace__segment_1_1LedMatrixBase.html#ad9d2bc50b50ab4b2c16c1ef53b3397d2">draw</a>(uint8_t <span class="comment">/*group*/</span>, uint8_t <span class="comment">/*elementPattern*/</span>)<span class="keyword"> const </span>{}</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; </div>
-<div class="line"><a name="l00103"></a><span class="lineno"><a class="line" href="classace__segment_1_1LedMatrixBase.html#a392418ec3a4e763920e21acc763e8848">  103</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classace__segment_1_1LedMatrixBase.html#a392418ec3a4e763920e21acc763e8848">disableGroup</a>(uint8_t <span class="comment">/*group*/</span>)<span class="keyword"> const </span>{}</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
-<div class="line"><a name="l00106"></a><span class="lineno"><a class="line" href="classace__segment_1_1LedMatrixBase.html#ae2443123d487980dc87a59dc61f0c3bb">  106</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classace__segment_1_1LedMatrixBase.html#ae2443123d487980dc87a59dc61f0c3bb">enableGroup</a>(uint8_t <span class="comment">/*group*/</span>)<span class="keyword"> const </span>{}</div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160; </div>
-<div class="line"><a name="l00109"></a><span class="lineno"><a class="line" href="classace__segment_1_1LedMatrixBase.html#aa5fb153442f0504f93461b9d9f6f9a3e">  109</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classace__segment_1_1LedMatrixBase.html#aa5fb153442f0504f93461b9d9f6f9a3e">clear</a>()<span class="keyword"> const </span>{}</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160; </div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;  <span class="keyword">protected</span>:</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    uint8_t <span class="keyword">const</span> mGroupXorMask;</div>
+<div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">static</span> <span class="keyword">const</span> uint8_t kActiveHighPattern = 0xFF;</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
+<div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;<span class="keyword">static</span> <span class="keyword">const</span> uint8_t kActiveLowPattern = 0x00;</div>
+<div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160; </div>
+<div class="line"><a name="l00079"></a><span class="lineno"><a class="line" href="classace__segment_1_1LedMatrixBase.html">   79</a></span>&#160;<span class="keyword">class </span><a class="code" href="classace__segment_1_1LedMatrixBase.html">LedMatrixBase</a> {</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;  <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160; </div>
+<div class="line"><a name="l00086"></a><span class="lineno"><a class="line" href="classace__segment_1_1LedMatrixBase.html#ae46efc84d412faff4617fe461b912131">   86</a></span>&#160;    <a class="code" href="classace__segment_1_1LedMatrixBase.html#ae46efc84d412faff4617fe461b912131">LedMatrixBase</a>(</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        uint8_t elementOnPattern,</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        uint8_t groupOnPattern</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    ) :</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;        mElementXorMask(~elementOnPattern),</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;        mGroupXorMask(~groupOnPattern)</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    {}</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160; </div>
+<div class="line"><a name="l00095"></a><span class="lineno"><a class="line" href="classace__segment_1_1LedMatrixBase.html#a5c068db5e59b80d0884a1af616177f0e">   95</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classace__segment_1_1LedMatrixBase.html#a5c068db5e59b80d0884a1af616177f0e">begin</a>()<span class="keyword"> const </span>{}</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160; </div>
+<div class="line"><a name="l00098"></a><span class="lineno"><a class="line" href="classace__segment_1_1LedMatrixBase.html#a36c163f093b05a7a25daf40d5842186f">   98</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classace__segment_1_1LedMatrixBase.html#a36c163f093b05a7a25daf40d5842186f">end</a>()<span class="keyword"> const </span>{}</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160; </div>
+<div class="line"><a name="l00101"></a><span class="lineno"><a class="line" href="classace__segment_1_1LedMatrixBase.html#ad9d2bc50b50ab4b2c16c1ef53b3397d2">  101</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classace__segment_1_1LedMatrixBase.html#ad9d2bc50b50ab4b2c16c1ef53b3397d2">draw</a>(uint8_t <span class="comment">/*group*/</span>, uint8_t <span class="comment">/*elementPattern*/</span>)<span class="keyword"> const </span>{}</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160; </div>
+<div class="line"><a name="l00104"></a><span class="lineno"><a class="line" href="classace__segment_1_1LedMatrixBase.html#a392418ec3a4e763920e21acc763e8848">  104</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classace__segment_1_1LedMatrixBase.html#a392418ec3a4e763920e21acc763e8848">disableGroup</a>(uint8_t <span class="comment">/*group*/</span>)<span class="keyword"> const </span>{}</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160; </div>
+<div class="line"><a name="l00107"></a><span class="lineno"><a class="line" href="classace__segment_1_1LedMatrixBase.html#ae2443123d487980dc87a59dc61f0c3bb">  107</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classace__segment_1_1LedMatrixBase.html#ae2443123d487980dc87a59dc61f0c3bb">enableGroup</a>(uint8_t <span class="comment">/*group*/</span>)<span class="keyword"> const </span>{}</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160; </div>
+<div class="line"><a name="l00110"></a><span class="lineno"><a class="line" href="classace__segment_1_1LedMatrixBase.html#aa5fb153442f0504f93461b9d9f6f9a3e">  110</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classace__segment_1_1LedMatrixBase.html#aa5fb153442f0504f93461b9d9f6f9a3e">clear</a>()<span class="keyword"> const </span>{}</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160; </div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;  <span class="keyword">protected</span>:</div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    uint8_t <span class="keyword">const</span> mElementXorMask;</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;};</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160; </div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;}</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160; </div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    uint8_t <span class="keyword">const</span> mGroupXorMask;</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;};</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160; </div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;}</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160; </div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="aclassace__segment_1_1LedMatrixBase_html"><div class="ttname"><a href="classace__segment_1_1LedMatrixBase.html">ace_segment::LedMatrixBase</a></div><div class="ttdoc">Class that represents the abstraction of a particular LED display wiring, and knows how to turn off a...</div><div class="ttdef"><b>Definition:</b> <a href="LedMatrixBase_8h_source.html#l00072">LedMatrixBase.h:72</a></div></div>
-<div class="ttc" id="aclassace__segment_1_1LedMatrixBase_html_af30041c0cd3a4f12c8ad857c3ac478d7"><div class="ttname"><a href="classace__segment_1_1LedMatrixBase.html#af30041c0cd3a4f12c8ad857c3ac478d7">ace_segment::LedMatrixBase::kActiveLowPattern</a></div><div class="ttdeci">static constexpr uint8_t kActiveLowPattern</div><div class="ttdoc">Bit pattern to indicate that logical 0 activates group or element.</div><div class="ttdef"><b>Definition:</b> <a href="LedMatrixBase_8h_source.html#l00079">LedMatrixBase.h:79</a></div></div>
-<div class="ttc" id="aclassace__segment_1_1LedMatrixBase_html_a36c163f093b05a7a25daf40d5842186f"><div class="ttname"><a href="classace__segment_1_1LedMatrixBase.html#a36c163f093b05a7a25daf40d5842186f">ace_segment::LedMatrixBase::end</a></div><div class="ttdeci">void end() const</div><div class="ttdoc">Turn off the pins by doing the opposite of begin().</div><div class="ttdef"><b>Definition:</b> <a href="LedMatrixBase_8h_source.html#l00097">LedMatrixBase.h:97</a></div></div>
-<div class="ttc" id="aclassace__segment_1_1LedMatrixBase_html_ad9d2bc50b50ab4b2c16c1ef53b3397d2"><div class="ttname"><a href="classace__segment_1_1LedMatrixBase.html#ad9d2bc50b50ab4b2c16c1ef53b3397d2">ace_segment::LedMatrixBase::draw</a></div><div class="ttdeci">void draw(uint8_t, uint8_t) const</div><div class="ttdoc">Write element patterns for the given group.</div><div class="ttdef"><b>Definition:</b> <a href="LedMatrixBase_8h_source.html#l00100">LedMatrixBase.h:100</a></div></div>
-<div class="ttc" id="aclassace__segment_1_1LedMatrixBase_html_ab53a3edaa944f19196c9170c3830bb6f"><div class="ttname"><a href="classace__segment_1_1LedMatrixBase.html#ab53a3edaa944f19196c9170c3830bb6f">ace_segment::LedMatrixBase::LedMatrixBase</a></div><div class="ttdeci">LedMatrixBase(uint8_t groupOnPattern, uint8_t elementOnPattern)</div><div class="ttdef"><b>Definition:</b> <a href="LedMatrixBase_8h_source.html#l00085">LedMatrixBase.h:85</a></div></div>
-<div class="ttc" id="aclassace__segment_1_1LedMatrixBase_html_ade3ca76e0a5f73f36eb17d533799f627"><div class="ttname"><a href="classace__segment_1_1LedMatrixBase.html#ade3ca76e0a5f73f36eb17d533799f627">ace_segment::LedMatrixBase::kActiveHighPattern</a></div><div class="ttdeci">static constexpr uint8_t kActiveHighPattern</div><div class="ttdoc">Bit pattern to indicate that logical 1 activates group or element.</div><div class="ttdef"><b>Definition:</b> <a href="LedMatrixBase_8h_source.html#l00076">LedMatrixBase.h:76</a></div></div>
-<div class="ttc" id="aclassace__segment_1_1LedMatrixBase_html_a392418ec3a4e763920e21acc763e8848"><div class="ttname"><a href="classace__segment_1_1LedMatrixBase.html#a392418ec3a4e763920e21acc763e8848">ace_segment::LedMatrixBase::disableGroup</a></div><div class="ttdeci">void disableGroup(uint8_t) const</div><div class="ttdoc">Disable the elements of given group.</div><div class="ttdef"><b>Definition:</b> <a href="LedMatrixBase_8h_source.html#l00103">LedMatrixBase.h:103</a></div></div>
-<div class="ttc" id="aclassace__segment_1_1LedMatrixBase_html_aa5fb153442f0504f93461b9d9f6f9a3e"><div class="ttname"><a href="classace__segment_1_1LedMatrixBase.html#aa5fb153442f0504f93461b9d9f6f9a3e">ace_segment::LedMatrixBase::clear</a></div><div class="ttdeci">void clear() const</div><div class="ttdoc">Clear everything.</div><div class="ttdef"><b>Definition:</b> <a href="LedMatrixBase_8h_source.html#l00109">LedMatrixBase.h:109</a></div></div>
-<div class="ttc" id="aclassace__segment_1_1LedMatrixBase_html_a5c068db5e59b80d0884a1af616177f0e"><div class="ttname"><a href="classace__segment_1_1LedMatrixBase.html#a5c068db5e59b80d0884a1af616177f0e">ace_segment::LedMatrixBase::begin</a></div><div class="ttdeci">void begin() const</div><div class="ttdoc">Configure the pins for the given LED wiring.</div><div class="ttdef"><b>Definition:</b> <a href="LedMatrixBase_8h_source.html#l00094">LedMatrixBase.h:94</a></div></div>
-<div class="ttc" id="aclassace__segment_1_1LedMatrixBase_html_ae2443123d487980dc87a59dc61f0c3bb"><div class="ttname"><a href="classace__segment_1_1LedMatrixBase.html#ae2443123d487980dc87a59dc61f0c3bb">ace_segment::LedMatrixBase::enableGroup</a></div><div class="ttdeci">void enableGroup(uint8_t) const</div><div class="ttdoc">Enable the elements of given group.</div><div class="ttdef"><b>Definition:</b> <a href="LedMatrixBase_8h_source.html#l00106">LedMatrixBase.h:106</a></div></div>
+<div class="ttc" id="aclassace__segment_1_1LedMatrixBase_html"><div class="ttname"><a href="classace__segment_1_1LedMatrixBase.html">ace_segment::LedMatrixBase</a></div><div class="ttdoc">Class that represents the abstraction of a particular LED display wiring, and knows how to turn off a...</div><div class="ttdef"><b>Definition:</b> <a href="LedMatrixBase_8h_source.html#l00079">LedMatrixBase.h:79</a></div></div>
+<div class="ttc" id="aclassace__segment_1_1LedMatrixBase_html_ae46efc84d412faff4617fe461b912131"><div class="ttname"><a href="classace__segment_1_1LedMatrixBase.html#ae46efc84d412faff4617fe461b912131">ace_segment::LedMatrixBase::LedMatrixBase</a></div><div class="ttdeci">LedMatrixBase(uint8_t elementOnPattern, uint8_t groupOnPattern)</div><div class="ttdef"><b>Definition:</b> <a href="LedMatrixBase_8h_source.html#l00086">LedMatrixBase.h:86</a></div></div>
+<div class="ttc" id="aclassace__segment_1_1LedMatrixBase_html_a36c163f093b05a7a25daf40d5842186f"><div class="ttname"><a href="classace__segment_1_1LedMatrixBase.html#a36c163f093b05a7a25daf40d5842186f">ace_segment::LedMatrixBase::end</a></div><div class="ttdeci">void end() const</div><div class="ttdoc">Turn off the pins by doing the opposite of begin().</div><div class="ttdef"><b>Definition:</b> <a href="LedMatrixBase_8h_source.html#l00098">LedMatrixBase.h:98</a></div></div>
+<div class="ttc" id="aclassace__segment_1_1LedMatrixBase_html_ad9d2bc50b50ab4b2c16c1ef53b3397d2"><div class="ttname"><a href="classace__segment_1_1LedMatrixBase.html#ad9d2bc50b50ab4b2c16c1ef53b3397d2">ace_segment::LedMatrixBase::draw</a></div><div class="ttdeci">void draw(uint8_t, uint8_t) const</div><div class="ttdoc">Write element patterns for the given group.</div><div class="ttdef"><b>Definition:</b> <a href="LedMatrixBase_8h_source.html#l00101">LedMatrixBase.h:101</a></div></div>
+<div class="ttc" id="aclassace__segment_1_1LedMatrixBase_html_a392418ec3a4e763920e21acc763e8848"><div class="ttname"><a href="classace__segment_1_1LedMatrixBase.html#a392418ec3a4e763920e21acc763e8848">ace_segment::LedMatrixBase::disableGroup</a></div><div class="ttdeci">void disableGroup(uint8_t) const</div><div class="ttdoc">Disable the elements of given group.</div><div class="ttdef"><b>Definition:</b> <a href="LedMatrixBase_8h_source.html#l00104">LedMatrixBase.h:104</a></div></div>
+<div class="ttc" id="aclassace__segment_1_1LedMatrixBase_html_aa5fb153442f0504f93461b9d9f6f9a3e"><div class="ttname"><a href="classace__segment_1_1LedMatrixBase.html#aa5fb153442f0504f93461b9d9f6f9a3e">ace_segment::LedMatrixBase::clear</a></div><div class="ttdeci">void clear() const</div><div class="ttdoc">Clear everything.</div><div class="ttdef"><b>Definition:</b> <a href="LedMatrixBase_8h_source.html#l00110">LedMatrixBase.h:110</a></div></div>
+<div class="ttc" id="aclassace__segment_1_1LedMatrixBase_html_a5c068db5e59b80d0884a1af616177f0e"><div class="ttname"><a href="classace__segment_1_1LedMatrixBase.html#a5c068db5e59b80d0884a1af616177f0e">ace_segment::LedMatrixBase::begin</a></div><div class="ttdeci">void begin() const</div><div class="ttdoc">Configure the pins for the given LED wiring.</div><div class="ttdef"><b>Definition:</b> <a href="LedMatrixBase_8h_source.html#l00095">LedMatrixBase.h:95</a></div></div>
+<div class="ttc" id="aclassace__segment_1_1LedMatrixBase_html_ae2443123d487980dc87a59dc61f0c3bb"><div class="ttname"><a href="classace__segment_1_1LedMatrixBase.html#ae2443123d487980dc87a59dc61f0c3bb">ace_segment::LedMatrixBase::enableGroup</a></div><div class="ttdeci">void enableGroup(uint8_t) const</div><div class="ttdoc">Enable the elements of given group.</div><div class="ttdef"><b>Definition:</b> <a href="LedMatrixBase_8h_source.html#l00107">LedMatrixBase.h:107</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

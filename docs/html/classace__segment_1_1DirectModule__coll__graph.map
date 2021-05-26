@@ -1,0 +1,5 @@
+<map id="ace_segment::DirectModule&lt; T_DIGITS, T_SUBFIELDS, T_CI, T_GPIOI &gt;" name="ace_segment::DirectModule&lt; T_DIGITS, T_SUBFIELDS, T_CI, T_GPIOI &gt;">
+<area shape="rect" id="node1" title="An implementation of LedModule whose segment and digit pins are directly connected to the GPIO pins o..." alt="" coords="533,5,737,61"/>
+<area shape="rect" id="node2" href="$classace__segment_1_1ScanningModule.html" title=" " alt="" coords="241,5,485,61"/>
+<area shape="rect" id="node3" href="$classace__segment_1_1LedModule.html" title="General interface that represents a generic seven&#45;segment LED module with multiple digits." alt="" coords="5,20,193,47"/>
+</map>
