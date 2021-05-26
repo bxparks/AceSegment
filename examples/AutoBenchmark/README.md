@@ -26,7 +26,7 @@ LED module:
 * `Max7219Module::flush()`
     * Sends out the buffered digits using SPI.
 
-**Version**: AceSegment v0.5
+**Version**: AceSegment v0.6
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -114,7 +114,7 @@ number of `TimingStats::update()` calls that were made.
   the CPU time of `renderFieldsNow()` by a tiny amount, maybe a microsecond on a
   AVR. For 32-bit processors, the difference seems to be within the noise.
 
-**v0.5+:**
+**v0.6:**
 
 * `HardSpiInterface` is slightly slower on the fastest processors (e.g. ESP8266,
   ESP32, Teensy 3.2), because the SPI frequency was reduced from 20 MHz to 8

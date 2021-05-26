@@ -62,7 +62,7 @@ SOFTWARE.
 #endif
 
 // Version format: xxyyzz == "xx.yy.zz"
-#define ACE_SEGMENT_VERSION 500
-#define ACE_SEGMENT_VERSION_STRING "0.5"
+#define ACE_SEGMENT_VERSION 600
+#define ACE_SEGMENT_VERSION_STRING "0.6"
 
 #endif

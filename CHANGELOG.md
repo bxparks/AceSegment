@@ -1,6 +1,7 @@
 # Changelog
 
 * Unreleased
+* 0.6 (2021-05-26)
     * `HardSpiInterface`
         * Add support for microcontrollers with 2 SPI buses (ESP32 and STM32F1).
         * Reduce maximum SPI speed from 20 MHz to 8 MHz, since the MAX7219 chip

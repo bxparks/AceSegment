@@ -25,7 +25,7 @@ into hardware-dependent components and hardware-independent components to allow
 application code to be written without worrying too much about the low-level
 details of the specific LED module.
 
-**Version**: 0.5 (2021-05-14)
+**Version**: 0.6 (2021-05-26)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
@@ -119,6 +119,10 @@ The unit tests depend on:
 Some of the examples may depend on:
 
 * AceButton (https://github.com/bxparks/AceButton)
+* TimerOne (https://github.com/PaulStoffregen/TimerOne)
+* one of the DigitalWriteFast libraries
+    * https://github.com/watterott/Arduino-Libs/tree/master/digitalWriteFast
+    * https://github.com/NicksonYap/digitalWriteFast
 
 <a name="Documentation"></a>
 ## Documentation
