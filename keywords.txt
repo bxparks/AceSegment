@@ -129,7 +129,7 @@ display	KEYWORD2
 # LevelWriter
 display	KEYWORD2
 getMaxLevel	KEYWORD2
-setLevel	KEYWORD2
+writeLevel	KEYWORD2
 
 #######################################
 # Instances (KEYWORD2)

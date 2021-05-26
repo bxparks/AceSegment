@@ -928,7 +928,7 @@ void randomLevels() {
     level = maxLevel - 1;
   }
 
-  levelWriter.setLevel(level);
+  levelWriter.writeLevel(level);
 }
 
 //-----------------------------------------------------------------------------

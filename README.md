@@ -1196,7 +1196,7 @@ class LevelWriter {
     LedDisplay& display() const;
 
     uint8_t getMaxLevel() const;
-    void setLevel(uint8_t level);
+    void writeLevel(uint8_t level);
 };
 ```
 

@@ -60,7 +60,7 @@ class LevelWriter {
     }
 
     /** Write out the level bar, 2 levels per digit. */
-    void setLevel(uint8_t level) {
+    void writeLevel(uint8_t level) {
       uint8_t fullDigits = level / 2;
       uint8_t partialDigit = level & 0x1;
       uint8_t numDigits = mLedDisplay.getNumDigits();

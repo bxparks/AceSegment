@@ -449,7 +449,7 @@ void loop() {
   stringScroller.scrollLeft();
 
 #elif FEATURE == FEATURE_LEVEL_WRITER
-  levelWriter.setLevel(3);
+  levelWriter.writeLevel(3);
 
 #endif
 }
