@@ -32,6 +32,7 @@ ClockWriter	KEYWORD1
 CharWriter	KEYWORD1
 StringWriter	KEYWORD1
 StringScroller	KEYWORD1
+LevelWriter	KEYWORD1
 hexchar_t	KEYWORD1
 
 #######################################
@@ -82,8 +83,6 @@ getFieldsPerSecond	KEYWORD2
 setBrightnessAt	KEYWORD2
 renderFieldNow	KEYWORD2
 renderFieldWhenReady	KEYWORD2
-prepareToSleep	KEYWORD2
-wakeFromSleep	KEYWORD2
 
 # NumberWriter.h
 writeHexCharAt	KEYWORD2
@@ -126,6 +125,11 @@ initScrollRight	KEYWORD2
 scrollLeft	KEYWORD2
 scrollRight	KEYWORD2
 display	KEYWORD2
+
+# LevelWriter
+display	KEYWORD2
+getMaxLevel	KEYWORD2
+setLevel	KEYWORD2
 
 #######################################
 # Instances (KEYWORD2)
