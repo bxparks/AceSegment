@@ -1006,6 +1006,10 @@ symbols, so `[0,17]`:
 
 A `NumberWriter` consumes about 150 bytes of flash memory on an AVR.
 
+![NumberWriter](docs/writers/number_writer_hex.jpg)
+
+![NumberWriter](docs/writers/number_writer_decimal.jpg)
+
 <a name="ClockWriter"></a>
 ### ClockWriter
 
@@ -1042,6 +1046,8 @@ class ClockWriter {
 A `ClockWriter` consumes about 250 bytes of flash memory on an AVR, which
 includes an instance of a `NumberWriter`.
 
+![ClockWriter](docs/writers/clock_writer.jpg)
+
 <a name="TemperatureWriter"></a>
 ### TemperatureWriter
 
@@ -1068,6 +1074,10 @@ class TemperatureWriter {
 
 A `TemperatureWriter` consumes about 270 bytes of flash memory on an AVR, which
 includes an instance of a `NumberWriter`.
+
+![TemperatureWriter-Celsius](docs/writers/temperature_writer_celsius.jpg)
+
+![TemperatureWriter-Fahrenheit](docs/writers/temperature_writer_fahrenheit.jpg)
 
 <a name="CharWriter"></a>
 ### CharWriter
@@ -1104,6 +1114,8 @@ class CharWriter {
 ```
 
 A `CharWriter` consumes about 250 bytes of flash memory on an AVR.
+
+![CharWriter](docs/writers/char_writer.jpg)
 
 <a name="StringWriter"></a>
 ### StringWriter
@@ -1155,6 +1167,28 @@ uint8_t written = stringWriter.writeStringAt(0, s);
 stringWriter.clearToEnd(written);
 ```
 
+![StringWriter](docs/writers/string_writer.jpg)
+
+<a name="LevelWriter"></a>
+### LevelWriter
+
+A `LevelWriter` writes a specified number of vertical bars (2 vertical
+bar per digit) to the LED display, emulating a level meter LED module.
+
+```C++
+class LevelWriter {
+  public:
+    explicit LevelWriter(LedDisplay& ledDisplay);
+
+    LedDisplay& display() const;
+
+    uint8_t getMaxLevel() const;
+    void writeLevel(uint8_t level);
+};
+```
+
+![LevelWriter](docs/writers/level_writer.jpg)
+
 <a name="StringScroller"></a>
 ### StringScroller
 
@@ -1181,24 +1215,6 @@ class StringScroller {
 
 To scroll a string to the left, first initialize the string, then call
 `scrollLeft()` to shift left. Similarly to the right.
-
-<a name="LevelWriter"></a>
-### LevelWriter
-
-A `LevelWriter` writes a specified number of vertical bars (2 vertical
-bar per digit) to the LED display, emulating a level meter LED module.
-
-```C++
-class LevelWriter {
-  public:
-    explicit LevelWriter(LedDisplay& ledDisplay);
-
-    LedDisplay& display() const;
-
-    uint8_t getMaxLevel() const;
-    void writeLevel(uint8_t level);
-};
-```
 
 <a name="AdvancedUsage"></a>
 ## Advanced Usage
