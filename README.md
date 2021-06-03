@@ -1213,8 +1213,17 @@ class StringScroller {
 };
 ```
 
-To scroll a string to the left, first initialize the string, then call
-`scrollLeft()` to shift left. Similarly to the right.
+To scroll a string to the left, initialize the string using `initScrollLeft()`,
+then call `scrollLeft()` to shift one position to the left. The string scrolls
+into the first digit on the right. When the scrolling is finished, the display
+becomes blank, and the `scrollLeft()` method returns `true` to indicate
+`isDone`.
+
+Similarly to scroll to the right, initialize the string using
+`initScrollRight()`, then call `scrollRight()` to shift to the right. The string
+scrolls into the first digit on the left. When the scrolling is finished, the
+display becomes blank, and the `scrollRight()` method returns `true` to indicate
+`isDone`.
 
 <a name="AdvancedUsage"></a>
 ## Advanced Usage
