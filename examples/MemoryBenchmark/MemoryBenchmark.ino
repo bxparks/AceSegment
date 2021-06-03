@@ -8,7 +8,7 @@
 #include <Arduino.h>
 
 // DO NOT MODIFY THIS LINE. This will be overwritten by collect.sh on each
-// iteration, incrementing from 0 to 5. The Arduino IDE will compile the
+// iteration, incrementing from 0 to N. The Arduino IDE will compile the
 // program, then the script will extract the flash and static memory usage
 // numbers printed out by the Arduino compiler. The numbers will be printed on
 // the STDOUT, which then can be saved to a file specific for a particular
