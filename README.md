@@ -383,7 +383,7 @@ targeted for specific controller chips. It looks like this:
 ```C++
 class LedModule {
   public:
-    LedModule(uint8_t numDigits);
+    explicit LedModule(uint8_t numDigits);
 
     uint8_t getNumDigits() const;
     virtual void setPatternAt(uint8_t pos, uint8_t pattern) = 0;

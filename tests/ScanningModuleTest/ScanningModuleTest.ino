@@ -40,7 +40,6 @@ class ScanningModuleTest: public TestOnce {
   protected:
     void setup() override {
       scanningModule.begin();
-      TestableClockInterface::sEventLog.clear();
       ledMatrix.mEventLog.clear();
     }
 };

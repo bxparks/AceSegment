@@ -111,7 +111,7 @@ class Max7219Module : public LedModule {
      * @param remapArray (optional, nullable) a mapping of the physical digit
      *    positions to their logical positions
      */
-    Max7219Module(
+    explicit Max7219Module(
         const T_SPII& spiInterface,
         const uint8_t* remapArray = nullptr
     ) :

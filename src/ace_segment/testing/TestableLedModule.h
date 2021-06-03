@@ -38,7 +38,7 @@ namespace testing {
 template <uint8_t T_DIGITS>
 class TestableLedModule : public LedModule {
   public:
-    TestableLedModule() : LedModule(T_DIGITS) {}
+    explicit TestableLedModule() : LedModule(T_DIGITS) {}
 
     void setBrightness(uint8_t /*brightness*/) override {}
 

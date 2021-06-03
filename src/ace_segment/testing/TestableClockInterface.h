@@ -25,8 +25,6 @@ SOFTWARE.
 #ifndef ACE_SEGMENT_TESTABLE_CLOCK_INTERFACE_H
 #define ACE_SEGMENT_TESTABLE_CLOCK_INTERFACE_H
 
-#include "EventLog.h"
-
 namespace ace_segment {
 namespace testing {
 
@@ -43,7 +41,6 @@ class TestableClockInterface {
   public:
     static unsigned long sMillis;
     static unsigned long sMicros;
-    static EventLog sEventLog;
 };
 
 } // namespace testing

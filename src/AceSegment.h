@@ -27,6 +27,10 @@ SOFTWARE.
  *
  * This is the Doxygen documentation for the
  * <a href="https://github.com/bxparks/AceSegment">AceSegment Library</a>.
+ *
+ * Click on the "Classes" menu above to see the list of classes.
+ *
+ * Click on the "Files" menu above to see the list of header files.
  */
 
 #ifndef ACE_SEGMENT_ACE_SEGMENT_H
@@ -57,6 +61,8 @@ SOFTWARE.
 #include "ace_segment/writer/StringScroller.h"
 #include "ace_segment/writer/LevelWriter.h"
 
+// Blacklist platforms using https://github.com/arduino/ArduinoCore-api due to
+// incompatibilities.
 #if defined(ARDUINO_API_VERSION)
 #error Platforms using ArduinoCore-API not supported
 #endif
