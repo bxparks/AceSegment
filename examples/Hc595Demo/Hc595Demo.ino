@@ -70,6 +70,19 @@ using ace_segment::kActiveHighPattern;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
 
+#elif defined(AUNITER_MICRO_CUSTOM_DUAL)
+  const uint8_t NUM_DIGITS = 4;
+  const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = kActiveLowPattern;
+  const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
+  const uint8_t* const REMAP_ARRAY = nullptr;
+
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
+  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
+  const uint8_t LATCH_PIN = 10;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+
 #elif defined(AUNITER_STM32_HC595)
   const uint8_t NUM_DIGITS = 8;
   const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
