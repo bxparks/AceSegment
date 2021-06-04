@@ -64,10 +64,11 @@ consumption.
     * [TemperatureWriter](#TemperatureWriter)
     * [CharWriter](#CharWriter)
     * [StringWriter](#StringWriter)
-    * [StringScroller](#StringScroller)
     * [LevelWriter](#LevelWriter)
+    * [StringScroller](#StringScroller)
 * [Advanced Usage](#AdvancedUsage)
     * [DigitalWriteFast on AVR](#DigitalWriteFast)
+    * [Multiple SPI Buses](#MultipleSpiBuses)
     * [ScanningModule](#ScanningModule)
 * [Resource Consumption](#ResourceConsumption)
     * [SizeOf Classes](#SizeOfClasses)
@@ -805,7 +806,7 @@ better choices for those people. Higher frame rate means that
 `renderFieldWhenReady()` or `renderFieldNow()` must be called faster.
 
 With two 74HC595 shift registers daisy chained together, one of the 74HC595
-controls the segments, and the other controls the digits. We sent 16-bits to the
+controls the segments, and the other controls the digits. We send 16-bits to the
 chips using SPI, and the `byteOrder` determines whether whether the digits pins
 or segment pins are on the high byte. The library predefines 2 constants:
 `ace_segment::kByteOrderSegmentHighDigitLow` and
@@ -1497,6 +1498,132 @@ need to include these headers manually, like this:
 The amount of flash memory saved can be between 100 to 700 bytes. This can make
 meaningful differences on AVR processors, especially on the ATtiny85 with only
 8kB of flash. See [MemoryBenchmark](examples/MemoryBenchmark) for full details.
+
+<a name="MultipleSpiBuses"></a>
+### Multiple SPI Buses
+
+Some processors (e.g. STM32, ESP32) have multiple hardware SPI buses. Here are
+some notes about how to configure them.
+
+#### STM32 (STM32F103)
+
+The STM32F103 "Blue Pill" has 2 SPI buses:
+* SPI1
+    * SS1 = PA4
+    * SCK1 = PA5
+    * MISO1 = PA6
+    * MOSI1 = PA7
+* SPI2
+    * SS2 = PB12
+    * SCK2 = PB13
+    * MISO2 = PB14
+    * MOSI2 = PB15
+
+The primary (default) SPI interface is used like this:
+
+```C++
+const uint8_t LATCH_PIN = SS;
+const uint8_t DATA_PIN = MOSI;
+const uint8_t CLOCK_PIN = SCK;
+
+HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+
+Max7219Module<HardSpiInterface, NUM_DIGITS> max7219Module(
+    spiInterface, kDigitRemapArray8Max7219);
+
+void setupAceSegment() {
+  spiInterface.begin();
+  max7219Module.begin();
+}
+```
+
+The second SPI interface can be used like this:
+
+```C++
+const uint8_t LATCH_PIN = PB12;
+const uint8_t DATA_PIN = PB15;
+const uint8_t CLOCK_PIN = PB13;
+
+SPIClass SPISecondary(DATA_PIN, PB14 /*miso*/, CLOCK_PIN);
+HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN, SPISecondary);
+
+Max7219Module<HardSpiInterface, NUM_DIGITS> max7219Module(
+    spiInterface, kDigitRemapArray8Max7219);
+
+void setupAceSegment() {
+  spiInterface.begin();
+  max7219Module.begin();
+}
+```
+
+#### ESP32
+
+The ESP32 has 4 SPI buses, of which 2 are available for general purposes. The
+default GPIO pin mappings are:
+
+* SPI2 (aka HSPI)
+    * MOSI = 13
+    * MISO = 12
+    * SS = 15
+    * SCK = 14
+* SPI3 (aka VSPI, default)
+    * MOSI = 23
+    * MISO = 19
+    * SS = 5
+    * SCK = 18
+
+(My understanding is that the ESP32 has some sort of GPIO pin remapping
+matrix that reroute these pins to other pins, but my knowledge of this
+capability is limited.)
+
+The primary (default) `SPI` instance uses the `VSPI` bus and is used like this:
+
+```C++
+const uint8_t LATCH_PIN = SS;
+const uint8_t DATA_PIN = MOSI;
+const uint8_t CLOCK_PIN = SCK;
+
+HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+
+Hc595Module<HardSpiInterface, NUM_DIGITS> hc595Module(
+    spiInterface,
+    SEGMENT_ON_PATTERN,
+    DIGIT_ON_PATTERN,
+    FRAMES_PER_SECOND,
+    HC595_BYTE_ORDER,
+    REMAP_ARRAY
+);
+
+void setupAceSegment() {
+  spiInterface.begin();
+  hc595Module.begin();
+}
+```
+
+The secondary `HSPI` bus can be used like this:
+
+```C++
+const uint8_t LATCH_PIN = 15;
+const uint8_t DATA_PIN = 13;
+const uint8_t CLOCK_PIN = 14;
+
+SPIClass SPISecondary(HSPI);
+HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN, SPISecondary);
+
+Hc595Module<HardSpiInterface, NUM_DIGITS> hc595Module(
+    spiInterface,
+    SEGMENT_ON_PATTERN,
+    DIGIT_ON_PATTERN,
+    FRAMES_PER_SECOND,
+    HC595_BYTE_ORDER,
+    REMAP_ARRAY
+);
+
+void setupAceSegment() {
+  spiInterface.begin();
+  hc595Module.begin();
+}
+```
 
 <a name="ScanningModule"></a>
 ### Custom Configuration of ScanningModule
