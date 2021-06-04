@@ -54,7 +54,10 @@ consumption.
         * [MAX7219 Module With 8 Digits](#Max7219Module8)
     * [Hc595Module](#Hc595Module)
         * [74HC595 Module With 8 Digits](#Hc595Module8)
+        * [74HC595 Module With 4 Digits](#Hc595Module4)
         * [Rendering the Hc595Module](#RenderingHc595Module)
+    * [HybridModule](#HybridModule)
+    * [DirectModule](#DirectModule)
     * [LedDisplay](#LedDisplay)
     * [NumberWriter](#NumberWriter)
     * [ClockWriter](#ClockWriter)
@@ -487,7 +490,7 @@ microseconds, `flushIncremental()` takes around 10 milliseconds per iteration.
 ![TM1637 LED Module Alt](docs/tm1637/tm1637_4_digits_alt.jpg)
 
 The configuration of the `Tm1637Module` class for the 4-digit module looks like
-this:
+this (c.f. [examples/Tm1637Demo](examples/Tm1637Demo)):
 
 ```C++
 #include <AceSegment.h>
@@ -552,7 +555,8 @@ capacitors. These modules seem to work with a `BIT_DELAY` of 7 microseconds.
 The configuration of the `Tm1637Module` class for the 6-digit module is slightly
 more complicated because the digits are wired to be in the order of `2 1 0 5 4
 3`. A predefined remap array `kDigitRemapArray6Tm1637` must be given to the
-`Tm1637Module` constructor, like this:
+`Tm1637Module` constructor, like this
+(c.f. [examples/Tm1637Demo](examples/Tm1637Demo)):
 
 ```C++
 #include <Arduino.h>
@@ -669,7 +673,7 @@ The `flush()` method sends the bit patterns to the MAX7219 controller using SPI.
 #### MAX7219 Module with 8 Digits
 
 The configuration of the `Max7219Module` class for the 8-digit module looks like
-this:
+this (c.f. [examples/Max7219Demo](examples/Max7219Demo)):
 
 ```C++
 #include <Arduino.h>
@@ -820,17 +824,13 @@ See the section below for an explanation.
 ### 74HC595 Module With 8 Digits
 
 The configuration of the `Hc595Module` class for the 8-digit module looks like
-this:
+this (c.f. [examples/Hc595Demo](examples/Hc595Demo):
 
 ```C++
 #include <Arduino.h>
 #include <AceSegment.h>
 
 using namespace ace_segment;
-
-const uint8_t LATCH_PIN = 10;
-const uint8_t DATA_PIN = MOSI;
-const uint8_t CLOCK_PIN = SCK;
 
 const uint8_t NUM_DIGITS = 8;
 const uint8_t FRAMES_PER_SECOND = 60;
@@ -839,6 +839,94 @@ const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
 const uint8_t DIGIT_ON_PATTERN = kActiveHighPattern;
 const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
 const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
+
+const uint8_t LATCH_PIN = 10;
+const uint8_t DATA_PIN = MOSI;
+const uint8_t CLOCK_PIN = SCK;
+
+using SpiInterface = HardSpiInterface;
+SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+
+Hc595Module<SpiInterface, NUM_DIGITS> ledModule(
+    spiInterface,
+    SEGMENT_ON_PATTERN,
+    DIGIT_ON_PATTERN,
+    FRAMES_PER_SECOND,
+    HC595_BYTE_ORDER,
+    REMAP_ARRAY
+);
+
+LedDisplay display(ledModule);
+
+void setupAceSegment() {
+  spiInterface.begin();
+  ledModule.begin();
+}
+
+// Flush to LED module when ready. Call this as fast as possible, allowing
+// the internal counters to figure out when to actually render.
+void flushModule() {
+  ledModule.renderFieldWhenReady();
+}
+
+void setup() {
+  setupAceSegment();
+  ...
+}
+
+void loop() {
+  flushModule();
+  ...
+}
+```
+
+<a name="Hc595Module4"></a>
+### 74HC595 Module With 4 Digits
+
+Here is a custom LED module using two 74HC595 shift registers that I built a
+couple of years ago:
+
+![Custom Hc595Module Front](docs/custom_modules/custom_hc595_module_front.jpg)
+
+![Custom Hc595Module Back](docs/custom_modules/custom_hc595_module_back.jpg)
+
+The configuration of `Hc595Module` is very similar to the 8-digit module, except
+for the following:
+
+* The LED module is a Common Anode, so the digit pin needs to be `HIGH` and
+  the segment pin needs to be `LOW`.
+* There are 4 driver transistors on the digit lines which allows it handle
+  higher currents. These cause the logic levels on the digit lines to be
+  inverted. The digits are activated by `LOW` not `HIGH`, so `DIGIT_ON_PATTERN`
+  is set to `kActiveLowPattern`.
+* The two 74HC595 chips are wired so that the digit lines are in the upper 8
+  bits, and the segment lines are in the lower 8 bits. Thus `HC595_BYTE_ORDER`
+  must be set to `kByteOrderDigitHighSegmentLow`.
+* The `REMAP_ARRAY` can be set to `nullptr` because the digits are arranged in
+  the natural ordering expected by `Hc595Module`, left-most digit at position 0,
+  and the right-most digit at position 3.
+
+Putting all these together, we get the following code which is similar to the
+8-digit version above, except for a few configuration parameters (c.f.
+[examples/Hc595Demo](examples/Hc595Demo)):
+
+```C++
+#include <Arduino.h>
+#include <AceSegment.h>
+
+using namespace ace_segment;
+
+const uint8_t NUM_DIGITS = 4;
+const uint8_t FRAMES_PER_SECOND = 60;
+
+const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
+const uint8_t DIGIT_ON_PATTERN = kActiveLowPattern;
+const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
+const uint8_t* const REMAP_ARRAY = nullptr;
+
+const uint8_t LATCH_PIN = 10;
+const uint8_t DATA_PIN = MOSI;
+const uint8_t CLOCK_PIN = SCK;
 
 using SpiInterface = HardSpiInterface;
 SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
@@ -904,6 +992,139 @@ in the global `loop()` function. It keeps an internal timing variable that
 remembers the last time that it was called. When the correct amount of time has
 passed, it then calls `renderFieldNow()`, and resets the timing variable.
 
+<a name="HybridModule"></a>
+### HybridModule
+
+Here is a 4-digit custom module that I built that uses one 74HC595 shift
+register on the 8 segment lines (which can be accessed through 3 SPI pins), and
+4 digit lines directly connected to the microcontroller.
+
+![Hybrid Module Front](docs/custom_modules/hybrid_module_front.jpg)
+
+![Hybrid Module Back](docs/custom_modules/hybrid_module_back.jpg)
+
+This particular module has the following characteristics:
+
+* Common Cathode leds, which means that the digit must be `LOW` and the segment
+  must be `HIGH`.
+* But there are 4 driver transistors on the digit lines, which inverts the logic
+  levels, so the digits need to be `HIGH`.
+
+The `HybridModule` configuration looks like this (c.f.
+[examples/HybridDemo](examples/HybridDemo)):
+
+```C++
+#include <AceSegment.h>
+
+const uint8_t NUM_DIGITS = 4;
+const uint8_t FRAMES_PER_SECOND = 60;
+
+const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
+const uint8_t LATCH_PIN = 10;
+const uint8_t DATA_PIN = MOSI;
+const uint8_t CLOCK_PIN = SCK;
+
+using SpiInterface = HardSpiInterface;
+SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+
+HybridModule<SpiInterface, NUM_DIGITS> ledModule(
+    spiInterface,
+    kActiveHighPattern /*segmentOnPattern*/,
+    kActiveHighPattern /*digitOnPattern*/,
+    FRAMES_PER_SECOND,
+    DIGIT_PINS
+);
+
+LedDisplay display(ledModule);
+
+void setupAceSegment() {
+  spiInterface.begin();
+  ledModule.begin();
+}
+
+// Flush to LED module when ready. Call this as fast as possible, allowing
+// the internal counters to figure out when to actually render.
+void flushModule() {
+  ledModule.renderFieldWhenReady();
+}
+
+void setup() {
+  setupAceSegment();
+  ...
+}
+
+void loop() {
+  flushModule();
+  ...
+}
+```
+
+<a name="DirectModule"></a>
+### DirectModule
+
+Here is a custom 4-digit module that whose digit and segment lines are connected
+directly to the microcontroller without any driver chip. This requires a
+microcontroller with at least 12 GPIO pins.
+
+![Direct Module Front](docs/custom_modules/direct_module_front.jpg)
+
+![Direct Module Back](docs/custom_modules/direct_module_back.jpg)
+
+This particular module has the following characteristics:
+
+* Common Anode leds, which means that the digit must be `HIGH` and the segment
+  must be `LOW`.
+* But there are 4 driver transistors on the digit lines, which inverts the logic
+  levels, so the digits need to be `LOW`.
+
+The `DirectModule` configuration looks like this (c.f.
+[examples/DirectDemo](examples/DirectDemo)):
+
+```C++
+#include <AceSegment.h>
+
+const uint8_t NUM_DIGITS = 4;
+const uint8_t NUM_SEGMENTS = 8;
+
+const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
+const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
+
+const uint8_t FRAMES_PER_SECOND = 60;
+
+using SpiInterface = HardSpiInterface;
+SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+
+DirectModule<NUM_DIGITS, NUM_SUBFIELDS> ledModule(
+    kActiveLowPattern /*segmentOnPattern*/,
+    kActiveLowPattern /*digitOnPattern*/,
+    FRAMES_PER_SECOND,
+    SEGMENT_PINS,
+    DIGIT_PINS);
+
+LedDisplay display(ledModule);
+
+void setupAceSegment() {
+  spiInterface.begin();
+  ledModule.begin();
+}
+
+// Flush to LED module when ready. Call this as fast as possible, allowing
+// the internal counters to figure out when to actually render.
+void flushModule() {
+  ledModule.renderFieldWhenReady();
+}
+
+void setup() {
+  setupAceSegment();
+  ...
+}
+
+void loop() {
+  flushModule();
+  ...
+}
+```
+
 <a name="LedDisplay"></a>
 ### LedDisplay
 
@@ -921,6 +1142,7 @@ class LedDisplay {
     explicit LedDisplay(LedModule& ledModule);
 
     uint8_t getNumDigits() const;
+
     void writePatternAt(uint8_t pos, uint8_t pattern);
     void writePatternsAt(uint8_t pos, const uint8_t patterns[], uint8_t len);
     void writePatternsAt_P(uint8_t pos, const uint8_t patterns[], uint8_t len);
