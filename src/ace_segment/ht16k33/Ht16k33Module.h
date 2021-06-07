@@ -29,14 +29,18 @@ SOFTWARE.
 #include <string.h> // memset()
 #include "../LedModule.h"
 
+class Ht16k33ModuleTest_patternForChipPos_colonDisabled;
+class Ht16k33ModuleTest_patternForChipPos_colonEnabled;
+
 namespace ace_segment {
 
 /**
- * An implementation of LedModule using the HT16K33 chip. The chip uses SPI.
+ * An implementation of LedModule using the HT16K33 chip. The chip uses I2C
+ * for communication.
  *
- * @tparam T_WIREI the class that implements the SPI interface, usually
+ * @tparam T_WIREI the class that implements the I2C Wire interface, usually
  *    either SoftSpiInterface or HardSpiInterface
- * @tparam T_DIGITS number of digits in the module
+ * @tparam T_DIGITS number of logical digits in the module
  */
 template <typename T_WIREI, uint8_t T_DIGITS>
 class Ht16k33Module : public LedModule {
@@ -46,11 +50,15 @@ class Ht16k33Module : public LedModule {
      * @param wire instance of T_WIREI class
      * @param remapArray (optional, nullable) a mapping of the physical digit
      *    positions to their logical positions
+     * @param enableColon enable the colon segment between HH and MM by
+     *    repurposing the decimal point bit (bit 7) of digit 1 (second from
+     *    left) to the colon segment (default: false)
      */
-    explicit Ht16k33Module(const T_WIREI& wire) :
+    explicit Ht16k33Module(const T_WIREI& wire, bool enableColon = false) :
         LedModule(T_DIGITS),
         mWire(wire),
-        mBrightness(1) // set to 1 to avoid using uninitialized value
+        mBrightness(0),
+        mEnableColon(enableColon)
     {}
 
     //-----------------------------------------------------------------------
@@ -95,39 +103,30 @@ class Ht16k33Module : public LedModule {
      * Send segment patterns of all digits. Using the default 100kHz speed of
      * Wire, this takes about 1.2 millis to send 4 digits.
      *
-     * On this particular LED module, the 4 LED digits are connected to 5 COM
-     * lines (COM0 to COM4). The mapping is:
+     * On this particular LED module, the 4 logical LED digits are connected to
+     * 5 COM lines (COM0 to COM4), i.e. 5 physical digits. The mapping is:
      *
      *    * digit 0 = COM0
      *    * digit 1 = COM1
-     *    * colon = COM2
+     *    * colon = COM2 (bit 1)
      *    * digit 2 = COM3
      *    * digit 3 = COM4
      *
      * Unlike some LED modules, it can display both the decimal point on digit 1
-     * as well as the colon. However, various writers (e.g. ClockWriter) assumes
-     * that the most-significant-bit of digit 1 is connected to the colon. So we
-     * make the logical mapping so the physical COM line.
+     * as well as the colon segment at the same time. However, various writers
+     * (e.g. ClockWriter) assumes that the most-significant-bit of digit 1 is
+     * connected to the colon. So we make the logical mapping so the physical
+     * COM line.
      */
     void flush() {
       mWire.beginTransmission();
       mWire.write(0x00); // start at position 0
-      for (uint8_t chipPos = 0; chipPos < T_DIGITS; ++chipPos) {
-        uint8_t pattern = mPatterns[chipPos];
-        if (chipPos == 1) {
-          // Strip the colon off Digit1 and send to COM1.
-          pattern &= 0x7F;
-        } else if (chipPos == 2) {
-          // Logically connect the Digit1 colon bit (that was stripped above)
-          // and send to the colon LED at COM2. It looks like the colon is
-          // connected to ROW1 (i.e. 0x02) instead of ROW7 (i.e. 0x80) that I
-          // would have expected.
-          uint8_t hasColon = mPatterns[1] & 0x80;
-          mWire.write(hasColon ? 0x02 : 0x00);
-          mWire.write(0);
-        }
-        mWire.write(pattern); // row0-row7
-        mWire.write(0); // row8-row15 unused
+
+      // Loop over the 5 physical digit lines of this module.
+      for (uint8_t chipPos = 0; chipPos < T_DIGITS + 1; ++chipPos) {
+        uint8_t pattern = patternForChipPos(chipPos, mPatterns, mEnableColon);
+        mWire.write(pattern); // ROW0-ROW7
+        mWire.write(0); // ROW8-ROW15 unused
       }
       mWire.endTransmission();
 
@@ -135,10 +134,49 @@ class Ht16k33Module : public LedModule {
     }
 
   private:
+    friend class ::Ht16k33ModuleTest_patternForChipPos_colonDisabled;
+    friend class ::Ht16k33ModuleTest_patternForChipPos_colonEnabled;
+
+    /** Write a single byte command to the LED module. */
     void writeCommand(uint8_t command) {
       mWire.beginTransmission();
       mWire.write(command);
       mWire.endTransmission();
+    }
+
+    /**
+     * Return the segment pattern appropriate for the given physical digit
+     * position (COM{N}}. This function is static for unit testing purposes.
+     */
+    static uint8_t patternForChipPos(
+        uint8_t chipPos, const uint8_t patterns[], bool enableColon) {
+      switch (chipPos) {
+        case 0:
+          return patterns[0];
+        case 1: {
+          uint8_t pattern = patterns[1];
+          return (enableColon) ? pattern & 0x7F : pattern;
+        }
+        case 2: {
+          if (enableColon) {
+            // Connect the Digit 1 colon bit 7 (that was stripped above)
+            // and send to the colon segment at Physical digit COM2. It looks
+            // like on the 4-digit HT16K33 modules that I got, the colon is
+            // connected to ROW1 (i.e. 0x02) instead of ROW7 (i.e. 0x80) that I
+            // would have expected.
+            bool hasColon = patterns[1] & 0x80;
+            return hasColon ? 0x02 : 0x00;
+          } else {
+            return 0;
+          }
+        }
+        case 3:
+          return patterns[2];
+        case 4:
+          return patterns[3];
+        default:
+          return 0;
+      }
     }
 
   private:
@@ -148,7 +186,7 @@ class Ht16k33Module : public LedModule {
     static uint8_t const kDisplayOn  = 0x81;
     static uint8_t const kBrightness = 0xE0;
 
-    /** SPI interface. */
+    /** I2C Wire interface. */
     const T_WIREI& mWire;
 
     /** Pattern for each digit. */
@@ -156,6 +194,9 @@ class Ht16k33Module : public LedModule {
 
     /** Brightness 0 - 15 */
     uint8_t mBrightness;
+
+    /** Enable colon. */
+    bool mEnableColon;
 };
 
 }
