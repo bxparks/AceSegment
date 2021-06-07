@@ -70,15 +70,15 @@ test(Tm1637ModuleTest, flushIncremental) {
   assertEqual(7, tmiInterface.mEventLog.getNumRecords());
   assertTrue(tmiInterface.mEventLog.assertEvents(
     7,
-    (int) EventType::kWireStartCondition,
-    (int) EventType::kWireSendByte,
+    (int) EventType::kTmiStartCondition,
+    (int) EventType::kTmiSendByte,
         Tm1637Module<TestableTmiInterface, NUM_DIGITS>::kDataCmdFixedAddress,
-    (int) EventType::kWireStopCondition,
-    (int) EventType::kWireStartCondition,
-    (int) EventType::kWireSendByte,
+    (int) EventType::kTmiStopCondition,
+    (int) EventType::kTmiStartCondition,
+    (int) EventType::kTmiSendByte,
         Tm1637Module<TestableTmiInterface, NUM_DIGITS>::kAddressCmd | 0x1,
-    (int) EventType::kWireSendByte, 0x11,
-    (int) EventType::kWireStopCondition
+    (int) EventType::kTmiSendByte, 0x11,
+    (int) EventType::kTmiStopCondition
   ));
   assertFalse(tm1637Module.isDirtyBit(1));
   assertEqual(2, tm1637Module.mFlushStage);
@@ -106,12 +106,12 @@ test(Tm1637ModuleTest, flushIncremental) {
   assertEqual(3, tmiInterface.mEventLog.getNumRecords());
   assertTrue(tmiInterface.mEventLog.assertEvents(
     3,
-    (int) EventType::kWireStartCondition,
-    (int) EventType::kWireSendByte,
+    (int) EventType::kTmiStartCondition,
+    (int) EventType::kTmiSendByte,
         Tm1637Module<TestableTmiInterface, NUM_DIGITS>::kBrightnessCmd
           | Tm1637Module<TestableTmiInterface, NUM_DIGITS>::kBrightnessLevelOn
           | 2,
-    (int) EventType::kWireStopCondition
+    (int) EventType::kTmiStopCondition
   ));
   assertFalse(tm1637Module.isDirtyBit(4));
   assertEqual(0x0, tm1637Module.mIsDirty);
@@ -147,28 +147,28 @@ test(Tm1637ModuleTest, flush) {
   assertTrue(tmiInterface.mEventLog.assertEvents(
     13,
     // brightness
-    (int) EventType::kWireStartCondition,
-    (int) EventType::kWireSendByte,
+    (int) EventType::kTmiStartCondition,
+    (int) EventType::kTmiSendByte,
         Tm1637Module<TestableTmiInterface, NUM_DIGITS>::kBrightnessCmd
           | Tm1637Module<TestableTmiInterface, NUM_DIGITS>::kBrightnessLevelOn
           | 2,
-    (int) EventType::kWireStopCondition,
+    (int) EventType::kTmiStopCondition,
 
     // auto increment mode
-    (int) EventType::kWireStartCondition,
-    (int) EventType::kWireSendByte,
+    (int) EventType::kTmiStartCondition,
+    (int) EventType::kTmiSendByte,
         Tm1637Module<TestableTmiInterface, NUM_DIGITS>::kDataCmdAutoAddress,
-    (int) EventType::kWireStopCondition,
+    (int) EventType::kTmiStopCondition,
 
     // send 4 digits
-    (int) EventType::kWireStartCondition,
-    (int) EventType::kWireSendByte,
+    (int) EventType::kTmiStartCondition,
+    (int) EventType::kTmiSendByte,
         Tm1637Module<TestableTmiInterface, NUM_DIGITS>::kAddressCmd,
-    (int) EventType::kWireSendByte, 0x00,
-    (int) EventType::kWireSendByte, 0x11,
-    (int) EventType::kWireSendByte, 0x00,
-    (int) EventType::kWireSendByte, 0x00,
-    (int) EventType::kWireStopCondition
+    (int) EventType::kTmiSendByte, 0x00,
+    (int) EventType::kTmiSendByte, 0x11,
+    (int) EventType::kTmiSendByte, 0x00,
+    (int) EventType::kTmiSendByte, 0x00,
+    (int) EventType::kTmiStopCondition
   ));
   assertEqual(0x0, tm1637Module.mIsDirty);
 }

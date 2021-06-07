@@ -38,11 +38,11 @@ enum class EventType : uint8_t {
   kSpiEnd,
   kSpiSend8,
   kSpiSend16,
-  kWireBegin,
-  kWireEnd,
-  kWireStartCondition,
-  kWireStopCondition,
-  kWireSendByte,
+  kTmiBegin,
+  kTmiEnd,
+  kTmiStartCondition,
+  kTmiStopCondition,
+  kTmiSendByte,
   kLedMatrixDraw,
   kLedMatrixEnableGroup,
   kLedMatrixDisableGroup,
@@ -120,43 +120,43 @@ class EventLog {
 
     //-------------------------------------------------------------------------
 
-    void addWireBegin() {
+    void addTmiBegin() {
       if (mNumRecords >= kMaxRecords) return;
 
       Event& event = mEvents[mNumRecords];
-      event.type = EventType::kWireBegin;
+      event.type = EventType::kTmiBegin;
       mNumRecords++;
     }
 
-    void addWireEnd() {
+    void addTmiEnd() {
       if (mNumRecords >= kMaxRecords) return;
 
       Event& event = mEvents[mNumRecords];
-      event.type = EventType::kWireEnd;
+      event.type = EventType::kTmiEnd;
       mNumRecords++;
     }
 
-    void addWireStartCondition() {
+    void addTmiStartCondition() {
       if (mNumRecords >= kMaxRecords) return;
 
       Event& event = mEvents[mNumRecords];
-      event.type = EventType::kWireStartCondition;
+      event.type = EventType::kTmiStartCondition;
       mNumRecords++;
     }
 
-    void addWireStopCondition() {
+    void addTmiStopCondition() {
       if (mNumRecords >= kMaxRecords) return;
 
       Event& event = mEvents[mNumRecords];
-      event.type = EventType::kWireStopCondition;
+      event.type = EventType::kTmiStopCondition;
       mNumRecords++;
     }
 
-    void addWireSendByte(uint8_t data) {
+    void addTmiSendByte(uint8_t data) {
       if (mNumRecords >= kMaxRecords) return;
 
       Event& event = mEvents[mNumRecords];
-      event.type = EventType::kWireSendByte;
+      event.type = EventType::kTmiSendByte;
       event.arg1 = data;
       mNumRecords++;
     }
@@ -253,19 +253,19 @@ class EventLog {
             }
             break;
 
-          case EventType::kWireBegin:
+          case EventType::kTmiBegin:
             break;
 
-          case EventType::kWireEnd:
+          case EventType::kTmiEnd:
             break;
 
-          case EventType::kWireStopCondition:
+          case EventType::kTmiStopCondition:
             break;
 
-          case EventType::kWireStartCondition:
+          case EventType::kTmiStartCondition:
             break;
 
-          case EventType::kWireSendByte: {
+          case EventType::kTmiSendByte: {
               uint8_t value = va_arg(args, int);
               if (value != event.arg1) return false;
             }

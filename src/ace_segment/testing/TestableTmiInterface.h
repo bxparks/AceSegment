@@ -9,23 +9,23 @@ namespace testing {
 class TestableTmiInterface {
   public:
     void begin() const {
-      mEventLog.addWireBegin();
+      mEventLog.addTmiBegin();
     }
 
     void end() const {
-      mEventLog.addWireEnd();
+      mEventLog.addTmiEnd();
     }
 
     void startCondition() const {
-      mEventLog.addWireStartCondition();
+      mEventLog.addTmiStartCondition();
     }
 
     void stopCondition() const {
-      mEventLog.addWireStopCondition();
+      mEventLog.addTmiStopCondition();
     }
 
     void sendByte(uint8_t data) const {
-      mEventLog.addWireSendByte(data);
+      mEventLog.addTmiSendByte(data);
     }
 
   public:
