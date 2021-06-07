@@ -119,9 +119,9 @@ class Ht16k33Module : public LedModule {
      * COM line.
      */
     void flush() {
+      // Write digits.
       mWire.beginTransmission();
       mWire.write(0x00); // start at position 0
-
       // Loop over the 5 physical digit lines of this module.
       for (uint8_t chipPos = 0; chipPos < T_DIGITS + 1; ++chipPos) {
         uint8_t pattern = patternForChipPos(chipPos, mPatterns, mEnableColon);
@@ -130,7 +130,8 @@ class Ht16k33Module : public LedModule {
       }
       mWire.endTransmission();
 
-      // TODO: Send out brightness
+      // Write brightness.
+      writeCommand(mBrightness | kBrightness);
     }
 
   private:
