@@ -38,6 +38,25 @@ namespace ace_segment {
  * An implementation of LedModule using the HT16K33 chip. The chip uses I2C
  * for communication.
  *
+ * This class is customized for the 4-digit LED module from Adafruit
+ * (https://www.adafruit.com/product/878) or one of its clones where the decimal
+ * point after digit 1 (second from left) and the colon between digits 1 and 2
+ * can be controlled independently and turned on at the same time.
+ *
+ * This class has the option of making the LED module behave like a normal
+ * 4-digit LED module (witout a colon), or a 4-digit LED clock module (with a
+ * colon). With the `enableColon` parameter set to false (default), the decimal
+ * point (bit 7) of digit 1 controls the decimal point to the right of digit 1.
+ * With `enableColon` set to true, the same bit controls the colon to the right
+ * of digit 1.
+ *
+ * Although the hardware is capable of turning on the decimal point and colon at
+ * the same time, the AceSegment library does not support that mode. It does not
+ * seem like a combination that is useful. Fortunately, this class does allow
+ * the behavior of the colon segment to be changed at runtime using the
+ * enableColon() method. You can display the time of a clock (`hh:mm`), then
+ * display a normal number with a decimal point (`xx.yy`).
+ *
  * @tparam T_WIREI the class that implements the I2C Wire interface, usually
  *    either SoftSpiInterface or HardSpiInterface
  * @tparam T_DIGITS number of logical digits in the module
@@ -50,9 +69,10 @@ class Ht16k33Module : public LedModule {
      * @param wire instance of T_WIREI class
      * @param remapArray (optional, nullable) a mapping of the physical digit
      *    positions to their logical positions
-     * @param enableColon enable the colon segment between HH and MM by
-     *    repurposing the decimal point bit (bit 7) of digit 1 (second from
-     *    left) to the colon segment (default: false)
+     * @param enableColon enable the colon segment to behave like a 4-digit
+     *    LED module for clocks (displaying a colon in `hh:mm`). The
+     *    decimal point (bit 7) of digit 1 (second from left) becomes wired
+     *    to the colon segment. (default: false)
      */
     explicit Ht16k33Module(const T_WIREI& wire, bool enableColon = false) :
         LedModule(T_DIGITS),
@@ -62,7 +82,7 @@ class Ht16k33Module : public LedModule {
     {}
 
     //-----------------------------------------------------------------------
-    // Initialization and termination.
+    // Initialization, termination, and configuration.
     //-----------------------------------------------------------------------
 
     void begin() {
@@ -74,6 +94,19 @@ class Ht16k33Module : public LedModule {
     void end() {
       writeCommand(kDisplayOff);
       writeCommand(kSystemOff);
+    }
+
+    /**
+     * Set true to enable the colon segment on the module, which replaces the
+     * decimal point on digit 1 (second from left). This has the same meaning as
+     * the `enableColon` parameter in the constructor.
+     *
+     * You can enable the colon at runtime, just before the flush() method, to
+     * render a `hh:mm` clock display. Then you can call this method to disable
+     * the colon to enable the decimal point to render a `xx.yy` number.
+     */
+    void enableColon(bool enable) {
+      mEnableColon = enable;
     }
 
     //-----------------------------------------------------------------------
@@ -115,8 +148,8 @@ class Ht16k33Module : public LedModule {
      * Unlike some LED modules, it can display both the decimal point on digit 1
      * as well as the colon segment at the same time. However, various writers
      * (e.g. ClockWriter) assumes that the most-significant-bit of digit 1 is
-     * connected to the colon. So we make the logical mapping so the physical
-     * COM line.
+     * connected to the colon. So if enableColon is set, make the logical
+     * mapping of that decimal point bit so the colon bit.
      */
     void flush() {
       // Write digits.
@@ -160,11 +193,11 @@ class Ht16k33Module : public LedModule {
         }
         case 2: {
           if (enableColon) {
-            // Connect the Digit 1 colon bit 7 (that was stripped above)
-            // and send to the colon segment at Physical digit COM2. It looks
-            // like on the 4-digit HT16K33 modules that I got, the colon is
-            // connected to ROW1 (i.e. 0x02) instead of ROW7 (i.e. 0x80) that I
-            // would have expected.
+            // Connect the colon bit 7 on logical digit 1 (that was stripped
+            // above) and send to the colon segment at physical digit COM2. It
+            // looks like on the 4-digit HT16K33 modules that I got, the colon
+            // is connected to ROW1 (i.e. 0x02) instead of ROW7 (i.e. 0x80) that
+            // I would have expected.
             bool hasColon = patterns[1] & 0x80;
             return hasColon ? 0x02 : 0x00;
           } else {

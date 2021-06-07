@@ -750,7 +750,7 @@ void setupAceSegment() {
   Wire.begin();
   wireInterface.begin();
   ledModule.begin();
-  ledModule.setBrightness(0); // 0-15
+  ledModule.setBrightness(1); // 0-15
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_DIRECT
   ledModule.begin();
@@ -1053,10 +1053,25 @@ void updateDemo() {
   }
 }
 
-/** Go to the next demo */
+/** Go to the next demo. */
 void nextDemo() {
+// The HT16K33 module can display both a decimal point and a colon segment after
+// digit 1 (second from left). The Ht16k33Module.enableColon() selects one or
+// the other.
+#if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HT16K33
+  if (prevDemoMode == DEMO_MODE_CLOCK) {
+    ledModule.enableColon(false);
+  }
+#endif
   prevDemoMode = demoMode;
+
   incrementMod(demoMode, DEMO_MODE_COUNT);
+#if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HT16K33
+  if (demoMode == DEMO_MODE_CLOCK) {
+    ledModule.enableColon(true);
+  }
+#endif
+
   ledDisplay.clear();
 
   updateDemo();
