@@ -168,6 +168,14 @@ before substantional refactoring in 2021.
   `HardSpiFastInterface`. Increases flash memory by 10-30 bytes.
 * Add benchmarks for `StringScroller` and `LevelWriter`.
 
+**v0.6+**
+
+* Add benchmarks for `Ht16k33Module`. Consumes about 2400 bytes of flash on
+  ATmega328 (Nano) or ATmega32U4 (Pro Micro), about 2X larger than any other LED
+  module due to the I2C `<Wire.h>` library.
+* The `Max7219(HardSpiFast)` increases by about 100 on AVR because the previous
+  version neglected to call `Max7219Module::flush()`.
+
 ## Results
 
 The following shows the flash and static memory sizes of the `MemoryBenchmark`

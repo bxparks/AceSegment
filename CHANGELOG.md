@@ -1,6 +1,12 @@
 # Changelog
 
 * Unreleased
+    * HT16K33 LED Module
+        * Add `Ht16k33Module` class to support 4-digit LED display from
+          Adafruit or one of its clones.
+        * Add `HardWireInterface` as a thin abstraction between `TwoWire` class
+          and the `Ht16k33Module`, to avoid including `<Wire.h>` which pulls in
+          about 1000 bytes of flash even if `Ht16k33Module` is never used.
 * 0.6 (2021-05-26)
     * `HardSpiInterface`
         * Add support for microcontrollers with 2 SPI buses (ESP32 and STM32F1).
