@@ -57,8 +57,8 @@ namespace ace_segment {
  * enableColon() method. You can display the time of a clock (`hh:mm`), then
  * display a normal number with a decimal point (`xx.yy`).
  *
- * @tparam T_WIREI the class that implements the I2C Wire interface, usually
- *    either SoftSpiInterface or HardSpiInterface
+ * @tparam T_WIREI the class that wraps the I2C Wire interface, usually
+ *    WireInterface
  * @tparam T_DIGITS number of logical digits in the module
  */
 template <typename T_WIREI, uint8_t T_DIGITS>
@@ -74,7 +74,7 @@ class Ht16k33Module : public LedModule {
      *    decimal point (bit 7) of digit 1 (second from left) becomes wired
      *    to the colon segment. (default: false)
      */
-    explicit Ht16k33Module(const T_WIREI& wire, bool enableColon = false) :
+    explicit Ht16k33Module(T_WIREI& wire, bool enableColon = false) :
         LedModule(T_DIGITS),
         mWire(wire),
         mBrightness(0),
@@ -221,7 +221,7 @@ class Ht16k33Module : public LedModule {
     static uint8_t const kBrightness = 0xE0;
 
     /** I2C Wire interface. */
-    const T_WIREI& mWire;
+    T_WIREI& mWire;
 
     /** Pattern for each digit. */
     uint8_t mPatterns[T_DIGITS];

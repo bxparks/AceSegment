@@ -27,31 +27,40 @@ SOFTWARE.
 
 #include <stdint.h>
 #include <Arduino.h>
-#include <Wire.h>
 
 namespace ace_segment {
 
+/**
+ * A thin wrapper around an I2C `TwoWire` class and its `Wire` object. This is a
+ * template class to avoid including the <Wire.h> header file, which increases
+ * flash memory on AVR by about 1000 byte even if the Wire object is never used.
+ */
+template <typename T_WIRE>
 class HardWireInterface {
   public:
-    HardWireInterface(uint8_t addr) : mAddr(addr) {}
+    HardWireInterface(T_WIRE& wire, uint8_t addr) :
+        mWire(wire),
+        mAddr(addr)
+    {}
 
-    void begin() const {}
+    void begin() {}
 
-    void end() const {}
+    void end() {}
 
-    void beginTransmission() const {
-      Wire.beginTransmission(mAddr);
+    void beginTransmission() {
+      mWire.beginTransmission(mAddr);
     }
 
-    void write(uint8_t data) const {
-      Wire.write(data);
+    void write(uint8_t data) {
+      mWire.write(data);
     }
 
-    void endTransmission() const {
-      Wire.endTransmission();
+    void endTransmission() {
+      mWire.endTransmission();
     }
 
   private:
+    T_WIRE &mWire;
     uint8_t const mAddr;
 };
 

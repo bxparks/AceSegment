@@ -33,14 +33,15 @@
 #define FEATURE_MAX7219_SOFT_SPI_FAST 14
 #define FEATURE_MAX7219_HARD_SPI 15
 #define FEATURE_MAX7219_HARD_SPI_FAST 16
-#define FEATURE_STUB_MODULE 17
-#define FEATURE_NUMBER_WRITER 18
-#define FEATURE_CLOCK_WRITER 19
-#define FEATURE_TEMPERATURE_WRITER 20
-#define FEATURE_CHAR_WRITER 21
-#define FEATURE_STRING_WRITER 22
-#define FEATURE_STRING_SCROLLER 23
-#define FEATURE_LEVEL_WRITER 24
+#define FEATURE_HT16K33_HARD_WIRE 17
+#define FEATURE_STUB_MODULE 18
+#define FEATURE_NUMBER_WRITER 19
+#define FEATURE_CLOCK_WRITER 20
+#define FEATURE_TEMPERATURE_WRITER 21
+#define FEATURE_CHAR_WRITER 22
+#define FEATURE_STRING_WRITER 23
+#define FEATURE_STRING_SCROLLER 24
+#define FEATURE_LEVEL_WRITER 25
 
 // A volatile integer to prevent the compiler from optimizing away the entire
 // program.
@@ -278,6 +279,13 @@ volatile int disableCompilerOptimization = 0;
     Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
         spiInterface, kDigitRemapArray8Max7219);
 
+  #elif FEATURE == FEATURE_HT16K33_HARD_WIRE
+    #include <Wire.h>
+    const uint8_t HT16K33_I2C_ADDRESS = 0x70;
+    using WireInterface = HardWireInterface<TwoWire>;
+    WireInterface wireInterface(Wire, HT16K33_I2C_ADDRESS);
+    Ht16k33Module<WireInterface, NUM_DIGITS> ht16k33Module(wireInterface);
+
   #elif FEATURE == FEATURE_STUB_MODULE
     StubModule stubModule;
     LedDisplay ledDisplay(stubModule);
@@ -318,6 +326,9 @@ volatile int disableCompilerOptimization = 0;
     StubModule stubModule;
     LedDisplay ledDisplay(stubModule);
     LevelWriter levelWriter(ledDisplay);
+
+  #else
+    #error Unknown FEATURE
 
   #endif
 #endif
@@ -395,6 +406,11 @@ void setup() {
   spiInterface.begin();
   max7219Module.begin();
 
+#elif FEATURE == FEATURE_HT16K33_HARD_WIRE
+  Wire.begin();
+  wireInterface.begin();
+  ht16k33Module.begin();
+
 #else
   // No setup() needed for Writers.
 
@@ -402,7 +418,10 @@ void setup() {
 }
 
 void loop() {
-#if FEATURE > FEATURE_BASELINE && FEATURE < FEATURE_TM1637_TMI
+#if FEATURE == FEATURE_BASELINE
+  // do nothing
+
+#elif FEATURE > FEATURE_BASELINE && FEATURE < FEATURE_TM1637_TMI
   scanningModule.setPatternAt(0, 0x3A);
   scanningModule.renderFieldWhenReady();
 
@@ -425,6 +444,14 @@ void loop() {
 #elif FEATURE == FEATURE_MAX7219_HARD_SPI
   max7219Module.setPatternAt(0, 0xff);
   max7219Module.flush();
+
+#elif FEATURE == FEATURE_MAX7219_HARD_SPI_FAST
+  max7219Module.setPatternAt(0, 0xff);
+  max7219Module.flush();
+
+#elif FEATURE == FEATURE_HT16K33_HARD_WIRE
+  ht16k33Module.setPatternAt(0, 0xff);
+  ht16k33Module.flush();
 
 #elif FEATURE == FEATURE_STUB_MODULE
   stubModule.setPatternAt(0, 0xff);
@@ -450,6 +477,9 @@ void loop() {
 
 #elif FEATURE == FEATURE_LEVEL_WRITER
   levelWriter.writeLevel(3);
+
+#else
+  #error Unknown FEATURE
 
 #endif
 }

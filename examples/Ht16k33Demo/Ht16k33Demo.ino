@@ -4,7 +4,6 @@
  */
 
 #include <Arduino.h>
-#include <Wire.h>
 #include <AceCommon.h> // incrementMod()
 #include <AceSegment.h> // Ht16k33Module, LedDisplay
 
@@ -12,8 +11,8 @@ using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
 using ace_segment::Ht16k33Module;
-using ace_segment::LedDisplay;
 using ace_segment::HardWireInterface;
+using ace_segment::LedDisplay;
 
 // Select I2C implementation, either HardWireInterface or SoftWireInterface.
 #define WIRE_INTERFACE_TYPE_HARD 0
@@ -74,10 +73,11 @@ const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 //------------------------------------------------------------------
 
 #if WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_HARD
-  using WireInterface = HardWireInterface;
-  WireInterface wireInterface(HT16K33_I2C_ADDRESS);
+  #include <Wire.h>
+  using WireInterface = HardWireInterface<TwoWire>;
+  WireInterface wireInterface(Wire, HT16K33_I2C_ADDRESS);
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SOFT
-  using WireInterface = SoftWireInterface<SCL_PIN, SDA_PIN>;
+  using SoftWireInterface = SoftWireInterface<SCL_PIN, SDA_PIN>;
   WireInterface wireInterface(HT16K33_I2C_ADDRESS);
 #else
   #error Unknown WIRE_INTERFACE_TYPE

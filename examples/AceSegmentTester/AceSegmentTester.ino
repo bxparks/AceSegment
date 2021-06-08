@@ -638,9 +638,10 @@ const uint8_t NUM_SUBFIELDS = 1;
   );
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HT16K33
+  #include <Wire.h>
   #if INTERFACE_TYPE == INTERFACE_TYPE_HARD_WIRE
-    using WireInterface = HardWireInterface;
-    WireInterface wireInterface(HT16K33_I2C_ADDRESS);
+    using WireInterface = HardWireInterface<TwoWire>;
+    WireInterface wireInterface(Wire, HT16K33_I2C_ADDRESS);
   #elif INTERFACE_TYPE == INTERFACE_TYPE_SOFT_WIRE
     using WireInterface = TBD;
     WireInterface wireInterface;
