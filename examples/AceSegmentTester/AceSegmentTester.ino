@@ -52,21 +52,23 @@
   using ace_segment::SoftTmiFastInterface;
   using ace_segment::HardSpiFastInterface;
   using ace_segment::SoftSpiFastInterface;
+  using ace_segment::DirectFast4Module;
 #endif
 
 using ace_common::incrementMod;
 using ace_button::AceButton;
 using ace_button::ButtonConfig;
 using ace_button::LadderButtonConfig;
+using ace_segment::SoftTmiInterface;
+using ace_segment::HardSpiInterface;
+using ace_segment::SoftSpiInterface;
+using ace_segment::HardWireInterface;
 using ace_segment::DirectModule;
-using ace_segment::DirectFast4Module;
 using ace_segment::HybridModule;
 using ace_segment::Hc595Module;
 using ace_segment::Tm1637Module;
 using ace_segment::Max7219Module;
-using ace_segment::SoftTmiInterface;
-using ace_segment::HardSpiInterface;
-using ace_segment::SoftSpiInterface;
+using ace_segment::Ht16k33Module;
 using ace_segment::LedDisplay;
 using ace_segment::CharWriter;
 using ace_segment::NumberWriter;
@@ -98,9 +100,10 @@ using ace_segment::kActiveHighPattern;
 #define LED_DISPLAY_TYPE_TM1637 1
 #define LED_DISPLAY_TYPE_MAX7219 2
 #define LED_DISPLAY_TYPE_HC595 3
-#define LED_DISPLAY_TYPE_DIRECT 4
-#define LED_DISPLAY_TYPE_HYBRID 5
-#define LED_DISPLAY_TYPE_FULL 6
+#define LED_DISPLAY_TYPE_HT16K33 4
+#define LED_DISPLAY_TYPE_DIRECT 5
+#define LED_DISPLAY_TYPE_HYBRID 6
+#define LED_DISPLAY_TYPE_FULL 7 /* Rename to CUSTOM_HC595? */
 
 // Used by LED_DISPLAY_TYPE_DIRECT
 #define DIRECT_INTERFACE_TYPE_NORMAL 0
@@ -114,6 +117,8 @@ using ace_segment::kActiveHighPattern;
 #define INTERFACE_TYPE_HARD_SPI_FAST 3
 #define INTERFACE_TYPE_SOFT_TMI 4
 #define INTERFACE_TYPE_SOFT_TMI_FAST 5
+#define INTERFACE_TYPE_HARD_WIRE 6
+#define INTERFACE_TYPE_SOFT_WIRE 7
 
 // Some microcontrollers have 2 or more SPI buses. PRIMARY selects the default.
 // SECONDARY selects the alternate. I don't have a board with more than 2, but
@@ -272,6 +277,21 @@ using ace_segment::kActiveHighPattern;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
 
+#elif defined(AUNITER_MICRO_HT16K33)
+  #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
+  const uint8_t MODE_BUTTON_PIN = A2;
+  const uint8_t CHANGE_BUTTON_PIN = A3;
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HT16K33
+  const uint8_t NUM_DIGITS = 4;
+
+  // Choose one of the following variants:
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_WIRE
+  const uint8_t SCL_PIN = SCL;
+  const uint8_t SDA_PIN = SDA;
+  const uint8_t HT16K33_I2C_ADDRESS = 0x70;
+
 #elif defined(AUNITER_STM32_TM1637)
   #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
   const uint8_t MODE_BUTTON_PIN = PA0;
@@ -346,6 +366,21 @@ using ace_segment::kActiveHighPattern;
     #error Unknown SPI_INSTANCE_TYPE
   #endif
 
+#elif defined(AUNITER_STM32_HT16K33)
+  #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
+  const uint8_t MODE_BUTTON_PIN = PA0;
+  const uint8_t CHANGE_BUTTON_PIN = PA1;
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HT16K33
+  const uint8_t NUM_DIGITS = 4;
+
+  // Choose one of the following variants:
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_WIRE
+  const uint8_t SCL_PIN = SCL;
+  const uint8_t SDA_PIN = SDA;
+  const uint8_t HT16K33_I2C_ADDRESS = 0x70;
+
 #elif defined(AUNITER_D1MINI_LARGE_TM1637)
   #define BUTTON_TYPE BUTTON_TYPE_ANALOG
   const uint8_t MODE_BUTTON_PIN = 0;
@@ -415,6 +450,29 @@ using ace_segment::kActiveHighPattern;
   const uint8_t LATCH_PIN = SS;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
+
+#elif defined(AUNITER_D1MINI_LARGE_HT16K33)
+  #define BUTTON_TYPE BUTTON_TYPE_ANALOG
+  const uint8_t MODE_BUTTON_PIN = 0;
+  const uint8_t CHANGE_BUTTON_PIN = 2;
+  #define ANALOG_BUTTON_PIN A0
+  #define ANALOG_BUTTON_LEVELS { \
+      0 /*short to ground*/, \
+      327 /*32%, 4.7k*/, \
+      512 /*50%, 10k*/, \
+      844 /*82%, 47k*/, \
+      1023 /*100%, open*/ \
+    }
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HT16K33
+  const uint8_t NUM_DIGITS = 4;
+
+  // Choose one of the following variants:
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_WIRE
+  const uint8_t SCL_PIN = SCL;
+  const uint8_t SDA_PIN = SDA;
+  const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
 #elif defined(AUNITER_ESP32_TM1637)
   #define BUTTON_TYPE BUTTON_TYPE_ANALOG
@@ -494,6 +552,23 @@ using ace_segment::kActiveHighPattern;
     #error Unknown SPI_INSTANCE_TYPE
   #endif
 
+#elif defined(AUNITER_ESP32_HT16K33)
+  #define BUTTON_TYPE BUTTON_TYPE_ANALOG
+  const uint8_t MODE_BUTTON_PIN = 0;
+  const uint8_t CHANGE_BUTTON_PIN = 1;
+  #define ANALOG_BUTTON_LEVELS {0, 2048, 4095}
+  #define ANALOG_BUTTON_PIN A10
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HT16K33
+  const uint8_t NUM_DIGITS = 4;
+
+  // Choose one of the following variants:
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_WIRE
+  const uint8_t SCL_PIN = SCL;
+  const uint8_t SDA_PIN = SDA;
+  const uint8_t HT16K33_I2C_ADDRESS = 0x70;
+
 #else
   #error Unknown AUNITER environment
 #endif
@@ -561,6 +636,17 @@ const uint8_t NUM_SUBFIELDS = 1;
       kByteOrderSegmentHighDigitLow,
       kDigitRemapArray8Hc595
   );
+
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HT16K33
+  #include <Wire.h>
+  #if INTERFACE_TYPE == INTERFACE_TYPE_HARD_WIRE
+    using WireInterface = HardWireInterface<TwoWire>;
+    WireInterface wireInterface(Wire, HT16K33_I2C_ADDRESS);
+  #elif INTERFACE_TYPE == INTERFACE_TYPE_SOFT_WIRE
+    using WireInterface = TBD;
+    WireInterface wireInterface;
+  #endif
+  Ht16k33Module<WireInterface, NUM_DIGITS> ledModule(wireInterface);
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_DIRECT
   // Common Anode, with transitors on Group pins
@@ -660,6 +746,12 @@ void setupAceSegment() {
   spiInterface.begin();
   ledModule.begin();
   ledModule.setBrightness(1); // 0-1
+
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HT16K33
+  Wire.begin();
+  wireInterface.begin();
+  ledModule.begin();
+  ledModule.setBrightness(1); // 0-15
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_DIRECT
   ledModule.begin();
@@ -962,10 +1054,25 @@ void updateDemo() {
   }
 }
 
-/** Go to the next demo */
+/** Go to the next demo. */
 void nextDemo() {
+// The HT16K33 module can display both a decimal point and a colon segment after
+// digit 1 (second from left). The Ht16k33Module.enableColon() selects one or
+// the other.
+#if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HT16K33
+  if (prevDemoMode == DEMO_MODE_CLOCK) {
+    ledModule.enableColon(false);
+  }
+#endif
   prevDemoMode = demoMode;
+
   incrementMod(demoMode, DEMO_MODE_COUNT);
+#if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HT16K33
+  if (demoMode == DEMO_MODE_CLOCK) {
+    ledModule.enableColon(true);
+  }
+#endif
+
   ledDisplay.clear();
 
   updateDemo();

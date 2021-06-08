@@ -43,6 +43,11 @@ enum class EventType : uint8_t {
   kTmiStartCondition,
   kTmiStopCondition,
   kTmiSendByte,
+  kWireBegin,
+  kWireEnd,
+  kWireBeginTransmission,
+  kWireEndTransmission,
+  kWireWrite,
   kLedMatrixDraw,
   kLedMatrixEnableGroup,
   kLedMatrixDisableGroup,
@@ -163,6 +168,49 @@ class EventLog {
 
     //-------------------------------------------------------------------------
 
+    void addWireBegin() {
+      if (mNumRecords >= kMaxRecords) return;
+
+      Event& event = mEvents[mNumRecords];
+      event.type = EventType::kWireBegin;
+      mNumRecords++;
+    }
+
+    void addWireEnd() {
+      if (mNumRecords >= kMaxRecords) return;
+
+      Event& event = mEvents[mNumRecords];
+      event.type = EventType::kWireEnd;
+      mNumRecords++;
+    }
+
+    void addWireBeginTransmission() {
+      if (mNumRecords >= kMaxRecords) return;
+
+      Event& event = mEvents[mNumRecords];
+      event.type = EventType::kWireBeginTransmission;
+      mNumRecords++;
+    }
+
+    void addWireEndTransmission() {
+      if (mNumRecords >= kMaxRecords) return;
+
+      Event& event = mEvents[mNumRecords];
+      event.type = EventType::kWireEndTransmission;
+      mNumRecords++;
+    }
+
+    void addWireWrite(uint8_t data) {
+      if (mNumRecords >= kMaxRecords) return;
+
+      Event& event = mEvents[mNumRecords];
+      event.type = EventType::kWireWrite;
+      event.arg1 = data;
+      mNumRecords++;
+    }
+
+    //-------------------------------------------------------------------------
+
     void addLedMatrixDraw(uint8_t group, uint8_t elementPattern) {
       if (mNumRecords >= kMaxRecords) return;
 
@@ -266,6 +314,24 @@ class EventLog {
             break;
 
           case EventType::kTmiSendByte: {
+              uint8_t value = va_arg(args, int);
+              if (value != event.arg1) return false;
+            }
+            break;
+
+          case EventType::kWireBegin:
+            break;
+
+          case EventType::kWireEnd:
+            break;
+
+          case EventType::kWireBeginTransmission:
+            break;
+
+          case EventType::kWireEndTransmission:
+            break;
+
+          case EventType::kWireWrite: {
               uint8_t value = va_arg(args, int);
               if (value != event.arg1) return false;
             }
