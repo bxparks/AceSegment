@@ -168,6 +168,7 @@ program for various `LedModule` configurations and various Writer classes.
 * `Hc595Module`
 * `Tm1637Module`
 * `Max7219Module`
+* `Ht16k33Module`
 * `NumberWriter`
 * `ClockWriter`
 * `TemperatureWriter`
@@ -328,7 +329,7 @@ other `MemoryBenchmark` programs.)
 
 * 48 MHz ARM Cortex-M0+
 * Arduino IDE 1.8.13
-* Sparkfun SAMD Core 1.8.1
+* Sparkfun SAMD Core 1.8.3
 
 ```
 +--------------------------------------------------------------+
@@ -375,7 +376,7 @@ other `MemoryBenchmark` programs.)
 
 * STM32F103C8, 72 MHz ARM Cortex-M3
 * Arduino IDE 1.8.13
-* STM32duino 1.9.0
+* STM32duino 2.0.0
 
 ```
 +--------------------------------------------------------------+
