@@ -152,6 +152,15 @@ number of `TimingStats::update()` calls that were made.
   `Tm1637(4,SoftTmiFast,5us)`). The `flush()` or `flushIncremental()` durations
   are almost a factor of 10X to 20X shorter compared to `BIT_DELAY = 100`.
 
+**v0.6+:**
+
+* Add `sizeof(LevelWriter)` and `sizeof(HardWireInterface)`.
+* Add benchmarks for `Ht16k33Module`. On SAMD21 and STM32, the runtime
+  of the `Ht16k33Module` seems to depend on whether an actual HT16K33 LED module
+  is attached to the I2C bus. On the SAMD21, the transmission time becomes 50X
+  longer *without* the LED module attached. On the STM32, gthe transmission time
+  becomes 30-40X smaller *without* the LED module attached.
+
 ## Results
 
 The following tables show the number of microseconds taken by:
@@ -176,6 +185,9 @@ The following tables show the number of microseconds taken by:
 * `Max7219Module::flush()`
     * sends all digits in the buffer to the MAX7219 LED module using
       software SPI or hardware SPI
+* `Ht16k33Module::flush()`
+    * sends all digits in the buffer to the HT16K33 LED module using
+      hardware I2C
 
 On AVR processors, the "fast" options are available using the
 [digitalWriteFast](https://github.com/NicksonYap/digitalWriteFast) library whose
@@ -211,7 +223,7 @@ compared to their non-fast equivalents.
 
 * 48 MHz ARM Cortex-M0+
 * Arduino IDE 1.8.13
-* Sparkfun SAMD Core 1.8.1
+* Sparkfun SAMD Core 1.8.3
 
 ```
 {samd_results}
@@ -221,7 +233,7 @@ compared to their non-fast equivalents.
 
 * STM32 "Blue Pill", STM32F103C8, 72 MHz ARM Cortex-M3
 * Arduino IDE 1.8.13
-* STM32duino 1.9.0
+* STM32duino 2.0.0
 
 ```
 {stm32_results}

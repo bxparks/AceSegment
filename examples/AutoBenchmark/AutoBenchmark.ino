@@ -38,6 +38,8 @@ SOFTWARE.
 
 #include <stdio.h>
 #include <Arduino.h>
+#include <SPI.h> // SPIClass
+#include <Wire.h> // TwoWire
 #include <AceCommon.h> // TimingStats
 #include <AceSegment.h>
 
@@ -189,6 +191,8 @@ void runScanningBenchmark(const __FlashStringHelper* name, LM& scanningModule) {
 }
 
 //-----------------------------------------------------------------------------
+// Direct LED Modules
+//-----------------------------------------------------------------------------
 
 // Common Anode, with transistors on Group pins
 void runDirect() {
@@ -244,6 +248,8 @@ void runDirectFast4() {
 }
 #endif
 
+//-----------------------------------------------------------------------------
+// Hybrid 74HC595 and Direct LED Modules.
 //-----------------------------------------------------------------------------
 
 // Common Cathode, with transistors on Group pins
@@ -381,6 +387,8 @@ void runHybridHardSpiFast() {
 #endif
 
 //-----------------------------------------------------------------------------
+// 74HC595 LED Modules
+//-----------------------------------------------------------------------------
 
 // Common Anode, with transistors on Group pins
 void runHc595SoftSpi() {
@@ -516,6 +524,8 @@ void runHc595HardSpiFast() {
 }
 #endif
 
+//-----------------------------------------------------------------------------
+// TM1637 LED Modules
 //-----------------------------------------------------------------------------
 
 static uint8_t kTm1637Patterns[6] = {
@@ -661,6 +671,8 @@ void runTm1637SixSoftTmiFast() {
 #endif
 
 //-----------------------------------------------------------------------------
+// MAX7219 LED Modules
+//-----------------------------------------------------------------------------
 
 template <typename LM>
 void runMax7219Benchmark(const __FlashStringHelper* name, LM& ledModule) {
@@ -739,6 +751,47 @@ void runMax7219HardSpiFast() {
 #endif
 
 //-----------------------------------------------------------------------------
+// HT16K33 LED Modules
+//-----------------------------------------------------------------------------
+
+const uint8_t HT16K33_I2C_ADDRESS = 0x70;
+
+template <typename LM>
+void runHt16k33Benchmark(const __FlashStringHelper* name, LM& ledModule) {
+  ledModule.setPatternAt(0, 0x13);
+  ledModule.setPatternAt(0, 0x37);
+  ledModule.setPatternAt(0, 0x7F);
+  ledModule.setPatternAt(0, 0xFF);
+
+  timingStats.reset();
+  const uint16_t numSamples = 20;
+  for (uint16_t i = 0; i < numSamples; ++i) {
+    uint16_t startMicros = micros();
+    ledModule.flush();
+    uint16_t endMicros = micros();
+    timingStats.update(endMicros - startMicros);
+    yield();
+  }
+
+  printStats(name, timingStats, numSamples);
+}
+
+void runHt16k33HardWire() {
+  using WireInterface = HardWireInterface<TwoWire>;
+  WireInterface wireInterface(Wire, HT16K33_I2C_ADDRESS);
+  Ht16k33Module<WireInterface, 4> ht16k33Module(wireInterface);
+
+  Wire.begin();
+  wireInterface.begin();
+  ht16k33Module.begin();
+  runHt16k33Benchmark(F("Ht16k33(4,HardWire)"), ht16k33Module);
+  ht16k33Module.end();
+  wireInterface.end();
+}
+
+//-----------------------------------------------------------------------------
+// runBenchmarks()
+//-----------------------------------------------------------------------------
 
 void runBenchmarks() {
   runDirect();
@@ -790,8 +843,12 @@ void runBenchmarks() {
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
   runMax7219HardSpiFast();
 #endif
+
+  runHt16k33HardWire();
 }
 
+//-----------------------------------------------------------------------------
+// sizeof()
 //-----------------------------------------------------------------------------
 
 void printSizeOf() {
@@ -815,10 +872,12 @@ void printSizeOf() {
   SERIAL_PORT_MONITOR.println(sizeof(HardSpiInterface<SPIClass>));
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  SERIAL_PORT_MONITOR.print(
-      F("sizeof(HardSpiFastInterface<SPIClass, 11>): "));
+  SERIAL_PORT_MONITOR.print(F("sizeof(HardSpiFastInterface): "));
   SERIAL_PORT_MONITOR.println(sizeof(HardSpiFastInterface<SPIClass, 11>));
 #endif
+
+  SERIAL_PORT_MONITOR.print(F("sizeof(HardWireInterface): "));
+  SERIAL_PORT_MONITOR.println(sizeof(HardWireInterface<TwoWire>));
 
   SERIAL_PORT_MONITOR.print(F("sizeof(LedMatrixDirect<>): "));
   SERIAL_PORT_MONITOR.println(sizeof(LedMatrixDirect<>));
@@ -873,6 +932,10 @@ void printSizeOf() {
   SERIAL_PORT_MONITOR.print(F("sizeof(Max7219Module<SoftSpiInterface, 8>): "));
   SERIAL_PORT_MONITOR.println(sizeof(Max7219Module<SoftSpiInterface, 8>));
 
+  SERIAL_PORT_MONITOR.print(F("sizeof(Ht16k33Module<HardWireInterface, 4>): "));
+  SERIAL_PORT_MONITOR.println(
+      sizeof(Ht16k33Module<HardWireInterface<TwoWire>, 4>));
+
   SERIAL_PORT_MONITOR.print(F("sizeof(LedDisplay): "));
   SERIAL_PORT_MONITOR.println(sizeof(LedDisplay));
 
@@ -890,6 +953,9 @@ void printSizeOf() {
 
   SERIAL_PORT_MONITOR.print(F("sizeof(StringWriter): "));
   SERIAL_PORT_MONITOR.println(sizeof(StringWriter));
+
+  SERIAL_PORT_MONITOR.print(F("sizeof(LevelWriter): "));
+  SERIAL_PORT_MONITOR.println(sizeof(LevelWriter));
 
   SERIAL_PORT_MONITOR.print(F("sizeof(StringScroller): "));
   SERIAL_PORT_MONITOR.println(sizeof(StringScroller));
