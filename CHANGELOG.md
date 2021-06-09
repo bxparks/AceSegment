@@ -1,13 +1,13 @@
 # Changelog
 
 * Unreleased
-    * HT16K33 LED Module
+    * Support HT16K33 LED modules
         * Add `Ht16k33Module` class to support 4-digit LED display from
           Adafruit or one of its clones.
         * Add `HardWireInterface` as a thin abstraction between `TwoWire` class
           and the `Ht16k33Module`, to avoid including `<Wire.h>` which pulls in
           about 1000 bytes of flash even if `Ht16k33Module` is never used.
-    * Improve `HardSpiInterface`, `HardSpiFastInterface`
+    * Improve `HardSpiInterface` and `HardSpiFastInterface`
         * Fix Hardware SPI on ESP8266.
             * Defer the initialization to `SPIClass::begin()` which knows to
               call `pinMode(pin, SPECIAL)` instead of `pinMode(pin, OUTPUT)`

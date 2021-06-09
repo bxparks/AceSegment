@@ -6,13 +6,14 @@ An adjustable, configurable, and extensible framework for rendering seven
 segment LED displays on Arduino platforms. The library supports multiple types
 of LED displays:
 
-* LED modules using the TM1637 controller chip
-* LED modules using the MAX7219/MAX7221 controller chip
-* LED modules using two 74HC595 shift register chips
+* LED modules using the TM1637 controller chip over a custom 2 wire protocol
+* LED modules using the MAX7219/MAX7221 controller chip over SPI
+* LED modules using the HT16K33 controller chip over I2C
+* LED modules using two 74HC595 shift register chips over SPI
 * LED modules using a hybrid of one 74HC595 chip and direct GPIO connections
 * LED modules directly connected to the GPIO pins, no controller chips
 
-The first 3 types are readily available from consumer sources such as Amazon and
+The first 4 types are readily available from consumer sources such as Amazon and
 eBay, in multiple colors and sizes. The final 2 types of modules (hybrid and
 directly connected) are usually custom creations. The AceSegment library hopes
 to support as many of these configurations as possible within a single
@@ -25,7 +26,7 @@ into hardware-dependent components and hardware-independent components to allow
 application code to be written without worrying too much about the low-level
 details of the specific LED module.
 
-**Version**: 0.6 (2021-05-26)
+**Version**: 0.6+ (2021-06-09)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
@@ -52,6 +53,8 @@ consumption.
         * [TM1637 Capacitor Removal](#Tm1637CapacitorRemoval)
     * [Max7219Module](#Max7219Module)
         * [MAX7219 Module With 8 Digits](#Max7219Module8)
+    * [Ht16k33Module](#Ht16k33Module)
+        * [HT16K33 Module With 4 Digits](#Ht16k33Module4)
     * [Hc595Module](#Hc595Module)
         * [74HC595 Module With 8 Digits](#Hc595Module8)
         * [74HC595 Module With 4 Digits](#Hc595Module4)
@@ -149,6 +152,8 @@ The following example sketches are provided:
         * Demo of a TM1637 LED module using `Tm1637Module`
     * [Max7219Demo.ino](examples/Max7219Demo)
         * Demo of a MAX7219 LED module using `Max7219Module`
+    * [Ht16k33Demo.ino](examples/Ht16k33Demo)
+        * Demo of a HT16K33 LED module using `Ht16k33Module`
     * [Hc595Demo.ino](examples/Hc595Demo)
         * Demo of a 74HC595 LED module using `Hc595Module`
     * [AceSegmentTester.ino](examples/AceSegmentTester)
@@ -201,8 +206,7 @@ end-users, listed roughly from low-level to higher-level classes which often
 depend on the lower-level classes:
 
 * `SpiInterface`
-    * Thin-wrapper classes for communicating with the LED module that support
-      SPI
+    * Thin wrapper classes for communicating with LED modules that support SPI
     * Used by `Max7219Module` and `Hc595Module`.
     * There are 4 implementations.
         * `SoftSpiInterface`
@@ -214,7 +218,7 @@ depend on the lower-level classes:
         * `HardSpiFastInterface`
             * Hardware SPI using `digitalWriteFast()` to control the latch pin.
 * `TmiInterface`
-    * Thin-wrapper classes to communicating with LED modules using the TM1637
+    * Thin wrapper classes to communicating with LED modules using the TM1637
       protocol. Similar to I2C but not exactly the same.
     * Used by `Tm1637Module`.
     * There are 2 implementations:
@@ -222,6 +226,10 @@ depend on the lower-level classes:
             * Implement the TM1637 protocol using `digitalWrite()`.
         * `SoftTmiFastInterface`
             * Implement the TM1637 protocol using `digitalWriteFast()`.
+* `WireInterface`
+    * Thin wrapper classes for communicating with LED modules using I2C.
+    * Used by `Ht16k33Module`.
+    * Currently only one implementation: `HardWireInterface`.
 * `LedModule`
     * Base interface for all hardware dependent implementation of a
       seven-segment LED module.
@@ -229,6 +237,8 @@ depend on the lower-level classes:
         * An implementation using a TM1637 controller.
     * `Max7219Module`
         * An implementation using a MAX7219 controller.
+    * `Ht16k33Module`
+        * An implementation using an HT16K33 controller.
     * `Hc595Module`
         * An implementation using two 74HC595 shift registers.
     * `HybridModule`
@@ -293,16 +303,16 @@ The dependency diagram among these classes looks something like this
                        LedModule
                           ^
                           |
-      +-------------------+-----------------+--------------+--------------+
-      |                   |                 |              |              |
-Tm1637Module          Max7219Module     Hc595Module  HybridModule  DirectModule
-      |                         \           |         /
-      |                          \          |        /
-      v                           v         v       v
-SoftTmiInterface                  SoftSpiInterface
-SoftTmiFastInterface              SoftSpiFastInterface
-                                  HardSpiInterface
-                                  HardSpiFastInterface
+      +-----------+-------+-----+--------------+--------------+---------+
+      |           |             |              |              |         |
+Tm1637Module  Max7219Module Hc595Module HybridModule DirectModule Ht16k33Module
+      |               \         |       /                               |
+      |                \        |      /                                |
+      v                 v       v     v                                 v
+SoftTmiInterface         SoftSpiInterface                     HardWireInterface
+SoftTmiFastInterface     SoftSpiFastInterface
+                         HardSpiInterface
+                         HardSpiFastInterface
 ```
 
 <a name="DigitAndSegmentAddressing"></a>
@@ -626,9 +636,9 @@ milliseconds instead of 22 milliseconds.
 
 These LED modules use the MAX7219 controller chip which communicate using SPI. A
 single chip supports 8 segments of up to 8 digits. Multiple controller chips can
-be daisychained to support more than 8 digits. The 8-digit module is readily
-available commercially from multiple suppliers on Amazon and eBay, and they look
-like this:
+be daisychained to support more than 8 digits. LED modules with 8 digits are
+readily available from multiple suppliers on Amazon and eBay, and they look like
+this:
 
 ![MAX7219 LED Module](docs/max7219/max7219_8_digits.jpg)
 
@@ -725,6 +735,123 @@ seem to have their digits wired in the opposite orientation compared to the one
 used in this library. In other words, digit 0 is on the far right, and digit 7
 is on the far left. The `kDigitRemapArray8Max7219` array tells the
 `Max7219Module` class to remap those digits so that they appear correct.
+
+<a name="Ht16k33Module"></a>
+### Ht16k33Module
+
+These LED modules use the HT16K33 controller chip which communicate using SPI. A
+single chip supports up to 16 segments and 8 digits, but the AceSegment
+library supports modules with only 8 segments (7 segments plus decimal point).
+Generic 4-digit modules are readily available from multiple suppliers on
+Amazon and eBay, and they look like this:
+
+![Generic HT16K33 LED Module](docs/ht16k33/ht16k33_4_digits.jpg)
+
+It was only after I purchased a set of these that I discovered that they seem to
+be generic clones of the LED modules (https://www.adafruit.com/product/878)
+available from [Adafruit](https://www.adafruit.com), such as these:
+
+![Adafruit HT16K33 LED Module](docs/ht16k33/adafruit_ht16k33_4_digits.jpg)
+![Adafruit HT16K33 LED Module Front](docs/ht16k33/adafruit_ht16k33_backpack_front.jpg)
+![Adafruit HT16K33 LED Module Front](docs/ht16k33/adafruit_ht16k33_backpack_back.jpg)
+
+The `Ht16k33Module` class looks like this:
+
+```C++
+template <typename T_WIREI, uint8_t T_DIGITS>
+class Ht16k33Module : public LedModule {
+  public:
+    explicit Ht16k33Module(T_WIREI& wire, bool enableColon = false);
+
+    void enableColon(bool enable);
+    void begin();
+    void end();
+
+    uint8_t getNumDigits() const { return T_DIGITS; }
+    void setPatternAt(uint8_t pos, uint8_t pattern) override;
+    uint8_t getPatternAt(uint8_t pos) override;
+    void setBrightness(uint8_t brightness) override;
+
+    void flush();
+};
+```
+
+The `T_WIREI` template parameter is the class name of the Wire interface,
+currently just `HardWireInterface`.
+
+The `T_DIGITS` template parameter is the number of digits in the module. I have
+only seen 4 digit modules for sale.
+
+Most of the methods are implementations of the virtual methods of `LedModule`.
+
+The `flush()` method sends all 4 digits as well as the brightness setting to the
+LED module using I2C.
+
+The `enableColon` parameter and the `enableColon()` method determine whether the
+colon segment between Digit 1 and Digit 2 of the LED module is active. The
+4-digit HT16K33 LED clock module from Adafruit (and its clones) allows the colon
+segment to be controlled independently of the decimal point of Digit 1. This is
+unlike other 4-digit clock modules which take over the control line for the
+decimal point of Digit 1 to the colon segment, causing that decimal point to
+become disabled.
+
+The AceSegment library does not support controlling both the decimal point and
+the colon segment *at the time same*. However, it allows selecting one or the
+other. With `enableColon = false`, the LED module behave like any other 4-digit
+LED module with its decimal point on Digit 1. With `enableColon = true`, the LED
+module behaves like a clock module with a colon segment between Digit 1 and
+Digit 2. This behavior can be selected at dynamically at runtime using the
+`enableColon()` function.
+
+<a name="Ht16k33Module4"></a>
+#### HT16K33 Module with 4 Digits
+
+The configuration of the `Ht16k33Module` class for the 4-digit Adfruit LED
+module looks like this (c.f. [examples/Ht16k33Demo](examples/Ht16k33Demo)):
+
+```C++
+#include <Arduino.h>
+#include <Wire.h>
+#include <AceSegment.h>
+using namespace ace_segment;
+
+const uint8_t HT16K33_I2C_ADDRESS = 0x70;
+const uint8_t SCL_PIN = SCL;
+const uint8_t SDA_PIN = SDA;
+const uint8_t NUM_DIGITS = 4;
+
+using WireInterface = HardWireInterface<TwoWire>;
+WireInterface wireInterface(Wire, HT16K33_I2C_ADDRESS);
+
+Ht16k33Module<WireInterface, NUM_DIGITS> ledModule(wireInterface);
+LedDisplay display(ledModule);
+
+void setupAceSegment() {
+  Wire.begin();
+  wireInterface.begin();
+  ledModule.begin();
+}
+
+// Flush to LED module every 100 millis.
+void flushModule() {
+  static uint16_t prevFlushMillis;
+  uint16_t nowMillis = millis();
+  if ((uint16_t) (nowMillis - prevFlushMillis) >= 100) {
+    prevFlushMillis = nowMillis;
+    ledModule.flush();
+  }
+}
+
+void setup() {
+  setupAceSegment();
+  ...
+}
+
+void loop() {
+  flushModule();
+  ...
+}
+```
 
 <a name="Hc595Module"></a>
 ### Hc595Module
