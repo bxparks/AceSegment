@@ -26,7 +26,6 @@ SOFTWARE.
 #define ACE_SEGMENT_HARD_WIRE_INTERFACE_H
 
 #include <stdint.h>
-#include <Arduino.h>
 
 namespace ace_segment {
 

@@ -52,10 +52,12 @@ using ace_segment::kActiveHighPattern;
 #if defined(EPOXY_DUINO)
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
   #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
+  SPIClass& spiInstance = SPI;
 
 #elif defined(AUNITER_MICRO_CUSTOM_SINGLE)
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
   #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
+  SPIClass& spiInstance = SPI;
 
 #else
   #error Unknown environment
@@ -96,21 +98,12 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
 #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
-  using SpiInterface = HardSpiInterface;
-  #if SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_PRIMARY
-    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
-    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN, SPISecondary);
-  #endif
+  using SpiInterface = HardSpiInterface<SPIClass>;
+  SpiInterface spiInterface(spiInstance, LATCH_PIN, DATA_PIN, CLOCK_PIN);
 #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
-  using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
-  #if SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_PRIMARY
-    SpiInterface spiInterface;
-  #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
-    SpiInterface spiInterface(SPISecondary);
-  #else
-    #error Unknown SPI_INSTANCE_TYPE
-  #endif
+  using SpiInterface = HardSpiFastInterface<
+      SPIClass, LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  SpiInterface spiInterface(spiInstance);
 #else
   #error Unknown INTERFACE_TYPE
 #endif
@@ -134,6 +127,11 @@ const uint8_t PATTERNS[NUM_DIGITS] = {
 };
 
 void setupAceSegment() {
+#if INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI \
+    || INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
+  spiInstance.begin();
+#endif
+
   spiInterface.begin();
   ledModule.begin();
 }

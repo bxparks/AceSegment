@@ -4,6 +4,7 @@
  */
 
 #include <Arduino.h>
+#include <SPI.h> // SPI, SPIClass
 #include <AceCommon.h> // incrementMod()
 #include <AceSegment.h> // Max7219Module, LedDisplay
 
@@ -47,6 +48,7 @@ using ace_segment::kDigitRemapArray8Max7219;
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
+  SPIClass& spiInstance = SPI;
 
 #elif defined(AUNITER_MICRO_MAX7219)
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
@@ -56,6 +58,7 @@ using ace_segment::kDigitRemapArray8Max7219;
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
+  SPIClass& spiInstance = SPI;
 
 #elif defined(AUNITER_STM32_MAX7219)
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
@@ -66,24 +69,29 @@ using ace_segment::kDigitRemapArray8Max7219;
     const uint8_t LATCH_PIN = SS;
     const uint8_t DATA_PIN = MOSI;
     const uint8_t CLOCK_PIN = SCK;
+    SPIClass& spiInstance = SPI;
   #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
     // SPI2 pins
     const uint8_t LATCH_PIN = PB12;
     const uint8_t DATA_PIN = PB15;
     const uint8_t CLOCK_PIN = PB13;
-    SPIClass SPISecondary(DATA_PIN, PB14 /*miso*/, CLOCK_PIN);
+    SPIClass spiInstance(DATA_PIN, PB14 /*miso*/, CLOCK_PIN);
   #else
     #error Unknown SPI_INSTANCE_TYPE
   #endif
 
 #elif defined(AUNITER_D1MINI_LARGE_MAX7219)
-  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+
+  // Hardware SPI does not work on ESP8266, don't know why...
+  //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
   #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
 
   // SPI pins
   const uint8_t LATCH_PIN = SS;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
+  SPIClass& spiInstance = SPI;
 
 #elif defined(AUNITER_ESP32_MAX7219)
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
@@ -95,12 +103,13 @@ using ace_segment::kDigitRemapArray8Max7219;
     const uint8_t LATCH_PIN = SS;
     const uint8_t DATA_PIN = MOSI;
     const uint8_t CLOCK_PIN = SCK;
+    SPIClass& spiInstance = SPI;
   #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
     // HSPI pins
     const uint8_t LATCH_PIN = 15;
     const uint8_t DATA_PIN = 13;
     const uint8_t CLOCK_PIN = 14;
-    SPIClass SPISecondary(HSPI);
+    SPIClass spiInstance(HSPI);
   #else
     #error Unknown SPI_INSTANCE_TYPE
   #endif
@@ -136,23 +145,12 @@ const uint8_t PATTERNS[NUM_DIGITS] = {
 };
 
 #if INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
-  using SpiInterface = HardSpiInterface;
-  #if SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_PRIMARY
-    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
-    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN, SPISecondary);
-  #else
-    #error Unknown SPI_INSTANCE_TYPE
-  #endif
+  using SpiInterface = HardSpiInterface<SPIClass>;
+  SpiInterface spiInterface(spiInstance, LATCH_PIN, DATA_PIN, CLOCK_PIN);
 #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
-  using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
-  #if SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_PRIMARY
-    SpiInterface spiInterface;
-  #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
-    SpiInterface spiInterface(SPISecondary);
-  #else
-    #error Unknown SPI_INSTANCE_TYPE
-  #endif
+  using SpiInterface = HardSpiFastInterface<
+      SPIClass, LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  SpiInterface spiInterface(spiInstance);
 #elif INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI
   using SpiInterface = SoftSpiInterface;
   SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
@@ -168,6 +166,12 @@ Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
 LedDisplay display(max7219Module);
 
 void setupAceSegment() {
+
+#if INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI \
+    || INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
+  spiInstance.begin();
+#endif
+
   spiInterface.begin();
   max7219Module.begin();
 }

@@ -26,7 +26,7 @@ SOFTWARE.
 #define ACE_SEGMENT_HARD_SPI_INTERFACE_H
 
 #include <stdint.h>
-#include <Arduino.h>
+#include <Arduino.h> // digitalWrite()
 #include <SPI.h>
 
 namespace ace_segment {
@@ -47,14 +47,35 @@ namespace ace_segment {
  * The ESP32 has 2 user-accessible SPI buses (HSPI and VSPI), and so does the
  * STM32F1 (SPI1 and SPI2). By default, the predefined SPI instance is used, but
  * a user-defined secondary SPI instance can be passed into the constructor.
+ *
+ * @tparam T_SPI the class of the hardware SPI instance, usually SPIClass
  */
+template <typename T_SPI>
 class HardSpiInterface {
+  private:
+    // The following constants are defined without including <SPI.h> to avoid
+    // pulling in the global SPI instance into applications which don't use SPI.
+    // They may become template parameters in the future.
+
+    /** MAX7219 has a maximum clock of 16 MHz, so set this to 8 MHz. */
+    static const uint32_t kClockSpeed = 8000000;
+
+    /** MSB first or LSB first */
+  #if defined(ARDUINO_ARCH_STM32) || defined(ARDUINO_ARCH_SAMD)
+    static const BitOrder kBitOrder = MSBFIRST;
+  #else
+    static const uint8_t kBitOrder = MSBFIRST;
+  #endif
+
+    /** SPI mode */
+    static const uint8_t kSpiMode = SPI_MODE0;
+
   public:
     HardSpiInterface(
+        T_SPI& spi,
         uint8_t latchPin,
         uint8_t dataPin,
-        uint8_t clockPin,
-        SPIClass& spi = SPI
+        uint8_t clockPin
     ) :
         mSpi(spi),
         mLatchPin(latchPin),
@@ -66,19 +87,17 @@ class HardSpiInterface {
       pinMode(mLatchPin, OUTPUT);
       pinMode(mDataPin, OUTPUT);
       pinMode(mClockPin, OUTPUT);
-      mSpi.begin();
     }
 
     void end() const {
       pinMode(mLatchPin, INPUT);
       pinMode(mDataPin, INPUT);
       pinMode(mClockPin, INPUT);
-      mSpi.end();
     }
 
     /** Send 8 bits, including latching LOW and HIGH. */
     void send8(uint8_t value) const {
-      mSpi.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
+      mSpi.beginTransaction(SPISettings(kClockSpeed, kBitOrder, kSpiMode));
       digitalWrite(mLatchPin, LOW);
       mSpi.transfer(value);
       digitalWrite(mLatchPin, HIGH);
@@ -87,7 +106,7 @@ class HardSpiInterface {
 
     /** Send 16 bits, including latching LOW and HIGH. */
     void send16(uint16_t value) const {
-      mSpi.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
+      mSpi.beginTransaction(SPISettings(kClockSpeed, kBitOrder, kSpiMode));
       digitalWrite(mLatchPin, LOW);
       mSpi.transfer16(value);
       digitalWrite(mLatchPin, HIGH);
@@ -104,7 +123,7 @@ class HardSpiInterface {
     }
 
   private:
-    SPIClass& mSpi;
+    T_SPI& mSpi;
     uint8_t const mLatchPin;
     uint8_t const mDataPin;
     uint8_t const mClockPin;

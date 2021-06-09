@@ -314,8 +314,8 @@ void runHybridSoftSpiFast() {
 
 // Common Cathode, with transistors on Group pins
 void runHybridHardSpi() {
-  using SpiInterface = HardSpiInterface;
-  SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  using SpiInterface = HardSpiInterface<SPIClass>;
+  SpiInterface spiInterface(SPI, LATCH_PIN, DATA_PIN, CLOCK_PIN);
 
   HybridModule<SpiInterface, NUM_DIGITS> scanningModule(
       spiInterface,
@@ -333,6 +333,7 @@ void runHybridHardSpi() {
       DIGIT_PINS
   );
 
+  SPI.begin();
   spiInterface.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
@@ -347,8 +348,9 @@ void runHybridHardSpi() {
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 // Common Cathode, with transistors on Group pins
 void runHybridHardSpiFast() {
-  using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
-  SpiInterface spiInterface;
+  using SpiInterface = HardSpiFastInterface<
+      SPIClass, LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  SpiInterface spiInterface(SPI);
 
   HybridModule<SpiInterface, NUM_DIGITS> scanningModule(
       spiInterface,
@@ -366,6 +368,7 @@ void runHybridHardSpiFast() {
       DIGIT_PINS
   );
 
+  SPI.begin();
   spiInterface.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
@@ -449,8 +452,8 @@ void runHc595SoftSpiFast() {
 
 // Common Anode, with transistors on Group pins
 void runHc595HardSpi() {
-  using SpiInterface = HardSpiInterface;
-  SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  using SpiInterface = HardSpiInterface<SPIClass>;
+  SpiInterface spiInterface(SPI, LATCH_PIN, DATA_PIN, CLOCK_PIN);
 
   Hc595Module<SpiInterface, 8> scanningModule(
       spiInterface,
@@ -468,6 +471,7 @@ void runHc595HardSpi() {
       kByteOrderDigitHighSegmentLow
   );
 
+  SPI.begin();
   spiInterface.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
@@ -481,8 +485,9 @@ void runHc595HardSpi() {
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 // Common Anode, with transistors on Group pins
 void runHc595HardSpiFast() {
-  using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
-  SpiInterface spiInterface;
+  using SpiInterface = HardSpiFastInterface<
+      SPIClass, LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  SpiInterface spiInterface(SPI);
 
   Hc595Module<SpiInterface, 8> scanningModule(
       spiInterface,
@@ -500,6 +505,7 @@ void runHc595HardSpiFast() {
       kByteOrderDigitHighSegmentLow
   );
 
+  SPI.begin();
   spiInterface.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
@@ -707,8 +713,8 @@ void runMax7219SoftSpiFast() {
 #endif
 
 void runMax7219HardSpi() {
-  using SpiInterface = HardSpiInterface;
-  SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  using SpiInterface = HardSpiInterface<SPIClass>;
+  SpiInterface spiInterface(SPI, LATCH_PIN, DATA_PIN, CLOCK_PIN);
   Max7219Module<SpiInterface, 8> max7219Module(
       spiInterface, kDigitRemapArray8Max7219);
 
@@ -721,8 +727,9 @@ void runMax7219HardSpi() {
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 void runMax7219HardSpiFast() {
-  using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
-  SpiInterface spiInterface;
+  using SpiInterface = HardSpiFastInterface<
+      SPIClass, LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  SpiInterface spiInterface(SPI);
   Max7219Module<SpiInterface, 8> max7219Module(
       spiInterface, kDigitRemapArray8Max7219);
 
@@ -808,11 +815,13 @@ void printSizeOf() {
 #endif
 
   SERIAL_PORT_MONITOR.print(F("sizeof(HardSpiInterface): "));
-  SERIAL_PORT_MONITOR.println(sizeof(HardSpiInterface));
+  SERIAL_PORT_MONITOR.println(sizeof(HardSpiInterface<SPIClass>));
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  SERIAL_PORT_MONITOR.print(F("sizeof(HardSpiFastInterface<11, 12, 13>): "));
-  SERIAL_PORT_MONITOR.println(sizeof(HardSpiFastInterface<11, 12, 13>));
+  SERIAL_PORT_MONITOR.print(
+      F("sizeof(HardSpiFastInterface<SPIClass, 11, 12, 13>): "));
+  SERIAL_PORT_MONITOR.println(
+      sizeof(HardSpiFastInterface<SPIClass, 11, 12, 13>));
 #endif
 
   SERIAL_PORT_MONITOR.print(F("sizeof(LedMatrixDirect<>): "));
@@ -832,7 +841,8 @@ void printSizeOf() {
 
   SERIAL_PORT_MONITOR.print(
       F("sizeof(LedMatrixDualHc595<HardSpiInterface>): "));
-  SERIAL_PORT_MONITOR.println(sizeof(LedMatrixDualHc595<HardSpiInterface>));
+  SERIAL_PORT_MONITOR.println(
+      sizeof(LedMatrixDualHc595<HardSpiInterface<SPIClass>>));
 
   SERIAL_PORT_MONITOR.print(F("sizeof(LedModule): "));
   SERIAL_PORT_MONITOR.println(sizeof(LedModule));

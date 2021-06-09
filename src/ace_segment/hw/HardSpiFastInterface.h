@@ -53,28 +53,45 @@ namespace ace_segment {
  * instantiations of the HybridModule, Max7219Module, or Hc595Module classes.
  * Users are advised to try both and compare the difference.
  */
-template <uint8_t T_LATCH_PIN, uint8_t T_DATA_PIN, uint8_t T_CLOCK_PIN>
+template <
+    typename T_SPI,
+    uint8_t T_LATCH_PIN,
+    uint8_t T_DATA_PIN,
+    uint8_t T_CLOCK_PIN
+>
 class HardSpiFastInterface {
+  private:
+    // The following constants are defined without including <SPI.h> to avoid
+    // pulling in the global SPI instance into applications which don't use SPI.
+    // They may become template parameters in the future.
+
+    /** MAX7219 has a maximum clock of 16 MHz, so set this to 8 MHz. */
+    static const uint32_t kClockSpeed = 8000000;
+
+    /** MSB first or LSB first */
+    static const uint8_t kBitOrder = MSBFIRST;
+
+    /** SPI mode */
+    static const uint8_t kSpiMode = SPI_MODE0;
+
   public:
-    HardSpiFastInterface(SPIClass& spi = SPI) : mSpi(spi) {}
+    HardSpiFastInterface(T_SPI& spi) : mSpi(spi) {}
 
     void begin() const {
       pinModeFast(T_LATCH_PIN, OUTPUT);
       pinModeFast(T_DATA_PIN, OUTPUT);
       pinModeFast(T_CLOCK_PIN, OUTPUT);
-      mSpi.begin();
     }
 
     void end() const {
       pinModeFast(T_LATCH_PIN, INPUT);
       pinModeFast(T_DATA_PIN, INPUT);
       pinModeFast(T_CLOCK_PIN, INPUT);
-      mSpi.end();
     }
 
     /** Send 8 bits, including latching LOW and HIGH. */
     void send8(uint8_t value) const {
-      mSpi.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
+      mSpi.beginTransaction(SPISettings(kClockSpeed, kBitOrder, kSpiMode));
       digitalWriteFast(T_LATCH_PIN, LOW);
       mSpi.transfer(value);
       digitalWriteFast(T_LATCH_PIN, HIGH);
@@ -83,7 +100,7 @@ class HardSpiFastInterface {
 
     /** Send 16 bits, including latching LOW and HIGH. */
     void send16(uint16_t value) const {
-      mSpi.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
+      mSpi.beginTransaction(SPISettings(kClockSpeed, kBitOrder, kSpiMode));
       digitalWriteFast(T_LATCH_PIN, LOW);
       mSpi.transfer16(value);
       digitalWriteFast(T_LATCH_PIN, HIGH);
@@ -96,7 +113,7 @@ class HardSpiFastInterface {
     }
 
   private:
-    SPIClass& mSpi;
+    T_SPI& mSpi;
 };
 
 } // ace_segment
