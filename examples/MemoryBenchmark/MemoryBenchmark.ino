@@ -152,7 +152,7 @@ volatile int disableCompilerOptimization = 0;
   #elif FEATURE == FEATURE_HYBRID_HARD_SPI
     // Common Cathode, with transistors on Group pins
     using SpiInterface = HardSpiInterface<SPIClass>;
-    SpiInterface spiInterface(SPI, LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    SpiInterface spiInterface(SPI, LATCH_PIN);
     HybridModule<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
         kActiveHighPattern /*segmentOnPattern*/,
@@ -167,8 +167,7 @@ volatile int disableCompilerOptimization = 0;
     #endif
 
     // Common Cathode, with transistors on Group pins
-    using SpiInterface = HardSpiFastInterface<
-        SPIClass, LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
     SpiInterface spiInterface(SPI);
     HybridModule<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
@@ -209,7 +208,7 @@ volatile int disableCompilerOptimization = 0;
   #elif FEATURE == FEATURE_HC595_HARD_SPI
     // Common Cathode, with transistors on Group pins
     using SpiInterface = HardSpiInterface<SPIClass>;
-    SpiInterface spiInterface(SPI, LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    SpiInterface spiInterface(SPI, LATCH_PIN);
     Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
         kActiveLowPattern /*segmentOnPattern*/,
@@ -224,8 +223,7 @@ volatile int disableCompilerOptimization = 0;
     #endif
 
     // Common Cathode, with transistors on Group pins
-    using SpiInterface = HardSpiFastInterface<
-        SPIClass, LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
     SpiInterface spiInterface(SPI);
     Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
@@ -267,7 +265,7 @@ volatile int disableCompilerOptimization = 0;
 
   #elif FEATURE == FEATURE_MAX7219_HARD_SPI
     using SpiInterface = HardSpiInterface<SPIClass>;
-    SpiInterface spiInterface(SPI, LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    SpiInterface spiInterface(SPI, LATCH_PIN);
     Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
         spiInterface, kDigitRemapArray8Max7219);
 
@@ -276,8 +274,7 @@ volatile int disableCompilerOptimization = 0;
       #error Unsupported FEATURE on this platform
     #endif
 
-    using SpiInterface = HardSpiFastInterface<
-        SPIClass, LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
     SpiInterface spiInterface(SPI);
     Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
         spiInterface, kDigitRemapArray8Max7219);

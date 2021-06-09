@@ -198,10 +198,9 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   SpiInterface spiInterface;
 #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
   using SpiInterface = HardSpiInterface<SPIClass>;
-  SpiInterface spiInterface(spiInstance, LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  SpiInterface spiInterface(spiInstance, LATCH_PIN);
 #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
-  using SpiInterface = HardSpiFastInterface<
-      SPIClass, LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
   SpiInterface spiInterface(spiInstance);
 #else
   #error Unknown INTERFACE_TYPE

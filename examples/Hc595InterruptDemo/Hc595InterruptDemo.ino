@@ -56,26 +56,30 @@ using ace_segment::kActiveHighPattern;
 #endif
 
 #if defined(EPOXY_DUINO)
-  #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
   const uint8_t NUM_DIGITS = 4;
-  const uint8_t LATCH_PIN = 10;
-  const uint8_t DATA_PIN = MOSI;
-  const uint8_t CLOCK_PIN = SCK;
   const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
   const uint8_t DIGIT_ON_PATTERN = kActiveLowPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
   const uint8_t* const REMAP_ARRAY = nullptr;
 
-#elif defined(AUNITER_MICRO_CUSTOM_DUAL)
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
-  const uint8_t NUM_DIGITS = 4;
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
+  SPIClass& spiInstance = SPI;
+
+#elif defined(AUNITER_MICRO_CUSTOM_DUAL)
+  const uint8_t NUM_DIGITS = 4;
   const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
   const uint8_t DIGIT_ON_PATTERN = kActiveLowPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
   const uint8_t* const REMAP_ARRAY = nullptr;
+
+  #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
+  const uint8_t LATCH_PIN = 10;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+  SPIClass& spiInstance = SPI;
 
 #elif defined(AUNITER_MICRO_HC595)
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
@@ -90,6 +94,7 @@ using ace_segment::kActiveHighPattern;
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
+  SPIClass& spiInstance = SPI;
 
 #elif defined(AUNITER_STM32_HC595)
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
@@ -130,6 +135,7 @@ using ace_segment::kActiveHighPattern;
   const uint8_t LATCH_PIN = SS;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
+  SPIClass& spiInstance = SPI;
 
 #elif defined(AUNITER_ESP32_HC595)
   const uint8_t NUM_DIGITS = 8;
@@ -203,10 +209,9 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   SpiInterface spiInterface;
 #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
   using SpiInterface = HardSpiInterface<SPIClass>;
-  SpiInterface spiInterface(spiInstance, LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  SpiInterface spiInterface(spiInstance, LATCH_PIN);
 #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
-  using SpiInterface = HardSpiFastInterface<
-      SPIClass, LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
   SpiInterface spiInterface(spiInstance);
 #else
   #error Unknown INTERFACE_TYPE

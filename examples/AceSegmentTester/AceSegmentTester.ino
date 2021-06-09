@@ -608,10 +608,9 @@ const uint8_t NUM_SUBFIELDS = 1;
     SpiInterface spiInterface;
   #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
     using SpiInterface = HardSpiInterface<SPIClass>;
-    SpiInterface spiInterface(spiInstance, LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    SpiInterface spiInterface(spiInstance, LATCH_PIN);
   #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
-    using SpiInterface = HardSpiFastInterface<
-        SPIClass, LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
     SpiInterface spiInterface(spiInstance);
   #endif
   Max7219Module<SpiInterface, NUM_DIGITS> ledModule(
@@ -627,10 +626,9 @@ const uint8_t NUM_SUBFIELDS = 1;
     SpiInterface spiInterface;
   #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
     using SpiInterface = HardSpiInterface<SPIClass>;
-    SpiInterface spiInterface(spiInstance, LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    SpiInterface spiInterface(spiInstance, LATCH_PIN);
   #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
-    using SpiInterface = HardSpiFastInterface<
-        SPIClass, LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
     SpiInterface spiInterface(spiInstance);
   #endif
 
@@ -684,10 +682,9 @@ const uint8_t NUM_SUBFIELDS = 1;
     SpiInterface spiInterface;
   #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
     using SpiInterface = HardSpiInterface<SPIClass>;
-    SpiInterface spiInterface(SPI, LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    SpiInterface spiInterface(SPI, LATCH_PIN);
   #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
-    using SpiInterface = HardSpiFastInterface<
-        SPIClass, LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
     SpiInterface spiInterface(SPI);
   #endif
   HybridModule<SpiInterface, NUM_DIGITS> ledModule(
@@ -707,10 +704,10 @@ const uint8_t NUM_SUBFIELDS = 1;
     using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
   #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
-    using SpiInterface = HardSpiInterface;
-    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    using SpiInterface = HardSpiInterface<SPIClass>;
+    SpiInterface spiInterface(SPI, LATCH_PIN);
   #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
-    using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
     SpiInterface spiInterface;
   #endif
 

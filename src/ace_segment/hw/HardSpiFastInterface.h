@@ -52,13 +52,11 @@ namespace ace_segment {
  * consume less flash memory because it avoids generating different template
  * instantiations of the HybridModule, Max7219Module, or Hc595Module classes.
  * Users are advised to try both and compare the difference.
+ *
+ * @tparam T_SPI the class of the hardware SPI instance, usually SPIClass
+ * @tparam T_LATCH_PIN the CS/SS pin that controls the SPI peripheral
  */
-template <
-    typename T_SPI,
-    uint8_t T_LATCH_PIN,
-    uint8_t T_DATA_PIN,
-    uint8_t T_CLOCK_PIN
->
+template <typename T_SPI, uint8_t T_LATCH_PIN>
 class HardSpiFastInterface {
   private:
     // The following constants are defined without including <SPI.h> to avoid
@@ -69,7 +67,11 @@ class HardSpiFastInterface {
     static const uint32_t kClockSpeed = 8000000;
 
     /** MSB first or LSB first */
+  #if defined(ARDUINO_ARCH_STM32)
+    static const BitOrder kBitOrder = MSBFIRST;
+  #else
     static const uint8_t kBitOrder = MSBFIRST;
+  #endif
 
     /** SPI mode */
     static const uint8_t kSpiMode = SPI_MODE0;

@@ -71,16 +71,9 @@ class HardSpiInterface {
     static const uint8_t kSpiMode = SPI_MODE0;
 
   public:
-    HardSpiInterface(
-        T_SPI& spi,
-        uint8_t latchPin,
-        uint8_t dataPin,
-        uint8_t clockPin
-    ) :
+    HardSpiInterface(T_SPI& spi, uint8_t latchPin) :
         mSpi(spi),
-        mLatchPin(latchPin),
-        mDataPin(dataPin),
-        mClockPin(clockPin)
+        mLatchPin(latchPin)
     {}
 
     /**
@@ -136,8 +129,6 @@ class HardSpiInterface {
   private:
     T_SPI& mSpi;
     uint8_t const mLatchPin;
-    uint8_t const mDataPin;
-    uint8_t const mClockPin;
 };
 
 } // ace_segment

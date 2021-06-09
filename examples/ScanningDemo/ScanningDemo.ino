@@ -171,8 +171,7 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HARD_SPI
   // Common Cathode, with transistors on Group pins
   SPIClass& spiInstance = SPI;
-  HardSpiInterface<SPIClass> spiInterface(
-      spiInstance, LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  HardSpiInterface<SPIClass> spiInterface(spiInstance, LATCH_PIN);
   using LedMatrix = LedMatrixSingleHc595<HardSpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
@@ -184,8 +183,7 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HARD_SPI_FAST
   // Common Cathode, with transistors on Group pins
   SPIClass& spiInstance = SPI;
-  using SpiInterface = HardSpiFastInterface<
-      SPIClass, LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
   SpiInterface spiInterface(spiInstance);
   using LedMatrix = LedMatrixSingleHc595<SpiInterface>;
   LedMatrix ledMatrix(
@@ -219,8 +217,7 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HARD_SPI
   // Common Anode, with transistors on Group pins
   SPIClass& spiInstance = SPI;
-  HardSpiInterface<SPIClass> spiInterface(
-      spiInstance, LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  HardSpiInterface<SPIClass> spiInterface(spiInstance, LATCH_PIN);
   using LedMatrix = LedMatrixDualHc595<HardSpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
@@ -231,8 +228,7 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HARD_SPI_FAST
   // Common Anode, with transistors on Group pins
   SPIClass& spiInstance = SPI;
-  using SpiInterface = HardSpiFastInterface<
-      SPIClass, LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
   SpiInterface spiInterface(spiInstance);
   using LedMatrix = LedMatrixDualHc595<SpiInterface>;
   LedMatrix ledMatrix(

@@ -562,7 +562,6 @@ more complicated because the digits are wired to be in the order of `2 1 0 5 4
 ```C++
 #include <Arduino.h>
 #include <AceSegment.h>
-
 using namespace ace_segment;
 
 const uint8_t CLK_PIN = 10;
@@ -678,8 +677,8 @@ this (c.f. [examples/Max7219Demo](examples/Max7219Demo)):
 
 ```C++
 #include <Arduino.h>
+#include <SPI.h>
 #include <AceSegment.h>
-
 using namespace ace_segment;
 
 const uint8_t LATCH_PIN = 10;
@@ -687,14 +686,15 @@ const uint8_t DATA_PIN = MOSI;
 const uint8_t CLOCK_PIN = SCK;
 const uint8_t NUM_DIGITS = 8;
 
-using SpiInterface = HardSpiInterface;
-SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+using SpiInterface = HardSpiInterface<SPIClass>;
+SpiInterface spiInterface(SPI, LATCH_PIN);
 
 Max7219Module<SpiInterface, NUM_DIGITS> ledModule(
     spiInterface, kDigitRemapArray8Max7219);
 LedDisplay display(ledModule);
 
 void setupAceSegment() {
+  SPI.begin();
   spiInterface.begin();
   ledModule.begin();
 }
@@ -829,8 +829,8 @@ this (c.f. [examples/Hc595Demo](examples/Hc595Demo):
 
 ```C++
 #include <Arduino.h>
+#include <SPI.h>
 #include <AceSegment.h>
-
 using namespace ace_segment;
 
 const uint8_t NUM_DIGITS = 8;
@@ -845,8 +845,8 @@ const uint8_t LATCH_PIN = 10;
 const uint8_t DATA_PIN = MOSI;
 const uint8_t CLOCK_PIN = SCK;
 
-using SpiInterface = HardSpiInterface;
-SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+using SpiInterface = HardSpiInterface<SPIClass>;
+SpiInterface spiInterface(SPI, LATCH_PIN);
 
 Hc595Module<SpiInterface, NUM_DIGITS> ledModule(
     spiInterface,
@@ -860,6 +860,7 @@ Hc595Module<SpiInterface, NUM_DIGITS> ledModule(
 LedDisplay display(ledModule);
 
 void setupAceSegment() {
+  SPI.begin();
   spiInterface.begin();
   ledModule.begin();
 }
@@ -913,8 +914,8 @@ Putting all these together, we get the following code which is similar to the
 
 ```C++
 #include <Arduino.h>
+#include <SPI.h>
 #include <AceSegment.h>
-
 using namespace ace_segment;
 
 const uint8_t NUM_DIGITS = 4;
@@ -929,8 +930,8 @@ const uint8_t LATCH_PIN = 10;
 const uint8_t DATA_PIN = MOSI;
 const uint8_t CLOCK_PIN = SCK;
 
-using SpiInterface = HardSpiInterface;
-SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+using SpiInterface = HardSpiInterface<SPIClass>;
+SpiInterface spiInterface(SPI, LATCH_PIN);
 
 Hc595Module<SpiInterface, NUM_DIGITS> ledModule(
     spiInterface,
@@ -944,6 +945,7 @@ Hc595Module<SpiInterface, NUM_DIGITS> ledModule(
 LedDisplay display(ledModule);
 
 void setupAceSegment() {
+  SPI.begin();
   spiInterface.begin();
   ledModule.begin();
 }
@@ -1015,7 +1017,10 @@ The `HybridModule` configuration looks like this (c.f.
 [examples/HybridDemo](examples/HybridDemo)):
 
 ```C++
+#include <Arduino.h>
+#include <SPI.h>
 #include <AceSegment.h>
+using namespace ace_segment;
 
 const uint8_t NUM_DIGITS = 4;
 const uint8_t FRAMES_PER_SECOND = 60;
@@ -1025,8 +1030,8 @@ const uint8_t LATCH_PIN = 10;
 const uint8_t DATA_PIN = MOSI;
 const uint8_t CLOCK_PIN = SCK;
 
-using SpiInterface = HardSpiInterface;
-SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+using SpiInterface = HardSpiInterface<SPIClass>;
+SpiInterface spiInterface(SPI, LATCH_PIN);
 
 HybridModule<SpiInterface, NUM_DIGITS> ledModule(
     spiInterface,
@@ -1039,6 +1044,7 @@ HybridModule<SpiInterface, NUM_DIGITS> ledModule(
 LedDisplay display(ledModule);
 
 void setupAceSegment() {
+  SPI.begin();
   spiInterface.begin();
   ledModule.begin();
 }
@@ -1082,7 +1088,9 @@ The `DirectModule` configuration looks like this (c.f.
 [examples/DirectDemo](examples/DirectDemo)):
 
 ```C++
+#include <Arduino.h>
 #include <AceSegment.h>
+using namespace ace_segment;
 
 const uint8_t NUM_DIGITS = 4;
 const uint8_t NUM_SEGMENTS = 8;
@@ -1091,9 +1099,6 @@ const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
 const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
 
 const uint8_t FRAMES_PER_SECOND = 60;
-
-using SpiInterface = HardSpiInterface;
-SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
 
 DirectModule<NUM_DIGITS, NUM_SUBFIELDS> ledModule(
     kActiveLowPattern /*segmentOnPattern*/,
@@ -1105,7 +1110,6 @@ DirectModule<NUM_DIGITS, NUM_SUBFIELDS> ledModule(
 LedDisplay display(ledModule);
 
 void setupAceSegment() {
-  spiInterface.begin();
   ledModule.begin();
 }
 
@@ -1485,6 +1489,7 @@ need to include these headers manually, like this:
 
 ```C++
 #include <AceSegment.h> // do this first
+...
 
 #if defined(ARDUINO_ARCH_AVR)
   #include <digitalWriteFast.h> // from 3rd party library
@@ -1522,16 +1527,22 @@ The STM32F103 "Blue Pill" has 2 SPI buses:
 The primary (default) SPI interface is used like this:
 
 ```C++
+#include <Arduino.h>
+#include <SPI.h>
+#include <AceSegment.h>
+using namespace ace_segment;
+
 const uint8_t LATCH_PIN = SS;
 const uint8_t DATA_PIN = MOSI;
 const uint8_t CLOCK_PIN = SCK;
 
-HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+HardSpiInterface<SPIClass> spiInterface(SPI, LATCH_PIN);
 
 Max7219Module<HardSpiInterface, NUM_DIGITS> max7219Module(
     spiInterface, kDigitRemapArray8Max7219);
 
 void setupAceSegment() {
+  SPI.begin();
   spiInterface.begin();
   max7219Module.begin();
 }
@@ -1540,17 +1551,23 @@ void setupAceSegment() {
 The second SPI interface can be used like this:
 
 ```C++
+#include <Arduino.h>
+#include <SPI.h>
+#include <AceSegment.h>
+using namespace ace_segment;
+
 const uint8_t LATCH_PIN = PB12;
 const uint8_t DATA_PIN = PB15;
 const uint8_t CLOCK_PIN = PB13;
 
 SPIClass SPISecondary(DATA_PIN, PB14 /*miso*/, CLOCK_PIN);
-HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN, SPISecondary);
+HardSpiInterface<SPIClass> spiInterface(SPISecondary, LATCH_PIN);
 
 Max7219Module<HardSpiInterface, NUM_DIGITS> max7219Module(
     spiInterface, kDigitRemapArray8Max7219);
 
 void setupAceSegment() {
+  SPISecondary.begin();
   spiInterface.begin();
   max7219Module.begin();
 }
@@ -1579,11 +1596,16 @@ capability is limited.)
 The primary (default) `SPI` instance uses the `VSPI` bus and is used like this:
 
 ```C++
+#include <Arduino.h>
+#include <SPI.h>
+#include <AceSegment.h>
+using namespace ace_segment;
+
 const uint8_t LATCH_PIN = SS;
 const uint8_t DATA_PIN = MOSI;
 const uint8_t CLOCK_PIN = SCK;
 
-HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+HardSpiInterface<SPIClass> spiInterface(SPI, LATCH_PIN);
 
 Hc595Module<HardSpiInterface, NUM_DIGITS> hc595Module(
     spiInterface,
@@ -1595,6 +1617,7 @@ Hc595Module<HardSpiInterface, NUM_DIGITS> hc595Module(
 );
 
 void setupAceSegment() {
+  SPI.begin();
   spiInterface.begin();
   hc595Module.begin();
 }
@@ -1603,12 +1626,17 @@ void setupAceSegment() {
 The secondary `HSPI` bus can be used like this:
 
 ```C++
+#include <Arduino.h>
+#include <SPI.h>
+#include <AceSegment.h>
+using namespace ace_segment;
+
 const uint8_t LATCH_PIN = 15;
 const uint8_t DATA_PIN = 13;
 const uint8_t CLOCK_PIN = 14;
 
 SPIClass SPISecondary(HSPI);
-HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN, SPISecondary);
+HardSpiInterface<SPIClass> spiInterface(SPISecondary, LATCH_PIN);
 
 Hc595Module<HardSpiInterface, NUM_DIGITS> hc595Module(
     spiInterface,
@@ -1620,6 +1648,7 @@ Hc595Module<HardSpiInterface, NUM_DIGITS> hc595Module(
 );
 
 void setupAceSegment() {
+  SPISecondary.begin();
   spiInterface.begin();
   hc595Module.begin();
 }

@@ -315,7 +315,7 @@ void runHybridSoftSpiFast() {
 // Common Cathode, with transistors on Group pins
 void runHybridHardSpi() {
   using SpiInterface = HardSpiInterface<SPIClass>;
-  SpiInterface spiInterface(SPI, LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  SpiInterface spiInterface(SPI, LATCH_PIN);
 
   HybridModule<SpiInterface, NUM_DIGITS> scanningModule(
       spiInterface,
@@ -348,8 +348,7 @@ void runHybridHardSpi() {
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 // Common Cathode, with transistors on Group pins
 void runHybridHardSpiFast() {
-  using SpiInterface = HardSpiFastInterface<
-      SPIClass, LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
   SpiInterface spiInterface(SPI);
 
   HybridModule<SpiInterface, NUM_DIGITS> scanningModule(
@@ -453,7 +452,7 @@ void runHc595SoftSpiFast() {
 // Common Anode, with transistors on Group pins
 void runHc595HardSpi() {
   using SpiInterface = HardSpiInterface<SPIClass>;
-  SpiInterface spiInterface(SPI, LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  SpiInterface spiInterface(SPI, LATCH_PIN);
 
   Hc595Module<SpiInterface, 8> scanningModule(
       spiInterface,
@@ -485,8 +484,7 @@ void runHc595HardSpi() {
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 // Common Anode, with transistors on Group pins
 void runHc595HardSpiFast() {
-  using SpiInterface = HardSpiFastInterface<
-      SPIClass, LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
   SpiInterface spiInterface(SPI);
 
   Hc595Module<SpiInterface, 8> scanningModule(
@@ -714,7 +712,7 @@ void runMax7219SoftSpiFast() {
 
 void runMax7219HardSpi() {
   using SpiInterface = HardSpiInterface<SPIClass>;
-  SpiInterface spiInterface(SPI, LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  SpiInterface spiInterface(SPI, LATCH_PIN);
   Max7219Module<SpiInterface, 8> max7219Module(
       spiInterface, kDigitRemapArray8Max7219);
 
@@ -727,8 +725,7 @@ void runMax7219HardSpi() {
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 void runMax7219HardSpiFast() {
-  using SpiInterface = HardSpiFastInterface<
-      SPIClass, LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
   SpiInterface spiInterface(SPI);
   Max7219Module<SpiInterface, 8> max7219Module(
       spiInterface, kDigitRemapArray8Max7219);
@@ -819,9 +816,8 @@ void printSizeOf() {
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
   SERIAL_PORT_MONITOR.print(
-      F("sizeof(HardSpiFastInterface<SPIClass, 11, 12, 13>): "));
-  SERIAL_PORT_MONITOR.println(
-      sizeof(HardSpiFastInterface<SPIClass, 11, 12, 13>));
+      F("sizeof(HardSpiFastInterface<SPIClass, 11>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(HardSpiFastInterface<SPIClass, 11>));
 #endif
 
   SERIAL_PORT_MONITOR.print(F("sizeof(LedMatrixDirect<>): "));
