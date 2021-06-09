@@ -82,9 +82,7 @@ using ace_segment::kDigitRemapArray8Max7219;
 
 #elif defined(AUNITER_D1MINI_LARGE_MAX7219)
 
-  // Hardware SPI does not work on ESP8266, don't know why...
-  //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
-  #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
 
   // SPI pins

@@ -119,7 +119,6 @@ using ace_segment::kActiveHighPattern;
   #endif
 
 #elif defined(AUNITER_D1MINI_LARGE_HC595)
-  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   const uint8_t NUM_DIGITS = 8;
   const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
   const uint8_t DIGIT_ON_PATTERN = kActiveHighPattern;

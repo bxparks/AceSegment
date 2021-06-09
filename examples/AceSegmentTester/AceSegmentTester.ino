@@ -200,7 +200,6 @@ using ace_segment::kActiveHighPattern;
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
-  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
@@ -218,7 +217,6 @@ using ace_segment::kActiveHighPattern;
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
-  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
@@ -255,7 +253,6 @@ using ace_segment::kActiveHighPattern;
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
-  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
@@ -274,7 +271,6 @@ using ace_segment::kActiveHighPattern;
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
-  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
@@ -427,7 +423,6 @@ using ace_segment::kActiveHighPattern;
   // Choose one of the following variants:
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
-  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
   const uint8_t LATCH_PIN = SS;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
@@ -452,7 +447,6 @@ using ace_segment::kActiveHighPattern;
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
-  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
   const uint8_t LATCH_PIN = SS;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
@@ -510,15 +504,15 @@ using ace_segment::kActiveHighPattern;
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
-  // My dev board uses HSPI.
+  // My dev board uses HSPI, which is the Secondary SPI.
   #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_SECONDARY
 
   #if SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_PRIMARY
     // VSPI pins (default)
     const uint8_t LATCH_PIN = SS;
     const uint8_t DATA_PIN = MOSI;
-    SPIClass& spiInstance = SPI;
     const uint8_t CLOCK_PIN = SCK;
+    SPIClass& spiInstance = SPI;
   #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
     // HSPI pins
     const uint8_t LATCH_PIN = 15;

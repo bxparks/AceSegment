@@ -77,16 +77,27 @@ class HardSpiFastInterface {
   public:
     HardSpiFastInterface(T_SPI& spi) : mSpi(spi) {}
 
+    /**
+     * Initialize the HardSpiInterface. The hardware SPI object must be
+     * initialized using `SPI.begin()` as well.
+     */
     void begin() const {
+      // To use Hardware SPI on ESP8266, we must set the SCK and MOSI pins to
+      // 'SPECIAL' instead of 'OUTPUT'. This is performed by calling
+      // SPI.begin(). Also, unlike other Arduino platforms, the SPIClass on
+      // the ESP8266 defaults to controlling the SS/CS pin itself, instead of
+      // letting the application code control it. The setHwCs(false) let's
+      // HardSpiInterface control the CS/SS pin.
+      // https://www.esp8266.com/wiki/doku.php?id=esp8266_gpio_pin_allocations
+      #if defined(ESP8266)
+        mSpi.setHwCs(false);
+      #endif
+
       pinModeFast(T_LATCH_PIN, OUTPUT);
-      pinModeFast(T_DATA_PIN, OUTPUT);
-      pinModeFast(T_CLOCK_PIN, OUTPUT);
     }
 
     void end() const {
       pinModeFast(T_LATCH_PIN, INPUT);
-      pinModeFast(T_DATA_PIN, INPUT);
-      pinModeFast(T_CLOCK_PIN, INPUT);
     }
 
     /** Send 8 bits, including latching LOW and HIGH. */

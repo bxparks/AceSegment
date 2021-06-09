@@ -120,9 +120,7 @@ using ace_segment::kActiveHighPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
   const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 
-  // Hardware SPI does not work on ESP8266, don't know why...
-  //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
-  #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
   const uint8_t LATCH_PIN = SS;
   const uint8_t DATA_PIN = MOSI;
@@ -203,7 +201,7 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   SpiInterface spiInterface(spiInstance, LATCH_PIN, DATA_PIN, CLOCK_PIN);
 #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
   using SpiInterface = HardSpiFastInterface<
-      SpiClass, LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+      SPIClass, LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface(spiInstance);
 #else
   #error Unknown INTERFACE_TYPE
@@ -235,9 +233,6 @@ void setupAceSegment() {
 #if INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI \
     || INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
   spiInstance.begin();
-  #if defined(ESP8266)
-    spiInstance.setHwCs(false);
-  #endif
 #endif
 
   spiInterface.begin();
