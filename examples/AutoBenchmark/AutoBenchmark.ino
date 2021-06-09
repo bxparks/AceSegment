@@ -891,6 +891,9 @@ void printSizeOf() {
   SERIAL_PORT_MONITOR.print(F("sizeof(StringWriter): "));
   SERIAL_PORT_MONITOR.println(sizeof(StringWriter));
 
+  SERIAL_PORT_MONITOR.print(F("sizeof(LevelWriter): "));
+  SERIAL_PORT_MONITOR.println(sizeof(LevelWriter));
+
   SERIAL_PORT_MONITOR.print(F("sizeof(StringScroller): "));
   SERIAL_PORT_MONITOR.println(sizeof(StringScroller));
 }
