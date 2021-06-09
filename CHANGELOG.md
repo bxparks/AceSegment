@@ -7,6 +7,18 @@
         * Add `HardWireInterface` as a thin abstraction between `TwoWire` class
           and the `Ht16k33Module`, to avoid including `<Wire.h>` which pulls in
           about 1000 bytes of flash even if `Ht16k33Module` is never used.
+    * Improve `HardSpiInterface`, `HardSpiFastInterface`
+        * Fix Hardware SPI on ESP8266.
+            * Defer the initialization to `SPIClass::begin()` which knows to
+              call `pinMode(pin, SPECIAL)` instead of `pinMode(pin, OUTPUT)`
+              on the SCK and MOSI pins.
+            * Call `SPIClass::setHwCs(false)` to allow `HardSpiInterface` to
+              control the CS/SS pin, instead of being managed by the `SPIClass`.
+        * Add `SPIClass` as template parameter.
+        * Remove `dataPin` and `clockPin` parameters, since these pins
+          are implicit in the `SPIClass` object.
+        * Small reduction of flash (~30 bytes) and static memory (~2 bytes)
+          on AVR.
 * 0.6 (2021-05-26)
     * `HardSpiInterface`
         * Add support for microcontrollers with 2 SPI buses (ESP32 and STM32F1).
