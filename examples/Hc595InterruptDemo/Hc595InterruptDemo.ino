@@ -4,18 +4,10 @@
  */
 
 #include <Arduino.h>
+#include <SPI.h>
 #include <AceCommon.h> // incrementMod()
 #include <AceSegment.h> // Hc595Module, LedDisplay
 #include <TimerOne.h> // Timer1
-
-#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-#include <digitalWriteFast.h>
-#include <ace_segment/hw/SoftSpiFastInterface.h>
-#include <ace_segment/hw/HardSpiFastInterface.h>
-#include <ace_segment/hw/SoftTmiFastInterface.h>
-using ace_segment::SoftSpiFastInterface;
-using ace_segment::HardSpiFastInterface;
-#endif
 
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
@@ -29,10 +21,6 @@ using ace_segment::kByteOrderDigitHighSegmentLow;
 using ace_segment::kByteOrderSegmentHighDigitLow;
 using ace_segment::kActiveLowPattern;
 using ace_segment::kActiveHighPattern;
-
-//----------------------------------------------------------------------------
-// Hardware configuration.
-//----------------------------------------------------------------------------
 
 // Type of LED Module
 #define LED_DISPLAY_TYPE_SCANNING 0
@@ -52,65 +40,129 @@ using ace_segment::kActiveHighPattern;
 #define INTERFACE_TYPE_SOFT_TMI 4
 #define INTERFACE_TYPE_SOFT_TMI_FAST 5
 
+// Some microcontrollers have 2 or more SPI buses. PRIMARY selects the default.
+// SECONDARY selects the alternate. I don't have a board with more than 2, but
+// we could add additional options here if needed.
+#define SPI_INSTANCE_TYPE_PRIMARY 0
+#define SPI_INSTANCE_TYPE_SECONDARY 1
+
+//----------------------------------------------------------------------------
+// Hardware configuration.
+//----------------------------------------------------------------------------
+
 // Configuration for Arduino IDE
 #if ! defined(EPOXY_DUINO) && ! defined(AUNITER)
   #define AUNITER_MICRO_HC595
 #endif
 
 #if defined(EPOXY_DUINO)
-  #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
   const uint8_t NUM_DIGITS = 4;
-  const uint8_t LATCH_PIN = 10;
-  const uint8_t DATA_PIN = MOSI;
-  const uint8_t CLOCK_PIN = SCK;
   const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
   const uint8_t DIGIT_ON_PATTERN = kActiveLowPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
   const uint8_t* const REMAP_ARRAY = nullptr;
 
-#elif defined(AUNITER_MICRO_CUSTOM_DUAL)
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
-  const uint8_t NUM_DIGITS = 4;
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
+  SPIClass& spiInstance = SPI;
+
+#elif defined(AUNITER_MICRO_CUSTOM_DUAL)
+  const uint8_t NUM_DIGITS = 4;
   const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
   const uint8_t DIGIT_ON_PATTERN = kActiveLowPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
   const uint8_t* const REMAP_ARRAY = nullptr;
+
+  #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
+  const uint8_t LATCH_PIN = 10;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+  SPIClass& spiInstance = SPI;
 
 #elif defined(AUNITER_MICRO_HC595)
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
   const uint8_t NUM_DIGITS = 8;
-  const uint8_t LATCH_PIN = 10;
-  const uint8_t DATA_PIN = MOSI;
-  const uint8_t CLOCK_PIN = SCK;
   const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
   const uint8_t DIGIT_ON_PATTERN = kActiveHighPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
   const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
+
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
+  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
+  const uint8_t LATCH_PIN = 10;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+  SPIClass& spiInstance = SPI;
 
 #elif defined(AUNITER_STM32_HC595)
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   const uint8_t NUM_DIGITS = 8;
-  const uint8_t LATCH_PIN = SS;
-  const uint8_t DATA_PIN = MOSI;
-  const uint8_t CLOCK_PIN = SCK;
   const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
   const uint8_t DIGIT_ON_PATTERN = kActiveHighPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
   const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 
-#elif defined(AUNITER_D1MINI_LARGE_HC595)
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
+
+  #if SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_PRIMARY
+    // SPI1 pins (default)
+    const uint8_t LATCH_PIN = SS;
+    const uint8_t DATA_PIN = MOSI;
+    const uint8_t CLOCK_PIN = SCK;
+    SPIClass& spiInstance = SPI;
+  #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
+    // SPI2 pins
+    const uint8_t LATCH_PIN = PB12;
+    const uint8_t DATA_PIN = PB15;
+    const uint8_t CLOCK_PIN = PB13;
+    SPIClass spiInstance(DATA_PIN, PB14 /*miso*/, CLOCK_PIN);
+  #else
+    #error Unknown SPI_INSTANCE_TYPE
+  #endif
+
+#elif defined(AUNITER_D1MINI_LARGE_HC595)
   const uint8_t NUM_DIGITS = 8;
-  const uint8_t LATCH_PIN = SS;
-  const uint8_t DATA_PIN = MOSI;
-  const uint8_t CLOCK_PIN = SCK;
   const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
   const uint8_t DIGIT_ON_PATTERN = kActiveHighPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
   const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
+
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
+  const uint8_t LATCH_PIN = SS;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+  SPIClass& spiInstance = SPI;
+
+#elif defined(AUNITER_ESP32_HC595)
+  const uint8_t NUM_DIGITS = 8;
+  const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = kActiveHighPattern;
+  const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
+  const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
+
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  // My dev board uses HSPI.
+  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_SECONDARY
+
+  #if SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_PRIMARY
+    // VSPI pins (default)
+    const uint8_t LATCH_PIN = SS;
+    const uint8_t DATA_PIN = MOSI;
+    const uint8_t CLOCK_PIN = SCK;
+    SPIClass& spiInstance = SPI;
+  #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
+    // HSPI pins
+    const uint8_t LATCH_PIN = 15;
+    const uint8_t DATA_PIN = 13;
+    const uint8_t CLOCK_PIN = 14;
+    SPIClass spiInstance(HSPI);
+  #else
+    #error Unknown SPI_INSTANCE_TYPE
+  #endif
 
 #else
   #error Unknown environment
@@ -119,6 +171,15 @@ using ace_segment::kActiveHighPattern;
 //------------------------------------------------------------------
 // AceSegment Configuration
 //------------------------------------------------------------------
+
+#if INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST \
+    || INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI_FAST
+  #include <digitalWriteFast.h>
+  #include <ace_segment/hw/SoftSpiFastInterface.h>
+  #include <ace_segment/hw/HardSpiFastInterface.h>
+  using ace_segment::SoftSpiFastInterface;
+  using ace_segment::HardSpiFastInterface;
+#endif
 
 // LED segment patterns.
 const uint8_t NUM_SEGMENTS = 8;
@@ -147,11 +208,11 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
 #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
-  using SpiInterface = HardSpiInterface;
-  SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  using SpiInterface = HardSpiInterface<SPIClass>;
+  SpiInterface spiInterface(spiInstance, LATCH_PIN);
 #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
-  using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
-  SpiInterface spiInterface;
+  using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
+  SpiInterface spiInterface(spiInstance);
 #else
   #error Unknown INTERFACE_TYPE
 #endif
@@ -178,6 +239,11 @@ const uint8_t PATTERNS[8] = {
 };
 
 void setupAceSegment() {
+#if INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI \
+    || INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
+  spiInstance.begin();
+#endif
+
   spiInterface.begin();
   ledModule.begin();
 }

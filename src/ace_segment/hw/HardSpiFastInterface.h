@@ -52,29 +52,59 @@ namespace ace_segment {
  * consume less flash memory because it avoids generating different template
  * instantiations of the HybridModule, Max7219Module, or Hc595Module classes.
  * Users are advised to try both and compare the difference.
+ *
+ * @tparam T_SPI the class of the hardware SPI instance, usually SPIClass
+ * @tparam T_LATCH_PIN the CS/SS pin that controls the SPI peripheral
  */
-template <uint8_t T_LATCH_PIN, uint8_t T_DATA_PIN, uint8_t T_CLOCK_PIN>
+template <typename T_SPI, uint8_t T_LATCH_PIN>
 class HardSpiFastInterface {
-  public:
-    HardSpiFastInterface(SPIClass& spi = SPI) : mSpi(spi) {}
+  private:
+    // The following constants are defined without including <SPI.h> to avoid
+    // pulling in the global SPI instance into applications which don't use SPI.
+    // They may become template parameters in the future.
 
+    /** MAX7219 has a maximum clock of 16 MHz, so set this to 8 MHz. */
+    static const uint32_t kClockSpeed = 8000000;
+
+    /** MSB first or LSB first */
+  #if defined(ARDUINO_ARCH_STM32)
+    static const BitOrder kBitOrder = MSBFIRST;
+  #else
+    static const uint8_t kBitOrder = MSBFIRST;
+  #endif
+
+    /** SPI mode */
+    static const uint8_t kSpiMode = SPI_MODE0;
+
+  public:
+    HardSpiFastInterface(T_SPI& spi) : mSpi(spi) {}
+
+    /**
+     * Initialize the HardSpiInterface. The hardware SPI object must be
+     * initialized using `SPI.begin()` as well.
+     */
     void begin() const {
+      // To use Hardware SPI on ESP8266, we must set the SCK and MOSI pins to
+      // 'SPECIAL' instead of 'OUTPUT'. This is performed by calling
+      // SPI.begin(). Also, unlike other Arduino platforms, the SPIClass on
+      // the ESP8266 defaults to controlling the SS/CS pin itself, instead of
+      // letting the application code control it. The setHwCs(false) let's
+      // HardSpiInterface control the CS/SS pin.
+      // https://www.esp8266.com/wiki/doku.php?id=esp8266_gpio_pin_allocations
+      #if defined(ESP8266)
+        mSpi.setHwCs(false);
+      #endif
+
       pinModeFast(T_LATCH_PIN, OUTPUT);
-      pinModeFast(T_DATA_PIN, OUTPUT);
-      pinModeFast(T_CLOCK_PIN, OUTPUT);
-      mSpi.begin();
     }
 
     void end() const {
       pinModeFast(T_LATCH_PIN, INPUT);
-      pinModeFast(T_DATA_PIN, INPUT);
-      pinModeFast(T_CLOCK_PIN, INPUT);
-      mSpi.end();
     }
 
     /** Send 8 bits, including latching LOW and HIGH. */
     void send8(uint8_t value) const {
-      mSpi.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
+      mSpi.beginTransaction(SPISettings(kClockSpeed, kBitOrder, kSpiMode));
       digitalWriteFast(T_LATCH_PIN, LOW);
       mSpi.transfer(value);
       digitalWriteFast(T_LATCH_PIN, HIGH);
@@ -83,7 +113,7 @@ class HardSpiFastInterface {
 
     /** Send 16 bits, including latching LOW and HIGH. */
     void send16(uint16_t value) const {
-      mSpi.beginTransaction(SPISettings(8000000, MSBFIRST, SPI_MODE0));
+      mSpi.beginTransaction(SPISettings(kClockSpeed, kBitOrder, kSpiMode));
       digitalWriteFast(T_LATCH_PIN, LOW);
       mSpi.transfer16(value);
       digitalWriteFast(T_LATCH_PIN, HIGH);
@@ -96,7 +126,7 @@ class HardSpiFastInterface {
     }
 
   private:
-    SPIClass& mSpi;
+    T_SPI& mSpi;
 };
 
 } // ace_segment

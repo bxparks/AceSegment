@@ -8,6 +8,7 @@
  */
 
 #include <Arduino.h>
+#include <SPI.h>
 #include <AceCommon.h> // incrementMod()
 #include <AceSegment.h> // ScanningModule, LedDisplay
 
@@ -169,7 +170,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HARD_SPI
   // Common Cathode, with transistors on Group pins
-  HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  SPIClass& spiInstance = SPI;
+  HardSpiInterface<SPIClass> spiInterface(spiInstance, LATCH_PIN);
   using LedMatrix = LedMatrixSingleHc595<HardSpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
@@ -180,8 +182,9 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HARD_SPI_FAST
   // Common Cathode, with transistors on Group pins
-  using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
-  SpiInterface spiInterface;
+  SPIClass& spiInstance = SPI;
+  using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
+  SpiInterface spiInterface(spiInstance);
   using LedMatrix = LedMatrixSingleHc595<SpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
@@ -213,7 +216,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HARD_SPI
   // Common Anode, with transistors on Group pins
-  HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  SPIClass& spiInstance = SPI;
+  HardSpiInterface<SPIClass> spiInterface(spiInstance, LATCH_PIN);
   using LedMatrix = LedMatrixDualHc595<HardSpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
@@ -223,8 +227,9 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HARD_SPI_FAST
   // Common Anode, with transistors on Group pins
-  using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
-  SpiInterface spiInterface;
+  SPIClass& spiInstance = SPI;
+  using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
+  SpiInterface spiInterface(spiInstance);
   using LedMatrix = LedMatrixDualHc595<SpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
@@ -250,6 +255,13 @@ const uint8_t PATTERNS[NUM_DIGITS] = {
 };
 
 void setupAceSegment() {
+  #if LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HARD_SPI \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HARD_SPI_FAST \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HARD_SPI \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HARD_SPI_FAST
+    spiInstance.begin();
+  #endif
+
   #if LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SOFT_SPI \
       || LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HARD_SPI \
       || LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SOFT_SPI_FAST \

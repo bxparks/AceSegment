@@ -175,6 +175,10 @@ before substantional refactoring in 2021.
   module due to the I2C `<Wire.h>` library.
 * The `Max7219(HardSpiFast)` increases by about 100 on AVR because the previous
   version neglected to call `Max7219Module::flush()`.
+* Modules using hardware SPI (through `HardSpiInterface` or
+  `HardSpiFastInterface`) becomes slightly smaller (30 bytes of flash, 2 bytes
+  of static RAM on AVR) due to removal of explicit `pinMode(dataPin, X)` and
+  `pinMode(clockPin, X)`. These are deferred to `SPIClass::begin()`.
 
 ## Results
 

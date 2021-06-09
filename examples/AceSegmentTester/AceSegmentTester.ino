@@ -39,6 +39,7 @@
  */
 
 #include <Arduino.h>
+#include <SPI.h>
 #include <AceButton.h>
 #include <AceCommon.h> // incrementMod()
 #include <AceSegment.h>
@@ -199,7 +200,6 @@ using ace_segment::kActiveHighPattern;
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
-  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
@@ -217,7 +217,6 @@ using ace_segment::kActiveHighPattern;
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
-  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
@@ -254,10 +253,10 @@ using ace_segment::kActiveHighPattern;
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
-  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
+  SPIClass& spiInstance = SPI;
 
 #elif defined(AUNITER_MICRO_HC595)
   #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
@@ -272,10 +271,10 @@ using ace_segment::kActiveHighPattern;
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
-  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
+  SPIClass& spiInstance = SPI;
 
 #elif defined(AUNITER_MICRO_HT16K33)
   #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
@@ -328,12 +327,13 @@ using ace_segment::kActiveHighPattern;
     const uint8_t LATCH_PIN = SS;
     const uint8_t DATA_PIN = MOSI;
     const uint8_t CLOCK_PIN = SCK;
+    SPIClass& spiInstance = SPI;
   #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
     // SPI2 pins
     const uint8_t LATCH_PIN = PB12;
     const uint8_t DATA_PIN = PB15;
     const uint8_t CLOCK_PIN = PB13;
-    SPIClass SPISecondary(DATA_PIN, PB14 /*miso*/, CLOCK_PIN);
+    SPIClass spiInstance(DATA_PIN, PB14 /*miso*/, CLOCK_PIN);
   #else
     #error Unknown SPI_INSTANCE_TYPE
   #endif
@@ -356,12 +356,13 @@ using ace_segment::kActiveHighPattern;
     const uint8_t LATCH_PIN = SS;
     const uint8_t DATA_PIN = MOSI;
     const uint8_t CLOCK_PIN = SCK;
+    SPIClass& spiInstance = SPI;
   #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
     // SPI2 pins
     const uint8_t LATCH_PIN = PB12;
     const uint8_t DATA_PIN = PB15;
     const uint8_t CLOCK_PIN = PB13;
-    SPIClass SPISecondary(DATA_PIN, PB14 /*miso*/, CLOCK_PIN);
+    SPIClass spiInstance(DATA_PIN, PB14 /*miso*/, CLOCK_PIN);
   #else
     #error Unknown SPI_INSTANCE_TYPE
   #endif
@@ -422,10 +423,10 @@ using ace_segment::kActiveHighPattern;
   // Choose one of the following variants:
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
-  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
   const uint8_t LATCH_PIN = SS;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
+  SPIClass& spiInstance = SPI;
 
 #elif defined(AUNITER_D1MINI_LARGE_HC595)
   #define BUTTON_TYPE BUTTON_TYPE_ANALOG
@@ -446,10 +447,10 @@ using ace_segment::kActiveHighPattern;
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
-  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
   const uint8_t LATCH_PIN = SS;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
+  SPIClass& spiInstance = SPI;
 
 #elif defined(AUNITER_D1MINI_LARGE_HT16K33)
   #define BUTTON_TYPE BUTTON_TYPE_ANALOG
@@ -503,7 +504,7 @@ using ace_segment::kActiveHighPattern;
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
-  // My dev board uses HSPI.
+  // My dev board uses HSPI, which is the Secondary SPI.
   #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_SECONDARY
 
   #if SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_PRIMARY
@@ -511,12 +512,13 @@ using ace_segment::kActiveHighPattern;
     const uint8_t LATCH_PIN = SS;
     const uint8_t DATA_PIN = MOSI;
     const uint8_t CLOCK_PIN = SCK;
+    SPIClass& spiInstance = SPI;
   #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
     // HSPI pins
     const uint8_t LATCH_PIN = 15;
     const uint8_t DATA_PIN = 13;
     const uint8_t CLOCK_PIN = 14;
-    SPIClass SPISecondary(HSPI);
+    SPIClass spiInstance(HSPI);
   #else
     #error Unknown SPI_INSTANCE_TYPE
   #endif
@@ -542,12 +544,14 @@ using ace_segment::kActiveHighPattern;
     const uint8_t LATCH_PIN = SS;
     const uint8_t DATA_PIN = MOSI;
     const uint8_t CLOCK_PIN = SCK;
+    SPIClass& spiInstance = SPI;
+
   #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
     // HSPI pins
     const uint8_t LATCH_PIN = 15;
     const uint8_t DATA_PIN = 13;
     const uint8_t CLOCK_PIN = 14;
-    SPIClass SPISecondary(HSPI);
+    SPIClass spiInstance(HSPI);
   #else
     #error Unknown SPI_INSTANCE_TYPE
   #endif
@@ -603,11 +607,11 @@ const uint8_t NUM_SUBFIELDS = 1;
     using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
   #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
-    using SpiInterface = HardSpiInterface;
-    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    using SpiInterface = HardSpiInterface<SPIClass>;
+    SpiInterface spiInterface(spiInstance, LATCH_PIN);
   #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
-    using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
-    SpiInterface spiInterface;
+    using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
+    SpiInterface spiInterface(spiInstance);
   #endif
   Max7219Module<SpiInterface, NUM_DIGITS> ledModule(
       spiInterface, kDigitRemapArray8Max7219);
@@ -621,11 +625,11 @@ const uint8_t NUM_SUBFIELDS = 1;
     using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
   #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
-    using SpiInterface = HardSpiInterface;
-    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    using SpiInterface = HardSpiInterface<SPIClass>;
+    SpiInterface spiInterface(spiInstance, LATCH_PIN);
   #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
-    using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
-    SpiInterface spiInterface;
+    using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
+    SpiInterface spiInterface(spiInstance);
   #endif
 
   Hc595Module<SpiInterface, NUM_DIGITS> ledModule(
@@ -677,11 +681,11 @@ const uint8_t NUM_SUBFIELDS = 1;
     using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
   #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
-    using SpiInterface = HardSpiInterface;
-    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    using SpiInterface = HardSpiInterface<SPIClass>;
+    SpiInterface spiInterface(SPI, LATCH_PIN);
   #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
-    using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
-    SpiInterface spiInterface;
+    using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
+    SpiInterface spiInterface(SPI);
   #endif
   HybridModule<SpiInterface, NUM_DIGITS> ledModule(
       spiInterface,
@@ -700,10 +704,10 @@ const uint8_t NUM_SUBFIELDS = 1;
     using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
   #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
-    using SpiInterface = HardSpiInterface;
-    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    using SpiInterface = HardSpiInterface<SPIClass>;
+    SpiInterface spiInterface(SPI, LATCH_PIN);
   #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
-    using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
     SpiInterface spiInterface;
   #endif
 
@@ -731,6 +735,13 @@ LevelWriter levelWriter(ledDisplay);
 
 // Setup the various resources.
 void setupAceSegment() {
+
+#if INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI \
+    || INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
+  spiInstance.begin();
+#elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_WIRE
+  Wire.begin();
+#endif
 
 #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_TM1637
   tmiInterface.begin();
