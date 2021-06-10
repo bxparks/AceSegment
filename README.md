@@ -739,11 +739,11 @@ is on the far left. The `kDigitRemapArray8Max7219` array tells the
 <a name="Ht16k33Module"></a>
 ### Ht16k33Module
 
-These LED modules use the HT16K33 controller chip which communicate using SPI. A
-single chip supports up to 16 segments and 8 digits, but the AceSegment
+These LED modules use the HT16K33 controller chip which communicates using I2C.
+A single chip supports up to 16 segments and 8 digits, but the AceSegment
 library supports modules with only 8 segments (7 segments plus decimal point).
-Generic 4-digit modules are readily available from multiple suppliers on
-Amazon and eBay, and they look like this:
+Generic 4-digit modules are readily available from multiple suppliers on Amazon
+and eBay, and they look like this:
 
 ![Generic HT16K33 LED Module](docs/ht16k33/ht16k33_4_digits.jpg)
 
@@ -789,7 +789,7 @@ LED module using I2C.
 
 The `enableColon` parameter and the `enableColon()` method determine whether the
 colon segment between Digit 1 and Digit 2 of the LED module is active. The
-4-digit HT16K33 LED clock module from Adafruit (and its clones) allows the colon
+4-digit HT16K33 LED clock modules from Adafruit (and its clones) allow the colon
 segment to be controlled independently of the decimal point of Digit 1. This is
 unlike other 4-digit clock modules which take over the control line for the
 decimal point of Digit 1 to the colon segment, causing that decimal point to
@@ -800,7 +800,7 @@ the colon segment *at the time same*. However, it allows selecting one or the
 other. With `enableColon = false`, the LED module behave like any other 4-digit
 LED module with its decimal point on Digit 1. With `enableColon = true`, the LED
 module behaves like a clock module with a colon segment between Digit 1 and
-Digit 2. This behavior can be selected at dynamically at runtime using the
+Digit 2. This behavior can be selected dynamically at runtime using the
 `enableColon()` function.
 
 <a name="Ht16k33Module4"></a>
