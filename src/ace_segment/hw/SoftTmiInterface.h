@@ -54,6 +54,7 @@ namespace ace_segment {
  *    * There is no I2C address byte, so only a single TM1637 device can be on
  *      the bus.
  *    * The first byte sent to the TM1637 is a command byte.
+ *    * The bytes are sent LSB first instead of the usual MSB first on I2C.
  *
  * Since the protocol does not match I2C, we cannot use the hardware I2C
  * capabilities of the microcontroller, so we have to implement a software
@@ -111,7 +112,9 @@ class SoftTmiInterface {
     }
 
     /**
-     * Send the data byte on the data bus.
+     * Send the data byte on the data bus, with LSB first instead of the usual
+     * MSB first for I2C.
+     *
      * @return 0 means ACK, 1 means NACK.
      */
     uint8_t sendByte(uint8_t data) const {

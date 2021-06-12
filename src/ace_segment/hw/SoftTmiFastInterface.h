@@ -60,7 +60,7 @@ namespace ace_segment {
  * When there are more than some number of TM1636 LED modules, it may actually
  * be more efficient to use the non-fast `SoftTmiInterface`, because you will
  * generate only a single template instantiation. I have not currently done any
- * experimentation to see where the break-even point would be.
+ * experiments to see where the break-even point would be.
  *
  * This class is stateless. It is thread-safe.
  */
@@ -111,7 +111,9 @@ class SoftTmiFastInterface {
     }
 
     /**
-     * Send the data byte on the data bus.
+     * Send the data byte on the data bus, with LSB first instead of the usual
+     * MSB first for I2C.
+     *
      * @return 0 means ACK, 1 means NACK.
      */
     uint8_t sendByte(uint8_t data) const {
