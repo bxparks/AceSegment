@@ -30,7 +30,7 @@ SOFTWARE.
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 
 #include <stdint.h>
-#include <Arduino.h>
+#include <Arduino.h> // delayMicroseconds()
 
 namespace ace_segment {
 

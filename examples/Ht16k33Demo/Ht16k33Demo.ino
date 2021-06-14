@@ -26,6 +26,8 @@ using ace_segment::LedDisplay;
 #define WIRE_INTERFACE_TYPE_SWIRE 3
 // AceSegment's own software Wire.
 #define WIRE_INTERFACE_TYPE_SIMPLE_WIRE 4
+// AceSegment's own software Wire using digitalWriteFast libraries.
+#define WIRE_INTERFACE_TYPE_SIMPLE_WIRE_FAST 5
 
 const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
@@ -39,7 +41,7 @@ const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 #endif
 
 #if defined(EPOXY_DUINO)
-  #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_SIMPLE_WIRE
+  #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_SIMPLE_WIRE_FAST
 
   const uint8_t SCL_PIN = SCL;
   const uint8_t SDA_PIN = SDA;
@@ -47,7 +49,7 @@ const uint8_t HT16K33_I2C_ADDRESS = 0x70;
   const uint8_t DELAY_MICROS = 5;
 
 #elif defined(AUNITER_MICRO_HT16K33)
-  #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_SIMPLE_WIRE
+  #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_SIMPLE_WIRE_FAST
 
   const uint8_t SCL_PIN = SCL;
   const uint8_t SDA_PIN = SDA;
@@ -110,6 +112,13 @@ const uint8_t HT16K33_I2C_ADDRESS = 0x70;
   using WireInterface = SimpleWireInterface;
   WireInterface wireInterface(
       HT16K33_I2C_ADDRESS, SDA_PIN, SCL_PIN, DELAY_MICROS);
+#elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SIMPLE_WIRE_FAST
+  #warning Using SimpleWireFastInterface.h
+  #include <digitalWriteFast.h>
+  #include <ace_segment/hw/SimpleWireFastInterface.h>
+  using ace_segment::SimpleWireFastInterface;
+  using WireInterface = SimpleWireFastInterface<SDA_PIN, SCL_PIN, DELAY_MICROS>;
+  WireInterface wireInterface(HT16K33_I2C_ADDRESS);
 #else
   #error Unknown WIRE_INTERFACE_TYPE
 #endif
@@ -127,6 +136,8 @@ void setupAceSegment() {
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SWIRE
   SWire.begin(SDA_PIN, SCL_PIN);
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SIMPLE_WIRE
+  // do nothing
+#elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SIMPLE_WIRE_FAST
   // do nothing
 #else
   #error Unknown WIRE_INTERFACE_TYPE

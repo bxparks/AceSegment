@@ -232,6 +232,7 @@ depend on the lower-level classes:
     * There are 2 implementations:
         * `HardWireInterface`
         * `SimpleWireInterface`
+        * `SimpleWireFastInterface`
 * `LedModule`
     * Base interface for all hardware dependent implementation of a
       seven-segment LED module.
@@ -305,15 +306,15 @@ The dependency diagram among these classes looks something like this
                        LedModule
                           ^
                           |
-      +-----------+-------+-----+--------------+--------------+---------+
-      |           |             |              |              |         |
+      +-----------+-------+-----+------------+------------+-------------+
+      |           |             |            |            |             |
 Tm1637Module  Max7219Module Hc595Module HybridModule DirectModule Ht16k33Module
-      |               \         |       /                               |
-      |                \        |      /                                |
-      v                 v       v     v                                 v
+      |                \        |       /                               |
+      |                 \       |      /                                |
+      v                  v      v     v                                 v
 SoftTmiInterface         SoftSpiInterface                     HardWireInterface
 SoftTmiFastInterface     SoftSpiFastInterface               SimpleWireInterface
-                         HardSpiInterface
+                         HardSpiInterface               SimpleWireFastInterface
                          HardSpiFastInterface
 ```
 
