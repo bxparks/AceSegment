@@ -153,6 +153,8 @@ before substantional refactoring in 2021.
   `HardSpiFastInterface`) becomes slightly smaller (30 bytes of flash, 2 bytes
   of static RAM on AVR) due to removal of explicit `pinMode(dataPin, X)` and
   `pinMode(clockPin, X)`. These are deferred to `SPIClass::begin()`.
+* Extract out `readAck()`, saving 10 bytes of flash for `SoftTmiInterface` and
+  6 bytes of flash for `SoftTmiFastInterface`.
 
 ## Results
 
@@ -256,8 +258,8 @@ other `MemoryBenchmark` programs.)
 | Hc595(HardSpi)                  |   1542/   60 |  1086/   49 |
 | Hc595(HardSpiFast)              |   1474/   59 |  1018/   48 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SoftTmi)                 |   1582/   39 |  1126/   28 |
-| Tm1637(SoftTmiFast)             |    926/   36 |   470/   25 |
+| Tm1637(SoftTmi)                 |   1572/   39 |  1116/   28 |
+| Tm1637(SoftTmiFast)             |    920/   36 |   464/   25 |
 |---------------------------------+--------------+-------------|
 | Max7219(SoftSpi)                |   1214/   44 |   758/   33 |
 | Max7219(SoftSpiFast)            |    774/   42 |   318/   31 |
@@ -303,8 +305,8 @@ other `MemoryBenchmark` programs.)
 | Hc595(HardSpi)                  |   4538/  200 |  1066/   49 |
 | Hc595(HardSpiFast)              |   4458/  199 |   986/   48 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SoftTmi)                 |   4652/  179 |  1180/   28 |
-| Tm1637(SoftTmiFast)             |   3882/  176 |   410/   25 |
+| Tm1637(SoftTmi)                 |   4642/  179 |  1170/   28 |
+| Tm1637(SoftTmiFast)             |   3876/  176 |   404/   25 |
 |---------------------------------+--------------+-------------|
 | Max7219(SoftSpi)                |   4284/  184 |   812/   33 |
 | Max7219(SoftSpiFast)            |   3730/  182 |   258/   31 |

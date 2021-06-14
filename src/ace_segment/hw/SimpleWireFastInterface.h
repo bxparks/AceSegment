@@ -47,7 +47,7 @@ namespace ace_segment {
 template <
     uint8_t T_DATA_PIN,
     uint8_t T_CLOCK_PIN,
-    uint16_t T_DELAY_MICROS
+    uint8_t T_DELAY_MICROS
 >
 class SimpleWireFastInterface {
   public:
@@ -58,7 +58,7 @@ class SimpleWireFastInterface {
     SimpleWireFastInterface(uint8_t addr) : mAddr(addr) {}
 
     /** Initialize the clock and data pins. */
-    void begin() {
+    void begin() const {
       // These are open-drain lines, with a pull-up resistor. We must not drive
       // them HIGH actively since that could damage the transitor at the other
       // end of the line pulling LOW. Instead, we go into INPUT mode to let the
@@ -79,7 +79,7 @@ class SimpleWireFastInterface {
     }
 
     /** Send start condition. */
-    void beginTransmission() {
+    void beginTransmission() const {
       clockHigh();
       dataHigh();
 
@@ -91,12 +91,19 @@ class SimpleWireFastInterface {
       write(effectiveAddr);
     }
 
+    /** Send stop condition. */
+    void endTransmission() const {
+      dataLow();
+      clockHigh();
+      dataHigh();
+    }
+
     /**
      * Send the data byte on the data bus, with MSB first as specified by I2C.
      *
      * @return 0 means ACK, 1 means NACK.
      */
-    uint8_t write(uint8_t data) {
+    uint8_t write(uint8_t data) const {
       for (uint8_t i = 0;  i < 8; ++i) {
         if (data & 0x80) {
           dataHigh();
@@ -108,10 +115,17 @@ class SimpleWireFastInterface {
         data <<= 1;
       }
 
-      // Device places the ACK/NACK bit upon the falling edge of the 8th CLK,
-      // which happens in the loop above.
-      pinModeFast(T_DATA_PIN, INPUT);
-      bitDelay();
+      return readAck();
+    }
+
+  private:
+    /**
+     * Read the ACK/NACK bit from the device upon the falling edge of the 8th
+     * CLK, which happens in the write() loop above.
+     */
+    uint8_t readAck() const {
+      // Go into INPUT mode, reusing dataHigh(), saving 10 flash bytes on AVR.
+      dataHigh();
       uint8_t ack = digitalReadFast(T_DATA_PIN);
 
       // Device releases SDA upon falling edge of the 9th CLK.
@@ -120,14 +134,10 @@ class SimpleWireFastInterface {
       return ack;
     }
 
-    /** Send stop condition. */
-    void endTransmission() {
-      dataLow();
-      clockHigh();
-      dataHigh();
-    }
+    // The following methods use compile-time constants from the template
+    // parameters. The compiler will optimize away the 'this' pointer so that
+    // these methods become identical to calling static functions.
 
-  private:
     void bitDelay() const { delayMicroseconds(T_DELAY_MICROS); }
 
     void clockHigh() const { pinModeFast(T_CLOCK_PIN, INPUT); bitDelay(); }

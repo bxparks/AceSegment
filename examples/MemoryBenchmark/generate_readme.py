@@ -179,6 +179,8 @@ before substantional refactoring in 2021.
   `HardSpiFastInterface`) becomes slightly smaller (30 bytes of flash, 2 bytes
   of static RAM on AVR) due to removal of explicit `pinMode(dataPin, X)` and
   `pinMode(clockPin, X)`. These are deferred to `SPIClass::begin()`.
+* Extract out `readAck()`, saving 10 bytes of flash for `SoftTmiInterface` and
+  6 bytes of flash for `SoftTmiFastInterface`.
 
 ## Results
 

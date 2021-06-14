@@ -128,10 +128,17 @@ class SoftTmiFastInterface {
         data >>= 1;
       }
 
-      // Device places the ACK/NACK bit upon the falling edge of the 8th CLK,
-      // which happens in the loop above.
-      pinModeFast(T_DIO_PIN, INPUT);
-      bitDelay();
+      return readAck();
+    }
+
+  private:
+    /**
+     * Read the ACK/NACK bit from the device upon the falling edge of the 8th
+     * CLK, which happens in the sendByte() loop above.
+     */
+    uint8_t readAck() const {
+      // Go into INPUT mode, reusing dataHigh(), saving 6 flash bytes on AVR.
+      dataHigh();
       uint8_t ack = digitalReadFast(T_DIO_PIN);
 
       // Device releases DIO upon falling edge of the 9th CLK.
@@ -140,7 +147,10 @@ class SoftTmiFastInterface {
       return ack;
     }
 
-  private:
+    // The following methods use compile-time constants from the template
+    // parameters. The compiler will optimize away the 'this' pointer so that
+    // these methods become identical to calling static functions.
+
     void bitDelay() const { delayMicroseconds(T_DELAY_MICROS); }
 
     void clockHigh() const { pinModeFast(T_CLK_PIN, INPUT); bitDelay(); }

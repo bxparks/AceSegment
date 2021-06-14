@@ -60,7 +60,7 @@ class SimpleWireInterface {
     {}
 
     /** Initialize the clock and data pins. */
-    void begin() {
+    void begin() const {
       // These are open-drain lines, with a pull-up resistor. We must not drive
       // them HIGH actively since that could damage the transitor at the other
       // end of the line pulling LOW. Instead, we go into INPUT mode to let the
@@ -81,7 +81,7 @@ class SimpleWireInterface {
     }
 
     /** Send start condition. */
-    void beginTransmission() {
+    void beginTransmission() const {
       clockHigh();
       dataHigh();
 
@@ -93,12 +93,19 @@ class SimpleWireInterface {
       write(effectiveAddr);
     }
 
+    /** Send stop condition. */
+    void endTransmission() const {
+      dataLow();
+      clockHigh();
+      dataHigh();
+    }
+
     /**
      * Send the data byte on the data bus, with MSB first as specified by I2C.
      *
      * @return 0 means ACK, 1 means NACK.
      */
-    uint8_t write(uint8_t data) {
+    uint8_t write(uint8_t data) const {
       for (uint8_t i = 0;  i < 8; ++i) {
         if (data & 0x80) {
           dataHigh();
@@ -110,10 +117,17 @@ class SimpleWireInterface {
         data <<= 1;
       }
 
-      // Device places the ACK/NACK bit upon the falling edge of the 8th CLK,
-      // which happens in the loop above.
-      pinMode(mDataPin, INPUT);
-      bitDelay();
+      return readAck();
+    }
+
+  private:
+    /**
+     * Read the ACK/NACK bit from the device upon the falling edge of the 8th
+     * CLK, which happens in the write() loop above.
+     */
+    uint8_t readAck() const {
+      // Go into INPUT mode, reusing dataHigh(), saving 10 flash bytes on AVR.
+      dataHigh();
       uint8_t ack = digitalRead(mDataPin);
 
       // Device releases SDA upon falling edge of the 9th CLK.
@@ -122,14 +136,6 @@ class SimpleWireInterface {
       return ack;
     }
 
-    /** Send stop condition. */
-    void endTransmission() {
-      dataLow();
-      clockHigh();
-      dataHigh();
-    }
-
-  private:
     void bitDelay() const { delayMicroseconds(mDelayMicros); }
 
     void clockHigh() const { pinMode(mClockPin, INPUT); bitDelay(); }
