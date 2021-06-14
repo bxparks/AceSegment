@@ -1,6 +1,6 @@
 /*
  * A simple demo of a single HT16K33 LED module, with the digits [0,3] scrolling
- * to the left every second, and the brightness changing each iteration.
+ * to the left every second, and changing the brightness each iteration.
  */
 
 #include <Arduino.h>
@@ -12,11 +12,20 @@ using ace_common::incrementModOffset;
 using ace_common::TimingStats;
 using ace_segment::Ht16k33Module;
 using ace_segment::HardWireInterface;
+using ace_segment::SimpleWireInterface;
 using ace_segment::LedDisplay;
 
-// Select I2C implementation, either HardWireInterface or SoftWireInterface.
+// Select the I2C implementation:
+// Built-in Arduino <Wire.h>
 #define WIRE_INTERFACE_TYPE_HARD 0
-#define WIRE_INTERFACE_TYPE_SOFT 1
+// https://github.com/Testato/SoftwareWire
+#define WIRE_INTERFACE_TYPE_SOFTWARE_WIRE 1
+// https://github.com/stevemarple/SoftWire
+#define WIRE_INTERFACE_TYPE_SOFT_WIRE 2
+// https://github.com/RaemondBW/SWire
+#define WIRE_INTERFACE_TYPE_SWIRE 3
+// AceSegment's own software Wire.
+#define WIRE_INTERFACE_TYPE_SIMPLE_WIRE 4
 
 const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
@@ -30,18 +39,20 @@ const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 #endif
 
 #if defined(EPOXY_DUINO)
-  #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_HARD
+  #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_SIMPLE_WIRE
 
   const uint8_t SCL_PIN = SCL;
   const uint8_t SDA_PIN = SDA;
   const uint8_t NUM_DIGITS = 4;
+  const uint8_t DELAY_MICROS = 5;
 
 #elif defined(AUNITER_MICRO_HT16K33)
-  #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_HARD
+  #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_SIMPLE_WIRE
 
   const uint8_t SCL_PIN = SCL;
   const uint8_t SDA_PIN = SDA;
   const uint8_t NUM_DIGITS = 4;
+  const uint8_t DELAY_MICROS = 1;
 
 #elif defined(AUNITER_STM32_HT16K33)
   #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_HARD
@@ -73,12 +84,32 @@ const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 //------------------------------------------------------------------
 
 #if WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_HARD
+  #warning Using Wire.h
   #include <Wire.h>
   using WireInterface = HardWireInterface<TwoWire>;
   WireInterface wireInterface(Wire, HT16K33_I2C_ADDRESS);
-#elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SOFT
-  using SoftWireInterface = SoftWireInterface<SCL_PIN, SDA_PIN>;
-  WireInterface wireInterface(HT16K33_I2C_ADDRESS);
+#elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SOFTWARE_WIRE
+  #warning Using SoftwareWire.h
+  #include <SoftwareWire.h>
+  SoftwareWire softwareWire(SDA_PIN, SCL_PIN);
+  using WireInterface = HardWireInterface<SoftwareWire>;
+  WireInterface wireInterface(softwareWire, HT16K33_I2C_ADDRESS);
+#elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SOFT_WIRE
+  #warning Using SoftWire.h
+  #include <SoftWire.h>
+  SoftWire softWire(SDA_PIN, SCL_PIN);
+  using WireInterface = HardWireInterface<SoftWire>;
+  WireInterface wireInterface(softWire, HT16K33_I2C_ADDRESS);
+#elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SWIRE
+  #warning Using SWire.h
+  #include <SWire.h>
+  using WireInterface = HardWireInterface<SoftWire>;
+  WireInterface wireInterface(SWire, HT16K33_I2C_ADDRESS);
+#elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SIMPLE_WIRE
+  #warning Using SimpleWireInterface.h
+  using WireInterface = SimpleWireInterface;
+  WireInterface wireInterface(
+      HT16K33_I2C_ADDRESS, SDA_PIN, SCL_PIN, DELAY_MICROS);
 #else
   #error Unknown WIRE_INTERFACE_TYPE
 #endif
@@ -87,6 +118,20 @@ Ht16k33Module<WireInterface, NUM_DIGITS> ht16k33Module(wireInterface);
 LedDisplay display(ht16k33Module);
 
 void setupAceSegment() {
+#if WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_HARD
+  Wire.begin();
+#elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SOFTWARE_WIRE
+  softwareWire.begin();
+#elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SOFT_WIRE
+  softWire.begin();
+#elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SWIRE
+  SWire.begin(SDA_PIN, SCL_PIN);
+#elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SIMPLE_WIRE
+  // do nothing
+#else
+  #error Unknown WIRE_INTERFACE_TYPE
+#endif
+
   wireInterface.begin();
   ht16k33Module.begin();
 }
@@ -180,7 +225,6 @@ void setup() {
   while (!Serial);
 #endif
 
-  Wire.begin();
   setupAceSegment();
 }
 
