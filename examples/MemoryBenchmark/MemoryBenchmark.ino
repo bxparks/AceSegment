@@ -34,14 +34,16 @@
 #define FEATURE_MAX7219_HARD_SPI 15
 #define FEATURE_MAX7219_HARD_SPI_FAST 16
 #define FEATURE_HT16K33_HARD_WIRE 17
-#define FEATURE_STUB_MODULE 18
-#define FEATURE_NUMBER_WRITER 19
-#define FEATURE_CLOCK_WRITER 20
-#define FEATURE_TEMPERATURE_WRITER 21
-#define FEATURE_CHAR_WRITER 22
-#define FEATURE_STRING_WRITER 23
-#define FEATURE_STRING_SCROLLER 24
-#define FEATURE_LEVEL_WRITER 25
+#define FEATURE_HT16K33_SIMPLE_WIRE 18
+#define FEATURE_HT16K33_SIMPLE_WIRE_FAST 19
+#define FEATURE_STUB_MODULE 20
+#define FEATURE_NUMBER_WRITER 21
+#define FEATURE_CLOCK_WRITER 22
+#define FEATURE_TEMPERATURE_WRITER 23
+#define FEATURE_CHAR_WRITER 24
+#define FEATURE_STRING_WRITER 25
+#define FEATURE_STRING_SCROLLER 26
+#define FEATURE_LEVEL_WRITER 27
 
 // A volatile integer to prevent the compiler from optimizing away the entire
 // program.
@@ -76,7 +78,12 @@ volatile int disableCompilerOptimization = 0;
   // TM1637
   const uint8_t CLK_PIN = 16;
   const uint8_t DIO_PIN = 10;
-  const uint16_t BIT_DELAY = 100;
+  const uint8_t BIT_DELAY = 100;
+
+  // HT16K33
+  const uint8_t SDA_PIN = 2;
+  const uint8_t SCL_PIN = 3;
+  const uint8_t DELAY_MICROS = 2;
 
   // A stub LedModule to allow various Writer classes to be created, but mostly
   // isolated from the underlying LedModule implementations.
@@ -286,6 +293,26 @@ volatile int disableCompilerOptimization = 0;
     WireInterface wireInterface(Wire, HT16K33_I2C_ADDRESS);
     Ht16k33Module<WireInterface, NUM_DIGITS> ht16k33Module(wireInterface);
 
+  #elif FEATURE == FEATURE_HT16K33_SIMPLE_WIRE
+    const uint8_t HT16K33_I2C_ADDRESS = 0x70;
+    using WireInterface = SimpleWireInterface;
+    WireInterface wireInterface(
+        HT16K33_I2C_ADDRESS, SDA_PIN, SCL_PIN, DELAY_MICROS);
+    Ht16k33Module<WireInterface, NUM_DIGITS> ht16k33Module(wireInterface);
+
+  #elif FEATURE == FEATURE_HT16K33_SIMPLE_WIRE_FAST
+    #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
+      #error Unsupported FEATURE on this platform
+    #endif
+
+    #include <digitalWriteFast.h>
+    #include <ace_segment/hw/SimpleWireFastInterface.h>
+    const uint8_t HT16K33_I2C_ADDRESS = 0x70;
+    using WireInterface = SimpleWireFastInterface<
+        SDA_PIN, SCL_PIN, DELAY_MICROS>;
+    WireInterface wireInterface(HT16K33_I2C_ADDRESS);
+    Ht16k33Module<WireInterface, NUM_DIGITS> ht16k33Module(wireInterface);
+
   #elif FEATURE == FEATURE_STUB_MODULE
     StubModule stubModule;
     LedDisplay ledDisplay(stubModule);
@@ -417,6 +444,14 @@ void setup() {
   wireInterface.begin();
   ht16k33Module.begin();
 
+#elif FEATURE == FEATURE_HT16K33_SIMPLE_WIRE
+  wireInterface.begin();
+  ht16k33Module.begin();
+
+#elif FEATURE == FEATURE_HT16K33_SIMPLE_WIRE_FAST
+  wireInterface.begin();
+  ht16k33Module.begin();
+
 #else
   // No setup() needed for Writers.
 
@@ -456,6 +491,14 @@ void loop() {
   max7219Module.flush();
 
 #elif FEATURE == FEATURE_HT16K33_HARD_WIRE
+  ht16k33Module.setPatternAt(0, 0xff);
+  ht16k33Module.flush();
+
+#elif FEATURE == FEATURE_HT16K33_SIMPLE_WIRE
+  ht16k33Module.setPatternAt(0, 0xff);
+  ht16k33Module.flush();
+
+#elif FEATURE == FEATURE_HT16K33_SIMPLE_WIRE_FAST
   ht16k33Module.setPatternAt(0, 0xff);
   ht16k33Module.flush();
 

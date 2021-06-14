@@ -24,14 +24,16 @@ BEGIN {
   labels[15] = "Max7219(HardSpi)";
   labels[16] = "Max7219(HardSpiFast)";
   labels[17] = "Ht16k33(HardWire)";
-  labels[18] = "StubModule+LedDisplay";
-  labels[19] = "NumberWriter+Stub";
-  labels[20] = "ClockWriter+Stub";
-  labels[21] = "TemperatureWriter+Stub";
-  labels[22] = "CharWriter+Stub";
-  labels[23] = "StringWriter+Stub";
-  labels[24] = "StringScroller+Stub";
-  labels[25] = "LevelWriter+Stub";
+  labels[18] = "Ht16k33(SimpleWire)";
+  labels[19] = "Ht16k33(SimpleWireFast)";
+  labels[20] = "StubModule+LedDisplay";
+  labels[21] = "NumberWriter+Stub";
+  labels[22] = "ClockWriter+Stub";
+  labels[23] = "TemperatureWriter+Stub";
+  labels[24] = "CharWriter+Stub";
+  labels[25] = "StringWriter+Stub";
+  labels[26] = "StringScroller+Stub";
+  labels[27] = "LevelWriter+Stub";
   record_index = 0
 }
 {

@@ -181,6 +181,7 @@ before substantional refactoring in 2021.
   `pinMode(clockPin, X)`. These are deferred to `SPIClass::begin()`.
 * Extract out `readAck()`, saving 10 bytes of flash for `SoftTmiInterface` and
   6 bytes of flash for `SoftTmiFastInterface`.
+* Add `Ht16k33Module(SimpleWire)` and `Ht16k33Module(SimpleWireFast)`.
 
 ## Results
 
