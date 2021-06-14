@@ -67,7 +67,7 @@ namespace ace_segment {
 template <
     uint8_t T_CLK_PIN,
     uint8_t T_DIO_PIN,
-    uint16_t T_DELAY_MICROS
+    uint8_t T_DELAY_MICROS
 >
 class SoftTmiFastInterface {
   public:

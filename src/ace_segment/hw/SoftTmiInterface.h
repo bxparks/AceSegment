@@ -67,7 +67,7 @@ class SoftTmiInterface {
     explicit SoftTmiInterface(
         uint8_t clkPin,
         uint8_t dioPin,
-        uint16_t delayMicros
+        uint8_t delayMicros
     ) :
         mClkPin(clkPin),
         mDioPin(dioPin),
@@ -161,7 +161,7 @@ class SoftTmiInterface {
   private:
     uint8_t const mClkPin;
     uint8_t const mDioPin;
-    uint16_t const mDelayMicros;
+    uint8_t const mDelayMicros;
 };
 
 } // ace_segment
