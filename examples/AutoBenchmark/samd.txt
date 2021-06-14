@@ -1,8 +1,9 @@
 SIZEOF
-sizeof(SoftTmiInterface): 4
+sizeof(SoftTmiInterface): 3
 sizeof(SoftSpiInterface): 3
 sizeof(HardSpiInterface): 8
 sizeof(HardWireInterface): 8
+sizeof(SimpleWireInterface): 4
 sizeof(LedMatrixDirect<>): 16
 sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 16
 sizeof(LedMatrixDualHc595<HardSpiInterface>): 16
@@ -15,6 +16,7 @@ sizeof(Tm1637Module<SoftTmiInterface, 4>): 24
 sizeof(Tm1637Module<SoftTmiInterface, 6>): 28
 sizeof(Max7219Module<SoftSpiInterface, 8>): 28
 sizeof(Ht16k33Module<HardWireInterface, 4>): 20
+sizeof(Ht16k33Module<SimpleWireInterface, 4>): 20
 sizeof(LedDisplay): 4
 sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
@@ -24,23 +26,21 @@ sizeof(StringWriter): 4
 sizeof(LevelWriter): 4
 sizeof(StringScroller): 12
 BENCHMARKS
-Direct(4) 24 24 28 40
+Direct(4) 24 24 26 40
 Direct(4,subfields) 2 5 28 640
-Hybrid(4,SoftSpi) 53 53 57 40
-Hybrid(4,SoftSpi,subfields) 2 8 57 640
+Hybrid(4,SoftSpi) 52 52 56 40
+Hybrid(4,SoftSpi,subfields) 2 8 56 640
 Hybrid(4,HardSpi) 24 24 28 40
-Hybrid(4,HardSpi,subfields) 2 5 27 640
-Hc595(8,SoftSpi) 90 90 95 80
-Hc595(8,SoftSpi,subfields) 3 13 95 1280
+Hybrid(4,HardSpi,subfields) 2 5 29 640
+Hc595(8,SoftSpi) 88 89 93 80
+Hc595(8,SoftSpi,subfields) 3 13 93 1280
 Hc595(8,HardSpi) 24 24 28 80
-Hc595(8,HardSpi,subfields) 3 5 29 1280
-Tm1637(4,SoftTmi) 22226 22230 22236 10
-Tm1637(4,SoftTmi,incremental) 3598 8766 10062 50
-Tm1637(6,SoftTmi) 27943 27946 27951 10
-Tm1637(6,SoftTmi,incremental) 3601 9135 10061 70
-Tm1637(4,SoftTmi,5us) 2122 2122 2126 10
-Tm1637(4,SoftTmi,incremental,5us) 344 838 963 50
-Max7219(8,SoftSpi) 806 808 811 20
-Max7219(8,HardSpi) 203 204 207 20
-Ht16k33(4,HardWire) 1348 1348 1353 20
-END
+Hc595(8,HardSpi,subfields) 3 5 28 1280
+Tm1637(4,SoftTmi) 22213 22217 22224 10
+Tm1637(4,SoftTmi,incremental) 3596 8761 10055 50
+Tm1637(6,SoftTmi) 27923 27929 27934 10
+Tm1637(6,SoftTmi,incremental) 3597 9129 10054 70
+Tm1637(4,SoftTmi,5us) 2111 2111 2114 10
+Tm1637(4,SoftTmi,incremental,5us) 342 834 958 50
+Max7219(8,SoftSpi) 785 787 789 20
+Max7219(8,HardSpi) 201 202 206 20
