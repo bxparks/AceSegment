@@ -229,7 +229,10 @@ depend on the lower-level classes:
 * `WireInterface`
     * Thin wrapper classes for communicating with LED modules using I2C.
     * Used by `Ht16k33Module`.
-    * Currently only one implementation: `HardWireInterface`.
+    * There are 2 implementations:
+        * `HardWireInterface`
+        * `SimpleWireInterface`
+        * `SimpleWireFastInterface`
 * `LedModule`
     * Base interface for all hardware dependent implementation of a
       seven-segment LED module.
@@ -303,15 +306,15 @@ The dependency diagram among these classes looks something like this
                        LedModule
                           ^
                           |
-      +-----------+-------+-----+--------------+--------------+---------+
-      |           |             |              |              |         |
+      +-----------+-------+-----+------------+------------+-------------+
+      |           |             |            |            |             |
 Tm1637Module  Max7219Module Hc595Module HybridModule DirectModule Ht16k33Module
-      |               \         |       /                               |
-      |                \        |      /                                |
-      v                 v       v     v                                 v
+      |                \        |       /                               |
+      |                 \       |      /                                |
+      v                  v      v     v                                 v
 SoftTmiInterface         SoftSpiInterface                     HardWireInterface
-SoftTmiFastInterface     SoftSpiFastInterface
-                         HardSpiInterface
+SoftTmiFastInterface     SoftSpiFastInterface               SimpleWireInterface
+                         HardSpiInterface               SimpleWireFastInterface
                          HardSpiFastInterface
 ```
 

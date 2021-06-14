@@ -7,6 +7,10 @@
         * Add `HardWireInterface` as a thin abstraction between `TwoWire` class
           and the `Ht16k33Module`, to avoid including `<Wire.h>` which pulls in
           about 1000 bytes of flash even if `Ht16k33Module` is never used.
+        * Add `SimpleWireInterface`, a very simple software implementation of
+          I2C that supports sending only.
+        * Add `SimpleWireFastInterface`, same as `SimpleWireInterface` but
+          using one of the `digitalWriteFast` libraries.
     * Improve `HardSpiInterface` and `HardSpiFastInterface`
         * Fix Hardware SPI on ESP8266.
             * Defer the initialization to `SPIClass::begin()` which knows to

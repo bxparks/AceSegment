@@ -67,7 +67,7 @@ class SoftTmiInterface {
     explicit SoftTmiInterface(
         uint8_t clkPin,
         uint8_t dioPin,
-        uint16_t delayMicros
+        uint8_t delayMicros
     ) :
         mClkPin(clkPin),
         mDioPin(dioPin),
@@ -129,10 +129,17 @@ class SoftTmiInterface {
         data >>= 1;
       }
 
-      // Device places the ACK/NACK bit upon the falling edge of the 8th CLK,
-      // which happens in the loop above.
-      pinMode(mDioPin, INPUT);
-      bitDelay();
+      return readAck();
+    }
+
+  private:
+    /**
+     * Read the ACK/NACK bit from the device upon the falling edge of the 8th
+     * CLK, which happens in the sendByte() loop above.
+     */
+    uint8_t readAck() const {
+      // Go into INPUT mode, reusing dataHigh(), saving 10 flash bytes on AVR.
+      dataHigh();
       uint8_t ack = digitalRead(mDioPin);
 
       // Device releases DIO upon falling edge of the 9th CLK.
@@ -141,7 +148,6 @@ class SoftTmiInterface {
       return ack;
     }
 
-  private:
     void bitDelay() const { delayMicroseconds(mDelayMicros); }
 
     void clockHigh() const { pinMode(mClkPin, INPUT); bitDelay(); }
@@ -155,7 +161,7 @@ class SoftTmiInterface {
   private:
     uint8_t const mClkPin;
     uint8_t const mDioPin;
-    uint16_t const mDelayMicros;
+    uint8_t const mDelayMicros;
 };
 
 } // ace_segment

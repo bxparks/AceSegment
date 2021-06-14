@@ -160,6 +160,8 @@ number of `TimingStats::update()` calls that were made.
   is attached to the I2C bus. On the SAMD21, the transmission time becomes 50X
   longer *without* the LED module attached. On the STM32, gthe transmission time
   becomes 30-40X smaller *without* the LED module attached.
+* Add benchmarks for `Ht16k33Module` with `SimpleWireInterface` and
+  `SimpleWireFastInterface`.
 
 ## Results
 

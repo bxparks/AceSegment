@@ -49,6 +49,7 @@ SOFTWARE.
 #include <ace_segment/hw/HardSpiFastInterface.h>
 #include <ace_segment/hw/SoftTmiFastInterface.h>
 #include <ace_segment/direct/DirectFast4Module.h>
+#include <ace_segment/hw/SimpleWireFastInterface.h>
 #endif
 
 using namespace ace_segment;
@@ -68,8 +69,8 @@ const uint8_t NUM_SUBFIELDS = 16;
 const uint8_t NUM_DIGITS = 4;
 const uint8_t NUM_SEGMENTS = 8;
 
-const uint16_t BIT_DELAY = 100;
-const uint16_t BIT_DELAY_SHORT = 5;
+const uint8_t BIT_DELAY = 100;
+const uint8_t BIT_DELAY_SHORT = 5;
 
 #if defined(EPOXY_DUINO)
   // numbers don't matter
@@ -146,6 +147,11 @@ const uint16_t BIT_DELAY_SHORT = 5;
 const uint8_t LATCH_PIN = 10; // ST_CP on 74HC595
 const uint8_t DATA_PIN = MOSI; // DS on 74HC595
 const uint8_t CLOCK_PIN = SCK; // SH_CP on 74HC595
+
+// HT16K33
+const uint8_t SDA_PIN = SDA;
+const uint8_t SCL_PIN = SCL;
+const uint8_t DELAY_MICROS = 1;
 
 //------------------------------------------------------------------
 // Run benchmarks.
@@ -789,6 +795,33 @@ void runHt16k33HardWire() {
   wireInterface.end();
 }
 
+void runHt16k33SimpleWire() {
+  using WireInterface = SimpleWireInterface;
+  WireInterface wireInterface(
+      HT16K33_I2C_ADDRESS, SDA_PIN, SCL_PIN, DELAY_MICROS);
+  Ht16k33Module<WireInterface, 4> ht16k33Module(wireInterface);
+
+  wireInterface.begin();
+  ht16k33Module.begin();
+  runHt16k33Benchmark(F("Ht16k33(4,SimpleWire)"), ht16k33Module);
+  ht16k33Module.end();
+  wireInterface.end();
+}
+
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+void runHt16k33SimpleWireFast() {
+  using WireInterface = SimpleWireFastInterface<SDA_PIN, SCL_PIN, DELAY_MICROS>;
+  WireInterface wireInterface(HT16K33_I2C_ADDRESS);
+  Ht16k33Module<WireInterface, 4> ht16k33Module(wireInterface);
+
+  wireInterface.begin();
+  ht16k33Module.begin();
+  runHt16k33Benchmark(F("Ht16k33(4,SimpleWireFast)"), ht16k33Module);
+  ht16k33Module.end();
+  wireInterface.end();
+}
+#endif
+
 //-----------------------------------------------------------------------------
 // runBenchmarks()
 //-----------------------------------------------------------------------------
@@ -845,6 +878,10 @@ void runBenchmarks() {
 #endif
 
   runHt16k33HardWire();
+  runHt16k33SimpleWire();
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+  runHt16k33SimpleWireFast();
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -878,6 +915,14 @@ void printSizeOf() {
 
   SERIAL_PORT_MONITOR.print(F("sizeof(HardWireInterface): "));
   SERIAL_PORT_MONITOR.println(sizeof(HardWireInterface<TwoWire>));
+
+  SERIAL_PORT_MONITOR.print(F("sizeof(SimpleWireInterface): "));
+  SERIAL_PORT_MONITOR.println(sizeof(SimpleWireInterface));
+
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+  SERIAL_PORT_MONITOR.print(F("sizeof(SimpleWireFastInterface<2, 3, 10>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(SimpleWireFastInterface<2, 3, 10>));
+#endif
 
   SERIAL_PORT_MONITOR.print(F("sizeof(LedMatrixDirect<>): "));
   SERIAL_PORT_MONITOR.println(sizeof(LedMatrixDirect<>));
@@ -935,6 +980,10 @@ void printSizeOf() {
   SERIAL_PORT_MONITOR.print(F("sizeof(Ht16k33Module<HardWireInterface, 4>): "));
   SERIAL_PORT_MONITOR.println(
       sizeof(Ht16k33Module<HardWireInterface<TwoWire>, 4>));
+
+  SERIAL_PORT_MONITOR.print(
+      F("sizeof(Ht16k33Module<SimpleWireInterface, 4>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(Ht16k33Module<SimpleWireInterface, 4>));
 
   SERIAL_PORT_MONITOR.print(F("sizeof(LedDisplay): "));
   SERIAL_PORT_MONITOR.println(sizeof(LedDisplay));
