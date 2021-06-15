@@ -133,18 +133,18 @@ before substantional refactoring in 2021.
 
 * Slight increase in memory usage (20-30 bytes) on some processors (AVR,
   ESP8266, ESP8266), but slight decrease on others (STM32, Teensy), I think the
-  changes are due to some removal/addition of some methods in `LedDisplay`.
+  changes are due to some removal/addition of some methods in `PatternWriter`.
 * Add memory usage for `Tm1637Module`. Seems to consume something in between
   similar to the `ScanningModule` w/ SW SPI and `ScanningModule` with HW SPI.
 * Add memory usage for `Tm1637Module` using `SoftTmiFastInterface` which uses
   `digitalWriteFast` library for AVR processors. Saves 662 - 776 bytes of flash
   on AVR processors compared to `Tm1637Module` using normal `SoftTmiInterface`.
 * Save 150-200 bytes of flash on AVR processors by lifting all of the
-  `LedDisplay::writePatternAt()` type of methods to `LedDisplay`, making them
-  non-virtual, then funneling these methods through just 2 lower-level virtual
-  methods: `setPatternAt()` and `getPatternAt()`. It also made the
+  `PatternWriter::writePatternAt()` type of methods to `PatternWriter`, making
+  them non-virtual, then funneling these methods through just 2 lower-level
+  virtual methods: `setPatternAt()` and `getPatternAt()`. It also made the
   implementation of `Tm1637Module` position remapping easier.
-* Extracting `LedModule` from `LedDisplay` saves 10-40 bytes on AVR for
+* Extracting `LedModule` from `PatternWriter` saves 10-40 bytes on AVR for
   `ScanningModule` and `Tm1637Module`, but add about that many bytes for various
   Writer classes (probably because they have to go though one additional layer
   of indirection through the `LedModule`). So overall, I think it's a wash.
@@ -182,6 +182,10 @@ before substantional refactoring in 2021.
 * Extract out `readAck()`, saving 10 bytes of flash for `SoftTmiInterface` and
   6 bytes of flash for `SoftTmiFastInterface`.
 * Add `Ht16k33Module(SimpleWire)` and `Ht16k33Module(SimpleWireFast)`.
+* Rename `LedDisplay` to `PatternWriter` and remove one layer of abstraction.
+  Saves 10-22 bytes of flash and 2 bytes of static RAM for most Writer
+  classes (exception: `ClockWriter` and `StringWriter` which increases by 10-16
+  bytes of flash).
 
 ## Results
 
@@ -206,7 +210,7 @@ program for various `LedModule` configurations and various Writer classes.
 * `StringScroller`
 * `LevelWriter`
 
-The `StubDisplay` is a dummy subclass of `LedDisplay` needed to create the
+The `StubModule` is a dummy subclass of `LedModule` needed to create the
 various Writers. To get a better flash consumption of the Writer classes, this
 stub class should be subtracted from the numbers below. (Ideally, the
 `generate_table.awk` script should do this automatically, but I'm trying to keep

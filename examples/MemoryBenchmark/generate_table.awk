@@ -26,7 +26,7 @@ BEGIN {
   labels[17] = "Ht16k33(TwoWire)";
   labels[18] = "Ht16k33(SimpleWire)";
   labels[19] = "Ht16k33(SimpleWireFast)";
-  labels[20] = "StubModule+LedDisplay";
+  labels[20] = "StubModule";
   labels[21] = "NumberWriter+Stub";
   labels[22] = "ClockWriter+Stub";
   labels[23] = "TemperatureWriter+Stub";
@@ -69,7 +69,7 @@ END {
         || labels[i] ~ /Tm1637\(SoftTmi\)/ \
         || labels[i] ~ /Max7219\(SoftSpi\)/ \
         || labels[i] ~ /Ht16k33\(TwoWire\)/ \
-        || labels[i] == "StubModule+LedDisplay") {
+        || labels[i] ~ /^StubModule$/) {
       printf(\
         "|---------------------------------+--------------+-------------|\n")
     }

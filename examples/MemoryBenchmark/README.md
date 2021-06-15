@@ -107,18 +107,18 @@ before substantional refactoring in 2021.
 
 * Slight increase in memory usage (20-30 bytes) on some processors (AVR,
   ESP8266, ESP8266), but slight decrease on others (STM32, Teensy), I think the
-  changes are due to some removal/addition of some methods in `LedDisplay`.
+  changes are due to some removal/addition of some methods in `PatternWriter`.
 * Add memory usage for `Tm1637Module`. Seems to consume something in between
   similar to the `ScanningModule` w/ SW SPI and `ScanningModule` with HW SPI.
 * Add memory usage for `Tm1637Module` using `SoftTmiFastInterface` which uses
   `digitalWriteFast` library for AVR processors. Saves 662 - 776 bytes of flash
   on AVR processors compared to `Tm1637Module` using normal `SoftTmiInterface`.
 * Save 150-200 bytes of flash on AVR processors by lifting all of the
-  `LedDisplay::writePatternAt()` type of methods to `LedDisplay`, making them
-  non-virtual, then funneling these methods through just 2 lower-level virtual
-  methods: `setPatternAt()` and `getPatternAt()`. It also made the
+  `PatternWriter::writePatternAt()` type of methods to `PatternWriter`, making
+  them non-virtual, then funneling these methods through just 2 lower-level
+  virtual methods: `setPatternAt()` and `getPatternAt()`. It also made the
   implementation of `Tm1637Module` position remapping easier.
-* Extracting `LedModule` from `LedDisplay` saves 10-40 bytes on AVR for
+* Extracting `LedModule` from `PatternWriter` saves 10-40 bytes on AVR for
   `ScanningModule` and `Tm1637Module`, but add about that many bytes for various
   Writer classes (probably because they have to go though one additional layer
   of indirection through the `LedModule`). So overall, I think it's a wash.
@@ -156,6 +156,10 @@ before substantional refactoring in 2021.
 * Extract out `readAck()`, saving 10 bytes of flash for `SoftTmiInterface` and
   6 bytes of flash for `SoftTmiFastInterface`.
 * Add `Ht16k33Module(SimpleWire)` and `Ht16k33Module(SimpleWireFast)`.
+* Rename `LedDisplay` to `PatternWriter` and remove one layer of abstraction.
+  Saves 10-22 bytes of flash and 2 bytes of static RAM for most Writer
+  classes (exception: `ClockWriter` and `StringWriter` which increases by 10-16
+  bytes of flash).
 
 ## Results
 
@@ -180,7 +184,7 @@ program for various `LedModule` configurations and various Writer classes.
 * `StringScroller`
 * `LevelWriter`
 
-The `StubDisplay` is a dummy subclass of `LedDisplay` needed to create the
+The `StubModule` is a dummy subclass of `LedModule` needed to create the
 various Writers. To get a better flash consumption of the Writer classes, this
 stub class should be subtracted from the numbers below. (Ideally, the
 `generate_table.awk` script should do this automatically, but I'm trying to keep
@@ -224,14 +228,14 @@ other `MemoryBenchmark` programs.)
 | Ht16k33(SimpleWire)             |   1264/   36 |  1004/   25 |
 | Ht16k33(SimpleWireFast)         |    658/   33 |   398/   22 |
 |---------------------------------+--------------+-------------|
-| StubModule+LedDisplay           |    378/   24 |   118/   13 |
-| NumberWriter+Stub               |    474/   28 |   214/   17 |
-| ClockWriter+Stub                |    554/   29 |   294/   18 |
-| TemperatureWriter+Stub          |    552/   28 |   292/   17 |
-| CharWriter+Stub                 |    592/   31 |   332/   20 |
-| StringWriter+Stub               |    774/   39 |   514/   28 |
-| StringScroller+Stub             |    836/   45 |   576/   34 |
-| LevelWriter+Stub                |    510/   28 |   250/   17 |
+| StubModule                      |    296/   11 |    36/    0 |
+| NumberWriter+Stub               |    456/   26 |   196/   15 |
+| ClockWriter+Stub                |    568/   27 |   308/   16 |
+| TemperatureWriter+Stub          |    524/   26 |   264/   15 |
+| CharWriter+Stub                 |    582/   29 |   322/   18 |
+| StringWriter+Stub               |    784/   37 |   524/   26 |
+| StringScroller+Stub             |    814/   43 |   554/   32 |
+| LevelWriter+Stub                |    490/   26 |   230/   15 |
 +--------------------------------------------------------------+
 
 ```
@@ -273,14 +277,14 @@ other `MemoryBenchmark` programs.)
 | Ht16k33(SimpleWire)             |   1558/   36 |  1102/   25 |
 | Ht16k33(SimpleWireFast)         |    968/   33 |   512/   22 |
 |---------------------------------+--------------+-------------|
-| StubModule+LedDisplay           |    578/   24 |   122/   13 |
-| NumberWriter+Stub               |    682/   28 |   226/   17 |
-| ClockWriter+Stub                |    766/   29 |   310/   18 |
-| TemperatureWriter+Stub          |    764/   28 |   308/   17 |
-| CharWriter+Stub                 |    788/   31 |   332/   20 |
-| StringWriter+Stub               |    988/   39 |   532/   28 |
-| StringScroller+Stub             |   1036/   45 |   580/   34 |
-| LevelWriter+Stub                |    716/   28 |   260/   17 |
+| StubModule                      |    494/   11 |    38/    0 |
+| NumberWriter+Stub               |    664/   26 |   208/   15 |
+| ClockWriter+Stub                |    782/   27 |   326/   16 |
+| TemperatureWriter+Stub          |    736/   26 |   280/   15 |
+| CharWriter+Stub                 |    778/   29 |   322/   18 |
+| StringWriter+Stub               |    998/   37 |   542/   26 |
+| StringScroller+Stub             |   1014/   43 |   558/   32 |
+| LevelWriter+Stub                |    694/   26 |   238/   15 |
 +--------------------------------------------------------------+
 
 ```
@@ -322,14 +326,14 @@ other `MemoryBenchmark` programs.)
 | Ht16k33(SimpleWire)             |   4628/  176 |  1156/   25 |
 | Ht16k33(SimpleWireFast)         |   3924/  173 |   452/   22 |
 |---------------------------------+--------------+-------------|
-| StubModule+LedDisplay           |   3534/  164 |    62/   13 |
-| NumberWriter+Stub               |   3638/  168 |   166/   17 |
-| ClockWriter+Stub                |   3722/  169 |   250/   18 |
-| TemperatureWriter+Stub          |   3720/  168 |   248/   17 |
-| CharWriter+Stub                 |   3744/  171 |   272/   20 |
-| StringWriter+Stub               |   3944/  179 |   472/   28 |
-| StringScroller+Stub             |   3992/  185 |   520/   34 |
-| LevelWriter+Stub                |   3672/  168 |   200/   17 |
+| StubModule                      |   3508/  151 |    36/    0 |
+| NumberWriter+Stub               |   3620/  166 |   148/   15 |
+| ClockWriter+Stub                |   3738/  167 |   266/   16 |
+| TemperatureWriter+Stub          |   3692/  166 |   220/   15 |
+| CharWriter+Stub                 |   3734/  169 |   262/   18 |
+| StringWriter+Stub               |   3954/  177 |   482/   26 |
+| StringScroller+Stub             |   3970/  183 |   498/   32 |
+| LevelWriter+Stub                |   3650/  166 |   178/   15 |
 +--------------------------------------------------------------+
 
 ```
@@ -371,14 +375,14 @@ other `MemoryBenchmark` programs.)
 | Ht16k33(SimpleWire)             |  10840/    0 |   776/    0 |
 | Ht16k33(SimpleWireFast)         |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| StubModule+LedDisplay           |  10320/    0 |   256/    0 |
-| NumberWriter+Stub               |  10656/    0 |   592/    0 |
-| ClockWriter+Stub                |  10464/    0 |   400/    0 |
-| TemperatureWriter+Stub          |  10720/    0 |   656/    0 |
-| CharWriter+Stub                 |  10528/    0 |   464/    0 |
-| StringWriter+Stub               |  10712/    0 |   648/    0 |
-| StringScroller+Stub             |  10656/    0 |   592/    0 |
-| LevelWriter+Stub                |  10408/    0 |   344/    0 |
+| StubModule                      |  10312/    0 |   248/    0 |
+| NumberWriter+Stub               |  10648/    0 |   584/    0 |
+| ClockWriter+Stub                |  10448/    0 |   384/    0 |
+| TemperatureWriter+Stub          |  10712/    0 |   648/    0 |
+| CharWriter+Stub                 |  10520/    0 |   456/    0 |
+| StringWriter+Stub               |  10656/    0 |   592/    0 |
+| StringScroller+Stub             |  10640/    0 |   576/    0 |
+| LevelWriter+Stub                |  10400/    0 |   336/    0 |
 +--------------------------------------------------------------+
 
 ```
@@ -420,14 +424,14 @@ other `MemoryBenchmark` programs.)
 | Ht16k33(SimpleWire)             |  24372/ 3932 |  2952/  396 |
 | Ht16k33(SimpleWireFast)         |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| StubModule+LedDisplay           |  21624/ 3904 |   204/  368 |
-| NumberWriter+Stub               |  21912/ 3908 |   492/  372 |
-| ClockWriter+Stub                |  21792/ 3912 |   372/  376 |
-| TemperatureWriter+Stub          |  22008/ 3908 |   588/  372 |
-| CharWriter+Stub                 |  21832/ 3916 |   412/  380 |
-| StringWriter+Stub               |  22004/ 3920 |   584/  384 |
-| StringScroller+Stub             |  21956/ 3928 |   536/  392 |
-| LevelWriter+Stub                |  21704/ 3908 |   284/  372 |
+| StubModule                      |  21616/ 3900 |   196/  364 |
+| NumberWriter+Stub               |  21904/ 3904 |   484/  368 |
+| ClockWriter+Stub                |  21784/ 3908 |   364/  372 |
+| TemperatureWriter+Stub          |  21996/ 3904 |   576/  368 |
+| CharWriter+Stub                 |  21824/ 3912 |   404/  376 |
+| StringWriter+Stub               |  21964/ 3916 |   544/  380 |
+| StringScroller+Stub             |  21944/ 3924 |   524/  388 |
+| LevelWriter+Stub                |  21692/ 3904 |   272/  368 |
 +--------------------------------------------------------------+
 
 ```
@@ -469,14 +473,14 @@ other `MemoryBenchmark` programs.)
 | Ht16k33(SimpleWire)             | 257980/27028 |  1280/  244 |
 | Ht16k33(SimpleWireFast)         |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| StubModule+LedDisplay           | 256856/27004 |   156/  220 |
-| NumberWriter+Stub               | 257352/27004 |   652/  220 |
-| ClockWriter+Stub                | 257176/27012 |   476/  228 |
-| TemperatureWriter+Stub          | 257464/27004 |   764/  220 |
+| StubModule                      | 256840/26996 |   140/  212 |
+| NumberWriter+Stub               | 257336/27004 |   636/  220 |
+| ClockWriter+Stub                | 257160/27004 |   460/  220 |
+| TemperatureWriter+Stub          | 257448/27004 |   748/  220 |
 | CharWriter+Stub                 | 257096/27012 |   396/  228 |
-| StringWriter+Stub               | 257344/27020 |   644/  236 |
-| StringScroller+Stub             | 257296/27028 |   596/  244 |
-| LevelWriter+Stub                | 257000/27004 |   300/  220 |
+| StringWriter+Stub               | 257264/27012 |   564/  228 |
+| StringScroller+Stub             | 257296/27020 |   596/  236 |
+| LevelWriter+Stub                | 256984/27004 |   284/  220 |
 +--------------------------------------------------------------+
 
 ```
@@ -518,14 +522,14 @@ other `MemoryBenchmark` programs.)
 | Ht16k33(SimpleWire)             | 200774/13544 |  3026/  460 |
 | Ht16k33(SimpleWireFast)         |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| StubModule+LedDisplay           | 199204/13368 |  1456/  284 |
-| NumberWriter+Stub               | 199592/13368 |  1844/  284 |
-| ClockWriter+Stub                | 199536/13376 |  1788/  292 |
-| TemperatureWriter+Stub          | 199712/13368 |  1964/  284 |
-| CharWriter+Stub                 | 199476/13376 |  1728/  292 |
-| StringWriter+Stub               | 199672/13384 |  1924/  300 |
-| StringScroller+Stub             | 199624/13392 |  1876/  308 |
-| LevelWriter+Stub                | 199388/13368 |  1640/  284 |
+| StubModule                      | 199196/13360 |  1448/  276 |
+| NumberWriter+Stub               | 199580/13368 |  1832/  284 |
+| ClockWriter+Stub                | 199528/13368 |  1780/  284 |
+| TemperatureWriter+Stub          | 199700/13368 |  1952/  284 |
+| CharWriter+Stub                 | 199468/13376 |  1720/  292 |
+| StringWriter+Stub               | 199604/13376 |  1856/  292 |
+| StringScroller+Stub             | 199604/13384 |  1856/  300 |
+| LevelWriter+Stub                | 199364/13368 |  1616/  284 |
 +--------------------------------------------------------------+
 
 ```
@@ -568,14 +572,14 @@ other `MemoryBenchmark` programs.)
 | Ht16k33(SimpleWire)             |  13504/ 4364 |  5880/ 1316 |
 | Ht16k33(SimpleWireFast)         |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| StubModule+LedDisplay           |  10904/ 4356 |  3280/ 1308 |
-| NumberWriter+Stub               |  11380/ 4360 |  3756/ 1312 |
-| ClockWriter+Stub                |  11092/ 4364 |  3468/ 1316 |
-| TemperatureWriter+Stub          |  11536/ 4360 |  3912/ 1312 |
-| CharWriter+Stub                 |  11104/ 4368 |  3480/ 1320 |
-| StringWriter+Stub               |  11308/ 4372 |  3684/ 1324 |
-| StringScroller+Stub             |  11304/ 4380 |  3680/ 1332 |
-| LevelWriter+Stub                |  11056/ 4360 |  3432/ 1312 |
+| StubModule                      |  10896/ 4352 |  3272/ 1304 |
+| NumberWriter+Stub               |  11372/ 4356 |  3748/ 1308 |
+| ClockWriter+Stub                |  11072/ 4360 |  3448/ 1312 |
+| TemperatureWriter+Stub          |  11524/ 4356 |  3900/ 1308 |
+| CharWriter+Stub                 |  11096/ 4364 |  3472/ 1316 |
+| StringWriter+Stub               |  11288/ 4368 |  3664/ 1320 |
+| StringScroller+Stub             |  11296/ 4376 |  3672/ 1328 |
+| LevelWriter+Stub                |  11048/ 4356 |  3424/ 1308 |
 +--------------------------------------------------------------+
 
 ```
