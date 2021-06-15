@@ -587,9 +587,9 @@ void runTm1637SoftTmi() {
 
   Tm1637Module<TmiInterface, 4> tm1637Module(tmiInterface);
   tm1637Module.begin();
-  runTm1637Benchmark(F("Tm1637(4,SoftTmi)"), tm1637Module, 4, false);
+  runTm1637Benchmark(F("Tm1637(4,SoftTmi,100us)"), tm1637Module, 4, false);
   runTm1637Benchmark(
-      F("Tm1637(4,SoftTmi,incremental)"), tm1637Module, 4, true);
+      F("Tm1637(4,SoftTmi,100us,incremental)"), tm1637Module, 4, true);
   tm1637Module.end();
 
   tmiInterface.end();
@@ -603,9 +603,9 @@ void runTm1637SoftTmiFast() {
 
   Tm1637Module<TmiInterface, 4> tm1637Module(tmiInterface);
   tm1637Module.begin();
-  runTm1637Benchmark(F("Tm1637(4,SoftTmiFast)"), tm1637Module, 4, false);
+  runTm1637Benchmark(F("Tm1637(4,SoftTmiFast,100us)"), tm1637Module, 4, false);
   runTm1637Benchmark(
-      F("Tm1637(4,SoftTmiFast,incremental)"), tm1637Module, 4, true);
+      F("Tm1637(4,SoftTmiFast,100us,incremental)"), tm1637Module, 4, true);
   tm1637Module.end();
 
   tmiInterface.end();
@@ -621,7 +621,7 @@ void runTm1637SoftTmiShort() {
   tm1637Module.begin();
   runTm1637Benchmark(F("Tm1637(4,SoftTmi,5us)"), tm1637Module, 4, false);
   runTm1637Benchmark(
-      F("Tm1637(4,SoftTmi,incremental,5us)"), tm1637Module, 4, true);
+      F("Tm1637(4,SoftTmi,5us,incremental)"), tm1637Module, 4, true);
   tm1637Module.end();
 
   tmiInterface.end();
@@ -637,7 +637,7 @@ void runTm1637SoftTmiFastShort() {
   tm1637Module.begin();
   runTm1637Benchmark(F("Tm1637(4,SoftTmiFast,5us)"), tm1637Module, 4, false);
   runTm1637Benchmark(
-      F("Tm1637(4,SoftTmiFast,incremental,5us)"), tm1637Module, 4, true);
+      F("Tm1637(4,SoftTmiFast,5us,incremental)"), tm1637Module, 4, true);
   tm1637Module.end();
 
   tmiInterface.end();
@@ -857,14 +857,14 @@ void runBenchmarks() {
   runTm1637SoftTmiFast();
 #endif
 
-  runTm1637SixSoftTmi();
-#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  runTm1637SixSoftTmiFast();
-#endif
-
   runTm1637SoftTmiShort();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
   runTm1637SoftTmiFastShort();
+#endif
+
+  runTm1637SixSoftTmi();
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+  runTm1637SixSoftTmiFast();
 #endif
 
   runMax7219SoftSpi();
