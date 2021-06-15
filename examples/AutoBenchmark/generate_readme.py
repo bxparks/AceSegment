@@ -155,13 +155,22 @@ number of `TimingStats::update()` calls that were made.
 **v0.6+:**
 
 * Add `sizeof(LevelWriter)` and `sizeof(HardWireInterface)`.
-* Add benchmarks for `Ht16k33Module`. On SAMD21 and STM32, the runtime
-  of the `Ht16k33Module` seems to depend on whether an actual HT16K33 LED module
-  is attached to the I2C bus. On the SAMD21, the transmission time becomes 50X
-  longer *without* the LED module attached. On the STM32, gthe transmission time
-  becomes 30-40X smaller *without* the LED module attached.
-* Add benchmarks for `Ht16k33Module` with `SimpleWireInterface` and
-  `SimpleWireFastInterface`.
+* Add benchmarks for `Ht16k33Module`, using `HardWireInterface`,
+  `SimpleWireInterface`, and `SimpleWireFastInterface`.
+    * On SAMD21 and STM32, the runtime of the `Ht16k33Module(HardWire)` seems to
+      depend on whether an actual HT16K33 LED module is attached to the I2C bus.
+        * SAMD21: the transmission time becomes 50X longer *without* the LED
+          module attached. 
+        * STM32, the transmission time becomes 30-40X shorter *without* the LED
+          module attached.
+        * I think this is because the `<Wire.h>` library on the SAMD21 and STM32
+          support clock stretching. If the SDA and SCL pins are floating, then
+          the library incorrectly thinks that the slave device is holding the
+          clock line. (Not sure what happens on the STM32 which causes it to
+          perform so much faster.)
+        * Fixed by adding 10k pullup resistors on the SDA and SCL lines on the
+          dev boards that run AutoBenchmark. Prevents clock stretching even if
+          no LED module is actually attached to the pins.
 
 ## Results
 
