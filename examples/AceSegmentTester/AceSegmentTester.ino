@@ -63,7 +63,7 @@ using ace_button::LadderButtonConfig;
 using ace_segment::SoftTmiInterface;
 using ace_segment::HardSpiInterface;
 using ace_segment::SoftSpiInterface;
-using ace_segment::HardWireInterface;
+using ace_segment::TwoWireInterface;
 using ace_segment::DirectModule;
 using ace_segment::HybridModule;
 using ace_segment::Hc595Module;
@@ -118,7 +118,7 @@ using ace_segment::kActiveHighPattern;
 #define INTERFACE_TYPE_HARD_SPI_FAST 3
 #define INTERFACE_TYPE_SOFT_TMI 4
 #define INTERFACE_TYPE_SOFT_TMI_FAST 5
-#define INTERFACE_TYPE_HARD_WIRE 6
+#define INTERFACE_TYPE_TWO_WIRE 6
 #define INTERFACE_TYPE_SOFT_WIRE 7
 
 // Some microcontrollers have 2 or more SPI buses. PRIMARY selects the default.
@@ -232,8 +232,8 @@ using ace_segment::kActiveHighPattern;
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_TMI
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_TMI_FAST
-  const uint8_t CLK_PIN = A0;
   const uint8_t DIO_PIN = 9;
+  const uint8_t CLK_PIN = A0;
   const uint16_t BIT_DELAY = 100;
 
   // Select one of the flush methods.
@@ -286,9 +286,9 @@ using ace_segment::kActiveHighPattern;
 
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE
-  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_WIRE
-  const uint8_t SCL_PIN = SCL;
+  #define INTERFACE_TYPE INTERFACE_TYPE_TWO_WIRE
   const uint8_t SDA_PIN = SDA;
+  const uint8_t SCL_PIN = SCL;
   const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
 #elif defined(AUNITER_STM32_TM1637)
@@ -301,8 +301,8 @@ using ace_segment::kActiveHighPattern;
 
   // Choose one of the following variants:
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_TMI
-  const uint8_t CLK_PIN = PB3;
   const uint8_t DIO_PIN = PB4;
+  const uint8_t CLK_PIN = PB3;
   const uint16_t BIT_DELAY = 100;
 
   // Select one of the flush methods.
@@ -377,9 +377,9 @@ using ace_segment::kActiveHighPattern;
 
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE
-  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_WIRE
-  const uint8_t SCL_PIN = SCL;
+  #define INTERFACE_TYPE INTERFACE_TYPE_TWO_WIRE
   const uint8_t SDA_PIN = SDA;
+  const uint8_t SCL_PIN = SCL;
   const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
 #elif defined(AUNITER_D1MINI_LARGE_TM1637)
@@ -400,8 +400,8 @@ using ace_segment::kActiveHighPattern;
 
   // Choose one of the following variants:
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_TMI
-  const uint8_t CLK_PIN = D5;
   const uint8_t DIO_PIN = D7;
+  const uint8_t CLK_PIN = D5;
   const uint16_t BIT_DELAY = 100;
 
 #elif defined(AUNITER_D1MINI_LARGE_MAX7219)
@@ -470,9 +470,9 @@ using ace_segment::kActiveHighPattern;
 
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE
-  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_WIRE
-  const uint8_t SCL_PIN = SCL;
+  #define INTERFACE_TYPE INTERFACE_TYPE_TWO_WIRE
   const uint8_t SDA_PIN = SDA;
+  const uint8_t SCL_PIN = SCL;
   const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
 #elif defined(AUNITER_ESP32_TM1637)
@@ -487,8 +487,8 @@ using ace_segment::kActiveHighPattern;
 
   // Choose one of the following variants:
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_TMI
-  const uint8_t CLK_PIN = 14;
   const uint8_t DIO_PIN = 13;
+  const uint8_t CLK_PIN = 14;
   const uint16_t BIT_DELAY = 100;
 
 #elif defined(AUNITER_ESP32_MAX7219)
@@ -568,9 +568,9 @@ using ace_segment::kActiveHighPattern;
 
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE
-  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_WIRE
-  const uint8_t SCL_PIN = SCL;
+  #define INTERFACE_TYPE INTERFACE_TYPE_TWO_WIRE
   const uint8_t SDA_PIN = SDA;
+  const uint8_t SCL_PIN = SCL;
   const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
 #else
@@ -643,8 +643,8 @@ const uint8_t NUM_SUBFIELDS = 1;
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HT16K33
   #include <Wire.h>
-  #if INTERFACE_TYPE == INTERFACE_TYPE_HARD_WIRE
-    using WireInterface = HardWireInterface<TwoWire>;
+  #if INTERFACE_TYPE == INTERFACE_TYPE_TWO_WIRE
+    using WireInterface = TwoWireInterface<TwoWire>;
     WireInterface wireInterface(Wire, HT16K33_I2C_ADDRESS);
   #elif INTERFACE_TYPE == INTERFACE_TYPE_SOFT_WIRE
     using WireInterface = TBD;
@@ -739,7 +739,7 @@ void setupAceSegment() {
 #if INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI \
     || INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
   spiInstance.begin();
-#elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_WIRE
+#elif INTERFACE_TYPE == INTERFACE_TYPE_TWO_WIRE
   Wire.begin();
 #endif
 

@@ -129,10 +129,10 @@ number of `TimingStats::update()` calls that were made.
 
 **v0.6+:**
 
-* Add `sizeof(LevelWriter)` and `sizeof(HardWireInterface)`.
-* Add benchmarks for `Ht16k33Module`, using `HardWireInterface`,
+* Add `sizeof(LevelWriter)` and `sizeof(TwoWireInterface)`.
+* Add benchmarks for `Ht16k33Module`, using `TwoWireInterface`,
   `SimpleWireInterface`, and `SimpleWireFastInterface`.
-    * On SAMD21 and STM32, the runtime of the `Ht16k33Module(HardWire)` seems to
+    * On SAMD21 and STM32, the runtime of the `Ht16k33Module(TwoWire)` seems to
       depend on whether an actual HT16K33 LED module is attached to the I2C bus.
         * SAMD21: the transmission time becomes 50X longer *without* the LED
           module attached. 
@@ -198,7 +198,7 @@ sizeof(SoftSpiInterface): 3
 sizeof(SoftSpiFastInterface<11, 12, 13>): 1
 sizeof(HardSpiInterface): 3
 sizeof(HardSpiFastInterface): 2
-sizeof(HardWireInterface): 3
+sizeof(TwoWireInterface): 3
 sizeof(SimpleWireInterface): 4
 sizeof(SimpleWireFastInterface<2, 3, 10>): 1
 sizeof(LedMatrixDirect<>): 9
@@ -214,7 +214,7 @@ sizeof(Hc595Module<SoftSpiInterface, 8>): 46
 sizeof(Tm1637Module<SoftTmiInterface, 4>): 14
 sizeof(Tm1637Module<SoftTmiInterface, 6>): 16
 sizeof(Max7219Module<SoftSpiInterface, 8>): 16
-sizeof(Ht16k33Module<HardWireInterface, 4>): 11
+sizeof(Ht16k33Module<TwoWireInterface, 4>): 11
 sizeof(Ht16k33Module<SimpleWireInterface, 4>): 11
 sizeof(LedDisplay): 2
 sizeof(NumberWriter): 2
@@ -272,7 +272,7 @@ CPU:
 | Max7219(8,HardSpi)                      |   208/  221/  240 |      20 |
 | Max7219(8,HardSpiFast)                  |    96/  107/  116 |      20 |
 |-----------------------------------------+-------------------+---------|
-| Ht16k33(4,HardWire)                     |   340/  344/  360 |      20 |
+| Ht16k33(4,TwoWire)                      |   340/  344/  360 |      20 |
 | Ht16k33(4,SimpleWire)                   |  2560/ 2571/ 2652 |      20 |
 | Ht16k33(4,SimpleWireFast)               |   272/  283/  312 |      20 |
 +-----------------------------------------+-------------------+---------+
@@ -294,7 +294,7 @@ sizeof(SoftSpiInterface): 3
 sizeof(SoftSpiFastInterface<11, 12, 13>): 1
 sizeof(HardSpiInterface): 3
 sizeof(HardSpiFastInterface): 2
-sizeof(HardWireInterface): 3
+sizeof(TwoWireInterface): 3
 sizeof(SimpleWireInterface): 4
 sizeof(SimpleWireFastInterface<2, 3, 10>): 1
 sizeof(LedMatrixDirect<>): 9
@@ -310,7 +310,7 @@ sizeof(Hc595Module<SoftSpiInterface, 8>): 46
 sizeof(Tm1637Module<SoftTmiInterface, 4>): 14
 sizeof(Tm1637Module<SoftTmiInterface, 6>): 16
 sizeof(Max7219Module<SoftSpiInterface, 8>): 16
-sizeof(Ht16k33Module<HardWireInterface, 4>): 11
+sizeof(Ht16k33Module<TwoWireInterface, 4>): 11
 sizeof(Ht16k33Module<SimpleWireInterface, 4>): 11
 sizeof(LedDisplay): 2
 sizeof(NumberWriter): 2
@@ -368,7 +368,7 @@ CPU:
 | Max7219(8,HardSpi)                      |   220/  226/  232 |      20 |
 | Max7219(8,HardSpiFast)                  |    96/  100/  108 |      20 |
 |-----------------------------------------+-------------------+---------|
-| Ht16k33(4,HardWire)                     |   336/  341/  348 |      20 |
+| Ht16k33(4,TwoWire)                      |   336/  341/  348 |      20 |
 | Ht16k33(4,SimpleWire)                   |  2572/ 2581/ 2588 |      20 |
 | Ht16k33(4,SimpleWireFast)               |   272/  277/  288 |      20 |
 +-----------------------------------------+-------------------+---------+
@@ -386,7 +386,7 @@ Sizes of Objects:
 sizeof(SoftTmiInterface): 3
 sizeof(SoftSpiInterface): 3
 sizeof(HardSpiInterface): 8
-sizeof(HardWireInterface): 8
+sizeof(TwoWireInterface): 8
 sizeof(SimpleWireInterface): 4
 sizeof(LedMatrixDirect<>): 16
 sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 16
@@ -399,7 +399,7 @@ sizeof(Hc595Module<SoftSpiInterface, 8>): 64
 sizeof(Tm1637Module<SoftTmiInterface, 4>): 24
 sizeof(Tm1637Module<SoftTmiInterface, 6>): 28
 sizeof(Max7219Module<SoftSpiInterface, 8>): 28
-sizeof(Ht16k33Module<HardWireInterface, 4>): 20
+sizeof(Ht16k33Module<TwoWireInterface, 4>): 20
 sizeof(Ht16k33Module<SimpleWireInterface, 4>): 20
 sizeof(LedDisplay): 4
 sizeof(NumberWriter): 4
@@ -439,7 +439,7 @@ CPU:
 | Max7219(8,SoftSpi)                      |   783/  788/  790 |      20 |
 | Max7219(8,HardSpi)                      |   201/  203/  207 |      20 |
 |-----------------------------------------+-------------------+---------|
-| Ht16k33(4,HardWire)                     |   238/  238/  239 |      20 |
+| Ht16k33(4,TwoWire)                      |   238/  238/  239 |      20 |
 | Ht16k33(4,SimpleWire)                   |  2091/ 2091/ 2096 |      20 |
 +-----------------------------------------+-------------------+---------+
 
@@ -456,7 +456,7 @@ Sizes of Objects:
 sizeof(SoftTmiInterface): 3
 sizeof(SoftSpiInterface): 3
 sizeof(HardSpiInterface): 8
-sizeof(HardWireInterface): 8
+sizeof(TwoWireInterface): 8
 sizeof(SimpleWireInterface): 4
 sizeof(LedMatrixDirect<>): 16
 sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 16
@@ -469,7 +469,7 @@ sizeof(Hc595Module<SoftSpiInterface, 8>): 64
 sizeof(Tm1637Module<SoftTmiInterface, 4>): 24
 sizeof(Tm1637Module<SoftTmiInterface, 6>): 28
 sizeof(Max7219Module<SoftSpiInterface, 8>): 28
-sizeof(Ht16k33Module<HardWireInterface, 4>): 20
+sizeof(Ht16k33Module<TwoWireInterface, 4>): 20
 sizeof(Ht16k33Module<SimpleWireInterface, 4>): 20
 sizeof(LedDisplay): 4
 sizeof(NumberWriter): 4
@@ -509,7 +509,7 @@ CPU:
 | Max7219(8,SoftSpi)                      |   688/  691/  693 |      20 |
 | Max7219(8,HardSpi)                      |   394/  395/  398 |      20 |
 |-----------------------------------------+-------------------+---------|
-| Ht16k33(4,HardWire)                     |   230/  230/  231 |      20 |
+| Ht16k33(4,TwoWire)                      |   230/  230/  231 |      20 |
 | Ht16k33(4,SimpleWire)                   |  3007/ 3008/ 3009 |      20 |
 +-----------------------------------------+-------------------+---------+
 
@@ -526,7 +526,7 @@ Sizes of Objects:
 sizeof(SoftTmiInterface): 3
 sizeof(SoftSpiInterface): 3
 sizeof(HardSpiInterface): 8
-sizeof(HardWireInterface): 8
+sizeof(TwoWireInterface): 8
 sizeof(SimpleWireInterface): 4
 sizeof(LedMatrixDirect<>): 16
 sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 16
@@ -539,7 +539,7 @@ sizeof(Hc595Module<SoftSpiInterface, 8>): 64
 sizeof(Tm1637Module<SoftTmiInterface, 4>): 24
 sizeof(Tm1637Module<SoftTmiInterface, 6>): 28
 sizeof(Max7219Module<SoftSpiInterface, 8>): 28
-sizeof(Ht16k33Module<HardWireInterface, 4>): 20
+sizeof(Ht16k33Module<TwoWireInterface, 4>): 20
 sizeof(Ht16k33Module<SimpleWireInterface, 4>): 20
 sizeof(LedDisplay): 4
 sizeof(NumberWriter): 4
@@ -579,7 +579,7 @@ CPU:
 | Max7219(8,SoftSpi)                      |   460/  460/  469 |      20 |
 | Max7219(8,HardSpi)                      |   125/  126/  134 |      20 |
 |-----------------------------------------+-------------------+---------|
-| Ht16k33(4,HardWire)                     |   245/  246/  269 |      20 |
+| Ht16k33(4,TwoWire)                      |   245/  246/  269 |      20 |
 | Ht16k33(4,SimpleWire)                   |  1338/ 1342/ 1369 |      20 |
 +-----------------------------------------+-------------------+---------+
 
@@ -596,7 +596,7 @@ Sizes of Objects:
 sizeof(SoftTmiInterface): 3
 sizeof(SoftSpiInterface): 3
 sizeof(HardSpiInterface): 8
-sizeof(HardWireInterface): 8
+sizeof(TwoWireInterface): 8
 sizeof(SimpleWireInterface): 4
 sizeof(LedMatrixDirect<>): 16
 sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 16
@@ -609,7 +609,7 @@ sizeof(Hc595Module<SoftSpiInterface, 8>): 64
 sizeof(Tm1637Module<SoftTmiInterface, 4>): 24
 sizeof(Tm1637Module<SoftTmiInterface, 6>): 28
 sizeof(Max7219Module<SoftSpiInterface, 8>): 28
-sizeof(Ht16k33Module<HardWireInterface, 4>): 20
+sizeof(Ht16k33Module<TwoWireInterface, 4>): 20
 sizeof(Ht16k33Module<SimpleWireInterface, 4>): 20
 sizeof(LedDisplay): 4
 sizeof(NumberWriter): 4
@@ -649,7 +649,7 @@ CPU:
 | Max7219(8,SoftSpi)                      |    60/   61/   68 |      20 |
 | Max7219(8,HardSpi)                      |    90/   91/   98 |      20 |
 |-----------------------------------------+-------------------+---------|
-| Ht16k33(4,HardWire)                     |   310/  312/  320 |      20 |
+| Ht16k33(4,TwoWire)                      |   310/  312/  320 |      20 |
 | Ht16k33(4,SimpleWire)                   |   831/  836/  840 |      20 |
 +-----------------------------------------+-------------------+---------+
 
@@ -667,7 +667,7 @@ Sizes of Objects:
 sizeof(SoftTmiInterface): 3
 sizeof(SoftSpiInterface): 3
 sizeof(HardSpiInterface): 8
-sizeof(HardWireInterface): 8
+sizeof(TwoWireInterface): 8
 sizeof(SimpleWireInterface): 4
 sizeof(LedMatrixDirect<>): 16
 sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 16
@@ -680,7 +680,7 @@ sizeof(Hc595Module<SoftSpiInterface, 8>): 64
 sizeof(Tm1637Module<SoftTmiInterface, 4>): 24
 sizeof(Tm1637Module<SoftTmiInterface, 6>): 28
 sizeof(Max7219Module<SoftSpiInterface, 8>): 28
-sizeof(Ht16k33Module<HardWireInterface, 4>): 20
+sizeof(Ht16k33Module<TwoWireInterface, 4>): 20
 sizeof(Ht16k33Module<SimpleWireInterface, 4>): 20
 sizeof(LedDisplay): 4
 sizeof(NumberWriter): 4
@@ -720,7 +720,7 @@ CPU:
 | Max7219(8,SoftSpi)                      |   151/  152/  154 |      20 |
 | Max7219(8,HardSpi)                      |    38/   38/   41 |      20 |
 |-----------------------------------------+-------------------+---------|
-| Ht16k33(4,HardWire)                     |   221/  221/  222 |      20 |
+| Ht16k33(4,TwoWire)                      |   221/  221/  222 |      20 |
 | Ht16k33(4,SimpleWire)                   |   570/  572/  578 |      20 |
 +-----------------------------------------+-------------------+---------+
 

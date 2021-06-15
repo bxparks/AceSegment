@@ -12,7 +12,7 @@ SoftSpiInterface	KEYWORD1
 SoftSpiFastInterface	KEYWORD1
 SoftTmiInterface	KEYWORD1
 SoftTmiFastInterface	KEYWORD1
-HardWireInterface	KEYWORD1
+TwoWireInterface	KEYWORD1
 SimpleWireInterface	KEYWORD1
 SimpleFastWireInterface	KEYWORD1
 LedMatrixBase	KEYWORD1
@@ -55,7 +55,7 @@ startCondition	KEYWORD2
 stopCondition	KEYWORD2
 sendByte	KEYWORD2
 
-# HardWireInterface.h, SimpleWireInterface.h, SimpleWireFastInterface.h
+# TwoWireInterface.h, SimpleWireInterface.h, SimpleWireFastInterface.h
 begin	KEYWORD2
 end	KEYWORD2
 beginTransmission	KEYWORD2

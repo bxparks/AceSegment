@@ -11,7 +11,7 @@ using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
 using ace_segment::Ht16k33Module;
-using ace_segment::HardWireInterface;
+using ace_segment::TwoWireInterface;
 using ace_segment::SimpleWireInterface;
 using ace_segment::LedDisplay;
 
@@ -88,24 +88,24 @@ const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 #if WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_HARD
   #warning Using Wire.h
   #include <Wire.h>
-  using WireInterface = HardWireInterface<TwoWire>;
+  using WireInterface = TwoWireInterface<TwoWire>;
   WireInterface wireInterface(Wire, HT16K33_I2C_ADDRESS);
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SOFTWARE_WIRE
   #warning Using SoftwareWire.h
   #include <SoftwareWire.h>
   SoftwareWire softwareWire(SDA_PIN, SCL_PIN);
-  using WireInterface = HardWireInterface<SoftwareWire>;
+  using WireInterface = TwoWireInterface<SoftwareWire>;
   WireInterface wireInterface(softwareWire, HT16K33_I2C_ADDRESS);
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SOFT_WIRE
   #warning Using SoftWire.h
   #include <SoftWire.h>
   SoftWire softWire(SDA_PIN, SCL_PIN);
-  using WireInterface = HardWireInterface<SoftWire>;
+  using WireInterface = TwoWireInterface<SoftWire>;
   WireInterface wireInterface(softWire, HT16K33_I2C_ADDRESS);
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SWIRE
   #warning Using SWire.h
   #include <SWire.h>
-  using WireInterface = HardWireInterface<SoftWire>;
+  using WireInterface = TwoWireInterface<SoftWire>;
   WireInterface wireInterface(SWire, HT16K33_I2C_ADDRESS);
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SIMPLE_WIRE
   #warning Using SimpleWireInterface.h

@@ -22,8 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_HARD_WIRE_INTERFACE_H
-#define ACE_SEGMENT_HARD_WIRE_INTERFACE_H
+#ifndef ACE_SEGMENT_TWO_WIRE_INTERFACE_H
+#define ACE_SEGMENT_TWO_WIRE_INTERFACE_H
 
 #include <stdint.h>
 
@@ -35,9 +35,9 @@ namespace ace_segment {
  * flash memory on AVR by about 1000 byte even if the Wire object is never used.
  */
 template <typename T_WIRE>
-class HardWireInterface {
+class TwoWireInterface {
   public:
-    HardWireInterface(T_WIRE& wire, uint8_t addr) :
+    TwoWireInterface(T_WIRE& wire, uint8_t addr) :
         mWire(wire),
         mAddr(addr)
     {}

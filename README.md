@@ -229,10 +229,17 @@ depend on the lower-level classes:
 * `WireInterface`
     * Thin wrapper classes for communicating with LED modules using I2C.
     * Used by `Ht16k33Module`.
-    * There are 2 implementations:
-        * `HardWireInterface`
+    * There are 3 implementations:
+        * `TwoWireInterface`
+            * Thin wrapper around I2C libraries which follow the API of
+              the `TwoWire` class in the pre-installed `<Wire.h>` library.
+            * Both hardware and software implementations are supported.
         * `SimpleWireInterface`
+            * AceSegment's own software bitbanging library that implements just
+              enough I2C to communicate with the HT16K33 controller chip.
         * `SimpleWireFastInterface`
+            * Same as `SimpleWireInterface` using one of the
+              `<digitalWriteFast.h>` libraries.
 * `LedModule`
     * Base interface for all hardware dependent implementation of a
       seven-segment LED module.
@@ -312,7 +319,7 @@ Tm1637Module  Max7219Module Hc595Module HybridModule DirectModule Ht16k33Module
       |                \        |       /                               |
       |                 \       |      /                                |
       v                  v      v     v                                 v
-SoftTmiInterface         SoftSpiInterface                     HardWireInterface
+SoftTmiInterface         SoftSpiInterface                      TwoWireInterface
 SoftTmiFastInterface     SoftSpiFastInterface               SimpleWireInterface
                          HardSpiInterface               SimpleWireFastInterface
                          HardSpiFastInterface
@@ -780,7 +787,7 @@ class Ht16k33Module : public LedModule {
 ```
 
 The `T_WIREI` template parameter is the class name of the Wire interface,
-currently just `HardWireInterface`.
+currently just `TwoWireInterface`.
 
 The `T_DIGITS` template parameter is the number of digits in the module. I have
 only seen 4 digit modules for sale.
@@ -823,7 +830,7 @@ const uint8_t SCL_PIN = SCL;
 const uint8_t SDA_PIN = SDA;
 const uint8_t NUM_DIGITS = 4;
 
-using WireInterface = HardWireInterface<TwoWire>;
+using WireInterface = TwoWireInterface<TwoWire>;
 WireInterface wireInterface(Wire, HT16K33_I2C_ADDRESS);
 
 Ht16k33Module<WireInterface, NUM_DIGITS> ledModule(wireInterface);
@@ -1808,7 +1815,7 @@ sizeof(SoftSpiInterface): 3
 sizeof(SoftSpiFastInterface<11, 12, 13>): 1
 sizeof(HardSpiInterface): 3
 sizeof(HardSpiFastInterface): 2
-sizeof(HardWireInterface): 3
+sizeof(TwoWireInterface): 3
 sizeof(LedMatrixDirect<>): 9
 sizeof(LedMatrixDirectFast4<6..13, 2..5>): 3
 sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 8
@@ -1822,7 +1829,7 @@ sizeof(Hc595Module<SoftSpiInterface, 8>): 46
 sizeof(Tm1637Module<SoftTmiInterface, 4>): 14
 sizeof(Tm1637Module<SoftTmiInterface, 6>): 16
 sizeof(Max7219Module<SoftSpiInterface, 8>): 16
-sizeof(Ht16k33Module<HardWireInterface, 4>): 11
+sizeof(Ht16k33Module<TwoWireInterface, 4>): 11
 sizeof(LedDisplay): 2
 sizeof(NumberWriter): 2
 sizeof(ClockWriter): 3
@@ -1839,7 +1846,7 @@ On 32-bit processors, these numbers look like this:
 sizeof(SoftTmiInterface): 4
 sizeof(SoftSpiInterface): 3
 sizeof(HardSpiInterface): 8
-sizeof(HardWireInterface): 8
+sizeof(TwoWireInterface): 8
 sizeof(LedMatrixDirect<>): 16
 sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 16
 sizeof(LedMatrixDualHc595<HardSpiInterface>): 16
@@ -1851,7 +1858,7 @@ sizeof(Hc595Module<SoftSpiInterface, 8>): 64
 sizeof(Tm1637Module<SoftTmiInterface, 4>): 24
 sizeof(Tm1637Module<SoftTmiInterface, 6>): 28
 sizeof(Max7219Module<SoftSpiInterface, 8>): 28
-sizeof(Ht16k33Module<HardWireInterface, 4>): 20
+sizeof(Ht16k33Module<TwoWireInterface, 4>): 20
 sizeof(LedDisplay): 4
 sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
@@ -1901,7 +1908,7 @@ static memory consumptions for various configurations on an Arduino Nano
 | Max7219(HardSpi)                |   1290/   46 |   834/   35 |
 | Max7219(HardSpiFast)            |   1184/   45 |   728/   34 |
 |---------------------------------+--------------+-------------|
-| Ht16k33(HardWire)               |   2866/  251 |  2410/  240 |
+| Ht16k33(TwoWire)               |   2866/  251 |  2410/  240 |
 |---------------------------------+--------------+-------------|
 | StubModule+LedDisplay           |    578/   24 |   122/   13 |
 | NumberWriter+Stub               |    682/   28 |   226/   17 |
@@ -1943,7 +1950,7 @@ And here are the memory consumption numbers for an ESP8266:
 | Max7219(HardSpi)                | 258804/27044 |  2104/  260 |
 | Max7219(HardSpiFast)            |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Ht16k33(HardWire)               | 261364/27500 |  4664/  716 |
+| Ht16k33(TwoWire)                | 261364/27500 |  4664/  716 |
 |---------------------------------+--------------+-------------|
 | StubModule+LedDisplay           | 256856/27004 |   156/  220 |
 | NumberWriter+Stub               | 257352/27004 |   652/  220 |
@@ -2010,7 +2017,7 @@ Here are the CPU numbers for an AVR processor:
 | Max7219(8,HardSpi)                     |   208/  221/  240 |      20 |
 | Max7219(8,HardSpiFast)                 |   100/  107/  120 |      20 |
 |----------------------------------------+-------------------+---------|
-| Ht16k33(4,HardWire)                    |   336/  341/  356 |      20 |
+| Ht16k33(4,TwoWire)                     |   336/  341/  356 |      20 |
 +----------------------------------------+-------------------+---------+
 ```
 
@@ -2047,7 +2054,7 @@ Here are the CPU numbers for an ESP8266:
 | Max7219(8,SoftSpi)                     |   460/  461/  472 |      20 |
 | Max7219(8,HardSpi)                     |   126/  126/  134 |      20 |
 |----------------------------------------+-------------------+---------|
-| Ht16k33(4,HardWire)                    |   245/  246/  272 |      20 |
+| Ht16k33(4,TwoWire)                     |   245/  246/  272 |      20 |
 +----------------------------------------+-------------------+---------+
 ```
 

@@ -4,7 +4,7 @@
     * Support HT16K33 LED modules
         * Add `Ht16k33Module` class to support 4-digit LED display from
           Adafruit or one of its clones.
-        * Add `HardWireInterface` as a thin abstraction between `TwoWire` class
+        * Add `TwoWireInterface` as a thin abstraction between `TwoWire` class
           and the `Ht16k33Module`, to avoid including `<Wire.h>` which pulls in
           about 1000 bytes of flash even if `Ht16k33Module` is never used.
         * Add `SimpleWireInterface`, a very simple software implementation of

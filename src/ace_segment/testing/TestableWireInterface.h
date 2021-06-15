@@ -7,7 +7,7 @@ namespace ace_segment {
 namespace testing {
 
 /**
- * Version of HardWireInterface with the same API but writes to the EventLog
+ * Version of TwoWireInterface with the same API but writes to the EventLog
  * so that it can be validated in unit tests.
  */
 class TestableWireInterface {

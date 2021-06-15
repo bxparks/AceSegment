@@ -33,7 +33,7 @@
 #define FEATURE_MAX7219_SOFT_SPI_FAST 14
 #define FEATURE_MAX7219_HARD_SPI 15
 #define FEATURE_MAX7219_HARD_SPI_FAST 16
-#define FEATURE_HT16K33_HARD_WIRE 17
+#define FEATURE_HT16K33_TWO_WIRE 17
 #define FEATURE_HT16K33_SIMPLE_WIRE 18
 #define FEATURE_HT16K33_SIMPLE_WIRE_FAST 19
 #define FEATURE_STUB_MODULE 20
@@ -286,10 +286,10 @@ volatile int disableCompilerOptimization = 0;
     Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
         spiInterface, kDigitRemapArray8Max7219);
 
-  #elif FEATURE == FEATURE_HT16K33_HARD_WIRE
+  #elif FEATURE == FEATURE_HT16K33_TWO_WIRE
     #include <Wire.h>
     const uint8_t HT16K33_I2C_ADDRESS = 0x70;
-    using WireInterface = HardWireInterface<TwoWire>;
+    using WireInterface = TwoWireInterface<TwoWire>;
     WireInterface wireInterface(Wire, HT16K33_I2C_ADDRESS);
     Ht16k33Module<WireInterface, NUM_DIGITS> ht16k33Module(wireInterface);
 
@@ -439,7 +439,7 @@ void setup() {
   spiInterface.begin();
   max7219Module.begin();
 
-#elif FEATURE == FEATURE_HT16K33_HARD_WIRE
+#elif FEATURE == FEATURE_HT16K33_TWO_WIRE
   Wire.begin();
   wireInterface.begin();
   ht16k33Module.begin();
@@ -490,7 +490,7 @@ void loop() {
   max7219Module.setPatternAt(0, 0xff);
   max7219Module.flush();
 
-#elif FEATURE == FEATURE_HT16K33_HARD_WIRE
+#elif FEATURE == FEATURE_HT16K33_TWO_WIRE
   ht16k33Module.setPatternAt(0, 0xff);
   ht16k33Module.flush();
 

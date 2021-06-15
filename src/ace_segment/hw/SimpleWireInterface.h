@@ -32,7 +32,7 @@ namespace ace_segment {
 
 /**
  * A software I2C implementation for sending LED segment patterns over I2C. This
- * has the same API has HardWireInterface so it can be a drop-in replacement.
+ * has the same API has TwoWireInterface so it can be a drop-in replacement.
  *
  * The implementation is very similar to SoftTmiInterface because the TM1637
  * protocol is very similar to I2C. To keep everything simple, so the

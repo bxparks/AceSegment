@@ -23,7 +23,7 @@ BEGIN {
   labels[14] = "Max7219(SoftSpiFast)";
   labels[15] = "Max7219(HardSpi)";
   labels[16] = "Max7219(HardSpiFast)";
-  labels[17] = "Ht16k33(HardWire)";
+  labels[17] = "Ht16k33(TwoWire)";
   labels[18] = "Ht16k33(SimpleWire)";
   labels[19] = "Ht16k33(SimpleWireFast)";
   labels[20] = "StubModule+LedDisplay";
@@ -68,7 +68,7 @@ END {
         || labels[i] ~ /Hc595\(SoftSpi\)/ \
         || labels[i] ~ /Tm1637\(SoftTmi\)/ \
         || labels[i] ~ /Max7219\(SoftSpi\)/ \
-        || labels[i] ~ /Ht16k33\(HardWire\)/ \
+        || labels[i] ~ /Ht16k33\(TwoWire\)/ \
         || labels[i] == "StubModule+LedDisplay") {
       printf(\
         "|---------------------------------+--------------+-------------|\n")

@@ -41,7 +41,7 @@ SOFTWARE.
 #include "ace_segment/hw/SoftSpiInterface.h"
 #include "ace_segment/hw/HardSpiInterface.h"
 #include "ace_segment/hw/SoftTmiInterface.h"
-#include "ace_segment/hw/HardWireInterface.h"
+#include "ace_segment/hw/TwoWireInterface.h"
 #include "ace_segment/hw/SimpleWireInterface.h"
 #include "ace_segment/hw/remap.h"
 #include "ace_segment/scanning/LedMatrixDirect.h"

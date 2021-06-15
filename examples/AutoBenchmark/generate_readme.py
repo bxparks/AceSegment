@@ -154,10 +154,10 @@ number of `TimingStats::update()` calls that were made.
 
 **v0.6+:**
 
-* Add `sizeof(LevelWriter)` and `sizeof(HardWireInterface)`.
-* Add benchmarks for `Ht16k33Module`, using `HardWireInterface`,
+* Add `sizeof(LevelWriter)` and `sizeof(TwoWireInterface)`.
+* Add benchmarks for `Ht16k33Module`, using `TwoWireInterface`,
   `SimpleWireInterface`, and `SimpleWireFastInterface`.
-    * On SAMD21 and STM32, the runtime of the `Ht16k33Module(HardWire)` seems to
+    * On SAMD21 and STM32, the runtime of the `Ht16k33Module(TwoWire)` seems to
       depend on whether an actual HT16K33 LED module is attached to the I2C bus.
         * SAMD21: the transmission time becomes 50X longer *without* the LED
           module attached. 

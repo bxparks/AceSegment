@@ -782,15 +782,15 @@ void runHt16k33Benchmark(const __FlashStringHelper* name, LM& ledModule) {
   printStats(name, timingStats, numSamples);
 }
 
-void runHt16k33HardWire() {
-  using WireInterface = HardWireInterface<TwoWire>;
+void runHt16k33TwoWire() {
+  using WireInterface = TwoWireInterface<TwoWire>;
   WireInterface wireInterface(Wire, HT16K33_I2C_ADDRESS);
   Ht16k33Module<WireInterface, 4> ht16k33Module(wireInterface);
 
   Wire.begin();
   wireInterface.begin();
   ht16k33Module.begin();
-  runHt16k33Benchmark(F("Ht16k33(4,HardWire)"), ht16k33Module);
+  runHt16k33Benchmark(F("Ht16k33(4,TwoWire)"), ht16k33Module);
   ht16k33Module.end();
   wireInterface.end();
 }
@@ -877,7 +877,7 @@ void runBenchmarks() {
   runMax7219HardSpiFast();
 #endif
 
-  runHt16k33HardWire();
+  runHt16k33TwoWire();
   runHt16k33SimpleWire();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
   runHt16k33SimpleWireFast();
@@ -913,8 +913,8 @@ void printSizeOf() {
   SERIAL_PORT_MONITOR.println(sizeof(HardSpiFastInterface<SPIClass, 11>));
 #endif
 
-  SERIAL_PORT_MONITOR.print(F("sizeof(HardWireInterface): "));
-  SERIAL_PORT_MONITOR.println(sizeof(HardWireInterface<TwoWire>));
+  SERIAL_PORT_MONITOR.print(F("sizeof(TwoWireInterface): "));
+  SERIAL_PORT_MONITOR.println(sizeof(TwoWireInterface<TwoWire>));
 
   SERIAL_PORT_MONITOR.print(F("sizeof(SimpleWireInterface): "));
   SERIAL_PORT_MONITOR.println(sizeof(SimpleWireInterface));
@@ -977,9 +977,9 @@ void printSizeOf() {
   SERIAL_PORT_MONITOR.print(F("sizeof(Max7219Module<SoftSpiInterface, 8>): "));
   SERIAL_PORT_MONITOR.println(sizeof(Max7219Module<SoftSpiInterface, 8>));
 
-  SERIAL_PORT_MONITOR.print(F("sizeof(Ht16k33Module<HardWireInterface, 4>): "));
+  SERIAL_PORT_MONITOR.print(F("sizeof(Ht16k33Module<TwoWireInterface, 4>): "));
   SERIAL_PORT_MONITOR.println(
-      sizeof(Ht16k33Module<HardWireInterface<TwoWire>, 4>));
+      sizeof(Ht16k33Module<TwoWireInterface<TwoWire>, 4>));
 
   SERIAL_PORT_MONITOR.print(
       F("sizeof(Ht16k33Module<SimpleWireInterface, 4>): "));
