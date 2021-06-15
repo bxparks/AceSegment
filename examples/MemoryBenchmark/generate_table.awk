@@ -26,14 +26,15 @@ BEGIN {
   labels[17] = "Ht16k33(TwoWire)";
   labels[18] = "Ht16k33(SimpleWire)";
   labels[19] = "Ht16k33(SimpleWireFast)";
-  labels[20] = "StubModule+LedDisplay";
-  labels[21] = "NumberWriter+Stub";
-  labels[22] = "ClockWriter+Stub";
-  labels[23] = "TemperatureWriter+Stub";
-  labels[24] = "CharWriter+Stub";
-  labels[25] = "StringWriter+Stub";
-  labels[26] = "StringScroller+Stub";
-  labels[27] = "LevelWriter+Stub";
+  labels[20] = "StubModule";
+  labels[21] = "PatternWriter+Stub";
+  labels[22] = "NumberWriter+Stub";
+  labels[23] = "ClockWriter+Stub";
+  labels[24] = "TemperatureWriter+Stub";
+  labels[25] = "CharWriter+Stub";
+  labels[26] = "StringWriter+Stub";
+  labels[27] = "StringScroller+Stub";
+  labels[28] = "LevelWriter+Stub";
   record_index = 0
 }
 {
@@ -69,7 +70,7 @@ END {
         || labels[i] ~ /Tm1637\(SoftTmi\)/ \
         || labels[i] ~ /Max7219\(SoftSpi\)/ \
         || labels[i] ~ /Ht16k33\(TwoWire\)/ \
-        || labels[i] == "StubModule+LedDisplay") {
+        || labels[i] ~ /^StubModule$/) {
       printf(\
         "|---------------------------------+--------------+-------------|\n")
     }

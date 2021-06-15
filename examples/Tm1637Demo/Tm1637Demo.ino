@@ -6,13 +6,13 @@
 
 #include <Arduino.h>
 #include <AceCommon.h> // incrementMod()
-#include <AceSegment.h> // Tm1636Module, LedDisplay
+#include <AceSegment.h> // Tm1636Module, PatternWriter
 
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
 using ace_segment::Tm1637Module;
-using ace_segment::LedDisplay;
+using ace_segment::PatternWriter;
 using ace_segment::SoftTmiInterface;
 using ace_segment::kDigitRemapArray6Tm1637;
 
@@ -117,12 +117,12 @@ const uint16_t BIT_DELAY = 100;
   const uint8_t* const remapArray = nullptr;
 #endif
 
-Tm1637Module<TmiInterface, NUM_DIGITS> tm1637Module(tmiInterface, remapArray);
-LedDisplay display(tm1637Module);
+Tm1637Module<TmiInterface, NUM_DIGITS> ledModule(tmiInterface, remapArray);
+PatternWriter patternWriter(ledModule);
 
 void setupAceSegment() {
   tmiInterface.begin();
-  tm1637Module.begin();
+  ledModule.begin();
 }
 
 //----------------------------------------------------------------------------
@@ -152,15 +152,15 @@ void updateDisplay() {
     // Update the display
     uint8_t j = digitIndex;
     for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
-      display.writePatternAt(i, PATTERNS[j]);
+      patternWriter.writePatternAt(i, PATTERNS[j]);
       // Write a decimal point every other digit, for demo purposes.
-      display.writeDecimalPointAt(i, j & 0x1);
+      patternWriter.writeDecimalPointAt(i, j & 0x1);
       incrementMod(j, (uint8_t) NUM_DIGITS);
     }
     incrementMod(digitIndex, (uint8_t) NUM_DIGITS);
 
     // Update the brightness. The TM1637 has 8 levels of brightness.
-    display.setBrightness(brightness);
+    ledModule.setBrightness(brightness);
     incrementModOffset(brightness, (uint8_t) 7, (uint8_t) 1);
   }
 }
@@ -179,7 +179,7 @@ void flushIncrementalModule() {
 
     // Flush incrementally, and measure the time.
     uint16_t startMicros = micros();
-    tm1637Module.flushIncremental();
+    ledModule.flushIncremental();
     uint16_t elapsedMicros = (uint16_t) micros() - startMicros;
     stats.update(elapsedMicros);
   }
@@ -197,7 +197,7 @@ void flushModule() {
 
     // Flush incrementally, and measure the time.
     uint16_t startMicros = micros();
-    tm1637Module.flush();
+    ledModule.flush();
     uint16_t elapsedMicros = (uint16_t) micros() - startMicros;
     stats.update(elapsedMicros);
   }

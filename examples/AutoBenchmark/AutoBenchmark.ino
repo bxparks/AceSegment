@@ -985,8 +985,8 @@ void printSizeOf() {
       F("sizeof(Ht16k33Module<SimpleWireInterface, 4>): "));
   SERIAL_PORT_MONITOR.println(sizeof(Ht16k33Module<SimpleWireInterface, 4>));
 
-  SERIAL_PORT_MONITOR.print(F("sizeof(LedDisplay): "));
-  SERIAL_PORT_MONITOR.println(sizeof(LedDisplay));
+  SERIAL_PORT_MONITOR.print(F("sizeof(PatternWriter): "));
+  SERIAL_PORT_MONITOR.println(sizeof(PatternWriter));
 
   SERIAL_PORT_MONITOR.print(F("sizeof(NumberWriter): "));
   SERIAL_PORT_MONITOR.println(sizeof(NumberWriter));

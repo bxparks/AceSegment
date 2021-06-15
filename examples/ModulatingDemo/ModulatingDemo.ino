@@ -31,7 +31,6 @@ using ace_segment::HardSpiInterface;
 using ace_segment::DirectModule;
 using ace_segment::HybridModule;
 using ace_segment::Hc595Module;
-using ace_segment::LedDisplay;
 using ace_segment::NumberWriter;
 
 #ifndef ENABLE_SERIAL_DEBUG
@@ -351,8 +350,7 @@ void setupAceSegment() {
 //------------------------------------------------------------------
 
 void setupPulseDisplay() {
-  LedDisplay ledDisplay(ledModule);
-  NumberWriter numberWriter(ledDisplay);
+  NumberWriter numberWriter(ledModule);
   for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
     numberWriter.writeHexCharAt(i, i);
   }

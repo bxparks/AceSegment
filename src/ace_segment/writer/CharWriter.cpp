@@ -189,8 +189,8 @@ uint8_t CharWriter::getPattern(char c) const {
 }
 
 void CharWriter::writeCharAt(uint8_t pos, char c) {
-  if (pos >= mLedDisplay.getNumDigits()) return;
-  mLedDisplay.writePatternAt(pos, getPattern(c));
+  if (pos >= mPatternWriter.getNumDigits()) return;
+  mPatternWriter.writePatternAt(pos, getPattern(c));
 }
 
 }

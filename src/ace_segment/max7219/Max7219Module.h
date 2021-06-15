@@ -88,7 +88,7 @@ inline uint8_t convertPatternMax7219(uint8_t pattern) {
  *
  * The 8-digit MAX7219 LED modules that I bought on eBay and Amazon are wired
  * such that the digits appear as "7 6 5 4 3 2 1 0" intead of "0 1 2 3 4 5 6 7".
- * This is the reverse of the convention used by the `LedDisplay` class.
+ * This is the reverse of the convention used by other `LedModule` classes.
  *
  * You can create your own remap array to handle other LED modules with
  * different physical ordering compared to the logical ordering.

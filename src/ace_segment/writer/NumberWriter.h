@@ -26,13 +26,13 @@ SOFTWARE.
 #define ACE_SEGMENT_NUMBER_WRITER_H
 
 #include <stdint.h>
-#include "../LedDisplay.h"
+#include "PatternWriter.h"
 
 namespace ace_segment {
 
 /**
  * The NumberWriter supports converting decimal and hexadecimal numbers to
- * segment patterns expected by LedDisplay. The character set includes 0 to F,
+ * segment patterns expected by LedModule. The character set includes 0 to F,
  * and a few other characters which should be self-explanatory: kCharSpace and
  * kCharMinus.
  */
@@ -65,14 +65,15 @@ class NumberWriter {
     static const hexchar_t kCharMinus = 0x11;
 
     /** Constructor. */
-    explicit NumberWriter(LedDisplay& ledDisplay) :
-        mLedDisplay(ledDisplay)
+    explicit NumberWriter(LedModule& ledModule) :
+        mPatternWriter(ledModule)
     {}
 
-    /** Get the underlying LedDisplay. */
-    LedDisplay& display() const {
-      return mLedDisplay;
-    }
+    /** Get the underlying LedModule. */
+    LedModule& ledModule() { return mPatternWriter.ledModule(); }
+
+    /** Get the underlying LedModule. */
+    PatternWriter& patternWriter() { return mPatternWriter; }
 
     /**
      * Write the hex character `c` at position `pos`. If `c` falls outside the
@@ -145,11 +146,22 @@ class NumberWriter {
     void writeUnsignedDecimal2At(uint8_t pos, uint8_t num);
 
     /**
+     * Write the decimal point for the pos. Clock LED modules will attach the
+     * colon segment to one of the decimal points.
+     */
+    void writeDecimalPointAt(uint8_t pos, bool state = true) {
+      mPatternWriter.writeDecimalPointAt(pos, state);
+    }
+
+    /** Clear the entire display. */
+    void clear() { clearToEnd(0); }
+
+    /**
      * Clear the display from `pos` to the end. Useful after calling
      * writeSignedDecimalAt() and writeUnsignedDecimalAt() which prints a
      * variable number of digits.
      */
-    void clearToEnd(uint8_t pos) { display().clearToEnd(pos); }
+    void clearToEnd(uint8_t pos) { mPatternWriter.clearToEnd(pos); }
 
   private:
     // disable copy-constructor and assignment operator
@@ -210,7 +222,7 @@ class NumberWriter {
     /** Bit pattern map for hex characters. */
     static const uint8_t kHexCharPatterns[kNumHexChars];
 
-    LedDisplay& mLedDisplay;
+    PatternWriter mPatternWriter;
 };
 
 }

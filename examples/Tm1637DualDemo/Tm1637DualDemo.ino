@@ -16,7 +16,7 @@ using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
 using ace_segment::Tm1637Module;
-using ace_segment::LedDisplay;
+using ace_segment::PatternWriter;
 using ace_segment::SoftTmiInterface;
 
 // Select TM1637 protocol version, either SoftTmiInterface or
@@ -78,8 +78,8 @@ const uint16_t BIT_DELAY = 100;
   using TmiInterface = SoftTmiInterface;
   TmiInterface tmiInterface1(DIO1_PIN, CLK_PIN, BIT_DELAY);
   TmiInterface tmiInterface2(DIO2_PIN, CLK_PIN, BIT_DELAY);
-  Tm1637Module<TmiInterface, NUM_DIGITS> tm1637Module1(tmiInterface1);
-  Tm1637Module<TmiInterface, NUM_DIGITS> tm1637Module2(tmiInterface2);
+  Tm1637Module<TmiInterface, NUM_DIGITS> ledModule1(tmiInterface1);
+  Tm1637Module<TmiInterface, NUM_DIGITS> ledModule2(tmiInterface2);
 
 #elif TMI_INTERFACE_TYPE == TMI_INTERFACE_TYPE_FAST
   #include <digitalWriteFast.h>
@@ -89,21 +89,21 @@ const uint16_t BIT_DELAY = 100;
   using TmiInterface2 = SoftTmiFastInterface<DIO2_PIN, CLK_PIN, BIT_DELAY>;
   TmiInterface1 tmiInterface1;
   TmiInterface2 tmiInterface2;
-  Tm1637Module<TmiInterface1, NUM_DIGITS> tm1637Module1(tmiInterface1);
-  Tm1637Module<TmiInterface2, NUM_DIGITS> tm1637Module2(tmiInterface2);
+  Tm1637Module<TmiInterface1, NUM_DIGITS> ledModule1(tmiInterface1);
+  Tm1637Module<TmiInterface2, NUM_DIGITS> ledModule2(tmiInterface2);
 
 #else
   #error Unknown TMI_INTERFACE_TYPE
 #endif
 
-LedDisplay display1(tm1637Module1);
-LedDisplay display2(tm1637Module2);
+PatternWriter display1(ledModule1);
+PatternWriter display2(ledModule2);
 
 void setupAceSegment() {
   tmiInterface1.begin();
   tmiInterface2.begin();
-  tm1637Module1.begin();
-  tm1637Module2.begin();
+  ledModule1.begin();
+  ledModule2.begin();
 }
 
 //----------------------------------------------------------------------------
@@ -145,8 +145,8 @@ void updateDisplay() {
     incrementMod(digitIndex, (uint8_t) NUM_DIGITS);
 
     // Update the brightness, range from 1 to 7.
-    display1.setBrightness(brightness);
-    display2.setBrightness(brightness);
+    ledModule1.setBrightness(brightness);
+    ledModule2.setBrightness(brightness);
     incrementModOffset(brightness, (uint8_t) 7, (uint8_t) 1);
   }
 }
@@ -170,8 +170,8 @@ void flushIncrementalModule() {
 
     // Flush incrementally, and measure the time.
     uint16_t startMicros = micros();
-    tm1637Module1.flushIncremental();
-    tm1637Module2.flushIncremental();
+    ledModule1.flushIncremental();
+    ledModule2.flushIncremental();
     uint16_t elapsedMicros = (uint16_t) micros() - startMicros;
     stats.update(elapsedMicros);
   }
@@ -189,8 +189,8 @@ void flushModule() {
 
     // Flush incrementally, and measure the time.
     uint16_t startMicros = micros();
-    tm1637Module1.flush();
-    tm1637Module2.flush();
+    ledModule1.flush();
+    ledModule2.flush();
     uint16_t elapsedMicros = (uint16_t) micros() - startMicros;
     stats.update(elapsedMicros);
   }
