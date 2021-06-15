@@ -424,8 +424,37 @@ particularly the 74HC595, is a fairly dumb controller chip that requires the
 host microcontroller to perform the multiplexing itself. The bit patterns must
 be sent out to the controller chip with precise timing intervals.
 
-Because each controller chip has slightly different rendering requirements, the
-`LedModule` class pushes the rendering logic down into the specific subclasses.
+The `setBrightness()` method controls the brightness of the entire LED module.
+The range of the `brightness` parameter is determined by the underlying
+controller chip:
+
+* TM1637
+    * Supports 8 levels from 0 to 7, with 0 turning off the display and 7 being
+      the brightest.
+* MAX7219
+    * Supports 16 levels from 0 to 15, with 0 being the dimmest level (which
+      does not turn off the display), and 15 being the brightest.
+* HT16K33
+    * Supports 16 levels from 0 to 15, with 0 being the dimmest level (which
+      does not turn off the display), and 15 being the brightest.
+* 74HC595
+    * The brightness is controlled directly by the microcontroller using pulse
+      width modulation (PWM).
+    * The range of values could theoretically be from 0 to 255, but in practice,
+      it is limited by the speed of the microcontroller and the speed of the SPI
+      transfer to the 74HC595 chip. A brightness range of 0-7 or 0-15 seems
+      practical for most configurations.
+
+If brightness control is enabled on the LED module using the 74HC595 chip, it
+can also support brightness control on a per-digit basis. But the interface for
+that feature is part of the `LedModule` class because no other controller chip
+supports this feature.
+
+The rendering of each digit and segment, and how the information is transferred
+to the controller chip, is pushed down into the specific subclasses of
+`LedModule`. The rendering methods are called `flush()`, `flushIncremental()`,
+`renderNow()` or `renderWhenReady()`, Each controller chip has slightly
+different rendering logic.
 
 <a name="Tm1637Module"></a>
 ### Tm1637Module
@@ -707,9 +736,9 @@ const uint8_t NUM_DIGITS = 8;
 
 using SpiInterface = HardSpiInterface<SPIClass>;
 SpiInterface spiInterface(SPI, LATCH_PIN);
-
 Max7219Module<SpiInterface, NUM_DIGITS> ledModule(
     spiInterface, kDigitRemapArray8Max7219);
+
 PatternWriter patternWriter(ledModule);
 
 void setupAceSegment() {
@@ -831,8 +860,8 @@ const uint8_t NUM_DIGITS = 4;
 
 using WireInterface = TwoWireInterface<TwoWire>;
 WireInterface wireInterface(Wire, HT16K33_I2C_ADDRESS);
-
 Ht16k33Module<WireInterface, NUM_DIGITS> ledModule(wireInterface);
+
 PatternWriter patternWriter(ledModule);
 
 void setupAceSegment() {
@@ -1269,13 +1298,22 @@ void loop() {
 <a name="PatternWriter"></a>
 ### PatternWriter
 
-The `PatternWriter` object is a thin-wrapper around an `LedModule` object which
-provides a unified API to write bit patterns to the LED module at specific
-positions. The `PatternWriter` also provides an API to set and clear the decimal
-point on the LED module if available, and it provides the ability to control the
-brightness of the LED module.
+The `PatternWriter` class is the most basic wrapper around an `LedModule`
+object, and provides more convenient interfaces to writing to the LED module. It
+provides the following features on top of `LedModule`:
 
-The public methods of class looks like this (not all public methods shown):
+* Validation is performed on the digit `pos` parameter. If the `pos` is not
+  valid, then the method returns immediately without performing any action.
+* Entire strings (both normall strings and `PROGMEM` strings) can be written
+  to the led module.
+* The `writeDecimalPointAt()` convenience function adds a decimal point at the
+  specified `pos` location.
+* The `clear()` and `clearToEnd()` functions provide ways to clear the LED
+  display.
+* Note that the brightness control (`setBrightness()`) remains on the
+  `LedModule` and is not exposed through the `PatternWriter` class.
+
+The public methods of the class looks like this (not all public methods shown):
 
 ```C++
 class PatternWriter {
@@ -1301,28 +1339,12 @@ byte for a given digit. This bit is cleared by the other `writePatternAt()` or
 `writePatternsAt()` functions. So the `writeDecimalPointAt()` should be called
 **after** the other write methods are called.
 
-The brightness value of an LED module is determine by the underlying controller
-chip, and the range of values are different for each chip:
-
-* The TM1637 chip supports 8 levels from 0 to 7, with 0 turning off the
-  display and 7 being the brightest.
-* The MAX7219 chip supports 16 levels from 0 to 15, with 0 being the dimmest
-  level (which does not turn off the display), and 15 being the brightest.
-* The brightness of 74HC595 module is controlled entirely by the
-  microcontroller using pulse width modulation (PWM). The range of values could
-  theoretically be from 0 to 255, but in practice, it is limited by the speed
-  of the SPI protocol to the 74HC595 chip. A brightness range of 0-7 or 0-15
-  seems practical for most configurations.
-
 After a specific, hardware-dependent instance of `LedModule` is created, the
-`PatternWriter` is created by wrapping around the `LedModule`:
+`PatternWriter` is created by wrapping around the `LedModule`, like this:
 
 ```C++
 PatternWriter patternWriter(ledModule);
 ```
-
-Various Writer classes build upon the `PatternWriter` class to provide
-additional ways of printing numbers and letters to the LED module.
 
 <a name="NumberWriter"></a>
 ### NumberWriter
@@ -1368,8 +1390,6 @@ symbols, so `[0,17]`:
 * `NumberWriter::kCharSpace`
 * `NumberWriter::kCharMinus`
 
-A `NumberWriter` consumes about 150 bytes of flash memory on an AVR.
-
 ![NumberWriter](docs/writers/number_writer_hex.jpg)
 
 ![NumberWriter](docs/writers/number_writer_decimal.jpg)
@@ -1407,9 +1427,6 @@ class ClockWriter {
 };
 ```
 
-A `ClockWriter` consumes about 250 bytes of flash memory on an AVR, which
-includes an instance of a `NumberWriter`.
-
 ![ClockWriter](docs/writers/clock_writer.jpg)
 
 <a name="TemperatureWriter"></a>
@@ -1435,9 +1452,6 @@ class TemperatureWriter {
     uint8_t writeTempDegFAt(uint8_t pos, int16_t temp, boxSize = 0);
 };
 ```
-
-A `TemperatureWriter` consumes about 270 bytes of flash memory on an AVR, which
-includes an instance of a `NumberWriter`.
 
 ![TemperatureWriter-Celsius](docs/writers/temperature_writer_celsius.jpg)
 
@@ -1476,8 +1490,6 @@ class CharWriter {
     uint8_t getPattern(char c) const;
 };
 ```
-
-A `CharWriter` consumes about 250 bytes of flash memory on an AVR.
 
 ![CharWriter](docs/writers/char_writer.jpg)
 
@@ -1813,13 +1825,15 @@ Here are the sizes of the various classes on the 8-bit AVR microcontrollers
 (Arduino Uno, Nano, etc):
 
 ```
-sizeof(SoftTmiInterface): 4
+sizeof(SoftTmiInterface): 3
 sizeof(SoftTmiFastInterface<4, 5, 100>): 1
 sizeof(SoftSpiInterface): 3
 sizeof(SoftSpiFastInterface<11, 12, 13>): 1
 sizeof(HardSpiInterface): 3
 sizeof(HardSpiFastInterface): 2
 sizeof(TwoWireInterface): 3
+sizeof(SimpleWireInterface): 4
+sizeof(SimpleWireFastInterface<2, 3, 10>): 1
 sizeof(LedMatrixDirect<>): 9
 sizeof(LedMatrixDirectFast4<6..13, 2..5>): 3
 sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 8
@@ -1834,7 +1848,8 @@ sizeof(Tm1637Module<SoftTmiInterface, 4>): 14
 sizeof(Tm1637Module<SoftTmiInterface, 6>): 16
 sizeof(Max7219Module<SoftSpiInterface, 8>): 16
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 11
-sizeof(LedModule): 2
+sizeof(Ht16k33Module<SimpleWireInterface, 4>): 11
+sizeof(PatternWriter): 2
 sizeof(NumberWriter): 2
 sizeof(ClockWriter): 3
 sizeof(TemperatureWriter): 2
@@ -1847,10 +1862,11 @@ sizeof(StringScroller): 8
 On 32-bit processors, these numbers look like this:
 
 ```
-sizeof(SoftTmiInterface): 4
+sizeof(SoftTmiInterface): 3
 sizeof(SoftSpiInterface): 3
 sizeof(HardSpiInterface): 8
 sizeof(TwoWireInterface): 8
+sizeof(SimpleWireInterface): 4
 sizeof(LedMatrixDirect<>): 16
 sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 16
 sizeof(LedMatrixDualHc595<HardSpiInterface>): 16
@@ -1863,7 +1879,8 @@ sizeof(Tm1637Module<SoftTmiInterface, 4>): 24
 sizeof(Tm1637Module<SoftTmiInterface, 6>): 28
 sizeof(Max7219Module<SoftSpiInterface, 8>): 28
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 20
-sizeof(LedModule): 4
+sizeof(Ht16k33Module<SimpleWireInterface, 4>): 20
+sizeof(PatternWriter): 4
 sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
 sizeof(TemperatureWriter): 4
@@ -1877,8 +1894,8 @@ sizeof(StringScroller): 12
 ### Flash And Static Memory
 
 For the most part, the user pays only for the feature that is being used. For
-example, if the `CharWriter` (which consumes 312 bytes of flash) is not used, it
-is not loaded into the program.
+example, if the `CharWriter` (which consumes about 300 bytes of flash on AVR) is
+not used, it is not loaded into the program.
 
 The full details are given in
 [examples/MemoryBenchmark](examples/MemoryBenchmark). Here are the flash and
@@ -1904,24 +1921,27 @@ static memory consumptions for various configurations on an Arduino Nano
 | Hc595(HardSpi)                  |   1542/   60 |  1086/   49 |
 | Hc595(HardSpiFast)              |   1474/   59 |  1018/   48 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SoftTmi)                 |   1582/   39 |  1126/   28 |
-| Tm1637(SoftTmiFast)             |    926/   36 |   470/   25 |
+| Tm1637(SoftTmi)                 |   1568/   38 |  1112/   27 |
+| Tm1637(SoftTmiFast)             |    920/   36 |   464/   25 |
 |---------------------------------+--------------+-------------|
 | Max7219(SoftSpi)                |   1214/   44 |   758/   33 |
 | Max7219(SoftSpiFast)            |    774/   42 |   318/   31 |
 | Max7219(HardSpi)                |   1290/   46 |   834/   35 |
 | Max7219(HardSpiFast)            |   1184/   45 |   728/   34 |
 |---------------------------------+--------------+-------------|
-| Ht16k33(TwoWire)               |   2866/  251 |  2410/  240 |
+| Ht16k33(TwoWire)                |   2866/  251 |  2410/  240 |
+| Ht16k33(SimpleWire)             |   1558/   36 |  1102/   25 |
+| Ht16k33(SimpleWireFast)         |    968/   33 |   512/   22 |
 |---------------------------------+--------------+-------------|
-| StubModule+LedModule           |    578/   24 |   122/   13 |
-| NumberWriter+Stub               |    682/   28 |   226/   17 |
-| ClockWriter+Stub                |    766/   29 |   310/   18 |
-| TemperatureWriter+Stub          |    764/   28 |   308/   17 |
-| CharWriter+Stub                 |    788/   31 |   332/   20 |
-| StringWriter+Stub               |    988/   39 |   532/   28 |
-| StringScroller+Stub             |   1036/   45 |   580/   34 |
-| LevelWriter+Stub                |    716/   28 |   260/   17 |
+| StubModule                      |    494/   11 |    38/    0 |
+| PatternWriter+Stub              |    608/   26 |   152/   15 |
+| NumberWriter+Stub               |    664/   26 |   208/   15 |
+| ClockWriter+Stub                |    782/   27 |   326/   16 |
+| TemperatureWriter+Stub          |    736/   26 |   280/   15 |
+| CharWriter+Stub                 |    778/   29 |   322/   18 |
+| StringWriter+Stub               |    998/   37 |   542/   26 |
+| StringScroller+Stub             |   1014/   43 |   558/   32 |
+| LevelWriter+Stub                |    694/   26 |   238/   15 |
 +--------------------------------------------------------------+
 ```
 
@@ -1946,7 +1966,7 @@ And here are the memory consumption numbers for an ESP8266:
 | Hc595(HardSpi)                  | 258924/27068 |  2224/  284 |
 | Hc595(HardSpiFast)              |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SoftTmi)                 | 257900/27028 |  1200/  244 |
+| Tm1637(SoftTmi)                 | 257884/27028 |  1184/  244 |
 | Tm1637(SoftTmiFast)             |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | Max7219(SoftSpi)                | 257636/27028 |   936/  244 |
@@ -1955,15 +1975,18 @@ And here are the memory consumption numbers for an ESP8266:
 | Max7219(HardSpiFast)            |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | Ht16k33(TwoWire)                | 261364/27500 |  4664/  716 |
+| Ht16k33(SimpleWire)             | 257980/27028 |  1280/  244 |
+| Ht16k33(SimpleWireFast)         |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| StubModule+LedModule           | 256856/27004 |   156/  220 |
-| NumberWriter+Stub               | 257352/27004 |   652/  220 |
-| ClockWriter+Stub                | 257176/27012 |   476/  228 |
-| TemperatureWriter+Stub          | 257464/27004 |   764/  220 |
+| StubModule                      | 256840/26996 |   140/  212 |
+| PatternWriter+Stub              | 256872/27004 |   172/  220 |
+| NumberWriter+Stub               | 257336/27004 |   636/  220 |
+| ClockWriter+Stub                | 257160/27004 |   460/  220 |
+| TemperatureWriter+Stub          | 257448/27004 |   748/  220 |
 | CharWriter+Stub                 | 257096/27012 |   396/  228 |
-| StringWriter+Stub               | 257344/27020 |   644/  236 |
-| StringScroller+Stub             | 257296/27028 |   596/  244 |
-| LevelWriter+Stub                | 257000/27004 |   300/  220 |
+| StringWriter+Stub               | 257264/27012 |   564/  228 |
+| StringScroller+Stub             | 257296/27020 |   596/  236 |
+| LevelWriter+Stub                | 256984/27004 |   284/  220 |
 +--------------------------------------------------------------+
 ```
 
@@ -1976,53 +1999,56 @@ The CPU benchmark numbers can be seen in
 Here are the CPU numbers for an AVR processor:
 
 ```
-+----------------------------------------+-------------------+---------+
-| Functionality                          |   min/  avg/  max | samples |
-|----------------------------------------+-------------------+---------|
-| Direct(4)                              |    76/   82/   88 |      40 |
-| Direct(4,subfields)                    |     4/   13/   84 |     640 |
-| DirectFast4(4)                         |    28/   31/   40 |      40 |
-| DirectFast4(4,subfields)               |     4/    8/   36 |     640 |
-|----------------------------------------+-------------------+---------|
-| Hybrid(4,SoftSpi)                      |   152/  161/  180 |      40 |
-| Hybrid(4,SoftSpi,subfields)            |     4/   22/  180 |     640 |
-| Hybrid(4,SoftSpiFast)                  |    28/   34/   44 |      40 |
-| Hybrid(4,SoftSpiFast,subfields)        |     4/    8/   40 |     640 |
-| Hybrid(4,HardSpi)                      |    36/   41/   52 |      40 |
-| Hybrid(4,HardSpi,subfields)            |     4/    9/   48 |     640 |
-| Hybrid(4,HardSpiFast)                  |    24/   28/   36 |      40 |
-| Hybrid(4,HardSpiFast,subfields)        |     4/    7/   36 |     640 |
-|----------------------------------------+-------------------+---------|
-| Hc595(8,SoftSpi)                       |   268/  272/  300 |      80 |
-| Hc595(8,SoftSpi,subfields)             |     4/   36/  300 |    1280 |
-| Hc595(8,SoftSpiFast)                   |    24/   27/   36 |      80 |
-| Hc595(8,SoftSpiFast,subfields)         |     4/    8/   32 |    1280 |
-| Hc595(8,HardSpi)                       |    24/   30/   40 |      80 |
-| Hc595(8,HardSpi,subfields)             |     4/    8/   36 |    1280 |
-| Hc595(8,HardSpiFast)                   |    12/   17/   24 |      80 |
-| Hc595(8,HardSpiFast,subfields)         |     4/    6/   24 |    1280 |
-|----------------------------------------+-------------------+---------|
-| Tm1637(4,SoftTmi)                      | 22316/22348/22564 |      10 |
-| Tm1637(4,SoftTmi,incremental)          |  3612/ 8810/10304 |      50 |
-| Tm1637(4,SoftTmiFast)                  | 21064/21092/21312 |      10 |
-| Tm1637(4,SoftTmiFast,incremental)      |  3412/ 8314/ 9764 |      50 |
-| Tm1637(6,SoftTmi)                      | 28060/28092/28336 |      10 |
-| Tm1637(6,SoftTmi,incremental)          |  3612/ 9178/10304 |      70 |
-| Tm1637(6,SoftTmiFast)                  | 26484/26512/26732 |      10 |
-| Tm1637(6,SoftTmiFast,incremental)      |  3412/ 8663/ 9764 |      70 |
-|----------------------------------------+-------------------+---------|
-| Tm1637(4,SoftTmi,5us)                  |  2252/ 2283/ 2480 |      10 |
-| Tm1637(4,SoftTmi,incremental,5us)      |   364/  897/ 1128 |      50 |
-| Tm1637(4,SoftTmiFast,5us)              |  1000/ 1030/ 1104 |      10 |
-| Tm1637(4,SoftTmiFast,incremental,5us)  |   164/  403/  508 |      50 |
-|----------------------------------------+-------------------+---------|
-| Max7219(8,SoftSpi)                     |  2380/ 2397/ 2624 |      20 |
-| Max7219(8,SoftSpiFast)                 |   208/  217/  240 |      20 |
-| Max7219(8,HardSpi)                     |   208/  221/  240 |      20 |
-| Max7219(8,HardSpiFast)                 |   100/  107/  120 |      20 |
-|----------------------------------------+-------------------+---------|
-| Ht16k33(4,TwoWire)                     |   336/  341/  356 |      20 |
-+----------------------------------------+-------------------+---------+
++-----------------------------------------+-------------------+---------+
+| Functionality                           |   min/  avg/  max | samples |
+|-----------------------------------------+-------------------+---------|
+| Direct(4)                               |    72/   82/   88 |      40 |
+| Direct(4,subfields)                     |     4/   13/   84 |     640 |
+| DirectFast4(4)                          |    28/   31/   36 |      40 |
+| DirectFast4(4,subfields)                |     4/    8/   36 |     640 |
+|-----------------------------------------+-------------------+---------|
+| Hybrid(4,SoftSpi)                       |   156/  161/  180 |      40 |
+| Hybrid(4,SoftSpi,subfields)             |     4/   22/  180 |     640 |
+| Hybrid(4,SoftSpiFast)                   |    28/   35/   40 |      40 |
+| Hybrid(4,SoftSpiFast,subfields)         |     4/    8/   40 |     640 |
+| Hybrid(4,HardSpi)                       |    36/   41/   52 |      40 |
+| Hybrid(4,HardSpi,subfields)             |     4/    9/   52 |     640 |
+| Hybrid(4,HardSpiFast)                   |    24/   28/   40 |      40 |
+| Hybrid(4,HardSpiFast,subfields)         |     4/    7/   40 |     640 |
+|-----------------------------------------+-------------------+---------|
+| Hc595(8,SoftSpi)                        |   268/  273/  308 |      80 |
+| Hc595(8,SoftSpi,subfields)              |     4/   36/  304 |    1280 |
+| Hc595(8,SoftSpiFast)                    |    24/   27/   36 |      80 |
+| Hc595(8,SoftSpiFast,subfields)          |     4/    8/   36 |    1280 |
+| Hc595(8,HardSpi)                        |    24/   30/   40 |      80 |
+| Hc595(8,HardSpi,subfields)              |     4/    8/   36 |    1280 |
+| Hc595(8,HardSpiFast)                    |    12/   16/   24 |      80 |
+| Hc595(8,HardSpiFast,subfields)          |     4/    6/   24 |    1280 |
+|-----------------------------------------+-------------------+---------|
+| Tm1637(4,SoftTmi,100us)                 | 22316/22346/22568 |      10 |
+| Tm1637(4,SoftTmi,100us,incremental)     |  3612/ 8809/10312 |      50 |
+| Tm1637(4,SoftTmiFast,100us)             | 21068/21098/21316 |      10 |
+| Tm1637(4,SoftTmiFast,100us,incremental) |  3412/ 8316/ 9768 |      50 |
+|-----------------------------------------+-------------------+---------|
+| Tm1637(4,SoftTmi,5us)                   |  2252/ 2282/ 2480 |      10 |
+| Tm1637(4,SoftTmi,5us,incremental)       |   364/  896/ 1124 |      50 |
+| Tm1637(4,SoftTmiFast,5us)               |  1000/ 1034/ 1112 |      10 |
+| Tm1637(4,SoftTmiFast,5us,incremental)   |   164/  403/  508 |      50 |
+|-----------------------------------------+-------------------+---------|
+| Tm1637(6,SoftTmi)                       | 28060/28092/28336 |      10 |
+| Tm1637(6,SoftTmi,incremental)           |  3612/ 9178/10308 |      70 |
+| Tm1637(6,SoftTmiFast)                   | 26484/26515/26736 |      10 |
+| Tm1637(6,SoftTmiFast,incremental)       |  3412/ 8664/ 9760 |      70 |
+|-----------------------------------------+-------------------+---------|
+| Max7219(8,SoftSpi)                      |  2380/ 2397/ 2628 |      20 |
+| Max7219(8,SoftSpiFast)                  |   208/  218/  236 |      20 |
+| Max7219(8,HardSpi)                      |   208/  221/  240 |      20 |
+| Max7219(8,HardSpiFast)                  |    96/  107/  116 |      20 |
+|-----------------------------------------+-------------------+---------|
+| Ht16k33(4,TwoWire)                      |   340/  344/  360 |      20 |
+| Ht16k33(4,SimpleWire)                   |  2560/ 2571/ 2652 |      20 |
+| Ht16k33(4,SimpleWireFast)               |   272/  283/  312 |      20 |
++-----------------------------------------+-------------------+---------+
 ```
 
 What is amazing is that if you use `digitalWriteFast()`, the software SPI is
@@ -2031,35 +2057,37 @@ just as fast as hardware SPI, **and** consumes 500 bytes of less flash memory.
 Here are the CPU numbers for an ESP8266:
 
 ```
-+----------------------------------------+-------------------+---------+
-| Functionality                          |   min/  avg/  max | samples |
-|----------------------------------------+-------------------+---------|
-| Direct(4)                              |    12/   13/   28 |      40 |
-| Direct(4,subfields)                    |     0/    2/   24 |     640 |
-|----------------------------------------+-------------------+---------|
-| Hybrid(4,SoftSpi)                      |    29/   29/   45 |      40 |
-| Hybrid(4,SoftSpi,subfields)            |     0/    4/   41 |     640 |
-| Hybrid(4,HardSpi)                      |    12/   12/   28 |      40 |
-| Hybrid(4,HardSpi,subfields)            |     0/    2/   20 |     640 |
-|----------------------------------------+-------------------+---------|
-| Hc595(8,SoftSpi)                       |    50/   50/   66 |      80 |
-| Hc595(8,SoftSpi,subfields)             |     0/    6/   63 |    1280 |
-| Hc595(8,HardSpi)                       |    14/   14/   30 |      80 |
-| Hc595(8,HardSpi,subfields)             |     0/    2/   26 |    1280 |
-|----------------------------------------+-------------------+---------|
-| Tm1637(4,SoftTmi)                      | 21494/21502/21534 |      10 |
-| Tm1637(4,SoftTmi,incremental)          |  3480/ 8477/ 9749 |      50 |
-| Tm1637(6,SoftTmi)                      | 27022/27031/27044 |      10 |
-| Tm1637(6,SoftTmi,incremental)          |  3481/ 8835/ 9784 |      70 |
-|----------------------------------------+-------------------+---------|
-| Tm1637(4,SoftTmi,5us)                  |  1523/ 1525/ 1532 |      10 |
-| Tm1637(4,SoftTmi,incremental,5us)      |   247/  601/  693 |      50 |
-|----------------------------------------+-------------------+---------|
-| Max7219(8,SoftSpi)                     |   460/  461/  472 |      20 |
-| Max7219(8,HardSpi)                     |   126/  126/  134 |      20 |
-|----------------------------------------+-------------------+---------|
-| Ht16k33(4,TwoWire)                     |   245/  246/  272 |      20 |
-+----------------------------------------+-------------------+---------+
++-----------------------------------------+-------------------+---------+
+| Functionality                           |   min/  avg/  max | samples |
+|-----------------------------------------+-------------------+---------|
+| Direct(4)                               |    12/   13/   32 |      40 |
+| Direct(4,subfields)                     |     0/    2/   24 |     640 |
+|-----------------------------------------+-------------------+---------|
+| Hybrid(4,SoftSpi)                       |    29/   29/   42 |      40 |
+| Hybrid(4,SoftSpi,subfields)             |     0/    4/   41 |     640 |
+| Hybrid(4,HardSpi)                       |    12/   12/   28 |      40 |
+| Hybrid(4,HardSpi,subfields)             |     0/    2/   25 |     640 |
+|-----------------------------------------+-------------------+---------|
+| Hc595(8,SoftSpi)                        |    50/   50/   63 |      80 |
+| Hc595(8,SoftSpi,subfields)              |     0/    6/   66 |    1280 |
+| Hc595(8,HardSpi)                        |    14/   14/   23 |      80 |
+| Hc595(8,HardSpi,subfields)              |     0/    2/   29 |    1280 |
+|-----------------------------------------+-------------------+---------|
+| Tm1637(4,SoftTmi,100us)                 | 21496/21513/21540 |      10 |
+| Tm1637(4,SoftTmi,100us,incremental)     |  3481/ 8482/ 9773 |      50 |
+|-----------------------------------------+-------------------+---------|
+| Tm1637(4,SoftTmi,5us)                   |  1525/ 1525/ 1529 |      10 |
+| Tm1637(4,SoftTmi,5us,incremental)       |   247/  602/  694 |      50 |
+|-----------------------------------------+-------------------+---------|
+| Tm1637(6,SoftTmi)                       | 27024/27058/27123 |      10 |
+| Tm1637(6,SoftTmi,incremental)           |  3481/ 8837/ 9769 |      70 |
+|-----------------------------------------+-------------------+---------|
+| Max7219(8,SoftSpi)                      |   460/  460/  469 |      20 |
+| Max7219(8,HardSpi)                      |   125/  126/  134 |      20 |
+|-----------------------------------------+-------------------+---------|
+| Ht16k33(4,TwoWire)                      |   245/  246/  269 |      20 |
+| Ht16k33(4,SimpleWire)                   |  1338/ 1342/ 1369 |      20 |
++-----------------------------------------+-------------------+---------+
 ```
 
 On the ESP8266, the hardware SPI is about 4X faster, but it does consume 1200
