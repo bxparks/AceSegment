@@ -6,16 +6,12 @@ dependencies and configuration combinations.
 ## Source Code Organization
 
 All classes are in the `ace_segment` namespace, but the `.h` and `.cpp` files
-are organized in subdirectories under `src/ace_segment`. The depedency graph is
+are organized in subdirectories under `src/ace_segment`. The dependency graph is
 roughly like this:
 
 ```
                     ace_segment/writer/
                       *Writer.h
-                          |
-                          v
-                    ace_segment/
-                      LedDisplay.h
                           |
                           v
                     ace_segment/
@@ -48,7 +44,7 @@ ace_segment/direct/ ace_segment/hc595/  ace_segment/tm1637/ ace_segment/max7219/
                              SoftTmiFastInterface.h
 ```
 
-## Hardware and Communcation Abstraction
+## Hardware and Communication Abstraction
 
 The classes under `ace_segment/hw` provide a thin layer of abstraction over
 low-level hardware and communication. This allows alternate implementation to be
@@ -74,14 +70,14 @@ called directly. ("Zero-cost abstraction").
 * `HardSpiFastInterface`
     * hardware SPI using `digitalWriteFast` for controlling the LatchPin
 * `SoftTmiInterface`
-    * software implmentation of the TM1637 protocol similar to I2C
+    * software implementation of the TM1637 protocol similar to I2C
 * `SoftTmiFastInterface`
     * same as `SoftTmiInterface` but using `digitalWriteFast` library
 
 ## LED Modules
 
 * Direct
-    * All LedMatrix segment and digit pins are directly connect to the the
+    * All LedMatrix segment and digit pins are directly connect to the
       microcontroller.
     * The segment pins have current limiting resistors.
     * There may transistors on the digit pins to enable higher current.
@@ -90,9 +86,9 @@ called directly. ("Zero-cost abstraction").
 * Single 74HC595 Shift Register
     * LED segment pins are hooked up to a 74HC575 shfit register,
       which can be accessed through SPI (software or hardware)
-    * The digit pins are still directly connected to the microtroller. If there
-      are only 4 digits on the LED module, then only 4 pins are needed on the
-      MCU.
+    * The digit pins are still directly connected to the microcontroller. If
+      there are only 4 digits on the LED module, then only 4 pins are needed on
+      the MCU.
     * There are current limiting resistors between the LED segment pins and the
       shift register chip.
     * There may be transistors on digit pins to provide extra current.
@@ -151,7 +147,7 @@ there are 5 combinations possible:
 Writes the LED segment pattern for a digit to the LED module, using one of the
 `LedMatrix` classes. There are roughly 2 parts to the `ScanningModule` class:
 
-1) It implements the externally facing `LedDisplay` interface which has methods
+1) It implements the externally facing `LedModule` interface which has methods
 that allow LED segment patterns for each digit to be written into an internal
 pattern buffer.
     * `writePatternAt(digit, pattern, brightness)`
@@ -242,20 +238,22 @@ physicalToLogical:  2 0 1 5 3 4
 logicalToPhysical:  1 2 0 4 5 3
 ```
 
-## LedDisplay
-
-A thin layer above an `LedModule` that provides a consistent API to the various
-`Writer` classes.
-
 ## Writers
 
 Writer classes provide mappings between characters, numbers or digits into
 specific LED segment patterns using an internal "font" table. These classes use
-the `LedDisplay` interface (implemented by `ScanningModule`), so in theory,
+the `LedModule` interface (implemented by `ScanningModule`), so in theory,
 other types of LED displays could be used by these Writer classes.
 
 This library currently provides the following Writer and Scroller classes:
 
+* `PatternWriter` (previously named `LedDisplay`)
+    * `writePatternAt()`
+    * `writePatternAt_P()`
+    * `WritePatternsAt()`
+    * `WritePatternsAt_P()`
+    * `clear()`
+    * `clearToEnd()`
 * `NumberWriter`
     * `writeHexCharAt()`
     * `writeHexByteAt()`
@@ -263,6 +261,7 @@ This library currently provides the following Writer and Scroller classes:
     * `writeSignedDecimalAt()`
     * `writeUnsignedDecimalAt()`
     * `writeUnsignedDecimal2At()`
+    * `clear()`
     * `clearToEnd()`
 * `ClockWriter`
     * `writeCharAt()`

@@ -88,10 +88,10 @@ rating. A driver transistor would be needed on the digit pin to handle this
 current.
 
 If driver transistors are used on the digits, then it is likely that the logic
-levels need to be inverted software. In the examnple below, using common cathode
+levels need to be inverted software. In the example below, using common cathode
 display, with the resistors on the segments, an NPN transistor on the digit,
-the digit pin on the microcontroll (D12) needs to be HIGH to turn on the LED
-segement. In contrast, if the D12 pin was connected directly to the LED, the
+the digit pin on the microcontroller (D12) needs to be HIGH to turn on the LED
+segment. In contrast, if the D12 pin was connected directly to the LED, the
 digit pin would need to be set LOW to turn on the LED.
 
 ```
@@ -191,7 +191,7 @@ LedMatrix ledMatrix(
     DIGIT_PINS);
 ScanningModule<LedMatrix, NUM_DIGITS> scanningModule(
     ledMatrix, FRAMES_PER_SECOND);
-LedDisplay ledDisplay(scanningModule);
+PatternWriter patternWriter(scanningModule);
 ...
 
 void setupScanningModule() {
@@ -279,7 +279,7 @@ LedMatrix ledMatrix(
     DIGIT_PINS):
 ScanningModule<LedMatrix, NUM_DIGITS> scanningModule(
     ledMatrix, FRAMES_PER_SECOND);
-LedDisplay ledDisplay(scanningModule);
+PatternWriter patternWriter(scanningModule);
 ...
 
 void setupScanningModule() {
@@ -342,7 +342,7 @@ LedMatrix ledMatrix(
     kActiveHighPattern /*groupOnPattern*/);
 ScanningModule<LedMatrix, NUM_DIGITS> scanningModule(
     ledMatrix, FRAMES_PER_SECOND);
-LedDisplay ledDisplay(scanningModule);
+PatternWriter patternWriter(scanningModule);
 ...
 
 void setupScanningModule() {
@@ -408,10 +408,8 @@ in the later stages depending on the objects created in the earlier stage:
    communicate to the LED segments.
 1. The `ScanningModule` represents the actual LED segment module using
    direct scanning, or scanning through an 74HC595 shift register chip.
-1. The `LedDisplay` writes seven-segment bit patterns to the underlying
-   `LedModule`.
 1. The various Writer classes which translate higher level characters and
-   strings into bit patterns used by `LedDisplay`.
+   strings into bit patterns used by `LedModule`.
 
 A typical resource creation code looks like this:
 
@@ -433,12 +431,12 @@ LedMatrix ledMatrix(
     DIGIT_PINS);
 ScanningModule<LedMatrix, NUM_DIGITS> scanningModule(
     ledMatrix, FRAMES_PER_SECOND);
-LedDisplay ledDisplay(scanningModule);
 
-NumberWriter hexWriter(ledDisplay);
-ClockWriter clockWriter(ledDisplay);
-CharWriter charWriter(ledDisplay);
-StringWriter stringWriter(ledDisplay);
+PatternWriter patternWriter(scanningModule);
+NumberWriter numberWriter(scanningModule);
+ClockWriter clockWriter(scanningModule);
+CharWriter charWriter(scanningModule);
+StringWriter stringWriter(scanningModule);
 ...
 
 void setupAceSegment() {
@@ -512,7 +510,7 @@ LedMatrix ledMatrix(
     kActiveHighPattern /*groupOnPattern*/);
 ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
     ledMatrix, FRAMES_PER_SECOND);
-LedDisplay ledDisplay(scanningModule);
+PatternWriter patternWriter(scanningModule);
 ```
 
 Each digit is rendered 16 times within a single field, and modulated using pulse
@@ -608,7 +606,7 @@ this:
 ```C++
 #include <Arduino.h>
 #include <AceCommon.h> // incrementMod()
-#include <AceSegment.h> // Hc595Module, LedDisplay
+#include <AceSegment.h> // Hc595Module, PatternWriter
 #include <TimerOne.h> // Timer1
 
 using namespace ace_segment;
@@ -641,7 +639,8 @@ Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
     HC595_BYTE_ORDER,
     REMAP_ARRAY
 );
-LedDisplay display(ledModule);
+
+PatternWriter patternWriter(ledModule);
 
 void setupAceSegment() {
   spiInterface.begin();
@@ -658,7 +657,7 @@ void setupTimer() {
 }
 
 void updateDisplay() {
-  // Update the 'display' with LED segment patterns.
+  // Use the 'patternWriter' to update LED segment patterns.
 }
 
 void setup() {
