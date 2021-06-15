@@ -229,6 +229,7 @@ other `MemoryBenchmark` programs.)
 | Ht16k33(SimpleWireFast)         |    658/   33 |   398/   22 |
 |---------------------------------+--------------+-------------|
 | StubModule                      |    296/   11 |    36/    0 |
+| PatternWriter+Stub              |    412/   26 |   152/   15 |
 | NumberWriter+Stub               |    456/   26 |   196/   15 |
 | ClockWriter+Stub                |    568/   27 |   308/   16 |
 | TemperatureWriter+Stub          |    524/   26 |   264/   15 |
@@ -278,6 +279,7 @@ other `MemoryBenchmark` programs.)
 | Ht16k33(SimpleWireFast)         |    968/   33 |   512/   22 |
 |---------------------------------+--------------+-------------|
 | StubModule                      |    494/   11 |    38/    0 |
+| PatternWriter+Stub              |    608/   26 |   152/   15 |
 | NumberWriter+Stub               |    664/   26 |   208/   15 |
 | ClockWriter+Stub                |    782/   27 |   326/   16 |
 | TemperatureWriter+Stub          |    736/   26 |   280/   15 |
@@ -327,6 +329,7 @@ other `MemoryBenchmark` programs.)
 | Ht16k33(SimpleWireFast)         |   3924/  173 |   452/   22 |
 |---------------------------------+--------------+-------------|
 | StubModule                      |   3508/  151 |    36/    0 |
+| PatternWriter+Stub              |   3564/  166 |    92/   15 |
 | NumberWriter+Stub               |   3620/  166 |   148/   15 |
 | ClockWriter+Stub                |   3738/  167 |   266/   16 |
 | TemperatureWriter+Stub          |   3692/  166 |   220/   15 |
@@ -376,6 +379,7 @@ other `MemoryBenchmark` programs.)
 | Ht16k33(SimpleWireFast)         |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | StubModule                      |  10312/    0 |   248/    0 |
+| PatternWriter+Stub              |  10336/    0 |   272/    0 |
 | NumberWriter+Stub               |  10648/    0 |   584/    0 |
 | ClockWriter+Stub                |  10448/    0 |   384/    0 |
 | TemperatureWriter+Stub          |  10712/    0 |   648/    0 |
@@ -425,6 +429,7 @@ other `MemoryBenchmark` programs.)
 | Ht16k33(SimpleWireFast)         |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | StubModule                      |  21616/ 3900 |   196/  364 |
+| PatternWriter+Stub              |  21636/ 3904 |   216/  368 |
 | NumberWriter+Stub               |  21904/ 3904 |   484/  368 |
 | ClockWriter+Stub                |  21784/ 3908 |   364/  372 |
 | TemperatureWriter+Stub          |  21996/ 3904 |   576/  368 |
@@ -474,6 +479,7 @@ other `MemoryBenchmark` programs.)
 | Ht16k33(SimpleWireFast)         |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | StubModule                      | 256840/26996 |   140/  212 |
+| PatternWriter+Stub              | 256872/27004 |   172/  220 |
 | NumberWriter+Stub               | 257336/27004 |   636/  220 |
 | ClockWriter+Stub                | 257160/27004 |   460/  220 |
 | TemperatureWriter+Stub          | 257448/27004 |   748/  220 |
@@ -523,6 +529,7 @@ other `MemoryBenchmark` programs.)
 | Ht16k33(SimpleWireFast)         |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | StubModule                      | 199196/13360 |  1448/  276 |
+| PatternWriter+Stub              | 199256/13368 |  1508/  284 |
 | NumberWriter+Stub               | 199580/13368 |  1832/  284 |
 | ClockWriter+Stub                | 199528/13368 |  1780/  284 |
 | TemperatureWriter+Stub          | 199700/13368 |  1952/  284 |
@@ -573,6 +580,7 @@ other `MemoryBenchmark` programs.)
 | Ht16k33(SimpleWireFast)         |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
 | StubModule                      |  10896/ 4352 |  3272/ 1304 |
+| PatternWriter+Stub              |  10940/ 4356 |  3316/ 1308 |
 | NumberWriter+Stub               |  11372/ 4356 |  3748/ 1308 |
 | ClockWriter+Stub                |  11072/ 4360 |  3448/ 1312 |
 | TemperatureWriter+Stub          |  11524/ 4356 |  3900/ 1308 |

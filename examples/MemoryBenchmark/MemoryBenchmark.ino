@@ -37,13 +37,14 @@
 #define FEATURE_HT16K33_SIMPLE_WIRE 18
 #define FEATURE_HT16K33_SIMPLE_WIRE_FAST 19
 #define FEATURE_STUB_MODULE 20
-#define FEATURE_NUMBER_WRITER 21
-#define FEATURE_CLOCK_WRITER 22
-#define FEATURE_TEMPERATURE_WRITER 23
-#define FEATURE_CHAR_WRITER 24
-#define FEATURE_STRING_WRITER 25
-#define FEATURE_STRING_SCROLLER 26
-#define FEATURE_LEVEL_WRITER 27
+#define FEATURE_PATTERN_WRITER 21
+#define FEATURE_NUMBER_WRITER 22
+#define FEATURE_CLOCK_WRITER 23
+#define FEATURE_TEMPERATURE_WRITER 24
+#define FEATURE_CHAR_WRITER 25
+#define FEATURE_STRING_WRITER 26
+#define FEATURE_STRING_SCROLLER 27
+#define FEATURE_LEVEL_WRITER 28
 
 // A volatile integer to prevent the compiler from optimizing away the entire
 // program.
@@ -316,6 +317,10 @@ volatile int disableCompilerOptimization = 0;
   #elif FEATURE == FEATURE_STUB_MODULE
     StubModule stubModule;
 
+  #elif FEATURE == FEATURE_PATTERN_WRITER
+    StubModule stubModule;
+    PatternWriter patternWriter(stubModule);
+
   #elif FEATURE == FEATURE_NUMBER_WRITER
     StubModule stubModule;
     NumberWriter numberWriter(stubModule);
@@ -496,6 +501,9 @@ void loop() {
 
 #elif FEATURE == FEATURE_STUB_MODULE
   stubModule.setPatternAt(0, 0xff);
+
+#elif FEATURE == FEATURE_PATTERN_WRITER
+  patternWriter.writePatternAt(0, 0x3C);
 
 #elif FEATURE == FEATURE_NUMBER_WRITER
   numberWriter.writeUnsignedDecimalAt(0, 42);
