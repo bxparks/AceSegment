@@ -49,10 +49,12 @@
   #include <ace_segment/hw/SoftSpiFastInterface.h>
   #include <ace_segment/hw/HardSpiFastInterface.h>
   #include <ace_segment/hw/SoftTmiFastInterface.h>
+  #include <ace_segment/hw/SimpleWireFastInterface.h>
   #include <ace_segment/direct/DirectFast4Module.h>
   using ace_segment::SoftTmiFastInterface;
   using ace_segment::HardSpiFastInterface;
   using ace_segment::SoftSpiFastInterface;
+  using ace_segment::SimpleWireFastInterface;
   using ace_segment::DirectFast4Module;
 #endif
 
@@ -64,6 +66,7 @@ using ace_segment::SoftTmiInterface;
 using ace_segment::HardSpiInterface;
 using ace_segment::SoftSpiInterface;
 using ace_segment::TwoWireInterface;
+using ace_segment::SimpleWireInterface;
 using ace_segment::DirectModule;
 using ace_segment::HybridModule;
 using ace_segment::Hc595Module;
@@ -110,8 +113,7 @@ using ace_segment::kActiveHighPattern;
 #define DIRECT_INTERFACE_TYPE_NORMAL 0
 #define DIRECT_INTERFACE_TYPE_FAST_4 1
 
-// Used by LED_DISPLAY_TYPE_HC595, LED_DISPLAY_TYPE_HYBRID,
-// and LED_DISPLAY_TYPE_FULL
+// Methods of communication to the LED module (SPI, I2C, TM1637).
 #define INTERFACE_TYPE_SOFT_SPI 0
 #define INTERFACE_TYPE_SOFT_SPI_FAST 1
 #define INTERFACE_TYPE_HARD_SPI 2
@@ -119,7 +121,8 @@ using ace_segment::kActiveHighPattern;
 #define INTERFACE_TYPE_SOFT_TMI 4
 #define INTERFACE_TYPE_SOFT_TMI_FAST 5
 #define INTERFACE_TYPE_TWO_WIRE 6
-#define INTERFACE_TYPE_SOFT_WIRE 7
+#define INTERFACE_TYPE_SIMPLE_WIRE 7
+#define INTERFACE_TYPE_SIMPLE_WIRE_FAST 8
 
 // Some microcontrollers have 2 or more SPI buses. PRIMARY selects the default.
 // SECONDARY selects the alternate. I don't have a board with more than 2, but
@@ -285,10 +288,12 @@ using ace_segment::kActiveHighPattern;
   const uint8_t NUM_DIGITS = 4;
 
   // Choose one of the following variants:
-  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_WIRE
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_WIRE_FAST
   #define INTERFACE_TYPE INTERFACE_TYPE_TWO_WIRE
   const uint8_t SDA_PIN = SDA;
   const uint8_t SCL_PIN = SCL;
+  const uint8_t BIT_DELAY = 2;
   const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
 #elif defined(AUNITER_STM32_TM1637)
@@ -376,10 +381,12 @@ using ace_segment::kActiveHighPattern;
   const uint8_t NUM_DIGITS = 4;
 
   // Choose one of the following variants:
-  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_WIRE
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_WIRE_FAST
   #define INTERFACE_TYPE INTERFACE_TYPE_TWO_WIRE
   const uint8_t SDA_PIN = SDA;
   const uint8_t SCL_PIN = SCL;
+  const uint8_t BIT_DELAY = 2;
   const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
 #elif defined(AUNITER_D1MINI_LARGE_TM1637)
@@ -469,10 +476,12 @@ using ace_segment::kActiveHighPattern;
   const uint8_t NUM_DIGITS = 4;
 
   // Choose one of the following variants:
-  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_WIRE
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_WIRE_FAST
   #define INTERFACE_TYPE INTERFACE_TYPE_TWO_WIRE
   const uint8_t SDA_PIN = SDA;
   const uint8_t SCL_PIN = SCL;
+  const uint8_t BIT_DELAY = 2;
   const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
 #elif defined(AUNITER_ESP32_TM1637)
@@ -567,10 +576,12 @@ using ace_segment::kActiveHighPattern;
   const uint8_t NUM_DIGITS = 4;
 
   // Choose one of the following variants:
-  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_WIRE
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_WIRE
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_WIRE_FAST
   #define INTERFACE_TYPE INTERFACE_TYPE_TWO_WIRE
   const uint8_t SDA_PIN = SDA;
   const uint8_t SCL_PIN = SCL;
+  const uint8_t BIT_DELAY = 2;
   const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
 #else
@@ -642,13 +653,19 @@ const uint8_t NUM_SUBFIELDS = 1;
   );
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HT16K33
-  #include <Wire.h>
   #if INTERFACE_TYPE == INTERFACE_TYPE_TWO_WIRE
+    // On AVR, simply including <Wire.h> consumes an extra 1700 bytes of flash
+    // so include this only when required.
+    #include <Wire.h>
     using WireInterface = TwoWireInterface<TwoWire>;
     WireInterface wireInterface(Wire, HT16K33_I2C_ADDRESS);
-  #elif INTERFACE_TYPE == INTERFACE_TYPE_SOFT_WIRE
-    using WireInterface = TBD;
-    WireInterface wireInterface;
+  #elif INTERFACE_TYPE == INTERFACE_TYPE_SIMPLE_WIRE
+    using WireInterface = SimpleWireInterface;
+    WireInterface wireInterface(
+        HT16K33_I2C_ADDRESS, SDA_PIN, SCL_PIN, BIT_DELAY);
+  #elif INTERFACE_TYPE == INTERFACE_TYPE_SIMPLE_WIRE_FAST
+    using WireInterface = SimpleWireFastInterface<SDA_PIN, SCL_PIN, BIT_DELAY>;
+    WireInterface wireInterface(HT16K33_I2C_ADDRESS);
   #endif
   Ht16k33Module<WireInterface, NUM_DIGITS> ledModule(wireInterface);
 
@@ -759,7 +776,6 @@ void setupAceSegment() {
   ledModule.setBrightness(1); // 0-1
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HT16K33
-  Wire.begin();
   wireInterface.begin();
   ledModule.begin();
   ledModule.setBrightness(1); // 0-15
