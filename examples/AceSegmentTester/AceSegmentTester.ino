@@ -73,7 +73,7 @@ using ace_segment::Hc595Module;
 using ace_segment::Tm1637Module;
 using ace_segment::Max7219Module;
 using ace_segment::Ht16k33Module;
-using ace_segment::LedDisplay;
+using ace_segment::PatternWriter;
 using ace_segment::CharWriter;
 using ace_segment::NumberWriter;
 using ace_segment::ClockWriter;
@@ -741,14 +741,14 @@ const uint8_t NUM_SUBFIELDS = 1;
   #error Unknown LED_DISPLAY_TYPE
 #endif
 
-LedDisplay ledDisplay(ledModule);
-NumberWriter numberWriter(ledDisplay);
-ClockWriter clockWriter(ledDisplay);
-TemperatureWriter temperatureWriter(ledDisplay);
-CharWriter charWriter(ledDisplay);
+PatternWriter patternWriter(ledModule);
+NumberWriter numberWriter(ledModule);
+ClockWriter clockWriter(ledModule);
+TemperatureWriter temperatureWriter(ledModule);
+CharWriter charWriter(ledModule);
 StringWriter stringWriter(charWriter);
 StringScroller stringScroller(charWriter);
-LevelWriter levelWriter(ledDisplay);
+LevelWriter levelWriter(ledModule);
 
 // Setup the various resources.
 void setupAceSegment() {
@@ -1006,7 +1006,7 @@ const uint8_t SPIN_PATTERNS[NUM_SPIN_PATTERNS][4] PROGMEM = {
 void spinDisplay() {
   static uint8_t i = 0;
   const uint8_t* patterns = SPIN_PATTERNS[i];
-  ledDisplay.writePatternsAt_P(0, patterns, 4);
+  patternWriter.writePatternsAt_P(0, patterns, 4);
 
   incrementMod(i, NUM_SPIN_PATTERNS);
 }
@@ -1027,7 +1027,7 @@ const uint8_t SPIN_PATTERNS_2[NUM_SPIN_PATTERNS_2][4] PROGMEM = {
 void spinDisplay2() {
   static uint8_t i = 0;
   const uint8_t* patterns = SPIN_PATTERNS_2[i];
-  ledDisplay.writePatternsAt_P(0, patterns, 4 /*len*/);
+  patternWriter.writePatternsAt_P(0, patterns, 4 /*len*/);
 
   incrementMod(i, NUM_SPIN_PATTERNS_2);
 }
@@ -1100,7 +1100,7 @@ void nextDemo() {
   }
 #endif
 
-  ledDisplay.clear();
+  patternWriter.clear();
 
   updateDemo();
 }

@@ -26,6 +26,9 @@
     * Change order of `dioPin` and `clkPin` parameters in `SoftTmiInterface` and
       `SoftTmiFastInterface` to match the order of `sda` and `scl` pins of
       `TwoWire` and `SimpleWireInterface` classes.
+    * Rename `LedDisplay` to `PatternWriter` to remove extra layer of
+      indirection. Pass `LedModule` into `Writer` classes (except `StringWriter`
+      and `StringScroller` which take a `CharWriter`).
 * 0.6 (2021-05-26)
     * `HardSpiInterface`
         * Add support for microcontrollers with 2 SPI buses (ESP32 and STM32F1).

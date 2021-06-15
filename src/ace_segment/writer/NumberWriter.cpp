@@ -65,7 +65,7 @@ const uint8_t NumberWriter::kHexCharPatterns[kNumHexChars] PROGMEM = {
 
 void NumberWriter::writeInternalHexCharAt(uint8_t pos, hexchar_t c) {
   uint8_t pattern = pgm_read_byte(&kHexCharPatterns[(uint8_t) c]);
-  mLedDisplay.writePatternAt(pos, pattern);
+  mPatternWriter.writePatternAt(pos, pattern);
 }
 
 uint8_t NumberWriter::writeUnsignedDecimalAt(

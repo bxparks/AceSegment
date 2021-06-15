@@ -6,13 +6,13 @@
 #include <Arduino.h>
 #include <SPI.h> // SPI, SPIClass
 #include <AceCommon.h> // incrementMod()
-#include <AceSegment.h> // Max7219Module, LedDisplay
+#include <AceSegment.h> // Max7219Module, PatternWriter
 
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
 using ace_segment::Max7219Module;
-using ace_segment::LedDisplay;
+using ace_segment::PatternWriter;
 using ace_segment::HardSpiInterface;
 using ace_segment::SoftSpiInterface;
 using ace_segment::kDigitRemapArray8Max7219;
@@ -158,9 +158,9 @@ const uint8_t PATTERNS[NUM_DIGITS] = {
   #error Unknown INTERFACE_TYPE
 #endif
 
-Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
+Max7219Module<SpiInterface, NUM_DIGITS> ledModule(
     spiInterface, kDigitRemapArray8Max7219);
-LedDisplay display(max7219Module);
+PatternWriter patternWriter(ledModule);
 
 void setupAceSegment() {
 
@@ -170,7 +170,7 @@ void setupAceSegment() {
 #endif
 
   spiInterface.begin();
-  max7219Module.begin();
+  ledModule.begin();
 }
 
 //----------------------------------------------------------------------------
@@ -189,15 +189,15 @@ void updateDisplay() {
 
     uint8_t j = digitIndex;
     for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
-      display.writePatternAt(i, PATTERNS[j]);
+      patternWriter.writePatternAt(i, PATTERNS[j]);
       // Write a decimal point every other digit, for demo purposes.
-      display.writeDecimalPointAt(i, j & 0x1);
+      patternWriter.writeDecimalPointAt(i, j & 0x1);
       incrementMod(j, (uint8_t) NUM_DIGITS);
     }
     incrementMod(digitIndex, (uint8_t) NUM_DIGITS);
 
     // Update the brightness. The MAX7219 has 16 levels of brightness.
-    display.setBrightness(brightness);
+    ledModule.setBrightness(brightness);
     incrementMod(brightness, (uint8_t) 16);
   }
 }
@@ -215,7 +215,7 @@ void flushModule() {
 
     // Flush the change to the LED Module, and measure the time.
     uint16_t startMicros = micros();
-    max7219Module.flush();
+    ledModule.flush();
     uint16_t elapsedMicros = (uint16_t) micros() - startMicros;
     stats.update(elapsedMicros);
   }

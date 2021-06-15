@@ -26,13 +26,12 @@ SOFTWARE.
 #define ACE_SEGMENT_CLOCK_WRITER_H
 
 #include <stdint.h>
-#include "../LedDisplay.h"
 #include "NumberWriter.h"
 
 namespace ace_segment {
 
 /**
- * The ClockWriter writes "hh:mm" and "yyyy" to the LedDisplay. A few other
+ * The ClockWriter writes "hh:mm" and "yyyy" to the LedModule. A few other
  * characters are supported.
  */
 class ClockWriter {
@@ -54,24 +53,22 @@ class ClockWriter {
     /**
      * Constructor.
      *
-     * @param ledDisplay instance of LedDisplay
+     * @param ledModule instance of LedModule
      * @param colonDigit The digit which has the colon (":") character,
      *    mapped to bit 7 (i.e. 'H' segment). In many 4-digit LED clock
      *    display modules, this is digit 1 (counting from the left, 0-based,
      *    so the second digit from the left).
      */
     explicit ClockWriter(
-        LedDisplay& ledDisplay,
+        LedModule& ledModule,
         uint8_t colonDigit = 1
     ) :
-        mNumberWriter(ledDisplay),
+        mNumberWriter(ledModule),
         mColonDigit(colonDigit)
     {}
 
-    /** Get the underlying LedDisplay. */
-    LedDisplay& display() const {
-      return mNumberWriter.display();
-    }
+    /** Get the underlying LedModule. */
+    LedModule& ledModule() { return mNumberWriter.ledModule(); }
 
     /** Write the hexchar_t 'c' at 'pos'. */
     void writeCharAt(uint8_t pos, hexchar_t c) {
@@ -142,8 +139,14 @@ class ClockWriter {
      * @param state Set to false to turn off the colon.
      */
     void writeColon(bool state = true) {
-      display().writeDecimalPointAt(mColonDigit, state);
+      mNumberWriter.writeDecimalPointAt(mColonDigit, state);
     }
+
+    /** Clear the entire display. */
+    void clear() { mNumberWriter.clear(); }
+
+    /** Clear the display from `pos` to the end. */
+    void clearToEnd(uint8_t pos) { mNumberWriter.clearToEnd(pos); }
 
   private:
     // disable copy-constructor and assignment operator

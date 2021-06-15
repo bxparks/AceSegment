@@ -6,14 +6,14 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <AceCommon.h> // incrementMod()
-#include <AceSegment.h> // Hc595Module, LedDisplay
+#include <AceSegment.h> // Hc595Module, PatternWriter
 #include <TimerOne.h> // Timer1
 
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
 using ace_segment::Hc595Module;
-using ace_segment::LedDisplay;
+using ace_segment::PatternWriter;
 using ace_segment::HardSpiInterface;
 using ace_segment::SoftSpiInterface;
 using ace_segment::kDigitRemapArray8Hc595;
@@ -224,9 +224,9 @@ Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
     HC595_BYTE_ORDER,
     REMAP_ARRAY
 );
-LedDisplay display(ledModule);
+PatternWriter patternWriter(ledModule);
 
-// LedDisplay patterns
+// PatternWriter patterns
 const uint8_t PATTERNS[8] = {
   0b00111111, // 0
   0b00000110, // 1
@@ -265,16 +265,16 @@ void updateDisplay() {
     // Update the display
     uint8_t j = digitIndex;
     for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
-      display.writePatternAt(i, PATTERNS[j]);
+      patternWriter.writePatternAt(i, PATTERNS[j]);
       // Write a decimal point every other digit, for demo purposes.
-      display.writeDecimalPointAt(i, j & 0x1);
+      patternWriter.writeDecimalPointAt(i, j & 0x1);
       incrementMod(j, (uint8_t) NUM_DIGITS);
     }
     incrementMod(digitIndex, (uint8_t) NUM_DIGITS);
 
     // Update the brightness
     uint8_t brightness = BRIGHTNESS_LEVELS[brightnessIndex];
-    display.setBrightness(brightness);
+    ledModule.setBrightness(brightness);
     incrementMod(brightnessIndex, NUM_BRIGHTNESSES);
   }
 }

@@ -26,7 +26,7 @@ SOFTWARE.
 #define ACE_SEGMENT_TEMPERATURE_WRITER_H
 
 #include <stdint.h>
-#include "../LedDisplay.h"
+#include "../LedModule.h"
 #include "NumberWriter.h"
 
 namespace ace_segment {
@@ -49,16 +49,17 @@ class TemperatureWriter {
     /**
      * Constructor.
      *
-     * @param ledDisplay instance of LedDisplay
+     * @param ledModule instance of LedModule
      */
-    explicit TemperatureWriter(LedDisplay& ledDisplay) :
-        mNumberWriter(ledDisplay)
+    explicit TemperatureWriter(LedModule& ledModule) :
+        mNumberWriter(ledModule)
     {}
 
-    /** Get the underlying LedDisplay. */
-    LedDisplay& display() const {
-      return mNumberWriter.display();
-    }
+    /** Get the underlying LedModule. */
+    LedModule& ledModule() { return mNumberWriter.ledModule(); }
+
+    /** Get the underlying LedModule. */
+    PatternWriter& patternWriter() { return mNumberWriter.patternWriter(); }
 
     /**
      * Write signed integer temperature without deg or unit within the boxSize.
@@ -81,7 +82,7 @@ class TemperatureWriter {
       uint8_t written = mNumberWriter.writeSignedDecimalAt(pos, temp,
           boxSize >= 1 ? boxSize - 1 : 0);
       pos += written;
-      display().writePatternAt(pos++, kPatternDegree);
+      patternWriter().writePatternAt(pos++, kPatternDegree);
       return written + 1;
     }
 
@@ -92,8 +93,8 @@ class TemperatureWriter {
       uint8_t written = mNumberWriter.writeSignedDecimalAt(pos, temp,
           boxSize >= 2 ? boxSize - 2 : 0);
       pos += written;
-      display().writePatternAt(pos++, kPatternDegree);
-      display().writePatternAt(pos++, kPatternC);
+      patternWriter().writePatternAt(pos++, kPatternDegree);
+      patternWriter().writePatternAt(pos++, kPatternC);
       return written + 2;
     }
 
@@ -104,10 +105,16 @@ class TemperatureWriter {
       uint8_t written = mNumberWriter.writeSignedDecimalAt(pos, temp,
           boxSize >= 2 ? boxSize - 2 : 0);
       pos += written;
-      display().writePatternAt(pos++, kPatternDegree);
-      display().writePatternAt(pos++, kPatternF);
+      patternWriter().writePatternAt(pos++, kPatternDegree);
+      patternWriter().writePatternAt(pos++, kPatternF);
       return written + 2;
     }
+
+    /** Clear the entire display. */
+    void clear() { mNumberWriter.clearToEnd(0); }
+
+    /** Clear the display from `pos` to the end. */
+    void clearToEnd(uint8_t pos) { mNumberWriter.clearToEnd(pos); }
 
   private:
     // disable copy-constructor and assignment operator

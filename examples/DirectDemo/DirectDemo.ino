@@ -5,12 +5,12 @@
 
 #include <Arduino.h>
 #include <AceCommon.h> // incrementMod()
-#include <AceSegment.h> // DirectModule, LedDisplay
+#include <AceSegment.h> // DirectModule, PatternWriter
 
 using ace_common::incrementMod;
 using ace_common::TimingStats;
 using ace_segment::DirectModule;
-using ace_segment::LedDisplay;
+using ace_segment::PatternWriter;
 using ace_segment::kActiveLowPattern;
 
 //----------------------------------------------------------------------------
@@ -68,9 +68,9 @@ DirectModule<NUM_DIGITS, NUM_SUBFIELDS> ledModule(
     SEGMENT_PINS,
     DIGIT_PINS);
 
-LedDisplay display(ledModule);
+PatternWriter patternWriter(ledModule);
 
-// LedDisplay patterns
+// PatternWriter patterns
 const uint8_t PATTERNS[NUM_DIGITS] = {
   0b00111111, // 0
   0b00000110, // 1
@@ -89,7 +89,7 @@ TimingStats stats;
 uint8_t digitIndex = 0;
 uint8_t brightnessIndex = 0;
 
-// Update the display with new pattern and brightness every second.
+// Update the LedModule with new pattern and brightness every second.
 void updateDisplay() {
   static uint16_t prevUpdateMillis;
 
@@ -97,18 +97,19 @@ void updateDisplay() {
   if ((uint16_t) (nowMillis - prevUpdateMillis) >= 1000) {
     prevUpdateMillis = nowMillis;
 
+    // Update the display
     uint8_t j = digitIndex;
     for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
-      display.writePatternAt(i, PATTERNS[j]);
+      patternWriter.writePatternAt(i, PATTERNS[j]);
       // Write a decimal point every other digit, for demo purposes.
-      display.writeDecimalPointAt(i, j & 0x1);
+      patternWriter.writeDecimalPointAt(i, j & 0x1);
       incrementMod(j, (uint8_t) NUM_DIGITS);
     }
     incrementMod(digitIndex, (uint8_t) NUM_DIGITS);
 
     // Update the brightness
     uint8_t brightness = BRIGHTNESS_LEVELS[brightnessIndex];
-    display.setBrightness(brightness);
+    ledModule.setBrightness(brightness);
     incrementMod(brightnessIndex, NUM_BRIGHTNESSES);
   }
 }

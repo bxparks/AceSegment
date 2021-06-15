@@ -315,44 +315,36 @@ volatile int disableCompilerOptimization = 0;
 
   #elif FEATURE == FEATURE_STUB_MODULE
     StubModule stubModule;
-    LedDisplay ledDisplay(stubModule);
 
   #elif FEATURE == FEATURE_NUMBER_WRITER
     StubModule stubModule;
-    LedDisplay ledDisplay(stubModule);
-    NumberWriter numberWriter(ledDisplay);
+    NumberWriter numberWriter(stubModule);
 
   #elif FEATURE == FEATURE_CLOCK_WRITER
     StubModule stubModule;
-    LedDisplay ledDisplay(stubModule);
-    ClockWriter clockWriter(ledDisplay);
+    ClockWriter clockWriter(stubModule);
 
   #elif FEATURE == FEATURE_TEMPERATURE_WRITER
     StubModule stubModule;
-    LedDisplay ledDisplay(stubModule);
-    TemperatureWriter temperatureWriter(ledDisplay);
+    TemperatureWriter temperatureWriter(stubModule);
 
   #elif FEATURE == FEATURE_CHAR_WRITER
     StubModule stubModule;
-    LedDisplay ledDisplay(stubModule);
-    CharWriter charWriter(ledDisplay);
+    CharWriter charWriter(stubModule);
 
   #elif FEATURE == FEATURE_STRING_WRITER
     StubModule stubModule;
-    LedDisplay ledDisplay(stubModule);
-    CharWriter charWriter(ledDisplay);
+    CharWriter charWriter(stubModule);
     StringWriter stringWriter(charWriter);
 
   #elif FEATURE == FEATURE_STRING_SCROLLER
     StubModule stubModule;
-    LedDisplay ledDisplay(stubModule);
-    CharWriter charWriter(ledDisplay);
+    CharWriter charWriter(stubModule);
     StringScroller stringScroller(charWriter);
 
   #elif FEATURE == FEATURE_LEVEL_WRITER
     StubModule stubModule;
-    LedDisplay ledDisplay(stubModule);
-    LevelWriter levelWriter(ledDisplay);
+    LevelWriter levelWriter(stubModule);
 
   #else
     #error Unknown FEATURE

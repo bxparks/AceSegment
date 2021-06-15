@@ -61,7 +61,7 @@ consumption.
         * [Rendering the Hc595Module](#RenderingHc595Module)
     * [HybridModule](#HybridModule)
     * [DirectModule](#DirectModule)
-    * [LedDisplay](#LedDisplay)
+    * [PatternWriter](#PatternWriter)
     * [NumberWriter](#NumberWriter)
     * [ClockWriter](#ClockWriter)
     * [TemperatureWriter](#TemperatureWriter)
@@ -258,19 +258,19 @@ depend on the lower-level classes:
     * `DirectModule`
         * An implementation with all segment and digit pins connected directly
           to the microcontroller.
-* `LedDisplay`
-    * Class that knows how to write segment bit patterns to an `LedModule`.
-    * Provides a single, common API to the various Writer classes.
 * Writers
-    * Helper classes built on top of the `LedDisplay` which provide higher-level
+    * Helper classes built on top of the `LedModule` which provide higher-level
       interface to the LED module, such as printing numbers, time (hh:mm),
       and ASCII characters and strings.
+    * `PatternWriter`
+        * Class that knows how to write segment bit patterns to an `LedModule`.
+        * Other Writer classes are built upon this by composition.
     * `NumberWriter`
         * A class that writes integers in decimal or hexadecimal format to the
-          `LedDisplay`.
+          `LedModule`.
         * A few additional characters are supported: `kCharSpace`, `kCharMinus`
     * `ClockWriter`
-        * A class that writes a clock string "hh:mm" to `LedDisplay`.
+        * A class that writes a clock string "hh:mm" to `LedModule`.
         * A few additional symbols are supported: `kCharSpace`, `kCharMinus` and
           `kPatternA` ("A" for AM) and `kPatternP` ("P" for PM).
     * `TemperatureWriter`
@@ -283,7 +283,7 @@ depend on the lower-level classes:
           legibly but the `CharWriter` tries its best.
     * `StringWriter`
         * A class that prints strings of `char` to a `CharWriter`, which in
-          turns, prints to the `LedDisplay`.
+          turns, prints to the `LedModule`.
     * `StringScoller`
         * Scroll a string left and right.
     * `LevelWriter`
@@ -292,27 +292,23 @@ depend on the lower-level classes:
 <a name="DependencyDiagram"></a>
 ### Dependency Diagram
 
-The dependency diagram among these classes looks something like this
-(simplified for ease of understanding):
+The conceptual dependency diagram among these classes looks something like this:
 
 ```
-   StringScroller
-   StringWriter    ClockWriter TemperatureWriter
-          |            \           /
-          V             v         v
-       CharWriter       NumberWriter     LevelWriter
-            \              |             /
-             --------      |     --------
-                     \     |    /
-                      v    v   v
-                      LedDisplay
-                          |            (hardware independent)
---------------------------|-------------------------------------
-                          |            (hardware dependent)
-                          v
-                       LedModule
-                          ^
-                          |
+           StringScroller
+           StringWriter    ClockWriter TemperatureWriter
+                  |            \           /
+                  V             v         v
+PatternWriter  CharWriter       NumberWriter     LevelWriter
+         \          \              |             /
+          -------    ----------    |    ---------
+                 \             \   |   /
+                  ----------v   v  v  v
+                             LedModule
+                                ^               (hardware independent)
+--------------------------------|--------------------------------------------
+                                |               (hardware dependent)
+                                |
       +-----------+-------+-----+------------+------------+-------------+
       |           |             |            |            |             |
 Tm1637Module  Max7219Module Hc595Module HybridModule DirectModule Ht16k33Module
@@ -325,11 +321,14 @@ SoftTmiFastInterface     SoftSpiFastInterface               SimpleWireInterface
                          HardSpiFastInterface
 ```
 
+(The actual dependency among various classes is a bit more complicated than this
+diagram.)
+
 <a name="DigitAndSegmentAddressing"></a>
 ### Digit and Segment Addressing
 
-The `LedModule` and `LedDisplay` classes use the following conventions for
-addressing the digits and segments:
+The `LedModule` classes use the following conventions for addressing the digits
+and segments:
 
 * digits start at position 0 on the left and increase to the right
 * segments are assigned bits 0 to 7 of an unsigned byte (type `uint8_t`) with
@@ -526,7 +525,7 @@ using TmiInterface = SoftTmiInterface;
 TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY);
 Tm1637Module<TmiInterface, NUM_DIGITS> ledModule(tmiInterface);
 
-LedDisplay display(ledModule);
+PatternWriter patternWriter(ledModule);
 
 void setupAceSegment() {
   tmiInterface.begin();
@@ -594,7 +593,7 @@ TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY);
 Tm1637Module<TmiInterface, NUM_DIGITS> ledModule(
     tmiInterface, kDigitRemapArray6Tm1637);
 
-LedDisplay display(ledModule);
+PatternWriter patternWriter(ledModule);
 
 void setupAceSegment() {
   tmiInterface.begin();
@@ -711,7 +710,7 @@ SpiInterface spiInterface(SPI, LATCH_PIN);
 
 Max7219Module<SpiInterface, NUM_DIGITS> ledModule(
     spiInterface, kDigitRemapArray8Max7219);
-LedDisplay display(ledModule);
+PatternWriter patternWriter(ledModule);
 
 void setupAceSegment() {
   SPI.begin();
@@ -834,7 +833,7 @@ using WireInterface = TwoWireInterface<TwoWire>;
 WireInterface wireInterface(Wire, HT16K33_I2C_ADDRESS);
 
 Ht16k33Module<WireInterface, NUM_DIGITS> ledModule(wireInterface);
-LedDisplay display(ledModule);
+PatternWriter patternWriter(ledModule);
 
 void setupAceSegment() {
   Wire.begin();
@@ -994,7 +993,7 @@ Hc595Module<SpiInterface, NUM_DIGITS> ledModule(
     REMAP_ARRAY
 );
 
-LedDisplay display(ledModule);
+PatternWriter patternWriter(ledModule);
 
 void setupAceSegment() {
   SPI.begin();
@@ -1079,7 +1078,7 @@ Hc595Module<SpiInterface, NUM_DIGITS> ledModule(
     REMAP_ARRAY
 );
 
-LedDisplay display(ledModule);
+PatternWriter patternWriter(ledModule);
 
 void setupAceSegment() {
   SPI.begin();
@@ -1178,7 +1177,7 @@ HybridModule<SpiInterface, NUM_DIGITS> ledModule(
     DIGIT_PINS
 );
 
-LedDisplay display(ledModule);
+PatternWriter patternWriter(ledModule);
 
 void setupAceSegment() {
   SPI.begin();
@@ -1244,7 +1243,7 @@ DirectModule<NUM_DIGITS, NUM_SUBFIELDS> ledModule(
     SEGMENT_PINS,
     DIGIT_PINS);
 
-LedDisplay display(ledModule);
+PatternWriter patternWriter(ledModule);
 
 void setupAceSegment() {
   ledModule.begin();
@@ -1267,21 +1266,21 @@ void loop() {
 }
 ```
 
-<a name="LedDisplay"></a>
-### LedDisplay
+<a name="PatternWriter"></a>
+### PatternWriter
 
-The `LedDisplay` object is a thin-wrapper around an `LedModule` object which
+The `PatternWriter` object is a thin-wrapper around an `LedModule` object which
 provides a unified API to write bit patterns to the LED module at specific
-positions. The `LedDisplay` also provides an API to set and clear the decimal
+positions. The `PatternWriter` also provides an API to set and clear the decimal
 point on the LED module if available, and it provides the ability to control the
 brightness of the LED module.
 
 The public methods of class looks like this (not all public methods shown):
 
 ```C++
-class LedDisplay {
+class PatternWriter {
   public:
-    explicit LedDisplay(LedModule& ledModule);
+    explicit PatternWriter(LedModule& ledModule);
 
     uint8_t getNumDigits() const;
 
@@ -1316,19 +1315,19 @@ chip, and the range of values are different for each chip:
   seems practical for most configurations.
 
 After a specific, hardware-dependent instance of `LedModule` is created, the
-`LedDisplay` is created by wrapping around the `LedModule`:
+`PatternWriter` is created by wrapping around the `LedModule`:
 
 ```C++
-LedDisplay display(ledModule);
+PatternWriter patternWriter(ledModule);
 ```
 
-Various Writer classes build upon the `LedDisplay` class to provide additional
-ways of printing numbers and letters to the LED module.
+Various Writer classes build upon the `PatternWriter` class to provide
+additional ways of printing numbers and letters to the LED module.
 
 <a name="NumberWriter"></a>
 ### NumberWriter
 
-The `NumberWriter` can print integers to the `LedDisplay` using decimal (0-9) or
+The `NumberWriter` can print integers to the `LedModule` using decimal (0-9) or
 hexadecimal (0-9A-F) formats. On platforms that support it (AVR and ESP8266),
 the bit mapping table is stored in flash memory to conserve static memory.
 
@@ -1341,9 +1340,9 @@ class NumberWriter {
     static const hexchar_t kCharSpace = 0x10;
     static const hexchar_t kCharMinus = 0x11;
 
-    explicit NumberWriter(LedDisplay& ledDisplay);
+    explicit NumberWriter(LedModule& ledModule);
 
-    LedDisplay& display();
+    LedModule& ledModule();
 
     void writeHexCharAt(uint8_t pos, hexchar_t c);
     void writeHexCharsAt(uint8_t pos, hexchar_t [], uint8_t len);
@@ -1355,6 +1354,7 @@ class NumberWriter {
     void writeSignedDecimalAt(uint8_t pos, int16_t num, int8_t boxSize = 0);
     void writeUnsignedDecimal2At(uint8_t pos, uint8_t num);
 
+    void clear();
     void clearToEnd(uint8_t pos);
 };
 ```
@@ -1392,9 +1392,9 @@ class ClockWriter {
     static const uint8_t kPatternA = 0b01110111;
     static const uint8_t kPatternP = 0b01110011;
 
-    explicit ClockWriter(LedDisplay& ledDisplay, uint8_t colonDigit = 1);
+    explicit ClockWriter(LedModule& ledModule, uint8_t colonDigit = 1);
 
-    LedDisplay& display() const;
+    LedModule& ledModule();
     void writeCharAt(uint8_t pos, hexchar_t c);
     void writeChar2At(uint8_t pos, hexchar_t c0, hexchar_t c1);
 
@@ -1425,9 +1425,9 @@ class TemperatureWriter {
     static const uint8_t kPatternC = 0b00111001;
     static const uint8_t kPatternF = 0b01110001;
 
-    explicit TemperatureWriter(LedDisplay& ledDisplay);
+    explicit TemperatureWriter(LedModule& ledModule);
 
-    LedDisplay& display();
+    LedModule& ledModule();
 
     uint8_t writeTempAt(uint8_t pos, int16_t temp, boxSize = 0);
     uint8_t writeTempDegAt(uint8_t pos, int16_t temp, boxSize = 0);
@@ -1463,12 +1463,12 @@ class CharWriter {
     static const uint8_t kNumChars = 128;
 
     explicit CharWriter(
-        LedDisplay& ledDisplay,
+        LedModule& ledModule,
         const uint8_t charPatterns[] = kCharPatterns,
         uint8_t numChars = kNumChars
     );
 
-    LedDisplay& display();
+    LedModule& ledModule();
 
     void writeCharAt(uint8_t pos, char c);
 
@@ -1492,13 +1492,15 @@ class StringWriter {
   public:
     explicit StringWriter(CharWriter& charWriter);
 
-    LedDisplay& display();
+    LedModule& ledModule();
+    CharWriter& charWriter();
 
     uint8_t writeStringAt(uint8_t pos, const char* cs, uint8_t numChar = 255);
 
     uint8_t writeStringAt(uint8_t pos, const __FlashStringHelper* fs,
             uint8_t numChar = 255);
 
+    void clear();
     void clearToEnd(uint8_t pos);
 };
 ```
@@ -1525,7 +1527,8 @@ The following sequence of calls will write the given string and clear all digits
 after the end of the string:
 
 ```C++
-StringWriter stringWriter(ledDisplay);
+CharWriter charWriter(ledModule);
+StringWriter stringWriter(charWriter);
 
 uint8_t written = stringWriter.writeStringAt(0, s);
 stringWriter.clearToEnd(written);
@@ -1542,9 +1545,9 @@ bar per digit) to the LED display, emulating a level meter LED module.
 ```C++
 class LevelWriter {
   public:
-    explicit LevelWriter(LedDisplay& ledDisplay);
+    explicit LevelWriter(LedModule& ledModule);
 
-    LedDisplay& display() const;
+    LedModule& ledModule();
 
     uint8_t getMaxLevel() const;
     void writeLevel(uint8_t level);
@@ -1565,7 +1568,8 @@ class StringScroller {
   public:
     explicit StringScroller(CharWriter& charWriter);
 
-    LedDisplay& display() const;
+    LedModule& ledModule();
+    CharWriter& charWriter();
 
     void initScrollLeft(const char* s);
     void initScrollLeft(const __FlashStringHelper* s);
@@ -1830,7 +1834,7 @@ sizeof(Tm1637Module<SoftTmiInterface, 4>): 14
 sizeof(Tm1637Module<SoftTmiInterface, 6>): 16
 sizeof(Max7219Module<SoftSpiInterface, 8>): 16
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 11
-sizeof(LedDisplay): 2
+sizeof(LedModule): 2
 sizeof(NumberWriter): 2
 sizeof(ClockWriter): 3
 sizeof(TemperatureWriter): 2
@@ -1859,7 +1863,7 @@ sizeof(Tm1637Module<SoftTmiInterface, 4>): 24
 sizeof(Tm1637Module<SoftTmiInterface, 6>): 28
 sizeof(Max7219Module<SoftSpiInterface, 8>): 28
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 20
-sizeof(LedDisplay): 4
+sizeof(LedModule): 4
 sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
 sizeof(TemperatureWriter): 4
@@ -1910,7 +1914,7 @@ static memory consumptions for various configurations on an Arduino Nano
 |---------------------------------+--------------+-------------|
 | Ht16k33(TwoWire)               |   2866/  251 |  2410/  240 |
 |---------------------------------+--------------+-------------|
-| StubModule+LedDisplay           |    578/   24 |   122/   13 |
+| StubModule+LedModule           |    578/   24 |   122/   13 |
 | NumberWriter+Stub               |    682/   28 |   226/   17 |
 | ClockWriter+Stub                |    766/   29 |   310/   18 |
 | TemperatureWriter+Stub          |    764/   28 |   308/   17 |
@@ -1952,7 +1956,7 @@ And here are the memory consumption numbers for an ESP8266:
 |---------------------------------+--------------+-------------|
 | Ht16k33(TwoWire)                | 261364/27500 |  4664/  716 |
 |---------------------------------+--------------+-------------|
-| StubModule+LedDisplay           | 256856/27004 |   156/  220 |
+| StubModule+LedModule           | 256856/27004 |   156/  220 |
 | NumberWriter+Stub               | 257352/27004 |   652/  220 |
 | ClockWriter+Stub                | 257176/27012 |   476/  228 |
 | TemperatureWriter+Stub          | 257464/27004 |   764/  220 |

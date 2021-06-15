@@ -26,7 +26,7 @@ SOFTWARE.
 #define ACE_SEGMENT_LEVEL_WRITER_H
 
 #include <stdint.h>
-#include "../LedDisplay.h"
+#include "PatternWriter.h"
 
 namespace ace_segment {
 
@@ -44,36 +44,36 @@ class LevelWriter {
 
   public:
     /** Constructor. */
-    explicit LevelWriter(LedDisplay& ledDisplay) :
-        mLedDisplay(ledDisplay)
+    explicit LevelWriter(LedModule& ledModule) :
+        mPatternWriter(ledModule)
         {}
 
-    /** Get the underlying LedDisplay. */
-    LedDisplay& display() const { return mLedDisplay; }
+    /** Get the underlying LedModule. */
+    LedModule& ledModule() const { return mPatternWriter.ledModule(); }
 
     /**
      * Return the maximum level supported by this LED display. The range is [0,
      * maxLevel].
      */
     uint8_t getMaxLevel() const {
-      return mLedDisplay.getNumDigits() * 2;
+      return mPatternWriter.getNumDigits() * 2;
     }
 
     /** Write out the level bar, 2 levels per digit. */
     void writeLevel(uint8_t level) {
       uint8_t fullDigits = level / 2;
       uint8_t partialDigit = level & 0x1;
-      uint8_t numDigits = mLedDisplay.getNumDigits();
+      uint8_t numDigits = mPatternWriter.getNumDigits();
 
       uint8_t pos = 0;
       while (pos < fullDigits && pos < numDigits) {
-        mLedDisplay.writePatternAt(
+        mPatternWriter.writePatternAt(
             pos++, kLevelLeftPattern | kLevelRightPattern);
       }
       if (partialDigit && pos < numDigits) {
-        mLedDisplay.writePatternAt(pos++, kLevelLeftPattern);
+        mPatternWriter.writePatternAt(pos++, kLevelLeftPattern);
       }
-      mLedDisplay.clearToEnd(pos);
+      mPatternWriter.clearToEnd(pos);
     }
 
   private:
@@ -82,7 +82,7 @@ class LevelWriter {
     LevelWriter& operator=(const LevelWriter&) = delete;
 
   private:
-    LedDisplay& mLedDisplay;
+    PatternWriter mPatternWriter;
 };
 
 }

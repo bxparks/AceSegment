@@ -5,7 +5,7 @@
 
 #include <Arduino.h>
 #include <AceCommon.h> // incrementMod()
-#include <AceSegment.h> // Ht16k33Module, LedDisplay
+#include <AceSegment.h> // Ht16k33Module, PatternWriter
 
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
@@ -13,7 +13,7 @@ using ace_common::TimingStats;
 using ace_segment::Ht16k33Module;
 using ace_segment::TwoWireInterface;
 using ace_segment::SimpleWireInterface;
-using ace_segment::LedDisplay;
+using ace_segment::PatternWriter;
 
 // Select the I2C implementation:
 // Built-in Arduino <Wire.h>
@@ -123,8 +123,8 @@ const uint8_t HT16K33_I2C_ADDRESS = 0x70;
   #error Unknown WIRE_INTERFACE_TYPE
 #endif
 
-Ht16k33Module<WireInterface, NUM_DIGITS> ht16k33Module(wireInterface);
-LedDisplay display(ht16k33Module);
+Ht16k33Module<WireInterface, NUM_DIGITS> ledModule(wireInterface);
+PatternWriter patternWriter(ledModule);
 
 void setupAceSegment() {
 #if WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_HARD
@@ -144,7 +144,7 @@ void setupAceSegment() {
 #endif
 
   wireInterface.begin();
-  ht16k33Module.begin();
+  ledModule.begin();
 }
 
 //----------------------------------------------------------------------------
@@ -174,15 +174,15 @@ void updateDisplay() {
     // Update the display
     uint8_t j = digitIndex;
     for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
-      display.writePatternAt(i, PATTERNS[j]);
+      patternWriter.writePatternAt(i, PATTERNS[j]);
       // Write a decimal point every other digit, for demo purposes.
-      display.writeDecimalPointAt(i, j & 0x1);
+      patternWriter.writeDecimalPointAt(i, j & 0x1);
       incrementMod(j, (uint8_t) NUM_DIGITS);
     }
     incrementMod(digitIndex, (uint8_t) NUM_DIGITS);
 
     // Update the brightness. The HT16K33 has 16 levels of brightness (0-15).
-    display.setBrightness(brightness);
+    ledModule.setBrightness(brightness);
     incrementMod(brightness, (uint8_t) 16);
   }
 }
@@ -198,7 +198,7 @@ void flushModule() {
 
     // Flush incrementally, and measure the time.
     uint16_t startMicros = micros();
-    ht16k33Module.flush();
+    ledModule.flush();
     uint16_t elapsedMicros = (uint16_t) micros() - startMicros;
     stats.update(elapsedMicros);
   }
