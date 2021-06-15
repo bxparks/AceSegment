@@ -63,17 +63,22 @@ namespace ace_segment {
  * experiments to see where the break-even point would be.
  *
  * This class is stateless. It is thread-safe.
+ *
+ * @tparam T_DIO_PIN pin attached to the LED module data line
+ * @tparam T_CLK_PIN pin attached to the LED module clock line
+ * @tparam T_DELAY_MICROS delay after each bit transition (full cycle is 2 *
+ *    T_DELAY_MICROS)
  */
 template <
-    uint8_t T_CLK_PIN,
     uint8_t T_DIO_PIN,
+    uint8_t T_CLK_PIN,
     uint8_t T_DELAY_MICROS
 >
 class SoftTmiFastInterface {
   public:
     explicit SoftTmiFastInterface() = default;
 
-    /** Initialize the GPIO pins. */
+    /** Initialize the dio and clk pins. */
     void begin() const {
       // These are open-drain lines, with a pull-up resistor. We must not drive
       // them HIGH actively since that could damage the transitor at the other
@@ -88,7 +93,7 @@ class SoftTmiFastInterface {
       dataHigh();
     }
 
-    /** Set pins to INPUT mode. */
+    /** Set dio and clk pins to INPUT mode. */
     void end() const {
       clockHigh();
       dataHigh();

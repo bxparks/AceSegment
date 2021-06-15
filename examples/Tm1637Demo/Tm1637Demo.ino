@@ -99,13 +99,13 @@ const uint16_t BIT_DELAY = 100;
 
 #if TMI_INTERFACE_TYPE == TMI_INTERFACE_TYPE_NORMAL
   using TmiInterface = SoftTmiInterface;
-  TmiInterface tmiInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
+  TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY);
 #elif TMI_INTERFACE_TYPE == TMI_INTERFACE_TYPE_FAST
   #include <digitalWriteFast.h>
   #include <ace_segment/hw/SoftTmiFastInterface.h>
   using ace_segment::SoftTmiFastInterface;
 
-  using TmiInterface = SoftTmiFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
+  using TmiInterface = SoftTmiFastInterface<DIO_PIN, CLK_PIN, BIT_DELAY>;
   TmiInterface tmiInterface;
 #else
   #error Unknown TMI_INTERFACE_TYPE

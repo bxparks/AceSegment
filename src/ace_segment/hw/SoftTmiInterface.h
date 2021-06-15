@@ -64,17 +64,24 @@ namespace ace_segment {
  */
 class SoftTmiInterface {
   public:
+    /**
+     * Constructor.
+     * @tparam dioPin pin attached to the LED module data line
+     * @tparam clkPin pin attached to the LED module clock line
+     * @tparam delayMicros delay after each bit transition (full cycle is 2 *
+     *    delayMicros)
+     */
     explicit SoftTmiInterface(
-        uint8_t clkPin,
         uint8_t dioPin,
+        uint8_t clkPin,
         uint8_t delayMicros
     ) :
-        mClkPin(clkPin),
         mDioPin(dioPin),
+        mClkPin(clkPin),
         mDelayMicros(delayMicros)
     {}
 
-    /** Initialize the GPIO pins. */
+    /** Initialize the dio and clk pins. */
     void begin() const {
       // These are open-drain lines, with a pull-up resistor. We must not drive
       // them HIGH actively since that could damage the transitor at the other
@@ -89,7 +96,7 @@ class SoftTmiInterface {
       dataHigh();
     }
 
-    /** Set pins to INPUT mode. */
+    /** Set dio and clk pins to INPUT mode. */
     void end() const {
       clockHigh();
       dataHigh();
@@ -159,8 +166,8 @@ class SoftTmiInterface {
     void dataLow() const { pinMode(mDioPin, OUTPUT); bitDelay(); }
 
   private:
-    uint8_t const mClkPin;
     uint8_t const mDioPin;
+    uint8_t const mClkPin;
     uint8_t const mDelayMicros;
 };
 

@@ -76,8 +76,8 @@ const uint16_t BIT_DELAY = 100;
 
 #if TMI_INTERFACE_TYPE == TMI_INTERFACE_TYPE_NORMAL
   using TmiInterface = SoftTmiInterface;
-  TmiInterface tmiInterface1(CLK_PIN, DIO1_PIN, BIT_DELAY);
-  TmiInterface tmiInterface2(CLK_PIN, DIO2_PIN, BIT_DELAY);
+  TmiInterface tmiInterface1(DIO1_PIN, CLK_PIN, BIT_DELAY);
+  TmiInterface tmiInterface2(DIO2_PIN, CLK_PIN, BIT_DELAY);
   Tm1637Module<TmiInterface, NUM_DIGITS> tm1637Module1(tmiInterface1);
   Tm1637Module<TmiInterface, NUM_DIGITS> tm1637Module2(tmiInterface2);
 
@@ -85,8 +85,8 @@ const uint16_t BIT_DELAY = 100;
   #include <digitalWriteFast.h>
   #include <ace_segment/hw/SoftTmiFastInterface.h>
   using ace_segment::SoftTmiFastInterface;
-  using TmiInterface1 = SoftTmiFastInterface<CLK_PIN, DIO1_PIN, BIT_DELAY>;
-  using TmiInterface2 = SoftTmiFastInterface<CLK_PIN, DIO2_PIN, BIT_DELAY>;
+  using TmiInterface1 = SoftTmiFastInterface<DIO1_PIN, CLK_PIN, BIT_DELAY>;
+  using TmiInterface2 = SoftTmiFastInterface<DIO2_PIN, CLK_PIN, BIT_DELAY>;
   TmiInterface1 tmiInterface1;
   TmiInterface2 tmiInterface2;
   Tm1637Module<TmiInterface1, NUM_DIGITS> tm1637Module1(tmiInterface1);

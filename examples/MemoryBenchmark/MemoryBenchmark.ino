@@ -242,7 +242,7 @@ volatile int disableCompilerOptimization = 0;
 
   #elif FEATURE == FEATURE_TM1637_TMI
     using TmiInterface = SoftTmiInterface;
-    TmiInterface tmiInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
+    TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY);
     Tm1637Module<TmiInterface, NUM_DIGITS> tm1637Module(tmiInterface);
 
   #elif FEATURE == FEATURE_TM1637_TMI_FAST
@@ -250,7 +250,7 @@ volatile int disableCompilerOptimization = 0;
       #error Unsupported FEATURE on this platform
     #endif
 
-    using TmiInterface = SoftTmiFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
+    using TmiInterface = SoftTmiFastInterface<DIO_PIN, CLK_PIN, BIT_DELAY>;
     TmiInterface tmiInterface;
     Tm1637Module<TmiInterface, NUM_DIGITS> tm1637Module(tmiInterface);
 

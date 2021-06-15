@@ -582,7 +582,7 @@ void runTm1637Benchmark(
 
 void runTm1637SoftTmi() {
   using TmiInterface = SoftTmiInterface;
-  TmiInterface tmiInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
+  TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY);
   tmiInterface.begin();
 
   Tm1637Module<TmiInterface, 4> tm1637Module(tmiInterface);
@@ -597,7 +597,7 @@ void runTm1637SoftTmi() {
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 void runTm1637SoftTmiFast() {
-  using TmiInterface = SoftTmiFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
+  using TmiInterface = SoftTmiFastInterface<DIO_PIN, CLK_PIN, BIT_DELAY>;
   TmiInterface tmiInterface;
   tmiInterface.begin();
 
@@ -614,7 +614,7 @@ void runTm1637SoftTmiFast() {
 
 void runTm1637SoftTmiShort() {
   using TmiInterface = SoftTmiInterface;
-  TmiInterface tmiInterface(CLK_PIN, DIO_PIN, BIT_DELAY_SHORT);
+  TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY_SHORT);
   tmiInterface.begin();
 
   Tm1637Module<TmiInterface, 4> tm1637Module(tmiInterface);
@@ -629,7 +629,7 @@ void runTm1637SoftTmiShort() {
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 void runTm1637SoftTmiFastShort() {
-  using TmiInterface = SoftTmiFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY_SHORT>;
+  using TmiInterface = SoftTmiFastInterface<DIO_PIN, CLK_PIN, BIT_DELAY_SHORT>;
   TmiInterface tmiInterface;
   tmiInterface.begin();
 
@@ -646,7 +646,7 @@ void runTm1637SoftTmiFastShort() {
 
 void runTm1637SixSoftTmi() {
   using TmiInterface = SoftTmiInterface;
-  TmiInterface tmiInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
+  TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY);
   tmiInterface.begin();
 
   Tm1637Module<TmiInterface, 6> tm1637SixModule(tmiInterface);
@@ -661,7 +661,7 @@ void runTm1637SixSoftTmi() {
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 void runTm1637SixSoftTmiFast() {
-  using TmiInterface = SoftTmiFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
+  using TmiInterface = SoftTmiFastInterface<DIO_PIN, CLK_PIN, BIT_DELAY>;
   TmiInterface tmiInterface;
   tmiInterface.begin();
 

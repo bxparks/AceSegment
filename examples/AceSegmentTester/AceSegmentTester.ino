@@ -592,9 +592,9 @@ const uint8_t NUM_SUBFIELDS = 1;
 #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_TM1637
   #if INTERFACE_TYPE == INTERFACE_TYPE_SOFT_TMI
     using TmiInterface = SoftTmiInterface;
-    TmiInterface tmiInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
+    TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY);
   #elif INTERFACE_TYPE == INTERFACE_TYPE_SOFT_TMI_FAST
-    using TmiInterface = SoftTmiFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
+    using TmiInterface = SoftTmiFastInterface<DIO_PIN, CLK_PIN, BIT_DELAY>;
     TmiInterface tmiInterface;
   #endif
   Tm1637Module<TmiInterface, NUM_DIGITS> ledModule(tmiInterface);

@@ -12,7 +12,6 @@
 #include <digitalWriteFast.h>
 #include <ace_segment/hw/HardSpiFastInterface.h>
 #include <ace_segment/hw/SoftSpiFastInterface.h>
-#include <ace_segment/hw/SoftTmiFastInterface.h>
 #endif
 
 using ace_common::incrementMod;

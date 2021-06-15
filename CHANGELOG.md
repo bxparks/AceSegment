@@ -23,6 +23,9 @@
           are implicit in the `SPIClass` object.
         * Small reduction of flash (~30 bytes) and static memory (~2 bytes)
           on AVR.
+    * Change order of `dioPin` and `clkPin` parameters in `SoftTmiInterface` and
+      `SoftTmiFastInterface` to match the order of `sda` and `scl` pins of
+      `TwoWire` and `SimpleWireInterface` classes.
 * 0.6 (2021-05-26)
     * `HardSpiInterface`
         * Add support for microcontrollers with 2 SPI buses (ESP32 and STM32F1).

@@ -516,7 +516,7 @@ const uint16_t BIT_DELAY = 100;
 const uint8_t NUM_DIGITS = 4;
 
 using TmiInterface = SoftTmiInterface;
-TmiInterface tmiInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
+TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY);
 Tm1637Module<TmiInterface, NUM_DIGITS> ledModule(tmiInterface);
 
 LedDisplay display(ledModule);
@@ -583,7 +583,7 @@ const uint16_t BIT_DELAY = 100;
 const uint8_t NUM_DIGITS = 4;
 
 using TmiInterface = SoftTmiInterface;
-TmiInterface tmiInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
+TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY);
 Tm1637Module<TmiInterface, NUM_DIGITS> ledModule(
     tmiInterface, kDigitRemapArray6Tm1637);
 
