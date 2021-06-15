@@ -36,12 +36,12 @@ Hc595(8,SoftSpi) 88 89 94 80
 Hc595(8,SoftSpi,subfields) 3 13 96 1280
 Hc595(8,HardSpi) 24 24 28 80
 Hc595(8,HardSpi,subfields) 3 5 29 1280
-Tm1637(4,SoftTmi) 22213 22216 22224 10
-Tm1637(4,SoftTmi,incremental) 3596 8761 10054 50
+Tm1637(4,SoftTmi,100us) 22213 22216 22224 10
+Tm1637(4,SoftTmi,100us,incremental) 3596 8761 10054 50
+Tm1637(4,SoftTmi,5us) 2111 2111 2117 10
+Tm1637(4,SoftTmi,5us,incremental) 342 834 958 50
 Tm1637(6,SoftTmi) 27926 27929 27934 10
 Tm1637(6,SoftTmi,incremental) 3601 9129 10054 70
-Tm1637(4,SoftTmi,5us) 2111 2111 2117 10
-Tm1637(4,SoftTmi,incremental,5us) 342 834 958 50
 Max7219(8,SoftSpi) 783 788 790 20
 Max7219(8,HardSpi) 201 203 207 20
 Ht16k33(4,HardWire) 238 238 239 20
