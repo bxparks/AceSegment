@@ -26,12 +26,12 @@ into hardware-dependent components and hardware-independent components to allow
 application code to be written without worrying too much about the low-level
 details of the specific LED module.
 
-**Version**: 0.6+ (2021-06-09)
+**Version**: 0.7 (2021-06-16)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
 **Status**: This is a **work in progress**. It is not ready for public
-consumption.
+consumption, but it is getting very close.
 
 ## Table of Contents
 

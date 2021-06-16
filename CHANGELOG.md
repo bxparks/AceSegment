@@ -1,6 +1,7 @@
 # Changelog
 
 * Unreleased
+* 0.7 (2021-06-16)
     * Support HT16K33 LED modules
         * Add `Ht16k33Module` class to support 4-digit LED display from
           Adafruit or one of its clones.
@@ -27,8 +28,12 @@
       `SoftTmiFastInterface` to match the order of `sda` and `scl` pins of
       `TwoWire` and `SimpleWireInterface` classes.
     * Rename `LedDisplay` to `PatternWriter` to remove extra layer of
-      indirection. Pass `LedModule` into `Writer` classes (except `StringWriter`
-      and `StringScroller` which take a `CharWriter`).
+      abstraction.
+        * Pass `LedModule` into `Writer` classes (except `StringWriter` and
+          `StringScroller` which depend on `CharWriter`).
+    * Fix results of `MemoryBenchmark` for TeensyDuino so that the BASELINE
+      numbers include 3200 bytes of flash and 1100 bytes of static RAM from
+      pulling in `malloc()` and `free()`.
 * 0.6 (2021-05-26)
     * `HardSpiInterface`
         * Add support for microcontrollers with 2 SPI buses (ESP32 and STM32F1).

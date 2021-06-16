@@ -38,7 +38,7 @@ by the runtime environment of the processor. For example, it often seems like
 the ESP8266 allocates flash memory in blocks of a certain quantity, so the
 calculated flash size can jump around in unexpected ways.
 
-**Version**: AceSegment v0.6
+**Version**: AceSegment v0.7
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -168,7 +168,7 @@ before substantional refactoring in 2021.
   `HardSpiFastInterface`. Increases flash memory by 10-30 bytes.
 * Add benchmarks for `StringScroller` and `LevelWriter`.
 
-**v0.6+**
+**v0.7**
 
 * Add benchmarks for `Ht16k33Module`. Consumes about 2400 bytes of flash on
   ATmega328 (Nano) or ATmega32U4 (Pro Micro), about 2X larger than any other LED

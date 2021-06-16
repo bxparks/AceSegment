@@ -51,7 +51,7 @@ LED module:
 * `Max7219Module::flush()`
     * Sends out the buffered digits using SPI.
 
-**Version**: AceSegment v0.6
+**Version**: AceSegment v0.7
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -152,9 +152,8 @@ number of `TimingStats::update()` calls that were made.
   `Tm1637(4,SoftTmiFast,5us)`). The `flush()` or `flushIncremental()` durations
   are almost a factor of 10X to 20X shorter compared to `BIT_DELAY = 100`.
 
-**v0.6+:**
+**v0.7:**
 
-* Add `sizeof(LevelWriter)` and `sizeof(TwoWireInterface)`.
 * Add benchmarks for `Ht16k33Module`, using `TwoWireInterface`,
   `SimpleWireInterface`, and `SimpleWireFastInterface`.
     * On SAMD21 and STM32, the runtime of the `Ht16k33Module(TwoWire)` seems to
