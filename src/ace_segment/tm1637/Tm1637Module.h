@@ -35,12 +35,14 @@ class Tm1637ModuleTest_flush;
 namespace ace_segment {
 
 /**
- * In theory, the chip should be able to handle fairly small delays, like
- * 250 kHz or 4 microseconds. But many TM1637 LED Modules from eBay
- * apparently use capacitors which are far too large (~10 nF, instead of ~100
- * pF). So the rise time of the signal on these lines are too slow, and we need
- * to use a very large delay between bits. A value of 50 microseconds does not
- * work on my LED Modules, but 100 microseconds does.
+ * According to the TM1637 datasheet, the chip should be able to handle fairly
+ * small delays, like 2 microseconds, giving a 250kHz clock cycle (fullcycle = 2
+ * * 2 microseconds). But many TM1637 LED Modules from eBay apparently use
+ * capacitors which are far too large (~10 nF, instead of ~100 pF). So the rise
+ * time of the signal on these lines is too slow, and we need to use a very
+ * large delay between bits. A value of 50 microseconds does not work on my LED
+ * Modules, but 100 microseconds does. If you remove the 10nF capacitors on the
+ * DIO and CLK lines, then you can use a 2 microsecond bit delay.
  */
 static const uint16_t kDefaultTm1637DelayMicros = 100;
 
@@ -66,11 +68,11 @@ namespace internal {
  * `numBits=4`, then we want 0b00001111 or 0x0F. The general expression to get
  * this result is `2^N - 1`. The exponential operation can be performed using a
  * left bit-shift. I believe this expression is well-defined in the C++ language
- * even if `numBits == 8` because `(1 << 8)` is 0, and `0 - 1` is `0xFF` using
- * unsigned integer arithmetics.
+ * even if `numBits == 8` because `(1 << 8)` is 0x100, and `0x100 - 1` is `0xFF`
+ * using unsigned integer arithmetics.
  */
 constexpr uint8_t initialDirtyBits(uint8_t numBits) {
-  return ((uint8_t) 0x1 << numBits) - 1;
+  return ((uint16_t) 0x1 << numBits) - 1;
 }
 
 } // namespace internal
