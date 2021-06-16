@@ -819,13 +819,15 @@ class Ht16k33Module : public LedModule {
 };
 ```
 
-The `T_WIREI` template parameter is the class name of the Wire interface,
-currently just `TwoWireInterface`.
+The `T_WIREI` template parameter is the class name of the Wire interface. There
+are 3 implementations: `TwoWireInterface`, `SimpleWireInterface`, and
+`SimpleWireFastInterface`.
 
 The `T_DIGITS` template parameter is the number of digits in the module. I have
 only seen 4 digit modules for sale.
 
-Most of the methods are implementations of the virtual methods of `LedModule`.
+Most of the methods in this class are implementations of the virtual methods of
+`LedModule`.
 
 The `flush()` method sends all 4 digits as well as the brightness setting to the
 LED module using I2C.
