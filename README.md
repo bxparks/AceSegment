@@ -452,8 +452,10 @@ controller chip:
 
 If brightness control is enabled on the LED module using the 74HC595 chip, it
 can also support brightness control on a per-digit basis. But the interface for
-that feature is part of the `LedModule` class because no other controller chip
-supports this feature.
+that feature is *not* part of the `LedModule` class because no other controller
+chip supports this feature. Adding another virtual method (`setBrightnessAt()`
+to `LedModule` would unnecessarily increase flash and static memory consumption
+for the other classes.
 
 The rendering of each digit and segment, and how the information is transferred
 to the controller chip, is pushed down into the specific subclasses of
