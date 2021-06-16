@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['numberwriter_169',['NumberWriter',['../classace__segment_1_1NumberWriter.html#afd63f269907c5dee9fb6a41a00eb3d37',1,'ace_segment::NumberWriter']]]
+  ['numberwriter_180',['NumberWriter',['../classace__segment_1_1NumberWriter.html#abb61529de2cbf876061915895d68f01d',1,'ace_segment::NumberWriter']]]
 ];

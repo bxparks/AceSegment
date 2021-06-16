@@ -22,9 +22,9 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.6.0</span>
+   &#160;<span id="projectnumber">0.7.0</span>
    </div>
-   <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, and 74HC595 controller chips</div>
+   <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, HT16K33, or 74HC595 controller chips</div>
   </td>
  </tr>
  </tbody>
@@ -83,19 +83,27 @@ $(function() {
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:af63058f8d90de08fa54c725d2c9f92b5"><td class="memItemLeft" align="right" valign="top"><a id="af63058f8d90de08fa54c725d2c9f92b5"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringWriter.html#af63058f8d90de08fa54c725d2c9f92b5">StringWriter</a> (<a class="el" href="classace__segment_1_1CharWriter.html">CharWriter</a> &amp;charWriter)</td></tr>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringWriter.html#af63058f8d90de08fa54c725d2c9f92b5">StringWriter</a> (<a class="el" href="classace__segment_1_1CharWriter.html">CharWriter</a> &amp;<a class="el" href="classace__segment_1_1StringWriter.html#a378981a15906a61e872b13d1c9ca7f0f">charWriter</a>)</td></tr>
 <tr class="memdesc:af63058f8d90de08fa54c725d2c9f92b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br /></td></tr>
 <tr class="separator:af63058f8d90de08fa54c725d2c9f92b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4bb5339f4f67bd406366684ed1fae2ed"><td class="memItemLeft" align="right" valign="top"><a id="a4bb5339f4f67bd406366684ed1fae2ed"></a>
-<a class="el" href="classace__segment_1_1LedDisplay.html">LedDisplay</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringWriter.html#a4bb5339f4f67bd406366684ed1fae2ed">display</a> () const</td></tr>
-<tr class="memdesc:a4bb5339f4f67bd406366684ed1fae2ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the underlying <a class="el" href="classace__segment_1_1LedDisplay.html" title="General interface for writing segment patterns to the underlying LedModule.">LedDisplay</a>. <br /></td></tr>
-<tr class="separator:a4bb5339f4f67bd406366684ed1fae2ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ebe52a50690e195e94895adbca57616"><td class="memItemLeft" align="right" valign="top"><a id="a8ebe52a50690e195e94895adbca57616"></a>
+<a class="el" href="classace__segment_1_1LedModule.html">LedModule</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringWriter.html#a8ebe52a50690e195e94895adbca57616">ledModule</a> ()</td></tr>
+<tr class="memdesc:a8ebe52a50690e195e94895adbca57616"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the underlying <a class="el" href="classace__segment_1_1LedModule.html" title="General interface that represents a generic seven-segment LED module with multiple digits.">LedModule</a>. <br /></td></tr>
+<tr class="separator:a8ebe52a50690e195e94895adbca57616"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a378981a15906a61e872b13d1c9ca7f0f"><td class="memItemLeft" align="right" valign="top"><a id="a378981a15906a61e872b13d1c9ca7f0f"></a>
+<a class="el" href="classace__segment_1_1CharWriter.html">CharWriter</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringWriter.html#a378981a15906a61e872b13d1c9ca7f0f">charWriter</a> ()</td></tr>
+<tr class="memdesc:a378981a15906a61e872b13d1c9ca7f0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the underlying <a class="el" href="classace__segment_1_1LedModule.html" title="General interface that represents a generic seven-segment LED module with multiple digits.">LedModule</a>. <br /></td></tr>
+<tr class="separator:a378981a15906a61e872b13d1c9ca7f0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6bd1098f384b81edc53f8ce33896cbcc"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringWriter.html#a6bd1098f384b81edc53f8ce33896cbcc">writeStringAt</a> (uint8_t pos, const char *cs, uint8_t numChar=255)</td></tr>
 <tr class="memdesc:a6bd1098f384b81edc53f8ce33896cbcc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write c-string <code>cs</code> at specified position <code>pos</code> up to <code>numChar</code> characters.  <a href="classace__segment_1_1StringWriter.html#a6bd1098f384b81edc53f8ce33896cbcc">More...</a><br /></td></tr>
 <tr class="separator:a6bd1098f384b81edc53f8ce33896cbcc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a438a77c7d459bbd875d288bdd0e8cccb"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringWriter.html#a438a77c7d459bbd875d288bdd0e8cccb">writeStringAt</a> (uint8_t pos, const __FlashStringHelper *fs, uint8_t numChar=255)</td></tr>
 <tr class="memdesc:a438a77c7d459bbd875d288bdd0e8cccb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write flash string <code>fs</code> at specified position <code>pos</code> up to <code>numChar</code> characters.  <a href="classace__segment_1_1StringWriter.html#a438a77c7d459bbd875d288bdd0e8cccb">More...</a><br /></td></tr>
 <tr class="separator:a438a77c7d459bbd875d288bdd0e8cccb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a74dbea15191db2fbebf8cd3cddd233c1"><td class="memItemLeft" align="right" valign="top"><a id="a74dbea15191db2fbebf8cd3cddd233c1"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringWriter.html#a74dbea15191db2fbebf8cd3cddd233c1">clear</a> ()</td></tr>
+<tr class="memdesc:a74dbea15191db2fbebf8cd3cddd233c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the entire display. <br /></td></tr>
+<tr class="separator:a74dbea15191db2fbebf8cd3cddd233c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6e693c99b63051f851bcd7d819cdd850"><td class="memItemLeft" align="right" valign="top"><a id="a6e693c99b63051f851bcd7d819cdd850"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringWriter.html#a6e693c99b63051f851bcd7d819cdd850">clearToEnd</a> (uint8_t pos)</td></tr>
 <tr class="memdesc:a6e693c99b63051f851bcd7d819cdd850"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the display from <code>pos</code> to the end. <br /></td></tr>
@@ -150,7 +158,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <p>Write flash string <code>fs</code> at specified position <code>pos</code> up to <code>numChar</code> characters. </p>
 <dl class="section return"><dt>Returns</dt><dd>number of actual LED digits written </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="StringWriter_8h_source.html#l00072">72</a> of file <a class="el" href="StringWriter_8h_source.html">StringWriter.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="StringWriter_8h_source.html#l00075">75</a> of file <a class="el" href="StringWriter_8h_source.html">StringWriter.h</a>.</p>
 
 </div>
 </div>
@@ -197,7 +205,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <p>Write c-string <code>cs</code> at specified position <code>pos</code> up to <code>numChar</code> characters. </p>
 <dl class="section return"><dt>Returns</dt><dd>number of actual LED digits written </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="StringWriter_8h_source.html#l00058">58</a> of file <a class="el" href="StringWriter_8h_source.html">StringWriter.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="StringWriter_8h_source.html#l00061">61</a> of file <a class="el" href="StringWriter_8h_source.html">StringWriter.h</a>.</p>
 
 </div>
 </div>

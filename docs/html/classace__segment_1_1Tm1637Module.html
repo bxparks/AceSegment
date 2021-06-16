@@ -22,9 +22,9 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.6.0</span>
+   &#160;<span id="projectnumber">0.7.0</span>
    </div>
-   <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, and 74HC595 controller chips</div>
+   <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, HT16K33, or 74HC595 controller chips</div>
   </td>
  </tr>
  </tbody>
@@ -165,7 +165,7 @@ class ace_segment::Tm1637Module&lt; T_TMII, T_DIGITS &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00089">89</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00091">91</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a9cc401ceeed8292b26a93d5dcc08312e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9cc401ceeed8292b26a93d5dcc08312e">&#9670;&nbsp;</a></span>Tm1637Module()</h2>
@@ -212,7 +212,7 @@ template&lt;typename T_TMII , uint8_t T_DIGITS&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00100">100</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00102">102</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
 
 </div>
 </div>
@@ -251,7 +251,7 @@ template&lt;typename T_TMII , uint8_t T_DIGITS&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00122">122</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00124">124</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
 
 </div>
 </div>
@@ -283,7 +283,7 @@ template&lt;typename T_TMII , uint8_t T_DIGITS&gt; </div>
 <p>Signal end of usage. </p>
 <p>Currently does nothing. </p>
 
-<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00136">136</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00138">138</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
 
 </div>
 </div>
@@ -315,7 +315,7 @@ template&lt;typename T_TMII , uint8_t T_DIGITS&gt; </div>
 <p>Send segment patterns of all digits plus the brightness to the display, if any of the digits or brightness is dirty. </p>
 <p>Takes about 22 ms using a 100 microsecond delay. </p>
 
-<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00185">185</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00187">187</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
 
 </div>
 </div>
@@ -353,7 +353,7 @@ template&lt;typename T_TMII , uint8_t T_DIGITS&gt; </div>
 <p>The incremental flushing must use fixed addressing mode to write specific digits, which adds extra commands to the wire protocol to the LED module. If this algorithm is used to send all the digits in one-shot, then this method is about 50% slower (30 ms), compared to <a class="el" href="classace__segment_1_1Tm1637Module.html#af3a100b0d07125af76aaf8ea10bc597c" title="Send segment patterns of all digits plus the brightness to the display, if any of the digits or brigh...">flush()</a> (22 ms).</p>
 <p>Technical note: The TM1637 datasheet seems to suggest that the brightness must always be sent after a set of digits are sent. However, experimentation shows that the brightness can be sent as an independent transimission, so this method splits out each digit and the brightness as separate iterations. </p>
 
-<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00247">247</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00249">249</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
 
 </div>
 </div>
@@ -388,7 +388,7 @@ template&lt;typename T_TMII , uint8_t T_DIGITS&gt; </div>
 
 <p>Implements <a class="el" href="classace__segment_1_1LedModule.html#af14827ce8d21f44bd65b02f0880244fc">ace_segment::LedModule</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00154">154</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00156">156</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
 
 </div>
 </div>
@@ -421,7 +421,7 @@ template&lt;typename T_TMII , uint8_t T_DIGITS&gt; </div>
 <p>Turn off the entire display. </p>
 <p>The brightness is not affected so when it is turned back on, the previous brightness will be used. </p>
 
-<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00167">167</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00169">169</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
 
 </div>
 </div>
