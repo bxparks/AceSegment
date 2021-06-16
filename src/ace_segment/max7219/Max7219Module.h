@@ -128,7 +128,11 @@ class Max7219Module : public LedModule {
     void begin() {
       memset(mPatterns, 0, T_DIGITS);
 
-      mSpiInterface.send16(kRegisterScanLimit, 7); // all digits
+      // **WARNING**: Do NOT set this smaller than 3, or you may damage the
+      // controller chip due to excessive current. See the MAX7219 datasheet for
+      // details.
+      mSpiInterface.send16(kRegisterScanLimit, 7); // scan all digits
+
       mSpiInterface.send16(kRegisterDecodeMode, 0); // no BCD decoding
       mSpiInterface.send16(kRegisterShutdown, 0x1); // turn on
     }
