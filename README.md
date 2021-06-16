@@ -6,7 +6,7 @@ An adjustable, configurable, and extensible framework for rendering seven
 segment LED displays on Arduino platforms. The library supports multiple types
 of LED displays:
 
-* LED modules using the TM1637 controller chip over a custom 2 wire protocol
+* LED modules using the TM1637 controller chip over its custom 2 wire protocol
 * LED modules using the MAX7219/MAX7221 controller chip over SPI
 * LED modules using the HT16K33 controller chip over I2C
 * LED modules using two 74HC595 shift register chips over SPI
@@ -368,8 +368,8 @@ Sometimes the LED modules are hardwired to the controller chip so that the
 positions of the digits (and sometimes segments) do not not match the logical
 arrangement described above. Fortunately, we can rearrange the digit and segment
 bits in software so that everything is remapped to their correct places. For
-example, the diymore.cc 6-digit TM1637 LED module is wired so that the digits
-are displayed like this:
+example, the diymore/robotdyn 6-digit TM1637 LED module is wired so that the
+digits are displayed like this:
 
 ```
 2 1 0 5 4 3
@@ -382,8 +382,9 @@ The `Tm1637Module` class can remap these digits into their correct order:
 ```
 
 Since it is impossible to predict all the different ways that the LED modules
-can be wired, various classes in the AceSegment library allow the remapping
-array to be supplied by the library user.
+can be wired, various classes in the library allow the remapping array to be
+supplied by the library user. The [DEVELOPER.md](DEVELOPER.md) document has some
+preliminary notes about how to create a remap array.
 
 <a name="Usage"></a>
 ## Usage
@@ -467,8 +468,18 @@ different rendering logic.
 ### Tm1637Module
 
 LED modules based on the Titan TM1637 controller chips are abundant on Amazon
-and eBay. The controller chip supports up to 6 digits. Consumer LED modules
-seem have either 4 digits or 6 digits.
+and eBay. Most of LED modules are marked with "diymore.cc" as the manufacturer.
+After purchasing a handful of these on eBay, I discovered that they seem to be
+clones of the TM1637 modules from robotdyn.com. The schematics for these modules
+can be found here:
+
+* https://robotdyn.com/4-digit-led-display-tube-7-segments-tm1637-30x14mm.html
+* https://robotdyn.com/4-digit-led-display-tube-7-segments-tm1637-50x19mm.html
+* https://robotdyn.com/6-digit-led-display-tube-7-segments-46x14mm-tm1637.html
+* https://robotdyn.com/6-digit-led-display-tube-7-segments-76x19mm-tm1637.html
+
+The controller chip supports up to 6 digits. The LED modules from diymore.cc or
+robotdyn.com seem have either 4 digits or 6 digits.
 
 The `Tm1637Module` class looks like this:
 
@@ -686,6 +697,8 @@ readily available from multiple suppliers on Amazon and eBay, and they look like
 this:
 
 ![MAX7219 LED Module](docs/max7219/max7219_8_digits.jpg)
+
+I have not found a circuit schematic for this module.
 
 The `Max7219Module` class looks like this:
 
@@ -911,10 +924,22 @@ pins, and the two chips can be daisy chained together. The chips can be
 programmed using the straightforward SPI protocol.
 
 Recently (since about Aug 2020?), off-the-shelf 8-digit LED modules using two
-74HC595 have become common on Amazon and eBay, in multiple colors. They look
-like this:
+74HC595 have become common on Amazon and eBay, in multiple colors. Many of these
+modules are made by diymore.cc, but they seem to be clones of the LED modules
+from robotdyn.com. The schematics can be found here:
+
+* https://robotdyn.com/8-digit-led-display-tube-7-segments-decimal-points-101x19mm-74hc595.html
+  (8 digits)
+* https://robotdyn.com/6-digit-led-display-tube-7-segments-74hc595.html
+  (6 digits)
+
+The 8-digit module looks like this:
 
 ![HC595 LED Module](docs/hc595/hc595_8_digits.jpg)
+
+(I have not found a source for the 6-digit 74HC595 module. Probably because if
+you need only 6 digits, it is likely easier and cheaper to use a TM1637
+controller, rather than the 74HC595 controller.)
 
 The `Hc595Module` class looks roughly like this (simplified for ease of
 understanding):
