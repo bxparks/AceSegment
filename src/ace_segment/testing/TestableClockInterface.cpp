@@ -29,7 +29,6 @@ namespace testing {
 
 unsigned long TestableClockInterface::sMillis;
 unsigned long TestableClockInterface::sMicros;
-EventLog TestableClockInterface::sEventLog;
 
 }
 }

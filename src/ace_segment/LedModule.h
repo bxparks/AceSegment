@@ -52,7 +52,7 @@ class LedModule {
      *    reference/pointer to the LedModule (or one of its subclasses). Then
      *    getNumDigits() can be used.
      */
-    LedModule(uint8_t numDigits) : mNumDigits(numDigits) {}
+    explicit LedModule(uint8_t numDigits) : mNumDigits(numDigits) {}
 
     /**
      * Return the number of digits supported by this display instance.

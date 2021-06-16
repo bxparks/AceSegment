@@ -22,9 +22,9 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.6.0</span>
+   &#160;<span id="projectnumber">0.7.0</span>
    </div>
-   <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, and 74HC595 controller chips</div>
+   <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, HT16K33, or 74HC595 controller chips</div>
   </td>
  </tr>
  </tbody>
@@ -68,18 +68,18 @@ $(function() {
 </div><!-- top -->
 <div class="header">
   <div class="headertitle">
-<div class="title">ace_segment::HardSpiFastInterface&lt; T_LATCH_PIN, T_DATA_PIN, T_CLOCK_PIN &gt; Member List</div>  </div>
+<div class="title">ace_segment::HardSpiFastInterface&lt; T_SPI, T_LATCH_PIN &gt; Member List</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>This is the complete list of members for <a class="el" href="classace__segment_1_1HardSpiFastInterface.html">ace_segment::HardSpiFastInterface&lt; T_LATCH_PIN, T_DATA_PIN, T_CLOCK_PIN &gt;</a>, including all inherited members.</p>
+<p>This is the complete list of members for <a class="el" href="classace__segment_1_1HardSpiFastInterface.html">ace_segment::HardSpiFastInterface&lt; T_SPI, T_LATCH_PIN &gt;</a>, including all inherited members.</p>
 <table class="directory">
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>begin</b>() const (defined in <a class="el" href="classace__segment_1_1HardSpiFastInterface.html">ace_segment::HardSpiFastInterface&lt; T_LATCH_PIN, T_DATA_PIN, T_CLOCK_PIN &gt;</a>)</td><td class="entry"><a class="el" href="classace__segment_1_1HardSpiFastInterface.html">ace_segment::HardSpiFastInterface&lt; T_LATCH_PIN, T_DATA_PIN, T_CLOCK_PIN &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr bgcolor="#f0f0f0"><td class="entry"><b>end</b>() const (defined in <a class="el" href="classace__segment_1_1HardSpiFastInterface.html">ace_segment::HardSpiFastInterface&lt; T_LATCH_PIN, T_DATA_PIN, T_CLOCK_PIN &gt;</a>)</td><td class="entry"><a class="el" href="classace__segment_1_1HardSpiFastInterface.html">ace_segment::HardSpiFastInterface&lt; T_LATCH_PIN, T_DATA_PIN, T_CLOCK_PIN &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>HardSpiFastInterface</b>(SPIClass &amp;spi=SPI) (defined in <a class="el" href="classace__segment_1_1HardSpiFastInterface.html">ace_segment::HardSpiFastInterface&lt; T_LATCH_PIN, T_DATA_PIN, T_CLOCK_PIN &gt;</a>)</td><td class="entry"><a class="el" href="classace__segment_1_1HardSpiFastInterface.html">ace_segment::HardSpiFastInterface&lt; T_LATCH_PIN, T_DATA_PIN, T_CLOCK_PIN &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classace__segment_1_1HardSpiFastInterface.html#a7c4e272788f23bd062b45d2e8457e6ce">send16</a>(uint16_t value) const</td><td class="entry"><a class="el" href="classace__segment_1_1HardSpiFastInterface.html">ace_segment::HardSpiFastInterface&lt; T_LATCH_PIN, T_DATA_PIN, T_CLOCK_PIN &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>send16</b>(uint8_t msb, uint8_t lsb) const (defined in <a class="el" href="classace__segment_1_1HardSpiFastInterface.html">ace_segment::HardSpiFastInterface&lt; T_LATCH_PIN, T_DATA_PIN, T_CLOCK_PIN &gt;</a>)</td><td class="entry"><a class="el" href="classace__segment_1_1HardSpiFastInterface.html">ace_segment::HardSpiFastInterface&lt; T_LATCH_PIN, T_DATA_PIN, T_CLOCK_PIN &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
-  <tr><td class="entry"><a class="el" href="classace__segment_1_1HardSpiFastInterface.html#ad11fffacbb1ebf47bf002c171986c227">send8</a>(uint8_t value) const</td><td class="entry"><a class="el" href="classace__segment_1_1HardSpiFastInterface.html">ace_segment::HardSpiFastInterface&lt; T_LATCH_PIN, T_DATA_PIN, T_CLOCK_PIN &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr class="even"><td class="entry"><a class="el" href="classace__segment_1_1HardSpiFastInterface.html#a7b1c61ec8701902c2099eba2ee1bc59e">begin</a>() const</td><td class="entry"><a class="el" href="classace__segment_1_1HardSpiFastInterface.html">ace_segment::HardSpiFastInterface&lt; T_SPI, T_LATCH_PIN &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr bgcolor="#f0f0f0"><td class="entry"><b>end</b>() const (defined in <a class="el" href="classace__segment_1_1HardSpiFastInterface.html">ace_segment::HardSpiFastInterface&lt; T_SPI, T_LATCH_PIN &gt;</a>)</td><td class="entry"><a class="el" href="classace__segment_1_1HardSpiFastInterface.html">ace_segment::HardSpiFastInterface&lt; T_SPI, T_LATCH_PIN &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>HardSpiFastInterface</b>(T_SPI &amp;spi) (defined in <a class="el" href="classace__segment_1_1HardSpiFastInterface.html">ace_segment::HardSpiFastInterface&lt; T_SPI, T_LATCH_PIN &gt;</a>)</td><td class="entry"><a class="el" href="classace__segment_1_1HardSpiFastInterface.html">ace_segment::HardSpiFastInterface&lt; T_SPI, T_LATCH_PIN &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classace__segment_1_1HardSpiFastInterface.html#a10fc33e5abef65ef953feea781c46eab">send16</a>(uint16_t value) const</td><td class="entry"><a class="el" href="classace__segment_1_1HardSpiFastInterface.html">ace_segment::HardSpiFastInterface&lt; T_SPI, T_LATCH_PIN &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr bgcolor="#f0f0f0" class="even"><td class="entry"><b>send16</b>(uint8_t msb, uint8_t lsb) const (defined in <a class="el" href="classace__segment_1_1HardSpiFastInterface.html">ace_segment::HardSpiFastInterface&lt; T_SPI, T_LATCH_PIN &gt;</a>)</td><td class="entry"><a class="el" href="classace__segment_1_1HardSpiFastInterface.html">ace_segment::HardSpiFastInterface&lt; T_SPI, T_LATCH_PIN &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
+  <tr><td class="entry"><a class="el" href="classace__segment_1_1HardSpiFastInterface.html#ad0bd4e40284fad9edf1a730c2468b460">send8</a>(uint8_t value) const</td><td class="entry"><a class="el" href="classace__segment_1_1HardSpiFastInterface.html">ace_segment::HardSpiFastInterface&lt; T_SPI, T_LATCH_PIN &gt;</a></td><td class="entry"><span class="mlabel">inline</span></td></tr>
 </table></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

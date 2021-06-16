@@ -30,7 +30,7 @@ SOFTWARE.
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 
 #include <stdint.h>
-#include <Arduino.h>
+#include <Arduino.h> // delayMicroseconds()
 
 namespace ace_segment {
 
@@ -60,20 +60,25 @@ namespace ace_segment {
  * When there are more than some number of TM1636 LED modules, it may actually
  * be more efficient to use the non-fast `SoftTmiInterface`, because you will
  * generate only a single template instantiation. I have not currently done any
- * experimentation to see where the break-even point would be.
+ * experiments to see where the break-even point would be.
  *
  * This class is stateless. It is thread-safe.
+ *
+ * @tparam T_DIO_PIN pin attached to the LED module data line
+ * @tparam T_CLK_PIN pin attached to the LED module clock line
+ * @tparam T_DELAY_MICROS delay after each bit transition (full cycle is 2 *
+ *    T_DELAY_MICROS)
  */
 template <
-    uint8_t T_CLK_PIN,
     uint8_t T_DIO_PIN,
-    uint16_t T_DELAY_MICROS
+    uint8_t T_CLK_PIN,
+    uint8_t T_DELAY_MICROS
 >
 class SoftTmiFastInterface {
   public:
     explicit SoftTmiFastInterface() = default;
 
-    /** Initialize the GPIO pins. */
+    /** Initialize the dio and clk pins. */
     void begin() const {
       // These are open-drain lines, with a pull-up resistor. We must not drive
       // them HIGH actively since that could damage the transitor at the other
@@ -88,7 +93,7 @@ class SoftTmiFastInterface {
       dataHigh();
     }
 
-    /** Set pins to INPUT mode. */
+    /** Set dio and clk pins to INPUT mode. */
     void end() const {
       clockHigh();
       dataHigh();
@@ -111,7 +116,9 @@ class SoftTmiFastInterface {
     }
 
     /**
-     * Send the data byte on the data bus.
+     * Send the data byte on the data bus, with LSB first instead of the usual
+     * MSB first for I2C.
+     *
      * @return 0 means ACK, 1 means NACK.
      */
     uint8_t sendByte(uint8_t data) const {
@@ -126,10 +133,17 @@ class SoftTmiFastInterface {
         data >>= 1;
       }
 
-      // Device places the ACK/NACK bit upon the falling edge of the 8th CLK,
-      // which happens in the loop above.
-      pinModeFast(T_DIO_PIN, INPUT);
-      bitDelay();
+      return readAck();
+    }
+
+  private:
+    /**
+     * Read the ACK/NACK bit from the device upon the falling edge of the 8th
+     * CLK, which happens in the sendByte() loop above.
+     */
+    uint8_t readAck() const {
+      // Go into INPUT mode, reusing dataHigh(), saving 6 flash bytes on AVR.
+      dataHigh();
       uint8_t ack = digitalReadFast(T_DIO_PIN);
 
       // Device releases DIO upon falling edge of the 9th CLK.
@@ -138,7 +152,10 @@ class SoftTmiFastInterface {
       return ack;
     }
 
-  private:
+    // The following methods use compile-time constants from the template
+    // parameters. The compiler will optimize away the 'this' pointer so that
+    // these methods become identical to calling static functions.
+
     void bitDelay() const { delayMicroseconds(T_DELAY_MICROS); }
 
     void clockHigh() const { pinModeFast(T_CLK_PIN, INPUT); bitDelay(); }

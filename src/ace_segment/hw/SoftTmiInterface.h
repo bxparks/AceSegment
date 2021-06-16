@@ -54,6 +54,7 @@ namespace ace_segment {
  *    * There is no I2C address byte, so only a single TM1637 device can be on
  *      the bus.
  *    * The first byte sent to the TM1637 is a command byte.
+ *    * The bytes are sent LSB first instead of the usual MSB first on I2C.
  *
  * Since the protocol does not match I2C, we cannot use the hardware I2C
  * capabilities of the microcontroller, so we have to implement a software
@@ -63,17 +64,24 @@ namespace ace_segment {
  */
 class SoftTmiInterface {
   public:
+    /**
+     * Constructor.
+     * @tparam dioPin pin attached to the LED module data line
+     * @tparam clkPin pin attached to the LED module clock line
+     * @tparam delayMicros delay after each bit transition (full cycle is 2 *
+     *    delayMicros)
+     */
     explicit SoftTmiInterface(
-        uint8_t clkPin,
         uint8_t dioPin,
-        uint16_t delayMicros
+        uint8_t clkPin,
+        uint8_t delayMicros
     ) :
-        mClkPin(clkPin),
         mDioPin(dioPin),
+        mClkPin(clkPin),
         mDelayMicros(delayMicros)
     {}
 
-    /** Initialize the GPIO pins. */
+    /** Initialize the dio and clk pins. */
     void begin() const {
       // These are open-drain lines, with a pull-up resistor. We must not drive
       // them HIGH actively since that could damage the transitor at the other
@@ -88,7 +96,7 @@ class SoftTmiInterface {
       dataHigh();
     }
 
-    /** Set pins to INPUT mode. */
+    /** Set dio and clk pins to INPUT mode. */
     void end() const {
       clockHigh();
       dataHigh();
@@ -111,7 +119,9 @@ class SoftTmiInterface {
     }
 
     /**
-     * Send the data byte on the data bus.
+     * Send the data byte on the data bus, with LSB first instead of the usual
+     * MSB first for I2C.
+     *
      * @return 0 means ACK, 1 means NACK.
      */
     uint8_t sendByte(uint8_t data) const {
@@ -126,10 +136,17 @@ class SoftTmiInterface {
         data >>= 1;
       }
 
-      // Device places the ACK/NACK bit upon the falling edge of the 8th CLK,
-      // which happens in the loop above.
-      pinMode(mDioPin, INPUT);
-      bitDelay();
+      return readAck();
+    }
+
+  private:
+    /**
+     * Read the ACK/NACK bit from the device upon the falling edge of the 8th
+     * CLK, which happens in the sendByte() loop above.
+     */
+    uint8_t readAck() const {
+      // Go into INPUT mode, reusing dataHigh(), saving 10 flash bytes on AVR.
+      dataHigh();
       uint8_t ack = digitalRead(mDioPin);
 
       // Device releases DIO upon falling edge of the 9th CLK.
@@ -138,7 +155,6 @@ class SoftTmiInterface {
       return ack;
     }
 
-  private:
     void bitDelay() const { delayMicroseconds(mDelayMicros); }
 
     void clockHigh() const { pinMode(mClkPin, INPUT); bitDelay(); }
@@ -150,9 +166,9 @@ class SoftTmiInterface {
     void dataLow() const { pinMode(mDioPin, OUTPUT); bitDelay(); }
 
   private:
-    uint8_t const mClkPin;
     uint8_t const mDioPin;
-    uint16_t const mDelayMicros;
+    uint8_t const mClkPin;
+    uint8_t const mDelayMicros;
 };
 
 } // ace_segment

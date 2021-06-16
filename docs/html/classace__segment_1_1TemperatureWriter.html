@@ -22,9 +22,9 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.6.0</span>
+   &#160;<span id="projectnumber">0.7.0</span>
    </div>
-   <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, and 74HC595 controller chips</div>
+   <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, HT16K33, or 74HC595 controller chips</div>
   </td>
  </tr>
  </tbody>
@@ -83,13 +83,17 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a7ff33a2cf83fcfbf411d048d5b522982"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1TemperatureWriter.html#a7ff33a2cf83fcfbf411d048d5b522982">TemperatureWriter</a> (<a class="el" href="classace__segment_1_1LedDisplay.html">LedDisplay</a> &amp;ledDisplay)</td></tr>
-<tr class="memdesc:a7ff33a2cf83fcfbf411d048d5b522982"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="classace__segment_1_1TemperatureWriter.html#a7ff33a2cf83fcfbf411d048d5b522982">More...</a><br /></td></tr>
-<tr class="separator:a7ff33a2cf83fcfbf411d048d5b522982"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a57014b17ff8a59c8da79151d24741e76"><td class="memItemLeft" align="right" valign="top"><a id="a57014b17ff8a59c8da79151d24741e76"></a>
-<a class="el" href="classace__segment_1_1LedDisplay.html">LedDisplay</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1TemperatureWriter.html#a57014b17ff8a59c8da79151d24741e76">display</a> () const</td></tr>
-<tr class="memdesc:a57014b17ff8a59c8da79151d24741e76"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the underlying <a class="el" href="classace__segment_1_1LedDisplay.html" title="General interface for writing segment patterns to the underlying LedModule.">LedDisplay</a>. <br /></td></tr>
-<tr class="separator:a57014b17ff8a59c8da79151d24741e76"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3d0dc943b6b9dbb9ab43ac1720189bd1"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1TemperatureWriter.html#a3d0dc943b6b9dbb9ab43ac1720189bd1">TemperatureWriter</a> (<a class="el" href="classace__segment_1_1LedModule.html">LedModule</a> &amp;<a class="el" href="classace__segment_1_1TemperatureWriter.html#a505122cb61cbe740291351210e86123a">ledModule</a>)</td></tr>
+<tr class="memdesc:a3d0dc943b6b9dbb9ab43ac1720189bd1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="classace__segment_1_1TemperatureWriter.html#a3d0dc943b6b9dbb9ab43ac1720189bd1">More...</a><br /></td></tr>
+<tr class="separator:a3d0dc943b6b9dbb9ab43ac1720189bd1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a505122cb61cbe740291351210e86123a"><td class="memItemLeft" align="right" valign="top"><a id="a505122cb61cbe740291351210e86123a"></a>
+<a class="el" href="classace__segment_1_1LedModule.html">LedModule</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1TemperatureWriter.html#a505122cb61cbe740291351210e86123a">ledModule</a> ()</td></tr>
+<tr class="memdesc:a505122cb61cbe740291351210e86123a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the underlying <a class="el" href="classace__segment_1_1LedModule.html" title="General interface that represents a generic seven-segment LED module with multiple digits.">LedModule</a>. <br /></td></tr>
+<tr class="separator:a505122cb61cbe740291351210e86123a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8f3c59d0c9c607f7f4bee6214c27a90c"><td class="memItemLeft" align="right" valign="top"><a id="a8f3c59d0c9c607f7f4bee6214c27a90c"></a>
+<a class="el" href="classace__segment_1_1PatternWriter.html">PatternWriter</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1TemperatureWriter.html#a8f3c59d0c9c607f7f4bee6214c27a90c">patternWriter</a> ()</td></tr>
+<tr class="memdesc:a8f3c59d0c9c607f7f4bee6214c27a90c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the underlying <a class="el" href="classace__segment_1_1LedModule.html" title="General interface that represents a generic seven-segment LED module with multiple digits.">LedModule</a>. <br /></td></tr>
+<tr class="separator:a8f3c59d0c9c607f7f4bee6214c27a90c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a01a15703c0396f4c3bb619fc43a935f5"><td class="memItemLeft" align="right" valign="top"><a id="a01a15703c0396f4c3bb619fc43a935f5"></a>
 uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1TemperatureWriter.html#a01a15703c0396f4c3bb619fc43a935f5">writeTempAt</a> (uint8_t pos, int16_t temp, int8_t boxSize=0)</td></tr>
 <tr class="memdesc:a01a15703c0396f4c3bb619fc43a935f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write signed integer temperature without deg or unit within the boxSize. <br /></td></tr>
@@ -105,6 +109,14 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1TemperatureWriter.html#a5e8d3bf6108c17b05a58b5750681c508">writeTempDegFAt</a> (uint8_t pos, int16_t temp, int8_t boxSize=0)</td></tr>
 <tr class="memdesc:a5e8d3bf6108c17b05a58b5750681c508"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write integer temperature with degree symbol and 'F' symbol. <br /></td></tr>
 <tr class="separator:a5e8d3bf6108c17b05a58b5750681c508"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a5b4b91727725c0aa8869710fa83b92"><td class="memItemLeft" align="right" valign="top"><a id="a3a5b4b91727725c0aa8869710fa83b92"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1TemperatureWriter.html#a3a5b4b91727725c0aa8869710fa83b92">clear</a> ()</td></tr>
+<tr class="memdesc:a3a5b4b91727725c0aa8869710fa83b92"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the entire display. <br /></td></tr>
+<tr class="separator:a3a5b4b91727725c0aa8869710fa83b92"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0f8cd16f2613cb4cec7654b20501b749"><td class="memItemLeft" align="right" valign="top"><a id="a0f8cd16f2613cb4cec7654b20501b749"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1TemperatureWriter.html#a0f8cd16f2613cb4cec7654b20501b749">clearToEnd</a> (uint8_t pos)</td></tr>
+<tr class="memdesc:a0f8cd16f2613cb4cec7654b20501b749"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the display from <code>pos</code> to the end. <br /></td></tr>
+<tr class="separator:a0f8cd16f2613cb4cec7654b20501b749"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
@@ -127,8 +139,8 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class
 
 <p class="definition">Definition at line <a class="el" href="TemperatureWriter_8h_source.html#l00038">38</a> of file <a class="el" href="TemperatureWriter_8h_source.html">TemperatureWriter.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a7ff33a2cf83fcfbf411d048d5b522982"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7ff33a2cf83fcfbf411d048d5b522982">&#9670;&nbsp;</a></span>TemperatureWriter()</h2>
+<a id="a3d0dc943b6b9dbb9ab43ac1720189bd1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3d0dc943b6b9dbb9ab43ac1720189bd1">&#9670;&nbsp;</a></span>TemperatureWriter()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -139,8 +151,8 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class
         <tr>
           <td class="memname">ace_segment::TemperatureWriter::TemperatureWriter </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="classace__segment_1_1LedDisplay.html">LedDisplay</a> &amp;&#160;</td>
-          <td class="paramname"><em>ledDisplay</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="classace__segment_1_1LedModule.html">LedModule</a> &amp;&#160;</td>
+          <td class="paramname"><em>ledModule</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -154,7 +166,7 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class
 <p>Constructor. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">ledDisplay</td><td>instance of <a class="el" href="classace__segment_1_1LedDisplay.html" title="General interface for writing segment patterns to the underlying LedModule.">LedDisplay</a> </td></tr>
+    <tr><td class="paramname">ledModule</td><td>instance of <a class="el" href="classace__segment_1_1LedModule.html" title="General interface that represents a generic seven-segment LED module with multiple digits.">LedModule</a> </td></tr>
   </table>
   </dd>
 </dl>
@@ -208,7 +220,7 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class
 <p>The caller is responsible for verifying that the temp value fits inside the <code>boxSize</code>. For example, if boxSize is 2, then the range of temp value is [-9, 99]. If the boxSize is too small, the digits will bleed to the right of the box.</p>
 <dl class="section return"><dt>Returns</dt><dd>number of digits written, including any '-' or space characters </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="TemperatureWriter_8h_source.html#l00080">80</a> of file <a class="el" href="TemperatureWriter_8h_source.html">TemperatureWriter.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="TemperatureWriter_8h_source.html#l00081">81</a> of file <a class="el" href="TemperatureWriter_8h_source.html">TemperatureWriter.h</a>.</p>
 
 </div>
 </div>

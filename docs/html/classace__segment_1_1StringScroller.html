@@ -22,9 +22,9 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.6.0</span>
+   &#160;<span id="projectnumber">0.7.0</span>
    </div>
-   <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, and 74HC595 controller chips</div>
+   <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, HT16K33, or 74HC595 controller chips</div>
   </td>
  </tr>
  </tbody>
@@ -83,13 +83,21 @@ $(function() {
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a87dd6ef5474a30bd4f022f690423e72c"><td class="memItemLeft" align="right" valign="top"><a id="a87dd6ef5474a30bd4f022f690423e72c"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringScroller.html#a87dd6ef5474a30bd4f022f690423e72c">StringScroller</a> (<a class="el" href="classace__segment_1_1CharWriter.html">CharWriter</a> &amp;charWriter)</td></tr>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringScroller.html#a87dd6ef5474a30bd4f022f690423e72c">StringScroller</a> (<a class="el" href="classace__segment_1_1CharWriter.html">CharWriter</a> &amp;<a class="el" href="classace__segment_1_1StringScroller.html#a137bd481081e0fff39f32fcd458119f3">charWriter</a>)</td></tr>
 <tr class="memdesc:a87dd6ef5474a30bd4f022f690423e72c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br /></td></tr>
 <tr class="separator:a87dd6ef5474a30bd4f022f690423e72c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4ccc5fc42ac5044761201cde293f4a86"><td class="memItemLeft" align="right" valign="top"><a id="a4ccc5fc42ac5044761201cde293f4a86"></a>
-<a class="el" href="classace__segment_1_1LedDisplay.html">LedDisplay</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringScroller.html#a4ccc5fc42ac5044761201cde293f4a86">display</a> () const</td></tr>
-<tr class="memdesc:a4ccc5fc42ac5044761201cde293f4a86"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the underlying <a class="el" href="classace__segment_1_1LedDisplay.html" title="General interface for writing segment patterns to the underlying LedModule.">LedDisplay</a>. <br /></td></tr>
-<tr class="separator:a4ccc5fc42ac5044761201cde293f4a86"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab81eb92243e2bfbdf9d445e7dfc41578"><td class="memItemLeft" align="right" valign="top"><a id="ab81eb92243e2bfbdf9d445e7dfc41578"></a>
+<a class="el" href="classace__segment_1_1LedModule.html">LedModule</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringScroller.html#ab81eb92243e2bfbdf9d445e7dfc41578">ledModule</a> () const</td></tr>
+<tr class="memdesc:ab81eb92243e2bfbdf9d445e7dfc41578"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the underlying <a class="el" href="classace__segment_1_1LedModule.html" title="General interface that represents a generic seven-segment LED module with multiple digits.">LedModule</a>. <br /></td></tr>
+<tr class="separator:ab81eb92243e2bfbdf9d445e7dfc41578"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a137bd481081e0fff39f32fcd458119f3"><td class="memItemLeft" align="right" valign="top"><a id="a137bd481081e0fff39f32fcd458119f3"></a>
+<a class="el" href="classace__segment_1_1CharWriter.html">CharWriter</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringScroller.html#a137bd481081e0fff39f32fcd458119f3">charWriter</a> ()</td></tr>
+<tr class="memdesc:a137bd481081e0fff39f32fcd458119f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the underlying <a class="el" href="classace__segment_1_1LedModule.html" title="General interface that represents a generic seven-segment LED module with multiple digits.">LedModule</a>. <br /></td></tr>
+<tr class="separator:a137bd481081e0fff39f32fcd458119f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab5bb266afefb6578d8a0d524629001e1"><td class="memItemLeft" align="right" valign="top"><a id="ab5bb266afefb6578d8a0d524629001e1"></a>
+uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringScroller.html#ab5bb266afefb6578d8a0d524629001e1">getNumDigits</a> () const</td></tr>
+<tr class="memdesc:ab5bb266afefb6578d8a0d524629001e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the number of digits supported by this display instance. <br /></td></tr>
+<tr class="separator:ab5bb266afefb6578d8a0d524629001e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae776ccdf7789ff01b13da06579322396"><td class="memItemLeft" align="right" valign="top"><a id="ae776ccdf7789ff01b13da06579322396"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringScroller.html#ae776ccdf7789ff01b13da06579322396">initScrollLeft</a> (const char *s)</td></tr>
 <tr class="memdesc:ae776ccdf7789ff01b13da06579322396"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set scroll string, clear the display, and prepare to scroll left. <br /></td></tr>
@@ -144,7 +152,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <p>Scroll one position left. </p>
 <p>Return true when the scrolling is done and the display is cleared </p>
 
-<p class="definition">Definition at line <a class="el" href="StringScroller_8h_source.html#l00071">71</a> of file <a class="el" href="StringScroller_8h_source.html">StringScroller.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="StringScroller_8h_source.html#l00077">77</a> of file <a class="el" href="StringScroller_8h_source.html">StringScroller.h</a>.</p>
 
 </div>
 </div>
@@ -174,7 +182,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <p>Scroll one position left. </p>
 <p>Return true when the scrolling is done and the display is cleared </p>
 
-<p class="definition">Definition at line <a class="el" href="StringScroller_8h_source.html#l00102">102</a> of file <a class="el" href="StringScroller_8h_source.html">StringScroller.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="StringScroller_8h_source.html#l00108">108</a> of file <a class="el" href="StringScroller_8h_source.html">StringScroller.h</a>.</p>
 
 </div>
 </div>

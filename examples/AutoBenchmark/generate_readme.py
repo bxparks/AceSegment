@@ -51,7 +51,7 @@ LED module:
 * `Max7219Module::flush()`
     * Sends out the buffered digits using SPI.
 
-**Version**: AceSegment v0.6
+**Version**: AceSegment v0.7
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -152,6 +152,25 @@ number of `TimingStats::update()` calls that were made.
   `Tm1637(4,SoftTmiFast,5us)`). The `flush()` or `flushIncremental()` durations
   are almost a factor of 10X to 20X shorter compared to `BIT_DELAY = 100`.
 
+**v0.7:**
+
+* Add benchmarks for `Ht16k33Module`, using `TwoWireInterface`,
+  `SimpleWireInterface`, and `SimpleWireFastInterface`.
+    * On SAMD21 and STM32, the runtime of the `Ht16k33Module(TwoWire)` seems to
+      depend on whether an actual HT16K33 LED module is attached to the I2C bus.
+        * SAMD21: the transmission time becomes 50X longer *without* the LED
+          module attached. 
+        * STM32, the transmission time becomes 30-40X shorter *without* the LED
+          module attached.
+        * I think this is because the `<Wire.h>` library on the SAMD21 and STM32
+          support clock stretching. If the SDA and SCL pins are floating, then
+          the library incorrectly thinks that the slave device is holding the
+          clock line. (Not sure what happens on the STM32 which causes it to
+          perform so much faster.)
+        * Fixed by adding 10k pullup resistors on the SDA and SCL lines on the
+          dev boards that run AutoBenchmark. Prevents clock stretching even if
+          no LED module is actually attached to the pins.
+
 ## Results
 
 The following tables show the number of microseconds taken by:
@@ -176,6 +195,9 @@ The following tables show the number of microseconds taken by:
 * `Max7219Module::flush()`
     * sends all digits in the buffer to the MAX7219 LED module using
       software SPI or hardware SPI
+* `Ht16k33Module::flush()`
+    * sends all digits in the buffer to the HT16K33 LED module using
+      hardware I2C
 
 On AVR processors, the "fast" options are available using the
 [digitalWriteFast](https://github.com/NicksonYap/digitalWriteFast) library whose
@@ -211,7 +233,7 @@ compared to their non-fast equivalents.
 
 * 48 MHz ARM Cortex-M0+
 * Arduino IDE 1.8.13
-* Sparkfun SAMD Core 1.8.1
+* Sparkfun SAMD Core 1.8.3
 
 ```
 {samd_results}
@@ -221,7 +243,7 @@ compared to their non-fast equivalents.
 
 * STM32 "Blue Pill", STM32F103C8, 72 MHz ARM Cortex-M3
 * Arduino IDE 1.8.13
-* STM32duino 1.9.0
+* STM32duino 2.0.0
 
 ```
 {stm32_results}

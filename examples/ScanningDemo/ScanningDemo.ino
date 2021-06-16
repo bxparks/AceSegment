@@ -8,8 +8,9 @@
  */
 
 #include <Arduino.h>
+#include <SPI.h>
 #include <AceCommon.h> // incrementMod()
-#include <AceSegment.h> // ScanningModule, LedDisplay
+#include <AceSegment.h> // ScanningModule, PatternWriter
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
   #include <digitalWriteFast.h>
@@ -28,7 +29,7 @@ using ace_segment::LedMatrixDirectFast4;
 using ace_segment::LedMatrixSingleHc595;
 using ace_segment::LedMatrixDualHc595;
 using ace_segment::ScanningModule;
-using ace_segment::LedDisplay;
+using ace_segment::PatternWriter;
 using ace_segment::kByteOrderDigitHighSegmentLow;
 using ace_segment::kActiveLowPattern;
 using ace_segment::kActiveHighPattern;
@@ -169,7 +170,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HARD_SPI
   // Common Cathode, with transistors on Group pins
-  HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  SPIClass& spiInstance = SPI;
+  HardSpiInterface<SPIClass> spiInterface(spiInstance, LATCH_PIN);
   using LedMatrix = LedMatrixSingleHc595<HardSpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
@@ -180,8 +182,9 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HARD_SPI_FAST
   // Common Cathode, with transistors on Group pins
-  using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
-  SpiInterface spiInterface;
+  SPIClass& spiInstance = SPI;
+  using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
+  SpiInterface spiInterface(spiInstance);
   using LedMatrix = LedMatrixSingleHc595<SpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
@@ -213,7 +216,8 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HARD_SPI
   // Common Anode, with transistors on Group pins
-  HardSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  SPIClass& spiInstance = SPI;
+  HardSpiInterface<SPIClass> spiInterface(spiInstance, LATCH_PIN);
   using LedMatrix = LedMatrixDualHc595<HardSpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
@@ -223,8 +227,9 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HARD_SPI_FAST
   // Common Anode, with transistors on Group pins
-  using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
-  SpiInterface spiInterface;
+  SPIClass& spiInstance = SPI;
+  using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
+  SpiInterface spiInterface(spiInstance);
   using LedMatrix = LedMatrixDualHc595<SpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
@@ -239,9 +244,9 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 // NUM_SUBFIELDS levels of brightness.
 ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
     ledModule(ledMatrix, FRAMES_PER_SECOND);
-LedDisplay display(ledModule);
+PatternWriter patternWriter(ledModule);
 
-// LedDisplay patterns
+// PatternWriter patterns
 const uint8_t PATTERNS[NUM_DIGITS] = {
   0b00111111, // 0
   0b00000110, // 1
@@ -250,6 +255,13 @@ const uint8_t PATTERNS[NUM_DIGITS] = {
 };
 
 void setupAceSegment() {
+  #if LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HARD_SPI \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HARD_SPI_FAST \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HARD_SPI \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HARD_SPI_FAST
+    spiInstance.begin();
+  #endif
+
   #if LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SOFT_SPI \
       || LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HARD_SPI \
       || LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SOFT_SPI_FAST \
@@ -282,16 +294,16 @@ void updateDisplay() {
     // Update the display
     uint8_t j = digitIndex;
     for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
-      display.writePatternAt(i, PATTERNS[j]);
+      patternWriter.writePatternAt(i, PATTERNS[j]);
       // Write a decimal point every other digit, for demo purposes.
-      display.writeDecimalPointAt(i, j & 0x1);
+      patternWriter.writeDecimalPointAt(i, j & 0x1);
       incrementMod(j, (uint8_t) NUM_DIGITS);
     }
     incrementMod(digitIndex, (uint8_t) NUM_DIGITS);
 
     // Update the brightness
     uint8_t brightness = BRIGHTNESS_LEVELS[brightnessIndex];
-    display.setBrightness(brightness);
+    ledModule.setBrightness(brightness);
     incrementMod(brightnessIndex, NUM_BRIGHTNESSES);
   }
 }

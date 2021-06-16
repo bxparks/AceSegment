@@ -52,24 +52,27 @@ END {
     print s[i]
   }
 
-
   print ""
   print "CPU:"
 
-  printf("+----------------------------------------+-------------------+---------+\n")
-  printf("| Functionality                          |   min/  avg/  max | samples |\n")
+  printf("+-----------------------------------------+-------------------+---------+\n")
+  printf("| Functionality                           |   min/  avg/  max | samples |\n")
   for (i = 0; i < TOTAL_BENCHMARKS; i++) {
-    if (u[i]["name"] ~ /^Direct\(4\)$/ \
-        || u[i]["name"] ~ /^Hybrid\(4,SoftSpi\)/ \
-        || u[i]["name"] ~ /^Hc595\(8,SoftSpi\)/ \
-        || u[i]["name"] ~ /^Tm1637\(4,SoftTmi\)/ \
-        || u[i]["name"] ~ /^Tm1637\(4,SoftTmi,5us\)/ \
-        || u[i]["name"] ~ /^Max7219\(8,SoftSpi\)/ \
+    name = u[i]["name"]
+    if (name ~ /^Direct\(4\)$/ \
+        || name ~ /^Hybrid\(4,SoftSpi\)/ \
+        || name ~ /^Hc595\(8,SoftSpi\)/ \
+        || name ~ /^Tm1637\(4,SoftTmi,100us\)/ \
+        || name ~ /^Tm1637\(4,SoftTmi,5us\)/ \
+        || name ~ /^Tm1637\(6,SoftTmi\)/ \
+        || name ~ /^Max7219\(8,SoftSpi\)/ \
+        || name ~ /^Ht16k33\(4,TwoWire\)/ \
     ) {
-      printf("|----------------------------------------+-------------------+---------|\n")
+      printf("|-----------------------------------------+-------------------+---------|\n")
     }
-    printf("| %-38s | %5d/%5d/%5d |    %4d |\n",
+
+    printf("| %-39s | %5d/%5d/%5d |    %4d |\n",
       u[i]["name"], u[i]["min"], u[i]["avg"], u[i]["max"], u[i]["samples"])
   }
-  printf("+----------------------------------------+-------------------+---------+\n")
+  printf("+-----------------------------------------+-------------------+---------+\n")
 }

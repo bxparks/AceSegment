@@ -6,13 +6,12 @@
 
 #include <Arduino.h>
 #include <AceCommon.h> // incrementMod()
-#include <AceSegment.h> // HybridModule, LedDisplay
+#include <AceSegment.h> // HybridModule, PatternWriter
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 #include <digitalWriteFast.h>
 #include <ace_segment/hw/HardSpiFastInterface.h>
 #include <ace_segment/hw/SoftSpiFastInterface.h>
-#include <ace_segment/hw/SoftTmiFastInterface.h>
 #endif
 
 using ace_common::incrementMod;
@@ -23,7 +22,7 @@ using ace_segment::HardSpiInterface;
 using ace_segment::SoftSpiFastInterface;
 using ace_segment::HardSpiFastInterface;
 using ace_segment::HybridModule;
-using ace_segment::LedDisplay;
+using ace_segment::PatternWriter;
 using ace_segment::kActiveHighPattern;
 
 // Select interface protocol.
@@ -52,10 +51,12 @@ using ace_segment::kActiveHighPattern;
 #if defined(EPOXY_DUINO)
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
   #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
+  SPIClass& spiInstance = SPI;
 
 #elif defined(AUNITER_MICRO_CUSTOM_SINGLE)
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
   #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
+  SPIClass& spiInstance = SPI;
 
 #else
   #error Unknown environment
@@ -96,21 +97,11 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
 #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
-  using SpiInterface = HardSpiInterface;
-  #if SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_PRIMARY
-    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
-    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN, SPISecondary);
-  #endif
+  using SpiInterface = HardSpiInterface<SPIClass>;
+  SpiInterface spiInterface(spiInstance, LATCH_PIN);
 #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
-  using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
-  #if SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_PRIMARY
-    SpiInterface spiInterface;
-  #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
-    SpiInterface spiInterface(SPISecondary);
-  #else
-    #error Unknown SPI_INSTANCE_TYPE
-  #endif
+  using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
+  SpiInterface spiInterface(spiInstance);
 #else
   #error Unknown INTERFACE_TYPE
 #endif
@@ -123,9 +114,9 @@ HybridModule<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
     FRAMES_PER_SECOND,
     DIGIT_PINS
 );
-LedDisplay display(ledModule);
+PatternWriter patternWriter(ledModule);
 
-// LedDisplay patterns
+// PatternWriter patterns
 const uint8_t PATTERNS[NUM_DIGITS] = {
   0b00111111, // 0
   0b00000110, // 1
@@ -134,6 +125,11 @@ const uint8_t PATTERNS[NUM_DIGITS] = {
 };
 
 void setupAceSegment() {
+#if INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI \
+    || INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
+  spiInstance.begin();
+#endif
+
   spiInterface.begin();
   ledModule.begin();
 }
@@ -154,16 +150,16 @@ void updateDisplay() {
   // Update the display
   uint8_t j = digitIndex;
   for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
-    display.writePatternAt(i, PATTERNS[j]);
+    patternWriter.writePatternAt(i, PATTERNS[j]);
     // Write a decimal point every other digit, for demo purposes.
-    display.writeDecimalPointAt(i, j & 0x1);
+    patternWriter.writeDecimalPointAt(i, j & 0x1);
     incrementMod(j, (uint8_t) NUM_DIGITS);
   }
   incrementMod(digitIndex, (uint8_t) NUM_DIGITS);
 
   // Update the brightness
   uint8_t brightness = BRIGHTNESS_LEVELS[brightnessIndex];
-  display.setBrightness(brightness);
+  ledModule.setBrightness(brightness);
   incrementMod(brightnessIndex, NUM_BRIGHTNESSES);
 }
 

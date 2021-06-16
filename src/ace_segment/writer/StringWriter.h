@@ -27,7 +27,7 @@ SOFTWARE.
 
 #include <stdint.h>
 #include <AceCommon.h> // FlashString
-#include "../LedDisplay.h"
+#include "../LedModule.h"
 #include "CharWriter.h"
 
 class __FlashStringHelper;
@@ -46,8 +46,11 @@ class StringWriter {
         mCharWriter(charWriter)
     {}
 
-    /** Get the underlying LedDisplay. */
-    LedDisplay& display() const { return mCharWriter.display(); }
+    /** Get the underlying LedModule. */
+    LedModule& ledModule() { return mCharWriter.ledModule(); }
+
+    /** Get the underlying LedModule. */
+    CharWriter& charWriter() { return mCharWriter; }
 
     /**
      * Write c-string `cs` at specified position `pos` up to `numChar`
@@ -78,8 +81,11 @@ class StringWriter {
           pos, ace_common::FlashString(fs), numChar);
     }
 
+    /** Clear the entire display. */
+    void clear() { mCharWriter.clear(); }
+
     /** Clear the display from `pos` to the end. */
-    void clearToEnd(uint8_t pos) { display().clearToEnd(pos); }
+    void clearToEnd(uint8_t pos) { mCharWriter.clearToEnd(pos); }
 
   private:
     // disable copy-constructor and assignment operator
@@ -99,8 +105,7 @@ class StringWriter {
      */
     template <typename T>
     uint8_t writeStringInternalAt(uint8_t pos, T s, uint8_t numChar) {
-      LedDisplay& ledDisplay = mCharWriter.display();
-      const uint8_t numDigits = ledDisplay.getNumDigits();
+      const uint8_t numDigits = mCharWriter.getNumDigits();
       const uint8_t originalPos = pos;
       bool charWasWritten = false;
 
@@ -112,7 +117,7 @@ class StringWriter {
         // Use the decimal point just after a digit to render the '.' character.
         if (c == '.') {
           if (charWasWritten) {
-            ledDisplay.writeDecimalPointAt(pos - 1);
+            mCharWriter.writeDecimalPointAt(pos - 1);
           } else {
             mCharWriter.writeCharAt(pos, '.');
             charWasWritten = false;

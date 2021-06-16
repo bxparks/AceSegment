@@ -38,11 +38,16 @@ enum class EventType : uint8_t {
   kSpiEnd,
   kSpiSend8,
   kSpiSend16,
+  kTmiBegin,
+  kTmiEnd,
+  kTmiStartCondition,
+  kTmiStopCondition,
+  kTmiSendByte,
   kWireBegin,
   kWireEnd,
-  kWireStartCondition,
-  kWireStopCondition,
-  kWireSendByte,
+  kWireBeginTransmission,
+  kWireEndTransmission,
+  kWireWrite,
   kLedMatrixDraw,
   kLedMatrixEnableGroup,
   kLedMatrixDisableGroup,
@@ -120,6 +125,49 @@ class EventLog {
 
     //-------------------------------------------------------------------------
 
+    void addTmiBegin() {
+      if (mNumRecords >= kMaxRecords) return;
+
+      Event& event = mEvents[mNumRecords];
+      event.type = EventType::kTmiBegin;
+      mNumRecords++;
+    }
+
+    void addTmiEnd() {
+      if (mNumRecords >= kMaxRecords) return;
+
+      Event& event = mEvents[mNumRecords];
+      event.type = EventType::kTmiEnd;
+      mNumRecords++;
+    }
+
+    void addTmiStartCondition() {
+      if (mNumRecords >= kMaxRecords) return;
+
+      Event& event = mEvents[mNumRecords];
+      event.type = EventType::kTmiStartCondition;
+      mNumRecords++;
+    }
+
+    void addTmiStopCondition() {
+      if (mNumRecords >= kMaxRecords) return;
+
+      Event& event = mEvents[mNumRecords];
+      event.type = EventType::kTmiStopCondition;
+      mNumRecords++;
+    }
+
+    void addTmiSendByte(uint8_t data) {
+      if (mNumRecords >= kMaxRecords) return;
+
+      Event& event = mEvents[mNumRecords];
+      event.type = EventType::kTmiSendByte;
+      event.arg1 = data;
+      mNumRecords++;
+    }
+
+    //-------------------------------------------------------------------------
+
     void addWireBegin() {
       if (mNumRecords >= kMaxRecords) return;
 
@@ -136,27 +184,27 @@ class EventLog {
       mNumRecords++;
     }
 
-    void addWireStartCondition() {
+    void addWireBeginTransmission() {
       if (mNumRecords >= kMaxRecords) return;
 
       Event& event = mEvents[mNumRecords];
-      event.type = EventType::kWireStartCondition;
+      event.type = EventType::kWireBeginTransmission;
       mNumRecords++;
     }
 
-    void addWireStopCondition() {
+    void addWireEndTransmission() {
       if (mNumRecords >= kMaxRecords) return;
 
       Event& event = mEvents[mNumRecords];
-      event.type = EventType::kWireStopCondition;
+      event.type = EventType::kWireEndTransmission;
       mNumRecords++;
     }
 
-    void addWireSendByte(uint8_t data) {
+    void addWireWrite(uint8_t data) {
       if (mNumRecords >= kMaxRecords) return;
 
       Event& event = mEvents[mNumRecords];
-      event.type = EventType::kWireSendByte;
+      event.type = EventType::kWireWrite;
       event.arg1 = data;
       mNumRecords++;
     }
@@ -207,8 +255,13 @@ class EventLog {
 
     void clear() { mNumRecords = 0; }
 
-    /** Return false if the event log does not match the given arguments. */
-    bool assertEvents(uint8_t n, ...) {
+    /**
+     * Return false if the event log does not match the given arguments.
+     *
+     * @param n number of variable parameters (must be `int` type to be used
+     * in va_start() macro).
+     */
+    bool assertEvents(int n, ...) {
       if (n != mNumRecords) return false;
 
       va_list args;
@@ -253,19 +306,37 @@ class EventLog {
             }
             break;
 
+          case EventType::kTmiBegin:
+            break;
+
+          case EventType::kTmiEnd:
+            break;
+
+          case EventType::kTmiStopCondition:
+            break;
+
+          case EventType::kTmiStartCondition:
+            break;
+
+          case EventType::kTmiSendByte: {
+              uint8_t value = va_arg(args, int);
+              if (value != event.arg1) return false;
+            }
+            break;
+
           case EventType::kWireBegin:
             break;
 
           case EventType::kWireEnd:
             break;
 
-          case EventType::kWireStopCondition:
+          case EventType::kWireBeginTransmission:
             break;
 
-          case EventType::kWireStartCondition:
+          case EventType::kWireEndTransmission:
             break;
 
-          case EventType::kWireSendByte: {
+          case EventType::kWireWrite: {
               uint8_t value = va_arg(args, int);
               if (value != event.arg1) return false;
             }

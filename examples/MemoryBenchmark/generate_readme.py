@@ -38,7 +38,7 @@ by the runtime environment of the processor. For example, it often seems like
 the ESP8266 allocates flash memory in blocks of a certain quantity, so the
 calculated flash size can jump around in unexpected ways.
 
-**Version**: AceSegment v0.6
+**Version**: AceSegment v0.7
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -133,18 +133,18 @@ before substantional refactoring in 2021.
 
 * Slight increase in memory usage (20-30 bytes) on some processors (AVR,
   ESP8266, ESP8266), but slight decrease on others (STM32, Teensy), I think the
-  changes are due to some removal/addition of some methods in `LedDisplay`.
+  changes are due to some removal/addition of some methods in `PatternWriter`.
 * Add memory usage for `Tm1637Module`. Seems to consume something in between
   similar to the `ScanningModule` w/ SW SPI and `ScanningModule` with HW SPI.
 * Add memory usage for `Tm1637Module` using `SoftTmiFastInterface` which uses
   `digitalWriteFast` library for AVR processors. Saves 662 - 776 bytes of flash
   on AVR processors compared to `Tm1637Module` using normal `SoftTmiInterface`.
 * Save 150-200 bytes of flash on AVR processors by lifting all of the
-  `LedDisplay::writePatternAt()` type of methods to `LedDisplay`, making them
-  non-virtual, then funneling these methods through just 2 lower-level virtual
-  methods: `setPatternAt()` and `getPatternAt()`. It also made the
+  `PatternWriter::writePatternAt()` type of methods to `PatternWriter`, making
+  them non-virtual, then funneling these methods through just 2 lower-level
+  virtual methods: `setPatternAt()` and `getPatternAt()`. It also made the
   implementation of `Tm1637Module` position remapping easier.
-* Extracting `LedModule` from `LedDisplay` saves 10-40 bytes on AVR for
+* Extracting `LedModule` from `PatternWriter` saves 10-40 bytes on AVR for
   `ScanningModule` and `Tm1637Module`, but add about that many bytes for various
   Writer classes (probably because they have to go though one additional layer
   of indirection through the `LedModule`). So overall, I think it's a wash.
@@ -168,6 +168,33 @@ before substantional refactoring in 2021.
   `HardSpiFastInterface`. Increases flash memory by 10-30 bytes.
 * Add benchmarks for `StringScroller` and `LevelWriter`.
 
+**v0.7**
+
+* Add benchmarks for `Ht16k33Module`. Consumes about 2400 bytes of flash on
+  ATmega328 (Nano) or ATmega32U4 (Pro Micro), about 2X larger than any other LED
+  module due to the I2C `<Wire.h>` library.
+* The `Max7219(HardSpiFast)` increases by about 100 on AVR because the previous
+  version neglected to call `Max7219Module::flush()`.
+* Modules using hardware SPI (through `HardSpiInterface` or
+  `HardSpiFastInterface`) becomes slightly smaller (30 bytes of flash, 2 bytes
+  of static RAM on AVR) due to removal of explicit `pinMode(dataPin, X)` and
+  `pinMode(clockPin, X)`. These are deferred to `SPIClass::begin()`.
+* Extract out `readAck()`, saving 10 bytes of flash for `SoftTmiInterface` and
+  6 bytes of flash for `SoftTmiFastInterface`.
+* Add `Ht16k33Module(SimpleWire)` and `Ht16k33Module(SimpleWireFast)`.
+* Rename `LedDisplay` to `PatternWriter` and remove one layer of abstraction.
+  Saves 10-22 bytes of flash and 2 bytes of static RAM for most Writer
+  classes (exception: `ClockWriter` and `StringWriter` which increases by 10-16
+  bytes of flash).
+* Modify `FEATURE_BASELINE` for TeensyDuino so that `malloc()` and `free()`
+  are included in its memory consumption. When a class is used polymorphically
+  (i.e. its virtual methods are called), TeensyDuino seems to automatically pull
+  in `malloc()` and `free()`, which seems to consume about 3200 bytes of flash
+  and 1100 bytes of static memory. This happens for all FEATURES other than
+  BASELINE, so we have to make sure that BASELINE also pulls in these. All
+  results for Teensy 3.2 become lower by 3200 bytes of flash and 1100 bytes of
+  static RAM.
+
 ## Results
 
 The following shows the flash and static memory sizes of the `MemoryBenchmark`
@@ -182,6 +209,7 @@ program for various `LedModule` configurations and various Writer classes.
 * `Hc595Module`
 * `Tm1637Module`
 * `Max7219Module`
+* `Ht16k33Module`
 * `NumberWriter`
 * `ClockWriter`
 * `TemperatureWriter`
@@ -190,7 +218,7 @@ program for various `LedModule` configurations and various Writer classes.
 * `StringScroller`
 * `LevelWriter`
 
-The `StubDisplay` is a dummy subclass of `LedDisplay` needed to create the
+The `StubModule` is a dummy subclass of `LedModule` needed to create the
 various Writers. To get a better flash consumption of the Writer classes, this
 stub class should be subtracted from the numbers below. (Ideally, the
 `generate_table.awk` script should do this automatically, but I'm trying to keep
@@ -231,7 +259,7 @@ other `MemoryBenchmark` programs.)
 
 * 48 MHz ARM Cortex-M0+
 * Arduino IDE 1.8.13
-* Sparkfun SAMD Core 1.8.1
+* Sparkfun SAMD Core 1.8.3
 
 ```
 {samd_results}
@@ -241,7 +269,7 @@ other `MemoryBenchmark` programs.)
 
 * STM32F103C8, 72 MHz ARM Cortex-M3
 * Arduino IDE 1.8.13
-* STM32duino 1.9.0
+* STM32duino 2.0.0
 
 ```
 {stm32_results}

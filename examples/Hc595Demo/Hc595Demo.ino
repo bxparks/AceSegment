@@ -5,14 +5,15 @@
  */
 
 #include <Arduino.h>
+#include <SPI.h>
 #include <AceCommon.h> // incrementMod()
-#include <AceSegment.h> // Hc595Module, LedDisplay
+#include <AceSegment.h> // Hc595Module, PatternWriter
 
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
 using ace_segment::Hc595Module;
-using ace_segment::LedDisplay;
+using ace_segment::PatternWriter;
 using ace_segment::HardSpiInterface;
 using ace_segment::SoftSpiInterface;
 using ace_segment::kDigitRemapArray8Hc595;
@@ -36,7 +37,7 @@ using ace_segment::kActiveHighPattern;
 #define SPI_INSTANCE_TYPE_SECONDARY 1
 
 //----------------------------------------------------------------------------
-// Hardware configuration.
+// Hardware environment configuration.
 //----------------------------------------------------------------------------
 
 // Configuration for Arduino IDE
@@ -56,6 +57,7 @@ using ace_segment::kActiveHighPattern;
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
+  SPIClass& spiInstance = SPI;
 
 #elif defined(AUNITER_MICRO_HC595)
   const uint8_t NUM_DIGITS = 8;
@@ -69,6 +71,21 @@ using ace_segment::kActiveHighPattern;
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
+  SPIClass& spiInstance = SPI;
+
+#elif defined(AUNITER_MICRO_CUSTOM_DUAL)
+  const uint8_t NUM_DIGITS = 4;
+  const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = kActiveLowPattern;
+  const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
+  const uint8_t* const REMAP_ARRAY = nullptr;
+
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
+  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
+  const uint8_t LATCH_PIN = 10;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+  SPIClass& spiInstance = SPI;
 
 #elif defined(AUNITER_STM32_HC595)
   const uint8_t NUM_DIGITS = 8;
@@ -85,12 +102,13 @@ using ace_segment::kActiveHighPattern;
     const uint8_t LATCH_PIN = SS;
     const uint8_t DATA_PIN = MOSI;
     const uint8_t CLOCK_PIN = SCK;
+    SPIClass& spiInstance = SPI;
   #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
     // SPI2 pins
     const uint8_t LATCH_PIN = PB12;
     const uint8_t DATA_PIN = PB15;
     const uint8_t CLOCK_PIN = PB13;
-    SPIClass SPISecondary(DATA_PIN, PB14 /*miso*/, CLOCK_PIN);
+    SPIClass spiInstance(DATA_PIN, PB14 /*miso*/, CLOCK_PIN);
   #else
     #error Unknown SPI_INSTANCE_TYPE
   #endif
@@ -107,6 +125,7 @@ using ace_segment::kActiveHighPattern;
   const uint8_t LATCH_PIN = SS;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
+  SPIClass& spiInstance = SPI;
 
 #elif defined(AUNITER_ESP32_HC595)
   const uint8_t NUM_DIGITS = 8;
@@ -124,12 +143,13 @@ using ace_segment::kActiveHighPattern;
     const uint8_t LATCH_PIN = SS;
     const uint8_t DATA_PIN = MOSI;
     const uint8_t CLOCK_PIN = SCK;
+    SPIClass& spiInstance = SPI;
   #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
     // HSPI pins
     const uint8_t LATCH_PIN = 15;
     const uint8_t DATA_PIN = 13;
     const uint8_t CLOCK_PIN = 14;
-    SPIClass SPISecondary(HSPI);
+    SPIClass spiInstance(HSPI);
   #else
     #error Unknown SPI_INSTANCE_TYPE
   #endif
@@ -177,21 +197,11 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
 #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
-  using SpiInterface = HardSpiInterface;
-  #if SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_PRIMARY
-    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
-    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN, SPISecondary);
-  #endif
+  using SpiInterface = HardSpiInterface<SPIClass>;
+  SpiInterface spiInterface(spiInstance, LATCH_PIN);
 #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
-  using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
-  #if SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_PRIMARY
-    SpiInterface spiInterface;
-  #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
-    SpiInterface spiInterface(SPISecondary);
-  #else
-    #error Unknown SPI_INSTANCE_TYPE
-  #endif
+  using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
+  SpiInterface spiInterface(spiInstance);
 #else
   #error Unknown INTERFACE_TYPE
 #endif
@@ -204,9 +214,9 @@ Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
     HC595_BYTE_ORDER,
     REMAP_ARRAY
 );
-LedDisplay display(ledModule);
+PatternWriter patternWriter(ledModule);
 
-// LedDisplay patterns
+// PatternWriter patterns
 const uint8_t PATTERNS[8] = {
   0b00111111, // 0
   0b00000110, // 1
@@ -219,6 +229,11 @@ const uint8_t PATTERNS[8] = {
 };
 
 void setupAceSegment() {
+#if INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI \
+    || INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
+  spiInstance.begin();
+#endif
+
   spiInterface.begin();
   ledModule.begin();
 }
@@ -229,7 +244,7 @@ TimingStats stats;
 uint8_t digitIndex = 0;
 uint8_t brightnessIndex = 0;
 
-// Update the display with new pattern and brightness every second.
+// Update the LedModule with new pattern and brightness every second.
 void updateDisplay() {
   static uint16_t prevUpdateMillis;
 
@@ -240,16 +255,16 @@ void updateDisplay() {
     // Update the display
     uint8_t j = digitIndex;
     for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
-      display.writePatternAt(i, PATTERNS[j]);
+      patternWriter.writePatternAt(i, PATTERNS[j]);
       // Write a decimal point every other digit, for demo purposes.
-      display.writeDecimalPointAt(i, j & 0x1);
+      patternWriter.writeDecimalPointAt(i, j & 0x1);
       incrementMod(j, (uint8_t) NUM_DIGITS);
     }
     incrementMod(digitIndex, (uint8_t) NUM_DIGITS);
 
     // Update the brightness
     uint8_t brightness = BRIGHTNESS_LEVELS[brightnessIndex];
-    display.setBrightness(brightness);
+    ledModule.setBrightness(brightness);
     incrementMod(brightnessIndex, NUM_BRIGHTNESSES);
   }
 }

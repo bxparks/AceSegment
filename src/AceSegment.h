@@ -27,6 +27,10 @@ SOFTWARE.
  *
  * This is the Doxygen documentation for the
  * <a href="https://github.com/bxparks/AceSegment">AceSegment Library</a>.
+ *
+ * Click on the "Classes" menu above to see the list of classes.
+ *
+ * Click on the "Files" menu above to see the list of header files.
  */
 
 #ifndef ACE_SEGMENT_ACE_SEGMENT_H
@@ -37,6 +41,8 @@ SOFTWARE.
 #include "ace_segment/hw/SoftSpiInterface.h"
 #include "ace_segment/hw/HardSpiInterface.h"
 #include "ace_segment/hw/SoftTmiInterface.h"
+#include "ace_segment/hw/TwoWireInterface.h"
+#include "ace_segment/hw/SimpleWireInterface.h"
 #include "ace_segment/hw/remap.h"
 #include "ace_segment/scanning/LedMatrixDirect.h"
 #include "ace_segment/scanning/LedMatrixSingleHc595.h"
@@ -48,7 +54,8 @@ SOFTWARE.
 #include "ace_segment/hc595/Hc595Module.h"
 #include "ace_segment/tm1637/Tm1637Module.h"
 #include "ace_segment/max7219/Max7219Module.h"
-#include "ace_segment/LedDisplay.h"
+#include "ace_segment/ht16k33/Ht16k33Module.h"
+#include "ace_segment/writer/PatternWriter.h"
 #include "ace_segment/writer/NumberWriter.h"
 #include "ace_segment/writer/ClockWriter.h"
 #include "ace_segment/writer/TemperatureWriter.h"
@@ -57,12 +64,14 @@ SOFTWARE.
 #include "ace_segment/writer/StringScroller.h"
 #include "ace_segment/writer/LevelWriter.h"
 
+// Blacklist platforms using https://github.com/arduino/ArduinoCore-api due to
+// incompatibilities.
 #if defined(ARDUINO_API_VERSION)
 #error Platforms using ArduinoCore-API not supported
 #endif
 
 // Version format: xxyyzz == "xx.yy.zz"
-#define ACE_SEGMENT_VERSION 600
-#define ACE_SEGMENT_VERSION_STRING "0.6"
+#define ACE_SEGMENT_VERSION 700
+#define ACE_SEGMENT_VERSION_STRING "0.7"
 
 #endif

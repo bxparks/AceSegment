@@ -22,9 +22,9 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.6.0</span>
+   &#160;<span id="projectnumber">0.7.0</span>
    </div>
-   <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, and 74HC595 controller chips</div>
+   <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, HT16K33, or 74HC595 controller chips</div>
   </td>
  </tr>
  </tbody>
@@ -72,7 +72,7 @@ $(function() {
 </div><table border="0" cellspacing="10" cellpadding="0">
 <tr><td><img src="inherit_graph_0.png" border="0" usemap="#ace__segment_1_1CharWriter" alt=""/>
 <map name="ace__segment_1_1CharWriter" id="ace__segment_1_1CharWriter">
-<area shape="rect" href="classace__segment_1_1CharWriter.html" title="The CharWriter supports mapping of an 8&#45;bit character set to segment patterns supported by LedDisplay..." alt="" coords="5,5,192,32"/>
+<area shape="rect" href="classace__segment_1_1CharWriter.html" title="The CharWriter supports mapping of an 8&#45;bit character set to segment patterns supported by LedModule." alt="" coords="5,5,192,32"/>
 </map>
 </td></tr>
 <tr><td><img src="inherit_graph_1.png" border="0" usemap="#ace__segment_1_1ClockInterface" alt=""/>
@@ -82,7 +82,7 @@ $(function() {
 </td></tr>
 <tr><td><img src="inherit_graph_2.png" border="0" usemap="#ace__segment_1_1ClockWriter" alt=""/>
 <map name="ace__segment_1_1ClockWriter" id="ace__segment_1_1ClockWriter">
-<area shape="rect" href="classace__segment_1_1ClockWriter.html" title="The ClockWriter writes &quot;hh:mm&quot; and &quot;yyyy&quot; to the LedDisplay." alt="" coords="5,5,199,32"/>
+<area shape="rect" href="classace__segment_1_1ClockWriter.html" title="The ClockWriter writes &quot;hh:mm&quot; and &quot;yyyy&quot; to the LedModule." alt="" coords="5,5,199,32"/>
 </map>
 </td></tr>
 <tr><td><img src="inherit_graph_3.png" border="0" usemap="#ace__segment_1_1GpioInterface" alt=""/>
@@ -90,22 +90,17 @@ $(function() {
 <area shape="rect" href="classace__segment_1_1GpioInterface.html" title="A utility lass that provides a thin layer of indirection to various GPIO functions." alt="" coords="5,5,211,32"/>
 </map>
 </td></tr>
-<tr><td><img src="inherit_graph_4.png" border="0" usemap="#ace__segment_1_1HardSpiFastInterface_3_01T__LATCH__PIN_00_01T__DATA__PIN_00_01T__CLOCK__PIN_01_4" alt=""/>
-<map name="ace__segment_1_1HardSpiFastInterface_3_01T__LATCH__PIN_00_01T__DATA__PIN_00_01T__CLOCK__PIN_01_4" id="ace__segment_1_1HardSpiFastInterface_3_01T__LATCH__PIN_00_01T__DATA__PIN_00_01T__CLOCK__PIN_01_4">
-<area shape="rect" href="classace__segment_1_1HardSpiFastInterface.html" title="Hardware SPI interface to talk to one or two 74HC595 Shift Register chip(s), using the predefined SPI..." alt="" coords="5,5,220,61"/>
+<tr><td><img src="inherit_graph_4.png" border="0" usemap="#ace__segment_1_1HardSpiFastInterface_3_01T__SPI_00_01T__LATCH__PIN_01_4" alt=""/>
+<map name="ace__segment_1_1HardSpiFastInterface_3_01T__SPI_00_01T__LATCH__PIN_01_4" id="ace__segment_1_1HardSpiFastInterface_3_01T__SPI_00_01T__LATCH__PIN_01_4">
+<area shape="rect" href="classace__segment_1_1HardSpiFastInterface.html" title="Hardware SPI interface to talk to one or two 74HC595 Shift Register chip(s), using the predefined SPI..." alt="" coords="5,5,244,47"/>
 </map>
 </td></tr>
-<tr><td><img src="inherit_graph_5.png" border="0" usemap="#ace__segment_1_1HardSpiInterface" alt=""/>
-<map name="ace__segment_1_1HardSpiInterface" id="ace__segment_1_1HardSpiInterface">
-<area shape="rect" href="classace__segment_1_1HardSpiInterface.html" title="Hardware SPI interface to talk to one or two 74HC595 Shift Register chip(s), using the predefined SPI..." alt="" coords="5,5,232,32"/>
+<tr><td><img src="inherit_graph_5.png" border="0" usemap="#ace__segment_1_1HardSpiInterface_3_01T__SPI_01_4" alt=""/>
+<map name="ace__segment_1_1HardSpiInterface_3_01T__SPI_01_4" id="ace__segment_1_1HardSpiInterface_3_01T__SPI_01_4">
+<area shape="rect" href="classace__segment_1_1HardSpiInterface.html" title="Hardware SPI interface to talk to one or two 74HC595 Shift Register chip(s), using the predefined SPI..." alt="" coords="5,5,232,47"/>
 </map>
 </td></tr>
-<tr><td><img src="inherit_graph_6.png" border="0" usemap="#ace__segment_1_1LedDisplay" alt=""/>
-<map name="ace__segment_1_1LedDisplay" id="ace__segment_1_1LedDisplay">
-<area shape="rect" href="classace__segment_1_1LedDisplay.html" title="General interface for writing segment patterns to the underlying LedModule." alt="" coords="5,5,195,32"/>
-</map>
-</td></tr>
-<tr><td><img src="inherit_graph_7.png" border="0" usemap="#ace__segment_1_1LedMatrixBase" alt=""/>
+<tr><td><img src="inherit_graph_6.png" border="0" usemap="#ace__segment_1_1LedMatrixBase" alt=""/>
 <map name="ace__segment_1_1LedMatrixBase" id="ace__segment_1_1LedMatrixBase">
 <area shape="rect" href="classace__segment_1_1LedMatrixBase.html" title="Class that represents the abstraction of a particular LED display wiring, and knows how to turn off a..." alt="" coords="5,143,220,170"/>
 <area shape="rect" href="classace__segment_1_1LedMatrixDirect.html" title="An LedMatrixBase that whose group pins and element pins are wired directly to the MCU." alt="" coords="271,5,493,47"/>
@@ -115,55 +110,71 @@ $(function() {
 <area shape="rect" href="classace__segment_1_1LedMatrixSingleHc595.html" title=" " alt="" coords="268,267,496,308"/>
 </map>
 </td></tr>
-<tr><td><img src="inherit_graph_8.png" border="0" usemap="#ace__segment_1_1LedModule" alt=""/>
+<tr><td><img src="inherit_graph_7.png" border="0" usemap="#ace__segment_1_1LedModule" alt=""/>
 <map name="ace__segment_1_1LedModule" id="ace__segment_1_1LedModule">
-<area shape="rect" href="classace__segment_1_1LedModule.html" title="General interface that represents a generic seven&#45;segment LED module with multiple digits." alt="" coords="5,233,193,259"/>
-<area shape="rect" href="classace__segment_1_1Max7219Module.html" title="An implementation of LedModule using the MAX7219 chip." alt="" coords="263,5,488,47"/>
-<area shape="rect" href="classace__segment_1_1ScanningModule.html" title="An implementation of LedModule for display modules which do not have hardware controller chips,..." alt="" coords="257,71,494,127"/>
-<area shape="rect" href="classace__segment_1_1Tm1637Module.html" title="An implementation of LedModule using the TM1637 chip." alt="" coords="266,152,485,193"/>
-<area shape="rect" href="classace__segment_1_1ScanningModule.html" title=" " alt="" coords="253,218,497,274"/>
-<area shape="rect" href="classace__segment_1_1ScanningModule.html" title=" " alt="" coords="263,298,487,383"/>
-<area shape="rect" href="classace__segment_1_1ScanningModule.html" title=" " alt="" coords="241,407,509,463"/>
-<area shape="rect" href="classace__segment_1_1ScanningModule.html" title=" " alt="" coords="263,488,487,559"/>
-<area shape="rect" href="classace__segment_1_1DirectModule.html" title="An implementation of LedModule whose segment and digit pins are directly connected to the GPIO pins o..." alt="" coords="577,218,781,274"/>
-<area shape="rect" href="classace__segment_1_1DirectFast4Module.html" title="An implementation of LedModule whose segment and digit pins are directly connected to the GPIO pins o..." alt="" coords="563,298,795,383"/>
-<area shape="rect" href="classace__segment_1_1Hc595Module.html" title="An implementation of LedModule class that supports an LED module using 2 74HC595 Shift Register chips..." alt="" coords="557,407,800,463"/>
-<area shape="rect" href="classace__segment_1_1HybridModule.html" title="An implementation of LedModule class that supports an LED module using a single 74HC595 Shift Registe..." alt="" coords="557,495,800,551"/>
+<area shape="rect" href="classace__segment_1_1LedModule.html" title="General interface that represents a generic seven&#45;segment LED module with multiple digits." alt="" coords="5,262,193,289"/>
+<area shape="rect" href="classace__segment_1_1Ht16k33Module.html" title="An implementation of LedModule using the HT16K33 chip." alt="" coords="265,5,485,47"/>
+<area shape="rect" href="classace__segment_1_1Max7219Module.html" title="An implementation of LedModule using the MAX7219 chip." alt="" coords="263,71,488,112"/>
+<area shape="rect" href="classace__segment_1_1ScanningModule.html" title="An implementation of LedModule for display modules which do not have hardware controller chips,..." alt="" coords="257,137,494,193"/>
+<area shape="rect" href="classace__segment_1_1Tm1637Module.html" title="An implementation of LedModule using the TM1637 chip." alt="" coords="266,217,485,259"/>
+<area shape="rect" href="classace__segment_1_1ScanningModule.html" title=" " alt="" coords="253,283,497,339"/>
+<area shape="rect" href="classace__segment_1_1ScanningModule.html" title=" " alt="" coords="263,363,487,449"/>
+<area shape="rect" href="classace__segment_1_1ScanningModule.html" title=" " alt="" coords="241,473,509,529"/>
+<area shape="rect" href="classace__segment_1_1ScanningModule.html" title=" " alt="" coords="263,553,487,624"/>
+<area shape="rect" href="classace__segment_1_1DirectModule.html" title="An implementation of LedModule whose segment and digit pins are directly connected to the GPIO pins o..." alt="" coords="577,283,781,339"/>
+<area shape="rect" href="classace__segment_1_1DirectFast4Module.html" title="An implementation of LedModule whose segment and digit pins are directly connected to the GPIO pins o..." alt="" coords="563,363,795,449"/>
+<area shape="rect" href="classace__segment_1_1Hc595Module.html" title="An implementation of LedModule class that supports an LED module using 2 74HC595 Shift Register chips..." alt="" coords="557,473,800,529"/>
+<area shape="rect" href="classace__segment_1_1HybridModule.html" title="An implementation of LedModule class that supports an LED module using a single 74HC595 Shift Registe..." alt="" coords="557,561,800,617"/>
 </map>
 </td></tr>
-<tr><td><img src="inherit_graph_9.png" border="0" usemap="#ace__segment_1_1LevelWriter" alt=""/>
+<tr><td><img src="inherit_graph_8.png" border="0" usemap="#ace__segment_1_1LevelWriter" alt=""/>
 <map name="ace__segment_1_1LevelWriter" id="ace__segment_1_1LevelWriter">
 <area shape="rect" href="classace__segment_1_1LevelWriter.html" title="Emulate a level led module using a left vertical bar and a right vertical bar on each digit." alt="" coords="5,5,197,32"/>
 </map>
 </td></tr>
-<tr><td><img src="inherit_graph_10.png" border="0" usemap="#ace__segment_1_1NumberWriter" alt=""/>
+<tr><td><img src="inherit_graph_9.png" border="0" usemap="#ace__segment_1_1NumberWriter" alt=""/>
 <map name="ace__segment_1_1NumberWriter" id="ace__segment_1_1NumberWriter">
 <area shape="rect" href="classace__segment_1_1NumberWriter.html" title="The NumberWriter supports converting decimal and hexadecimal numbers to segment patterns expected by ..." alt="" coords="5,5,215,32"/>
 </map>
 </td></tr>
-<tr><td><img src="inherit_graph_11.png" border="0" usemap="#ace__segment_1_1SoftSpiInterface" alt=""/>
+<tr><td><img src="inherit_graph_10.png" border="0" usemap="#ace__segment_1_1PatternWriter" alt=""/>
+<map name="ace__segment_1_1PatternWriter" id="ace__segment_1_1PatternWriter">
+<area shape="rect" href="classace__segment_1_1PatternWriter.html" title="Write LED segment patterns to the underlying LedModule." alt="" coords="5,5,208,32"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_11.png" border="0" usemap="#ace__segment_1_1SimpleWireInterface" alt=""/>
+<map name="ace__segment_1_1SimpleWireInterface" id="ace__segment_1_1SimpleWireInterface">
+<area shape="rect" href="classace__segment_1_1SimpleWireInterface.html" title="A software I2C implementation for sending LED segment patterns over I2C." alt="" coords="5,5,256,32"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_12.png" border="0" usemap="#ace__segment_1_1SoftSpiInterface" alt=""/>
 <map name="ace__segment_1_1SoftSpiInterface" id="ace__segment_1_1SoftSpiInterface">
 <area shape="rect" href="classace__segment_1_1SoftSpiInterface.html" title="Software SPI using shiftOut()." alt="" coords="5,5,225,32"/>
 </map>
 </td></tr>
-<tr><td><img src="inherit_graph_12.png" border="0" usemap="#ace__segment_1_1SoftTmiInterface" alt=""/>
+<tr><td><img src="inherit_graph_13.png" border="0" usemap="#ace__segment_1_1SoftTmiInterface" alt=""/>
 <map name="ace__segment_1_1SoftTmiInterface" id="ace__segment_1_1SoftTmiInterface">
 <area shape="rect" href="classace__segment_1_1SoftTmiInterface.html" title="Class that knows how to communicate with a TM1637 chip." alt="" coords="5,5,231,32"/>
 </map>
 </td></tr>
-<tr><td><img src="inherit_graph_13.png" border="0" usemap="#ace__segment_1_1StringScroller" alt=""/>
+<tr><td><img src="inherit_graph_14.png" border="0" usemap="#ace__segment_1_1StringScroller" alt=""/>
 <map name="ace__segment_1_1StringScroller" id="ace__segment_1_1StringScroller">
 <area shape="rect" href="classace__segment_1_1StringScroller.html" title="Class that scrolls a string left or right." alt="" coords="5,5,209,32"/>
 </map>
 </td></tr>
-<tr><td><img src="inherit_graph_14.png" border="0" usemap="#ace__segment_1_1StringWriter" alt=""/>
+<tr><td><img src="inherit_graph_15.png" border="0" usemap="#ace__segment_1_1StringWriter" alt=""/>
 <map name="ace__segment_1_1StringWriter" id="ace__segment_1_1StringWriter">
 <area shape="rect" href="classace__segment_1_1StringWriter.html" title="Class that writes out a string, collapsing &#39;." alt="" coords="5,5,200,32"/>
 </map>
 </td></tr>
-<tr><td><img src="inherit_graph_15.png" border="0" usemap="#ace__segment_1_1TemperatureWriter" alt=""/>
+<tr><td><img src="inherit_graph_16.png" border="0" usemap="#ace__segment_1_1TemperatureWriter" alt=""/>
 <map name="ace__segment_1_1TemperatureWriter" id="ace__segment_1_1TemperatureWriter">
 <area shape="rect" href="classace__segment_1_1TemperatureWriter.html" title="The TemperatureWriter supports writing integer temperature values in Celcius or Farenheit." alt="" coords="5,5,204,47"/>
+</map>
+</td></tr>
+<tr><td><img src="inherit_graph_17.png" border="0" usemap="#ace__segment_1_1TwoWireInterface_3_01T__WIRE_01_4" alt=""/>
+<map name="ace__segment_1_1TwoWireInterface_3_01T__WIRE_01_4" id="ace__segment_1_1TwoWireInterface_3_01T__WIRE_01_4">
+<area shape="rect" href="classace__segment_1_1TwoWireInterface.html" title="A thin wrapper around an I2C TwoWire class and its Wire object." alt="" coords="5,5,236,47"/>
 </map>
 </td></tr>
 </table>

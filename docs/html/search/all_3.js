@@ -1,9 +1,8 @@
 var searchData=
 [
-  ['digitalwrite_7',['digitalWrite',['../classace__segment_1_1GpioInterface.html#ae87dcb5fa1c1245fc5747abfeebac7b4',1,'ace_segment::GpioInterface']]],
-  ['directfast4module_8',['DirectFast4Module',['../classace__segment_1_1DirectFast4Module.html',1,'ace_segment']]],
-  ['directmodule_9',['DirectModule',['../classace__segment_1_1DirectModule.html',1,'ace_segment']]],
-  ['disablegroup_10',['disableGroup',['../classace__segment_1_1LedMatrixBase.html#a392418ec3a4e763920e21acc763e8848',1,'ace_segment::LedMatrixBase::disableGroup()'],['../classace__segment_1_1LedMatrixDualHc595.html#a0a08cfdd1de0cbdb20b9e66b22627c86',1,'ace_segment::LedMatrixDualHc595::disableGroup()']]],
-  ['display_11',['display',['../classace__segment_1_1CharWriter.html#a040fedebff2340e6a7435de64ececf91',1,'ace_segment::CharWriter::display()'],['../classace__segment_1_1ClockWriter.html#ae94575a04a919a06149f778f1b3fca30',1,'ace_segment::ClockWriter::display()'],['../classace__segment_1_1LevelWriter.html#a3f9d8b51d183563535d65d9118236fd3',1,'ace_segment::LevelWriter::display()'],['../classace__segment_1_1NumberWriter.html#a3c57c816ce39986bbc508eddb2e0ac3c',1,'ace_segment::NumberWriter::display()'],['../classace__segment_1_1StringScroller.html#a4ccc5fc42ac5044761201cde293f4a86',1,'ace_segment::StringScroller::display()'],['../classace__segment_1_1StringWriter.html#a4bb5339f4f67bd406366684ed1fae2ed',1,'ace_segment::StringWriter::display()'],['../classace__segment_1_1TemperatureWriter.html#a57014b17ff8a59c8da79151d24741e76',1,'ace_segment::TemperatureWriter::display()']]],
+  ['digitalwrite_8',['digitalWrite',['../classace__segment_1_1GpioInterface.html#ae87dcb5fa1c1245fc5747abfeebac7b4',1,'ace_segment::GpioInterface']]],
+  ['directfast4module_9',['DirectFast4Module',['../classace__segment_1_1DirectFast4Module.html',1,'ace_segment']]],
+  ['directmodule_10',['DirectModule',['../classace__segment_1_1DirectModule.html',1,'ace_segment']]],
+  ['disablegroup_11',['disableGroup',['../classace__segment_1_1LedMatrixBase.html#a392418ec3a4e763920e21acc763e8848',1,'ace_segment::LedMatrixBase::disableGroup()'],['../classace__segment_1_1LedMatrixDualHc595.html#a0a08cfdd1de0cbdb20b9e66b22627c86',1,'ace_segment::LedMatrixDualHc595::disableGroup()']]],
   ['draw_12',['draw',['../classace__segment_1_1LedMatrixBase.html#ad9d2bc50b50ab4b2c16c1ef53b3397d2',1,'ace_segment::LedMatrixBase::draw()'],['../classace__segment_1_1LedMatrixDualHc595.html#ac191206242ca55ebb31652de7993277e',1,'ace_segment::LedMatrixDualHc595::draw()']]]
 ];

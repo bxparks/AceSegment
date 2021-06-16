@@ -39,6 +39,7 @@
  */
 
 #include <Arduino.h>
+#include <SPI.h>
 #include <AceButton.h>
 #include <AceCommon.h> // incrementMod()
 #include <AceSegment.h>
@@ -48,26 +49,31 @@
   #include <ace_segment/hw/SoftSpiFastInterface.h>
   #include <ace_segment/hw/HardSpiFastInterface.h>
   #include <ace_segment/hw/SoftTmiFastInterface.h>
+  #include <ace_segment/hw/SimpleWireFastInterface.h>
   #include <ace_segment/direct/DirectFast4Module.h>
   using ace_segment::SoftTmiFastInterface;
   using ace_segment::HardSpiFastInterface;
   using ace_segment::SoftSpiFastInterface;
+  using ace_segment::SimpleWireFastInterface;
+  using ace_segment::DirectFast4Module;
 #endif
 
 using ace_common::incrementMod;
 using ace_button::AceButton;
 using ace_button::ButtonConfig;
 using ace_button::LadderButtonConfig;
+using ace_segment::SoftTmiInterface;
+using ace_segment::HardSpiInterface;
+using ace_segment::SoftSpiInterface;
+using ace_segment::TwoWireInterface;
+using ace_segment::SimpleWireInterface;
 using ace_segment::DirectModule;
-using ace_segment::DirectFast4Module;
 using ace_segment::HybridModule;
 using ace_segment::Hc595Module;
 using ace_segment::Tm1637Module;
 using ace_segment::Max7219Module;
-using ace_segment::SoftTmiInterface;
-using ace_segment::HardSpiInterface;
-using ace_segment::SoftSpiInterface;
-using ace_segment::LedDisplay;
+using ace_segment::Ht16k33Module;
+using ace_segment::PatternWriter;
 using ace_segment::CharWriter;
 using ace_segment::NumberWriter;
 using ace_segment::ClockWriter;
@@ -98,22 +104,25 @@ using ace_segment::kActiveHighPattern;
 #define LED_DISPLAY_TYPE_TM1637 1
 #define LED_DISPLAY_TYPE_MAX7219 2
 #define LED_DISPLAY_TYPE_HC595 3
-#define LED_DISPLAY_TYPE_DIRECT 4
-#define LED_DISPLAY_TYPE_HYBRID 5
-#define LED_DISPLAY_TYPE_FULL 6
+#define LED_DISPLAY_TYPE_HT16K33 4
+#define LED_DISPLAY_TYPE_DIRECT 5
+#define LED_DISPLAY_TYPE_HYBRID 6
+#define LED_DISPLAY_TYPE_FULL 7 /* Rename to CUSTOM_HC595? */
 
 // Used by LED_DISPLAY_TYPE_DIRECT
 #define DIRECT_INTERFACE_TYPE_NORMAL 0
 #define DIRECT_INTERFACE_TYPE_FAST_4 1
 
-// Used by LED_DISPLAY_TYPE_HC595, LED_DISPLAY_TYPE_HYBRID,
-// and LED_DISPLAY_TYPE_FULL
+// Methods of communication to the LED module (SPI, I2C, TM1637).
 #define INTERFACE_TYPE_SOFT_SPI 0
 #define INTERFACE_TYPE_SOFT_SPI_FAST 1
 #define INTERFACE_TYPE_HARD_SPI 2
 #define INTERFACE_TYPE_HARD_SPI_FAST 3
 #define INTERFACE_TYPE_SOFT_TMI 4
 #define INTERFACE_TYPE_SOFT_TMI_FAST 5
+#define INTERFACE_TYPE_TWO_WIRE 6
+#define INTERFACE_TYPE_SIMPLE_WIRE 7
+#define INTERFACE_TYPE_SIMPLE_WIRE_FAST 8
 
 // Some microcontrollers have 2 or more SPI buses. PRIMARY selects the default.
 // SECONDARY selects the alternate. I don't have a board with more than 2, but
@@ -194,7 +203,6 @@ using ace_segment::kActiveHighPattern;
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
-  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
@@ -212,7 +220,6 @@ using ace_segment::kActiveHighPattern;
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
-  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
@@ -228,8 +235,8 @@ using ace_segment::kActiveHighPattern;
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_TMI
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_TMI_FAST
-  const uint8_t CLK_PIN = A0;
   const uint8_t DIO_PIN = 9;
+  const uint8_t CLK_PIN = A0;
   const uint16_t BIT_DELAY = 100;
 
   // Select one of the flush methods.
@@ -249,10 +256,10 @@ using ace_segment::kActiveHighPattern;
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
-  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
+  SPIClass& spiInstance = SPI;
 
 #elif defined(AUNITER_MICRO_HC595)
   #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
@@ -267,10 +274,27 @@ using ace_segment::kActiveHighPattern;
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
-  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
+  SPIClass& spiInstance = SPI;
+
+#elif defined(AUNITER_MICRO_HT16K33)
+  #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
+  const uint8_t MODE_BUTTON_PIN = A2;
+  const uint8_t CHANGE_BUTTON_PIN = A3;
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HT16K33
+  const uint8_t NUM_DIGITS = 4;
+
+  // Choose one of the following variants:
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_WIRE
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_WIRE_FAST
+  #define INTERFACE_TYPE INTERFACE_TYPE_TWO_WIRE
+  const uint8_t SDA_PIN = SDA;
+  const uint8_t SCL_PIN = SCL;
+  const uint8_t BIT_DELAY = 2;
+  const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
 #elif defined(AUNITER_STM32_TM1637)
   #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
@@ -282,8 +306,8 @@ using ace_segment::kActiveHighPattern;
 
   // Choose one of the following variants:
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_TMI
-  const uint8_t CLK_PIN = PB3;
   const uint8_t DIO_PIN = PB4;
+  const uint8_t CLK_PIN = PB3;
   const uint16_t BIT_DELAY = 100;
 
   // Select one of the flush methods.
@@ -308,12 +332,13 @@ using ace_segment::kActiveHighPattern;
     const uint8_t LATCH_PIN = SS;
     const uint8_t DATA_PIN = MOSI;
     const uint8_t CLOCK_PIN = SCK;
+    SPIClass& spiInstance = SPI;
   #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
     // SPI2 pins
     const uint8_t LATCH_PIN = PB12;
     const uint8_t DATA_PIN = PB15;
     const uint8_t CLOCK_PIN = PB13;
-    SPIClass SPISecondary(DATA_PIN, PB14 /*miso*/, CLOCK_PIN);
+    SPIClass spiInstance(DATA_PIN, PB14 /*miso*/, CLOCK_PIN);
   #else
     #error Unknown SPI_INSTANCE_TYPE
   #endif
@@ -336,15 +361,33 @@ using ace_segment::kActiveHighPattern;
     const uint8_t LATCH_PIN = SS;
     const uint8_t DATA_PIN = MOSI;
     const uint8_t CLOCK_PIN = SCK;
+    SPIClass& spiInstance = SPI;
   #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
     // SPI2 pins
     const uint8_t LATCH_PIN = PB12;
     const uint8_t DATA_PIN = PB15;
     const uint8_t CLOCK_PIN = PB13;
-    SPIClass SPISecondary(DATA_PIN, PB14 /*miso*/, CLOCK_PIN);
+    SPIClass spiInstance(DATA_PIN, PB14 /*miso*/, CLOCK_PIN);
   #else
     #error Unknown SPI_INSTANCE_TYPE
   #endif
+
+#elif defined(AUNITER_STM32_HT16K33)
+  #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
+  const uint8_t MODE_BUTTON_PIN = PA0;
+  const uint8_t CHANGE_BUTTON_PIN = PA1;
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HT16K33
+  const uint8_t NUM_DIGITS = 4;
+
+  // Choose one of the following variants:
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_WIRE
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_WIRE_FAST
+  #define INTERFACE_TYPE INTERFACE_TYPE_TWO_WIRE
+  const uint8_t SDA_PIN = SDA;
+  const uint8_t SCL_PIN = SCL;
+  const uint8_t BIT_DELAY = 2;
+  const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
 #elif defined(AUNITER_D1MINI_LARGE_TM1637)
   #define BUTTON_TYPE BUTTON_TYPE_ANALOG
@@ -364,8 +407,8 @@ using ace_segment::kActiveHighPattern;
 
   // Choose one of the following variants:
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_TMI
-  const uint8_t CLK_PIN = D5;
   const uint8_t DIO_PIN = D7;
+  const uint8_t CLK_PIN = D5;
   const uint16_t BIT_DELAY = 100;
 
 #elif defined(AUNITER_D1MINI_LARGE_MAX7219)
@@ -387,10 +430,10 @@ using ace_segment::kActiveHighPattern;
   // Choose one of the following variants:
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
-  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
   const uint8_t LATCH_PIN = SS;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
+  SPIClass& spiInstance = SPI;
 
 #elif defined(AUNITER_D1MINI_LARGE_HC595)
   #define BUTTON_TYPE BUTTON_TYPE_ANALOG
@@ -411,10 +454,35 @@ using ace_segment::kActiveHighPattern;
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
-  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
   const uint8_t LATCH_PIN = SS;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
+  SPIClass& spiInstance = SPI;
+
+#elif defined(AUNITER_D1MINI_LARGE_HT16K33)
+  #define BUTTON_TYPE BUTTON_TYPE_ANALOG
+  const uint8_t MODE_BUTTON_PIN = 0;
+  const uint8_t CHANGE_BUTTON_PIN = 2;
+  #define ANALOG_BUTTON_PIN A0
+  #define ANALOG_BUTTON_LEVELS { \
+      0 /*short to ground*/, \
+      327 /*32%, 4.7k*/, \
+      512 /*50%, 10k*/, \
+      844 /*82%, 47k*/, \
+      1023 /*100%, open*/ \
+    }
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HT16K33
+  const uint8_t NUM_DIGITS = 4;
+
+  // Choose one of the following variants:
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_WIRE
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_WIRE_FAST
+  #define INTERFACE_TYPE INTERFACE_TYPE_TWO_WIRE
+  const uint8_t SDA_PIN = SDA;
+  const uint8_t SCL_PIN = SCL;
+  const uint8_t BIT_DELAY = 2;
+  const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
 #elif defined(AUNITER_ESP32_TM1637)
   #define BUTTON_TYPE BUTTON_TYPE_ANALOG
@@ -428,8 +496,8 @@ using ace_segment::kActiveHighPattern;
 
   // Choose one of the following variants:
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_TMI
-  const uint8_t CLK_PIN = 14;
   const uint8_t DIO_PIN = 13;
+  const uint8_t CLK_PIN = 14;
   const uint16_t BIT_DELAY = 100;
 
 #elif defined(AUNITER_ESP32_MAX7219)
@@ -445,7 +513,7 @@ using ace_segment::kActiveHighPattern;
   // Choose one of the following variants:
   //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
-  // My dev board uses HSPI.
+  // My dev board uses HSPI, which is the Secondary SPI.
   #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_SECONDARY
 
   #if SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_PRIMARY
@@ -453,12 +521,13 @@ using ace_segment::kActiveHighPattern;
     const uint8_t LATCH_PIN = SS;
     const uint8_t DATA_PIN = MOSI;
     const uint8_t CLOCK_PIN = SCK;
+    SPIClass& spiInstance = SPI;
   #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
     // HSPI pins
     const uint8_t LATCH_PIN = 15;
     const uint8_t DATA_PIN = 13;
     const uint8_t CLOCK_PIN = 14;
-    SPIClass SPISecondary(HSPI);
+    SPIClass spiInstance(HSPI);
   #else
     #error Unknown SPI_INSTANCE_TYPE
   #endif
@@ -484,15 +553,36 @@ using ace_segment::kActiveHighPattern;
     const uint8_t LATCH_PIN = SS;
     const uint8_t DATA_PIN = MOSI;
     const uint8_t CLOCK_PIN = SCK;
+    SPIClass& spiInstance = SPI;
+
   #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
     // HSPI pins
     const uint8_t LATCH_PIN = 15;
     const uint8_t DATA_PIN = 13;
     const uint8_t CLOCK_PIN = 14;
-    SPIClass SPISecondary(HSPI);
+    SPIClass spiInstance(HSPI);
   #else
     #error Unknown SPI_INSTANCE_TYPE
   #endif
+
+#elif defined(AUNITER_ESP32_HT16K33)
+  #define BUTTON_TYPE BUTTON_TYPE_ANALOG
+  const uint8_t MODE_BUTTON_PIN = 0;
+  const uint8_t CHANGE_BUTTON_PIN = 1;
+  #define ANALOG_BUTTON_LEVELS {0, 2048, 4095}
+  #define ANALOG_BUTTON_PIN A10
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HT16K33
+  const uint8_t NUM_DIGITS = 4;
+
+  // Choose one of the following variants:
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_WIRE
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_WIRE_FAST
+  #define INTERFACE_TYPE INTERFACE_TYPE_TWO_WIRE
+  const uint8_t SDA_PIN = SDA;
+  const uint8_t SCL_PIN = SCL;
+  const uint8_t BIT_DELAY = 2;
+  const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
 #else
   #error Unknown AUNITER environment
@@ -513,9 +603,9 @@ const uint8_t NUM_SUBFIELDS = 1;
 #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_TM1637
   #if INTERFACE_TYPE == INTERFACE_TYPE_SOFT_TMI
     using TmiInterface = SoftTmiInterface;
-    TmiInterface tmiInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
+    TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY);
   #elif INTERFACE_TYPE == INTERFACE_TYPE_SOFT_TMI_FAST
-    using TmiInterface = SoftTmiFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
+    using TmiInterface = SoftTmiFastInterface<DIO_PIN, CLK_PIN, BIT_DELAY>;
     TmiInterface tmiInterface;
   #endif
   Tm1637Module<TmiInterface, NUM_DIGITS> ledModule(tmiInterface);
@@ -528,11 +618,11 @@ const uint8_t NUM_SUBFIELDS = 1;
     using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
   #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
-    using SpiInterface = HardSpiInterface;
-    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    using SpiInterface = HardSpiInterface<SPIClass>;
+    SpiInterface spiInterface(spiInstance, LATCH_PIN);
   #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
-    using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
-    SpiInterface spiInterface;
+    using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
+    SpiInterface spiInterface(spiInstance);
   #endif
   Max7219Module<SpiInterface, NUM_DIGITS> ledModule(
       spiInterface, kDigitRemapArray8Max7219);
@@ -546,11 +636,11 @@ const uint8_t NUM_SUBFIELDS = 1;
     using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
   #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
-    using SpiInterface = HardSpiInterface;
-    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    using SpiInterface = HardSpiInterface<SPIClass>;
+    SpiInterface spiInterface(spiInstance, LATCH_PIN);
   #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
-    using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
-    SpiInterface spiInterface;
+    using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
+    SpiInterface spiInterface(spiInstance);
   #endif
 
   Hc595Module<SpiInterface, NUM_DIGITS> ledModule(
@@ -561,6 +651,23 @@ const uint8_t NUM_SUBFIELDS = 1;
       kByteOrderSegmentHighDigitLow,
       kDigitRemapArray8Hc595
   );
+
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HT16K33
+  #if INTERFACE_TYPE == INTERFACE_TYPE_TWO_WIRE
+    // On AVR, simply including <Wire.h> consumes an extra 1700 bytes of flash
+    // so include this only when required.
+    #include <Wire.h>
+    using WireInterface = TwoWireInterface<TwoWire>;
+    WireInterface wireInterface(Wire, HT16K33_I2C_ADDRESS);
+  #elif INTERFACE_TYPE == INTERFACE_TYPE_SIMPLE_WIRE
+    using WireInterface = SimpleWireInterface;
+    WireInterface wireInterface(
+        HT16K33_I2C_ADDRESS, SDA_PIN, SCL_PIN, BIT_DELAY);
+  #elif INTERFACE_TYPE == INTERFACE_TYPE_SIMPLE_WIRE_FAST
+    using WireInterface = SimpleWireFastInterface<SDA_PIN, SCL_PIN, BIT_DELAY>;
+    WireInterface wireInterface(HT16K33_I2C_ADDRESS);
+  #endif
+  Ht16k33Module<WireInterface, NUM_DIGITS> ledModule(wireInterface);
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_DIRECT
   // Common Anode, with transitors on Group pins
@@ -591,11 +698,11 @@ const uint8_t NUM_SUBFIELDS = 1;
     using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
   #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
-    using SpiInterface = HardSpiInterface;
-    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    using SpiInterface = HardSpiInterface<SPIClass>;
+    SpiInterface spiInterface(SPI, LATCH_PIN);
   #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
-    using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
-    SpiInterface spiInterface;
+    using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
+    SpiInterface spiInterface(SPI);
   #endif
   HybridModule<SpiInterface, NUM_DIGITS> ledModule(
       spiInterface,
@@ -614,10 +721,10 @@ const uint8_t NUM_SUBFIELDS = 1;
     using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
   #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
-    using SpiInterface = HardSpiInterface;
-    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    using SpiInterface = HardSpiInterface<SPIClass>;
+    SpiInterface spiInterface(SPI, LATCH_PIN);
   #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
-    using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
     SpiInterface spiInterface;
   #endif
 
@@ -634,17 +741,24 @@ const uint8_t NUM_SUBFIELDS = 1;
   #error Unknown LED_DISPLAY_TYPE
 #endif
 
-LedDisplay ledDisplay(ledModule);
-NumberWriter numberWriter(ledDisplay);
-ClockWriter clockWriter(ledDisplay);
-TemperatureWriter temperatureWriter(ledDisplay);
-CharWriter charWriter(ledDisplay);
+PatternWriter patternWriter(ledModule);
+NumberWriter numberWriter(ledModule);
+ClockWriter clockWriter(ledModule);
+TemperatureWriter temperatureWriter(ledModule);
+CharWriter charWriter(ledModule);
 StringWriter stringWriter(charWriter);
 StringScroller stringScroller(charWriter);
-LevelWriter levelWriter(ledDisplay);
+LevelWriter levelWriter(ledModule);
 
 // Setup the various resources.
 void setupAceSegment() {
+
+#if INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI \
+    || INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
+  spiInstance.begin();
+#elif INTERFACE_TYPE == INTERFACE_TYPE_TWO_WIRE
+  Wire.begin();
+#endif
 
 #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_TM1637
   tmiInterface.begin();
@@ -660,6 +774,11 @@ void setupAceSegment() {
   spiInterface.begin();
   ledModule.begin();
   ledModule.setBrightness(1); // 0-1
+
+#elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HT16K33
+  wireInterface.begin();
+  ledModule.begin();
+  ledModule.setBrightness(1); // 0-15
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_DIRECT
   ledModule.begin();
@@ -887,7 +1006,7 @@ const uint8_t SPIN_PATTERNS[NUM_SPIN_PATTERNS][4] PROGMEM = {
 void spinDisplay() {
   static uint8_t i = 0;
   const uint8_t* patterns = SPIN_PATTERNS[i];
-  ledDisplay.writePatternsAt_P(0, patterns, 4);
+  patternWriter.writePatternsAt_P(0, patterns, 4);
 
   incrementMod(i, NUM_SPIN_PATTERNS);
 }
@@ -908,7 +1027,7 @@ const uint8_t SPIN_PATTERNS_2[NUM_SPIN_PATTERNS_2][4] PROGMEM = {
 void spinDisplay2() {
   static uint8_t i = 0;
   const uint8_t* patterns = SPIN_PATTERNS_2[i];
-  ledDisplay.writePatternsAt_P(0, patterns, 4 /*len*/);
+  patternWriter.writePatternsAt_P(0, patterns, 4 /*len*/);
 
   incrementMod(i, NUM_SPIN_PATTERNS_2);
 }
@@ -962,11 +1081,26 @@ void updateDemo() {
   }
 }
 
-/** Go to the next demo */
+/** Go to the next demo. */
 void nextDemo() {
+// The HT16K33 module can display both a decimal point and a colon segment after
+// digit 1 (second from left). The Ht16k33Module.enableColon() selects one or
+// the other.
+#if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HT16K33
+  if (prevDemoMode == DEMO_MODE_CLOCK) {
+    ledModule.enableColon(false);
+  }
+#endif
   prevDemoMode = demoMode;
+
   incrementMod(demoMode, DEMO_MODE_COUNT);
-  ledDisplay.clear();
+#if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HT16K33
+  if (demoMode == DEMO_MODE_CLOCK) {
+    ledModule.enableColon(true);
+  }
+#endif
+
+  patternWriter.clear();
 
   updateDemo();
 }

@@ -26,13 +26,13 @@ SOFTWARE.
 #define ACE_SEGMENT_CHAR_WRITER_H
 
 #include <stdint.h>
-#include "../LedDisplay.h"
+#include "PatternWriter.h"
 
 namespace ace_segment {
 
 /**
  * The CharWriter supports mapping of an 8-bit character set to segment patterns
- * supported by LedDisplay. By default, the ASCII characters (0-127) is
+ * supported by LedModule. By default, the ASCII characters (0-127) is
  * provided, but can be overridden with a user-defined character set.
  */
 class CharWriter {
@@ -45,35 +45,47 @@ class CharWriter {
 
     /**
      * Constructor.
-     * @param ledDisplay reference to LedDisplay
+     * @param ledModule reference to LedModule
      * @param charPatterns (optional) array of 7-segment character patterns in
      *    PROGMEM (default: an ASCII character set)
      * @param numChars (optional) number of characters in charPatterns, 0 means
      *    256 (default: 128)
      */
     explicit CharWriter(
-        LedDisplay& ledDisplay,
+        LedModule& ledModule,
         const uint8_t charPatterns[] = kCharPatterns,
         uint8_t numChars = kNumChars
     ) :
-        mLedDisplay(ledDisplay),
+        mPatternWriter(ledModule),
         mCharPatterns(charPatterns),
         mNumChars(numChars)
     {}
 
+    /** Get the underlying LedModule. */
+    LedModule& ledModule() const { return mPatternWriter.ledModule(); }
+
+    /** Return the number of digits supported by this display instance. */
+    uint8_t getNumDigits() const { return mPatternWriter.getNumDigits(); }
+
+    /** Get number of characters in current character set. */
+    uint8_t getNumChars() const { return mNumChars; }
+
     /** Write the character at the specified position. */
     void writeCharAt(uint8_t pos, char c);
 
-    /** Get the underlying LedDisplay. */
-    LedDisplay& display() const {
-      return mLedDisplay;
-    }
-
-    /** Get number of characters in current character set, 0 means 256. */
-    uint8_t getNumChars() const { return mNumChars; }
-
     /** Get segment pattern for character 'c'. */
     uint8_t getPattern(char c) const;
+
+    /** Write the decimal point for the pos. */
+    void writeDecimalPointAt(uint8_t pos, bool state = true) {
+      mPatternWriter.writeDecimalPointAt(pos, state);
+    }
+
+    /** Clear the entire display. */
+    void clear() { clearToEnd(0); }
+
+    /** Clear the display from `pos` to the end. */
+    void clearToEnd(uint8_t pos) { mPatternWriter.clearToEnd(pos); }
 
   private:
     // disable copy-constructor and assignment operator
@@ -81,7 +93,7 @@ class CharWriter {
     CharWriter& operator=(const CharWriter&) = delete;
 
   private:
-    LedDisplay& mLedDisplay;
+    PatternWriter mPatternWriter;
     const uint8_t* const mCharPatterns;
     uint8_t const mNumChars;
 };

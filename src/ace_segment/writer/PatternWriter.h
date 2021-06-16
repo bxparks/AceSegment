@@ -22,34 +22,34 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_LED_DISPLAY_H
-#define ACE_SEGMENT_LED_DISPLAY_H
+#ifndef ACE_SEGMENT_PATTERN_WRITER_H
+#define ACE_SEGMENT_PATTERN_WRITER_H
 
 #include <stdint.h>
 #include <Arduino.h> // pgm_read_byte()
-#include "LedModule.h"
+#include "../LedModule.h"
 
 namespace ace_segment {
 
 /**
- * General interface for writing segment patterns to the underlying LedModule.
- * Various 'Writer' classes provide additional functionality on top of this
- * interface (e.g. NumberWriter, ClockWriter, TemperatureWriter, CharWriter,
- * StringWriter).
+ * Write LED segment patterns to the underlying LedModule. Other 'Writer'
+ * classes provide additional functionality on top of this class (e.g.
+ * NumberWriter, ClockWriter, TemperatureWriter, CharWriter, StringWriter).
  *
- * This class is stateless and does not contain any virtual functions. If it is
- * created transiently, the function calls can sometimes be optimized away by
- * the compiler. But usually, an instance of this class is created around a
- * specific subclass of `LedModule`, and then passed into one of the Writer
- * classes.
+ * This class is stateless and does not contain any virtual functions. If the
+ * method calls are made on the PatternWriter object directly, the compiler can
+ * optimize away the indirection and call LedModule methods directly.
  */
-class LedDisplay {
+class PatternWriter {
   public:
     /**
      * Constructor.
      * @param ledModule an instance of LedModule or one of its subclasses
      */
-    explicit LedDisplay(LedModule& ledModule) : mLedModule(ledModule) {}
+    explicit PatternWriter(LedModule& ledModule) : mLedModule(ledModule) {}
+
+    /** Return the underlying LedModule. */
+    LedModule& ledModule() const { return mLedModule; }
 
     /** Return the number of digits supported by this display instance. */
     uint8_t getNumDigits() const { return mLedModule.getNumDigits(); }
@@ -120,15 +120,10 @@ class LedDisplay {
       }
     }
 
-    /** Set the global brightness. */
-    void setBrightness(uint8_t brightness) {
-      mLedModule.setBrightness(brightness);
-    }
-
   private:
     // disable copy-constructor and assignment operator
-    LedDisplay(const LedDisplay&) = delete;
-    LedDisplay& operator=(const LedDisplay&) = delete;
+    PatternWriter(const PatternWriter&) = delete;
+    PatternWriter& operator=(const PatternWriter&) = delete;
 
   private:
     LedModule& mLedModule;

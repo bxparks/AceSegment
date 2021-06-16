@@ -17,15 +17,12 @@ using namespace ace_segment;
 using namespace ace_segment::testing;
 
 const uint8_t NUM_DIGITS = 4;
-const uint8_t CUSTOM_BRIGHTNESS = 64;
-const uint8_t DIFFERENT_BRIGHTNESS = 32;
 
 TestableLedModule<NUM_DIGITS> ledModule;
-LedDisplay ledDisplay(ledModule);
-NumberWriter numberWriter(ledDisplay);
-ClockWriter clockWriter(ledDisplay);
-TemperatureWriter temperatureWriter(ledDisplay);
-CharWriter charWriter(ledDisplay);
+NumberWriter numberWriter(ledModule);
+ClockWriter clockWriter(ledModule);
+TemperatureWriter temperatureWriter(ledModule);
+CharWriter charWriter(ledModule);
 StringWriter stringWriter(charWriter);
 
 // ----------------------------------------------------------------------
@@ -35,7 +32,7 @@ StringWriter stringWriter(charWriter);
 class CharWriterTest : public TestOnce {
   protected:
     void setup() override {
-      ledDisplay.clear();
+      charWriter.clear();
       mPatterns = ledModule.getPatterns();
     }
 
@@ -61,7 +58,7 @@ testF(CharWriterTest, writeAt_outOfBounds) {
 class StringWriterTest : public TestOnce {
   protected:
     void setup() override {
-      ledDisplay.clear();
+      stringWriter.clear();
       mPatterns = ledModule.getPatterns();
     }
 
@@ -98,7 +95,7 @@ testF(StringWriterTest, writeStringAt) {
 class NumberWriterTest : public TestOnce {
   protected:
     void setup() override {
-      ledDisplay.clear();
+      numberWriter.clear();
       mPatterns = ledModule.getPatterns();
     }
 
@@ -110,10 +107,10 @@ testF(NumberWriterTest, writeHexCharAt) {
   assertEqual(0b00111111, mPatterns[0]);
 
   numberWriter.writeHexCharAt(1, 0);
-  numberWriter.display().writeDecimalPointAt(1);
+  numberWriter.writeDecimalPointAt(1);
   assertEqual(0b00111111 | 0x80, mPatterns[1]);
 
-  numberWriter.display().writeDecimalPointAt(1, false);
+  numberWriter.writeDecimalPointAt(1, false);
   assertEqual(0b00111111, mPatterns[1]);
 }
 
@@ -121,7 +118,7 @@ testF(NumberWriterTest, writeHexCharAt_outOfBounds) {
   mPatterns[4] = 0;
 
   numberWriter.writeHexCharAt(4, NumberWriter::kCharMinus);
-  numberWriter.display().writeDecimalPointAt(4);
+  numberWriter.writeDecimalPointAt(4);
   assertEqual(0, mPatterns[4]);
 }
 
@@ -188,7 +185,7 @@ testF(NumberWriterTest, writeSignedDecimalAt_boxed) {
 class ClockWriterTest: public TestOnce {
   protected:
     void setup() override {
-      ledDisplay.clear();
+      clockWriter.clear();
       mPatterns = ledModule.getPatterns();
     }
 
@@ -261,7 +258,7 @@ testF(ClockWriterTest, writeChars2At) {
 class TemperatureWriterTest: public TestOnce {
   protected:
     void setup() override {
-      ledDisplay.clear();
+      temperatureWriter.clear();
       mPatterns = ledModule.getPatterns();
     }
 

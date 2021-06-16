@@ -19,7 +19,6 @@ using namespace ace_segment;
 using namespace ace_segment::testing;
 
 const int8_t NUM_DIGITS = 4;
-const int8_t NUM_SEGMENTS = 8;
 const uint16_t FRAMES_PER_SECOND = 60;
 const int8_t NUM_SUB_FIELDS = 1;
 
@@ -40,7 +39,6 @@ class ScanningModuleTest: public TestOnce {
   protected:
     void setup() override {
       scanningModule.begin();
-      TestableClockInterface::sEventLog.clear();
       ledMatrix.mEventLog.clear();
     }
 };

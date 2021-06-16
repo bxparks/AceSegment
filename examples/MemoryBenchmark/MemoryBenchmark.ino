@@ -8,7 +8,7 @@
 #include <Arduino.h>
 
 // DO NOT MODIFY THIS LINE. This will be overwritten by collect.sh on each
-// iteration, incrementing from 0 to 5. The Arduino IDE will compile the
+// iteration, incrementing from 0 to N. The Arduino IDE will compile the
 // program, then the script will extract the flash and static memory usage
 // numbers printed out by the Arduino compiler. The numbers will be printed on
 // the STDOUT, which then can be saved to a file specific for a particular
@@ -33,14 +33,18 @@
 #define FEATURE_MAX7219_SOFT_SPI_FAST 14
 #define FEATURE_MAX7219_HARD_SPI 15
 #define FEATURE_MAX7219_HARD_SPI_FAST 16
-#define FEATURE_STUB_MODULE 17
-#define FEATURE_NUMBER_WRITER 18
-#define FEATURE_CLOCK_WRITER 19
-#define FEATURE_TEMPERATURE_WRITER 20
-#define FEATURE_CHAR_WRITER 21
-#define FEATURE_STRING_WRITER 22
-#define FEATURE_STRING_SCROLLER 23
-#define FEATURE_LEVEL_WRITER 24
+#define FEATURE_HT16K33_TWO_WIRE 17
+#define FEATURE_HT16K33_SIMPLE_WIRE 18
+#define FEATURE_HT16K33_SIMPLE_WIRE_FAST 19
+#define FEATURE_STUB_MODULE 20
+#define FEATURE_PATTERN_WRITER 21
+#define FEATURE_NUMBER_WRITER 22
+#define FEATURE_CLOCK_WRITER 23
+#define FEATURE_TEMPERATURE_WRITER 24
+#define FEATURE_CHAR_WRITER 25
+#define FEATURE_STRING_WRITER 26
+#define FEATURE_STRING_SCROLLER 27
+#define FEATURE_LEVEL_WRITER 28
 
 // A volatile integer to prevent the compiler from optimizing away the entire
 // program.
@@ -67,7 +71,7 @@ volatile int disableCompilerOptimization = 0;
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
   const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
 
-  // 74HC595
+  // 74HC595, MAX7219
   const uint8_t LATCH_PIN = 10; // ST_CP on 74HC595
   const uint8_t DATA_PIN = MOSI; // DS on 74HC595
   const uint8_t CLOCK_PIN = SCK; // SH_CP on 74HC595
@@ -75,7 +79,12 @@ volatile int disableCompilerOptimization = 0;
   // TM1637
   const uint8_t CLK_PIN = 16;
   const uint8_t DIO_PIN = 10;
-  const uint16_t BIT_DELAY = 100;
+  const uint8_t BIT_DELAY = 100;
+
+  // HT16K33
+  const uint8_t SDA_PIN = 2;
+  const uint8_t SCL_PIN = 3;
+  const uint8_t DELAY_MICROS = 2;
 
   // A stub LedModule to allow various Writer classes to be created, but mostly
   // isolated from the underlying LedModule implementations.
@@ -150,8 +159,8 @@ volatile int disableCompilerOptimization = 0;
 
   #elif FEATURE == FEATURE_HYBRID_HARD_SPI
     // Common Cathode, with transistors on Group pins
-    using SpiInterface = HardSpiInterface;
-    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    using SpiInterface = HardSpiInterface<SPIClass>;
+    SpiInterface spiInterface(SPI, LATCH_PIN);
     HybridModule<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
         kActiveHighPattern /*segmentOnPattern*/,
@@ -166,8 +175,8 @@ volatile int disableCompilerOptimization = 0;
     #endif
 
     // Common Cathode, with transistors on Group pins
-    using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
-    SpiInterface spiInterface;
+    using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
+    SpiInterface spiInterface(SPI);
     HybridModule<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
         kActiveHighPattern /*segmentOnPattern*/,
@@ -206,8 +215,8 @@ volatile int disableCompilerOptimization = 0;
 
   #elif FEATURE == FEATURE_HC595_HARD_SPI
     // Common Cathode, with transistors on Group pins
-    using SpiInterface = HardSpiInterface;
-    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    using SpiInterface = HardSpiInterface<SPIClass>;
+    SpiInterface spiInterface(SPI, LATCH_PIN);
     Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
         kActiveLowPattern /*segmentOnPattern*/,
@@ -222,8 +231,8 @@ volatile int disableCompilerOptimization = 0;
     #endif
 
     // Common Cathode, with transistors on Group pins
-    using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
-    SpiInterface spiInterface;
+    using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
+    SpiInterface spiInterface(SPI);
     Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
         kActiveLowPattern /*segmentOnPattern*/,
@@ -234,7 +243,7 @@ volatile int disableCompilerOptimization = 0;
 
   #elif FEATURE == FEATURE_TM1637_TMI
     using TmiInterface = SoftTmiInterface;
-    TmiInterface tmiInterface(CLK_PIN, DIO_PIN, BIT_DELAY);
+    TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY);
     Tm1637Module<TmiInterface, NUM_DIGITS> tm1637Module(tmiInterface);
 
   #elif FEATURE == FEATURE_TM1637_TMI_FAST
@@ -242,7 +251,7 @@ volatile int disableCompilerOptimization = 0;
       #error Unsupported FEATURE on this platform
     #endif
 
-    using TmiInterface = SoftTmiFastInterface<CLK_PIN, DIO_PIN, BIT_DELAY>;
+    using TmiInterface = SoftTmiFastInterface<DIO_PIN, CLK_PIN, BIT_DELAY>;
     TmiInterface tmiInterface;
     Tm1637Module<TmiInterface, NUM_DIGITS> tm1637Module(tmiInterface);
 
@@ -263,8 +272,8 @@ volatile int disableCompilerOptimization = 0;
         spiInterface, kDigitRemapArray8Max7219);
 
   #elif FEATURE == FEATURE_MAX7219_HARD_SPI
-    using SpiInterface = HardSpiInterface;
-    SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+    using SpiInterface = HardSpiInterface<SPIClass>;
+    SpiInterface spiInterface(SPI, LATCH_PIN);
     Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
         spiInterface, kDigitRemapArray8Max7219);
 
@@ -273,56 +282,103 @@ volatile int disableCompilerOptimization = 0;
       #error Unsupported FEATURE on this platform
     #endif
 
-    using SpiInterface = HardSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
-    SpiInterface spiInterface;
+    using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
+    SpiInterface spiInterface(SPI);
     Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
         spiInterface, kDigitRemapArray8Max7219);
 
+  #elif FEATURE == FEATURE_HT16K33_TWO_WIRE
+    #include <Wire.h>
+    const uint8_t HT16K33_I2C_ADDRESS = 0x70;
+    using WireInterface = TwoWireInterface<TwoWire>;
+    WireInterface wireInterface(Wire, HT16K33_I2C_ADDRESS);
+    Ht16k33Module<WireInterface, NUM_DIGITS> ht16k33Module(wireInterface);
+
+  #elif FEATURE == FEATURE_HT16K33_SIMPLE_WIRE
+    const uint8_t HT16K33_I2C_ADDRESS = 0x70;
+    using WireInterface = SimpleWireInterface;
+    WireInterface wireInterface(
+        HT16K33_I2C_ADDRESS, SDA_PIN, SCL_PIN, DELAY_MICROS);
+    Ht16k33Module<WireInterface, NUM_DIGITS> ht16k33Module(wireInterface);
+
+  #elif FEATURE == FEATURE_HT16K33_SIMPLE_WIRE_FAST
+    #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
+      #error Unsupported FEATURE on this platform
+    #endif
+
+    #include <digitalWriteFast.h>
+    #include <ace_segment/hw/SimpleWireFastInterface.h>
+    const uint8_t HT16K33_I2C_ADDRESS = 0x70;
+    using WireInterface = SimpleWireFastInterface<
+        SDA_PIN, SCL_PIN, DELAY_MICROS>;
+    WireInterface wireInterface(HT16K33_I2C_ADDRESS);
+    Ht16k33Module<WireInterface, NUM_DIGITS> ht16k33Module(wireInterface);
+
   #elif FEATURE == FEATURE_STUB_MODULE
     StubModule stubModule;
-    LedDisplay ledDisplay(stubModule);
+
+  #elif FEATURE == FEATURE_PATTERN_WRITER
+    StubModule stubModule;
+    PatternWriter patternWriter(stubModule);
 
   #elif FEATURE == FEATURE_NUMBER_WRITER
     StubModule stubModule;
-    LedDisplay ledDisplay(stubModule);
-    NumberWriter numberWriter(ledDisplay);
+    NumberWriter numberWriter(stubModule);
 
   #elif FEATURE == FEATURE_CLOCK_WRITER
     StubModule stubModule;
-    LedDisplay ledDisplay(stubModule);
-    ClockWriter clockWriter(ledDisplay);
+    ClockWriter clockWriter(stubModule);
 
   #elif FEATURE == FEATURE_TEMPERATURE_WRITER
     StubModule stubModule;
-    LedDisplay ledDisplay(stubModule);
-    TemperatureWriter temperatureWriter(ledDisplay);
+    TemperatureWriter temperatureWriter(stubModule);
 
   #elif FEATURE == FEATURE_CHAR_WRITER
     StubModule stubModule;
-    LedDisplay ledDisplay(stubModule);
-    CharWriter charWriter(ledDisplay);
+    CharWriter charWriter(stubModule);
 
   #elif FEATURE == FEATURE_STRING_WRITER
     StubModule stubModule;
-    LedDisplay ledDisplay(stubModule);
-    CharWriter charWriter(ledDisplay);
+    CharWriter charWriter(stubModule);
     StringWriter stringWriter(charWriter);
 
   #elif FEATURE == FEATURE_STRING_SCROLLER
     StubModule stubModule;
-    LedDisplay ledDisplay(stubModule);
-    CharWriter charWriter(ledDisplay);
+    CharWriter charWriter(stubModule);
     StringScroller stringScroller(charWriter);
 
   #elif FEATURE == FEATURE_LEVEL_WRITER
     StubModule stubModule;
-    LedDisplay ledDisplay(stubModule);
-    LevelWriter levelWriter(ledDisplay);
+    LevelWriter levelWriter(stubModule);
+
+  #else
+    #error Unknown FEATURE
 
   #endif
 #endif
 
+// TeensyDuino seems to pull in malloc() and free() when a class with virtual
+// functions is used polymorphically. This causes the memory consumption of
+// FEATURE_BASELINE (which normally has no classes defined, so does not include
+// malloc() and free()) to be artificially small which throws off the memory
+// consumption calculations for all subsequent features. Let's define a
+// throw-away class and call its method for all FEATURES, including BASELINE.
+#if defined(TEENSYDUINO)
+  class FooClass {
+    public:
+      virtual void doit() {
+        disableCompilerOptimization = 0;
+      }
+  };
+
+  FooClass* foo;
+#endif
+
 void setup() {
+#if defined(TEENSYDUINO)
+  foo = new FooClass();
+#endif
+
 #if FEATURE == FEATURE_BASELINE
   disableCompilerOptimization = 3;
 
@@ -348,10 +404,12 @@ void setup() {
   scanningModule.begin();
 
 #elif FEATURE == FEATURE_HYBRID_HARD_SPI
+  SPI.begin();
   spiInterface.begin();
   scanningModule.begin();
 
 #elif FEATURE == FEATURE_HYBRID_HARD_SPI_FAST
+  SPI.begin();
   spiInterface.begin();
   scanningModule.begin();
 
@@ -364,10 +422,12 @@ void setup() {
   scanningModule.begin();
 
 #elif FEATURE == FEATURE_HC595_HARD_SPI
+  SPI.begin();
   spiInterface.begin();
   scanningModule.begin();
 
 #elif FEATURE == FEATURE_HC595_HARD_SPI_FAST
+  SPI.begin();
   spiInterface.begin();
   scanningModule.begin();
 
@@ -388,12 +448,27 @@ void setup() {
   max7219Module.begin();
 
 #elif FEATURE == FEATURE_MAX7219_HARD_SPI
+  SPI.begin();
   spiInterface.begin();
   max7219Module.begin();
 
 #elif FEATURE == FEATURE_MAX7219_HARD_SPI_FAST
+  SPI.begin();
   spiInterface.begin();
   max7219Module.begin();
+
+#elif FEATURE == FEATURE_HT16K33_TWO_WIRE
+  Wire.begin();
+  wireInterface.begin();
+  ht16k33Module.begin();
+
+#elif FEATURE == FEATURE_HT16K33_SIMPLE_WIRE
+  wireInterface.begin();
+  ht16k33Module.begin();
+
+#elif FEATURE == FEATURE_HT16K33_SIMPLE_WIRE_FAST
+  wireInterface.begin();
+  ht16k33Module.begin();
 
 #else
   // No setup() needed for Writers.
@@ -402,7 +477,14 @@ void setup() {
 }
 
 void loop() {
-#if FEATURE > FEATURE_BASELINE && FEATURE < FEATURE_TM1637_TMI
+#if defined(TEENSYDUINO)
+  foo->doit();
+#endif
+
+#if FEATURE == FEATURE_BASELINE
+  // do nothing
+
+#elif FEATURE > FEATURE_BASELINE && FEATURE < FEATURE_TM1637_TMI
   scanningModule.setPatternAt(0, 0x3A);
   scanningModule.renderFieldWhenReady();
 
@@ -426,8 +508,27 @@ void loop() {
   max7219Module.setPatternAt(0, 0xff);
   max7219Module.flush();
 
+#elif FEATURE == FEATURE_MAX7219_HARD_SPI_FAST
+  max7219Module.setPatternAt(0, 0xff);
+  max7219Module.flush();
+
+#elif FEATURE == FEATURE_HT16K33_TWO_WIRE
+  ht16k33Module.setPatternAt(0, 0xff);
+  ht16k33Module.flush();
+
+#elif FEATURE == FEATURE_HT16K33_SIMPLE_WIRE
+  ht16k33Module.setPatternAt(0, 0xff);
+  ht16k33Module.flush();
+
+#elif FEATURE == FEATURE_HT16K33_SIMPLE_WIRE_FAST
+  ht16k33Module.setPatternAt(0, 0xff);
+  ht16k33Module.flush();
+
 #elif FEATURE == FEATURE_STUB_MODULE
   stubModule.setPatternAt(0, 0xff);
+
+#elif FEATURE == FEATURE_PATTERN_WRITER
+  patternWriter.writePatternAt(0, 0x3C);
 
 #elif FEATURE == FEATURE_NUMBER_WRITER
   numberWriter.writeUnsignedDecimalAt(0, 42);
@@ -450,6 +551,9 @@ void loop() {
 
 #elif FEATURE == FEATURE_LEVEL_WRITER
   levelWriter.writeLevel(3);
+
+#else
+  #error Unknown FEATURE
 
 #endif
 }

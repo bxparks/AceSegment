@@ -88,7 +88,7 @@ inline uint8_t convertPatternMax7219(uint8_t pattern) {
  *
  * The 8-digit MAX7219 LED modules that I bought on eBay and Amazon are wired
  * such that the digits appear as "7 6 5 4 3 2 1 0" intead of "0 1 2 3 4 5 6 7".
- * This is the reverse of the convention used by the `LedDisplay` class.
+ * This is the reverse of the convention used by other `LedModule` classes.
  *
  * You can create your own remap array to handle other LED modules with
  * different physical ordering compared to the logical ordering.
@@ -111,7 +111,7 @@ class Max7219Module : public LedModule {
      * @param remapArray (optional, nullable) a mapping of the physical digit
      *    positions to their logical positions
      */
-    Max7219Module(
+    explicit Max7219Module(
         const T_SPII& spiInterface,
         const uint8_t* remapArray = nullptr
     ) :
@@ -128,7 +128,11 @@ class Max7219Module : public LedModule {
     void begin() {
       memset(mPatterns, 0, T_DIGITS);
 
-      mSpiInterface.send16(kRegisterScanLimit, 7); // all digits
+      // **WARNING**: Do NOT set this smaller than 3, or you may damage the
+      // controller chip due to excessive current. See the MAX7219 datasheet for
+      // details.
+      mSpiInterface.send16(kRegisterScanLimit, 7); // scan all digits
+
       mSpiInterface.send16(kRegisterDecodeMode, 0); // no BCD decoding
       mSpiInterface.send16(kRegisterShutdown, 0x1); // turn on
     }

@@ -1,7 +1,9 @@
 SIZEOF
-sizeof(SoftTmiInterface): 4
+sizeof(SoftTmiInterface): 3
 sizeof(SoftSpiInterface): 3
 sizeof(HardSpiInterface): 8
+sizeof(TwoWireInterface): 8
+sizeof(SimpleWireInterface): 4
 sizeof(LedMatrixDirect<>): 16
 sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 16
 sizeof(LedMatrixDualHc595<HardSpiInterface>): 16
@@ -13,30 +15,35 @@ sizeof(Hc595Module<SoftSpiInterface, 8>): 64
 sizeof(Tm1637Module<SoftTmiInterface, 4>): 24
 sizeof(Tm1637Module<SoftTmiInterface, 6>): 28
 sizeof(Max7219Module<SoftSpiInterface, 8>): 28
-sizeof(LedDisplay): 4
+sizeof(Ht16k33Module<TwoWireInterface, 4>): 20
+sizeof(Ht16k33Module<SimpleWireInterface, 4>): 20
+sizeof(PatternWriter): 4
 sizeof(NumberWriter): 4
 sizeof(ClockWriter): 8
 sizeof(TemperatureWriter): 4
 sizeof(CharWriter): 12
 sizeof(StringWriter): 4
-sizeof(StringScroller): 20
+sizeof(LevelWriter): 4
+sizeof(StringScroller): 12
 BENCHMARKS
 Direct(4) 2 2 8 40
-Direct(4,subfields) 0 1 10 640
+Direct(4,subfields) 0 1 9 640
 Hybrid(4,SoftSpi) 4 4 8 40
-Hybrid(4,SoftSpi,subfields) 0 1 13 640
-Hybrid(4,HardSpi) 9 10 14 40
-Hybrid(4,HardSpi,subfields) 0 1 14 640
-Hc595(8,SoftSpi) 7 7 15 80
-Hc595(8,SoftSpi,subfields) 0 1 15 1280
-Hc595(8,HardSpi) 11 11 14 80
-Hc595(8,HardSpi,subfields) 0 2 19 1280
-Tm1637(4,SoftTmi) 21230 21240 21247 10
-Tm1637(4,SoftTmi,incremental) 3436 8375 9616 50
-Tm1637(6,SoftTmi) 26684 26697 26705 10
-Tm1637(6,SoftTmi,incremental) 3437 8727 9616 70
-Tm1637(4,SoftTmi,5us) 1274 1278 1284 10
-Tm1637(4,SoftTmi,incremental,5us) 205 504 586 50
-Max7219(8,SoftSpi) 60 60 68 20
+Hybrid(4,SoftSpi,subfields) 0 1 9 640
+Hybrid(4,HardSpi) 9 10 18 40
+Hybrid(4,HardSpi,subfields) 0 1 18 640
+Hc595(8,SoftSpi) 7 7 11 80
+Hc595(8,SoftSpi,subfields) 0 1 16 1280
+Hc595(8,HardSpi) 11 11 20 80
+Hc595(8,HardSpi,subfields) 0 2 17 1280
+Tm1637(4,SoftTmi,100us) 21234 21239 21248 10
+Tm1637(4,SoftTmi,100us,incremental) 3435 8373 9616 50
+Tm1637(4,SoftTmi,5us) 1271 1277 1286 10
+Tm1637(4,SoftTmi,5us,incremental) 205 504 588 50
+Tm1637(6,SoftTmi) 26695 26700 26710 10
+Tm1637(6,SoftTmi,incremental) 3437 8726 9618 70
+Max7219(8,SoftSpi) 60 61 68 20
 Max7219(8,HardSpi) 90 91 98 20
+Ht16k33(4,TwoWire) 310 312 320 20
+Ht16k33(4,SimpleWire) 831 836 840 20
 END
