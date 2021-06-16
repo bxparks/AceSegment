@@ -127,7 +127,7 @@ Some of the examples may depend on:
 
 * AceButton (https://github.com/bxparks/AceButton)
 * TimerOne (https://github.com/PaulStoffregen/TimerOne)
-* one of the DigitalWriteFast libraries
+* one of the DigitalWriteFast libraries, for example:
     * https://github.com/watterott/Arduino-Libs/tree/master/digitalWriteFast
     * https://github.com/NicksonYap/digitalWriteFast
 
@@ -135,8 +135,12 @@ Some of the examples may depend on:
 ## Documentation
 
 * this `README.md` file
+* [DEVELOPER.md](DEVELOPER.md)
+    * Internal technical notes to developers of the library.
 * [scanning_module.md](docs/scanning_module.md)
-    * ScanningModule usage
+    * Information about `ScanningModule` and `LedMatrix` classes. These are the
+      implementation classes for `Hc595Module`, `HybridModule` and
+      `DirectModule`.
 * [capacitor_removal.md](docs/tm1637/capacitor_removal.md)
     * Removing the 10 nF capacitors on certain TM1637 LED modules
 * [Doxygen docs](https://bxparks.github.io/AceSegment/html)
@@ -218,9 +222,9 @@ depend on the lower-level classes:
         * `HardSpiFastInterface`
             * Hardware SPI using `digitalWriteFast()` to control the latch pin.
 * `TmiInterface`
-    * Thin wrapper classes to communicating with LED modules using the TM1637
+    * Thin wrapper classes to communicate with LED modules using the TM1637
       protocol. Similar to I2C but not exactly the same.
-    * Used by `Tm1637Module`.
+    * Used by `Tm1637Module` class.
     * There are 2 implementations:
         * `SoftTmiInterface`
             * Implement the TM1637 protocol using `digitalWrite()`.
@@ -295,15 +299,16 @@ depend on the lower-level classes:
 The conceptual dependency diagram among these classes looks something like this:
 
 ```
-           StringScroller
-           StringWriter    ClockWriter TemperatureWriter
-                  |            \           /
-                  V             v         v
-PatternWriter  CharWriter       NumberWriter     LevelWriter
-         \          \              |             /
-          -------    ----------    |    ---------
-                 \             \   |   /
-                  ----------v   v  v  v
+             StringScroller
+             StringWriter
+                   |
+                   V
+PatternWriter  CharWriter NumberWriter ClockWriter TemperatureWriter LevelWriter
+         \          \           |     /                /                /
+          -------    --------   |    / ----------------       ---------
+                 \           \  |   / /                      /
+                  ----------\ \ |  / / /---------------------
+                             v vv v v v
                              LedModule
                                 ^               (hardware independent)
 --------------------------------|--------------------------------------------
