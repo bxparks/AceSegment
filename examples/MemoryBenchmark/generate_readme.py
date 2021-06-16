@@ -186,6 +186,14 @@ before substantional refactoring in 2021.
   Saves 10-22 bytes of flash and 2 bytes of static RAM for most Writer
   classes (exception: `ClockWriter` and `StringWriter` which increases by 10-16
   bytes of flash).
+* Modify `FEATURE_BASELINE` for TeensyDuino so that `malloc()` and `free()`
+  are included in its memory consumption. When a class is used polymorphically
+  (i.e. its virtual methods are called), TeensyDuino seems to automatically pull
+  in `malloc()` and `free()`, which seems to consume about 3200 bytes of flash
+  and 1100 bytes of static memory. This happens for all FEATURES other than
+  BASELINE, so we have to make sure that BASELINE also pulls in these. All
+  results for Teensy 3.2 become lower by 3200 bytes of flash and 1100 bytes of
+  static RAM.
 
 ## Results
 

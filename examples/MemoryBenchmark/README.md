@@ -160,6 +160,14 @@ before substantional refactoring in 2021.
   Saves 10-22 bytes of flash and 2 bytes of static RAM for most Writer
   classes (exception: `ClockWriter` and `StringWriter` which increases by 10-16
   bytes of flash).
+* Modify `FEATURE_BASELINE` for TeensyDuino so that `malloc()` and `free()`
+  are included in its memory consumption. When a class is used polymorphically
+  (i.e. its virtual methods are called), TeensyDuino seems to automatically pull
+  in `malloc()` and `free()`, which seems to consume about 3200 bytes of flash
+  and 1100 bytes of static memory. This happens for all FEATURES other than
+  BASELINE, so we have to make sure that BASELINE also pulls in these. All
+  results for Teensy 3.2 become lower by 3200 bytes of flash and 1100 bytes of
+  static RAM.
 
 ## Results
 
@@ -552,42 +560,42 @@ other `MemoryBenchmark` programs.)
 +--------------------------------------------------------------+
 | functionality                   |  flash/  ram |       delta |
 |---------------------------------+--------------+-------------|
-| baseline                        |   7624/ 3048 |     0/    0 |
+| baseline                        |  10880/ 4152 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| DirectModule                    |  11880/ 4388 |  4256/ 1340 |
+| DirectModule                    |  11976/ 4396 |  1096/  244 |
 | DirectFast4Module               |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Hybrid(SoftSpi)                 |  11924/ 4392 |  4300/ 1344 |
+| Hybrid(SoftSpi)                 |  12020/ 4400 |  1140/  248 |
 | Hybrid(SoftSpiFast)             |     -1/   -1 |    -1/   -1 |
-| Hybrid(HardSpi)                 |  12948/ 4452 |  5324/ 1404 |
+| Hybrid(HardSpi)                 |  13048/ 4460 |  2168/  308 |
 | Hybrid(HardSpiFast)             |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Hc595(SoftSpi)                  |  11860/ 4396 |  4236/ 1348 |
+| Hc595(SoftSpi)                  |  11956/ 4404 |  1076/  252 |
 | Hc595(SoftSpiFast)              |     -1/   -1 |    -1/   -1 |
-| Hc595(HardSpi)                  |  12888/ 4456 |  5264/ 1408 |
+| Hc595(HardSpi)                  |  12984/ 4464 |  2104/  312 |
 | Hc595(HardSpiFast)              |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SoftTmi)                 |  12536/ 4368 |  4912/ 1320 |
+| Tm1637(SoftTmi)                 |  12632/ 4376 |  1752/  224 |
 | Tm1637(SoftTmiFast)             |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Max7219(SoftSpi)                |  11812/ 4368 |  4188/ 1320 |
+| Max7219(SoftSpi)                |  11912/ 4376 |  1032/  224 |
 | Max7219(SoftSpiFast)            |     -1/   -1 |    -1/   -1 |
-| Max7219(HardSpi)                |  13256/ 4428 |  5632/ 1380 |
+| Max7219(HardSpi)                |  13364/ 4436 |  2484/  284 |
 | Max7219(HardSpiFast)            |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Ht16k33(TwoWire)                |  14472/ 5032 |  6848/ 1984 |
-| Ht16k33(SimpleWire)             |  13504/ 4364 |  5880/ 1316 |
+| Ht16k33(TwoWire)                |  14572/ 5040 |  3692/  888 |
+| Ht16k33(SimpleWire)             |  13600/ 4372 |  2720/  220 |
 | Ht16k33(SimpleWireFast)         |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| StubModule                      |  10896/ 4352 |  3272/ 1304 |
-| PatternWriter+Stub              |  10940/ 4356 |  3316/ 1308 |
-| NumberWriter+Stub               |  11372/ 4356 |  3748/ 1308 |
-| ClockWriter+Stub                |  11072/ 4360 |  3448/ 1312 |
-| TemperatureWriter+Stub          |  11524/ 4356 |  3900/ 1308 |
-| CharWriter+Stub                 |  11096/ 4364 |  3472/ 1316 |
-| StringWriter+Stub               |  11288/ 4368 |  3664/ 1320 |
-| StringScroller+Stub             |  11296/ 4376 |  3672/ 1328 |
-| LevelWriter+Stub                |  11048/ 4356 |  3424/ 1308 |
+| StubModule                      |  10996/ 4356 |   116/  204 |
+| PatternWriter+Stub              |  11036/ 4360 |   156/  208 |
+| NumberWriter+Stub               |  11476/ 4360 |   596/  208 |
+| ClockWriter+Stub                |  11164/ 4364 |   284/  212 |
+| TemperatureWriter+Stub          |  11616/ 4360 |   736/  208 |
+| CharWriter+Stub                 |  11196/ 4368 |   316/  216 |
+| StringWriter+Stub               |  11384/ 4372 |   504/  220 |
+| StringScroller+Stub             |  11384/ 4380 |   504/  228 |
+| LevelWriter+Stub                |  11140/ 4360 |   260/  208 |
 +--------------------------------------------------------------+
 
 ```

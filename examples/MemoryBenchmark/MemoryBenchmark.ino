@@ -71,7 +71,7 @@ volatile int disableCompilerOptimization = 0;
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
   const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
 
-  // 74HC595
+  // 74HC595, MAX7219
   const uint8_t LATCH_PIN = 10; // ST_CP on 74HC595
   const uint8_t DATA_PIN = MOSI; // DS on 74HC595
   const uint8_t CLOCK_PIN = SCK; // SH_CP on 74HC595
@@ -357,7 +357,28 @@ volatile int disableCompilerOptimization = 0;
   #endif
 #endif
 
+// TeensyDuino seems to pull in malloc() and free() when a class with virtual
+// functions is used polymorphically. This causes the memory consumption of
+// FEATURE_BASELINE (which normally has no classes defined, so does not include
+// malloc() and free()) to be artificially small which throws off the memory
+// consumption calculations for all subsequent features. Let's define a
+// throw-away class and call its method for all FEATURES, including BASELINE.
+#if defined(TEENSYDUINO)
+  class FooClass {
+    public:
+      virtual void doit() {
+        disableCompilerOptimization = 0;
+      }
+  };
+
+  FooClass* foo;
+#endif
+
 void setup() {
+#if defined(TEENSYDUINO)
+  foo = new FooClass();
+#endif
+
 #if FEATURE == FEATURE_BASELINE
   disableCompilerOptimization = 3;
 
@@ -456,6 +477,10 @@ void setup() {
 }
 
 void loop() {
+#if defined(TEENSYDUINO)
+  foo->doit();
+#endif
+
 #if FEATURE == FEATURE_BASELINE
   // do nothing
 
