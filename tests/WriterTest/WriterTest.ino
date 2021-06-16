@@ -17,8 +17,6 @@ using namespace ace_segment;
 using namespace ace_segment::testing;
 
 const uint8_t NUM_DIGITS = 4;
-const uint8_t CUSTOM_BRIGHTNESS = 64;
-const uint8_t DIFFERENT_BRIGHTNESS = 32;
 
 TestableLedModule<NUM_DIGITS> ledModule;
 NumberWriter numberWriter(ledModule);
