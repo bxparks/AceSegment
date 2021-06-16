@@ -255,8 +255,13 @@ class EventLog {
 
     void clear() { mNumRecords = 0; }
 
-    /** Return false if the event log does not match the given arguments. */
-    bool assertEvents(uint8_t n, ...) {
+    /**
+     * Return false if the event log does not match the given arguments.
+     *
+     * @param n number of variable parameters (must be `int` type to be used
+     * in va_start() macro).
+     */
+    bool assertEvents(int n, ...) {
       if (n != mNumRecords) return false;
 
       va_list args;
