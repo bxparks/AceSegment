@@ -2199,16 +2199,17 @@ them.
       after the decimal point, and formating using scientific notation.
     * With so many different formatting options to consider, the easiest
       solution might be to defer this problem to the `vsnprintf()` function, to
-      print to a string, then send that string out to the LED module. Except
-      that on 8-bit AVR processors, the `vnsprintf()` function environments does
-      not support floating point numbers.
+      convert a float to a string, then render that string on the LED module.
+      Except that on 8-bit AVR processors, the `vnsprintf()` function does not
+      support floating point numbers.
     * The other potential solution is to use the `Print::print()` function to
-      print to a string buffer, such as the `PrintStr<N>` class in
+      print a float to a string buffer, such as the `PrintStr<N>` class in
       [AceCommon](https://github.com/bxparks/AceCommon), then print the string
-      to the LED module.
+      to the LED module. This might be the most practical solution on an Arduino
+      platform.
     * In any case, I think the code for printing floating point numbers should
       not go into the `NumberWriter` class, but into a new class called
-      something like `FloatWriter`. The `FloatWriter` class con contain a
+      something like `FloatWriter`. The `FloatWriter` class con pull in a
       `NumberWriter` object and build on top of it.
 
 <a name="License"></a>
