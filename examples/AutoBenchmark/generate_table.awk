@@ -64,7 +64,7 @@ END {
         || name ~ /^Hc595\(8,SoftSpi\)/ \
         || name ~ /^Tm1637\(4,SoftTmi,100us\)/ \
         || name ~ /^Tm1637\(4,SoftTmi,5us\)/ \
-        || name ~ /^Tm1637\(6,SoftTmi\)/ \
+        || name ~ /^Tm1637\(6,SoftTmi,100us\)/ \
         || name ~ /^Max7219\(8,SoftSpi\)/ \
         || name ~ /^Ht16k33\(4,TwoWire\)/ \
     ) {

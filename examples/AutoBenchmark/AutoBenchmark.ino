@@ -651,9 +651,9 @@ void runTm1637SixSoftTmi() {
 
   Tm1637Module<TmiInterface, 6> tm1637SixModule(tmiInterface);
   tm1637SixModule.begin();
-  runTm1637Benchmark(F("Tm1637(6,SoftTmi)"), tm1637SixModule, 6, false);
+  runTm1637Benchmark(F("Tm1637(6,SoftTmi,100us)"), tm1637SixModule, 6, false);
   runTm1637Benchmark(
-      F("Tm1637(6,SoftTmi,incremental)"), tm1637SixModule, 6, true);
+      F("Tm1637(6,SoftTmi,100us,incremental)"), tm1637SixModule, 6, true);
   tm1637SixModule.end();
 
   tmiInterface.end();
@@ -667,9 +667,10 @@ void runTm1637SixSoftTmiFast() {
 
   Tm1637Module<TmiInterface, 6> tm1637SixModule(tmiInterface);
   tm1637SixModule.begin();
-  runTm1637Benchmark(F("Tm1637(6,SoftTmiFast)"), tm1637SixModule, 6, false);
   runTm1637Benchmark(
-      F("Tm1637(6,SoftTmiFast,incremental)"), tm1637SixModule, 6, true);
+      F("Tm1637(6,SoftTmiFast,100us)"), tm1637SixModule, 6, false);
+  runTm1637Benchmark(
+      F("Tm1637(6,SoftTmiFast,100us,incremental)"), tm1637SixModule, 6, true);
   tm1637SixModule.end();
 
   tmiInterface.end();
@@ -803,7 +804,7 @@ void runHt16k33SimpleWire() {
 
   wireInterface.begin();
   ht16k33Module.begin();
-  runHt16k33Benchmark(F("Ht16k33(4,SimpleWire)"), ht16k33Module);
+  runHt16k33Benchmark(F("Ht16k33(4,SimpleWire,4us)"), ht16k33Module);
   ht16k33Module.end();
   wireInterface.end();
 }
@@ -816,7 +817,7 @@ void runHt16k33SimpleWireFast() {
 
   wireInterface.begin();
   ht16k33Module.begin();
-  runHt16k33Benchmark(F("Ht16k33(4,SimpleWireFast)"), ht16k33Module);
+  runHt16k33Benchmark(F("Ht16k33(4,SimpleWireFast,4us)"), ht16k33Module);
   ht16k33Module.end();
   wireInterface.end();
 }
