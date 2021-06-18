@@ -1,6 +1,13 @@
 # Changelog
 
 * Unreleased
+    * Move I2C address into `beginTransmission()` method of `TwoWireInterface`,
+      `SimpleWireInterface` and `SimpleWireFastInterface`.
+        * More consistent with `TwoWire` class API.
+        * Allows multiple HT16K33 LED modules with different addresses to
+          share a single WireInterface.
+    * Add caution that `delayMicroseconds()` on AVR is accurate for 3
+      microseconds or greater.
 * 0.7 (2021-06-16)
     * Support HT16K33 LED modules
         * Add `Ht16k33Module` class to support 4-digit LED display from
