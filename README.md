@@ -819,7 +819,8 @@ The `Ht16k33Module` class looks like this:
 template <typename T_WIREI, uint8_t T_DIGITS>
 class Ht16k33Module : public LedModule {
   public:
-    explicit Ht16k33Module(T_WIREI& wire, bool enableColon = false);
+    explicit Ht16k33Module(
+        T_WIREI& wire, uint8_t addr, bool enableColon = false);
 
     void enableColon(bool enable);
     void begin();
@@ -839,7 +840,15 @@ are 3 implementations: `TwoWireInterface`, `SimpleWireInterface`, and
 `SimpleWireFastInterface`.
 
 The `T_DIGITS` template parameter is the number of digits in the module. I have
-only seen 4 digit modules for sale.
+only seen 4 digit modules for sale, and the `Ht16k33Module` has specific code to
+support that hardware, so currently, the `T_DIGITS` should always be set to 4.
+If additional LED modules with different digits come on the market, the
+`Ht16k33Module` class will be extended, or a new class will be created.
+
+The `addr` parameter in the `Ht16k33Module` constructor is the I2C address of
+the HT16K33 controller chip. The base address is `0x70`. The LED module exposes
+3 jumpers that can be soldered in various combinations to change the I2C address
+one of the 8 addresses from 0x70 to 0x77.
 
 Most of the methods in this class are implementations of the virtual methods of
 `LedModule`.
@@ -849,19 +858,20 @@ LED module using I2C.
 
 The `enableColon` parameter and the `enableColon()` method determine whether the
 colon segment between Digit 1 and Digit 2 of the LED module is active. The
-4-digit HT16K33 LED clock modules from Adafruit (and its clones) allow the colon
-segment to be controlled independently of the decimal point of Digit 1. This is
-unlike other 4-digit clock modules which take over the control line for the
-decimal point of Digit 1 to the colon segment, causing that decimal point to
-become disabled.
+4-digit HT16K33 LED clock modules from Adafruit and its clones allow the colon
+segment to be controlled independently of the decimal point of Digit 1. But
+AceSegment does not support controlling both the decimal point and the colon
+segment *at the time same*. However, it allows selecting one or the other:
 
-The AceSegment library does not support controlling both the decimal point and
-the colon segment *at the time same*. However, it allows selecting one or the
-other. With `enableColon = false`, the LED module behave like any other 4-digit
-LED module with its decimal point on Digit 1. With `enableColon = true`, the LED
-module behaves like a clock module with a colon segment between Digit 1 and
-Digit 2. This behavior can be selected dynamically at runtime using the
-`enableColon()` function.
+* `enableColon = false`
+    * the module behave like a normal 4-digit LED module with its decimal
+      point on Digit 1.
+* `enableColon = true`
+    * the module behaves like a 4-digit clock module with a colon segment
+      between Digit 1 and Digit 2.
+
+The `enableColon` parameter can be changed dynamically at runtime using the
+`enableColon()` method.
 
 <a name="Ht16k33Module4"></a>
 #### HT16K33 Module with 4 Digits
@@ -881,8 +891,9 @@ const uint8_t SDA_PIN = SDA;
 const uint8_t NUM_DIGITS = 4;
 
 using WireInterface = TwoWireInterface<TwoWire>;
-WireInterface wireInterface(Wire, HT16K33_I2C_ADDRESS);
-Ht16k33Module<WireInterface, NUM_DIGITS> ledModule(wireInterface);
+WireInterface wireInterface(Wire);
+Ht16k33Module<WireInterface, NUM_DIGITS> ledModule(
+    wireInterface, HT16K33_I2C_ADDRESS);
 
 PatternWriter patternWriter(ledModule);
 
