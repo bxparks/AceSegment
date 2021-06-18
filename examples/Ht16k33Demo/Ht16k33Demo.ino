@@ -46,7 +46,7 @@ const uint8_t HT16K33_I2C_ADDRESS = 0x70;
   const uint8_t SCL_PIN = SCL;
   const uint8_t SDA_PIN = SDA;
   const uint8_t NUM_DIGITS = 4;
-  const uint8_t DELAY_MICROS = 5;
+  const uint8_t DELAY_MICROS = 4;
 
 #elif defined(AUNITER_MICRO_HT16K33)
   #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_SIMPLE_WIRE_FAST
@@ -54,7 +54,7 @@ const uint8_t HT16K33_I2C_ADDRESS = 0x70;
   const uint8_t SCL_PIN = SCL;
   const uint8_t SDA_PIN = SDA;
   const uint8_t NUM_DIGITS = 4;
-  const uint8_t DELAY_MICROS = 1;
+  const uint8_t DELAY_MICROS = 4;
 
 #elif defined(AUNITER_STM32_HT16K33)
   #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_HARD

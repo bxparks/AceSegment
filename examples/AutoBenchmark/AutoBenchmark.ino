@@ -151,7 +151,7 @@ const uint8_t CLOCK_PIN = SCK; // SH_CP on 74HC595
 // HT16K33
 const uint8_t SDA_PIN = SDA;
 const uint8_t SCL_PIN = SCL;
-const uint8_t DELAY_MICROS = 1;
+const uint8_t DELAY_MICROS = 4;
 
 //------------------------------------------------------------------
 // Run benchmarks.

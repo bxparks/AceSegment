@@ -293,7 +293,7 @@ using ace_segment::kActiveHighPattern;
   #define INTERFACE_TYPE INTERFACE_TYPE_TWO_WIRE
   const uint8_t SDA_PIN = SDA;
   const uint8_t SCL_PIN = SCL;
-  const uint8_t BIT_DELAY = 2;
+  const uint8_t BIT_DELAY = 4;
   const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
 #elif defined(AUNITER_STM32_TM1637)
@@ -386,7 +386,7 @@ using ace_segment::kActiveHighPattern;
   #define INTERFACE_TYPE INTERFACE_TYPE_TWO_WIRE
   const uint8_t SDA_PIN = SDA;
   const uint8_t SCL_PIN = SCL;
-  const uint8_t BIT_DELAY = 2;
+  const uint8_t BIT_DELAY = 4;
   const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
 #elif defined(AUNITER_D1MINI_LARGE_TM1637)
@@ -481,7 +481,7 @@ using ace_segment::kActiveHighPattern;
   #define INTERFACE_TYPE INTERFACE_TYPE_TWO_WIRE
   const uint8_t SDA_PIN = SDA;
   const uint8_t SCL_PIN = SCL;
-  const uint8_t BIT_DELAY = 2;
+  const uint8_t BIT_DELAY = 4;
   const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
 #elif defined(AUNITER_ESP32_TM1637)
@@ -581,7 +581,7 @@ using ace_segment::kActiveHighPattern;
   #define INTERFACE_TYPE INTERFACE_TYPE_TWO_WIRE
   const uint8_t SDA_PIN = SDA;
   const uint8_t SCL_PIN = SCL;
-  const uint8_t BIT_DELAY = 2;
+  const uint8_t BIT_DELAY = 4;
   const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
 #else

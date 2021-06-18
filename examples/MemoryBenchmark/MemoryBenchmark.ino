@@ -84,7 +84,7 @@ volatile int disableCompilerOptimization = 0;
   // HT16K33
   const uint8_t SDA_PIN = 2;
   const uint8_t SCL_PIN = 3;
-  const uint8_t DELAY_MICROS = 2;
+  const uint8_t DELAY_MICROS = 4;
 
   // A stub LedModule to allow various Writer classes to be created, but mostly
   // isolated from the underlying LedModule implementations.

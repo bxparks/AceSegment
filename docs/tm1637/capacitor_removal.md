@@ -18,10 +18,14 @@ the schematic below:
 
 The capacitors for `CLK` and `DIO` lines are 10 nF, which is about 50-100X
 larger than they should be. It causes the RC time constant to be about 100
-microseconds, which forces the `BIT_DELAY` parameter in the `SoftTmiInterface`
-and `SoftTmiFastInterface` classes to be 100 microseconds. According to the
-TM1637 datasheet, the controller chip should be able to handle a `BIT_DELAY` as
-low as 1 microsecond (i.e. 2 microseconds per full cycle, or 500 kHz).
+microseconds, which forces the `delayMicros` parameter in `SoftTmiInterface` and
+the `DELAY_MICROS` parameter in `SoftTmiFastInterface` to be 100 microseconds.
+According to the TM1637 datasheet, the controller chip has a maximum clock
+frequency of 500 kHz (50% duty cycle), which implies a theoretical
+`DELAY_MICROS` of 1 microsecond. However, the `delayMicroseconds()` function on
+an AVR platform is not accurate below 3 microseconds, so the examples programs
+under `examples/` set the `delayMicros` or `DELAY_MICROS` parameters to 3
+microseconds or higher.
 
 If you are handy with a soldering iron, you can remove the two 10 nF capacitors.
 The capacitors are located in different places depending on the size of the LED
@@ -30,10 +34,10 @@ capacitors is to use a multimeter and find the capacitors where one end of the
 capacitor is connected to `GND` and the other end of the capacitor is connected
 to either the `DIO` pin or the `CLK` pin.
 
-In theory, these capacitors should be replaced with ones in the
-range of 100 to 500 pF , to prevent interference from high frequency noise on
-the `CLK` and `DIO` lines. However, I have tested these modules with **no**
-capacitors on the `DIO` and `CLK` lines, and was able to use a `BIT_DELAY` as
+In theory, these capacitors should be replaced with ones in the range of 100 to
+500 pF , to prevent interference from high frequency noise on the `CLK` and
+`DIO` lines. However, I have tested these modules with **no** capacitors on the
+`DIO` and `CLK` lines, and was able to use a `delayMicros` or `DELAY_MICROS` as
 low as 1 microsecond.
 
 Here are the photos of the LED modules that I modified, where the red box marks
