@@ -658,16 +658,16 @@ const uint8_t NUM_SUBFIELDS = 1;
     // so include this only when required.
     #include <Wire.h>
     using WireInterface = TwoWireInterface<TwoWire>;
-    WireInterface wireInterface(Wire, HT16K33_I2C_ADDRESS);
+    WireInterface wireInterface(Wire);
   #elif INTERFACE_TYPE == INTERFACE_TYPE_SIMPLE_WIRE
     using WireInterface = SimpleWireInterface;
-    WireInterface wireInterface(
-        HT16K33_I2C_ADDRESS, SDA_PIN, SCL_PIN, BIT_DELAY);
+    WireInterface wireInterface(SDA_PIN, SCL_PIN, BIT_DELAY);
   #elif INTERFACE_TYPE == INTERFACE_TYPE_SIMPLE_WIRE_FAST
     using WireInterface = SimpleWireFastInterface<SDA_PIN, SCL_PIN, BIT_DELAY>;
-    WireInterface wireInterface(HT16K33_I2C_ADDRESS);
+    WireInterface wireInterface;
   #endif
-  Ht16k33Module<WireInterface, NUM_DIGITS> ledModule(wireInterface);
+  Ht16k33Module<WireInterface, NUM_DIGITS> ledModule(
+      wireInterface, HT16K33_I2C_ADDRESS);
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_DIRECT
   // Common Anode, with transitors on Group pins

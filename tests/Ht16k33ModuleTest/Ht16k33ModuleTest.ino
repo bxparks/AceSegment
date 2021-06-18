@@ -20,8 +20,10 @@ using ace_segment::Ht16k33Module;
 
 //----------------------------------------------------------------------------
 const uint8_t NUM_DIGITS = 4;
+const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 TestableWireInterface wireInterface;
-Ht16k33Module<TestableWireInterface, NUM_DIGITS> ht16k33Module(wireInterface);
+Ht16k33Module<TestableWireInterface, NUM_DIGITS> ht16k33Module(
+    wireInterface, HT16K33_I2C_ADDRESS);
 
 test(Ht16k33ModuleTest, patternForChipPos_colonDisabled) {
   uint8_t patterns[4] = {0x00, 0x01|0x80, 0x02, 0x03|0x80};

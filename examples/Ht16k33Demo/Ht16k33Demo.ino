@@ -89,41 +89,41 @@ const uint8_t HT16K33_I2C_ADDRESS = 0x70;
   #warning Using Wire.h
   #include <Wire.h>
   using WireInterface = TwoWireInterface<TwoWire>;
-  WireInterface wireInterface(Wire, HT16K33_I2C_ADDRESS);
+  WireInterface wireInterface(Wire);
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SOFTWARE_WIRE
   #warning Using SoftwareWire.h
   #include <SoftwareWire.h>
   SoftwareWire softwareWire(SDA_PIN, SCL_PIN);
   using WireInterface = TwoWireInterface<SoftwareWire>;
-  WireInterface wireInterface(softwareWire, HT16K33_I2C_ADDRESS);
+  WireInterface wireInterface(softwareWire);
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SOFT_WIRE
   #warning Using SoftWire.h
   #include <SoftWire.h>
   SoftWire softWire(SDA_PIN, SCL_PIN);
   using WireInterface = TwoWireInterface<SoftWire>;
-  WireInterface wireInterface(softWire, HT16K33_I2C_ADDRESS);
+  WireInterface wireInterface(softWire);
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SWIRE
   #warning Using SWire.h
   #include <SWire.h>
   using WireInterface = TwoWireInterface<SoftWire>;
-  WireInterface wireInterface(SWire, HT16K33_I2C_ADDRESS);
+  WireInterface wireInterface(SWire);
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SIMPLE_WIRE
   #warning Using SimpleWireInterface.h
   using WireInterface = SimpleWireInterface;
-  WireInterface wireInterface(
-      HT16K33_I2C_ADDRESS, SDA_PIN, SCL_PIN, DELAY_MICROS);
+  WireInterface wireInterface(SDA_PIN, SCL_PIN, DELAY_MICROS);
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SIMPLE_WIRE_FAST
   #warning Using SimpleWireFastInterface.h
   #include <digitalWriteFast.h>
   #include <ace_segment/hw/SimpleWireFastInterface.h>
   using ace_segment::SimpleWireFastInterface;
   using WireInterface = SimpleWireFastInterface<SDA_PIN, SCL_PIN, DELAY_MICROS>;
-  WireInterface wireInterface(HT16K33_I2C_ADDRESS);
+  WireInterface wireInterface;
 #else
   #error Unknown WIRE_INTERFACE_TYPE
 #endif
 
-Ht16k33Module<WireInterface, NUM_DIGITS> ledModule(wireInterface);
+Ht16k33Module<WireInterface, NUM_DIGITS> ledModule(
+    wireInterface, HT16K33_I2C_ADDRESS);
 PatternWriter patternWriter(ledModule);
 
 void setupAceSegment() {

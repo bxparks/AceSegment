@@ -36,9 +36,9 @@ namespace ace_segment {
  *
  * The implementation is very similar to SoftTmiInterface because the TM1637
  * protocol is very similar to I2C. To keep everything simple, so the
- * beginTransmission(), write() and endTransimision() methods are *blocking*
- * calls because interrupts are not used. This means that we can eliminate the
- * send buffer, saving static memory.
+ * beginTransmission(), write() and endTransimision() methods are *synchronous*
+ * (i.e. blocking) because interrupts are not used. This means that we can
+ * eliminate the send buffer, which saves both flash and static memory.
  */
 class SimpleWireInterface {
   public:
@@ -50,32 +50,32 @@ class SimpleWireInterface {
      * but it is probably prudent to keep delayMicros greater than or equal to
      * 3.
      *
-     * @param addr I2C address of slave device
      * @param dataPin SDA pin
      * @param clockPin SCL pin
      * @param delayMicros delay after each bit transition of SDA or SCL, should
      *    be greater or equal to 3 microseconds.
      */
     SimpleWireInterface(
-        uint8_t addr, uint8_t dataPin, uint8_t clockPin, uint8_t delayMicros
+        uint8_t dataPin, uint8_t clockPin, uint8_t delayMicros
     ) :
-        mAddr(addr),
         mDataPin(dataPin),
         mClockPin(clockPin),
         mDelayMicros(delayMicros)
     {}
 
-    /** Initialize the clock and data pins. */
+    /** Initialize the clock and data pins.
+     *
+     * These are open-drain lines, with pull-up resistors. We must not drive
+     * them HIGH actively since that could damage the transitor at the other
+     * end of the line pulling LOW. Instead, we go into INPUT mode to let the
+     * line to HIGH through the pullup resistor, then go to OUTPUT mode only
+     * to pull down.
+     */
     void begin() const {
-      // These are open-drain lines, with a pull-up resistor. We must not drive
-      // them HIGH actively since that could damage the transitor at the other
-      // end of the line pulling LOW. Instead, we go into INPUT mode to let the
-      // line to HIGH through the pullup resistor, then go to OUTPUT mode only
-      // to pull down.
       digitalWrite(mClockPin, LOW);
       digitalWrite(mDataPin, LOW);
 
-      // Begin with both lines at HIGH.
+      // Begin with both lines in INPUT mode to passively go HIGH.
       clockHigh();
       dataHigh();
     }
@@ -86,8 +86,11 @@ class SimpleWireInterface {
       dataHigh();
     }
 
-    /** Send start condition. */
-    void beginTransmission() const {
+    /**
+     * Send start condition.
+     * @param addr I2C address of slave device
+     */
+    void beginTransmission(uint8_t addr) const {
       clockHigh();
       dataHigh();
 
@@ -95,7 +98,7 @@ class SimpleWireInterface {
       clockLow();
 
       // Send I2C addr (7 bits) and R/W bit set to "write" (0x00).
-      uint8_t effectiveAddr = (mAddr << 1) | 0x00;
+      uint8_t effectiveAddr = (addr << 1) | 0x00;
       write(effectiveAddr);
     }
 
@@ -159,7 +162,6 @@ class SimpleWireInterface {
     void dataLow() const { pinMode(mDataPin, OUTPUT); bitDelay(); }
 
   private:
-    uint8_t const mAddr;
     uint8_t const mDataPin;
     uint8_t const mClockPin;
     uint8_t const mDelayMicros;

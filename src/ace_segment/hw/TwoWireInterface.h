@@ -33,21 +33,25 @@ namespace ace_segment {
  * A thin wrapper around an I2C `TwoWire` class and its `Wire` object. This is a
  * template class to avoid including the <Wire.h> header file, which increases
  * flash memory on AVR by about 1000 byte even if the Wire object is never used.
+ *
+ * This wrapper can also be used with alternative implementations of I2C
+ * (software or hardware) so long as they implement some basic API of the
+ * `TwoWire` class: specifically the `beginTransmission()`, `write()` and
+ * `endTransmission() methods. Since `TwoWireInterface` is a template, the
+ * alternative implementation classes do *not* need to inherit from the
+ * `TwoWire` class.
  */
 template <typename T_WIRE>
 class TwoWireInterface {
   public:
-    TwoWireInterface(T_WIRE& wire, uint8_t addr) :
-        mWire(wire),
-        mAddr(addr)
-    {}
+    TwoWireInterface(T_WIRE& wire) : mWire(wire) {}
 
     void begin() {}
 
     void end() {}
 
-    void beginTransmission() {
-      mWire.beginTransmission(mAddr);
+    void beginTransmission(uint8_t const addr) {
+      mWire.beginTransmission(addr);
     }
 
     void write(uint8_t data) {
@@ -60,7 +64,6 @@ class TwoWireInterface {
 
   private:
     T_WIRE &mWire;
-    uint8_t const mAddr;
 };
 
 }

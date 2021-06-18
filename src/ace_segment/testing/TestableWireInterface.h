@@ -20,8 +20,8 @@ class TestableWireInterface {
       mEventLog.addWireEnd();
     }
 
-    void beginTransmission() const {
-      mEventLog.addWireBeginTransmission();
+    void beginTransmission(uint8_t addr) const {
+      mEventLog.addWireBeginTransmission(addr);
     }
 
     void write(uint16_t data) const {

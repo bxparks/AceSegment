@@ -66,9 +66,10 @@ namespace ace_segment {
  * microseconds. I am not sure about the accuracy on other microcontrollers, but
  * it is probably prudent to keep T_DELAY_MICROS greater than or equal to 3.
  *
- * @tparam T_DIO_PIN pin attached to the LED module data line
- * @tparam T_CLK_PIN pin attached to the LED module clock line
- * @tparam T_DELAY_MICROS delay after each bit transition
+ * @tparam T_DIO_PIN pin attached to the data line
+ * @tparam T_CLK_PIN pin attached to the clock line
+ * @tparam T_DELAY_MICROS delay after each bit transition, should be greater
+ *    than or equal to 3 microseconds
  */
 template <
     uint8_t T_DIO_PIN,
@@ -79,13 +80,15 @@ class SoftTmiFastInterface {
   public:
     explicit SoftTmiFastInterface() = default;
 
-    /** Initialize the dio and clk pins. */
+    /** Initialize the dio and clk pins.
+     *
+     * These are open-drain lines, with pull-up resistors. We must not drive
+     * them HIGH actively since that could damage the transitor at the other
+     * end of the line pulling LOW. Instead, we go into INPUT mode to let the
+     * line to HIGH through the pullup resistor, then go to OUTPUT mode only
+     * to pull down.
+     */
     void begin() const {
-      // These are open-drain lines, with a pull-up resistor. We must not drive
-      // them HIGH actively since that could damage the transitor at the other
-      // end of the line pulling LOW. Instead, we go into INPUT mode to let the
-      // line to HIGH through the pullup resistor, then go to OUTPUT mode only
-      // to pull down.
       digitalWriteFast(T_CLK_PIN, LOW);
       digitalWriteFast(T_DIO_PIN, LOW);
 
