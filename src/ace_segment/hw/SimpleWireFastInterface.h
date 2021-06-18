@@ -35,7 +35,7 @@ SOFTWARE.
 namespace ace_segment {
 
 /**
- * A version of SimpleWriteInterface that uses one of the <digitalWriteFast.h>
+ * A version of SimpleWireInterface that uses one of the <digitalWriteFast.h>
  * libraries. The biggest benefit of using digitalWriteFast is the reduction of
  * flash memory size, 500-700 bytes on AVR.
  *
@@ -55,23 +55,23 @@ template <
 >
 class SimpleWireFastInterface {
   public:
-    /**
-     * Constructor.
-     * @param addr I2C address of slave device
-     */
-    SimpleWireFastInterface(uint8_t addr) : mAddr(addr) {}
+    /** Constructor. */
+    SimpleWireFastInterface() = default;
 
-    /** Initialize the clock and data pins. */
+    /**
+     * Initialize the clock and data pins.
+     *
+     * These are open-drain lines, with pull-up resistors. We must not drive
+     * them HIGH actively since that could damage the transitor at the other
+     * end of the line pulling LOW. Instead, we go into INPUT mode to let the
+     * line to HIGH through the pullup resistor, then go to OUTPUT mode only
+     * to pull down.
+     */
     void begin() const {
-      // These are open-drain lines, with a pull-up resistor. We must not drive
-      // them HIGH actively since that could damage the transitor at the other
-      // end of the line pulling LOW. Instead, we go into INPUT mode to let the
-      // line to HIGH through the pullup resistor, then go to OUTPUT mode only
-      // to pull down.
       digitalWriteFast(T_CLOCK_PIN, LOW);
       digitalWriteFast(T_DATA_PIN, LOW);
 
-      // Begin with both lines at HIGH.
+      // Begin with both lines in INPUT mode to passively go HIGH.
       clockHigh();
       dataHigh();
     }
@@ -82,8 +82,11 @@ class SimpleWireFastInterface {
       dataHigh();
     }
 
-    /** Send start condition. */
-    void beginTransmission() const {
+    /**
+     * Send start condition.
+     * @param addr I2C address of slave device
+     */
+    void beginTransmission(uint8_t addr) const {
       clockHigh();
       dataHigh();
 
@@ -91,7 +94,7 @@ class SimpleWireFastInterface {
       clockLow();
 
       // Send I2C addr (7 bits) and R/W bit set to "write" (0x00).
-      uint8_t effectiveAddr = (mAddr << 1) | 0x00;
+      uint8_t effectiveAddr = (addr << 1) | 0x00;
       write(effectiveAddr);
     }
 
@@ -157,9 +160,6 @@ class SimpleWireFastInterface {
     void dataHigh() const { pinModeFast(T_DATA_PIN, INPUT); bitDelay(); }
 
     void dataLow() const { pinModeFast(T_DATA_PIN, OUTPUT); bitDelay(); }
-
-  private:
-    uint8_t const mAddr;
 };
 
 }

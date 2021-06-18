@@ -785,8 +785,9 @@ void runHt16k33Benchmark(const __FlashStringHelper* name, LM& ledModule) {
 
 void runHt16k33TwoWire() {
   using WireInterface = TwoWireInterface<TwoWire>;
-  WireInterface wireInterface(Wire, HT16K33_I2C_ADDRESS);
-  Ht16k33Module<WireInterface, 4> ht16k33Module(wireInterface);
+  WireInterface wireInterface(Wire);
+  Ht16k33Module<WireInterface, 4> ht16k33Module(
+      wireInterface, HT16K33_I2C_ADDRESS);
 
   Wire.begin();
   wireInterface.begin();
@@ -799,8 +800,9 @@ void runHt16k33TwoWire() {
 void runHt16k33SimpleWire() {
   using WireInterface = SimpleWireInterface;
   WireInterface wireInterface(
-      HT16K33_I2C_ADDRESS, SDA_PIN, SCL_PIN, DELAY_MICROS);
-  Ht16k33Module<WireInterface, 4> ht16k33Module(wireInterface);
+      SDA_PIN, SCL_PIN, DELAY_MICROS);
+  Ht16k33Module<WireInterface, 4> ht16k33Module(
+      wireInterface, HT16K33_I2C_ADDRESS);
 
   wireInterface.begin();
   ht16k33Module.begin();
@@ -812,8 +814,9 @@ void runHt16k33SimpleWire() {
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 void runHt16k33SimpleWireFast() {
   using WireInterface = SimpleWireFastInterface<SDA_PIN, SCL_PIN, DELAY_MICROS>;
-  WireInterface wireInterface(HT16K33_I2C_ADDRESS);
-  Ht16k33Module<WireInterface, 4> ht16k33Module(wireInterface);
+  WireInterface wireInterface;
+  Ht16k33Module<WireInterface, 4> ht16k33Module(
+      wireInterface, HT16K33_I2C_ADDRESS);
 
   wireInterface.begin();
   ht16k33Module.begin();

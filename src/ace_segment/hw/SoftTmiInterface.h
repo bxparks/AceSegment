@@ -85,13 +85,16 @@ class SoftTmiInterface {
         mDelayMicros(delayMicros)
     {}
 
-    /** Initialize the dio and clk pins. */
+    /**
+     * Initialize the dio and clk pins.
+     *
+     * These are open-drain lines, with pull-up resistors. We must not drive
+     * them HIGH actively since that could damage the transitor at the other
+     * end of the line pulling LOW. Instead, we go into INPUT mode to let the
+     * line to HIGH through the pullup resistor, then go to OUTPUT mode only
+     * to pull down.
+     */
     void begin() const {
-      // These are open-drain lines, with a pull-up resistor. We must not drive
-      // them HIGH actively since that could damage the transitor at the other
-      // end of the line pulling LOW. Instead, we go into INPUT mode to let the
-      // line to HIGH through the pullup resistor, then go to OUTPUT mode only
-      // to pull down.
       digitalWrite(mClkPin, LOW);
       digitalWrite(mDioPin, LOW);
 

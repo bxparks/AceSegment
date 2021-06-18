@@ -69,14 +69,20 @@ class Ht16k33Module : public LedModule {
      * @param wire instance of T_WIREI class
      * @param remapArray (optional, nullable) a mapping of the physical digit
      *    positions to their logical positions
+     * @param addr the 7-bit I2C addr
      * @param enableColon enable the colon segment to behave like a 4-digit
      *    LED module for clocks (displaying a colon in `hh:mm`). The
      *    decimal point (bit 7) of digit 1 (second from left) becomes wired
      *    to the colon segment. (default: false)
      */
-    explicit Ht16k33Module(T_WIREI& wire, bool enableColon = false) :
+    explicit Ht16k33Module(
+        T_WIREI& wire,
+        uint8_t addr,
+        bool enableColon = false
+    ) :
         LedModule(T_DIGITS),
         mWire(wire),
+        mAddr(addr),
         mBrightness(0),
         mEnableColon(enableColon)
     {}
@@ -153,7 +159,7 @@ class Ht16k33Module : public LedModule {
      */
     void flush() {
       // Write digits.
-      mWire.beginTransmission();
+      mWire.beginTransmission(mAddr);
       mWire.write(0x00); // start at position 0
       // Loop over the 5 physical digit lines of this module.
       for (uint8_t chipPos = 0; chipPos < T_DIGITS + 1; ++chipPos) {
@@ -173,7 +179,7 @@ class Ht16k33Module : public LedModule {
 
     /** Write a single byte command to the LED module. */
     void writeCommand(uint8_t command) {
-      mWire.beginTransmission();
+      mWire.beginTransmission(mAddr);
       mWire.write(command);
       mWire.endTransmission();
     }
@@ -222,6 +228,9 @@ class Ht16k33Module : public LedModule {
 
     /** I2C Wire interface. */
     T_WIREI& mWire;
+
+    /** The 7-bit I2C address. */
+    uint8_t const mAddr;
 
     /** Pattern for each digit. */
     uint8_t mPatterns[T_DIGITS];

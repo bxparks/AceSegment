@@ -85,6 +85,7 @@ volatile int disableCompilerOptimization = 0;
   const uint8_t SDA_PIN = 2;
   const uint8_t SCL_PIN = 3;
   const uint8_t DELAY_MICROS = 4;
+  const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
   // A stub LedModule to allow various Writer classes to be created, but mostly
   // isolated from the underlying LedModule implementations.
@@ -289,17 +290,16 @@ volatile int disableCompilerOptimization = 0;
 
   #elif FEATURE == FEATURE_HT16K33_TWO_WIRE
     #include <Wire.h>
-    const uint8_t HT16K33_I2C_ADDRESS = 0x70;
     using WireInterface = TwoWireInterface<TwoWire>;
-    WireInterface wireInterface(Wire, HT16K33_I2C_ADDRESS);
-    Ht16k33Module<WireInterface, NUM_DIGITS> ht16k33Module(wireInterface);
+    WireInterface wireInterface(Wire);
+    Ht16k33Module<WireInterface, NUM_DIGITS> ht16k33Module(
+        wireInterface, HT16K33_I2C_ADDRESS);
 
   #elif FEATURE == FEATURE_HT16K33_SIMPLE_WIRE
-    const uint8_t HT16K33_I2C_ADDRESS = 0x70;
     using WireInterface = SimpleWireInterface;
-    WireInterface wireInterface(
-        HT16K33_I2C_ADDRESS, SDA_PIN, SCL_PIN, DELAY_MICROS);
-    Ht16k33Module<WireInterface, NUM_DIGITS> ht16k33Module(wireInterface);
+    WireInterface wireInterface(SDA_PIN, SCL_PIN, DELAY_MICROS);
+    Ht16k33Module<WireInterface, NUM_DIGITS> ht16k33Module(
+        wireInterface, HT16K33_I2C_ADDRESS);
 
   #elif FEATURE == FEATURE_HT16K33_SIMPLE_WIRE_FAST
     #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
@@ -308,11 +308,11 @@ volatile int disableCompilerOptimization = 0;
 
     #include <digitalWriteFast.h>
     #include <ace_segment/hw/SimpleWireFastInterface.h>
-    const uint8_t HT16K33_I2C_ADDRESS = 0x70;
     using WireInterface = SimpleWireFastInterface<
         SDA_PIN, SCL_PIN, DELAY_MICROS>;
-    WireInterface wireInterface(HT16K33_I2C_ADDRESS);
-    Ht16k33Module<WireInterface, NUM_DIGITS> ht16k33Module(wireInterface);
+    WireInterface wireInterface;
+    Ht16k33Module<WireInterface, NUM_DIGITS> ht16k33Module(
+        wireInterface, HT16K33_I2C_ADDRESS);
 
   #elif FEATURE == FEATURE_STUB_MODULE
     StubModule stubModule;
