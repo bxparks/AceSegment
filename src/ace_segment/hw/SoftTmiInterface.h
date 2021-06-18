@@ -59,17 +59,21 @@ namespace ace_segment {
  * Since the protocol does not match I2C, we cannot use the hardware I2C
  * capabilities of the microcontroller, so we have to implement a software
  * version of this protocol.
- *
- * This class is stateless. It is thread-safe.
  */
 class SoftTmiInterface {
   public:
     /**
      * Constructor.
-     * @tparam dioPin pin attached to the LED module data line
-     * @tparam clkPin pin attached to the LED module clock line
-     * @tparam delayMicros delay after each bit transition (full cycle is 2 *
-     *    delayMicros)
+     *
+     * On AVR processors, `delayMicroseconds()` is not accurate below 3
+     * microseconds. I am not sure about the accuracy on other microcontrollers,
+     * but it is probably prudent to keep delayMicros greater than or equal to
+     * 3.
+     *
+     * @tparam dioPin pin attached to the data line
+     * @tparam clkPin pin attached to the clock line
+     * @tparam delayMicros delay after each bit transition, should be greater
+     *    than or equal to 3 microseconds
      */
     explicit SoftTmiInterface(
         uint8_t dioPin,
@@ -113,6 +117,7 @@ class SoftTmiInterface {
 
     /** Generate the I2C stop condition. */
     void stopCondition() const {
+      // clock will always be LOW when this is called
       dataLow();
       clockHigh();
       dataHigh();
@@ -121,6 +126,11 @@ class SoftTmiInterface {
     /**
      * Send the data byte on the data bus, with LSB first instead of the usual
      * MSB first for I2C.
+     *
+     * This loop generates slightly asymmetric logic signals because clockLow()
+     * lasts for 2*bitDelay(), but clockHigh() lasts for only 1*bitDelay(). This
+     * does not seem to cause any problems with the LED modules that I have
+     * tested.
      *
      * @return 0 means ACK, 1 means NACK.
      */

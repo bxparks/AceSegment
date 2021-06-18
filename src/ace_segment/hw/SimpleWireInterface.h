@@ -44,11 +44,17 @@ class SimpleWireInterface {
   public:
     /**
      * Constructor.
+     *
+     * On AVR processors, `delayMicroseconds()` is not accurate below 3
+     * microseconds. I am not sure about the accuracy on other microcontrollers,
+     * but it is probably prudent to keep delayMicros greater than or equal to
+     * 3.
+     *
      * @param addr I2C address of slave device
      * @param dataPin SDA pin
      * @param clockPin SCL pin
-     * @param delayMicros delay after each bit transition (full cycle = 2 *
-     *    delayMicros)
+     * @param delayMicros delay after each bit transition of SDA or SCL, should
+     *    be greater or equal to 3 microseconds.
      */
     SimpleWireInterface(
         uint8_t addr, uint8_t dataPin, uint8_t clockPin, uint8_t delayMicros
@@ -95,6 +101,7 @@ class SimpleWireInterface {
 
     /** Send stop condition. */
     void endTransmission() const {
+      // clock will always be LOW when this is called
       dataLow();
       clockHigh();
       dataHigh();
@@ -102,6 +109,11 @@ class SimpleWireInterface {
 
     /**
      * Send the data byte on the data bus, with MSB first as specified by I2C.
+     *
+     * This loop generates slightly asymmetric logic signals because clockLow()
+     * lasts for 2*bitDelay(), but clockHigh() lasts for only 1*bitDelay(). This
+     * does not seem to cause any problems with the LED modules that I have
+     * tested.
      *
      * @return 0 means ACK, 1 means NACK.
      */

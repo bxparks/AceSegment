@@ -62,12 +62,13 @@ namespace ace_segment {
  * generate only a single template instantiation. I have not currently done any
  * experiments to see where the break-even point would be.
  *
- * This class is stateless. It is thread-safe.
+ * On AVR processors, `delayMicroseconds()` is not accurate below 3
+ * microseconds. I am not sure about the accuracy on other microcontrollers, but
+ * it is probably prudent to keep T_DELAY_MICROS greater than or equal to 3.
  *
  * @tparam T_DIO_PIN pin attached to the LED module data line
  * @tparam T_CLK_PIN pin attached to the LED module clock line
- * @tparam T_DELAY_MICROS delay after each bit transition (full cycle is 2 *
- *    T_DELAY_MICROS)
+ * @tparam T_DELAY_MICROS delay after each bit transition
  */
 template <
     uint8_t T_DIO_PIN,
@@ -110,6 +111,7 @@ class SoftTmiFastInterface {
 
     /** Generate the I2C stop condition. */
     void stopCondition() const {
+      // clock will always be LOW when this is called
       dataLow();
       clockHigh();
       dataHigh();
@@ -118,6 +120,11 @@ class SoftTmiFastInterface {
     /**
      * Send the data byte on the data bus, with LSB first instead of the usual
      * MSB first for I2C.
+     *
+     * This loop generates slightly asymmetric logic signals because clockLow()
+     * lasts for 2*bitDelay(), but clockHigh() lasts for only 1*bitDelay(). This
+     * does not seem to cause any problems with the LED modules that I have
+     * tested.
      *
      * @return 0 means ACK, 1 means NACK.
      */

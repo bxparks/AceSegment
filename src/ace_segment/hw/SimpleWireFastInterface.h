@@ -39,10 +39,14 @@ namespace ace_segment {
  * libraries. The biggest benefit of using digitalWriteFast is the reduction of
  * flash memory size, 500-700 bytes on AVR.
  *
- * @tparam T_DATA_PIN
- * @tparam T_CLOCK_PIN
- * @tparam T_DELAY_MICROS delay after each bit transition (full cycle = 2 *
-     delayMicros)
+ * On AVR processors, `delayMicroseconds()` is not accurate below 3
+ * microseconds. I am not sure about the accuracy on other microcontrollers, but
+ * it is probably prudent to keep T_DELAY_MICROS greater than or equal to 3.
+ *
+ * @tparam T_DATA_PIN SDA pin
+ * @tparam T_CLOCK_PIN SCL pin
+ * @tparam T_DELAY_MICROS delay after each bit transition, should be greater
+ *    or equal to 3 microseconds.
  */
 template <
     uint8_t T_DATA_PIN,
@@ -93,6 +97,7 @@ class SimpleWireFastInterface {
 
     /** Send stop condition. */
     void endTransmission() const {
+      // clock will always be LOW when this is called
       dataLow();
       clockHigh();
       dataHigh();
@@ -100,6 +105,11 @@ class SimpleWireFastInterface {
 
     /**
      * Send the data byte on the data bus, with MSB first as specified by I2C.
+     *
+     * This loop generates slightly asymmetric logic signals because clockLow()
+     * lasts for 2*bitDelay(), but clockHigh() lasts for only 1*bitDelay(). This
+     * does not seem to cause any problems with the LED modules that I have
+     * tested.
      *
      * @return 0 means ACK, 1 means NACK.
      */
