@@ -46,14 +46,14 @@ class SimpleWireInterface {
      * Constructor.
      *
      * On AVR processors, `delayMicroseconds()` is not accurate below 3
-     * microseconds. I am not sure about the accuracy on other microcontrollers,
-     * but it is probably prudent to keep delayMicros greater than or equal to
-     * 3.
+     * microseconds. Some microcontrollers may support better accuracy and may
+     * work well with values as low as 1 microsecond.
      *
      * @param dataPin SDA pin
      * @param clockPin SCL pin
-     * @param delayMicros delay after each bit transition of SDA or SCL, should
-     *    be greater or equal to 3 microseconds.
+     * @param delayMicros delay after each bit transition of SDA or SCL. Should
+     *    be greater or equal to 3 microseconds on AVR processors, but may work
+     *    as low as 1 microsecond on other microcontrollers.
      */
     SimpleWireInterface(
         uint8_t dataPin, uint8_t clockPin, uint8_t delayMicros

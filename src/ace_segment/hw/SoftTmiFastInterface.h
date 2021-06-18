@@ -63,13 +63,14 @@ namespace ace_segment {
  * experiments to see where the break-even point would be.
  *
  * On AVR processors, `delayMicroseconds()` is not accurate below 3
- * microseconds. I am not sure about the accuracy on other microcontrollers, but
- * it is probably prudent to keep T_DELAY_MICROS greater than or equal to 3.
+ * microseconds. Some microcontrollers may support better accuracy and may
+ * work well with values as low as 1 microsecond.
  *
  * @tparam T_DIO_PIN pin attached to the data line
  * @tparam T_CLK_PIN pin attached to the clock line
- * @tparam T_DELAY_MICROS delay after each bit transition, should be greater
- *    than or equal to 3 microseconds
+ * @tparam T_DELAY_MICROS delay after each bit transition of DIO or CLK.. Should
+ *    be greater or equal to 3 microseconds on AVR processors, but may work as
+ *    low as 1 microsecond on other microcontrollers.
  */
 template <
     uint8_t T_DIO_PIN,
