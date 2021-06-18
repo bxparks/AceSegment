@@ -43,23 +43,24 @@ namespace ace_segment {
  * point after digit 1 (second from left) and the colon between digits 1 and 2
  * can be controlled independently and turned on at the same time.
  *
- * This class has the option of making the LED module behave like a normal
- * 4-digit LED module (witout a colon), or a 4-digit LED clock module (with a
- * colon). With the `enableColon` parameter set to false (default), the decimal
- * point (bit 7) of digit 1 controls the decimal point to the right of digit 1.
- * With `enableColon` set to true, the same bit controls the colon to the right
- * of digit 1.
+ * Unfortunately, the AceSegment library does *not* support controlling both the
+ * decimal point and the colon at the same time. Instead, this class provides
+ * the option of enabling one or the other, making the LED module behave like a
+ * normal 4-digit LED module (witout a colon), or a 4-digit LED clock module
+ * (with a colon). With the `enableColon` parameter set to false (default), the
+ * decimal point (bit 7) of digit 1 controls the decimal point to the right of
+ * digit 1. With `enableColon` set to true, the same bit controls the colon to
+ * the right of digit 1.
  *
- * Although the hardware is capable of turning on the decimal point and colon at
- * the same time, the AceSegment library does not support that mode. It does not
- * seem like a combination that is useful. Fortunately, this class does allow
- * the behavior of the colon segment to be changed at runtime using the
+ * The behavior of the colon segment to be changed at runtime as well using the
  * enableColon() method. You can display the time of a clock (`hh:mm`), then
  * display a normal number with a decimal point (`xx.yy`).
  *
- * @tparam T_WIREI the class that wraps the I2C Wire interface, usually
- *    WireInterface
- * @tparam T_DIGITS number of logical digits in the module
+ * @tparam T_WIREI the class that wraps the I2C Wire interface (one of
+ *    TwoWireInterface, SimpleWireInterface of SimpleWireFastInterface)
+ * @tparam T_DIGITS number of logical digits in the module. Currently this
+ *    should always be set to 4 because it is designed to support the 4-digit
+ *    LED modules found on Adafruit, Amazon or eBay.
  */
 template <typename T_WIREI, uint8_t T_DIGITS>
 class Ht16k33Module : public LedModule {
@@ -67,8 +68,6 @@ class Ht16k33Module : public LedModule {
     /**
      * Constructor.
      * @param wire instance of T_WIREI class
-     * @param remapArray (optional, nullable) a mapping of the physical digit
-     *    positions to their logical positions
      * @param addr the 7-bit I2C addr
      * @param enableColon enable the colon segment to behave like a 4-digit
      *    LED module for clocks (displaying a colon in `hh:mm`). The
@@ -154,8 +153,8 @@ class Ht16k33Module : public LedModule {
      * Unlike some LED modules, it can display both the decimal point on digit 1
      * as well as the colon segment at the same time. However, various writers
      * (e.g. ClockWriter) assumes that the most-significant-bit of digit 1 is
-     * connected to the colon. So if enableColon is set, make the logical
-     * mapping of that decimal point bit so the colon bit.
+     * connected to the colon. So if enableColon is set, map the decimal point
+     * bit to the colon bit.
      */
     void flush() {
       // Write digits.

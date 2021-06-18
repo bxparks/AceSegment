@@ -2211,6 +2211,10 @@ them.
       not go into the `NumberWriter` class, but into a new class called
       something like `FloatWriter`. The `FloatWriter` class con pull in a
       `NumberWriter` object and build on top of it.
+* The `Ht16k33Module` class does not support blinking the digits as supported by
+  the HT16K33 controller chip.
+    * It should be pretty simple to add.
+    * I have not expended the effort because I don't use this feature.
 
 <a name="License"></a>
 ## License
