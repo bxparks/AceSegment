@@ -1,7 +1,17 @@
 /*
- * A demo of the off-the-shelf 8-digit LED module from diymore.cc with the
- * segment pins connected to a 74HC595 shift register and the digit pins also
- * connected to a 74HC595 shift regstier. Uses the Hc595Module class.
+ * A demo of the 8-digit LED module from diymore.cc/robotdyn.com, or a custom
+ * LED module with the segment pins and digit pins connected to two 74HC595
+ * shift register chips. Displays the digits 0 to 3 or 0 to 7, then slowly
+ * rotates the digits to the left, while incrementing the brightness of the
+ * display. Uses the Hc595Module class.
+ *
+ * Supported microcontroller environments:
+ *
+ *  * AUNITER_MICRO_HC595: SparkFun Pro Micro + Commerical LED module
+ *  * AUNITER_MICRO_CUSTOM_DUAL: SparkFun Pro Micro + Custom LED module
+ *  * AUNITER_STM32_HC595: STM32 F1 Blue Pill
+ *  * AUNITER_D1MINI_LARGE_HC595: WeMos D1 Mini ESP8266
+ *  * AUNITER_ESP32_HC595: ESP32 Dev Kit v1
  */
 
 #include <Arduino.h>

@@ -1,6 +1,18 @@
 /*
  * Same as Hc595Demo, but using timer interrupts (through TimerOne library) to
  * render the LED display.
+ *
+ * Supported microcontroller environments:
+ *
+ *  * AUNITER_MICRO_HC595: SparkFun Pro Micro
+ *  * AUNITER_MICRO_CUSTOM_DUAL: SparkFun Pro Micro
+ *
+ * The following configurations are defined, but I don't think they work because
+ * <TimerOne.h> library mahy not be compatible with these:
+ *
+ *  * AUNITER_STM32_HC595: STM32 F1 Blue Pill
+ *  * AUNITER_D1MINILARGE_HC595: WeMos D1 Mini ESP8266
+ *  * AUNITER_ESP32_HC595: ESP32 Dev Kit v1
  */
 
 #include <Arduino.h>

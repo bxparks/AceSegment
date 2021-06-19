@@ -1,6 +1,14 @@
 /*
- * A simple demo of a single HT16K33 LED module, with the digits [0,3] scrolling
- * to the left every second, and changing the brightness each iteration.
+ * A demo of a 4-digit, 7-segment HT16K33 LED module from Adafruit.com or one of
+ * its clones, with the digits [0,3] scrolling to the left every second, and
+ * changing the brightness each iteration.
+ *
+ * Supported microcontroller environments:
+ *
+ *  * AUNITER_MICRO_HT16K33: SparkFun Pro Micro
+ *  * AUNITER_STM32_HT16K33: STM32 F1 Blue Pill
+ *  * AUNITER_D1MINILARGE_HT16K33: WeMos D1 Mini ESP8266
+ *  * AUNITER_ESP32_HT16K33: ESP32 Dev Kit v1
  */
 
 #include <Arduino.h>

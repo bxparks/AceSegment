@@ -1,11 +1,18 @@
 /*
- * Demo the ability to control the brightness of each digit separately. Requires
- * one of the following configurations:
+ * Demo the ability to control the brightness of each digit separately.
+ * Write the digits 0 to 7, with each digit at slightly different brightness
+ * levels, then rotates the digits to the left, giving the appearance of a
+ * modulating waves moving to the left.
  *
- *  * DirectModule
- *  * DirectFast4Module
- *  * HybridModule
- *  * Hc595Module
+ * Supported microcontroller environments:
+ *
+ *  * AUNITER_MICRO_CUSTOM_DIRECT: Pro Micro + Custom Direct LED module
+ *  * AUNITER_MICRO_CUSTOM_SINGLE: Pro Micro + Custom Single 74HC595 LED module
+ *  * AUNITER_MICRO_CUSTOM_DUAL: Pro Micro + Custom Dual 74HC595 LED module
+ *  * AUNITER_MICRO_HC595: Pro Micro + diymore.cc 74HC595 LED module
+ *  * AUNITER_STM32_HC595: STM32 F1 Blue Pill+ diymore.cc 74HC595 LED module
+ *  * AUNITER_D1MINI_LARGE_HC595: WeMos D1 Mini + diymore.cc 74HC595 module
+ *  * AUNITER_ESP32_HC595: ESP32 dev kit v1 + diymore.cc 74HC595 module
  */
 #include <Arduino.h>
 #include <SPI.h>

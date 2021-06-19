@@ -1,11 +1,16 @@
 /*
- * Demo of 2 x TM1637 LED modules, sharing a common CLK but using 2 different
- * DIO pins.
+ * A demo of *two* TM1637 LED modules, sharing a common CLK line but using 2
+ * different DIO pins. Displays the digits 0 - 3, then slowly rotates the digits
+ * to the left, while changing the brightness of the display.
  *
  * Results: Works great except at high levels of brightness, there is a
  * noticeable flicker of the LEDs. My guess is that the LEDs are drawing more
  * current than the Arduino MCU can provide stably, so the voltage fluctuates.
  * Maybe I need to add a smoothing capacitor across the power line? Not tested.
+ *
+ * Supported microcontroller environments:
+ *
+ *  * AUNITER_MICRO_TM1637_DUAL: SparkFun Pro Micro + two 4-digit LED modules
  */
 
 #include <Arduino.h>

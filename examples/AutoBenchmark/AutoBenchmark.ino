@@ -23,17 +23,10 @@ SOFTWARE.
 */
 
 /*
- * A sketch that generates the min/avg/max (in microsecondes) benchmarks of
- * ScanningModule::renderFieldNow() for various configurations of LedMatrix.
- * The output is an space-separate list of numbers which can be fed into
- * `generate_table.awk` to extract a human-readable ASCII table that can be
- * pasted directly into the README.md file as a code block.
- *
- * Each runXxx() function configures the ScanningModule object and all of its
- * dependencies. It calls ScanningModule::renderFieldNow() for the number of
- * times returned by `ScanningModule::getFieldsPerSecond()` so that the entire
- * frame is sampled. The duration of that function call in microseconds is
- * collected, then printed out with the min/avg/max numbers.
+ * A sketch that generates the min/avg/max duration (in microsecondes) of the
+ * rendering logic of various module classes (e.g. Tm1637Module, Max7219Module,
+ * Ht16k33Module, Hc595Module). See the generated README.md for more
+ * information.
  */
 
 #include <stdio.h>
