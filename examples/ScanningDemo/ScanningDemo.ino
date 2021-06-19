@@ -1,10 +1,15 @@
 /*
- * A demo of various LED modules using the ScanningModule and LedMatrixXxx
- * classes. Supports the following environments:
+ * A demo of low-level ScanningModule and LedMatrixXxx classes. This is an
+ * advanced demo, most users of the AceSegment library will want to use
+ * DirectModule, HybridModule, and Hc595 Module instead. Displays the digits 0
+ * to 3, then slowly rotates the digits to the left, while incrementing the
+ * brightness of the entire LED module.
  *
- *  * env:micro_scanning_direct
- *  * env:micro_scanning_single
- *  * env:micro_scanning_dual
+ * Supported microcontroller environments:
+ *
+ *  * AUNITER_MICRO_SCANNING_DIRECT: Pro Micro + custom direct LED module
+ *  * AUNITER_MICRO_SCANNING_SINGLE: Pro Micro + custom single 74HC595 module
+ *  * AUNITER_MICRO_SCANNING_DUAL: Pro Micro + custom dual 74HC595 module
  */
 
 #include <Arduino.h>

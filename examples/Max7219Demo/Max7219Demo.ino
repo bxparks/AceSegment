@@ -1,6 +1,14 @@
 /*
- * A simple demo of a single, 8-digit LED module using a MAX7219 chip.
- * Display the digits 0 to 7 on the module.
+ * A demo of an 8-digit LED module using a MAX7219 chip. Displays the digits 0
+ * to 7 on the module, then slowly rotates the digits to the left, while
+ * incrementing the brightness of the display. Uses the Max7219Module class.
+ *
+ * Supported microcontroller environments:
+ *
+ *  * AUNITER_MICRO_MAX7219: SparkFun Pro Micro
+ *  * AUNITER_STM32_MAX7219: STM32 F1 Blue Pill
+ *  * AUNITER_D1MINILARGE_MAX7219: WeMos D1 Mini ESP8266
+ *  * AUNITER_ESP32_MAX7219: ESP32 Dev Kit v1
  */
 
 #include <Arduino.h>

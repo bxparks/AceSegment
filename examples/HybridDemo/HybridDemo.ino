@@ -1,7 +1,13 @@
 /*
- * A demo of a 4-digit LED module with segment pins connected to a 74HC595 shift
- * register and the digit pins connected directly to the microcontroller. Uses
- * the HybridModule class.
+ * A demo of a custom 4-digit LED module with the segment pins connected to a
+ * 74HC595 shift register and the digit pins connected directly to the
+ * microcontroller. Displays the digits 0 to 3, then slowly rotates the digits
+ * to the left, while incrementing the brightness of the display. Uses the
+ * HybridModule class.
+ *
+ * Supported microcontroller environments:
+ *
+ *  * AUNITER_MICRO_CUSTOM_SINGLE: SparkFun Pro Micro
  */
 
 #include <Arduino.h>

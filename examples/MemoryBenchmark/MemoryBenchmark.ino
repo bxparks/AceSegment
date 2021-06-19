@@ -1,8 +1,7 @@
 /*
- * A program which compiles various LedModule and Writer objects configured with
- * using different LED configurations to determine the flash and static memory
- * sizes from the output of the compiler. Set the FEATURE macro to various
- * integer to compile different algorithms.
+ * A program which compiles various LedModule and Writer objects with different
+ * LED configurations to determine the flash and static memory sizes from the
+ * output of the compiler. See the generated README.md for details.
  */
 
 #include <Arduino.h>

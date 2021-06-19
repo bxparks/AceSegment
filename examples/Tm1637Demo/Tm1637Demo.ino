@@ -1,7 +1,15 @@
 /*
- * A simple demo of a single TM1637 LED module, with the digits [0,3] or [0,5]
+ * A demo of a single TM1637 LED module, with the digits [0,3] or [0,5]
  * scrolling to the left every second, and the brightness changing each
  * iteration.
+ *
+ * Supported microcontroller environments:
+ *
+ *  * AUNITER_MICRO_TM1637: SparkFun Pro Micro + 4-digit LED module
+ *  * AUNITER_MICRO_TM1637_6: SparkFun Pro Micro + 6-digit LED module
+ *  * AUNITER_STM32_TM1637: STM32 F1 Blue Pill + 4-digit LED module
+ *  * AUNITER_D1MINI_LARGE_TM1637: WeMos D1 Mini ESP8266
+ *  * AUNITER_ESP32_TM1637: ESP32 Dev Kit v1
  */
 
 #include <Arduino.h>

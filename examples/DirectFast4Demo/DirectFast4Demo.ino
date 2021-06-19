@@ -1,7 +1,11 @@
 /*
- * A demo of a single, 4-digit, bare LED module with digit and segment pins
- * connected directly to the microcontroller. Use the DirectFast4Module
- * convenience class.
+ * Same as DirectDemo, with the segment and digit pints directly to the
+ * microcontroller. Uses the DirectFast4Module class which uses the
+ * <digitalWriteFast.h> library.
+ *
+ * Supported microcontroller environments:
+ *
+ *  * AUNITER_MICRO_CUSTOM_DIRECT: SparkFun Pro Micro
  */
 
 #include <Arduino.h>
