@@ -14,14 +14,15 @@
 
 #include <Arduino.h>
 #include <AceCommon.h> // incrementMod()
+#include <AceTMI.h>
 #include <AceSegment.h> // Tm1636Module, PatternWriter
 
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
+using ace_tmi::SoftTmiInterface;
 using ace_segment::Tm1637Module;
 using ace_segment::PatternWriter;
-using ace_segment::SoftTmiInterface;
 using ace_segment::kDigitRemapArray6Tm1637;
 
 // Select TM1637 protocol version, either SoftTmiInterface or
@@ -110,8 +111,8 @@ const uint16_t BIT_DELAY = 100;
   TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY);
 #elif TMI_INTERFACE_TYPE == TMI_INTERFACE_TYPE_FAST
   #include <digitalWriteFast.h>
-  #include <ace_segment/hw/SoftTmiFastInterface.h>
-  using ace_segment::SoftTmiFastInterface;
+  #include <ace_tmi/SoftTmiFastInterface.h>
+  using ace_tmi::SoftTmiFastInterface;
 
   using TmiInterface = SoftTmiFastInterface<DIO_PIN, CLK_PIN, BIT_DELAY>;
   TmiInterface tmiInterface;

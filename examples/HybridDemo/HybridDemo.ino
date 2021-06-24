@@ -12,21 +12,22 @@
 
 #include <Arduino.h>
 #include <AceCommon.h> // incrementMod()
+#include <AceSPI.h>
 #include <AceSegment.h> // HybridModule, PatternWriter
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 #include <digitalWriteFast.h>
-#include <ace_segment/hw/HardSpiFastInterface.h>
-#include <ace_segment/hw/SoftSpiFastInterface.h>
+#include <ace_spi/HardSpiFastInterface.h>
+#include <ace_spi/SoftSpiFastInterface.h>
 #endif
 
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
-using ace_segment::SoftSpiInterface;
-using ace_segment::HardSpiInterface;
-using ace_segment::SoftSpiFastInterface;
-using ace_segment::HardSpiFastInterface;
+using ace_spi::SoftSpiInterface;
+using ace_spi::HardSpiInterface;
+using ace_spi::SoftSpiFastInterface;
+using ace_spi::HardSpiFastInterface;
 using ace_segment::HybridModule;
 using ace_segment::PatternWriter;
 using ace_segment::kActiveHighPattern;
@@ -152,21 +153,29 @@ uint16_t prevUpdateMillis = 0;
 uint16_t prevStatsMillis = 0;
 #endif
 
+// Update the LedModule with new pattern and brightness every second.
 void updateDisplay() {
-  // Update the display
-  uint8_t j = digitIndex;
-  for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
-    patternWriter.writePatternAt(i, PATTERNS[j]);
-    // Write a decimal point every other digit, for demo purposes.
-    patternWriter.writeDecimalPointAt(i, j & 0x1);
-    incrementMod(j, (uint8_t) NUM_DIGITS);
-  }
-  incrementMod(digitIndex, (uint8_t) NUM_DIGITS);
+  static uint16_t prevUpdateMillis;
 
-  // Update the brightness
-  uint8_t brightness = BRIGHTNESS_LEVELS[brightnessIndex];
-  ledModule.setBrightness(brightness);
-  incrementMod(brightnessIndex, NUM_BRIGHTNESSES);
+  uint16_t nowMillis = millis();
+  if ((uint16_t) (nowMillis - prevUpdateMillis) >= 1000) {
+    prevUpdateMillis = nowMillis;
+
+    // Update the display
+    uint8_t j = digitIndex;
+    for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
+      patternWriter.writePatternAt(i, PATTERNS[j]);
+      // Write a decimal point every other digit, for demo purposes.
+      patternWriter.writeDecimalPointAt(i, j & 0x1);
+      incrementMod(j, (uint8_t) NUM_DIGITS);
+    }
+    incrementMod(digitIndex, (uint8_t) NUM_DIGITS);
+
+    // Update the brightness
+    uint8_t brightness = BRIGHTNESS_LEVELS[brightnessIndex];
+    ledModule.setBrightness(brightness);
+    incrementMod(brightnessIndex, NUM_BRIGHTNESSES);
+  }
 }
 
 // Call renderFieldWhenReady() as fast as possible. It uses an internal timer to

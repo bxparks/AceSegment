@@ -17,24 +17,25 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <AceCommon.h> // incrementMod()
+#include <AceSPI.h>
 #include <AceSegment.h>
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
   #include <digitalWriteFast.h>
-  #include <ace_segment/hw/SoftSpiFastInterface.h>
-  #include <ace_segment/hw/HardSpiFastInterface.h>
+  #include <ace_spi/SoftSpiFastInterface.h>
+  #include <ace_spi/HardSpiFastInterface.h>
   #include <ace_segment/direct/DirectFast4Module.h>
-  using ace_segment::SoftSpiFastInterface;
-  using ace_segment::HardSpiFastInterface;
+  using ace_spi::SoftSpiFastInterface;
+  using ace_spi::HardSpiFastInterface;
   using ace_segment::DirectFast4Module;
 #endif
 
 using ace_common::incrementMod;
+using ace_spi::HardSpiInterface;
 using ace_segment::kByteOrderSegmentHighDigitLow;
 using ace_segment::kDigitRemapArray8Hc595;
 using ace_segment::kActiveLowPattern;
 using ace_segment::kActiveHighPattern;
-using ace_segment::HardSpiInterface;
 using ace_segment::DirectModule;
 using ace_segment::HybridModule;
 using ace_segment::Hc595Module;

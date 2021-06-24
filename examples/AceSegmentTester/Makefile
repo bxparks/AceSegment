@@ -3,5 +3,5 @@
 
 APP_NAME := AceSegmentTester
 ARDUINO_LIBS := EpoxyMockDigitalWriteFast EpoxyMockTimerOne \
-	AceSegment AceButton AUnit AceCommon
+	AceSegment AceButton AUnit AceCommon AceSPI AceTMI AceWire
 include ../../../EpoxyDuino/EpoxyDuino.mk

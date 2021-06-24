@@ -14,15 +14,16 @@
 #include <Arduino.h>
 #include <SPI.h> // SPI, SPIClass
 #include <AceCommon.h> // incrementMod()
+#include <AceSPI.h>
 #include <AceSegment.h> // Max7219Module, PatternWriter
 
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
+using ace_spi::HardSpiInterface;
+using ace_spi::SoftSpiInterface;
 using ace_segment::Max7219Module;
 using ace_segment::PatternWriter;
-using ace_segment::HardSpiInterface;
-using ace_segment::SoftSpiInterface;
 using ace_segment::kDigitRemapArray8Max7219;
 
 // Select interface protocol.
@@ -131,10 +132,10 @@ using ace_segment::kDigitRemapArray8Max7219;
 #if INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST \
     || INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI_FAST
   #include <digitalWriteFast.h>
-  #include <ace_segment/hw/HardSpiFastInterface.h>
-  #include <ace_segment/hw/SoftSpiFastInterface.h>
-  using ace_segment::SoftSpiFastInterface;
-  using ace_segment::HardSpiFastInterface;
+  #include <ace_spi/HardSpiFastInterface.h>
+  #include <ace_spi/SoftSpiFastInterface.h>
+  using ace_spi::SoftSpiFastInterface;
+  using ace_spi::HardSpiFastInterface;
 #endif
 
 // LED segment patterns.

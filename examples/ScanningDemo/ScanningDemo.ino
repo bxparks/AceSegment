@@ -1,9 +1,9 @@
 /*
  * A demo of low-level ScanningModule and LedMatrixXxx classes. This is an
  * advanced demo, most users of the AceSegment library will want to use
- * DirectModule, HybridModule, and Hc595 Module instead. Displays the digits 0
- * to 3, then slowly rotates the digits to the left, while incrementing the
- * brightness of the entire LED module.
+ * DirectModule, HybridModule, and Hc595Module classes instead. Displays the
+ * digits 0 to 3, then slowly rotates the digits to the left, while incrementing
+ * the brightness of the entire LED module.
  *
  * Supported microcontroller environments:
  *
@@ -15,20 +15,23 @@
 #include <Arduino.h>
 #include <SPI.h>
 #include <AceCommon.h> // incrementMod()
+#include <AceSPI.h>
 #include <AceSegment.h> // ScanningModule, PatternWriter
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
   #include <digitalWriteFast.h>
-  #include <ace_segment/hw/HardSpiFastInterface.h>
-  #include <ace_segment/hw/SoftSpiFastInterface.h>
+  #include <ace_spi/HardSpiFastInterface.h>
+  #include <ace_spi/SoftSpiFastInterface.h>
   #include <ace_segment/scanning/LedMatrixDirectFast4.h>
-  using ace_segment::HardSpiFastInterface;
-  using ace_segment::SoftSpiFastInterface;
+  using ace_spi::HardSpiFastInterface;
+  using ace_spi::SoftSpiFastInterface;
 #endif
 
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
+using ace_spi::SoftSpiInterface;
+using ace_spi::HardSpiInterface;
 using ace_segment::LedMatrixDirect;
 using ace_segment::LedMatrixDirectFast4;
 using ace_segment::LedMatrixSingleHc595;
@@ -159,7 +162,7 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
       kActiveHighPattern /*elementOnPattern*/,
       kActiveHighPattern /*groupOnPattern*/,
       NUM_DIGITS,
-      DIGIT_PINS):
+      DIGIT_PINS);
 
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SOFT_SPI_FAST
   // Common Cathode, with transistors on Group pins
@@ -176,8 +179,9 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HARD_SPI
   // Common Cathode, with transistors on Group pins
   SPIClass& spiInstance = SPI;
-  HardSpiInterface<SPIClass> spiInterface(spiInstance, LATCH_PIN);
-  using LedMatrix = LedMatrixSingleHc595<HardSpiInterface>;
+  using SpiInterface = HardSpiInterface<SPIClass>;
+  SpiInterface spiInterface(spiInstance, LATCH_PIN);
+  using LedMatrix = LedMatrixSingleHc595<SpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
       kActiveHighPattern /*elementOnPattern*/,
@@ -222,8 +226,9 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 #elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HARD_SPI
   // Common Anode, with transistors on Group pins
   SPIClass& spiInstance = SPI;
-  HardSpiInterface<SPIClass> spiInterface(spiInstance, LATCH_PIN);
-  using LedMatrix = LedMatrixDualHc595<HardSpiInterface>;
+  using SpiInterface = HardSpiInterface<SPIClass>;
+  SpiInterface spiInterface(spiInstance, LATCH_PIN);
+  using LedMatrix = LedMatrixDualHc595<SpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
       kActiveLowPattern /*elementOnPattern*/,
@@ -289,6 +294,7 @@ TimingStats stats;
 uint8_t digitIndex = 0;
 uint8_t brightnessIndex = 0;
 
+// Update the LedModule with new pattern and brightness every second.
 void updateDisplay() {
   static uint16_t prevUpdateMillis;
 
