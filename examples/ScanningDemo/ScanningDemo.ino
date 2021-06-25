@@ -7,9 +7,9 @@
  *
  * Supported microcontroller environments:
  *
- *  * AUNITER_MICRO_SCANNING_DIRECT: Pro Micro + custom direct LED module
- *  * AUNITER_MICRO_SCANNING_SINGLE: Pro Micro + custom single 74HC595 module
- *  * AUNITER_MICRO_SCANNING_DUAL: Pro Micro + custom dual 74HC595 module
+ *  * AUNITER_MICRO_CUSTOM_DIRECT: Pro Micro + custom direct LED module
+ *  * AUNITER_MICRO_CUSTOM_SINGLE: Pro Micro + custom single 74HC595 module
+ *  * AUNITER_MICRO_CUSTOM_DUAL: Pro Micro + custom dual 74HC595 module
  */
 
 #include <Arduino.h>
@@ -61,7 +61,7 @@ using ace_segment::kActiveHighPattern;
 
 // Configuration for Arduino IDE
 #if ! defined(EPOXY_DUINO) && ! defined(AUNITER)
-  #define AUNITER_MICRO_SCANNING_DIRECT
+  #define AUNITER_MICRO_CUSTOM_DIRECT
 #endif
 
 #if defined(EPOXY_DUINO)
@@ -74,7 +74,7 @@ using ace_segment::kActiveHighPattern;
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
   const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
 
-#elif defined(AUNITER_MICRO_SCANNING_DIRECT)
+#elif defined(AUNITER_MICRO_CUSTOM_DIRECT)
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DIRECT_FAST
 
@@ -84,7 +84,7 @@ using ace_segment::kActiveHighPattern;
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
   const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
 
-#elif defined(AUNITER_MICRO_SCANNING_SINGLE)
+#elif defined(AUNITER_MICRO_CUSTOM_SINGLE)
   const uint8_t NUM_DIGITS = 4;
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
 
@@ -97,7 +97,7 @@ using ace_segment::kActiveHighPattern;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
 
-#elif defined(AUNITER_MICRO_SCANNING_DUAL)
+#elif defined(AUNITER_MICRO_CUSTOM_DUAL)
   const uint8_t NUM_DIGITS = 4;
   const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
   const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
