@@ -118,6 +118,12 @@ The source files are organized as follows:
 This library depends on the following additional libraries:
 
 * AceCommon (https://github.com/bxparks/AceCommon)
+* AceSPI (https://github.com/bxparks/AceSPI)
+    * Needed by `Hc595Module`, `Max7219Module`, and `HybridModule`
+* AceTMI (https://github.com/bxparks/AceTMI)
+    * Needed by `Tm1637Module`
+* AceWire (https://github.com/bxparks/AceWire)
+    * Needed by `Ht16k33Module`
 
 The unit tests depend on:
 
@@ -206,10 +212,10 @@ The following example sketches are provided:
 ### Classes
 
 Here are the classes in the library which will be most useful to the
-end-users, listed roughly from low-level to higher-level classes which often
-depend on the lower-level classes:
+end-users, listed roughly from low-level classes to higher-level classes:
 
 * `SpiInterface`
+    * From `AceSPI` library.
     * Thin wrapper classes for communicating with LED modules that support SPI
     * Used by `Max7219Module` and `Hc595Module`.
     * There are 4 implementations.
@@ -222,6 +228,7 @@ depend on the lower-level classes:
         * `HardSpiFastInterface`
             * Hardware SPI using `digitalWriteFast()` to control the latch pin.
 * `TmiInterface`
+    * From `AceTMI` library.
     * Thin wrapper classes to communicate with LED modules using the TM1637
       protocol. Similar to I2C but not exactly the same.
     * Used by `Tm1637Module` class.
@@ -231,6 +238,7 @@ depend on the lower-level classes:
         * `SoftTmiFastInterface`
             * Implement the TM1637 protocol using `digitalWriteFast()`.
 * `WireInterface`
+    * From `AceWire` library.
     * Thin wrapper classes for communicating with LED modules using I2C.
     * Used by `Ht16k33Module`.
     * There are 3 implementations:
@@ -314,16 +322,20 @@ PatternWriter  CharWriter NumberWriter ClockWriter TemperatureWriter LevelWriter
 --------------------------------|--------------------------------------------
                                 |               (hardware dependent)
                                 |
-      +-----------+-------+-----+------------+------------+-------------+
+      +-----------+-------------+------------+------------+-------------+
       |           |             |            |            |             |
-Tm1637Module  Max7219Module Hc595Module HybridModule DirectModule Ht16k33Module
-      |                \        |       /                               |
-      |                 \       |      /                                |
-      v                  v      v     v                                 v
-SoftTmiInterface         SoftSpiInterface                      TwoWireInterface
-SoftTmiFastInterface     SoftSpiFastInterface               SimpleWireInterface
-                         HardSpiInterface               SimpleWireFastInterface
-                         HardSpiFastInterface
+Tm1637Module  Max7219Module Hc595Module HybridModule Ht16k33Module DirectModule
+      |                  \       |         /              |
+      |                   \      |        /               |
+      v                    v     v       v                v
++----------------------+ +----------------------+ +-------------------------+
+| AceTMI library       | | AceSPI library       | | AceWire library         |
+|----------------------| |----------------------| |-------------------------|
+| SoftTmiInterface     | | SoftSpiInterface     | | TwoWireInterface        |
+| SoftTmiFastInterface | | SoftSpiFastInterface | | SimpleWireInterface     |
++----------------------+ | HardSpiInterface     | | SimpleWireFastInterface |
+                         | HardSpiFastInterface | +-------------------------+
+                         +----------------------+
 ```
 
 (The actual dependency among various classes is a bit more complicated than this
@@ -398,6 +410,7 @@ classes are defined in the `ace_segment` namespace. To use the code without
 prepending the `ace_segment::` prefix, use the `using` directive:
 
 ```C++
+#include <Arduino.h>
 #include <AceSegment.h>
 using namespace ace_segment;
 ```
@@ -514,7 +527,8 @@ but must implement a custom version. The library provides 2 implementations: the
 `SoftTmiInterface` compatible with all platforms, and `SoftTmiFastInterface`
 useful on AVR processors.
 
-The `tmiInterface` is an instance of `T_TMII`, which is either
+The `tmiInterface` is an instance of `T_TMII` which comes from the
+[AceTMI](https://github.com/bxparks/AceTMI) which provides
 `SoftTmiInterface` or `SoftTmiFastInterface`.
 
 The `remapArray` is an array of addresses which map the physical positions to
@@ -560,7 +574,10 @@ The configuration of the `Tm1637Module` class for the 4-digit module looks like
 this (c.f. [examples/Tm1637Demo](examples/Tm1637Demo)):
 
 ```C++
+#include <Arduino.h>
+#include <AceTMI.h>
 #include <AceSegment.h>
+using ace_tmi::SoftTmiInterface;
 using namespace ace_segment;
 
 const uint8_t CLK_PIN = 10;
@@ -627,7 +644,9 @@ more complicated because the digits are wired to be in the order of `2 1 0 5 4
 
 ```C++
 #include <Arduino.h>
+#include <AceTMI.h>
 #include <AceSegment.h>
+using ace_tmi::SoftTmiInterface;
 using namespace ace_segment;
 
 const uint8_t CLK_PIN = 10;
@@ -723,8 +742,9 @@ class Max7219Module : public LedModule {
 };
 ```
 
-The `T_SPII` template parameter is one of the SPI interface classes. The library
-provides 4 implementations: `SoftSpiInterface`, `SoftSpiFastInterface` (on AVR),
+The `T_SPII` template parameter is one of the SPI interface classes from the
+[AceSPI](https://github.com/bxparks/AceSPI) library, which provides 4
+implementations: `SoftSpiInterface`, `SoftSpiFastInterface` (on AVR),
 `HardSpiInterface` and `HardSpiFastInterface` (on AVR).
 
 The `T_DIGITS` is the number of digits in the LED module. Since this is a
@@ -746,7 +766,9 @@ this (c.f. [examples/Max7219Demo](examples/Max7219Demo)):
 ```C++
 #include <Arduino.h>
 #include <SPI.h>
+#include <AceSPI.h>
 #include <AceSegment.h>
+using ace_spi::HardSpiInterface;
 using namespace ace_segment;
 
 const uint8_t LATCH_PIN = 10;
@@ -835,8 +857,9 @@ class Ht16k33Module : public LedModule {
 };
 ```
 
-The `T_WIREI` template parameter is the class name of the Wire interface. There
-are 3 implementations: `TwoWireInterface`, `SimpleWireInterface`, and
+The `T_WIREI` template parameter is the class name of the Wire interface from
+the [AceWire](https://github.com/bxparks/AceWire) library which provides 3
+implementations: `TwoWireInterface`, `SimpleWireInterface`, and
 `SimpleWireFastInterface`.
 
 The `T_DIGITS` template parameter is the number of digits in the module. I have
@@ -882,7 +905,9 @@ module looks like this (c.f. [examples/Ht16k33Demo](examples/Ht16k33Demo)):
 ```C++
 #include <Arduino.h>
 #include <Wire.h>
+#include <AceWire.h>
 #include <AceSegment.h>
+using ace_wire::TwoWireInterface;
 using namespace ace_segment;
 
 const uint8_t HT16K33_I2C_ADDRESS = 0x70;
@@ -988,9 +1013,10 @@ class Hc595Module : public ScanningModule<[snip]> {
 ```
 
 There are 2 template parameters. The `T_SPII` specifies the SPI interface which
-will be used to communicate with the 74HC595 chips. There are 4 options:
-`SoftSpiInterface`, `SoftSpiFastInterface` (on AVR), `HardSpiInterface` and
-`HardSpiFastInterface` (on AVR).
+will be used to communicate with the 74HC595 chips. There are 4 options provided
+by the [AceSPI](https://github.com/bxparks/AceSPI) library: `SoftSpiInterface`,
+`SoftSpiFastInterface` (on AVR), `HardSpiInterface` and `HardSpiFastInterface`
+(on AVR).
 
 The `T_DIGITS` is the number of digits in the LED module. Since this is a
 compile-time constant, the `Hc595Module` class uses it to allocate a buffer of 8
@@ -1040,7 +1066,9 @@ this (c.f. [examples/Hc595Demo](examples/Hc595Demo):
 ```C++
 #include <Arduino.h>
 #include <SPI.h>
+#include <AceSPI.h>
 #include <AceSegment.h>
+using ace_spi::HardSpiInterface;
 using namespace ace_segment;
 
 const uint8_t NUM_DIGITS = 8;
@@ -1125,7 +1153,9 @@ Putting all these together, we get the following code which is similar to the
 ```C++
 #include <Arduino.h>
 #include <SPI.h>
+#include <AceSPI.h>
 #include <AceSegment.h>
+using ace_spi::HardSpiInterface;
 using namespace ace_segment;
 
 const uint8_t NUM_DIGITS = 4;
@@ -1229,7 +1259,9 @@ The `HybridModule` configuration looks like this (c.f.
 ```C++
 #include <Arduino.h>
 #include <SPI.h>
+#include <AceSPI.h>
 #include <AceSegment.h>
+using ace_spi::HardSpiInterface;
 using namespace ace_segment;
 
 const uint8_t NUM_DIGITS = 4;
@@ -1670,32 +1702,54 @@ I have written versions of some lower-level classes to take advantage of
 
 * `scanning/LedMatrixDirectFast4.h`
     * Variant of `LedMatrixDirect` using `digitalWriteFast()`
-* `hw/SoftSpiFastInterface.h`
+* AceSPI - `ace_api/SoftSpiFastInterface.h`
     * Variant of `SoftSpiInterface.h` using  `digitalWriteFast()` for the
       `MOSI`, `SCK` and `LATCH` pins
-* `hw/HardSpiFastInterface.h`
+* AceSPI - `ace_spi/HardSpiFastInterface.h`
     * Variant of `HardSpiInterface.h` using  `digitalWriteFast()` to toggle
       the `LATCH` pin, while the hardware SPI code controls the `MOSI` and `SCK`
       pins
-* `hw/SoftTmiFastInterface.h`
+* AceTMI - `ace_spi/SoftTmiFastInterface.h`
     * Variant of `SoftTmiInterface.h` using `digitalWriteFast()`
+* AceWire - `ace_wire/SimpleWireFastInterface.h`
+    * Variant of `SimpleWireInterface.h` using `digitalWriteFast()`
 
 Since these header files require an external `digitalWriteFast` library to be
 installed, and they are only valid for AVR processors, these header files are
-*not* included in the master `<AceSegment.h>` file. If you want to use them, you
-need to include these headers manually, like this:
+*not* included in the master `<AceSPI.h>`, `<AceTMI.h>` or `<AceWire.h` files.
+
+If you want to use the fast version of `<AceSPI.h>`, you need to include these
+headers manually, like this:
 
 ```C++
-#include <AceSegment.h> // do this first
-...
-
+#include <AceSPI.h>
 #if defined(ARDUINO_ARCH_AVR)
   #include <digitalWriteFast.h> // from 3rd party library
-  #include <ace_segment/hw/SoftSpiFastInterface.h>
-  #include <ace_segment/hw/HardSpiFastInterface.h>
-  #include <ace_segment/hw/SoftTmiFastInterface.h>
-  #include <ace_segment/direct/DirectFast4Module.h>
+  #include <ace_spi/SoftSpiFastInterface.h>
+  #include <ace_spi/HardSpiFastInterface.h>
 #endif
+using ace_spi::SoftSpiFastInterface;
+using ace_spi::HardSpiFastInterface;
+```
+
+If you want to use the fast versions of `<AceTMI.h>`, use something like this:
+
+```C++
+#include <AceTMI.h>
+#if defined(ARDUINO_ARCH_AVR)
+  #include <ace_tmi/SoftTmiFastInterface.h>
+#endif
+using ace_tmi::SoftTmiFastInterface;
+```
+
+If you want to use the fast versions of `<AceWire.h>`, use something like this:
+
+```C++
+#include <AceTMI.h>
+#if defined(ARDUINO_ARCH_AVR)
+  #include <ace_wire/SimpleWireFastInterface.h>
+#endif
+using ace_tmi::SoftWireFastInterface;
 ```
 
 The amount of flash memory saved can be between 100 to 700 bytes. This can make
@@ -1727,16 +1781,19 @@ The primary (default) SPI interface is used like this:
 ```C++
 #include <Arduino.h>
 #include <SPI.h>
+#include <AceSPI.h>
 #include <AceSegment.h>
+using ace_spi::HardSpiInterface;
 using namespace ace_segment;
 
 const uint8_t LATCH_PIN = SS;
 const uint8_t DATA_PIN = MOSI;
 const uint8_t CLOCK_PIN = SCK;
 
-HardSpiInterface<SPIClass> spiInterface(SPI, LATCH_PIN);
+using SpiInterface = HardSpiInterface<SPIClass>;
+SpiInterface spiInterface(SPI, LATCH_PIN);
 
-Max7219Module<HardSpiInterface, NUM_DIGITS> max7219Module(
+Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
     spiInterface, kDigitRemapArray8Max7219);
 
 void setupAceSegment() {
@@ -1751,7 +1808,9 @@ The second SPI interface can be used like this:
 ```C++
 #include <Arduino.h>
 #include <SPI.h>
+#include <AceSPI.h>
 #include <AceSegment.h>
+using ace_spi::HardSpiInterface;
 using namespace ace_segment;
 
 const uint8_t LATCH_PIN = PB12;
@@ -1759,9 +1818,10 @@ const uint8_t DATA_PIN = PB15;
 const uint8_t CLOCK_PIN = PB13;
 
 SPIClass SPISecondary(DATA_PIN, PB14 /*miso*/, CLOCK_PIN);
-HardSpiInterface<SPIClass> spiInterface(SPISecondary, LATCH_PIN);
+using SpiInterface = HardSpiInterface<SPIClass>;
+SpiInterface spiInterface(SPISecondary, LATCH_PIN);
 
-Max7219Module<HardSpiInterface, NUM_DIGITS> max7219Module(
+Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
     spiInterface, kDigitRemapArray8Max7219);
 
 void setupAceSegment() {
@@ -1796,16 +1856,19 @@ The primary (default) `SPI` instance uses the `VSPI` bus and is used like this:
 ```C++
 #include <Arduino.h>
 #include <SPI.h>
+#include <AceSPI.h>
 #include <AceSegment.h>
+using ace_spi::HardSpiInterface;
 using namespace ace_segment;
 
 const uint8_t LATCH_PIN = SS;
 const uint8_t DATA_PIN = MOSI;
 const uint8_t CLOCK_PIN = SCK;
 
-HardSpiInterface<SPIClass> spiInterface(SPI, LATCH_PIN);
+using SpiInterface = HardSpiInterface<SPIClass>;
+SpiInterface spiInterface(SPI, LATCH_PIN);
 
-Hc595Module<HardSpiInterface, NUM_DIGITS> hc595Module(
+Hc595Module<SpiInterface, NUM_DIGITS> hc595Module(
     spiInterface,
     SEGMENT_ON_PATTERN,
     DIGIT_ON_PATTERN,
@@ -1826,7 +1889,9 @@ The secondary `HSPI` bus can be used like this:
 ```C++
 #include <Arduino.h>
 #include <SPI.h>
+#include <AceSPI.h>
 #include <AceSegment.h>
+using ace_spi::HardSpiInterface;
 using namespace ace_segment;
 
 const uint8_t LATCH_PIN = 15;
@@ -1834,9 +1899,10 @@ const uint8_t DATA_PIN = 13;
 const uint8_t CLOCK_PIN = 14;
 
 SPIClass SPISecondary(HSPI);
-HardSpiInterface<SPIClass> spiInterface(SPISecondary, LATCH_PIN);
+using SpiInterface = HardSpiInterface<SPIClass>;
+SpiInterface spiInterface(SPISecondary, LATCH_PIN);
 
-Hc595Module<HardSpiInterface, NUM_DIGITS> hc595Module(
+Hc595Module<SpiInterface, NUM_DIGITS> hc595Module(
     spiInterface,
     SEGMENT_ON_PATTERN,
     DIGIT_ON_PATTERN,

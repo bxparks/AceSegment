@@ -34,17 +34,23 @@ SOFTWARE.
 #include <SPI.h> // SPIClass
 #include <Wire.h> // TwoWire
 #include <AceCommon.h> // TimingStats
+#include <AceSPI.h>
+#include <AceTMI.h>
+#include <AceWire.h>
 #include <AceSegment.h>
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 #include <digitalWriteFast.h>
-#include <ace_segment/hw/SoftSpiFastInterface.h>
-#include <ace_segment/hw/HardSpiFastInterface.h>
-#include <ace_segment/hw/SoftTmiFastInterface.h>
+#include <ace_spi/SoftSpiFastInterface.h>
+#include <ace_spi/HardSpiFastInterface.h>
+#include <ace_tmi/SoftTmiFastInterface.h>
+#include <ace_wire/SimpleWireFastInterface.h>
 #include <ace_segment/direct/DirectFast4Module.h>
-#include <ace_segment/hw/SimpleWireFastInterface.h>
 #endif
 
+using namespace ace_spi;
+using namespace ace_tmi;
+using namespace ace_wire;
 using namespace ace_segment;
 using ace_common::TimingStats;
 

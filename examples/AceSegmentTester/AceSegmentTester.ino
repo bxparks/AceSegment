@@ -42,19 +42,22 @@
 #include <SPI.h>
 #include <AceButton.h>
 #include <AceCommon.h> // incrementMod()
+#include <AceSPI.h>
+#include <AceTMI.h>
+#include <AceWire.h>
 #include <AceSegment.h>
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
   #include <digitalWriteFast.h>
-  #include <ace_segment/hw/SoftSpiFastInterface.h>
-  #include <ace_segment/hw/HardSpiFastInterface.h>
-  #include <ace_segment/hw/SoftTmiFastInterface.h>
-  #include <ace_segment/hw/SimpleWireFastInterface.h>
+  #include <ace_spi/SoftSpiFastInterface.h>
+  #include <ace_spi/HardSpiFastInterface.h>
+  #include <ace_tmi/SoftTmiFastInterface.h>
+  #include <ace_wire/SimpleWireFastInterface.h>
   #include <ace_segment/direct/DirectFast4Module.h>
-  using ace_segment::SoftTmiFastInterface;
-  using ace_segment::HardSpiFastInterface;
-  using ace_segment::SoftSpiFastInterface;
-  using ace_segment::SimpleWireFastInterface;
+  using ace_tmi::SoftTmiFastInterface;
+  using ace_spi::HardSpiFastInterface;
+  using ace_spi::SoftSpiFastInterface;
+  using ace_wire::SimpleWireFastInterface;
   using ace_segment::DirectFast4Module;
 #endif
 
@@ -62,11 +65,11 @@ using ace_common::incrementMod;
 using ace_button::AceButton;
 using ace_button::ButtonConfig;
 using ace_button::LadderButtonConfig;
-using ace_segment::SoftTmiInterface;
-using ace_segment::HardSpiInterface;
-using ace_segment::SoftSpiInterface;
-using ace_segment::TwoWireInterface;
-using ace_segment::SimpleWireInterface;
+using ace_spi::HardSpiInterface;
+using ace_spi::SoftSpiInterface;
+using ace_tmi::SoftTmiInterface;
+using ace_wire::TwoWireInterface;
+using ace_wire::SimpleWireInterface;
 using ace_segment::DirectModule;
 using ace_segment::HybridModule;
 using ace_segment::Hc595Module;

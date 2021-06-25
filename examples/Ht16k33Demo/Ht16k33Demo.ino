@@ -13,14 +13,15 @@
 
 #include <Arduino.h>
 #include <AceCommon.h> // incrementMod()
+#include <AceWire.h>
 #include <AceSegment.h> // Ht16k33Module, PatternWriter
 
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
+using ace_wire::TwoWireInterface;
+using ace_wire::SimpleWireInterface;
 using ace_segment::Ht16k33Module;
-using ace_segment::TwoWireInterface;
-using ace_segment::SimpleWireInterface;
 using ace_segment::PatternWriter;
 
 // Select the I2C implementation:
@@ -122,8 +123,8 @@ const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SIMPLE_WIRE_FAST
   #warning Using SimpleWireFastInterface.h
   #include <digitalWriteFast.h>
-  #include <ace_segment/hw/SimpleWireFastInterface.h>
-  using ace_segment::SimpleWireFastInterface;
+  #include <ace_wire/SimpleWireFastInterface.h>
+  using ace_wire::SimpleWireFastInterface;
   using WireInterface = SimpleWireFastInterface<SDA_PIN, SCL_PIN, DELAY_MICROS>;
   WireInterface wireInterface;
 #else

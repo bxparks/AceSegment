@@ -38,11 +38,6 @@ SOFTWARE.
 
 #include "ace_segment/hw/ClockInterface.h"
 #include "ace_segment/hw/GpioInterface.h"
-#include "ace_segment/hw/SoftSpiInterface.h"
-#include "ace_segment/hw/HardSpiInterface.h"
-#include "ace_segment/hw/SoftTmiInterface.h"
-#include "ace_segment/hw/TwoWireInterface.h"
-#include "ace_segment/hw/SimpleWireInterface.h"
 #include "ace_segment/hw/remap.h"
 #include "ace_segment/scanning/LedMatrixDirect.h"
 #include "ace_segment/scanning/LedMatrixSingleHc595.h"
