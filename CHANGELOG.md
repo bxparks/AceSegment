@@ -5,9 +5,15 @@
       `SimpleWireInterface` and `SimpleWireFastInterface`.
         * More consistent with `TwoWire` class API.
         * Allows multiple HT16K33 LED modules with different addresses to
-          share a single WireInterface.
+          share a single `WireInterface`.
     * Add caution that `delayMicroseconds()` on AVR is accurate for 3
       microseconds or greater.
+    * Extract `hw/*Spi*Interface` classes into new
+      [AceSPI](https://github.com/bxparks/AceSPI) library.
+    * Extract `hw/*Tmi*Interface` classes into new
+      [AceTMI](https://github.com/bxparks/AceTMI) library.
+    * Extract `hw/*Wire*Interface` classes into new
+      [AceWire](https://github.com/bxparks/AceWire) library.
 * 0.7 (2021-06-16)
     * Support HT16K33 LED modules
         * Add `Ht16k33Module` class to support 4-digit LED display from
