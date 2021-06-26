@@ -214,44 +214,27 @@ The following example sketches are provided:
 Here are the classes in the library which will be most useful to the
 end-users, listed roughly from low-level classes to higher-level classes:
 
-* `SpiInterface`
-    * From `AceSPI` library.
-    * Thin wrapper classes for communicating with LED modules that support SPI
-    * Used by `Max7219Module` and `Hc595Module`.
-    * There are 4 implementations.
-        * `SoftSpiInterface`
-            * Software SPI using `shiftOut()`
-        * `SoftSpiFastInterface`
-            * Software SPI using `digitalWriteFast()` on AVR processors
-        * `HardSpiInterface`
-            * Hardware SPI using `digitalWrite()` to control the latch pin.
-        * `HardSpiFastInterface`
-            * Hardware SPI using `digitalWriteFast()` to control the latch pin.
-* `TmiInterface`
-    * From `AceTMI` library.
-    * Thin wrapper classes to communicate with LED modules using the TM1637
-      protocol. Similar to I2C but not exactly the same.
-    * Used by `Tm1637Module` class.
-    * There are 2 implementations:
-        * `SoftTmiInterface`
-            * Implement the TM1637 protocol using `digitalWrite()`.
-        * `SoftTmiFastInterface`
-            * Implement the TM1637 protocol using `digitalWriteFast()`.
-* `WireInterface`
-    * From `AceWire` library.
-    * Thin wrapper classes for communicating with LED modules using I2C.
-    * Used by `Ht16k33Module`.
-    * There are 3 implementations:
-        * `TwoWireInterface`
-            * Thin wrapper around I2C libraries which follow the API of
-              the `TwoWire` class in the pre-installed `<Wire.h>` library.
-            * Both hardware and software implementations are supported.
-        * `SimpleWireInterface`
-            * AceSegment's own software bitbanging library that implements just
-              enough I2C to communicate with the HT16K33 controller chip.
-        * `SimpleWireFastInterface`
-            * Same as `SimpleWireInterface` using one of the
-              `<digitalWriteFast.h>` libraries.
+* Communication Libraries
+    * [AceSPI](https://github.com/bxparks/AceSPI)
+        * Needed by `Hc595Module`, `Max7219Module`, and `HybridModule`.
+        * There are 4 implementations:
+            * `SoftSpiInterface`
+            * `SoftSpiFastInterface`
+            * `HardSpiInterface`
+            * `HardSpiFastInterface`
+    * [AceTMI](https://github.com/bxparks/AceTMI)
+        * Needed by `Tm1637Module`
+        * There are 2 implementations:
+            * `SoftTmiInterface`
+                * Implement the TM1637 protocol using `digitalWrite()`.
+            * `SoftTmiFastInterface`
+                * Implement the TM1637 protocol using `digitalWriteFast()`.
+    * [AceWire](https://github.com/bxparks/AceWire)
+        * Used by `Ht16k33Module`.
+        * There are 3 implementations:
+            * `TwoWireInterface`
+            * `SimpleWireInterface`
+            * `SimpleWireFastInterface`
 * `LedModule`
     * Base interface for all hardware dependent implementation of a
       seven-segment LED module.
