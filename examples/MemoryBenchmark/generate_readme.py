@@ -113,7 +113,8 @@ before substantional refactoring in 2021.
   bytes on Teensy 3.2.
 * Reduce flash by 250-400 bytes on AVR by providing ability to use
   `digitalWriteFast()` (https://github.com/NicksonYap/digitalWriteFast) using
-  the `scanning/LedMatrixDirectFast4.h` and `hw/SoftSpiFastInterface.h` classes.
+  the `scanning/LedMatrixDirectFast4.h` and `ace_spi/SoftSpiFastInterface.h`
+  classes.
 * Total flash size saved is around 2kB for AVR, from (4 to 4.4) kB to (2 to 2.5)
   kB.
 * Reduce flash size by 828 bytes on AVR, 3kB on ESP8266, 5kB on ESP32 in commit
@@ -194,6 +195,11 @@ before substantional refactoring in 2021.
   BASELINE, so we have to make sure that BASELINE also pulls in these. All
   results for Teensy 3.2 become lower by 3200 bytes of flash and 1100 bytes of
   static RAM.
+
+**v0.7+**
+
+* Extract communcation interfaces into AceSPI, AceTMI, and AceWire libraries.
+  No change in memory consumption.
 
 ## Results
 
