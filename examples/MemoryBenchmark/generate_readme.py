@@ -200,6 +200,22 @@ before substantional refactoring in 2021.
 
 * Extract communcation interfaces into AceSPI, AceTMI, and AceWire libraries.
   No change in memory consumption.
+* Copy AceSPI, AceTMI, and AceWire interface objects by *value* into various
+  modules (i.e. Hc595Module, Ht16k33Module, Max7219Module, Tm1637Module)
+  instead of by *reference*.
+    * Interface objects are thin-adapters which hold only a few parameters (0 to
+      3) and are immutable.
+    * Copying them by-value into the various modules eliminates an extra level
+      of indirection through a pointer to the interface objects.
+    * On AVR processors, this saves between 0 to 90 bytes of flash on most
+      configurations. The most significant savings occur with the following:
+        * Tm1637Module(SoftTmi) saves 90 bytes,
+        * Ht16k33Module(SimpleWire) saves 68 bytes of flash,
+        * Max7219Module(SoftSpi) saves 30 bytes of flash.
+    * On 32-bit processors, the flash consumption usually goes *up* by 4-20
+      bytes, but decreases by a few bytes in a few cases.
+    * The 32-bit processors have so much more flash memory than 8-bit
+      processors, I think this tradeoff is worth it.
 
 ## Results
 
