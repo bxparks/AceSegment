@@ -56,7 +56,9 @@ extern const uint8_t kDigitRemapArray8Hc595[8];
  * 74HC595 Shift Register chips. This is a convenience class that pairs together
  * a ScanningModule and a LedMatrixDualHc595 in a single class.
  *
- * @tparam T_SPII interface to SPI, either SoftSpiInterface or HardSpiInterface
+ * @tparam T_SPII class that implements the SPI interface, usually one of the
+ *    classes in the AceSPI library: SoftSpiInterface, SoftSpiFastInterface,
+ *    HardSpiInterface, HardSpiFastInterface.
  * @tparam T_DIGITS number of LED digits
  * @tparam T_SUBFIELDS number of subfields for each digit to get brightness
  *    control using PWM. The default is 1, but can be set to greater than 1 to

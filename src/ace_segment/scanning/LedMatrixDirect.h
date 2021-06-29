@@ -43,6 +43,15 @@ namespace ace_segment {
 template <typename T_GPIOI = GpioInterface>
 class LedMatrixDirect : public LedMatrixBase {
   public:
+    /**
+     * Constructor.
+     * @param elementOnPattern bit pattern that turns on the elements (segments)
+     * @param groupOnpattern bit pattern that turns on the groups (digits)
+     * @param numElements number of LED segments, almost always 8
+     * @param elementPins pointer to array of 'numElements' pin numbers
+     * @param numGroups number of LED groups (digits)
+     * @param groupPins pointer to array of 'numGroups' pin numbers
+     */
     LedMatrixDirect(
         uint8_t elementOnPattern,
         uint8_t groupOnPattern,

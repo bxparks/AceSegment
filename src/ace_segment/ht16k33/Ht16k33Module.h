@@ -225,8 +225,11 @@ class Ht16k33Module : public LedModule {
     static uint8_t const kDisplayOn  = 0x81;
     static uint8_t const kBrightness = 0xE0;
 
-    /** I2C Wire interface. */
-    T_WIREI& mWire;
+    /**
+     * I2C Wire interface. Copied by value instead of reference to avoid an
+     * extra layer of indirection.
+     */
+    T_WIREI mWire;
 
     /** The 7-bit I2C address. */
     uint8_t const mAddr;

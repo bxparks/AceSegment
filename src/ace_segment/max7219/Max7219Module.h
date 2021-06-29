@@ -98,8 +98,9 @@ extern const uint8_t kDigitRemapArray8Max7219[8];
 /**
  * An implementation of LedModule using the MAX7219 chip. The chip uses SPI.
  *
- * @tparam T_SPII the class that implements the SPI interface, usually
- *    either SoftSpiInterface or HardSpiInterface
+ * @tparam T_SPII class that implements the SPI interface, usually one of the
+ *    classes in the AceSPI library: SoftSpiInterface, SoftSpiFastInterface,
+ *    HardSpiInterface, HardSpiFastInterface.
  * @tparam T_DIGITS number of digits in the module
  */
 template <typename T_SPII, uint8_t T_DIGITS>
@@ -107,7 +108,7 @@ class Max7219Module : public LedModule {
   public:
     /**
      * Constructor.
-     * @param spiInterface instance of T_SPII class
+     * @param spiInterface instance of SPI interface class
      * @param remapArray (optional, nullable) a mapping of the physical digit
      *    positions to their logical positions
      */
@@ -209,8 +210,11 @@ class Max7219Module : public LedModule {
     static uint8_t const kRegisterShutdown    = 0x0C;
     static uint8_t const kRegisterDisplayTest = 0x0F;
 
-    /** SPI interface. */
-    const T_SPII& mSpiInterface;
+    /**
+     * SPI interface object. Copied by value instead of reference to avoid an
+     * extra level of indirection.
+     */
+    const T_SPII mSpiInterface;
 
     /** Array to map digit addresses. */
     const uint8_t* const mRemapArray;
