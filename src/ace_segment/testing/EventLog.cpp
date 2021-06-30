@@ -22,13 +22,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "TestableSpiInterface.h"
+#include "EventLog.h"
 
 namespace ace_segment {
 namespace testing {
 
-EventLog TestableSpiInterface::sEventLog;
+EventLog gEventLog;
 
-} // testing
-} // ace_segment
-
+}
+}

@@ -33,15 +33,12 @@ namespace testing {
 class TestableGpioInterface {
   public:
     static void pinMode(uint8_t pin, uint8_t mode) {
-      sEventLog.addPinMode(pin, mode);
+      gEventLog.addPinMode(pin, mode);
     }
 
     static void digitalWrite(uint8_t pin, uint8_t value) {
-      sEventLog.addDigitalWrite(pin, value);
+      gEventLog.addDigitalWrite(pin, value);
     }
-
-  public:
-    static EventLog sEventLog;
 };
 
 }

@@ -9,12 +9,13 @@
 #include <Arduino.h>
 #include <AUnitVerbose.h>
 #include <AceSegment.h>
-#include <ace_segment/testing/TestableTmiInterface.h>
 #include <ace_segment/testing/EventLog.h>
+#include <ace_segment/testing/TestableTmiInterface.h>
 
 using aunit::TestRunner;
 using ace_segment::testing::TestableTmiInterface;
 using ace_segment::testing::EventType;
+using ace_segment::testing::gEventLog;
 using ace_segment::internal::initialDirtyBits;
 using ace_segment::Tm1637Module;
 
@@ -38,7 +39,7 @@ Tm1637Module<TestableTmiInterface, NUM_DIGITS> tm1637Module(tmiInterface);
 test(Tm1637ModuleTest, flushIncremental) {
   tmiInterface.begin();
   tm1637Module.begin();
-  tmiInterface.sEventLog.clear();
+  gEventLog.clear();
 
   // Verify dirty bits initial start dirty, 4 digit bits + 1 brightness bit
   assertEqual(0x1F, tm1637Module.mIsDirty);
@@ -57,18 +58,18 @@ test(Tm1637ModuleTest, flushIncremental) {
 
   // Iteration 0 sends digit 0, which did not change, so send nothing.
   assertEqual(0, tm1637Module.mFlushStage);
-  tmiInterface.sEventLog.clear();
+  gEventLog.clear();
   tm1637Module.flushIncremental();
-  assertEqual(0, tmiInterface.sEventLog.getNumRecords());
+  assertEqual(0, gEventLog.getNumRecords());
   assertFalse(tm1637Module.isDirtyBit(0));
   assertEqual(1, tm1637Module.mFlushStage);
 
   // Iteration 1 sends digit 1, which changed, so send digit 1;
   assertEqual(1, tm1637Module.mFlushStage);
-  tmiInterface.sEventLog.clear();
+  gEventLog.clear();
   tm1637Module.flushIncremental();
-  assertEqual(7, tmiInterface.sEventLog.getNumRecords());
-  assertTrue(tmiInterface.sEventLog.assertEvents(
+  assertEqual(7, gEventLog.getNumRecords());
+  assertTrue(gEventLog.assertEvents(
     7,
     (int) EventType::kTmiStartCondition,
     (int) EventType::kTmiSendByte,
@@ -85,26 +86,26 @@ test(Tm1637ModuleTest, flushIncremental) {
 
   // Iteration 2 sends digit 3, which sends nothing.
   assertEqual(2, tm1637Module.mFlushStage);
-  tmiInterface.sEventLog.clear();
+  gEventLog.clear();
   tm1637Module.flushIncremental();
-  assertEqual(0, tmiInterface.sEventLog.getNumRecords());
+  assertEqual(0, gEventLog.getNumRecords());
   assertFalse(tm1637Module.isDirtyBit(2));
   assertEqual(3, tm1637Module.mFlushStage);
 
   // Iteration 3 sends digit 3, which sends nothing.
   assertEqual(3, tm1637Module.mFlushStage);
-  tmiInterface.sEventLog.clear();
+  gEventLog.clear();
   tm1637Module.flushIncremental();
-  assertEqual(0, tmiInterface.sEventLog.getNumRecords());
+  assertEqual(0, gEventLog.getNumRecords());
   assertFalse(tm1637Module.isDirtyBit(3));
   assertEqual(4, tm1637Module.mFlushStage);
 
   // Iteration 4 sends brightness, which changed, so sends package.
   assertEqual(4, tm1637Module.mFlushStage);
-  tmiInterface.sEventLog.clear();
+  gEventLog.clear();
   tm1637Module.flushIncremental();
-  assertEqual(3, tmiInterface.sEventLog.getNumRecords());
-  assertTrue(tmiInterface.sEventLog.assertEvents(
+  assertEqual(3, gEventLog.getNumRecords());
+  assertTrue(gEventLog.assertEvents(
     3,
     (int) EventType::kTmiStartCondition,
     (int) EventType::kTmiSendByte,
@@ -121,16 +122,16 @@ test(Tm1637ModuleTest, flushIncremental) {
 test(Tm1637ModuleTest, flush) {
   tmiInterface.begin();
   tm1637Module.begin();
-  tmiInterface.sEventLog.clear();
+  gEventLog.clear();
 
   // Verify dirty bits initial start dirty, 4 digit bits + 1 brightness bit
   assertEqual(0x1F, tm1637Module.mIsDirty);
   tm1637Module.mIsDirty = 0x0;
 
   // Calling flush() when nothing is dirty returns immediately.
-  tmiInterface.sEventLog.clear();
+  gEventLog.clear();
   tm1637Module.flush();
-  assertEqual(0, tmiInterface.sEventLog.getNumRecords());
+  assertEqual(0, gEventLog.getNumRecords());
 
   // Set digit 0.
   tm1637Module.setPatternAt(1, 0x11);
@@ -141,10 +142,10 @@ test(Tm1637ModuleTest, flush) {
   assertEqual((0x1 << NUM_DIGITS) | (0x1 << 1), tm1637Module.mIsDirty);
 
   // Calling flush() sends everything.
-  tmiInterface.sEventLog.clear();
+  gEventLog.clear();
   tm1637Module.flush();
-  assertEqual(13, tmiInterface.sEventLog.getNumRecords());
-  assertTrue(tmiInterface.sEventLog.assertEvents(
+  assertEqual(13, gEventLog.getNumRecords());
+  assertTrue(gEventLog.assertEvents(
     13,
     // brightness
     (int) EventType::kTmiStartCondition,

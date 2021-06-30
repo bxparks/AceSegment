@@ -9,26 +9,20 @@ namespace testing {
 class TestableSpiInterface {
   public:
     void begin() const {
-      sEventLog.addSpiBegin();
+      gEventLog.addSpiBegin();
     }
 
     void end() const {
-      sEventLog.addSpiEnd();
+      gEventLog.addSpiEnd();
     }
 
     void send8(uint8_t value) const {
-      sEventLog.addSpiSend8(value);
+      gEventLog.addSpiSend8(value);
     }
 
     void send16(uint16_t value) const {
-      sEventLog.addSpiSend16(value);
+      gEventLog.addSpiSend16(value);
     }
-
-  public:
-    // The SpiInterface is copied by value into LedMarixSingleHc595 and
-    // LedMatrixDoubleHc595. We need to make sure there is only one copy of
-    // the EventLog, so make it static.
-    static EventLog sEventLog;
 };
 
 } // testing

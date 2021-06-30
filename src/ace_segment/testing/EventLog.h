@@ -382,6 +382,9 @@ class EventLog {
     uint8_t mNumRecords = 0;
 };
 
+// One global instance for testing.
+extern EventLog gEventLog;
+
 } // testing
 } // ace_segment
 
