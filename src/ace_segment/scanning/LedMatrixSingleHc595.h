@@ -43,13 +43,23 @@ namespace ace_segment {
  *   dataPin/D11/MOSI -- DS (Phillips) / SER (TI) / Pin 14
  *   clockPin/D13/SCK -- SH_CP (Phillips) / SRCK (TI) / Pin 11 (rising)
  *
- * @tparam T_SPII interface to SPI, either SoftSpiInterface or HardSpiInterface
+ * @tparam T_SPII class that implements the SPI interface, usually one of the
+ *    classes in the AceSPI library: SoftSpiInterface, SoftSpiFastInterface,
+ *    HardSpiInterface, HardSpiFastInterface.
  * @tparam T_GPIOI (optional) interface to GPIO functions,
  *    default GpioInterface (note: 'GPI' is already taken on ESP8266)
  */
 template <typename T_SPII, typename T_GPIOI = GpioInterface>
 class LedMatrixSingleHc595 : public LedMatrixBase {
   public:
+    /**
+     * Constructor.
+     * @param spiInterface object that knows how to send SPI packets
+     * @param elementOnPattern bit pattern that turns on the elements (segments)
+     * @param groupOnpattern bit pattern that turns on the groups (digits)
+     * @param numGroups number of LED groups (digits)
+     * @param groupPins pointer to array of 'numGroups' pin numbers
+     */
     LedMatrixSingleHc595(
         const T_SPII& spiInterface,
         uint8_t elementOnPattern,
@@ -124,8 +134,14 @@ class LedMatrixSingleHc595 : public LedMatrixBase {
     }
 
   private:
-    const T_SPII& mSpiInterface;
+    /**
+     * SPI interface object. Copied by value instead of reference to avoid an
+     * extra level of indirection.
+     */
+    const T_SPII mSpiInterface;
+
     const uint8_t* const mGroupPins;
+
     uint8_t const mNumGroups;
 
     /** Store the previous group, to turn it off after moving to new group. */

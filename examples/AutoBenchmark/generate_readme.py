@@ -176,6 +176,17 @@ number of `TimingStats::update()` calls that were made.
           dev boards that run AutoBenchmark. Prevents clock stretching even if
           no LED module is actually attached to the pins.
 
+**v0.7+**
+
+* Extract communication interfaces into AceSPI, AceTMI, and AceWire libraries.
+  No change.
+* Copy interface objects into various modules (Hc595Module, Max7219Module,
+  Tm1637Module, Ht16k33Module) by value instead of by reference.
+    * Remove an extra layer of indirection.
+    * Makes almost no difference in execution speed. Maybe if I squint hard
+      enough, it looks like a few microseconds faster on average?
+    * Saves flash consumption on AVR processors (see MemoryBenchmark/README.md).
+
 ## Results
 
 The following tables show the number of microseconds taken by:

@@ -48,13 +48,16 @@ const uint8_t kByteOrderElementHighGroupLow = 1;
  * The group pins are assumed to be connected to the most significant byte. The
  * element pins are connected to the least signficiant byte.
  *
- * @tparam T_SPII interface to SPI, either SoftSpiInterface or HardSpiInterface
+ * @tparam T_SPII class that implements the SPI interface, usually one of the
+ *    classes in the AceSPI library: SoftSpiInterface, SoftSpiFastInterface,
+ *    HardSpiInterface, HardSpiFastInterface.
  */
 template <typename T_SPII>
 class LedMatrixDualHc595: public LedMatrixBase {
   public:
     /**
-     * @param spiInterface interface to the SPI protocol
+     * Constructor.
+     * @param spiInterface object that knows how to send SPI packets
      * @param elementOnPattern bit pattern that turns on the elements
      * @param groupOnpattern bit pattern that turns on the groups
      * @param byteOrder determine order of group and element bytes
@@ -160,7 +163,11 @@ class LedMatrixDualHc595: public LedMatrixBase {
     friend class ::LedMatrixDualHc595Test_enableGroup;
     friend class ::LedMatrixDualHc595Test_disableGroup;
 
-    const T_SPII& mSpiInterface;
+    /**
+     * SPI interface object. Copied by value instead of reference to avoid an
+     * extra level of indirection.
+     */
+    const T_SPII mSpiInterface;
 
     /**
      * Mapping of the physical-to-logical addresses, which is the inverse of the

@@ -51,14 +51,20 @@ volatile int disableCompilerOptimization = 0;
 
 #if FEATURE > FEATURE_BASELINE
   #include <AceSegment.h>
+  #include <AceSPI.h>
+  #include <AceTMI.h>
+  #include <AceWire.h>
   #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
     #include <digitalWriteFast.h>
-    #include <ace_segment/hw/SoftSpiFastInterface.h>
-    #include <ace_segment/hw/HardSpiFastInterface.h>
-    #include <ace_segment/hw/SoftTmiFastInterface.h>
+    #include <ace_spi/SoftSpiFastInterface.h>
+    #include <ace_spi/HardSpiFastInterface.h>
+    #include <ace_tmi/SoftTmiFastInterface.h>
     #include <ace_segment/direct/DirectFast4Module.h>
   #endif
   using namespace ace_segment;
+  using namespace ace_spi;
+  using namespace ace_tmi;
+  using namespace ace_wire;
 
   // Common to all FEATURES
   const uint8_t NUM_DIGITS = 4;
@@ -306,7 +312,7 @@ volatile int disableCompilerOptimization = 0;
     #endif
 
     #include <digitalWriteFast.h>
-    #include <ace_segment/hw/SimpleWireFastInterface.h>
+    #include <ace_wire/SimpleWireFastInterface.h>
     using WireInterface = SimpleWireFastInterface<
         SDA_PIN, SCL_PIN, DELAY_MICROS>;
     WireInterface wireInterface;
