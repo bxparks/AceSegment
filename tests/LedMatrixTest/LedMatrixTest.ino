@@ -195,8 +195,8 @@ testF(LedMatrixSingleHc595Test, disableGroup) {
 
 testF(LedMatrixSingleHc595Test, drawElements) {
   ledMatrixSingleHc595.drawElements(0x55);
-  assertEqual(1, spiInterface.mEventLog.getNumRecords());
-  assertTrue(spiInterface.mEventLog.assertEvents(1,
+  assertEqual(1, spiInterface.sEventLog.getNumRecords());
+  assertTrue(spiInterface.sEventLog.assertEvents(1,
       (int) EventType::kSpiSend8, 0x55
   ));
 }
@@ -209,36 +209,36 @@ class LedMatrixDualHc595Test : public TestOnce {
   protected:
     void setup() override {
       ledMatrixDualHc595.begin();
-      spiInterface.mEventLog.clear();
+      spiInterface.sEventLog.clear();
     }
 };
 
 testF(LedMatrixDualHc595Test, begin) {
   ledMatrixDualHc595.begin();
-  assertEqual(0, spiInterface.mEventLog.getNumRecords());
+  assertEqual(0, spiInterface.sEventLog.getNumRecords());
 }
 
 testF(LedMatrixDualHc595Test, end) {
   ledMatrixDualHc595.end();
-  assertEqual(0, spiInterface.mEventLog.getNumRecords());
+  assertEqual(0, spiInterface.sEventLog.getNumRecords());
 }
 
 testF(LedMatrixDualHc595Test, enableGroup) {
   ledMatrixDualHc595.mPrevElementPattern = 0x42;
   ledMatrixDualHc595.enableGroup(1);
 
-  assertEqual(1, spiInterface.mEventLog.getNumRecords());
+  assertEqual(1, spiInterface.sEventLog.getNumRecords());
   uint16_t expectedOutput = ((0x1 << 1) << 8) | 0x42;
-  assertTrue(spiInterface.mEventLog.assertEvents(1,
+  assertTrue(spiInterface.sEventLog.assertEvents(1,
       (int) EventType::kSpiSend16, expectedOutput));
 }
 
 testF(LedMatrixDualHc595Test, disableGroup) {
   ledMatrixDualHc595.disableGroup(2);
 
-  assertEqual(1, spiInterface.mEventLog.getNumRecords());
+  assertEqual(1, spiInterface.sEventLog.getNumRecords());
   uint16_t expectedOutput = 0x0000;
-  assertTrue(spiInterface.mEventLog.assertEvents(1,
+  assertTrue(spiInterface.sEventLog.assertEvents(1,
       (int) EventType::kSpiSend16, expectedOutput));
 }
 
@@ -246,8 +246,8 @@ testF(LedMatrixDualHc595Test, draw) {
   ledMatrixDualHc595.draw(3, 0x55);
 
   uint16_t expectedOutput = ((0x1 << 3) << 8) | 0x55;
-  assertEqual(1, spiInterface.mEventLog.getNumRecords());
-  assertTrue(spiInterface.mEventLog.assertEvents(1,
+  assertEqual(1, spiInterface.sEventLog.getNumRecords());
+  assertTrue(spiInterface.sEventLog.assertEvents(1,
     (int) EventType::kSpiSend16, expectedOutput
   ));
 }

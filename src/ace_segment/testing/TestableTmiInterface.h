@@ -9,27 +9,27 @@ namespace testing {
 class TestableTmiInterface {
   public:
     void begin() const {
-      mEventLog.addTmiBegin();
+      sEventLog.addTmiBegin();
     }
 
     void end() const {
-      mEventLog.addTmiEnd();
+      sEventLog.addTmiEnd();
     }
 
     void startCondition() const {
-      mEventLog.addTmiStartCondition();
+      sEventLog.addTmiStartCondition();
     }
 
     void stopCondition() const {
-      mEventLog.addTmiStopCondition();
+      sEventLog.addTmiStopCondition();
     }
 
     void sendByte(uint8_t data) const {
-      mEventLog.addTmiSendByte(data);
+      sEventLog.addTmiSendByte(data);
     }
 
   public:
-    mutable EventLog mEventLog;
+    static EventLog sEventLog;
 };
 
 } // testing

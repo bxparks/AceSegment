@@ -38,7 +38,7 @@ Tm1637Module<TestableTmiInterface, NUM_DIGITS> tm1637Module(tmiInterface);
 test(Tm1637ModuleTest, flushIncremental) {
   tmiInterface.begin();
   tm1637Module.begin();
-  tmiInterface.mEventLog.clear();
+  tmiInterface.sEventLog.clear();
 
   // Verify dirty bits initial start dirty, 4 digit bits + 1 brightness bit
   assertEqual(0x1F, tm1637Module.mIsDirty);
@@ -57,18 +57,18 @@ test(Tm1637ModuleTest, flushIncremental) {
 
   // Iteration 0 sends digit 0, which did not change, so send nothing.
   assertEqual(0, tm1637Module.mFlushStage);
-  tmiInterface.mEventLog.clear();
+  tmiInterface.sEventLog.clear();
   tm1637Module.flushIncremental();
-  assertEqual(0, tmiInterface.mEventLog.getNumRecords());
+  assertEqual(0, tmiInterface.sEventLog.getNumRecords());
   assertFalse(tm1637Module.isDirtyBit(0));
   assertEqual(1, tm1637Module.mFlushStage);
 
   // Iteration 1 sends digit 1, which changed, so send digit 1;
   assertEqual(1, tm1637Module.mFlushStage);
-  tmiInterface.mEventLog.clear();
+  tmiInterface.sEventLog.clear();
   tm1637Module.flushIncremental();
-  assertEqual(7, tmiInterface.mEventLog.getNumRecords());
-  assertTrue(tmiInterface.mEventLog.assertEvents(
+  assertEqual(7, tmiInterface.sEventLog.getNumRecords());
+  assertTrue(tmiInterface.sEventLog.assertEvents(
     7,
     (int) EventType::kTmiStartCondition,
     (int) EventType::kTmiSendByte,
@@ -85,26 +85,26 @@ test(Tm1637ModuleTest, flushIncremental) {
 
   // Iteration 2 sends digit 3, which sends nothing.
   assertEqual(2, tm1637Module.mFlushStage);
-  tmiInterface.mEventLog.clear();
+  tmiInterface.sEventLog.clear();
   tm1637Module.flushIncremental();
-  assertEqual(0, tmiInterface.mEventLog.getNumRecords());
+  assertEqual(0, tmiInterface.sEventLog.getNumRecords());
   assertFalse(tm1637Module.isDirtyBit(2));
   assertEqual(3, tm1637Module.mFlushStage);
 
   // Iteration 3 sends digit 3, which sends nothing.
   assertEqual(3, tm1637Module.mFlushStage);
-  tmiInterface.mEventLog.clear();
+  tmiInterface.sEventLog.clear();
   tm1637Module.flushIncremental();
-  assertEqual(0, tmiInterface.mEventLog.getNumRecords());
+  assertEqual(0, tmiInterface.sEventLog.getNumRecords());
   assertFalse(tm1637Module.isDirtyBit(3));
   assertEqual(4, tm1637Module.mFlushStage);
 
   // Iteration 4 sends brightness, which changed, so sends package.
   assertEqual(4, tm1637Module.mFlushStage);
-  tmiInterface.mEventLog.clear();
+  tmiInterface.sEventLog.clear();
   tm1637Module.flushIncremental();
-  assertEqual(3, tmiInterface.mEventLog.getNumRecords());
-  assertTrue(tmiInterface.mEventLog.assertEvents(
+  assertEqual(3, tmiInterface.sEventLog.getNumRecords());
+  assertTrue(tmiInterface.sEventLog.assertEvents(
     3,
     (int) EventType::kTmiStartCondition,
     (int) EventType::kTmiSendByte,
@@ -121,16 +121,16 @@ test(Tm1637ModuleTest, flushIncremental) {
 test(Tm1637ModuleTest, flush) {
   tmiInterface.begin();
   tm1637Module.begin();
-  tmiInterface.mEventLog.clear();
+  tmiInterface.sEventLog.clear();
 
   // Verify dirty bits initial start dirty, 4 digit bits + 1 brightness bit
   assertEqual(0x1F, tm1637Module.mIsDirty);
   tm1637Module.mIsDirty = 0x0;
 
   // Calling flush() when nothing is dirty returns immediately.
-  tmiInterface.mEventLog.clear();
+  tmiInterface.sEventLog.clear();
   tm1637Module.flush();
-  assertEqual(0, tmiInterface.mEventLog.getNumRecords());
+  assertEqual(0, tmiInterface.sEventLog.getNumRecords());
 
   // Set digit 0.
   tm1637Module.setPatternAt(1, 0x11);
@@ -141,10 +141,10 @@ test(Tm1637ModuleTest, flush) {
   assertEqual((0x1 << NUM_DIGITS) | (0x1 << 1), tm1637Module.mIsDirty);
 
   // Calling flush() sends everything.
-  tmiInterface.mEventLog.clear();
+  tmiInterface.sEventLog.clear();
   tm1637Module.flush();
-  assertEqual(13, tmiInterface.mEventLog.getNumRecords());
-  assertTrue(tmiInterface.mEventLog.assertEvents(
+  assertEqual(13, tmiInterface.sEventLog.getNumRecords());
+  assertTrue(tmiInterface.sEventLog.assertEvents(
     13,
     // brightness
     (int) EventType::kTmiStartCondition,
