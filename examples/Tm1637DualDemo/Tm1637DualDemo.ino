@@ -78,12 +78,12 @@ using ace_segment::PatternWriter;
 // * 43 ms at 200 us delay.
 //
 // Using flushIncremental(), the duration is about 1/2 these numbers.
-const uint16_t BIT_DELAY = 100;
+const uint8_t DELAY_MICROS = 100;
 
 #if TMI_INTERFACE_TYPE == TMI_INTERFACE_TYPE_NORMAL
   using TmiInterface = SoftTmiInterface;
-  TmiInterface tmiInterface1(DIO1_PIN, CLK_PIN, BIT_DELAY);
-  TmiInterface tmiInterface2(DIO2_PIN, CLK_PIN, BIT_DELAY);
+  TmiInterface tmiInterface1(DIO1_PIN, CLK_PIN, DELAY_MICROS);
+  TmiInterface tmiInterface2(DIO2_PIN, CLK_PIN, DELAY_MICROS);
   Tm1637Module<TmiInterface, NUM_DIGITS> ledModule1(tmiInterface1);
   Tm1637Module<TmiInterface, NUM_DIGITS> ledModule2(tmiInterface2);
 
@@ -91,8 +91,8 @@ const uint16_t BIT_DELAY = 100;
   #include <digitalWriteFast.h>
   #include <ace_tmi/SoftTmiFastInterface.h>
   using ace_tmi::SoftTmiFastInterface;
-  using TmiInterface1 = SoftTmiFastInterface<DIO1_PIN, CLK_PIN, BIT_DELAY>;
-  using TmiInterface2 = SoftTmiFastInterface<DIO2_PIN, CLK_PIN, BIT_DELAY>;
+  using TmiInterface1 = SoftTmiFastInterface<DIO1_PIN, CLK_PIN, DELAY_MICROS>;
+  using TmiInterface2 = SoftTmiFastInterface<DIO2_PIN, CLK_PIN, DELAY_MICROS>;
   TmiInterface1 tmiInterface1;
   TmiInterface2 tmiInterface2;
   Tm1637Module<TmiInterface1, NUM_DIGITS> ledModule1(tmiInterface1);

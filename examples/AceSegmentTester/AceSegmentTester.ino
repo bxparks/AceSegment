@@ -240,7 +240,7 @@ using ace_segment::kActiveHighPattern;
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_TMI_FAST
   const uint8_t DIO_PIN = 9;
   const uint8_t CLK_PIN = A0;
-  const uint16_t BIT_DELAY = 100;
+  const uint8_t DELAY_MICROS = 100;
 
   // Select one of the flush methods.
   //#define TM_FLUSH_METHOD TM_FLUSH_METHOD_NORMAL
@@ -296,7 +296,7 @@ using ace_segment::kActiveHighPattern;
   #define INTERFACE_TYPE INTERFACE_TYPE_TWO_WIRE
   const uint8_t SDA_PIN = SDA;
   const uint8_t SCL_PIN = SCL;
-  const uint8_t BIT_DELAY = 4;
+  const uint8_t DELAY_MICROS = 4;
   const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
 #elif defined(AUNITER_STM32_TM1637)
@@ -311,7 +311,7 @@ using ace_segment::kActiveHighPattern;
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_TMI
   const uint8_t DIO_PIN = PB4;
   const uint8_t CLK_PIN = PB3;
-  const uint16_t BIT_DELAY = 100;
+  const uint8_t DELAY_MICROS = 100;
 
   // Select one of the flush methods.
   //#define TM_FLUSH_METHOD TM_FLUSH_METHOD_NORMAL
@@ -389,7 +389,7 @@ using ace_segment::kActiveHighPattern;
   #define INTERFACE_TYPE INTERFACE_TYPE_TWO_WIRE
   const uint8_t SDA_PIN = SDA;
   const uint8_t SCL_PIN = SCL;
-  const uint8_t BIT_DELAY = 4;
+  const uint8_t DELAY_MICROS = 4;
   const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
 #elif defined(AUNITER_D1MINI_LARGE_TM1637)
@@ -412,7 +412,7 @@ using ace_segment::kActiveHighPattern;
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_TMI
   const uint8_t DIO_PIN = D7;
   const uint8_t CLK_PIN = D5;
-  const uint16_t BIT_DELAY = 100;
+  const uint8_t DELAY_MICROS = 100;
 
 #elif defined(AUNITER_D1MINI_LARGE_MAX7219)
   #define BUTTON_TYPE BUTTON_TYPE_ANALOG
@@ -484,7 +484,7 @@ using ace_segment::kActiveHighPattern;
   #define INTERFACE_TYPE INTERFACE_TYPE_TWO_WIRE
   const uint8_t SDA_PIN = SDA;
   const uint8_t SCL_PIN = SCL;
-  const uint8_t BIT_DELAY = 4;
+  const uint8_t DELAY_MICROS = 4;
   const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
 #elif defined(AUNITER_ESP32_TM1637)
@@ -501,7 +501,7 @@ using ace_segment::kActiveHighPattern;
   #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_TMI
   const uint8_t DIO_PIN = 13;
   const uint8_t CLK_PIN = 14;
-  const uint16_t BIT_DELAY = 100;
+  const uint8_t DELAY_MICROS = 100;
 
 #elif defined(AUNITER_ESP32_MAX7219)
   #define BUTTON_TYPE BUTTON_TYPE_ANALOG
@@ -584,7 +584,7 @@ using ace_segment::kActiveHighPattern;
   #define INTERFACE_TYPE INTERFACE_TYPE_TWO_WIRE
   const uint8_t SDA_PIN = SDA;
   const uint8_t SCL_PIN = SCL;
-  const uint8_t BIT_DELAY = 4;
+  const uint8_t DELAY_MICROS = 4;
   const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
 #else
@@ -606,9 +606,9 @@ const uint8_t NUM_SUBFIELDS = 1;
 #if LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_TM1637
   #if INTERFACE_TYPE == INTERFACE_TYPE_SOFT_TMI
     using TmiInterface = SoftTmiInterface;
-    TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY);
+    TmiInterface tmiInterface(DIO_PIN, CLK_PIN, DELAY_MICROS);
   #elif INTERFACE_TYPE == INTERFACE_TYPE_SOFT_TMI_FAST
-    using TmiInterface = SoftTmiFastInterface<DIO_PIN, CLK_PIN, BIT_DELAY>;
+    using TmiInterface = SoftTmiFastInterface<DIO_PIN, CLK_PIN, DELAY_MICROS>;
     TmiInterface tmiInterface;
   #endif
   Tm1637Module<TmiInterface, NUM_DIGITS> ledModule(tmiInterface);
@@ -664,9 +664,10 @@ const uint8_t NUM_SUBFIELDS = 1;
     WireInterface wireInterface(Wire);
   #elif INTERFACE_TYPE == INTERFACE_TYPE_SIMPLE_WIRE
     using WireInterface = SimpleWireInterface;
-    WireInterface wireInterface(SDA_PIN, SCL_PIN, BIT_DELAY);
+    WireInterface wireInterface(SDA_PIN, SCL_PIN, DELAY_MICROS);
   #elif INTERFACE_TYPE == INTERFACE_TYPE_SIMPLE_WIRE_FAST
-    using WireInterface = SimpleWireFastInterface<SDA_PIN, SCL_PIN, BIT_DELAY>;
+    using WireInterface = SimpleWireFastInterface<
+        SDA_PIN, SCL_PIN, DELAY_MICROS>;
     WireInterface wireInterface;
   #endif
   Ht16k33Module<WireInterface, NUM_DIGITS> ledModule(

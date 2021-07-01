@@ -104,17 +104,17 @@ using ace_segment::kDigitRemapArray6Tm1637;
 // * 17 ms at 75 us delay.
 // * 22 ms at 100 us delay.
 // * 43 ms at 200 us delay.
-const uint16_t BIT_DELAY = 100;
+const uint8_t DELAY_MICROS = 100;
 
 #if TMI_INTERFACE_TYPE == TMI_INTERFACE_TYPE_NORMAL
   using TmiInterface = SoftTmiInterface;
-  TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY);
+  TmiInterface tmiInterface(DIO_PIN, CLK_PIN, DELAY_MICROS);
 #elif TMI_INTERFACE_TYPE == TMI_INTERFACE_TYPE_FAST
   #include <digitalWriteFast.h>
   #include <ace_tmi/SoftTmiFastInterface.h>
   using ace_tmi::SoftTmiFastInterface;
 
-  using TmiInterface = SoftTmiFastInterface<DIO_PIN, CLK_PIN, BIT_DELAY>;
+  using TmiInterface = SoftTmiFastInterface<DIO_PIN, CLK_PIN, DELAY_MICROS>;
   TmiInterface tmiInterface;
 #else
   #error Unknown TMI_INTERFACE_TYPE
