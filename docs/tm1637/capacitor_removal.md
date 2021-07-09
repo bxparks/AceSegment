@@ -22,10 +22,16 @@ microseconds, which forces the `delayMicros` parameter in `SoftTmiInterface` and
 the `DELAY_MICROS` parameter in `SoftTmiFastInterface` to be 100 microseconds.
 According to the TM1637 datasheet, the controller chip has a maximum clock
 frequency of 500 kHz (50% duty cycle), which implies a theoretical
-`DELAY_MICROS` of 1 microsecond. However, the `delayMicroseconds()` function on
-an AVR platform is not accurate below 3 microseconds, so the examples programs
-under `examples/` set the `delayMicros` or `DELAY_MICROS` parameters to 3
-microseconds or higher.
+`DELAY_MICROS` of 1 microsecond.
+
+The actual minimum value for the `delayMicroseconds()` function might be as low
+as 0 for several reasons:
+
+* there is overhead in calling the `delayMicroseconds()` function
+* the implementation of the `delayMicroseconds()` function on AVR processors is
+  not accurate for small (less than 10) microseconds
+* there is overhead for the `digitalWrite()` or `digitalWriteFast()` functions
+* there is overhead in the bit-shifting and looping
 
 If you are handy with a soldering iron, you can remove the two 10 nF capacitors.
 The capacitors are located in different places depending on the size of the LED

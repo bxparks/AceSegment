@@ -6,8 +6,8 @@
         * More consistent with `TwoWire` class API.
         * Allows multiple HT16K33 LED modules with different addresses to
           share a single `WireInterface`.
-    * Add caution that `delayMicroseconds()` on AVR is accurate for 3
-      microseconds or greater.
+    * Add caution that `delayMicroseconds()` on AVR is not accurate for small
+      (less than 10) microseconds.
     * Extract `hw/*Spi*Interface` classes into new
       [AceSPI](https://github.com/bxparks/AceSPI) library.
     * Extract `hw/*Tmi*Interface` classes into new
