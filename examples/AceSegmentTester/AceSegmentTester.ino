@@ -299,6 +299,77 @@ using ace_segment::kActiveHighPattern;
   const uint8_t DELAY_MICROS = 4;
   const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
+#elif defined(AUNITER_SAMD_TM1637)
+  #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
+  const uint8_t MODE_BUTTON_PIN = 8;
+  const uint8_t CHANGE_BUTTON_PIN = 9;
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_TM1637
+  const uint8_t NUM_DIGITS = 4;
+
+  // Choose one of the following variants:
+  #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_TMI
+  const uint8_t DIO_PIN = 11;
+  const uint8_t CLK_PIN = 13;
+  const uint8_t DELAY_MICROS = 100;
+
+  // Select one of the flush methods.
+  //#define TM_FLUSH_METHOD TM_FLUSH_METHOD_NORMAL
+  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
+
+#elif defined(AUNITER_SAMD_MAX7219)
+  #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
+  const uint8_t MODE_BUTTON_PIN = 8;
+  const uint8_t CHANGE_BUTTON_PIN = 9;
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_MAX7219
+  const uint8_t NUM_DIGITS = 8;
+
+  // Choose one of the following variants:
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
+  const uint8_t LATCH_PIN = SS;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+  SPIClass& spiInstance = SPI;
+
+#elif defined(AUNITER_SAMD_HC595)
+  #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
+  const uint8_t MODE_BUTTON_PIN = 8;
+  const uint8_t CHANGE_BUTTON_PIN = 9;
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595
+  const uint8_t NUM_DIGITS = 8;
+
+  // Choose one of the following variants:
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
+  const uint8_t LATCH_PIN = SS;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+  SPIClass& spiInstance = SPI;
+
+#elif defined(AUNITER_SAMD_HT16K33)
+  #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
+  const uint8_t MODE_BUTTON_PIN = 8;
+  const uint8_t CHANGE_BUTTON_PIN = 9;
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HT16K33
+  const uint8_t NUM_DIGITS = 4;
+
+  // Choose one of the following variants:
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_WIRE
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_WIRE_FAST
+  #define INTERFACE_TYPE INTERFACE_TYPE_TWO_WIRE
+  const uint8_t SDA_PIN = SDA;
+  const uint8_t SCL_PIN = SCL;
+  const uint8_t DELAY_MICROS = 1;
+  const uint8_t HT16K33_I2C_ADDRESS = 0x70;
+
 #elif defined(AUNITER_STM32_TM1637)
   #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
   const uint8_t MODE_BUTTON_PIN = PA0;
