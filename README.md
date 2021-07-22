@@ -166,8 +166,8 @@ The following example sketches are provided:
         * Demo of a HT16K33 LED module using `Ht16k33Module`
     * [Hc595Demo.ino](examples/Hc595Demo)
         * Demo of a 74HC595 LED module using `Hc595Module`
-    * [AceSegmentTester.ino](examples/AceSegmentTester)
-        * demo-reel through most of the features of the library
+    * [WriterTester.ino](examples/WriterTester)
+        * demo of the various `src/writer` classes
         * uses 2 buttons for "single step" debugging mode
         * depends on AceButton (https://github.com/bxparks/AceButton) library
 * Advanced

@@ -1,7 +1,7 @@
 /*
  * This program is used to test the AceSegment feature matrix composed of:
  *
- *    * varous AceSegment feature classes,
+ *    * varous AceSegment writer classes
  *    * various supported microcontrollers (e.g. AVR, STM32, ESP8266, etc),
  *    * various supported LED modules (TM1637, MAX7219, 74HC595).
  *
@@ -192,7 +192,7 @@ using ace_segment::kActiveHighPattern;
   #define INTERFACE_TYPE INTERFACE_TYPE_TWO_WIRE
   const uint8_t SDA_PIN = SDA;
   const uint8_t SCL_PIN = SCL;
-  const uint8_t DELAY_MICROS = 4;
+  const uint8_t DELAY_MICROS = 1;
   const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
 // Pro Micro dev board digital buttons can be configured to pins (A2, A3)
@@ -318,7 +318,7 @@ using ace_segment::kActiveHighPattern;
   #define INTERFACE_TYPE INTERFACE_TYPE_TWO_WIRE
   const uint8_t SDA_PIN = SDA;
   const uint8_t SCL_PIN = SCL;
-  const uint8_t DELAY_MICROS = 4;
+  const uint8_t DELAY_MICROS = 1;
   const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
 #elif defined(AUNITER_SAMD_TM1637)
@@ -482,7 +482,7 @@ using ace_segment::kActiveHighPattern;
   #define INTERFACE_TYPE INTERFACE_TYPE_TWO_WIRE
   const uint8_t SDA_PIN = SDA;
   const uint8_t SCL_PIN = SCL;
-  const uint8_t DELAY_MICROS = 4;
+  const uint8_t DELAY_MICROS = 1;
   const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
 #elif defined(AUNITER_D1MINI_LARGE_TM1637)
@@ -577,7 +577,7 @@ using ace_segment::kActiveHighPattern;
   #define INTERFACE_TYPE INTERFACE_TYPE_TWO_WIRE
   const uint8_t SDA_PIN = SDA;
   const uint8_t SCL_PIN = SCL;
-  const uint8_t DELAY_MICROS = 4;
+  const uint8_t DELAY_MICROS = 1;
   const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
 #elif defined(AUNITER_ESP32_TM1637)
@@ -677,7 +677,7 @@ using ace_segment::kActiveHighPattern;
   #define INTERFACE_TYPE INTERFACE_TYPE_TWO_WIRE
   const uint8_t SDA_PIN = SDA;
   const uint8_t SCL_PIN = SCL;
-  const uint8_t DELAY_MICROS = 4;
+  const uint8_t DELAY_MICROS = 1;
   const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
 #else
@@ -1131,7 +1131,7 @@ void spinDisplay2() {
 
 //-----------------------------------------------------------------------------
 
-void randomLevels() {
+void writeLevels() {
   static uint8_t level;
 
   // Do a random walk, with reflection on the left and right boundaries.
@@ -1174,7 +1174,7 @@ void updateDemo() {
   } else if (demoMode == DEMO_MODE_SPIN_2) {
     spinDisplay2();
   } else if (demoMode == DEMO_MODE_LEVEL) {
-    randomLevels();
+    writeLevels();
   }
 }
 

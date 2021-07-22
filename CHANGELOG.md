@@ -14,6 +14,7 @@
       [AceTMI](https://github.com/bxparks/AceTMI) library.
     * Extract `hw/*Wire*Interface` classes into new
       [AceWire](https://github.com/bxparks/AceWire) library.
+    * `examples/WriterTester`: renamed from `examples/AceSegmentTester`
 * 0.7 (2021-06-16)
     * Support HT16K33 LED modules
         * Add `Ht16k33Module` class to support 4-digit LED display from
