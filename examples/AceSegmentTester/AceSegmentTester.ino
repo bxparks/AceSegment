@@ -154,12 +154,6 @@ using ace_segment::kActiveHighPattern;
   #define AUNITER_MICRO_TM1637
 #endif
 
-// Pro Micro dev board buttons are now hardwared to A2 and A3, instead of being
-// configured with dip switches to either (2,3) or (8,9). Since (2,3) are used
-// by I2C, and LED_DISPLAY_TYPE_DIRECT uses (8,9) pins for two of the LED
-// segments/digits, the only spare pins are A2 and A3. All other digital pins
-// are taken. Fortunately, the ATmega32U4 allows all analog pins to be used as
-// digital pins.
 #if defined(EPOXY_DUINO)
   // For EpoxyDuino, the actual numbers don't matter, so let's set them to (2,3)
   // since I'm not sure if A2 and A3 are defined.
@@ -176,6 +170,34 @@ using ace_segment::kActiveHighPattern;
   #define DIRECT_INTERFACE_TYPE DIRECT_INTERFACE_TYPE_FAST
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
   const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
+
+// The Arduino Nano dev box was upgraded to support a HT16K33 LED module so that
+// AceSegment/AutoBenchmark can generate correct benchmark for the
+// TwoWireInterface<TwoWire> interface class. If an actual HT16K33 is not
+// connected to the I2C, the hardware <Wire.h> library reads a NACK from the
+// slave device and bails out early from the endTransmission(), producing timing
+// information which are too short.
+
+#elif defined(AUNITER_NANO_HT16K33)
+  #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
+  const uint8_t MODE_BUTTON_PIN = 2;
+  const uint8_t CHANGE_BUTTON_PIN = 3;
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HT16K33
+  const uint8_t NUM_DIGITS = 4;
+
+  // Choose one of the following variants:
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_WIRE
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_WIRE_FAST
+  #define INTERFACE_TYPE INTERFACE_TYPE_TWO_WIRE
+  const uint8_t SDA_PIN = SDA;
+  const uint8_t SCL_PIN = SCL;
+  const uint8_t DELAY_MICROS = 4;
+  const uint8_t HT16K33_I2C_ADDRESS = 0x70;
+
+// Pro Micro dev board digital buttons can be configured to pins (A2, A3)
+// or (2, 3) via DIP switches. Since (2, 3) are used
+// by I2C, be sure to use (A2, A3) when using I2C devices.
 
 #elif defined(AUNITER_MICRO_CUSTOM_DIRECT)
   #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
@@ -297,6 +319,77 @@ using ace_segment::kActiveHighPattern;
   const uint8_t SDA_PIN = SDA;
   const uint8_t SCL_PIN = SCL;
   const uint8_t DELAY_MICROS = 4;
+  const uint8_t HT16K33_I2C_ADDRESS = 0x70;
+
+#elif defined(AUNITER_SAMD_TM1637)
+  #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
+  const uint8_t MODE_BUTTON_PIN = 8;
+  const uint8_t CHANGE_BUTTON_PIN = 9;
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_TM1637
+  const uint8_t NUM_DIGITS = 4;
+
+  // Choose one of the following variants:
+  #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_TMI
+  const uint8_t DIO_PIN = 11;
+  const uint8_t CLK_PIN = 13;
+  const uint8_t DELAY_MICROS = 100;
+
+  // Select one of the flush methods.
+  //#define TM_FLUSH_METHOD TM_FLUSH_METHOD_NORMAL
+  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
+
+#elif defined(AUNITER_SAMD_MAX7219)
+  #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
+  const uint8_t MODE_BUTTON_PIN = 8;
+  const uint8_t CHANGE_BUTTON_PIN = 9;
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_MAX7219
+  const uint8_t NUM_DIGITS = 8;
+
+  // Choose one of the following variants:
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
+  const uint8_t LATCH_PIN = SS;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+  SPIClass& spiInstance = SPI;
+
+#elif defined(AUNITER_SAMD_HC595)
+  #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
+  const uint8_t MODE_BUTTON_PIN = 8;
+  const uint8_t CHANGE_BUTTON_PIN = 9;
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595
+  const uint8_t NUM_DIGITS = 8;
+
+  // Choose one of the following variants:
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
+  const uint8_t LATCH_PIN = SS;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+  SPIClass& spiInstance = SPI;
+
+#elif defined(AUNITER_SAMD_HT16K33)
+  #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
+  const uint8_t MODE_BUTTON_PIN = 8;
+  const uint8_t CHANGE_BUTTON_PIN = 9;
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HT16K33
+  const uint8_t NUM_DIGITS = 4;
+
+  // Choose one of the following variants:
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_WIRE
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_WIRE_FAST
+  #define INTERFACE_TYPE INTERFACE_TYPE_TWO_WIRE
+  const uint8_t SDA_PIN = SDA;
+  const uint8_t SCL_PIN = SCL;
+  const uint8_t DELAY_MICROS = 1;
   const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
 #elif defined(AUNITER_STM32_TM1637)

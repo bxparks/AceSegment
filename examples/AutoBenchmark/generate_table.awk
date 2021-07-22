@@ -66,7 +66,7 @@ END {
         || name ~ /^Tm1637\(4,SoftTmi,5us\)/ \
         || name ~ /^Tm1637\(6,SoftTmi,100us\)/ \
         || name ~ /^Max7219\(8,SoftSpi\)/ \
-        || name ~ /^Ht16k33\(4,TwoWire\)/ \
+        || name ~ /^Ht16k33\(4,TwoWire,100kHz)/ \
     ) {
       printf("|-----------------------------------------+-------------------+---------|\n")
     }

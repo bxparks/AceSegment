@@ -67,6 +67,14 @@ using ace_segment::kDigitRemapArray6Tm1637;
   const uint8_t DIO_PIN = 9;
   const uint8_t NUM_DIGITS = 6;
 
+#elif defined(AUNITER_SAMD_TM1637)
+  #define TMI_INTERFACE_TYPE TMI_INTERFACE_TYPE_NORMAL
+  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
+
+  const uint8_t CLK_PIN = 13;
+  const uint8_t DIO_PIN = 11;
+  const uint8_t NUM_DIGITS = 4;
+
 #elif defined(AUNITER_STM32_TM1637)
   #define TMI_INTERFACE_TYPE TMI_INTERFACE_TYPE_NORMAL
   #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL

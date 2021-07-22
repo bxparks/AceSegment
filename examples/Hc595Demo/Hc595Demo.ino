@@ -7,8 +7,9 @@
  *
  * Supported microcontroller environments:
  *
- *  * AUNITER_MICRO_HC595: SparkFun Pro Micro + Commerical LED module
+ *  * AUNITER_MICRO_HC595: SparkFun Pro Micro + diymore.cc LED module
  *  * AUNITER_MICRO_CUSTOM_DUAL: SparkFun Pro Micro + Custom LED module
+ *  * AUNITER_SAMD_HC595: SAMD21 M0 Mini + diymore.cc LED module
  *  * AUNITER_STM32_HC595: STM32 F1 Blue Pill
  *  * AUNITER_D1MINI_LARGE_HC595: WeMos D1 Mini ESP8266
  *  * AUNITER_ESP32_HC595: ESP32 Dev Kit v1
@@ -94,6 +95,20 @@ using ace_segment::kActiveHighPattern;
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
   #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
   const uint8_t LATCH_PIN = 10;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+  SPIClass& spiInstance = SPI;
+
+#elif defined(AUNITER_SAMD_HC595)
+  const uint8_t NUM_DIGITS = 8;
+  const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = kActiveHighPattern;
+  const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
+  const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
+
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
+  const uint8_t LATCH_PIN = SS;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
   SPIClass& spiInstance = SPI;

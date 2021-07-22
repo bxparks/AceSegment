@@ -150,7 +150,7 @@ const uint8_t CLOCK_PIN = SCK; // SH_CP on 74HC595
 // HT16K33
 const uint8_t SDA_PIN = SDA;
 const uint8_t SCL_PIN = SCL;
-const uint8_t DELAY_MICROS = 4;
+const uint8_t DELAY_MICROS = 1;
 
 //------------------------------------------------------------------
 // Run benchmarks.
@@ -782,16 +782,32 @@ void runHt16k33Benchmark(const __FlashStringHelper* name, LM& ledModule) {
   printStats(name, timingStats, numSamples);
 }
 
-void runHt16k33TwoWire() {
+void runHt16k33TwoWire100() {
   using WireInterface = TwoWireInterface<TwoWire>;
   WireInterface wireInterface(Wire);
   Ht16k33Module<WireInterface, 4> ht16k33Module(
       wireInterface, HT16K33_I2C_ADDRESS);
 
   Wire.begin();
+  Wire.setClock(100000L);
   wireInterface.begin();
   ht16k33Module.begin();
-  runHt16k33Benchmark(F("Ht16k33(4,TwoWire)"), ht16k33Module);
+  runHt16k33Benchmark(F("Ht16k33(4,TwoWire,100kHz)"), ht16k33Module);
+  ht16k33Module.end();
+  wireInterface.end();
+}
+
+void runHt16k33TwoWire400() {
+  using WireInterface = TwoWireInterface<TwoWire>;
+  WireInterface wireInterface(Wire);
+  Ht16k33Module<WireInterface, 4> ht16k33Module(
+      wireInterface, HT16K33_I2C_ADDRESS);
+
+  Wire.begin();
+  Wire.setClock(400000L);
+  wireInterface.begin();
+  ht16k33Module.begin();
+  runHt16k33Benchmark(F("Ht16k33(4,TwoWire,400kHz)"), ht16k33Module);
   ht16k33Module.end();
   wireInterface.end();
 }
@@ -805,7 +821,7 @@ void runHt16k33SimpleWire() {
 
   wireInterface.begin();
   ht16k33Module.begin();
-  runHt16k33Benchmark(F("Ht16k33(4,SimpleWire,4us)"), ht16k33Module);
+  runHt16k33Benchmark(F("Ht16k33(4,SimpleWire,1us)"), ht16k33Module);
   ht16k33Module.end();
   wireInterface.end();
 }
@@ -819,7 +835,7 @@ void runHt16k33SimpleWireFast() {
 
   wireInterface.begin();
   ht16k33Module.begin();
-  runHt16k33Benchmark(F("Ht16k33(4,SimpleWireFast,4us)"), ht16k33Module);
+  runHt16k33Benchmark(F("Ht16k33(4,SimpleWireFast,1us)"), ht16k33Module);
   ht16k33Module.end();
   wireInterface.end();
 }
@@ -880,7 +896,8 @@ void runBenchmarks() {
   runMax7219HardSpiFast();
 #endif
 
-  runHt16k33TwoWire();
+  runHt16k33TwoWire100();
+  runHt16k33TwoWire400();
   runHt16k33SimpleWire();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
   runHt16k33SimpleWireFast();

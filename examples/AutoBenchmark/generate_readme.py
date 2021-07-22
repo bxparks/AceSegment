@@ -20,7 +20,6 @@ esp32_results = check_output(
     "./generate_table.awk < esp32.txt", shell=True, text=True)
 teensy32_results = check_output(
     "./generate_table.awk < teensy32.txt", shell=True, text=True)
-#teensy32_results = 'TBD'
 
 print(f"""\
 # AutoBenchmark
@@ -186,6 +185,28 @@ number of `TimingStats::update()` calls that were made.
     * Makes almost no difference in execution speed. Maybe if I squint hard
       enough, it looks like a few microseconds faster on average?
     * Saves flash consumption on AVR processors (see MemoryBenchmark/README.md).
+* Regenerate after attaching an actual HT16K33 LED module on the I2C bus.
+    * The hardware I2C library `<Wire.h>` checks for a proper ACK
+      response from the I2C device. If a NACK is received, then it stops
+      transmitting the rest of the data in the transmit buffer and returns
+      immediately from `endTransmission()`.
+    * Causes AutoBenchmark to produces incorrect timing (too short) for the
+      `Ht16k33(TwoWire)` benchmark.
+    * Software I2C implementations such as `SimpleWireInterface` and
+      `SimpleWireFastInterface` do *not* check the response from the I2C device.
+      The benchmark results are not affected.
+    * For AVR processors, the software I2C implementation of
+      `SimpleWireFastInterface` using `digitalWriteFast()` is *faster* than
+      hardware I2C using `<Wire.h>`:
+        * `<Wire.h>` with `setClock(400000)` produces throughput of about 234
+          kHz.
+        * `SimpleWireFastInterface` using 1us delayMicros produces a throughput
+          of about 350 kHz.
+    * For 32-bit processors without a `digitalWriteFast` library,
+      `SimpleWireFastInterface` is comparable to the 100 kHz setting of
+      `<Wire.h>`, until we get to very fast 32-bit processors like the ESP32 and
+      Teensy 3.2, where `SimpleWireInterface` becomes competitive with 400 kHz
+      of `<Wire.h>`.
 
 ## Results
 
@@ -235,11 +256,14 @@ The following tables show the number of microseconds taken by:
         * HardSpiFast: hardware SPI using `<SPI.h>` and `<digitalWriteFast.h>`
           to control the latch pin
 * `Ht16k33Module::flush()`
-    * Sends all digits in the buffer to the HT16K33 LED module using 2
-      communication interfaces:
+    * Sends all 4 digits in the buffer and the brightness setting to the HT16K33
+      LED module using 2 communication interfaces:
         * TwoWire: hardware I2C using `<Wire.h>`
         * SimpleWire: AceSegment's custom bitbanging I2C implementation
         * SimpleWireFast: Same as SimpleWire using `<digitalWriteFast.h>`
+    * Total bits: the addr, 5 x 16-bit words, then another addr, and the
+      brightness, for a total of 13 bytes. Each byte sends 8 bits and reads the
+      ACK bit from the slave, so 9 bits per byte. Total bits: 117 bits.
 
 On AVR processors, the "fast" options are available using the
 [digitalWriteFast](https://github.com/NicksonYap/digitalWriteFast) library whose
