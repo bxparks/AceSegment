@@ -171,13 +171,37 @@ using ace_segment::kActiveHighPattern;
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
   const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
 
+#elif defined(AUNITER_ATTINY_HT16K33)
+  #define BUTTON_TYPE BUTTON_TYPE_ANALOG
+  #define MODE_BUTTON_PIN 0
+  #define CHANGE_BUTTON_PIN 1
+  #define ANALOG_BUTTON_PIN A0
+  // Resistor ladder must remain above 90% VCC because they are connected to
+  // the RESET button. We have 3 resistors (1k, 10k, 22k):
+  //    * 933: 10k/(11k+1k) = 90.9%
+  //    * 979: 22k/23k = 95.6%
+  //    * 1023: 100%, open
+  // Numbers then adjusted using LadderButtonCalibrator.
+  #define ANALOG_BUTTON_LEVELS {933, 980, 1024}
+
+  #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HT16K33
+  const uint8_t NUM_DIGITS = 4;
+
+  // Choose one of the following variants:
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_WIRE
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_WIRE_FAST
+  #define INTERFACE_TYPE INTERFACE_TYPE_TWO_WIRE
+  const uint8_t SDA_PIN = SDA;
+  const uint8_t SCL_PIN = SCL;
+  const uint8_t DELAY_MICROS = 1;
+  const uint8_t HT16K33_I2C_ADDRESS = 0x70;
+
 // The Arduino Nano dev box was upgraded to support a HT16K33 LED module so that
 // AceSegment/AutoBenchmark can generate correct benchmark for the
 // TwoWireInterface<TwoWire> interface class. If an actual HT16K33 is not
 // connected to the I2C, the hardware <Wire.h> library reads a NACK from the
 // slave device and bails out early from the endTransmission(), producing timing
 // information which are too short.
-
 #elif defined(AUNITER_NANO_HT16K33)
   #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
   const uint8_t MODE_BUTTON_PIN = 2;
@@ -198,7 +222,6 @@ using ace_segment::kActiveHighPattern;
 // Pro Micro dev board digital buttons can be configured to pins (A2, A3)
 // or (2, 3) via DIP switches. Since (2, 3) are used
 // by I2C, be sure to use (A2, A3) when using I2C devices.
-
 #elif defined(AUNITER_MICRO_CUSTOM_DIRECT)
   #define BUTTON_TYPE BUTTON_TYPE_DIGITAL
   const uint8_t MODE_BUTTON_PIN = A2;
