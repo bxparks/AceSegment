@@ -26,11 +26,13 @@ teensy32_results = check_output(
 print(f"""\
 # Memory Benchmark
 
-The `MemoryBenchmark.ino` compiles example code snippets using the various
-CRC algorithms. The `FEATURE` macro flag controls which feature is
-compiled. The `collect.sh` edits this `FEATURE` flag programmatically, then runs
-the Arduino IDE compiler on the program, and extracts the flash and static
-memory usage into a text file (e.g. `nano.txt`).
+The `MemoryBenchmark.ino` collects the amount of flash and static memory
+consumed by different implementations in the AceSegment library.
+
+It compiles various code snippets which are controlled by the `FEATURE` macro
+flag. The `collect.sh` edits this `FEATURE` flag programmatically, then runs the
+Arduino IDE compiler on the program, and extracts the flash and static memory
+usage into a text file (e.g. `nano.txt`).
 
 The numbers shown below should be considered to be rough estimates. It is often
 difficult to separate out the code size of the library from the overhead imposed

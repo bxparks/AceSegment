@@ -64,6 +64,8 @@ END {
   printf("| %-31s | %6d/%5d | %5d/%5d |\n",
     labels[0], u[0]["flash"], u[0]["ram"], u[0]["d_flash"], u[0]["d_ram"])
   for (i = 1 ; i < NUM_ENTRIES; i++) {
+    if (u[i]["flash"] == "-1") continue
+
     if (labels[i] ~ /DirectModule/ \
         || labels[i] ~ /Hybrid\(SoftSpi\)/ \
         || labels[i] ~ /Hc595\(SoftSpi\)/ \
