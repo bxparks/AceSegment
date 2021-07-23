@@ -166,7 +166,7 @@ class Ht16k33Module : public LedModule {
         mWire.write(pattern); // ROW0-ROW7
         mWire.write(0); // ROW8-ROW15 unused
       }
-      mWire.endTransmission();
+      mWire.endTransmission(false); // HT16K33 supports repeated START
 
       // Write brightness.
       writeCommand(mBrightness | kBrightness);

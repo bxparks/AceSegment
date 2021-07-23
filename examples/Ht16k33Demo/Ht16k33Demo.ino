@@ -5,7 +5,9 @@
  *
  * Supported microcontroller environments:
  *
+ *  * AUNITER_NANO_HT16K33: Arduino Nano
  *  * AUNITER_MICRO_HT16K33: SparkFun Pro Micro
+ *  * AUNITER_SAMD_HT16K33: SAMD21 M0 Mini
  *  * AUNITER_STM32_HT16K33: STM32 F1 Blue Pill
  *  * AUNITER_D1MINILARGE_HT16K33: WeMos D1 Mini ESP8266
  *  * AUNITER_ESP32_HT16K33: ESP32 Dev Kit v1
@@ -73,7 +75,7 @@ const uint8_t HT16K33_I2C_ADDRESS = 0x70;
   const uint8_t DELAY_MICROS = 1;
 
 #elif defined(AUNITER_MICRO_HT16K33)
-  #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_HARD
+  #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_SIMPLE_HARD
 
   const uint8_t SCL_PIN = SCL;
   const uint8_t SDA_PIN = SDA;
@@ -118,51 +120,51 @@ const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 //------------------------------------------------------------------
 
 #if WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_HARD
-  #warning Using Wire.h
+  #warning Using built-in <Wire.h>
   #include <Wire.h>
   using WireInterface = TwoWireInterface<TwoWire>;
   WireInterface wireInterface(Wire);
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SOFTWARE_WIRE
-  #warning Using SoftwareWire.h
+  #warning Using https://github.com/Testato/SoftwareWire
   #include <SoftwareWire.h>
   SoftwareWire softwareWire(SDA_PIN, SCL_PIN);
   using WireInterface = TwoWireInterface<SoftwareWire>;
   WireInterface wireInterface(softwareWire);
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SOFT_WIRE
-  #warning Using SoftWire.h
+  #warning https://github.com/stevemarple/SoftWire (does not work)
   #include <SoftWire.h>
   SoftWire softWire(SDA_PIN, SCL_PIN);
   using WireInterface = TwoWireInterface<SoftWire>;
   WireInterface wireInterface(softWire);
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SWIRE
-  #warning Using SWire.h
+  #warning Using https://github.com/RaemondBW/SWire
   #include <SWire.h>
   using WireInterface = TwoWireInterface<SoftWire>;
   WireInterface wireInterface(SWire);
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SIMPLE_WIRE
-  #warning Using SimpleWireInterface.h
+  #warning Using AceWire/SimpleWireInterface.h
   using WireInterface = SimpleWireInterface;
   WireInterface wireInterface(SDA_PIN, SCL_PIN, DELAY_MICROS);
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SIMPLE_WIRE_FAST
-  #warning Using SimpleWireFastInterface.h
+  #warning Using AceWire/SimpleWireFastInterface.h
   #include <digitalWriteFast.h>
   #include <ace_wire/SimpleWireFastInterface.h>
   using ace_wire::SimpleWireFastInterface;
   using WireInterface = SimpleWireFastInterface<SDA_PIN, SCL_PIN, DELAY_MICROS>;
   WireInterface wireInterface;
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SLOW_SOFT_WIRE
-  #warning Using SlowSoftWire.h
+  #warning Using https://github.com/felias-fogg/SlowSoftWire
   #include <SlowSoftWire.h>
   SlowSoftWire slowSoftWire(SDA_PIN, SCL_PIN);
   using WireInterface = TwoWireInterface<SlowSoftWire>;
   WireInterface wireInterface(slowSoftWire);
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_HARD_WIRE
-  #warning Using HardWire.h
+  #warning https://github.com/thexeno/HardWire-Arduino-Library
   #include <HardWire.h>
   using WireInterface = TwoWireInterface<TwoWire>;
   WireInterface wireInterface(Wire);
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SEEED_SOFTWARE_I2C
-  #warning Using SEEED SoftwareI2C.h
+  #warning Using https://github.com/Seeed-Studio/Arduino_Software_I2C
   #include <SoftwareI2C.h>
   SoftwareI2C seeedWire;
   using WireInterface = TwoWireInterface<SoftwareI2C>;
