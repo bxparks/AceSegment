@@ -29,7 +29,6 @@ SOFTWARE.
  * information.
  */
 
-#include <stdio.h>
 #include <Arduino.h>
 #include <SPI.h> // SPIClass
 #include <Wire.h> // TwoWire

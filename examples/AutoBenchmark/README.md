@@ -42,10 +42,11 @@ This program depends on the following libraries:
 * [AceCommon](https://github.com/bxparks/AceCommon)
 * [AceSegment](https://github.com/bxparks/AceButton)
 
-On AVR processors, the following library is required to run the
+On AVR processors, one of the following libraries is required to run the
 `digitalWriteFast()` versions of the low-level drivers:
 
-* [digitalWriteFast](https://github.com/NicksonYap/digitalWriteFast)
+* https://github.com/watterott/Arduino-Libs/tree/master/digitalWriteFast
+* https://github.com/NicksonYap/digitalWriteFast
 
 ## How to Generate
 
@@ -241,13 +242,11 @@ The following tables show the number of microseconds taken by:
       brightness, for a total of 13 bytes. Each byte sends 8 bits and reads the
       ACK bit from the slave, so 9 bits per byte. Total bits: 117 bits.
 
-On AVR processors, the "fast" options are available using the
-[digitalWriteFast](https://github.com/NicksonYap/digitalWriteFast) library whose
-`digitalWriteFast()` functions can be up to 50X faster if the `pin` number and
-`value` parameters are compile-time constants. In addition, the
-`digitalWriteFast` functions reduce flash memory consumption by 600-700 bytes
-for `SoftTmiFastInterface`, `SoftSpiFastInterface`, `HardSpiFastInterface`, and
-`SimpleWireFastInterface` compared to their non-fast equivalents.
+On AVR processors, the "fast" options are available using one of the
+digitalWriteFast libraries whose `digitalWriteFast()` functions can be up to 50X
+faster if the `pin` number and `value` parameters are compile-time constants. In
+addition, the `digitalWriteFast` functions reduce flash memory consumption by
+600-700 bytes compared to their non-fast equivalents.
 
 ### Arduino Nano
 
