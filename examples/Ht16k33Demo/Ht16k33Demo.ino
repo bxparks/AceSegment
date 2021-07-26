@@ -30,20 +30,28 @@ using ace_segment::PatternWriter;
 //
 // Built-in Arduino <Wire.h>
 #define WIRE_INTERFACE_TYPE_HARD 0
+
 // AceWire/SimpleWireInterface
 #define WIRE_INTERFACE_TYPE_SIMPLE_WIRE 1
-// AceWire/SimpleWireFastInterface
+
+// AceWire/SimpleWireFastInterface (AVR only)
 #define WIRE_INTERFACE_TYPE_SIMPLE_WIRE_FAST 2
-// https://github.com/Testato/SoftwareWire
+
+// https://github.com/Testato/SoftwareWire (AVR only)
 #define WIRE_INTERFACE_TYPE_SOFTWARE_WIRE 3
+
 // https://github.com/stevemarple/SoftWire (doesn't work, don't know why)
 #define WIRE_INTERFACE_TYPE_SOFT_WIRE 4
+
 // https://github.com/RaemondBW/SWire
 #define WIRE_INTERFACE_TYPE_SWIRE 5
+
 // https://github.com/felias-fogg/SlowSoftWire
 #define WIRE_INTERFACE_TYPE_SLOW_SOFT_WIRE 6
+
 // https://github.com/thexeno/HardWire-Arduino-Library
 #define WIRE_INTERFACE_TYPE_HARD_WIRE 7
+
 // https://github.com/Seeed-Studio/Arduino_Software_I2C
 #define WIRE_INTERFACE_TYPE_SEEED_SOFTWARE_I2C 8
 
@@ -104,6 +112,7 @@ const uint8_t HT16K33_I2C_ADDRESS = 0x70;
   const uint8_t SCL_PIN = SCL;
   const uint8_t SDA_PIN = SDA;
   const uint8_t NUM_DIGITS = 4;
+  const uint8_t DELAY_MICROS = 1;
 
 #elif defined(AUNITER_D1MINI_LARGE_HT16K33)
   #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_HARD
@@ -111,6 +120,7 @@ const uint8_t HT16K33_I2C_ADDRESS = 0x70;
   const uint8_t SCL_PIN = SCL;
   const uint8_t SDA_PIN = SDA;
   const uint8_t NUM_DIGITS = 4;
+  const uint8_t DELAY_MICROS = 1;
 
 #elif defined(AUNITER_ESP32_HT16K33)
   #define WIRE_INTERFACE_TYPE WIRE_INTERFACE_TYPE_HARD
@@ -118,6 +128,7 @@ const uint8_t HT16K33_I2C_ADDRESS = 0x70;
   const uint8_t SCL_PIN = SCL;
   const uint8_t SDA_PIN = SDA;
   const uint8_t NUM_DIGITS = 4;
+  const uint8_t DELAY_MICROS = 1;
 
 #else
   #error Unknown AUNITER environment
@@ -132,6 +143,17 @@ const uint8_t HT16K33_I2C_ADDRESS = 0x70;
   #include <Wire.h>
   using WireInterface = TwoWireInterface<TwoWire>;
   WireInterface wireInterface(Wire);
+#elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SIMPLE_WIRE
+  #warning Using AceWire/SimpleWireInterface.h
+  using WireInterface = SimpleWireInterface;
+  WireInterface wireInterface(SDA_PIN, SCL_PIN, DELAY_MICROS);
+#elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SIMPLE_WIRE_FAST
+  #warning Using AceWire/SimpleWireFastInterface.h
+  #include <digitalWriteFast.h>
+  #include <ace_wire/SimpleWireFastInterface.h>
+  using ace_wire::SimpleWireFastInterface;
+  using WireInterface = SimpleWireFastInterface<SDA_PIN, SCL_PIN, DELAY_MICROS>;
+  WireInterface wireInterface;
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SOFTWARE_WIRE
   #warning Using https://github.com/Testato/SoftwareWire
   #include <SoftwareWire.h>
@@ -149,17 +171,6 @@ const uint8_t HT16K33_I2C_ADDRESS = 0x70;
   #include <SWire.h>
   using WireInterface = TwoWireInterface<SoftWire>;
   WireInterface wireInterface(SWire);
-#elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SIMPLE_WIRE
-  #warning Using AceWire/SimpleWireInterface.h
-  using WireInterface = SimpleWireInterface;
-  WireInterface wireInterface(SDA_PIN, SCL_PIN, DELAY_MICROS);
-#elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SIMPLE_WIRE_FAST
-  #warning Using AceWire/SimpleWireFastInterface.h
-  #include <digitalWriteFast.h>
-  #include <ace_wire/SimpleWireFastInterface.h>
-  using ace_wire::SimpleWireFastInterface;
-  using WireInterface = SimpleWireFastInterface<SDA_PIN, SCL_PIN, DELAY_MICROS>;
-  WireInterface wireInterface;
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SLOW_SOFT_WIRE
   #warning Using https://github.com/felias-fogg/SlowSoftWire
   #include <SlowSoftWire.h>
@@ -188,16 +199,16 @@ PatternWriter patternWriter(ledModule);
 void setupAceSegment() {
 #if WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_HARD
   Wire.begin();
+#elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SIMPLE_WIRE
+  // do nothing
+#elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SIMPLE_WIRE_FAST
+  // do nothing
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SOFTWARE_WIRE
   softwareWire.begin();
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SOFT_WIRE
   softWire.begin();
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SWIRE
   SWire.begin(SDA_PIN, SCL_PIN);
-#elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SIMPLE_WIRE
-  // do nothing
-#elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SIMPLE_WIRE_FAST
-  // do nothing
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SLOW_SOFT_WIRE
   slowSoftWire.begin();
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_HARD_WIRE
