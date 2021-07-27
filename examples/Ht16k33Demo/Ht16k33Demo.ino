@@ -55,6 +55,11 @@ using ace_segment::PatternWriter;
 // https://github.com/Seeed-Studio/Arduino_Software_I2C
 #define WIRE_INTERFACE_TYPE_SEEED_SOFTWARE_I2C 8
 
+// https://github.com/todbot/SoftI2CMaster, conflicts with
+// https://github.com/felias-fogg/SoftI2CMaster so only one of them can be
+// installed at the same time. Also requires adding an endTransmission(bool).
+#define WIRE_INTERFACE_TYPE_SOFT_I2C_MASTER 9
+
 const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
 //----------------------------------------------------------------------------
@@ -188,6 +193,12 @@ const uint8_t HT16K33_I2C_ADDRESS = 0x70;
   SoftwareI2C seeedWire;
   using WireInterface = TwoWireInterface<SoftwareI2C>;
   WireInterface wireInterface(seeedWire);
+#elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SOFT_I2C_MASTER
+  #warning Using https://github.com/todbot/SoftI2CMaster
+  #include <SoftI2CMaster.h>
+  SoftI2CMaster wire(SCL_PIN, SDA_PIN);
+  using WireInterface = TwoWireInterface<SoftI2CMaster>;
+  WireInterface wireInterface(wire);
 #else
   #error Unknown WIRE_INTERFACE_TYPE
 #endif
@@ -215,6 +226,8 @@ void setupAceSegment() {
   Wire.begin();
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SEEED_SOFTWARE_I2C
   seeedWire.begin(SDA_PIN, SCL_PIN);
+#elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SOFT_I2C_MASTER
+  wire.begin();
 #else
   #error Unknown WIRE_INTERFACE_TYPE
 #endif
