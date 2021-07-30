@@ -56,19 +56,19 @@ called directly. ("Zero-cost abstraction").
     * digitalWrite()
     * pinMode()
 * AceSPI library
-    * `SoftSpiInterface`
+    * `SimpleSpiInterface`
         * software SPI
-    * `SoftFastSpiInterface`
+    * `SimpleSpiFastInterface`
         * software SPI using `digitalWriteFast` library on AVR processors
     * `HardSpiInterface`
         * hardware SPI
     * `HardSpiFastInterface`
         * hardware SPI using `digitalWriteFast` for controlling the LatchPin
 * AceTMI library
-    * `SoftTmiInterface`
+    * `SimpleTmiInterface`
         * software implementation of the TM1637 protocol similar to I2C
-    * `SoftTmiFastInterface`
-        * same as `SoftTmiInterface` but using `digitalWriteFast` library
+    * `SimpleTmiFastInterface`
+        * same as `SimpleTmiInterface` but using `digitalWriteFast` library
 * AceWire library
     * `TwoWireInterface`
     * `SimpleWireInterface`
@@ -129,7 +129,7 @@ Interface). Most microcontrollers support either hardware SPI or software SPI.
 You can choose to use either modes, and the library provides 2 classes that
 allows this configuration:
 
-* `SoftSpiInterface`
+* `SimpleSpiInterface`
     * Uses `digitalWrite()` function to manually write the correct signal at the
       correct time. (Also called "big-banging").
 * `HardSpiInterface`
@@ -140,9 +140,9 @@ Since the 74HC595 shift registers can be communicated using 2 different methods,
 there are 5 combinations possible:
 
 * LedMatrixDirect
-* LedMatrixSingleHc595 + SoftSpiInterface
+* LedMatrixSingleHc595 + SimpleSpiInterface
 * LedMatrixSingleHc595 + HardSpiInterface
-* LedMatrixDualHc595 + SoftSpiInterface
+* LedMatrixDualHc595 + SimpleSpiInterface
 * LedMatrixDualHc595 + HardSpiInterface
 
 ## ScanningModule

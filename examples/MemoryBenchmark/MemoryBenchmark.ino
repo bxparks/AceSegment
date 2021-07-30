@@ -18,18 +18,18 @@
 #define FEATURE_BASELINE 0
 #define FEATURE_DIRECT_MODULE 1
 #define FEATURE_DIRECT_FAST4_MODULE 2
-#define FEATURE_HYBRID_SOFT_SPI 3
-#define FEATURE_HYBRID_SOFT_SPI_FAST 4
+#define FEATURE_HYBRID_SIMPLE_SPI 3
+#define FEATURE_HYBRID_SIMPLE_SPI_FAST 4
 #define FEATURE_HYBRID_HARD_SPI 5
 #define FEATURE_HYBRID_HARD_SPI_FAST 6
-#define FEATURE_HC595_SOFT_SPI 7
-#define FEATURE_HC595_SOFT_SPI_FAST 8
+#define FEATURE_HC595_SIMPLE_SPI 7
+#define FEATURE_HC595_SIMPLE_SPI_FAST 8
 #define FEATURE_HC595_HARD_SPI 9
 #define FEATURE_HC595_HARD_SPI_FAST 10
 #define FEATURE_TM1637_TMI 11
 #define FEATURE_TM1637_TMI_FAST 12
-#define FEATURE_MAX7219_SOFT_SPI 13
-#define FEATURE_MAX7219_SOFT_SPI_FAST 14
+#define FEATURE_MAX7219_SIMPLE_SPI 13
+#define FEATURE_MAX7219_SIMPLE_SPI_FAST 14
 #define FEATURE_MAX7219_HARD_SPI 15
 #define FEATURE_MAX7219_HARD_SPI_FAST 16
 #define FEATURE_HT16K33_TWO_WIRE 17
@@ -56,9 +56,9 @@ volatile int disableCompilerOptimization = 0;
   #include <AceWire.h>
   #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
     #include <digitalWriteFast.h>
-    #include <ace_spi/SoftSpiFastInterface.h>
+    #include <ace_spi/SimpleSpiFastInterface.h>
     #include <ace_spi/HardSpiFastInterface.h>
-    #include <ace_tmi/SoftTmiFastInterface.h>
+    #include <ace_tmi/SimpleTmiFastInterface.h>
     #include <ace_segment/direct/DirectFast4Module.h>
   #endif
   using namespace ace_segment;
@@ -135,9 +135,9 @@ volatile int disableCompilerOptimization = 0;
         kActiveLowPattern /*digitOnPattern*/,
         FRAMES_PER_SECOND);
 
-  #elif FEATURE == FEATURE_HYBRID_SOFT_SPI
+  #elif FEATURE == FEATURE_HYBRID_SIMPLE_SPI
     // Common Cathode, with transistors on Group pins
-    using SpiInterface = SoftSpiInterface;
+    using SpiInterface = SimpleSpiInterface;
     SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
     HybridModule<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
@@ -147,13 +147,13 @@ volatile int disableCompilerOptimization = 0;
         DIGIT_PINS
     );
 
-  #elif FEATURE == FEATURE_HYBRID_SOFT_SPI_FAST
+  #elif FEATURE == FEATURE_HYBRID_SIMPLE_SPI_FAST
     #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
       #error Unsupported FEATURE on this platform
     #endif
 
     // Common Cathode, with transistors on Group pins
-    using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    using SpiInterface = SimpleSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
     HybridModule<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
@@ -191,9 +191,9 @@ volatile int disableCompilerOptimization = 0;
         DIGIT_PINS
     );
 
-  #elif FEATURE == FEATURE_HC595_SOFT_SPI
+  #elif FEATURE == FEATURE_HC595_SIMPLE_SPI
     // Common Cathode, with transistors on Group pins
-    using SpiInterface = SoftSpiInterface;
+    using SpiInterface = SimpleSpiInterface;
     SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
     Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
@@ -203,13 +203,13 @@ volatile int disableCompilerOptimization = 0;
         kByteOrderDigitHighSegmentLow
     );
 
-  #elif FEATURE == FEATURE_HC595_SOFT_SPI_FAST
+  #elif FEATURE == FEATURE_HC595_SIMPLE_SPI_FAST
     #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
       #error Unsupported FEATURE on this platform
     #endif
 
     // Common Cathode, with transistors on Group pins
-    using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    using SpiInterface = SimpleSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
     Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
         spiInterface,
@@ -248,7 +248,7 @@ volatile int disableCompilerOptimization = 0;
     );
 
   #elif FEATURE == FEATURE_TM1637_TMI
-    using TmiInterface = SoftTmiInterface;
+    using TmiInterface = SimpleTmiInterface;
     TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY);
     Tm1637Module<TmiInterface, NUM_DIGITS> tm1637Module(tmiInterface);
 
@@ -257,22 +257,22 @@ volatile int disableCompilerOptimization = 0;
       #error Unsupported FEATURE on this platform
     #endif
 
-    using TmiInterface = SoftTmiFastInterface<DIO_PIN, CLK_PIN, BIT_DELAY>;
+    using TmiInterface = SimpleTmiFastInterface<DIO_PIN, CLK_PIN, BIT_DELAY>;
     TmiInterface tmiInterface;
     Tm1637Module<TmiInterface, NUM_DIGITS> tm1637Module(tmiInterface);
 
-  #elif FEATURE == FEATURE_MAX7219_SOFT_SPI
-    using SpiInterface = SoftSpiInterface;
+  #elif FEATURE == FEATURE_MAX7219_SIMPLE_SPI
+    using SpiInterface = SimpleSpiInterface;
     SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
     Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
         spiInterface, kDigitRemapArray8Max7219);
 
-  #elif FEATURE == FEATURE_MAX7219_SOFT_SPI_FAST
+  #elif FEATURE == FEATURE_MAX7219_SIMPLE_SPI_FAST
     #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
       #error Unsupported FEATURE on this platform
     #endif
 
-    using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+    using SpiInterface = SimpleSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
     Max7219Module<SpiInterface, NUM_DIGITS> max7219Module(
         spiInterface, kDigitRemapArray8Max7219);
@@ -400,11 +400,11 @@ void setup() {
 #elif FEATURE == FEATURE_DIRECT_FAST4_MODULE
   scanningModule.begin();
 
-#elif FEATURE == FEATURE_HYBRID_SOFT_SPI
+#elif FEATURE == FEATURE_HYBRID_SIMPLE_SPI
   spiInterface.begin();
   scanningModule.begin();
 
-#elif FEATURE == FEATURE_HYBRID_SOFT_SPI_FAST
+#elif FEATURE == FEATURE_HYBRID_SIMPLE_SPI_FAST
   spiInterface.begin();
   scanningModule.begin();
 
@@ -418,11 +418,11 @@ void setup() {
   spiInterface.begin();
   scanningModule.begin();
 
-#elif FEATURE == FEATURE_HC595_SOFT_SPI
+#elif FEATURE == FEATURE_HC595_SIMPLE_SPI
   spiInterface.begin();
   scanningModule.begin();
 
-#elif FEATURE == FEATURE_HC595_SOFT_SPI_FAST
+#elif FEATURE == FEATURE_HC595_SIMPLE_SPI_FAST
   spiInterface.begin();
   scanningModule.begin();
 
@@ -444,11 +444,11 @@ void setup() {
   tmiInterface.begin();
   tm1637Module.begin();
 
-#elif FEATURE == FEATURE_MAX7219_SOFT_SPI
+#elif FEATURE == FEATURE_MAX7219_SIMPLE_SPI
   spiInterface.begin();
   max7219Module.begin();
 
-#elif FEATURE == FEATURE_MAX7219_SOFT_SPI_FAST
+#elif FEATURE == FEATURE_MAX7219_SIMPLE_SPI_FAST
   spiInterface.begin();
   max7219Module.begin();
 
@@ -501,11 +501,11 @@ void loop() {
   tm1637Module.setPatternAt(0, 0xff);
   tm1637Module.flush();
 
-#elif FEATURE == FEATURE_MAX7219_SOFT_SPI
+#elif FEATURE == FEATURE_MAX7219_SIMPLE_SPI
   max7219Module.setPatternAt(0, 0xff);
   max7219Module.flush();
 
-#elif FEATURE == FEATURE_MAX7219_SOFT_SPI_FAST
+#elif FEATURE == FEATURE_MAX7219_SIMPLE_SPI_FAST
   max7219Module.setPatternAt(0, 0xff);
   max7219Module.flush();
 

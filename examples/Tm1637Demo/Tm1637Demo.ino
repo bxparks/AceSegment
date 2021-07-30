@@ -20,13 +20,13 @@
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
-using ace_tmi::SoftTmiInterface;
+using ace_tmi::SimpleTmiInterface;
 using ace_segment::Tm1637Module;
 using ace_segment::PatternWriter;
 using ace_segment::kDigitRemapArray6Tm1637;
 
-// Select TM1637 protocol version, either SoftTmiInterface or
-// SoftTmiFastInterface.
+// Select TM1637 protocol version, either SimpleTmiInterface or
+// SimpleTmiFastInterface.
 #define TMI_INTERFACE_TYPE_NORMAL 0
 #define TMI_INTERFACE_TYPE_FAST 1
 
@@ -107,7 +107,7 @@ using ace_segment::kDigitRemapArray6Tm1637;
 // AceSegment Configuration
 //------------------------------------------------------------------
 
-// For a SoftTmiInterface (non-fast), time to send 4 digits:
+// For a SimpleTmiInterface (non-fast), time to send 4 digits:
 // * 12 ms at 50 us delay, but does not work with off-the-shelf TM1637 module.
 // * 17 ms at 75 us delay.
 // * 22 ms at 100 us delay.
@@ -115,14 +115,14 @@ using ace_segment::kDigitRemapArray6Tm1637;
 const uint8_t DELAY_MICROS = 100;
 
 #if TMI_INTERFACE_TYPE == TMI_INTERFACE_TYPE_NORMAL
-  using TmiInterface = SoftTmiInterface;
+  using TmiInterface = SimpleTmiInterface;
   TmiInterface tmiInterface(DIO_PIN, CLK_PIN, DELAY_MICROS);
 #elif TMI_INTERFACE_TYPE == TMI_INTERFACE_TYPE_FAST
   #include <digitalWriteFast.h>
-  #include <ace_tmi/SoftTmiFastInterface.h>
-  using ace_tmi::SoftTmiFastInterface;
+  #include <ace_tmi/SimpleTmiFastInterface.h>
+  using ace_tmi::SimpleTmiFastInterface;
 
-  using TmiInterface = SoftTmiFastInterface<DIO_PIN, CLK_PIN, DELAY_MICROS>;
+  using TmiInterface = SimpleTmiFastInterface<DIO_PIN, CLK_PIN, DELAY_MICROS>;
   TmiInterface tmiInterface;
 #else
   #error Unknown TMI_INTERFACE_TYPE

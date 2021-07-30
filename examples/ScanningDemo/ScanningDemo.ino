@@ -21,16 +21,16 @@
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
   #include <digitalWriteFast.h>
   #include <ace_spi/HardSpiFastInterface.h>
-  #include <ace_spi/SoftSpiFastInterface.h>
+  #include <ace_spi/SimpleSpiFastInterface.h>
   #include <ace_segment/scanning/LedMatrixDirectFast4.h>
   using ace_spi::HardSpiFastInterface;
-  using ace_spi::SoftSpiFastInterface;
+  using ace_spi::SimpleSpiFastInterface;
 #endif
 
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
-using ace_spi::SoftSpiInterface;
+using ace_spi::SimpleSpiInterface;
 using ace_spi::HardSpiInterface;
 using ace_segment::LedMatrixDirect;
 using ace_segment::LedMatrixDirectFast4;
@@ -50,12 +50,12 @@ using ace_segment::kActiveHighPattern;
 #define LED_MATRIX_MODE_NONE 0
 #define LED_MATRIX_MODE_DIRECT 1
 #define LED_MATRIX_MODE_DIRECT_FAST 2
-#define LED_MATRIX_MODE_SINGLE_SOFT_SPI 3
-#define LED_MATRIX_MODE_SINGLE_SOFT_SPI_FAST 4
+#define LED_MATRIX_MODE_SINGLE_SIMPLE_SPI 3
+#define LED_MATRIX_MODE_SINGLE_SIMPLE_SPI_FAST 4
 #define LED_MATRIX_MODE_SINGLE_HARD_SPI 5
 #define LED_MATRIX_MODE_SINGLE_HARD_SPI_FAST 6
-#define LED_MATRIX_MODE_DUAL_SOFT_SPI 7
-#define LED_MATRIX_MODE_DUAL_SOFT_SPI_FAST 8
+#define LED_MATRIX_MODE_DUAL_SIMPLE_SPI 7
+#define LED_MATRIX_MODE_DUAL_SIMPLE_SPI_FAST 8
 #define LED_MATRIX_MODE_DUAL_HARD_SPI 9
 #define LED_MATRIX_MODE_DUAL_HARD_SPI_FAST 10
 
@@ -89,8 +89,8 @@ using ace_segment::kActiveHighPattern;
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
 
   // Choose one of the following variants:
-  //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_SOFT_SPI
-  //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_SOFT_SPI_FAST
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_SIMPLE_SPI
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_SIMPLE_SPI_FAST
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_HARD_SPI
   #define LED_MATRIX_MODE LED_MATRIX_MODE_SINGLE_HARD_SPI_FAST
   const uint8_t LATCH_PIN = 10;
@@ -104,8 +104,8 @@ using ace_segment::kActiveHighPattern;
   const uint8_t DIGIT_ON_PATTERN = kActiveLowPattern;
 
   // Choose one of the following variants:
-  //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SOFT_SPI
-  //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SOFT_SPI_FAST
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SIMPLE_SPI
+  //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_SIMPLE_SPI_FAST
   //#define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HARD_SPI
   #define LED_MATRIX_MODE LED_MATRIX_MODE_DUAL_HARD_SPI_FAST
   const uint8_t LATCH_PIN = 10;
@@ -153,10 +153,10 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
       kActiveLowPattern /*elementOnPattern*/,
       kActiveLowPattern /*groupOnPattern*/);
 
-#elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SOFT_SPI
+#elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SIMPLE_SPI
   // Common Cathode, with transistors on Group pins
-  SoftSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  using LedMatrix = LedMatrixSingleHc595<SoftSpiInterface>;
+  SimpleSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  using LedMatrix = LedMatrixSingleHc595<SimpleSpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
       kActiveHighPattern /*elementOnPattern*/,
@@ -164,9 +164,9 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
       NUM_DIGITS,
       DIGIT_PINS);
 
-#elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SOFT_SPI_FAST
+#elif LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SIMPLE_SPI_FAST
   // Common Cathode, with transistors on Group pins
-  using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  using SpiInterface = SimpleSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
   using LedMatrix = LedMatrixSingleHc595<SpiInterface>;
   LedMatrix ledMatrix(
@@ -202,19 +202,19 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
       NUM_DIGITS,
       DIGIT_PINS);
 
-#elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SOFT_SPI
+#elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SIMPLE_SPI
   // Common Anode, with transistors on Group pins
-  SoftSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  using LedMatrix = LedMatrixDualHc595<SoftSpiInterface>;
+  SimpleSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+  using LedMatrix = LedMatrixDualHc595<SimpleSpiInterface>;
   LedMatrix ledMatrix(
       spiInterface,
       kActiveLowPattern /*elementOnPattern*/,
       kActiveLowPattern /*groupOnPattern*/,
       HC595_BYTE_ORDER);
 
-#elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SOFT_SPI_FAST
+#elif LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SIMPLE_SPI_FAST
   // Common Anode, with transistors on Group pins
-  using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  using SpiInterface = SimpleSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
   using LedMatrix = LedMatrixDualHc595<SpiInterface>;
   LedMatrix ledMatrix(
@@ -272,13 +272,13 @@ void setupAceSegment() {
     spiInstance.begin();
   #endif
 
-  #if LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SOFT_SPI \
+  #if LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SIMPLE_SPI \
       || LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HARD_SPI \
-      || LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SOFT_SPI_FAST \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_SIMPLE_SPI_FAST \
       || LED_MATRIX_MODE == LED_MATRIX_MODE_SINGLE_HARD_SPI_FAST \
-      || LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SOFT_SPI \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SIMPLE_SPI \
       || LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HARD_SPI \
-      || LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SOFT_SPI_FAST \
+      || LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_SIMPLE_SPI_FAST \
       || LED_MATRIX_MODE == LED_MATRIX_MODE_DUAL_HARD_SPI_FAST
     spiInterface.begin();
   #endif

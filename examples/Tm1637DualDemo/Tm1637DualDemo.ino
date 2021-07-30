@@ -21,12 +21,12 @@
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
-using ace_tmi::SoftTmiInterface;
+using ace_tmi::SimpleTmiInterface;
 using ace_segment::Tm1637Module;
 using ace_segment::PatternWriter;
 
-// Select TM1637 protocol version, either SoftTmiInterface or
-// SoftTmiFastInterface.
+// Select TM1637 protocol version, either SimpleTmiInterface or
+// SimpleTmiFastInterface.
 #define TMI_INTERFACE_TYPE_NORMAL 0
 #define TMI_INTERFACE_TYPE_FAST 1
 
@@ -69,7 +69,7 @@ using ace_segment::PatternWriter;
 // AceSegment Configuration
 //------------------------------------------------------------------
 
-// For a SoftTmiInterface (non-fast), time needed to send 4 digits using
+// For a SimpleTmiInterface (non-fast), time needed to send 4 digits using
 // flush():
 //
 // * 12 ms at 50 us delay, but does not work.
@@ -81,7 +81,7 @@ using ace_segment::PatternWriter;
 const uint8_t DELAY_MICROS = 100;
 
 #if TMI_INTERFACE_TYPE == TMI_INTERFACE_TYPE_NORMAL
-  using TmiInterface = SoftTmiInterface;
+  using TmiInterface = SimpleTmiInterface;
   TmiInterface tmiInterface1(DIO1_PIN, CLK_PIN, DELAY_MICROS);
   TmiInterface tmiInterface2(DIO2_PIN, CLK_PIN, DELAY_MICROS);
   Tm1637Module<TmiInterface, NUM_DIGITS> ledModule1(tmiInterface1);
@@ -89,10 +89,10 @@ const uint8_t DELAY_MICROS = 100;
 
 #elif TMI_INTERFACE_TYPE == TMI_INTERFACE_TYPE_FAST
   #include <digitalWriteFast.h>
-  #include <ace_tmi/SoftTmiFastInterface.h>
-  using ace_tmi::SoftTmiFastInterface;
-  using TmiInterface1 = SoftTmiFastInterface<DIO1_PIN, CLK_PIN, DELAY_MICROS>;
-  using TmiInterface2 = SoftTmiFastInterface<DIO2_PIN, CLK_PIN, DELAY_MICROS>;
+  #include <ace_tmi/SimpleTmiFastInterface.h>
+  using ace_tmi::SimpleTmiFastInterface;
+  using TmiInterface1 = SimpleTmiFastInterface<DIO1_PIN, CLK_PIN, DELAY_MICROS>;
+  using TmiInterface2 = SimpleTmiFastInterface<DIO2_PIN, CLK_PIN, DELAY_MICROS>;
   TmiInterface1 tmiInterface1;
   TmiInterface2 tmiInterface2;
   Tm1637Module<TmiInterface1, NUM_DIGITS> ledModule1(tmiInterface1);

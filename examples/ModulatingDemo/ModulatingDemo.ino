@@ -22,10 +22,10 @@
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
   #include <digitalWriteFast.h>
-  #include <ace_spi/SoftSpiFastInterface.h>
+  #include <ace_spi/SimpleSpiFastInterface.h>
   #include <ace_spi/HardSpiFastInterface.h>
   #include <ace_segment/direct/DirectFast4Module.h>
-  using ace_spi::SoftSpiFastInterface;
+  using ace_spi::SimpleSpiFastInterface;
   using ace_spi::HardSpiFastInterface;
   using ace_segment::DirectFast4Module;
 #endif
@@ -62,8 +62,8 @@ using ace_segment::NumberWriter;
 
 // Used by LED_DISPLAY_TYPE_HYBRID, LED_DISPLAY_TYPE_FULL, and
 // LED_DISPLAY_TYPE_HC595.
-#define INTERFACE_TYPE_SOFT_SPI 0
-#define INTERFACE_TYPE_SOFT_SPI_FAST 1
+#define INTERFACE_TYPE_SIMPLE_SPI 0
+#define INTERFACE_TYPE_SIMPLE_SPI_FAST 1
 #define INTERFACE_TYPE_HARD_SPI 2
 #define INTERFACE_TYPE_HARD_SPI_FAST 3
 
@@ -91,8 +91,8 @@ using ace_segment::NumberWriter;
   const uint8_t* const REMAP_ARRAY = nullptr;
 
   // Choose one of the following variants:
-  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
-  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_SPI
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_SPI_FAST
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
   const uint8_t LATCH_PIN = 10;
@@ -117,8 +117,8 @@ using ace_segment::NumberWriter;
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
 
   // Choose one of the following variants:
-  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
-  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_SPI
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_SPI_FAST
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
   const uint8_t LATCH_PIN = 10;
@@ -135,8 +135,8 @@ using ace_segment::NumberWriter;
   const uint8_t* const REMAP_ARRAY = nullptr;
 
   // Choose one of the following variants:
-  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
-  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_SPI
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_SPI_FAST
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
   const uint8_t LATCH_PIN = 10;
@@ -153,8 +153,8 @@ using ace_segment::NumberWriter;
   const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 
   // Choose one of the following variants:
-  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
-  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_SPI
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_SPI_FAST
   //#define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
   const uint8_t LATCH_PIN = 10;
@@ -198,7 +198,7 @@ using ace_segment::NumberWriter;
   const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 
   // Choose one of the following variants:
-  //#define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI
+  //#define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_SPI
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
   const uint8_t LATCH_PIN = SS;
   const uint8_t DATA_PIN = MOSI;
@@ -251,7 +251,7 @@ using ace_segment::NumberWriter;
 // According to AutoBenchmark, almost all versions of ScanningModule with
 // various LedMatrix can render a single field in less than this on 16 MHz AVR
 // processor. The combination of (ScanningModule + LedMatrixDualHc595 +
-// SoftSpiInterface) is the exception.
+// SimpleSpiInterface) is the exception.
 const uint8_t FRAMES_PER_SECOND = 60;
 const uint8_t NUM_SUBFIELDS = 16;
 const uint8_t NUM_BRIGHTNESSES = 8;
@@ -284,11 +284,11 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 
 #elif LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HYBRID
   // Common Cathode, with transistors on Group pins
-  #if INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI
-    using SpiInterface = SoftSpiInterface;
+  #if INTERFACE_TYPE == INTERFACE_TYPE_SIMPLE_SPI
+    using SpiInterface = SimpleSpiInterface;
     SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  #elif INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI_FAST
-    using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  #elif INTERFACE_TYPE == INTERFACE_TYPE_SIMPLE_SPI_FAST
+    using SpiInterface = SimpleSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
   #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
     using SpiInterface = HardSpiInterface<SPIClass>;
@@ -309,11 +309,11 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
     || LED_DISPLAY_TYPE == LED_DISPLAY_TYPE_HC595
 
   // Common Anode, with transistors on Group pins
-  #if INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI
-    using SpiInterface = SoftSpiInterface;
+  #if INTERFACE_TYPE == INTERFACE_TYPE_SIMPLE_SPI
+    using SpiInterface = SimpleSpiInterface;
     SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-  #elif INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI_FAST
-    using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+  #elif INTERFACE_TYPE == INTERFACE_TYPE_SIMPLE_SPI_FAST
+    using SpiInterface = SimpleSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
     SpiInterface spiInterface;
   #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
     using SpiInterface = HardSpiInterface<SPIClass>;

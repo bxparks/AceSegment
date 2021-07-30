@@ -81,7 +81,7 @@ before substantional refactoring in 2021.
   flash memory.
 * Reduce flash by 300-350 bytes on AVR (~150 on SAMD, 150-500 bytes on STM32,
   ~250 bytes on ESP8266, 300-600 bytes on ESP32) by templatizing LedMatrix
-  and ScanningModule on `NUM_DIGITS`, `NUM_SUBFIELDS`, `SoftSpiInterface` and
+  and ScanningModule on `NUM_DIGITS`, `NUM_SUBFIELDS`, `SimpleSpiInterface` and
   `HardSpiInterface`.
 * Reduce flash by flattening the `LedMatrix` hierarchy into templatized
   classes, and removing virtual methods. Saves 250-300 bytes on AVR, 150-200 on
@@ -89,7 +89,7 @@ before substantional refactoring in 2021.
   bytes on Teensy 3.2.
 * Reduce flash by 250-400 bytes on AVR by providing ability to use
   `digitalWriteFast()` (https://github.com/NicksonYap/digitalWriteFast) using
-  the `scanning/LedMatrixDirectFast4.h` and `ace_spi/SoftSpiFastInterface.h`
+  the `scanning/LedMatrixDirectFast4.h` and `ace_spi/SimpleSpiFastInterface.h`
   classes.
 * Total flash size saved is around 2kB for AVR, from (4 to 4.4) kB to (2 to 2.5)
   kB.
@@ -113,9 +113,10 @@ before substantional refactoring in 2021.
   changes are due to some removal/addition of some methods in `PatternWriter`.
 * Add memory usage for `Tm1637Module`. Seems to consume something in between
   similar to the `ScanningModule` w/ SW SPI and `ScanningModule` with HW SPI.
-* Add memory usage for `Tm1637Module` using `SoftTmiFastInterface` which uses
+* Add memory usage for `Tm1637Module` using `SimpleTmiFastInterface` which uses
   `digitalWriteFast` library for AVR processors. Saves 662 - 776 bytes of flash
-  on AVR processors compared to `Tm1637Module` using normal `SoftTmiInterface`.
+  on AVR processors compared to `Tm1637Module` using normal
+  `SimpleTmiInterface`.
 * Save 150-200 bytes of flash on AVR processors by lifting all of the
   `PatternWriter::writePatternAt()` type of methods to `PatternWriter`, making
   them non-virtual, then funneling these methods through just 2 lower-level
@@ -156,8 +157,8 @@ before substantional refactoring in 2021.
   `HardSpiFastInterface`) becomes slightly smaller (30 bytes of flash, 2 bytes
   of static RAM on AVR) due to removal of explicit `pinMode(dataPin, X)` and
   `pinMode(clockPin, X)`. These are deferred to `SPIClass::begin()`.
-* Extract out `readAck()`, saving 10 bytes of flash for `SoftTmiInterface` and
-  6 bytes of flash for `SoftTmiFastInterface`.
+* Extract out `readAck()`, saving 10 bytes of flash for `SimpleTmiInterface` and
+  6 bytes of flash for `SimpleTmiFastInterface`.
 * Add `Ht16k33Module(SimpleWire)` and `Ht16k33Module(SimpleWireFast)`.
 * Rename `LedDisplay` to `PatternWriter` and remove one layer of abstraction.
   Saves 10-22 bytes of flash and 2 bytes of static RAM for most Writer
@@ -185,9 +186,9 @@ before substantional refactoring in 2021.
       of indirection through a pointer to the interface objects.
     * On AVR processors, this saves between 0 to 90 bytes of flash on most
       configurations. The most significant savings occur with the following:
-        * Tm1637Module(SoftTmi) saves 90 bytes,
+        * Tm1637Module(SimpleTmi) saves 90 bytes,
         * Ht16k33Module(SimpleWire) saves 68 bytes of flash,
-        * Max7219Module(SoftSpi) saves 30 bytes of flash.
+        * Max7219Module(SimpleSpi) saves 30 bytes of flash.
     * On 32-bit processors, the flash consumption usually goes *up* by 4-20
       bytes, but decreases by a few bytes in a few cases.
     * The 32-bit processors have so much more flash memory than 8-bit
@@ -199,7 +200,7 @@ The following shows the flash and static memory sizes of the `MemoryBenchmark`
 program for various `LedModule` configurations and various Writer classes.
 
 * `ClockInterface`, `GpioInterface` (usually optimized away by the compiler)
-* `SoftSpiInterface`, `SoftSpiFastInterface`, `HardSpiInterface`,
+* `SimpleSpiInterface`, `SimpleSpiFastInterface`, `HardSpiInterface`,
   `HardSpiFastInterface`
 * `DirectModule`
 * `DirectFast4Module`
@@ -238,21 +239,21 @@ other `MemoryBenchmark` programs.)
 | DirectModule                    |   1248/   64 |   988/   53 |
 | DirectFast4Module               |   1012/   94 |   752/   83 |
 |---------------------------------+--------------+-------------|
-| Hybrid(SoftSpi)                 |   1288/   59 |  1028/   48 |
-| Hybrid(SoftSpiFast)             |   1160/   54 |   900/   43 |
+| Hybrid(SimpleSpi)               |   1288/   59 |  1028/   48 |
+| Hybrid(SimpleSpiFast)           |   1160/   54 |   900/   43 |
 | Hybrid(HardSpi)                 |   1646/   65 |  1386/   54 |
 | Hybrid(HardSpiFast)             |   1598/   63 |  1338/   52 |
 |---------------------------------+--------------+-------------|
-| Hc595(SoftSpi)                  |   1260/   59 |  1000/   48 |
-| Hc595(SoftSpiFast)              |    848/   54 |   588/   43 |
+| Hc595(SimpleSpi)                |   1260/   59 |  1000/   48 |
+| Hc595(SimpleSpiFast)            |    848/   54 |   588/   43 |
 | Hc595(HardSpi)                  |   1604/   65 |  1344/   54 |
 | Hc595(HardSpiFast)              |   1310/   63 |  1050/   52 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SoftTmi)                 |   1190/   39 |   930/   28 |
-| Tm1637(SoftTmiFast)             |    626/   34 |   366/   23 |
+| Tm1637(SimpleTmi)               |   1190/   39 |   930/   28 |
+| Tm1637(SimpleTmiFast)           |    626/   34 |   366/   23 |
 |---------------------------------+--------------+-------------|
-| Max7219(SoftSpi)                |    962/   45 |   702/   34 |
-| Max7219(SoftSpiFast)            |    550/   40 |   290/   29 |
+| Max7219(SimpleSpi)              |    962/   45 |   702/   34 |
+| Max7219(SimpleSpiFast)          |    550/   40 |   290/   29 |
 | Max7219(HardSpi)                |   1326/   51 |  1066/   40 |
 | Max7219(HardSpiFast)            |   1006/   49 |   746/   38 |
 |---------------------------------+--------------+-------------|
@@ -288,21 +289,21 @@ other `MemoryBenchmark` programs.)
 | DirectModule                    |   1486/   64 |  1030/   53 |
 | DirectFast4Module               |   1250/   94 |   794/   83 |
 |---------------------------------+--------------+-------------|
-| Hybrid(SoftSpi)                 |   1514/   59 |  1058/   48 |
-| Hybrid(SoftSpiFast)             |   1392/   54 |   936/   43 |
+| Hybrid(SimpleSpi)               |   1514/   59 |  1058/   48 |
+| Hybrid(SimpleSpiFast)           |   1392/   54 |   936/   43 |
 | Hybrid(HardSpi)                 |   1560/   61 |  1104/   50 |
 | Hybrid(HardSpiFast)             |   1502/   59 |  1046/   48 |
 |---------------------------------+--------------+-------------|
-| Hc595(SoftSpi)                  |   1478/   59 |  1022/   48 |
-| Hc595(SoftSpiFast)              |   1068/   54 |   612/   43 |
+| Hc595(SimpleSpi)                |   1478/   59 |  1022/   48 |
+| Hc595(SimpleSpiFast)            |   1068/   54 |   612/   43 |
 | Hc595(HardSpi)                  |   1538/   61 |  1082/   50 |
 | Hc595(HardSpiFast)              |   1470/   59 |  1014/   48 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SoftTmi)                 |   1478/   39 |  1022/   28 |
-| Tm1637(SoftTmiFast)             |    912/   34 |   456/   23 |
+| Tm1637(SimpleTmi)               |   1478/   39 |  1022/   28 |
+| Tm1637(SimpleTmiFast)           |    912/   34 |   456/   23 |
 |---------------------------------+--------------+-------------|
-| Max7219(SoftSpi)                |   1184/   45 |   728/   34 |
-| Max7219(SoftSpiFast)            |    766/   40 |   310/   29 |
+| Max7219(SimpleSpi)              |   1184/   45 |   728/   34 |
+| Max7219(SimpleSpiFast)          |    766/   40 |   310/   29 |
 | Max7219(HardSpi)                |   1268/   47 |   812/   36 |
 | Max7219(HardSpiFast)            |   1180/   45 |   724/   34 |
 |---------------------------------+--------------+-------------|
@@ -338,21 +339,21 @@ other `MemoryBenchmark` programs.)
 | DirectModule                    |   4482/  204 |  1010/   53 |
 | DirectFast4Module               |   4132/  234 |   660/   83 |
 |---------------------------------+--------------+-------------|
-| Hybrid(SoftSpi)                 |   4510/  199 |  1038/   48 |
-| Hybrid(SoftSpiFast)             |   4388/  194 |   916/   43 |
+| Hybrid(SimpleSpi)               |   4510/  199 |  1038/   48 |
+| Hybrid(SimpleSpiFast)           |   4388/  194 |   916/   43 |
 | Hybrid(HardSpi)                 |   4556/  201 |  1084/   50 |
 | Hybrid(HardSpiFast)             |   4498/  199 |  1026/   48 |
 |---------------------------------+--------------+-------------|
-| Hc595(SoftSpi)                  |   4474/  199 |  1002/   48 |
-| Hc595(SoftSpiFast)              |   3950/  194 |   478/   43 |
+| Hc595(SimpleSpi)                |   4474/  199 |  1002/   48 |
+| Hc595(SimpleSpiFast)            |   3950/  194 |   478/   43 |
 | Hc595(HardSpi)                  |   4534/  201 |  1062/   50 |
 | Hc595(HardSpiFast)              |   4454/  199 |   982/   48 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SoftTmi)                 |   4548/  179 |  1076/   28 |
-| Tm1637(SoftTmiFast)             |   3868/  174 |   396/   23 |
+| Tm1637(SimpleTmi)               |   4548/  179 |  1076/   28 |
+| Tm1637(SimpleTmiFast)           |   3868/  174 |   396/   23 |
 |---------------------------------+--------------+-------------|
-| Max7219(SoftSpi)                |   4254/  185 |   782/   34 |
-| Max7219(SoftSpiFast)            |   3722/  180 |   250/   29 |
+| Max7219(SimpleSpi)              |   4254/  185 |   782/   34 |
+| Max7219(SimpleSpiFast)          |   3722/  180 |   250/   29 |
 | Max7219(HardSpi)                |   4338/  187 |   866/   36 |
 | Max7219(HardSpiFast)            |   4238/  185 |   766/   34 |
 |---------------------------------+--------------+-------------|
@@ -387,15 +388,15 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | DirectModule                    |  10660/    0 |   720/    0 |
 |---------------------------------+--------------+-------------|
-| Hybrid(SoftSpi)                 |  10720/    0 |   780/    0 |
+| Hybrid(SimpleSpi)               |  10720/    0 |   780/    0 |
 | Hybrid(HardSpi)                 |  11136/    0 |  1196/    0 |
 |---------------------------------+--------------+-------------|
-| Hc595(SoftSpi)                  |  10632/    0 |   692/    0 |
+| Hc595(SimpleSpi)                |  10632/    0 |   692/    0 |
 | Hc595(HardSpi)                  |  11136/    0 |  1196/    0 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SoftTmi)                 |  10668/    0 |   728/    0 |
+| Tm1637(SimpleTmi)               |  10668/    0 |   728/    0 |
 |---------------------------------+--------------+-------------|
-| Max7219(SoftSpi)                |  10488/    0 |   548/    0 |
+| Max7219(SimpleSpi)              |  10488/    0 |   548/    0 |
 | Max7219(HardSpi)                |  10996/    0 |  1056/    0 |
 |---------------------------------+--------------+-------------|
 | Ht16k33(TwoWire)                |  11760/    0 |  1820/    0 |
@@ -428,15 +429,15 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | DirectModule                    |  24176/ 3956 |  2756/  420 |
 |---------------------------------+--------------+-------------|
-| Hybrid(SoftSpi)                 |  24240/ 3960 |  2820/  424 |
+| Hybrid(SimpleSpi)               |  24240/ 3960 |  2820/  424 |
 | Hybrid(HardSpi)                 |  26096/ 3968 |  4676/  432 |
 |---------------------------------+--------------+-------------|
-| Hc595(SoftSpi)                  |  24156/ 3964 |  2736/  428 |
+| Hc595(SimpleSpi)                |  24156/ 3964 |  2736/  428 |
 | Hc595(HardSpi)                  |  26052/ 3972 |  4632/  436 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SoftTmi)                 |  24328/ 3932 |  2908/  396 |
+| Tm1637(SimpleTmi)               |  24328/ 3932 |  2908/  396 |
 |---------------------------------+--------------+-------------|
-| Max7219(SoftSpi)                |  24064/ 3932 |  2644/  396 |
+| Max7219(SimpleSpi)              |  24064/ 3932 |  2644/  396 |
 | Max7219(HardSpi)                |  25956/ 3944 |  4536/  408 |
 |---------------------------------+--------------+-------------|
 | Ht16k33(TwoWire)                |  28660/ 4116 |  7240/  580 |
@@ -469,15 +470,15 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | DirectModule                    | 257784/27056 |  1084/  272 |
 |---------------------------------+--------------+-------------|
-| Hybrid(SoftSpi)                 | 257872/27056 |  1172/  272 |
+| Hybrid(SimpleSpi)               | 257872/27056 |  1172/  272 |
 | Hybrid(HardSpi)                 | 258944/27072 |  2244/  288 |
 |---------------------------------+--------------+-------------|
-| Hc595(SoftSpi)                  | 257772/27060 |  1072/  276 |
+| Hc595(SimpleSpi)                | 257772/27060 |  1072/  276 |
 | Hc595(HardSpi)                  | 258924/27076 |  2224/  292 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SoftTmi)                 | 257932/27028 |  1232/  244 |
+| Tm1637(SimpleTmi)               | 257932/27028 |  1232/  244 |
 |---------------------------------+--------------+-------------|
-| Max7219(SoftSpi)                | 257636/27028 |   936/  244 |
+| Max7219(SimpleSpi)              | 257636/27028 |   936/  244 |
 | Max7219(HardSpi)                | 258836/27044 |  2136/  260 |
 |---------------------------------+--------------+-------------|
 | Ht16k33(TwoWire)                | 261364/27500 |  4664/  716 |
@@ -510,15 +511,15 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | DirectModule                    | 200482/13568 |  2734/  484 |
 |---------------------------------+--------------+-------------|
-| Hybrid(SoftSpi)                 | 200530/13576 |  2782/  492 |
+| Hybrid(SimpleSpi)               | 200530/13576 |  2782/  492 |
 | Hybrid(HardSpi)                 | 202794/13632 |  5046/  548 |
 |---------------------------------+--------------+-------------|
-| Hc595(SoftSpi)                  | 200426/13576 |  2678/  492 |
+| Hc595(SimpleSpi)                | 200426/13576 |  2678/  492 |
 | Hc595(HardSpi)                  | 202766/13632 |  5018/  548 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SoftTmi)                 | 200686/13544 |  2938/  460 |
+| Tm1637(SimpleTmi)               | 200686/13544 |  2938/  460 |
 |---------------------------------+--------------+-------------|
-| Max7219(SoftSpi)                | 200292/13536 |  2544/  452 |
+| Max7219(SimpleSpi)              | 200292/13536 |  2544/  452 |
 | Max7219(HardSpi)                | 202692/13592 |  4944/  508 |
 |---------------------------------+--------------+-------------|
 | Ht16k33(TwoWire)                | 209922/14280 | 12174/ 1196 |
@@ -552,15 +553,15 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | DirectModule                    |  11968/ 4396 |  1088/  244 |
 |---------------------------------+--------------+-------------|
-| Hybrid(SoftSpi)                 |  12004/ 4400 |  1124/  248 |
+| Hybrid(SimpleSpi)               |  12004/ 4400 |  1124/  248 |
 | Hybrid(HardSpi)                 |  13044/ 4464 |  2164/  312 |
 |---------------------------------+--------------+-------------|
-| Hc595(SoftSpi)                  |  11940/ 4404 |  1060/  252 |
+| Hc595(SimpleSpi)                |  11940/ 4404 |  1060/  252 |
 | Hc595(HardSpi)                  |  12968/ 4468 |  2088/  316 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SoftTmi)                 |  12620/ 4372 |  1740/  220 |
+| Tm1637(SimpleTmi)               |  12620/ 4372 |  1740/  220 |
 |---------------------------------+--------------+-------------|
-| Max7219(SoftSpi)                |  11904/ 4372 |  1024/  220 |
+| Max7219(SimpleSpi)              |  11904/ 4372 |  1024/  220 |
 | Max7219(HardSpi)                |  13384/ 4440 |  2504/  288 |
 |---------------------------------+--------------+-------------|
 | Ht16k33(TwoWire)                |  14528/ 5036 |  3648/  884 |

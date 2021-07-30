@@ -84,7 +84,7 @@ constexpr uint8_t initialDirtyBits(uint8_t numBits) {
  *
  * @tparam T_TMII class that implements the two wire protocol interface for
  *    TM1637, usually one of the classes from the AceTMI library:
- *    SoftTmiInterface or SoftTmiFastInterface.
+ *    SimpleTmiInterface or SimpleTmiFastInterface.
  * @tparam T_DIGITS number of digits in the LED module (usually 4 or 6)
  */
 template <typename T_TMII, uint8_t T_DIGITS>
@@ -112,7 +112,7 @@ class Tm1637Module : public LedModule {
     //-----------------------------------------------------------------------
 
     /**
-     * Initialize the module. The SoftTmiInterface object must be initialized
+     * Initialize the module. The SimpleTmiInterface object must be initialized
      * separately.
      *
      * @param remapArray optional array of positions to handle LED modules whose

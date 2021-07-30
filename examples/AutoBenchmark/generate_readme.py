@@ -153,9 +153,10 @@ number of `TimingStats::update()` calls that were made.
   handle only 16 MHz.
 * Verified that removing the 10 nF capacitors from the CLK and DIO lines of the
   TM1637 modules allows a much shorter `DELAY_MICROS`. Added CPU benchmark
-  numbers for `DELAY_MICROS = 5` microseconds (e.g. `Tm1637(4,SoftTmi,5us)` and
-  `Tm1637(4,SoftTmiFast,5us)`). The `flush()` or `flushIncremental()` durations
-  are almost a factor of 10X to 20X shorter compared to `DELAY_MICROS = 100`.
+  numbers for `DELAY_MICROS = 5` microseconds (e.g. `Tm1637(4,SimpleTmi,5us)`
+  and `Tm1637(4,SimpleTmiFast,5us)`). The `flush()` or `flushIncremental()`
+  durations are almost a factor of 10X to 20X shorter compared to `DELAY_MICROS
+  = 100`.
 
 **v0.7:**
 
@@ -226,8 +227,8 @@ The following tables show the number of microseconds taken by:
     * The results below show that every processor, even the slowest AVR
       processor, is able to meet this threshhold.
     * Several communication implemenations are tested:
-        * SoftSpi: software bitbanging SPI using `digitalWrite()`
-        * SoftSpiFast: software bitbanging SPI using `<digitalWriteFast.h>`
+        * SimpleSpi: software bitbanging SPI using `digitalWrite()`
+        * SimpleSpiFast: software bitbanging SPI using `<digitalWriteFast.h>`
         * HardSpi: hardware SPI using `<SPI.h>` and `digitalWrite()` to control
           the latch pin
         * HardSpiFast: hardware SPI using `<SPI.h>` and `<digitalWriteFast.h>``
@@ -241,17 +242,17 @@ The following tables show the number of microseconds taken by:
     * Sends digits in the buffer to the TM1637 LED module using the I2C-like
       protocol.
     * Results for two values of `DELAY_MICROS` are collected:
-        * SoftTmi: software bigbanging the TM1637 protocol using
+        * SimpleTmi: software bigbanging the TM1637 protocol using
           `digitalWrite()` with a `delayMicros` of 100  microseconds or 5
           microseconds
-        * SoftTmiFast: software bigbanging the TM1637 protocol using
+        * SimpleTmiFast: software bigbanging the TM1637 protocol using
           `<digitalWriteFast.h>` and a `DELAY_MICROS` of 100  microseconds or 5
           microseconds
 * `Max7219Module::flush()`
     * Sends all digits in the buffer to the MAX7219 LED module using 4 types of
       communcation interfaces
-        * SoftSpi: software SPI using `digitalWrite()`
-        * SoftSpiFast: software SPI using `<digitalWriteFast.h>`
+        * SimpleSpi: software SPI using `digitalWrite()`
+        * SimpleSpiFast: software SPI using `<digitalWriteFast.h>`
         * HardSpi: hardware SPI using `<SPI.h>` and `digitalWrite()` to control
           the latch pin
         * HardSpiFast: hardware SPI using `<SPI.h>` and `<digitalWriteFast.h>`

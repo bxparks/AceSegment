@@ -57,7 +57,7 @@ extern const uint8_t kDigitRemapArray8Hc595[8];
  * a ScanningModule and a LedMatrixDualHc595 in a single class.
  *
  * @tparam T_SPII class that implements the SPI interface, usually one of the
- *    classes in the AceSPI library: SoftSpiInterface, SoftSpiFastInterface,
+ *    classes in the AceSPI library: SimpleSpiInterface, SimpleSpiFastInterface,
  *    HardSpiInterface, HardSpiFastInterface.
  * @tparam T_DIGITS number of LED digits
  * @tparam T_SUBFIELDS number of subfields for each digit to get brightness

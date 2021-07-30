@@ -26,7 +26,7 @@ using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
 using ace_spi::HardSpiInterface;
-using ace_spi::SoftSpiInterface;
+using ace_spi::SimpleSpiInterface;
 using ace_segment::Hc595Module;
 using ace_segment::PatternWriter;
 using ace_segment::kDigitRemapArray8Hc595;
@@ -46,12 +46,12 @@ using ace_segment::kActiveHighPattern;
 
 // Used by LED_DISPLAY_TYPE_PARTIAL, LED_DISPLAY_TYPE_FULL,
 // LED_DISPLAY_TYPE_HC595, and LED_DISPLAY_TYPE_TM1637.
-#define INTERFACE_TYPE_SOFT_SPI 0
-#define INTERFACE_TYPE_SOFT_SPI_FAST 1
+#define INTERFACE_TYPE_SIMPLE_SPI 0
+#define INTERFACE_TYPE_SIMPLE_SPI_FAST 1
 #define INTERFACE_TYPE_HARD_SPI 2
 #define INTERFACE_TYPE_HARD_SPI_FAST 3
-#define INTERFACE_TYPE_SOFT_TMI 4
-#define INTERFACE_TYPE_SOFT_TMI_FAST 5
+#define INTERFACE_TYPE_SIMPLE_TMI 4
+#define INTERFACE_TYPE_SIMPLE_TMI_FAST 5
 
 // Some microcontrollers have 2 or more SPI buses. PRIMARY selects the default.
 // SECONDARY selects the alternate. I don't have a board with more than 2, but
@@ -75,7 +75,7 @@ using ace_segment::kActiveHighPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
   const uint8_t* const REMAP_ARRAY = nullptr;
 
-  #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
+  #define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_SPI_FAST
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
@@ -88,7 +88,7 @@ using ace_segment::kActiveHighPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
   const uint8_t* const REMAP_ARRAY = nullptr;
 
-  #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
+  #define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_SPI_FAST
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
@@ -186,11 +186,11 @@ using ace_segment::kActiveHighPattern;
 //------------------------------------------------------------------
 
 #if INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST \
-    || INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI_FAST
+    || INTERFACE_TYPE == INTERFACE_TYPE_SIMPLE_SPI_FAST
   #include <digitalWriteFast.h>
-  #include <ace_spi/SoftSpiFastInterface.h>
+  #include <ace_spi/SimpleSpiFastInterface.h>
   #include <ace_spi/HardSpiFastInterface.h>
-  using ace_spi::SoftSpiFastInterface;
+  using ace_spi::SimpleSpiFastInterface;
   using ace_spi::HardSpiFastInterface;
 #endif
 
@@ -214,11 +214,11 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 };
 
 // Common Cathode, with transistors on Group pins
-#if INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI
-  using SpiInterface = SoftSpiInterface;
+#if INTERFACE_TYPE == INTERFACE_TYPE_SIMPLE_SPI
+  using SpiInterface = SimpleSpiInterface;
   SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-#elif INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI_FAST
-  using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+#elif INTERFACE_TYPE == INTERFACE_TYPE_SIMPLE_SPI_FAST
+  using SpiInterface = SimpleSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
 #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
   using SpiInterface = HardSpiInterface<SPIClass>;

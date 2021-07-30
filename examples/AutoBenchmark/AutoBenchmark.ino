@@ -40,9 +40,9 @@ SOFTWARE.
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 #include <digitalWriteFast.h>
-#include <ace_spi/SoftSpiFastInterface.h>
+#include <ace_spi/SimpleSpiFastInterface.h>
 #include <ace_spi/HardSpiFastInterface.h>
-#include <ace_tmi/SoftTmiFastInterface.h>
+#include <ace_tmi/SimpleTmiFastInterface.h>
 #include <ace_wire/SimpleWireFastInterface.h>
 #include <ace_segment/direct/DirectFast4Module.h>
 #endif
@@ -257,8 +257,8 @@ void runDirectFast4() {
 //-----------------------------------------------------------------------------
 
 // Common Cathode, with transistors on Group pins
-void runHybridSoftSpi() {
-  using SpiInterface = SoftSpiInterface;
+void runHybridSimpleSpi() {
+  using SpiInterface = SimpleSpiInterface;
   SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
 
   HybridModule<SpiInterface, NUM_DIGITS> scanningModule(
@@ -280,8 +280,8 @@ void runHybridSoftSpi() {
   spiInterface.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark(F("Hybrid(4,SoftSpi)"), scanningModule);
-  runScanningBenchmark(F("Hybrid(4,SoftSpi,subfields)"),
+  runScanningBenchmark(F("Hybrid(4,SimpleSpi)"), scanningModule);
+  runScanningBenchmark(F("Hybrid(4,SimpleSpi,subfields)"),
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -290,8 +290,8 @@ void runHybridSoftSpi() {
 
 // Common Cathode, with transistors on Group pins
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-void runHybridSoftSpiFast() {
-  using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+void runHybridSimpleSpiFast() {
+  using SpiInterface = SimpleSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
 
   HybridModule<SpiInterface, NUM_DIGITS> scanningModule(
@@ -313,8 +313,8 @@ void runHybridSoftSpiFast() {
   spiInterface.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark(F("Hybrid(4,SoftSpiFast)"), scanningModule);
-  runScanningBenchmark(F("Hybrid(4,SoftSpiFast,subfields)"),
+  runScanningBenchmark(F("Hybrid(4,SimpleSpiFast)"), scanningModule);
+  runScanningBenchmark(F("Hybrid(4,SimpleSpiFast,subfields)"),
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -395,8 +395,8 @@ void runHybridHardSpiFast() {
 //-----------------------------------------------------------------------------
 
 // Common Anode, with transistors on Group pins
-void runHc595SoftSpi() {
-  using SpiInterface = SoftSpiInterface;
+void runHc595SimpleSpi() {
+  using SpiInterface = SimpleSpiInterface;
   SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
 
   Hc595Module<SpiInterface, 8> scanningModule(
@@ -418,9 +418,9 @@ void runHc595SoftSpi() {
   spiInterface.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark(F("Hc595(8,SoftSpi)"), scanningModule);
+  runScanningBenchmark(F("Hc595(8,SimpleSpi)"), scanningModule);
   runScanningBenchmark(
-      F("Hc595(8,SoftSpi,subfields)"), scanningModuleSubfields);
+      F("Hc595(8,SimpleSpi,subfields)"), scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
   spiInterface.end();
@@ -428,8 +428,8 @@ void runHc595SoftSpi() {
 
 // Common Anode, with transistors on Group pins
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-void runHc595SoftSpiFast() {
-  using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+void runHc595SimpleSpiFast() {
+  using SpiInterface = SimpleSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
 
   Hc595Module<SpiInterface, 8> scanningModule(
@@ -452,8 +452,8 @@ void runHc595SoftSpiFast() {
   spiInterface.begin();
   scanningModule.begin();
   scanningModuleSubfields.begin();
-  runScanningBenchmark(F("Hc595(8,SoftSpiFast)"), scanningModule);
-  runScanningBenchmark(F("Hc595(8,SoftSpiFast,subfields)"),
+  runScanningBenchmark(F("Hc595(8,SimpleSpiFast)"), scanningModule);
+  runScanningBenchmark(F("Hc595(8,SimpleSpiFast,subfields)"),
       scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
@@ -487,7 +487,8 @@ void runHc595HardSpi() {
   scanningModule.begin();
   scanningModuleSubfields.begin();
   runScanningBenchmark(F("Hc595(8,HardSpi)"), scanningModule);
-  runScanningBenchmark(F("Hc595(8,HardSpi,subfields)"), scanningModuleSubfields);
+  runScanningBenchmark(
+      F("Hc595(8,HardSpi,subfields)"), scanningModuleSubfields);
   scanningModuleSubfields.end();
   scanningModule.end();
   spiInterface.end();
@@ -578,97 +579,101 @@ void runTm1637Benchmark(
   printStats(name, timingStats, numSamples);
 }
 
-void runTm1637SoftTmi() {
-  using TmiInterface = SoftTmiInterface;
+void runTm1637SimpleTmi() {
+  using TmiInterface = SimpleTmiInterface;
   TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY);
   tmiInterface.begin();
 
   Tm1637Module<TmiInterface, 4> tm1637Module(tmiInterface);
   tm1637Module.begin();
-  runTm1637Benchmark(F("Tm1637(4,SoftTmi,100us)"), tm1637Module, 4, false);
+  runTm1637Benchmark(F("Tm1637(4,SimpleTmi,100us)"), tm1637Module, 4, false);
   runTm1637Benchmark(
-      F("Tm1637(4,SoftTmi,100us,incremental)"), tm1637Module, 4, true);
+      F("Tm1637(4,SimpleTmi,100us,incremental)"), tm1637Module, 4, true);
   tm1637Module.end();
 
   tmiInterface.end();
 }
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-void runTm1637SoftTmiFast() {
-  using TmiInterface = SoftTmiFastInterface<DIO_PIN, CLK_PIN, BIT_DELAY>;
+void runTm1637SimpleTmiFast() {
+  using TmiInterface = SimpleTmiFastInterface<DIO_PIN, CLK_PIN, BIT_DELAY>;
   TmiInterface tmiInterface;
   tmiInterface.begin();
 
   Tm1637Module<TmiInterface, 4> tm1637Module(tmiInterface);
   tm1637Module.begin();
-  runTm1637Benchmark(F("Tm1637(4,SoftTmiFast,100us)"), tm1637Module, 4, false);
   runTm1637Benchmark(
-      F("Tm1637(4,SoftTmiFast,100us,incremental)"), tm1637Module, 4, true);
+      F("Tm1637(4,SimpleTmiFast,100us)"), tm1637Module, 4, false);
+  runTm1637Benchmark(
+      F("Tm1637(4,SimpleTmiFast,100us,incremental)"), tm1637Module, 4, true);
   tm1637Module.end();
 
   tmiInterface.end();
 }
 #endif
 
-void runTm1637SoftTmiShort() {
-  using TmiInterface = SoftTmiInterface;
+void runTm1637SimpleTmiShort() {
+  using TmiInterface = SimpleTmiInterface;
   TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY_SHORT);
   tmiInterface.begin();
 
   Tm1637Module<TmiInterface, 4> tm1637Module(tmiInterface);
   tm1637Module.begin();
-  runTm1637Benchmark(F("Tm1637(4,SoftTmi,5us)"), tm1637Module, 4, false);
+  runTm1637Benchmark(F("Tm1637(4,SimpleTmi,5us)"), tm1637Module, 4, false);
   runTm1637Benchmark(
-      F("Tm1637(4,SoftTmi,5us,incremental)"), tm1637Module, 4, true);
+      F("Tm1637(4,SimpleTmi,5us,incremental)"), tm1637Module, 4, true);
   tm1637Module.end();
 
   tmiInterface.end();
 }
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-void runTm1637SoftTmiFastShort() {
-  using TmiInterface = SoftTmiFastInterface<DIO_PIN, CLK_PIN, BIT_DELAY_SHORT>;
+void runTm1637SimpleTmiFastShort() {
+  using TmiInterface = SimpleTmiFastInterface<
+      DIO_PIN, CLK_PIN, BIT_DELAY_SHORT>;
   TmiInterface tmiInterface;
   tmiInterface.begin();
 
   Tm1637Module<TmiInterface, 4> tm1637Module(tmiInterface);
   tm1637Module.begin();
-  runTm1637Benchmark(F("Tm1637(4,SoftTmiFast,5us)"), tm1637Module, 4, false);
+  runTm1637Benchmark(F("Tm1637(4,SimpleTmiFast,5us)"), tm1637Module, 4, false);
   runTm1637Benchmark(
-      F("Tm1637(4,SoftTmiFast,5us,incremental)"), tm1637Module, 4, true);
+      F("Tm1637(4,SimpleTmiFast,5us,incremental)"), tm1637Module, 4, true);
   tm1637Module.end();
 
   tmiInterface.end();
 }
 #endif
 
-void runTm1637SixSoftTmi() {
-  using TmiInterface = SoftTmiInterface;
+void runTm1637SixSimpleTmi() {
+  using TmiInterface = SimpleTmiInterface;
   TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY);
   tmiInterface.begin();
 
   Tm1637Module<TmiInterface, 6> tm1637SixModule(tmiInterface);
   tm1637SixModule.begin();
-  runTm1637Benchmark(F("Tm1637(6,SoftTmi,100us)"), tm1637SixModule, 6, false);
   runTm1637Benchmark(
-      F("Tm1637(6,SoftTmi,100us,incremental)"), tm1637SixModule, 6, true);
+      F("Tm1637(6,SimpleTmi,100us)"), tm1637SixModule, 6, false);
+  runTm1637Benchmark(
+      F("Tm1637(6,SimpleTmi,100us,incremental)"), tm1637SixModule, 6, true);
   tm1637SixModule.end();
 
   tmiInterface.end();
 }
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-void runTm1637SixSoftTmiFast() {
-  using TmiInterface = SoftTmiFastInterface<DIO_PIN, CLK_PIN, BIT_DELAY>;
+void runTm1637SixSimpleTmiFast() {
+  using TmiInterface = SimpleTmiFastInterface<DIO_PIN, CLK_PIN, BIT_DELAY>;
   TmiInterface tmiInterface;
   tmiInterface.begin();
 
   Tm1637Module<TmiInterface, 6> tm1637SixModule(tmiInterface);
   tm1637SixModule.begin();
   runTm1637Benchmark(
-      F("Tm1637(6,SoftTmiFast,100us)"), tm1637SixModule, 6, false);
+      F("Tm1637(6,SimpleTmiFast,100us)"), tm1637SixModule, 6, false);
   runTm1637Benchmark(
-      F("Tm1637(6,SoftTmiFast,100us,incremental)"), tm1637SixModule, 6, true);
+      F("Tm1637(6,SimpleTmiFast,100us,incremental)"),
+      tm1637SixModule, 6, true);
   tm1637SixModule.end();
 
   tmiInterface.end();
@@ -699,29 +704,29 @@ void runMax7219Benchmark(const __FlashStringHelper* name, LM& ledModule) {
   printStats(name, timingStats, numSamples);
 }
 
-void runMax7219SoftSpi() {
-  using SpiInterface = SoftSpiInterface;
+void runMax7219SimpleSpi() {
+  using SpiInterface = SimpleSpiInterface;
   SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
   Max7219Module<SpiInterface, 8> max7219Module(
       spiInterface, kDigitRemapArray8Max7219);
 
   spiInterface.begin();
   max7219Module.begin();
-  runMax7219Benchmark(F("Max7219(8,SoftSpi)"), max7219Module);
+  runMax7219Benchmark(F("Max7219(8,SimpleSpi)"), max7219Module);
   max7219Module.end();
   spiInterface.end();
 }
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-void runMax7219SoftSpiFast() {
-  using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+void runMax7219SimpleSpiFast() {
+  using SpiInterface = SimpleSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
   Max7219Module<SpiInterface, 8> max7219Module(
       spiInterface, kDigitRemapArray8Max7219);
 
   spiInterface.begin();
   max7219Module.begin();
-  runMax7219Benchmark(F("Max7219(8,SoftSpiFast)"), max7219Module);
+  runMax7219Benchmark(F("Max7219(8,SimpleSpiFast)"), max7219Module);
   max7219Module.end();
   spiInterface.end();
 }
@@ -850,9 +855,9 @@ void runBenchmarks() {
   runDirectFast4();
 #endif
 
-  runHybridSoftSpi();
+  runHybridSimpleSpi();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  runHybridSoftSpiFast();
+  runHybridSimpleSpiFast();
 #endif
 
   runHybridHardSpi();
@@ -860,9 +865,9 @@ void runBenchmarks() {
   runHybridHardSpiFast();
 #endif
 
-  runHc595SoftSpi();
+  runHc595SimpleSpi();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  runHc595SoftSpiFast();
+  runHc595SimpleSpiFast();
 #endif
 
   runHc595HardSpi();
@@ -870,24 +875,24 @@ void runBenchmarks() {
   runHc595HardSpiFast();
 #endif
 
-  runTm1637SoftTmi();
+  runTm1637SimpleTmi();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  runTm1637SoftTmiFast();
+  runTm1637SimpleTmiFast();
 #endif
 
-  runTm1637SoftTmiShort();
+  runTm1637SimpleTmiShort();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  runTm1637SoftTmiFastShort();
+  runTm1637SimpleTmiFastShort();
 #endif
 
-  runTm1637SixSoftTmi();
+  runTm1637SixSimpleTmi();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  runTm1637SixSoftTmiFast();
+  runTm1637SixSimpleTmiFast();
 #endif
 
-  runMax7219SoftSpi();
+  runMax7219SimpleSpi();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  runMax7219SoftSpiFast();
+  runMax7219SimpleSpiFast();
 #endif
 
   runMax7219HardSpi();
@@ -908,20 +913,20 @@ void runBenchmarks() {
 //-----------------------------------------------------------------------------
 
 void printSizeOf() {
-  SERIAL_PORT_MONITOR.print(F("sizeof(SoftTmiInterface): "));
-  SERIAL_PORT_MONITOR.println(sizeof(SoftTmiInterface));
+  SERIAL_PORT_MONITOR.print(F("sizeof(SimpleTmiInterface): "));
+  SERIAL_PORT_MONITOR.println(sizeof(SimpleTmiInterface));
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  SERIAL_PORT_MONITOR.print(F("sizeof(SoftTmiFastInterface<4, 5, 100>): "));
-  SERIAL_PORT_MONITOR.println(sizeof(SoftTmiFastInterface<4, 5, 100>));
+  SERIAL_PORT_MONITOR.print(F("sizeof(SimpleTmiFastInterface<4, 5, 100>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(SimpleTmiFastInterface<4, 5, 100>));
 #endif
 
-  SERIAL_PORT_MONITOR.print(F("sizeof(SoftSpiInterface): "));
-  SERIAL_PORT_MONITOR.println(sizeof(SoftSpiInterface));
+  SERIAL_PORT_MONITOR.print(F("sizeof(SimpleSpiInterface): "));
+  SERIAL_PORT_MONITOR.println(sizeof(SimpleSpiInterface));
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  SERIAL_PORT_MONITOR.print(F("sizeof(SoftSpiFastInterface<11, 12, 13>): "));
-  SERIAL_PORT_MONITOR.println(sizeof(SoftSpiFastInterface<11, 12, 13>));
+  SERIAL_PORT_MONITOR.print(F("sizeof(SimpleSpiFastInterface<11, 12, 13>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(SimpleSpiFastInterface<11, 12, 13>));
 #endif
 
   SERIAL_PORT_MONITOR.print(F("sizeof(HardSpiInterface): "));
@@ -955,8 +960,8 @@ void printSizeOf() {
 #endif
 
   SERIAL_PORT_MONITOR.print(
-      F("sizeof(LedMatrixSingleHc595<SoftSpiInterface>): "));
-  SERIAL_PORT_MONITOR.println(sizeof(LedMatrixSingleHc595<SoftSpiInterface>));
+      F("sizeof(LedMatrixSingleHc595<SimpleSpiInterface>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(LedMatrixSingleHc595<SimpleSpiInterface>));
 
   SERIAL_PORT_MONITOR.print(
       F("sizeof(LedMatrixDualHc595<HardSpiInterface>): "));
@@ -981,20 +986,23 @@ void printSizeOf() {
   >));
 #endif
 
-  SERIAL_PORT_MONITOR.print(F("sizeof(HybridModule<SoftSpiInterface, 4>): "));
-  SERIAL_PORT_MONITOR.println(sizeof(HybridModule<SoftSpiInterface, 4>));
+  SERIAL_PORT_MONITOR.print(F("sizeof(HybridModule<SimpleSpiInterface, 4>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(HybridModule<SimpleSpiInterface, 4>));
 
-  SERIAL_PORT_MONITOR.print(F("sizeof(Hc595Module<SoftSpiInterface, 8>): "));
-  SERIAL_PORT_MONITOR.println(sizeof(Hc595Module<SoftSpiInterface, 8>));
+  SERIAL_PORT_MONITOR.print(F("sizeof(Hc595Module<SimpleSpiInterface, 8>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(Hc595Module<SimpleSpiInterface, 8>));
 
-  SERIAL_PORT_MONITOR.print(F("sizeof(Tm1637Module<SoftTmiInterface, 4>): "));
-  SERIAL_PORT_MONITOR.println(sizeof(Tm1637Module<SoftTmiInterface, 4>));
+  SERIAL_PORT_MONITOR.print(
+      F("sizeof(Tm1637Module<SimpleTmiInterface, 4>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(Tm1637Module<SimpleTmiInterface, 4>));
 
-  SERIAL_PORT_MONITOR.print(F("sizeof(Tm1637Module<SoftTmiInterface, 6>): "));
-  SERIAL_PORT_MONITOR.println(sizeof(Tm1637Module<SoftTmiInterface, 6>));
+  SERIAL_PORT_MONITOR.print(
+      F("sizeof(Tm1637Module<SimpleTmiInterface, 6>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(Tm1637Module<SimpleTmiInterface, 6>));
 
-  SERIAL_PORT_MONITOR.print(F("sizeof(Max7219Module<SoftSpiInterface, 8>): "));
-  SERIAL_PORT_MONITOR.println(sizeof(Max7219Module<SoftSpiInterface, 8>));
+  SERIAL_PORT_MONITOR.print(
+      F("sizeof(Max7219Module<SimpleSpiInterface, 8>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(Max7219Module<SimpleSpiInterface, 8>));
 
   SERIAL_PORT_MONITOR.print(F("sizeof(Ht16k33Module<TwoWireInterface, 4>): "));
   SERIAL_PORT_MONITOR.println(

@@ -99,7 +99,7 @@ extern const uint8_t kDigitRemapArray8Max7219[8];
  * An implementation of LedModule using the MAX7219 chip. The chip uses SPI.
  *
  * @tparam T_SPII class that implements the SPI interface, usually one of the
- *    classes in the AceSPI library: SoftSpiInterface, SoftSpiFastInterface,
+ *    classes in the AceSPI library: SimpleSpiInterface, SimpleSpiFastInterface,
  *    HardSpiInterface, HardSpiFastInterface.
  * @tparam T_DIGITS number of digits in the module
  */

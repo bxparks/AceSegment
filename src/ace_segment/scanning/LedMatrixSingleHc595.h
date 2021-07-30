@@ -44,7 +44,7 @@ namespace ace_segment {
  *   clockPin/D13/SCK -- SH_CP (Phillips) / SRCK (TI) / Pin 11 (rising)
  *
  * @tparam T_SPII class that implements the SPI interface, usually one of the
- *    classes in the AceSPI library: SoftSpiInterface, SoftSpiFastInterface,
+ *    classes in the AceSPI library: SimpleSpiInterface, SimpleSpiFastInterface,
  *    HardSpiInterface, HardSpiFastInterface.
  * @tparam T_GPIOI (optional) interface to GPIO functions,
  *    default GpioInterface (note: 'GPI' is already taken on ESP8266)

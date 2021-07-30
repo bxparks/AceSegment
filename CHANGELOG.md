@@ -18,6 +18,8 @@
     * Delete `keywords.txt`, takes too much effort to maintain.
     * Add examples/MemoryBenchmark and examples/AutoBenchmark to gather
       memory and CPU usage of various I2C implementations.
+    * Rename `SoftSpi*Interface` to `SimpleSpi*Interface`.
+    * Rename `SoftTmi*Interface` to `SimpleTmi*Interface`.
 * 0.7 (2021-06-16)
     * Support HT16K33 LED modules
         * Add `Ht16k33Module` class to support 4-digit LED display from

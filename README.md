@@ -218,16 +218,16 @@ end-users, listed roughly from low-level classes to higher-level classes:
     * [AceSPI](https://github.com/bxparks/AceSPI)
         * Needed by `Hc595Module`, `Max7219Module`, and `HybridModule`.
         * There are 4 implementations:
-            * `SoftSpiInterface`
-            * `SoftSpiFastInterface`
+            * `SimpleSpiInterface`
+            * `SimpleSpiFastInterface`
             * `HardSpiInterface`
             * `HardSpiFastInterface`
     * [AceTMI](https://github.com/bxparks/AceTMI)
         * Needed by `Tm1637Module`
         * There are 2 implementations:
-            * `SoftTmiInterface`
+            * `SimpleTmiInterface`
                 * Implement the TM1637 protocol using `digitalWrite()`.
-            * `SoftTmiFastInterface`
+            * `SimpleTmiFastInterface`
                 * Implement the TM1637 protocol using `digitalWriteFast()`.
     * [AceWire](https://github.com/bxparks/AceWire)
         * Used by `Ht16k33Module`.
@@ -311,14 +311,14 @@ Tm1637Module  Max7219Module Hc595Module HybridModule Ht16k33Module DirectModule
       |                  \       |         /              |
       |                   \      |        /               |
       v                    v     v       v                v
-+----------------------+ +----------------------+ +-------------------------+
-| AceTMI library       | | AceSPI library       | | AceWire library         |
-|----------------------| |----------------------| |-------------------------|
-| SoftTmiInterface     | | SoftSpiInterface     | | TwoWireInterface        |
-| SoftTmiFastInterface | | SoftSpiFastInterface | | SimpleWireInterface     |
-+----------------------+ | HardSpiInterface     | | SimpleWireFastInterface |
-                         | HardSpiFastInterface | +-------------------------+
-                         +----------------------+
++---------------------+ +---------------------+ +----------------------+
+| AceTMI library      | | AceSPI library      | | AceWire library      |
+|---------------------| |---------------------| |----------------------|
+| SimpleTmiI'face     | | SimpleSpiI'face     | | TwoWireI'face        |
+| SimpleTmiFastI'face | | SimpleSpiFastI'face | | SimpleWireI'face     |
++---------------------+ | HardSpiI'face       | | SimpleWireFastI'face |
+                        | HardSpiFastI'face   | +----------------------+
+                        +---------------------+
 ```
 
 (The actual dependency among various classes is a bit more complicated than this
@@ -507,12 +507,12 @@ The `T_TMII` template parameter is a class that implements the 2-wire protocol
 used by the TM1637 controller. It is a protocol that is very close to, but not
 quite the same as, I2C. This means that we cannot use the usual `Wire` library,
 but must implement a custom version. The library provides 2 implementations: the
-`SoftTmiInterface` compatible with all platforms, and `SoftTmiFastInterface`
+`SimpleTmiInterface` compatible with all platforms, and `SimpleTmiFastInterface`
 useful on AVR processors.
 
 The `tmiInterface` is an instance of `T_TMII` which comes from the
 [AceTMI](https://github.com/bxparks/AceTMI) which provides
-`SoftTmiInterface` or `SoftTmiFastInterface`.
+`SimpleTmiInterface` or `SimpleTmiFastInterface`.
 
 The `remapArray` is an array of addresses which map the physical positions to
 their logical positions. This is not needed by the 4-digit TM1637 LED modules,
@@ -560,7 +560,7 @@ this (c.f. [examples/Tm1637Demo](examples/Tm1637Demo)):
 #include <Arduino.h>
 #include <AceTMI.h>
 #include <AceSegment.h>
-using ace_tmi::SoftTmiInterface;
+using ace_tmi::SimpleTmiInterface;
 using namespace ace_segment;
 
 const uint8_t CLK_PIN = 10;
@@ -568,7 +568,7 @@ const uint8_t DIO_PIN = 9;
 const uint16_t BIT_DELAY = 100;
 const uint8_t NUM_DIGITS = 4;
 
-using TmiInterface = SoftTmiInterface;
+using TmiInterface = SimpleTmiInterface;
 TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY);
 Tm1637Module<TmiInterface, NUM_DIGITS> ledModule(tmiInterface);
 
@@ -629,7 +629,7 @@ more complicated because the digits are wired to be in the order of `2 1 0 5 4
 #include <Arduino.h>
 #include <AceTMI.h>
 #include <AceSegment.h>
-using ace_tmi::SoftTmiInterface;
+using ace_tmi::SimpleTmiInterface;
 using namespace ace_segment;
 
 const uint8_t CLK_PIN = 10;
@@ -637,7 +637,7 @@ const uint8_t DIO_PIN = 9;
 const uint16_t BIT_DELAY = 100;
 const uint8_t NUM_DIGITS = 4;
 
-using TmiInterface = SoftTmiInterface;
+using TmiInterface = SimpleTmiInterface;
 TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY);
 Tm1637Module<TmiInterface, NUM_DIGITS> ledModule(
     tmiInterface, kDigitRemapArray6Tm1637);
@@ -727,7 +727,7 @@ class Max7219Module : public LedModule {
 
 The `T_SPII` template parameter is one of the SPI interface classes from the
 [AceSPI](https://github.com/bxparks/AceSPI) library, which provides 4
-implementations: `SoftSpiInterface`, `SoftSpiFastInterface` (on AVR),
+implementations: `SimpleSpiInterface`, `SimpleSpiFastInterface` (on AVR),
 `HardSpiInterface` and `HardSpiFastInterface` (on AVR).
 
 The `T_DIGITS` is the number of digits in the LED module. Since this is a
@@ -997,8 +997,8 @@ class Hc595Module : public ScanningModule<[snip]> {
 
 There are 2 template parameters. The `T_SPII` specifies the SPI interface which
 will be used to communicate with the 74HC595 chips. There are 4 options provided
-by the [AceSPI](https://github.com/bxparks/AceSPI) library: `SoftSpiInterface`,
-`SoftSpiFastInterface` (on AVR), `HardSpiInterface` and `HardSpiFastInterface`
+by the [AceSPI](https://github.com/bxparks/AceSPI) library: `SimpleSpiInterface`,
+`SimpleSpiFastInterface` (on AVR), `HardSpiInterface` and `HardSpiFastInterface`
 (on AVR).
 
 The `T_DIGITS` is the number of digits in the LED module. Since this is a
@@ -1685,15 +1685,15 @@ I have written versions of some lower-level classes to take advantage of
 
 * `scanning/LedMatrixDirectFast4.h`
     * Variant of `LedMatrixDirect` using `digitalWriteFast()`
-* AceSPI - `ace_api/SoftSpiFastInterface.h`
-    * Variant of `SoftSpiInterface.h` using  `digitalWriteFast()` for the
+* AceSPI - `ace_api/SimpleSpiFastInterface.h`
+    * Variant of `SimpleSpiInterface.h` using  `digitalWriteFast()` for the
       `MOSI`, `SCK` and `LATCH` pins
 * AceSPI - `ace_spi/HardSpiFastInterface.h`
     * Variant of `HardSpiInterface.h` using  `digitalWriteFast()` to toggle
       the `LATCH` pin, while the hardware SPI code controls the `MOSI` and `SCK`
       pins
-* AceTMI - `ace_spi/SoftTmiFastInterface.h`
-    * Variant of `SoftTmiInterface.h` using `digitalWriteFast()`
+* AceTMI - `ace_spi/SimpleTmiFastInterface.h`
+    * Variant of `SimpleTmiInterface.h` using `digitalWriteFast()`
 * AceWire - `ace_wire/SimpleWireFastInterface.h`
     * Variant of `SimpleWireInterface.h` using `digitalWriteFast()`
 
@@ -1708,10 +1708,10 @@ headers manually, like this:
 #include <AceSPI.h>
 #if defined(ARDUINO_ARCH_AVR)
   #include <digitalWriteFast.h> // from 3rd party library
-  #include <ace_spi/SoftSpiFastInterface.h>
+  #include <ace_spi/SimpleSpiFastInterface.h>
   #include <ace_spi/HardSpiFastInterface.h>
 #endif
-using ace_spi::SoftSpiFastInterface;
+using ace_spi::SimpleSpiFastInterface;
 using ace_spi::HardSpiFastInterface;
 ```
 
@@ -1720,9 +1720,9 @@ If you want to use the fast versions of `<AceTMI.h>`, use something like this:
 ```C++
 #include <AceTMI.h>
 #if defined(ARDUINO_ARCH_AVR)
-  #include <ace_tmi/SoftTmiFastInterface.h>
+  #include <ace_tmi/SimpleTmiFastInterface.h>
 #endif
-using ace_tmi::SoftTmiFastInterface;
+using ace_tmi::SimpleTmiFastInterface;
 ```
 
 If you want to use the fast versions of `<AceWire.h>`, use something like this:
@@ -1748,8 +1748,8 @@ how to configure these alternate hardware buses. Example can be found in
 [examples/Max7219Demo](examples/Max7219Demo) and
 [examples/Hc595Demo](examples/Hc595Demo).
 
-With the software SPI classes in AceSPI (in other words, `SoftSpiInterface` and
-`SoftSpiFastInterface`) you can use any alternative GPIO pins which are suitable
+With the software SPI classes in AceSPI (in other words, `SimpleSpiInterface` and
+`SimpleSpiFastInterface`) you can use any alternative GPIO pins which are suitable
 for SPI output.
 
 <a name="ScanningModule"></a>
@@ -1770,10 +1770,10 @@ Here are the sizes of the various classes on the 8-bit AVR microcontrollers
 (Arduino Uno, Nano, etc):
 
 ```
-sizeof(SoftTmiInterface): 3
-sizeof(SoftTmiFastInterface<4, 5, 100>): 1
-sizeof(SoftSpiInterface): 3
-sizeof(SoftSpiFastInterface<11, 12, 13>): 1
+sizeof(SimpleTmiInterface): 3
+sizeof(SimpleTmiFastInterface<4, 5, 100>): 1
+sizeof(SimpleSpiInterface): 3
+sizeof(SimpleSpiFastInterface<11, 12, 13>): 1
 sizeof(HardSpiInterface): 3
 sizeof(HardSpiFastInterface): 2
 sizeof(TwoWireInterface): 2
@@ -1781,17 +1781,17 @@ sizeof(SimpleWireInterface): 3
 sizeof(SimpleWireFastInterface<2, 3, 10>): 1
 sizeof(LedMatrixDirect<>): 9
 sizeof(LedMatrixDirectFast4<6..13, 2..5>): 3
-sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 9
+sizeof(LedMatrixSingleHc595<SimpleSpiInterface>): 9
 sizeof(LedMatrixDualHc595<HardSpiInterface>): 9
 sizeof(LedModule): 3
 sizeof(ScanningModule<LedMatrixBase, 4>): 22
 sizeof(DirectModule<4>): 31
 sizeof(DirectFast4Module<...>): 25
-sizeof(HybridModule<SoftSpiInterface, 4>): 31
-sizeof(Hc595Module<SoftSpiInterface, 8>): 47
-sizeof(Tm1637Module<SoftTmiInterface, 4>): 15
-sizeof(Tm1637Module<SoftTmiInterface, 6>): 17
-sizeof(Max7219Module<SoftSpiInterface, 8>): 17
+sizeof(HybridModule<SimpleSpiInterface, 4>): 31
+sizeof(Hc595Module<SimpleSpiInterface, 8>): 47
+sizeof(Tm1637Module<SimpleTmiInterface, 4>): 15
+sizeof(Tm1637Module<SimpleTmiInterface, 6>): 17
+sizeof(Max7219Module<SimpleSpiInterface, 8>): 17
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 12
 sizeof(Ht16k33Module<SimpleWireInterface, 4>): 13
 sizeof(PatternWriter): 2
@@ -1807,22 +1807,22 @@ sizeof(StringScroller): 8
 On 32-bit processors, these numbers look like this:
 
 ```
-sizeof(SoftTmiInterface): 3
-sizeof(SoftSpiInterface): 3
+sizeof(SimpleTmiInterface): 3
+sizeof(SimpleSpiInterface): 3
 sizeof(HardSpiInterface): 8
 sizeof(TwoWireInterface): 4
 sizeof(SimpleWireInterface): 3
 sizeof(LedMatrixDirect<>): 16
-sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 16
+sizeof(LedMatrixSingleHc595<SimpleSpiInterface>): 16
 sizeof(LedMatrixDualHc595<HardSpiInterface>): 20
 sizeof(LedModule): 8
 sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(DirectModule<4>): 48
-sizeof(HybridModule<SoftSpiInterface, 4>): 48
-sizeof(Hc595Module<SoftSpiInterface, 8>): 64
-sizeof(Tm1637Module<SoftTmiInterface, 4>): 20
-sizeof(Tm1637Module<SoftTmiInterface, 6>): 24
-sizeof(Max7219Module<SoftSpiInterface, 8>): 24
+sizeof(HybridModule<SimpleSpiInterface, 4>): 48
+sizeof(Hc595Module<SimpleSpiInterface, 8>): 64
+sizeof(Tm1637Module<SimpleTmiInterface, 4>): 20
+sizeof(Tm1637Module<SimpleTmiInterface, 6>): 24
+sizeof(Max7219Module<SimpleSpiInterface, 8>): 24
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 20
 sizeof(Ht16k33Module<SimpleWireInterface, 4>): 16
 sizeof(PatternWriter): 4
@@ -1856,21 +1856,21 @@ static memory consumptions for various configurations on an Arduino Nano
 | DirectModule                    |   1486/   64 |  1030/   53 |
 | DirectFast4Module               |   1250/   94 |   794/   83 |
 |---------------------------------+--------------+-------------|
-| Hybrid(SoftSpi)                 |   1514/   59 |  1058/   48 |
-| Hybrid(SoftSpiFast)             |   1392/   54 |   936/   43 |
+| Hybrid(SimpleSpi)               |   1514/   59 |  1058/   48 |
+| Hybrid(SimpleSpiFast)           |   1392/   54 |   936/   43 |
 | Hybrid(HardSpi)                 |   1560/   61 |  1104/   50 |
 | Hybrid(HardSpiFast)             |   1502/   59 |  1046/   48 |
 |---------------------------------+--------------+-------------|
-| Hc595(SoftSpi)                  |   1478/   59 |  1022/   48 |
-| Hc595(SoftSpiFast)              |   1068/   54 |   612/   43 |
+| Hc595(SimpleSpi)                |   1478/   59 |  1022/   48 |
+| Hc595(SimpleSpiFast)            |   1068/   54 |   612/   43 |
 | Hc595(HardSpi)                  |   1538/   61 |  1082/   50 |
 | Hc595(HardSpiFast)              |   1470/   59 |  1014/   48 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SoftTmi)                 |   1478/   39 |  1022/   28 |
-| Tm1637(SoftTmiFast)             |    912/   34 |   456/   23 |
+| Tm1637(SimpleTmi)               |   1478/   39 |  1022/   28 |
+| Tm1637(SimpleTmiFast)           |    912/   34 |   456/   23 |
 |---------------------------------+--------------+-------------|
-| Max7219(SoftSpi)                |   1184/   45 |   728/   34 |
-| Max7219(SoftSpiFast)            |    766/   40 |   310/   29 |
+| Max7219(SimpleSpi)              |   1184/   45 |   728/   34 |
+| Max7219(SimpleSpiFast)          |    766/   40 |   310/   29 |
 | Max7219(HardSpi)                |   1268/   47 |   812/   36 |
 | Max7219(HardSpiFast)            |   1180/   45 |   724/   34 |
 |---------------------------------+--------------+-------------|
@@ -1900,15 +1900,15 @@ And here are the memory consumption numbers for an ESP8266:
 |---------------------------------+--------------+-------------|
 | DirectModule                    | 257784/27056 |  1084/  272 |
 |---------------------------------+--------------+-------------|
-| Hybrid(SoftSpi)                 | 257872/27056 |  1172/  272 |
+| Hybrid(SimpleSpi)               | 257872/27056 |  1172/  272 |
 | Hybrid(HardSpi)                 | 258944/27072 |  2244/  288 |
 |---------------------------------+--------------+-------------|
-| Hc595(SoftSpi)                  | 257772/27060 |  1072/  276 |
+| Hc595(SimpleSpi)                | 257772/27060 |  1072/  276 |
 | Hc595(HardSpi)                  | 258924/27076 |  2224/  292 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SoftTmi)                 | 257932/27028 |  1232/  244 |
+| Tm1637(SimpleTmi)               | 257932/27028 |  1232/  244 |
 |---------------------------------+--------------+-------------|
-| Max7219(SoftSpi)                | 257636/27028 |   936/  244 |
+| Max7219(SimpleSpi)              | 257636/27028 |   936/  244 |
 | Max7219(HardSpi)                | 258836/27044 |  2136/  260 |
 |---------------------------------+--------------+-------------|
 | Ht16k33(TwoWire)                | 261364/27500 |  4664/  716 |
@@ -1935,56 +1935,57 @@ The CPU benchmark numbers can be seen in
 Here are the CPU numbers for an AVR processor:
 
 ```
-+-----------------------------------------+-------------------+---------+
-| Functionality                           |   min/  avg/  max | samples |
-|-----------------------------------------+-------------------+---------|
-| Direct(4)                               |    72/   82/   88 |      40 |
-| Direct(4,subfields)                     |     4/   13/   88 |     640 |
-| DirectFast4(4)                          |    24/   30/   36 |      40 |
-| DirectFast4(4,subfields)                |     4/    8/   36 |     640 |
-|-----------------------------------------+-------------------+---------|
-| Hybrid(4,SoftSpi)                       |   152/  160/  180 |      40 |
-| Hybrid(4,SoftSpi,subfields)             |     4/   22/  180 |     640 |
-| Hybrid(4,SoftSpiFast)                   |    28/   33/   44 |      40 |
-| Hybrid(4,SoftSpiFast,subfields)         |     4/    8/   40 |     640 |
-| Hybrid(4,HardSpi)                       |    32/   39/   52 |      40 |
-| Hybrid(4,HardSpi,subfields)             |     4/    8/   48 |     640 |
-| Hybrid(4,HardSpiFast)                   |    20/   25/   32 |      40 |
-| Hybrid(4,HardSpiFast,subfields)         |     4/    7/   32 |     640 |
-|-----------------------------------------+-------------------+---------|
-| Hc595(8,SoftSpi)                        |   268/  273/  304 |      80 |
-| Hc595(8,SoftSpi,subfields)              |     4/   36/  300 |    1280 |
-| Hc595(8,SoftSpiFast)                    |    24/   27/   40 |      80 |
-| Hc595(8,SoftSpiFast,subfields)          |     4/    8/   32 |    1280 |
-| Hc595(8,HardSpi)                        |    24/   30/   36 |      80 |
-| Hc595(8,HardSpi,subfields)              |     4/    8/   36 |    1280 |
-| Hc595(8,HardSpiFast)                    |    12/   17/   28 |      80 |
-| Hc595(8,HardSpiFast,subfields)          |     4/    6/   24 |    1280 |
-|-----------------------------------------+-------------------+---------|
-| Tm1637(4,SoftTmi,100us)                 | 22312/22341/22560 |      10 |
-| Tm1637(4,SoftTmi,100us,incremental)     |  3612/ 8806/10340 |      50 |
-| Tm1637(4,SoftTmiFast,100us)             | 21068/21101/21356 |      10 |
-| Tm1637(4,SoftTmiFast,100us,incremental) |  3412/ 8316/ 9812 |      50 |
-|-----------------------------------------+-------------------+---------|
-| Tm1637(4,SoftTmi,5us)                   |  2244/ 2282/ 2488 |      10 |
-| Tm1637(4,SoftTmi,5us,incremental)       |   364/  893/ 1120 |      50 |
-| Tm1637(4,SoftTmiFast,5us)               |  1004/ 1033/ 1104 |      10 |
-| Tm1637(4,SoftTmiFast,5us,incremental)   |   164/  403/  508 |      50 |
-|-----------------------------------------+-------------------+---------|
-| Tm1637(6,SoftTmi,100us)                 | 28056/28088/28360 |      10 |
-| Tm1637(6,SoftTmi,100us,incremental)     |  3612/ 9176/10344 |      70 |
-| Tm1637(6,SoftTmiFast,100us)             | 26488/26520/26776 |      10 |
-| Tm1637(6,SoftTmiFast,100us,incremental) |  3412/ 8665/ 9812 |      70 |
-|-----------------------------------------+-------------------+---------|
-| Max7219(8,SoftSpi)                      |  2380/ 2395/ 2628 |      20 |
-| Max7219(8,SoftSpiFast)                  |   204/  216/  236 |      20 |
-| Max7219(8,HardSpi)                      |   204/  218/  236 |      20 |
-| Max7219(8,HardSpiFast)                  |   100/  107/  116 |      20 |
-|-----------------------------------------+-------------------+---------|
-| Ht16k33(4,TwoWire)                      |   340/  345/  356 |      20 |
-| Ht16k33(4,SimpleWire,4us)               |  3744/ 3754/ 3792 |      20 |
-| Ht16k33(4,SimpleWireFast,4us)           |  1444/ 1452/ 1532 |      20 |
-+-----------------------------------------+-------------------+---------+
++-------------------------------------------+-------------------+---------+
+| Functionality                             |   min/  avg/  max | samples |
+|-------------------------------------------+-------------------+---------|
+| Direct(4)                                 |    72/   82/   88 |      40 |
+| Direct(4,subfields)                       |     4/   13/   88 |     640 |
+| DirectFast4(4)                            |    24/   30/   36 |      40 |
+| DirectFast4(4,subfields)                  |     4/    8/   36 |     640 |
+|-------------------------------------------+-------------------+---------|
+| Hybrid(4,SimpleSpi)                       |   152/  160/  180 |      40 |
+| Hybrid(4,SimpleSpi,subfields)             |     4/   22/  180 |     640 |
+| Hybrid(4,SimpleSpiFast)                   |    28/   33/   44 |      40 |
+| Hybrid(4,SimpleSpiFast,subfields)         |     4/    8/   40 |     640 |
+| Hybrid(4,HardSpi)                         |    32/   39/   52 |      40 |
+| Hybrid(4,HardSpi,subfields)               |     4/    8/   48 |     640 |
+| Hybrid(4,HardSpiFast)                     |    20/   25/   32 |      40 |
+| Hybrid(4,HardSpiFast,subfields)           |     4/    7/   32 |     640 |
+|-------------------------------------------+-------------------+---------|
+| Hc595(8,SimpleSpi)                        |   268/  273/  304 |      80 |
+| Hc595(8,SimpleSpi,subfields)              |     4/   36/  300 |    1280 |
+| Hc595(8,SimpleSpiFast)                    |    24/   27/   40 |      80 |
+| Hc595(8,SimpleSpiFast,subfields)          |     4/    8/   32 |    1280 |
+| Hc595(8,HardSpi)                          |    24/   30/   36 |      80 |
+| Hc595(8,HardSpi,subfields)                |     4/    8/   36 |    1280 |
+| Hc595(8,HardSpiFast)                      |    12/   17/   28 |      80 |
+| Hc595(8,HardSpiFast,subfields)            |     4/    6/   24 |    1280 |
+|-------------------------------------------+-------------------+---------|
+| Tm1637(4,SimpleTmi,100us)                 | 22312/22341/22560 |      10 |
+| Tm1637(4,SimpleTmi,100us,incremental)     |  3612/ 8806/10340 |      50 |
+| Tm1637(4,SimpleTmiFast,100us)             | 21068/21100/21356 |      10 |
+| Tm1637(4,SimpleTmiFast,100us,incremental) |  3412/ 8317/ 9816 |      50 |
+|-------------------------------------------+-------------------+---------|
+| Tm1637(4,SimpleTmi,5us)                   |  2244/ 2282/ 2488 |      10 |
+| Tm1637(4,SimpleTmi,5us,incremental)       |   364/  893/ 1120 |      50 |
+| Tm1637(4,SimpleTmiFast,5us)               |  1004/ 1034/ 1108 |      10 |
+| Tm1637(4,SimpleTmiFast,5us,incremental)   |   164/  403/  508 |      50 |
+|-------------------------------------------+-------------------+---------|
+| Tm1637(6,SimpleTmi,100us)                 | 28052/28087/28360 |      10 |
+| Tm1637(6,SimpleTmi,100us,incremental)     |  3612/ 9176/10340 |      70 |
+| Tm1637(6,SimpleTmiFast,100us)             | 26484/26519/26776 |      10 |
+| Tm1637(6,SimpleTmiFast,100us,incremental) |  3412/ 8665/ 9816 |      70 |
+|-------------------------------------------+-------------------+---------|
+| Max7219(8,SimpleSpi)                      |  2380/ 2396/ 2624 |      20 |
+| Max7219(8,SimpleSpiFast)                  |   208/  218/  236 |      20 |
+| Max7219(8,HardSpi)                        |   208/  219/  240 |      20 |
+| Max7219(8,HardSpiFast)                    |    96/  107/  116 |      20 |
+|-------------------------------------------+-------------------+---------|
+| Ht16k33(4,TwoWire,100kHz)                 |  1472/ 1478/ 1500 |      20 |
+| Ht16k33(4,TwoWire,400kHz)                 |   500/  506/  524 |      20 |
+| Ht16k33(4,SimpleWire,1us)                 |  2560/ 2573/ 2708 |      20 |
+| Ht16k33(4,SimpleWireFast,1us)             |   336/  347/  384 |      20 |
++-------------------------------------------+-------------------+---------+
 ```
 
 What is amazing is that if you use `digitalWriteFast()`, the software SPI is
@@ -1993,37 +1994,38 @@ just as fast as hardware SPI, **and** consumes 500 bytes of less flash memory.
 Here are the CPU numbers for an ESP8266:
 
 ```
-+-----------------------------------------+-------------------+---------+
-| Functionality                           |   min/  avg/  max | samples |
-|-----------------------------------------+-------------------+---------|
-| Direct(4)                               |    12/   13/   36 |      40 |
-| Direct(4,subfields)                     |     0/    2/   20 |     640 |
-|-----------------------------------------+-------------------+---------|
-| Hybrid(4,SoftSpi)                       |    29/   29/   41 |      40 |
-| Hybrid(4,SoftSpi,subfields)             |     0/    4/   42 |     640 |
-| Hybrid(4,HardSpi)                       |    12/   12/   32 |      40 |
-| Hybrid(4,HardSpi,subfields)             |     0/    2/   24 |     640 |
-|-----------------------------------------+-------------------+---------|
-| Hc595(8,SoftSpi)                        |    50/   51/   66 |      80 |
-| Hc595(8,SoftSpi,subfields)              |     0/    6/   63 |    1280 |
-| Hc595(8,HardSpi)                        |    14/   14/   26 |      80 |
-| Hc595(8,HardSpi,subfields)              |     0/    2/   26 |    1280 |
-|-----------------------------------------+-------------------+---------|
-| Tm1637(4,SoftTmi,100us)                 | 21496/21506/21543 |      10 |
-| Tm1637(4,SoftTmi,100us,incremental)     |  3481/ 8479/ 9749 |      50 |
-|-----------------------------------------+-------------------+---------|
-| Tm1637(4,SoftTmi,5us)                   |  1525/ 1525/ 1526 |      10 |
-| Tm1637(4,SoftTmi,5us,incremental)       |   248/  603/  707 |      50 |
-|-----------------------------------------+-------------------+---------|
-| Tm1637(6,SoftTmi,100us)                 | 27025/27054/27118 |      10 |
-| Tm1637(6,SoftTmi,100us,incremental)     |  3481/ 8836/ 9757 |      70 |
-|-----------------------------------------+-------------------+---------|
-| Max7219(8,SoftSpi)                      |   459/  460/  467 |      20 |
-| Max7219(8,HardSpi)                      |   125/  126/  137 |      20 |
-|-----------------------------------------+-------------------+---------|
-| Ht16k33(4,TwoWire)                      |   245/  246/  269 |      20 |
-| Ht16k33(4,SimpleWire,4us)               |  2514/ 2516/ 2538 |      20 |
-+-----------------------------------------+-------------------+---------+
++-------------------------------------------+-------------------+---------+
+| Functionality                             |   min/  avg/  max | samples |
+|-------------------------------------------+-------------------+---------|
+| Direct(4)                                 |    12/   13/   32 |      40 |
+| Direct(4,subfields)                       |     0/    2/   25 |     640 |
+|-------------------------------------------+-------------------+---------|
+| Hybrid(4,SimpleSpi)                       |    29/   29/   42 |      40 |
+| Hybrid(4,SimpleSpi,subfields)             |     0/    3/   41 |     640 |
+| Hybrid(4,HardSpi)                         |    12/   12/   24 |      40 |
+| Hybrid(4,HardSpi,subfields)               |     0/    2/   24 |     640 |
+|-------------------------------------------+-------------------+---------|
+| Hc595(8,SimpleSpi)                        |    50/   51/   59 |      80 |
+| Hc595(8,SimpleSpi,subfields)              |     0/    6/   63 |    1280 |
+| Hc595(8,HardSpi)                          |    14/   14/   26 |      80 |
+| Hc595(8,HardSpi,subfields)                |     0/    2/   26 |    1280 |
+|-------------------------------------------+-------------------+---------|
+| Tm1637(4,SimpleTmi,100us)                 | 21496/21504/21540 |      10 |
+| Tm1637(4,SimpleTmi,100us,incremental)     |  3481/ 8479/ 9765 |      50 |
+|-------------------------------------------+-------------------+---------|
+| Tm1637(4,SimpleTmi,5us)                   |  1525/ 1526/ 1530 |      10 |
+| Tm1637(4,SimpleTmi,5us,incremental)       |   248/  602/  695 |      50 |
+|-------------------------------------------+-------------------+---------|
+| Tm1637(6,SimpleTmi,100us)                 | 27024/27031/27044 |      10 |
+| Tm1637(6,SimpleTmi,100us,incremental)     |  3481/ 8837/ 9753 |      70 |
+|-------------------------------------------+-------------------+---------|
+| Max7219(8,SimpleSpi)                      |   459/  459/  464 |      20 |
+| Max7219(8,HardSpi)                        |   125/  125/  134 |      20 |
+|-------------------------------------------+-------------------+---------|
+| Ht16k33(4,TwoWire,100kHz)                 |  1331/ 1332/ 1355 |      20 |
+| Ht16k33(4,TwoWire,400kHz)                 |   348/  348/  349 |      20 |
+| Ht16k33(4,SimpleWire,1us)                 |  1338/ 1341/ 1358 |      20 |
++-------------------------------------------+-------------------+---------+
 ```
 
 On the ESP8266, the hardware SPI is about 4X faster, but it does consume 1200

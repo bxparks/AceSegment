@@ -18,10 +18,10 @@ the schematic below:
 
 The capacitors for `CLK` and `DIO` lines are 10 nF, which is about 50-100X
 larger than they should be. It causes the RC time constant to be about 100
-microseconds, which forces the `delayMicros` parameter in `SoftTmiInterface` and
-the `DELAY_MICROS` parameter in `SoftTmiFastInterface` to be 100 microseconds.
-According to the TM1637 datasheet, the controller chip has a maximum clock
-frequency of 500 kHz (50% duty cycle), which implies a theoretical
+microseconds, which forces the `delayMicros` parameter in `SimpleTmiInterface`
+and the `DELAY_MICROS` parameter in `SimpleTmiFastInterface` to be 100
+microseconds. According to the TM1637 datasheet, the controller chip has a
+maximum clock frequency of 500 kHz (50% duty cycle), which implies a theoretical
 `DELAY_MICROS` of 1 microsecond.
 
 The actual minimum value for the `delayMicroseconds()` function might be as low

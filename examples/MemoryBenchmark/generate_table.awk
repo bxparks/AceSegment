@@ -9,18 +9,18 @@ BEGIN {
   labels[0] = "baseline"
   labels[1] = "DirectModule";
   labels[2] = "DirectFast4Module";
-  labels[3] = "Hybrid(SoftSpi)";
-  labels[4] = "Hybrid(SoftSpiFast)";
+  labels[3] = "Hybrid(SimpleSpi)";
+  labels[4] = "Hybrid(SimpleSpiFast)";
   labels[5] = "Hybrid(HardSpi)";
   labels[6] = "Hybrid(HardSpiFast)";
-  labels[7] = "Hc595(SoftSpi)";
-  labels[8] = "Hc595(SoftSpiFast)";
+  labels[7] = "Hc595(SimpleSpi)";
+  labels[8] = "Hc595(SimpleSpiFast)";
   labels[9] = "Hc595(HardSpi)";
   labels[10] = "Hc595(HardSpiFast)";
-  labels[11] = "Tm1637(SoftTmi)";
-  labels[12] = "Tm1637(SoftTmiFast)";
-  labels[13] = "Max7219(SoftSpi)";
-  labels[14] = "Max7219(SoftSpiFast)";
+  labels[11] = "Tm1637(SimpleTmi)";
+  labels[12] = "Tm1637(SimpleTmiFast)";
+  labels[13] = "Max7219(SimpleSpi)";
+  labels[14] = "Max7219(SimpleSpiFast)";
   labels[15] = "Max7219(HardSpi)";
   labels[16] = "Max7219(HardSpiFast)";
   labels[17] = "Ht16k33(TwoWire)";
@@ -67,10 +67,10 @@ END {
     if (u[i]["flash"] == "-1") continue
 
     if (labels[i] ~ /DirectModule/ \
-        || labels[i] ~ /Hybrid\(SoftSpi\)/ \
-        || labels[i] ~ /Hc595\(SoftSpi\)/ \
-        || labels[i] ~ /Tm1637\(SoftTmi\)/ \
-        || labels[i] ~ /Max7219\(SoftSpi\)/ \
+        || labels[i] ~ /Hybrid\(SimpleSpi\)/ \
+        || labels[i] ~ /Hc595\(SimpleSpi\)/ \
+        || labels[i] ~ /Tm1637\(SimpleTmi\)/ \
+        || labels[i] ~ /Max7219\(SimpleSpi\)/ \
         || labels[i] ~ /Ht16k33\(TwoWire\)/ \
         || labels[i] ~ /^StubModule$/) {
       printf(\

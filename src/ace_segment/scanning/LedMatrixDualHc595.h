@@ -49,7 +49,7 @@ const uint8_t kByteOrderElementHighGroupLow = 1;
  * element pins are connected to the least signficiant byte.
  *
  * @tparam T_SPII class that implements the SPI interface, usually one of the
- *    classes in the AceSPI library: SoftSpiInterface, SoftSpiFastInterface,
+ *    classes in the AceSPI library: SimpleSpiInterface, SimpleSpiFastInterface,
  *    HardSpiInterface, HardSpiFastInterface.
  */
 template <typename T_SPII>
