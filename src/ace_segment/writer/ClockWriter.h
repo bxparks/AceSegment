@@ -70,6 +70,12 @@ class ClockWriter {
     /** Get the underlying LedModule. */
     LedModule& ledModule() { return mNumberWriter.ledModule(); }
 
+    /** Get the underlying PatternWriter. */
+    PatternWriter& patternWriter() { return mNumberWriter.patternWriter(); }
+
+    /** Get the underlying NumberWriter. */
+    NumberWriter& numberWriter() { return mNumberWriter; }
+
     /** Write the hexchar_t 'c' at 'pos'. */
     void writeCharAt(uint8_t pos, hexchar_t c) {
       mNumberWriter.writeHexCharAt(pos, c);

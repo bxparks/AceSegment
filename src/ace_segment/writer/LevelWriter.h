@@ -49,7 +49,10 @@ class LevelWriter {
         {}
 
     /** Get the underlying LedModule. */
-    LedModule& ledModule() const { return mPatternWriter.ledModule(); }
+    LedModule& ledModule() { return mPatternWriter.ledModule(); }
+
+    /** Get the underlying PatternWriter. */
+    PatternWriter& patternWriter() { return mPatternWriter; }
 
     /**
      * Return the maximum level supported by this LED display. The range is [0,

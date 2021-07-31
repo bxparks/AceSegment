@@ -44,7 +44,10 @@ class StringScroller {
     {}
 
     /** Get the underlying LedModule. */
-    LedModule& ledModule() const { return mCharWriter.ledModule(); }
+    LedModule& ledModule() { return mCharWriter.ledModule(); }
+
+    /** Get the underlying PatternWriter. */
+    PatternWriter& patternWriter() { return mCharWriter.patternWriter(); }
 
     /** Get the underlying LedModule. */
     CharWriter& charWriter() { return mCharWriter; }

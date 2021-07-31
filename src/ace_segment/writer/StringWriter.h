@@ -49,7 +49,10 @@ class StringWriter {
     /** Get the underlying LedModule. */
     LedModule& ledModule() { return mCharWriter.ledModule(); }
 
-    /** Get the underlying LedModule. */
+    /** Get the underlying PatternWriter. */
+    PatternWriter& patternWriter() { return mCharWriter.patternWriter(); }
+
+    /** Get the underlying CharWriter. */
     CharWriter& charWriter() { return mCharWriter; }
 
     /**

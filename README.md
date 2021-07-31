@@ -319,10 +319,10 @@ The conceptual dependency diagram among these classes looks something like this:
                    V
 PatternWriter  CharWriter NumberWriter ClockWriter TemperatureWriter LevelWriter
          \          \           |     /                /                /
-          -------    --------   |    / ----------------       ---------
-                 \           \  |   / /                      /
-                  ----------\ \ |  / / /---------------------
-                             v vv v v v
+          -------    -------    |    / ----------------       ----------
+                 \          \   |   / /                      /
+                  ---------\ \  |  / / /---------------------
+                            v v v v v v
                              LedModule
                                 ^               (hardware independent)
 --------------------------------|--------------------------------------------
@@ -341,7 +341,10 @@ Tm1637Module  Max7219Module Hc595Module HybridModule Ht16k33Module DirectModule
 | SimpleTmiFastI'face | | HardSpiFastI'face   | | SimpleWireI'face     |
 +---------------------+ | SimpleSpiI'face     | | SimpleWireFastI'face |
                         | SimpleSpiFastI'face | +----------------------+
-                        +---------------------+
+                        +---------------------+         |
+                                |                       |
+                                v                       v
+                            <SPI.h>                 <Wire.h>
 ```
 
 (The actual dependency among various classes is a bit more complicated than this
@@ -1700,6 +1703,7 @@ class NumberWriter {
     explicit NumberWriter(LedModule& ledModule);
 
     LedModule& ledModule();
+    PatternWriter& patternWriter();
 
     void writeHexCharAt(uint8_t pos, hexchar_t c);
     void writeHexCharsAt(uint8_t pos, hexchar_t [], uint8_t len);
@@ -1750,6 +1754,9 @@ class ClockWriter {
     explicit ClockWriter(LedModule& ledModule, uint8_t colonDigit = 1);
 
     LedModule& ledModule();
+    PatternWriter& patternWriter();
+    NumberWriter& numberWriter();
+
     void writeCharAt(uint8_t pos, hexchar_t c);
     void writeChar2At(uint8_t pos, hexchar_t c0, hexchar_t c1);
 
@@ -1760,6 +1767,14 @@ class ClockWriter {
     void writeHourMinute(uint8_t hh, uint8_t mm);
     void writeColon(bool state = true);
 };
+```
+
+You can write the letters `A` and `P` using the underlying `patternWriter()`:
+
+```C++
+uint8_t pos = ...;
+ClockWriter clockWriter(...);
+clockWriter.patternWriter().writePatternAt(pos, ClockWriter::kPatternA);
 ```
 
 ![ClockWriter](docs/writers/clock_writer.jpg)
@@ -1780,6 +1795,7 @@ class TemperatureWriter {
     explicit TemperatureWriter(LedModule& ledModule);
 
     LedModule& ledModule();
+    PatternWriter& patternWriter();
 
     uint8_t writeTempAt(uint8_t pos, int16_t temp, boxSize = 0);
     uint8_t writeTempDegAt(uint8_t pos, int16_t temp, boxSize = 0);
@@ -1818,6 +1834,7 @@ class CharWriter {
     );
 
     LedModule& ledModule();
+    PatternWriter& patternWriter();
 
     void writeCharAt(uint8_t pos, char c);
 
@@ -1840,6 +1857,7 @@ class StringWriter {
     explicit StringWriter(CharWriter& charWriter);
 
     LedModule& ledModule();
+    PatternWriter& patternWriter();
     CharWriter& charWriter();
 
     uint8_t writeStringAt(uint8_t pos, const char* cs, uint8_t numChar = 255);
@@ -1895,6 +1913,7 @@ class LevelWriter {
     explicit LevelWriter(LedModule& ledModule);
 
     LedModule& ledModule();
+    PatternWriter& patternWriter();
 
     uint8_t getMaxLevel() const;
     void writeLevel(uint8_t level);
@@ -1920,6 +1939,7 @@ class StringScroller {
     explicit StringScroller(CharWriter& charWriter);
 
     LedModule& ledModule();
+    PatternWriter& patternWriter();
     CharWriter& charWriter();
 
     void initScrollLeft(const char* s);

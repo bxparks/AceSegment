@@ -62,7 +62,10 @@ class CharWriter {
     {}
 
     /** Get the underlying LedModule. */
-    LedModule& ledModule() const { return mPatternWriter.ledModule(); }
+    LedModule& ledModule() { return mPatternWriter.ledModule(); }
+
+    /** Get the underlying PatternWriter. */
+    PatternWriter& patternWriter() { return mPatternWriter; }
 
     /** Return the number of digits supported by this display instance. */
     uint8_t getNumDigits() const { return mPatternWriter.getNumDigits(); }
