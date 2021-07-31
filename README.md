@@ -61,14 +61,15 @@ consumption, but it is getting very close.
         * [Rendering the Hc595Module](#RenderingHc595Module)
     * [HybridModule](#HybridModule)
     * [DirectModule](#DirectModule)
-    * [PatternWriter](#PatternWriter)
-    * [NumberWriter](#NumberWriter)
-    * [ClockWriter](#ClockWriter)
-    * [TemperatureWriter](#TemperatureWriter)
-    * [CharWriter](#CharWriter)
-    * [StringWriter](#StringWriter)
-    * [LevelWriter](#LevelWriter)
-    * [StringScroller](#StringScroller)
+    * [Writers](#Writers)
+        * [PatternWriter](#PatternWriter)
+        * [NumberWriter](#NumberWriter)
+        * [ClockWriter](#ClockWriter)
+        * [TemperatureWriter](#TemperatureWriter)
+        * [CharWriter](#CharWriter)
+        * [StringWriter](#StringWriter)
+        * [LevelWriter](#LevelWriter)
+        * [StringScroller](#StringScroller)
 * [Advanced Usage](#AdvancedUsage)
     * [DigitalWriteFast on AVR](#DigitalWriteFast)
     * [Multiple SPI Buses](#MultipleSpiBuses)
@@ -1355,8 +1356,22 @@ void loop() {
 }
 ```
 
+<a name="Writers"></a>
+### Writers
+
+All LED module classes provide a unified API by implementing the `LedModule`
+interface. The API of the `LedModule` class is low-level and primitive by
+design, providing only 3 methods for rendering: `setPatternAt()`,
+`getPatternAt()`, and `setBrightness()`.
+
+To display numbers, letters, and other more complicated patterns, this library
+provides a set of "writer" classes which wrap around the `LedModule` class and
+provide more powerful rendering capabilities. If these pre-defined writer
+classes are not sufficient, applications can build additional "writer" classes
+to implement the required features.
+
 <a name="PatternWriter"></a>
-### PatternWriter
+#### PatternWriter
 
 The `PatternWriter` class is the most basic wrapper around an `LedModule`
 object, and provides more convenient interfaces to writing to the LED module. It
@@ -1407,7 +1422,7 @@ PatternWriter patternWriter(ledModule);
 ```
 
 <a name="NumberWriter"></a>
-### NumberWriter
+#### NumberWriter
 
 The `NumberWriter` can print integers to the `LedModule` using decimal (0-9) or
 hexadecimal (0-9A-F) formats. On platforms that support it (AVR and ESP8266),
@@ -1455,7 +1470,7 @@ symbols, so `[0,17]`:
 ![NumberWriter](docs/writers/number_writer_decimal.jpg)
 
 <a name="ClockWriter"></a>
-### ClockWriter
+#### ClockWriter
 
 There are special, 4 digit,  seven segment LED displays which replace the
 decimal point with the colon symbol ":" between the 2 digits on either side so
@@ -1490,7 +1505,7 @@ class ClockWriter {
 ![ClockWriter](docs/writers/clock_writer.jpg)
 
 <a name="TemperatureWriter"></a>
-### TemperatureWriter
+#### TemperatureWriter
 
 This class supports writing out temperatures in degrees Celsius or Fahrenheit.
 The public methods of this class looks something like this:
@@ -1518,7 +1533,7 @@ class TemperatureWriter {
 ![TemperatureWriter-Fahrenheit](docs/writers/temperature_writer_fahrenheit.jpg)
 
 <a name="CharWriter"></a>
-### CharWriter
+#### CharWriter
 
 It is possible to represent many of the ASCII characters in the range `[0,127]`
 on a seven-segment LED display, although some of the characters will necessarily
@@ -1554,7 +1569,7 @@ class CharWriter {
 ![CharWriter](docs/writers/char_writer.jpg)
 
 <a name="StringWriter"></a>
-### StringWriter
+#### StringWriter
 
 A `StringWriter` is a class that builds on top of the `CharWriter`. It knows how
 to write entirely strings into the LED display. The public methods look like:
@@ -1609,7 +1624,7 @@ stringWriter.clearToEnd(written);
 ![StringWriter](docs/writers/string_writer.jpg)
 
 <a name="LevelWriter"></a>
-### LevelWriter
+#### LevelWriter
 
 A `LevelWriter` writes a specified number of vertical bars (2 vertical
 bar per digit) to the LED display, emulating a level meter LED module.
@@ -1629,7 +1644,7 @@ class LevelWriter {
 ![LevelWriter](docs/writers/level_writer.jpg)
 
 <a name="StringScroller"></a>
-### StringScroller
+#### StringScroller
 
 A `StringScroller` is a class that builds on top of the `CharWriter`. It knows
 how to write entirely strings into the LED display. The public methods look
