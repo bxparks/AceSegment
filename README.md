@@ -2118,12 +2118,14 @@ them.
       platform.
     * In any case, I think the code for printing floating point numbers should
       not go into the `NumberWriter` class, but into a new class called
-      something like `FloatWriter`. The `FloatWriter` class con pull in a
+      something like `FloatWriter`. The `FloatWriter` class could pull in a
       `NumberWriter` object and build on top of it.
 * The `Ht16k33Module` class does not support blinking the digits as supported by
   the HT16K33 controller chip.
     * It should be pretty simple to add.
-    * I have not expended the effort because I don't use this feature.
+    * I have not done the work because I don't use this feature.
+* Some LED controllers (TM1637, HT16K33) have hardware support for scanning key
+  matrices. AceSegment does not support this feature.
 
 <a name="License"></a>
 ## License
