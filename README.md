@@ -1641,6 +1641,10 @@ class LevelWriter {
 };
 ```
 
+There are 2 vertical bars available per per digit. So the maximum level
+supported by a 4-digit LED module is 8, and an 8-digit LED module supports a
+maximum level of 16.
+
 ![LevelWriter](docs/writers/level_writer.jpg)
 
 <a name="StringScroller"></a>
