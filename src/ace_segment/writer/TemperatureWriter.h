@@ -58,7 +58,7 @@ class TemperatureWriter {
     /** Get the underlying LedModule. */
     LedModule& ledModule() { return mNumberWriter.ledModule(); }
 
-    /** Get the underlying LedModule. */
+    /** Get the underlying PatternWriter. */
     PatternWriter& patternWriter() { return mNumberWriter.patternWriter(); }
 
     /**

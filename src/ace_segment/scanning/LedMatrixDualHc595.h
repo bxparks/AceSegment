@@ -92,7 +92,7 @@ class LedMatrixDualHc595: public LedMatrixBase {
      * need to send that pattern to the logical position which will cause it to
      * appear in the correct physical position. That turns out to be a mapping
      * of the physical-to-logical address, which is the inverse of the remapping
-     * operation performed in Tm1636Module and Max7219Module. In those classes,
+     * operation performed in Tm1637Module and Max7219Module. In those classes,
      * we have random access to all the logical segment/element patterns. In
      * this class, we are given just a single digit, but we don't have random
      * access to the other digit patterns, so the remapArray must go the other

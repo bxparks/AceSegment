@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.8.0</span>
+   &#160;<span id="projectnumber">0.8.1</span>
    </div>
    <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, HT16K33, or 74HC595 controller chips</div>
   </td>
@@ -331,7 +331,7 @@ template&lt;typename T_SPII &gt; </div>
 
 <p>Write out the group and element patterns in a single 16-bit stream. </p>
 <p>The byteOrder parameter determines whether the group bits are in the high byte and element bits in the low byte, or flipped around.</p>
-<p>The <code>group</code> is the <em>desired</em> physical location of <code>elementPattern</code>. We need to send that pattern to the logical position which will cause it to appear in the correct physical position. That turns out to be a mapping of the physical-to-logical address, which is the inverse of the remapping operation performed in Tm1636Module and <a class="el" href="classace__segment_1_1Max7219Module.html" title="An implementation of LedModule using the MAX7219 chip.">Max7219Module</a>. In those classes, we have random access to all the logical segment/element patterns. In this class, we are given just a single digit, but we don't have random access to the other digit patterns, so the remapArray must go the other way. The direction of the remapArray conversion is quite subtle, and it took me 2-3 attempts to get this right. In many (most?) cases, the remapArray and the remapArrayInverted are identical because the digit reordering is caused by pair-wise swapping of the LED modules pins to the controller chip pins. But in the general case, this class needs the inverted mapping.</p>
+<p>The <code>group</code> is the <em>desired</em> physical location of <code>elementPattern</code>. We need to send that pattern to the logical position which will cause it to appear in the correct physical position. That turns out to be a mapping of the physical-to-logical address, which is the inverse of the remapping operation performed in <a class="el" href="classace__segment_1_1Tm1637Module.html" title="An implementation of LedModule using the TM1637 chip.">Tm1637Module</a> and <a class="el" href="classace__segment_1_1Max7219Module.html" title="An implementation of LedModule using the MAX7219 chip.">Max7219Module</a>. In those classes, we have random access to all the logical segment/element patterns. In this class, we are given just a single digit, but we don't have random access to the other digit patterns, so the remapArray must go the other way. The direction of the remapArray conversion is quite subtle, and it took me 2-3 attempts to get this right. In many (most?) cases, the remapArray and the remapArrayInverted are identical because the digit reordering is caused by pair-wise swapping of the LED modules pins to the controller chip pins. But in the general case, this class needs the inverted mapping.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">group</td><td>the desired physical position of the elementPattern </td></tr>

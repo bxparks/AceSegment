@@ -1,6 +1,11 @@
 # Changelog
 
 * Unreleased
+* 0.8.1 (2021-07-31)
+    * Add `HelloTm1636`, `HelloMax7219`, `HelloHt16k33`, and `HelloHc595`
+      examples to `examples/` and `README.md`.
+    * Clean up methods to retrieve underlying `patternWriter()`, `charWriter()`,
+      `numberWriter()`, etc in various Writer classes.
 * 0.8 (2021-07-30)
     * Move I2C address into `beginTransmission()` method of `TwoWireInterface`,
       `SimpleWireInterface` and `SimpleWireFastInterface`.

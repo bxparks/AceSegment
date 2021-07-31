@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.8.0</span>
+   &#160;<span id="projectnumber">0.8.1</span>
    </div>
    <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, HT16K33, or 74HC595 controller chips</div>
   </td>
@@ -90,9 +90,13 @@ Public Member Functions</h2></td></tr>
 <a class="el" href="classace__segment_1_1LedModule.html">LedModule</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringWriter.html#a8ebe52a50690e195e94895adbca57616">ledModule</a> ()</td></tr>
 <tr class="memdesc:a8ebe52a50690e195e94895adbca57616"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the underlying <a class="el" href="classace__segment_1_1LedModule.html" title="General interface that represents a generic seven-segment LED module with multiple digits.">LedModule</a>. <br /></td></tr>
 <tr class="separator:a8ebe52a50690e195e94895adbca57616"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4639fb0127c10643d0143579748fcf44"><td class="memItemLeft" align="right" valign="top"><a id="a4639fb0127c10643d0143579748fcf44"></a>
+<a class="el" href="classace__segment_1_1PatternWriter.html">PatternWriter</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringWriter.html#a4639fb0127c10643d0143579748fcf44">patternWriter</a> ()</td></tr>
+<tr class="memdesc:a4639fb0127c10643d0143579748fcf44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the underlying <a class="el" href="classace__segment_1_1PatternWriter.html" title="Write LED segment patterns to the underlying LedModule.">PatternWriter</a>. <br /></td></tr>
+<tr class="separator:a4639fb0127c10643d0143579748fcf44"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a378981a15906a61e872b13d1c9ca7f0f"><td class="memItemLeft" align="right" valign="top"><a id="a378981a15906a61e872b13d1c9ca7f0f"></a>
 <a class="el" href="classace__segment_1_1CharWriter.html">CharWriter</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringWriter.html#a378981a15906a61e872b13d1c9ca7f0f">charWriter</a> ()</td></tr>
-<tr class="memdesc:a378981a15906a61e872b13d1c9ca7f0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the underlying <a class="el" href="classace__segment_1_1LedModule.html" title="General interface that represents a generic seven-segment LED module with multiple digits.">LedModule</a>. <br /></td></tr>
+<tr class="memdesc:a378981a15906a61e872b13d1c9ca7f0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the underlying <a class="el" href="classace__segment_1_1CharWriter.html" title="The CharWriter supports mapping of an 8-bit character set to segment patterns supported by LedModule.">CharWriter</a>. <br /></td></tr>
 <tr class="separator:a378981a15906a61e872b13d1c9ca7f0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6bd1098f384b81edc53f8ce33896cbcc"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringWriter.html#a6bd1098f384b81edc53f8ce33896cbcc">writeStringAt</a> (uint8_t pos, const char *cs, uint8_t numChar=255)</td></tr>
 <tr class="memdesc:a6bd1098f384b81edc53f8ce33896cbcc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write c-string <code>cs</code> at specified position <code>pos</code> up to <code>numChar</code> characters.  <a href="classace__segment_1_1StringWriter.html#a6bd1098f384b81edc53f8ce33896cbcc">More...</a><br /></td></tr>
@@ -158,7 +162,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <p>Write flash string <code>fs</code> at specified position <code>pos</code> up to <code>numChar</code> characters. </p>
 <dl class="section return"><dt>Returns</dt><dd>number of actual LED digits written </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="StringWriter_8h_source.html#l00075">75</a> of file <a class="el" href="StringWriter_8h_source.html">StringWriter.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="StringWriter_8h_source.html#l00078">78</a> of file <a class="el" href="StringWriter_8h_source.html">StringWriter.h</a>.</p>
 
 </div>
 </div>
@@ -205,7 +209,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <p>Write c-string <code>cs</code> at specified position <code>pos</code> up to <code>numChar</code> characters. </p>
 <dl class="section return"><dt>Returns</dt><dd>number of actual LED digits written </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="StringWriter_8h_source.html#l00061">61</a> of file <a class="el" href="StringWriter_8h_source.html">StringWriter.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="StringWriter_8h_source.html#l00064">64</a> of file <a class="el" href="StringWriter_8h_source.html">StringWriter.h</a>.</p>
 
 </div>
 </div>

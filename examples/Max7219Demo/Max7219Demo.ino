@@ -6,6 +6,7 @@
  * Supported microcontroller environments:
  *
  *  * AUNITER_MICRO_MAX7219: SparkFun Pro Micro
+ *  * AUNITER_SAMD_HT16K33: SAMD21 M0 Mini
  *  * AUNITER_STM32_MAX7219: STM32 F1 Blue Pill
  *  * AUNITER_D1MINILARGE_MAX7219: WeMos D1 Mini ESP8266
  *  * AUNITER_ESP32_MAX7219: ESP32 Dev Kit v1

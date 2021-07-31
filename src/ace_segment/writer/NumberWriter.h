@@ -72,7 +72,7 @@ class NumberWriter {
     /** Get the underlying LedModule. */
     LedModule& ledModule() { return mPatternWriter.ledModule(); }
 
-    /** Get the underlying LedModule. */
+    /** Get the underlying PatternWriter. */
     PatternWriter& patternWriter() { return mPatternWriter; }
 
     /**

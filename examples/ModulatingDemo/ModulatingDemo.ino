@@ -6,11 +6,12 @@
  *
  * Supported microcontroller environments:
  *
- *  * AUNITER_MICRO_CUSTOM_DIRECT: Pro Micro + Custom Direct LED module
- *  * AUNITER_MICRO_CUSTOM_SINGLE: Pro Micro + Custom Single 74HC595 LED module
- *  * AUNITER_MICRO_CUSTOM_DUAL: Pro Micro + Custom Dual 74HC595 LED module
- *  * AUNITER_MICRO_HC595: Pro Micro + diymore.cc 74HC595 LED module
- *  * AUNITER_STM32_HC595: STM32 F1 Blue Pill+ diymore.cc 74HC595 LED module
+ *  * AUNITER_MICRO_CUSTOM_DIRECT: Pro Micro + Custom Direct module
+ *  * AUNITER_MICRO_CUSTOM_SINGLE: Pro Micro + Custom Single 74HC595 module
+ *  * AUNITER_MICRO_CUSTOM_DUAL: Pro Micro + Custom Dual 74HC595 module
+ *  * AUNITER_MICRO_HC595: Pro Micro + diymore.cc 74HC595 module
+ *  * AUNITER_SAMD_HT16K33: SAMD21 M0 Mini + diymore.cc 74HC595 module
+ *  * AUNITER_STM32_HC595: STM32 F1 Blue Pill+ diymore.cc 74HC595 module
  *  * AUNITER_D1MINI_LARGE_HC595: WeMos D1 Mini + diymore.cc 74HC595 module
  *  * AUNITER_ESP32_HC595: ESP32 dev kit v1 + diymore.cc 74HC595 module
  */

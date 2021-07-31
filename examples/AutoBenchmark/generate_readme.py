@@ -55,7 +55,7 @@ LED module:
 * `Ht16k33Module::flush()`
     * Sends out the buffered digits using I2C
 
-**Version**: AceSegment v0.8
+**Version**: AceSegment v0.8.1
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
