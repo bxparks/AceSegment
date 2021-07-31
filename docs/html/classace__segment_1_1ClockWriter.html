@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.8.0</span>
+   &#160;<span id="projectnumber">0.8.1</span>
    </div>
    <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, HT16K33, or 74HC595 controller chips</div>
   </td>
@@ -97,6 +97,14 @@ Public Member Functions</h2></td></tr>
 <a class="el" href="classace__segment_1_1LedModule.html">LedModule</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1ClockWriter.html#a5ebd90e614a3cb6b41625634cf13aea2">ledModule</a> ()</td></tr>
 <tr class="memdesc:a5ebd90e614a3cb6b41625634cf13aea2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the underlying <a class="el" href="classace__segment_1_1LedModule.html" title="General interface that represents a generic seven-segment LED module with multiple digits.">LedModule</a>. <br /></td></tr>
 <tr class="separator:a5ebd90e614a3cb6b41625634cf13aea2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa81797eebe1f09528d629d6a32ab2187"><td class="memItemLeft" align="right" valign="top"><a id="aa81797eebe1f09528d629d6a32ab2187"></a>
+<a class="el" href="classace__segment_1_1PatternWriter.html">PatternWriter</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1ClockWriter.html#aa81797eebe1f09528d629d6a32ab2187">patternWriter</a> ()</td></tr>
+<tr class="memdesc:aa81797eebe1f09528d629d6a32ab2187"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the underlying <a class="el" href="classace__segment_1_1PatternWriter.html" title="Write LED segment patterns to the underlying LedModule.">PatternWriter</a>. <br /></td></tr>
+<tr class="separator:aa81797eebe1f09528d629d6a32ab2187"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a47b6acf282d7e31a816bee00e2d1db57"><td class="memItemLeft" align="right" valign="top"><a id="a47b6acf282d7e31a816bee00e2d1db57"></a>
+<a class="el" href="classace__segment_1_1NumberWriter.html">NumberWriter</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1ClockWriter.html#a47b6acf282d7e31a816bee00e2d1db57">numberWriter</a> ()</td></tr>
+<tr class="memdesc:a47b6acf282d7e31a816bee00e2d1db57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the underlying <a class="el" href="classace__segment_1_1NumberWriter.html" title="The NumberWriter supports converting decimal and hexadecimal numbers to segment patterns expected by ...">NumberWriter</a>. <br /></td></tr>
+<tr class="separator:a47b6acf282d7e31a816bee00e2d1db57"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a38a81ddc4dae8fa1a0367b53950da5ed"><td class="memItemLeft" align="right" valign="top"><a id="a38a81ddc4dae8fa1a0367b53950da5ed"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1ClockWriter.html#a38a81ddc4dae8fa1a0367b53950da5ed">writeCharAt</a> (uint8_t pos, hexchar_t c)</td></tr>
 <tr class="memdesc:a38a81ddc4dae8fa1a0367b53950da5ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write the hexchar_t 'c' at 'pos'. <br /></td></tr>
@@ -238,7 +246,7 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class
 <p>Write a 2-digit BCD number at position, which involves just printing the number as a hexadecimal number. </p>
 <p>For example, 0x12 is printed as "12", but 0x1A is printed as "1 ". </p>
 
-<p class="definition">Definition at line <a class="el" href="ClockWriter_8h_source.html#l00093">93</a> of file <a class="el" href="ClockWriter_8h_source.html">ClockWriter.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ClockWriter_8h_source.html#l00099">99</a> of file <a class="el" href="ClockWriter_8h_source.html">ClockWriter.h</a>.</p>
 
 </div>
 </div>
@@ -285,7 +293,7 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class
 <p>Write the 2 hexchar_t 'c0' and 'c1' at 'pos' and 'pos+1'. </p>
 <p>This is a convenience method because the need to write 2 digits (or 2 spaces) occurs quite frequently when implementing clocks. </p>
 
-<p class="definition">Definition at line <a class="el" href="ClockWriter_8h_source.html#l00083">83</a> of file <a class="el" href="ClockWriter_8h_source.html">ClockWriter.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ClockWriter_8h_source.html#l00089">89</a> of file <a class="el" href="ClockWriter_8h_source.html">ClockWriter.h</a>.</p>
 
 </div>
 </div>
@@ -321,7 +329,7 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ClockWriter_8h_source.html#l00141">141</a> of file <a class="el" href="ClockWriter_8h_source.html">ClockWriter.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ClockWriter_8h_source.html#l00147">147</a> of file <a class="el" href="ClockWriter_8h_source.html">ClockWriter.h</a>.</p>
 
 </div>
 </div>
@@ -362,7 +370,7 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class
 <p>Write a 2-digit decimal number at position digit, right justified. </p>
 <p>If the number is greater than 100, then print "  " (2 spaces). Useful for day, hour, minute, seconds. </p>
 
-<p class="definition">Definition at line <a class="el" href="ClockWriter_8h_source.html#l00106">106</a> of file <a class="el" href="ClockWriter_8h_source.html">ClockWriter.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ClockWriter_8h_source.html#l00112">112</a> of file <a class="el" href="ClockWriter_8h_source.html">ClockWriter.h</a>.</p>
 
 </div>
 </div>
@@ -403,7 +411,7 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class
 <p>Write the 4 digit decimal number at pos, right justified, padded with a '0' character. </p>
 <p>Useful for year. </p>
 
-<p class="definition">Definition at line <a class="el" href="ClockWriter_8h_source.html#l00119">119</a> of file <a class="el" href="ClockWriter_8h_source.html">ClockWriter.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ClockWriter_8h_source.html#l00125">125</a> of file <a class="el" href="ClockWriter_8h_source.html">ClockWriter.h</a>.</p>
 
 </div>
 </div>
@@ -444,7 +452,7 @@ static const uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class
 <p>Write the hour and minutes, and the colon in one-shot, assuming the LED module is a 4-digit clock module. </p>
 <p>This is a convenience function. </p>
 
-<p class="definition">Definition at line <a class="el" href="ClockWriter_8h_source.html#l00130">130</a> of file <a class="el" href="ClockWriter_8h_source.html">ClockWriter.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ClockWriter_8h_source.html#l00136">136</a> of file <a class="el" href="ClockWriter_8h_source.html">ClockWriter.h</a>.</p>
 
 </div>
 </div>

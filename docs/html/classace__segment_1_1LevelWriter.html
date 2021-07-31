@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.8.0</span>
+   &#160;<span id="projectnumber">0.8.1</span>
    </div>
    <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, HT16K33, or 74HC595 controller chips</div>
   </td>
@@ -83,13 +83,17 @@ $(function() {
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a9472935c5224a65be532ed6ab191ca37"><td class="memItemLeft" align="right" valign="top"><a id="a9472935c5224a65be532ed6ab191ca37"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LevelWriter.html#a9472935c5224a65be532ed6ab191ca37">LevelWriter</a> (<a class="el" href="classace__segment_1_1LedModule.html">LedModule</a> &amp;<a class="el" href="classace__segment_1_1LevelWriter.html#a4284ff0ce92453182596db0c273881b5">ledModule</a>)</td></tr>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LevelWriter.html#a9472935c5224a65be532ed6ab191ca37">LevelWriter</a> (<a class="el" href="classace__segment_1_1LedModule.html">LedModule</a> &amp;<a class="el" href="classace__segment_1_1LevelWriter.html#a6ec84a27ac083a49afa0e3a894677334">ledModule</a>)</td></tr>
 <tr class="memdesc:a9472935c5224a65be532ed6ab191ca37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br /></td></tr>
 <tr class="separator:a9472935c5224a65be532ed6ab191ca37"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4284ff0ce92453182596db0c273881b5"><td class="memItemLeft" align="right" valign="top"><a id="a4284ff0ce92453182596db0c273881b5"></a>
-<a class="el" href="classace__segment_1_1LedModule.html">LedModule</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LevelWriter.html#a4284ff0ce92453182596db0c273881b5">ledModule</a> () const</td></tr>
-<tr class="memdesc:a4284ff0ce92453182596db0c273881b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the underlying <a class="el" href="classace__segment_1_1LedModule.html" title="General interface that represents a generic seven-segment LED module with multiple digits.">LedModule</a>. <br /></td></tr>
-<tr class="separator:a4284ff0ce92453182596db0c273881b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6ec84a27ac083a49afa0e3a894677334"><td class="memItemLeft" align="right" valign="top"><a id="a6ec84a27ac083a49afa0e3a894677334"></a>
+<a class="el" href="classace__segment_1_1LedModule.html">LedModule</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LevelWriter.html#a6ec84a27ac083a49afa0e3a894677334">ledModule</a> ()</td></tr>
+<tr class="memdesc:a6ec84a27ac083a49afa0e3a894677334"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the underlying <a class="el" href="classace__segment_1_1LedModule.html" title="General interface that represents a generic seven-segment LED module with multiple digits.">LedModule</a>. <br /></td></tr>
+<tr class="separator:a6ec84a27ac083a49afa0e3a894677334"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:affb4ec21f0760dc987f43c5278d966bf"><td class="memItemLeft" align="right" valign="top"><a id="affb4ec21f0760dc987f43c5278d966bf"></a>
+<a class="el" href="classace__segment_1_1PatternWriter.html">PatternWriter</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LevelWriter.html#affb4ec21f0760dc987f43c5278d966bf">patternWriter</a> ()</td></tr>
+<tr class="memdesc:affb4ec21f0760dc987f43c5278d966bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the underlying <a class="el" href="classace__segment_1_1PatternWriter.html" title="Write LED segment patterns to the underlying LedModule.">PatternWriter</a>. <br /></td></tr>
+<tr class="separator:affb4ec21f0760dc987f43c5278d966bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a691f02aa87e9777d4c5eb36674447662"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LevelWriter.html#a691f02aa87e9777d4c5eb36674447662">getMaxLevel</a> () const</td></tr>
 <tr class="memdesc:a691f02aa87e9777d4c5eb36674447662"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the maximum level supported by this LED display.  <a href="classace__segment_1_1LevelWriter.html#a691f02aa87e9777d4c5eb36674447662">More...</a><br /></td></tr>
 <tr class="separator:a691f02aa87e9777d4c5eb36674447662"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -130,7 +134,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <p>Return the maximum level supported by this LED display. </p>
 <p>The range is [0, maxLevel]. </p>
 
-<p class="definition">Definition at line <a class="el" href="LevelWriter_8h_source.html#l00058">58</a> of file <a class="el" href="LevelWriter_8h_source.html">LevelWriter.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LevelWriter_8h_source.html#l00061">61</a> of file <a class="el" href="LevelWriter_8h_source.html">LevelWriter.h</a>.</p>
 
 </div>
 </div>
