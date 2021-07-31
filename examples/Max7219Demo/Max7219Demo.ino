@@ -1,29 +1,38 @@
 /*
- * A simple demo of a single, 8-digit LED module using a MAX7219 chip.
- * Display the digits 0 to 7 on the module.
+ * A demo of an 8-digit LED module using a MAX7219 chip. Displays the digits 0
+ * to 7 on the module, then slowly rotates the digits to the left, while
+ * incrementing the brightness of the display. Uses the Max7219Module class.
+ *
+ * Supported microcontroller environments:
+ *
+ *  * AUNITER_MICRO_MAX7219: SparkFun Pro Micro
+ *  * AUNITER_STM32_MAX7219: STM32 F1 Blue Pill
+ *  * AUNITER_D1MINILARGE_MAX7219: WeMos D1 Mini ESP8266
+ *  * AUNITER_ESP32_MAX7219: ESP32 Dev Kit v1
  */
 
 #include <Arduino.h>
 #include <SPI.h> // SPI, SPIClass
 #include <AceCommon.h> // incrementMod()
+#include <AceSPI.h>
 #include <AceSegment.h> // Max7219Module, PatternWriter
 
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
+using ace_spi::HardSpiInterface;
+using ace_spi::SimpleSpiInterface;
 using ace_segment::Max7219Module;
 using ace_segment::PatternWriter;
-using ace_segment::HardSpiInterface;
-using ace_segment::SoftSpiInterface;
 using ace_segment::kDigitRemapArray8Max7219;
 
 // Select interface protocol.
-#define INTERFACE_TYPE_SOFT_SPI 0
-#define INTERFACE_TYPE_SOFT_SPI_FAST 1
+#define INTERFACE_TYPE_SIMPLE_SPI 0
+#define INTERFACE_TYPE_SIMPLE_SPI_FAST 1
 #define INTERFACE_TYPE_HARD_SPI 2
 #define INTERFACE_TYPE_HARD_SPI_FAST 3
-#define INTERFACE_TYPE_SOFT_TMI 4
-#define INTERFACE_TYPE_SOFT_TMI_FAST 5
+#define INTERFACE_TYPE_SIMPLE_TMI 4
+#define INTERFACE_TYPE_SIMPLE_TMI_FAST 5
 
 // Some microcontrollers have 2 or more SPI buses. PRIMARY selects the default.
 // SECONDARY selects the alternate. I don't have a board with more than 2, but
@@ -56,6 +65,16 @@ using ace_segment::kDigitRemapArray8Max7219;
 
   // SPI pins
   const uint8_t LATCH_PIN = 10;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+  SPIClass& spiInstance = SPI;
+
+#elif defined(AUNITER_SAMD_MAX7219)
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
+
+  // SPI pins
+  const uint8_t LATCH_PIN = SS;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
   SPIClass& spiInstance = SPI;
@@ -121,12 +140,12 @@ using ace_segment::kDigitRemapArray8Max7219;
 //------------------------------------------------------------------
 
 #if INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST \
-    || INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI_FAST
+    || INTERFACE_TYPE == INTERFACE_TYPE_SIMPLE_SPI_FAST
   #include <digitalWriteFast.h>
-  #include <ace_segment/hw/HardSpiFastInterface.h>
-  #include <ace_segment/hw/SoftSpiFastInterface.h>
-  using ace_segment::SoftSpiFastInterface;
-  using ace_segment::HardSpiFastInterface;
+  #include <ace_spi/HardSpiFastInterface.h>
+  #include <ace_spi/SimpleSpiFastInterface.h>
+  using ace_spi::SimpleSpiFastInterface;
+  using ace_spi::HardSpiFastInterface;
 #endif
 
 // LED segment patterns.
@@ -148,11 +167,11 @@ const uint8_t PATTERNS[NUM_DIGITS] = {
 #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST
   using SpiInterface = HardSpiFastInterface<SPIClass, LATCH_PIN>;
   SpiInterface spiInterface(spiInstance);
-#elif INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI
-  using SpiInterface = SoftSpiInterface;
+#elif INTERFACE_TYPE == INTERFACE_TYPE_SIMPLE_SPI
+  using SpiInterface = SimpleSpiInterface;
   SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-#elif INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI_FAST
-  using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+#elif INTERFACE_TYPE == INTERFACE_TYPE_SIMPLE_SPI_FAST
+  using SpiInterface = SimpleSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
 #else
   #error Unknown INTERFACE_TYPE

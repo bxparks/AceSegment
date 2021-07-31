@@ -1,26 +1,32 @@
 /*
- * Demo of 2 x TM1637 LED modules, sharing a common CLK but using 2 different
- * DIO pins.
+ * A demo of *two* TM1637 LED modules, sharing a common CLK line but using 2
+ * different DIO pins. Displays the digits 0 - 3, then slowly rotates the digits
+ * to the left, while changing the brightness of the display.
  *
  * Results: Works great except at high levels of brightness, there is a
  * noticeable flicker of the LEDs. My guess is that the LEDs are drawing more
  * current than the Arduino MCU can provide stably, so the voltage fluctuates.
  * Maybe I need to add a smoothing capacitor across the power line? Not tested.
+ *
+ * Supported microcontroller environments:
+ *
+ *  * AUNITER_MICRO_TM1637_DUAL: SparkFun Pro Micro + two 4-digit LED modules
  */
 
 #include <Arduino.h>
 #include <AceCommon.h> // incrementMod()
+#include <AceTMI.h>
 #include <AceSegment.h> // Tm1637Display
 
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
+using ace_tmi::SimpleTmiInterface;
 using ace_segment::Tm1637Module;
 using ace_segment::PatternWriter;
-using ace_segment::SoftTmiInterface;
 
-// Select TM1637 protocol version, either SoftTmiInterface or
-// SoftTmiFastInterface.
+// Select TM1637 protocol version, either SimpleTmiInterface or
+// SimpleTmiFastInterface.
 #define TMI_INTERFACE_TYPE_NORMAL 0
 #define TMI_INTERFACE_TYPE_FAST 1
 
@@ -63,7 +69,7 @@ using ace_segment::SoftTmiInterface;
 // AceSegment Configuration
 //------------------------------------------------------------------
 
-// For a SoftTmiInterface (non-fast), time needed to send 4 digits using
+// For a SimpleTmiInterface (non-fast), time needed to send 4 digits using
 // flush():
 //
 // * 12 ms at 50 us delay, but does not work.
@@ -72,21 +78,21 @@ using ace_segment::SoftTmiInterface;
 // * 43 ms at 200 us delay.
 //
 // Using flushIncremental(), the duration is about 1/2 these numbers.
-const uint16_t BIT_DELAY = 100;
+const uint8_t DELAY_MICROS = 100;
 
 #if TMI_INTERFACE_TYPE == TMI_INTERFACE_TYPE_NORMAL
-  using TmiInterface = SoftTmiInterface;
-  TmiInterface tmiInterface1(DIO1_PIN, CLK_PIN, BIT_DELAY);
-  TmiInterface tmiInterface2(DIO2_PIN, CLK_PIN, BIT_DELAY);
+  using TmiInterface = SimpleTmiInterface;
+  TmiInterface tmiInterface1(DIO1_PIN, CLK_PIN, DELAY_MICROS);
+  TmiInterface tmiInterface2(DIO2_PIN, CLK_PIN, DELAY_MICROS);
   Tm1637Module<TmiInterface, NUM_DIGITS> ledModule1(tmiInterface1);
   Tm1637Module<TmiInterface, NUM_DIGITS> ledModule2(tmiInterface2);
 
 #elif TMI_INTERFACE_TYPE == TMI_INTERFACE_TYPE_FAST
   #include <digitalWriteFast.h>
-  #include <ace_segment/hw/SoftTmiFastInterface.h>
-  using ace_segment::SoftTmiFastInterface;
-  using TmiInterface1 = SoftTmiFastInterface<DIO1_PIN, CLK_PIN, BIT_DELAY>;
-  using TmiInterface2 = SoftTmiFastInterface<DIO2_PIN, CLK_PIN, BIT_DELAY>;
+  #include <ace_tmi/SimpleTmiFastInterface.h>
+  using ace_tmi::SimpleTmiFastInterface;
+  using TmiInterface1 = SimpleTmiFastInterface<DIO1_PIN, CLK_PIN, DELAY_MICROS>;
+  using TmiInterface2 = SimpleTmiFastInterface<DIO2_PIN, CLK_PIN, DELAY_MICROS>;
   TmiInterface1 tmiInterface1;
   TmiInterface2 tmiInterface2;
   Tm1637Module<TmiInterface1, NUM_DIGITS> ledModule1(tmiInterface1);

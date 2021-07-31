@@ -22,47 +22,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef ACE_SEGMENT_TWO_WIRE_INTERFACE_H
-#define ACE_SEGMENT_TWO_WIRE_INTERFACE_H
-
-#include <stdint.h>
+#include "EventLog.h"
 
 namespace ace_segment {
+namespace testing {
 
-/**
- * A thin wrapper around an I2C `TwoWire` class and its `Wire` object. This is a
- * template class to avoid including the <Wire.h> header file, which increases
- * flash memory on AVR by about 1000 byte even if the Wire object is never used.
- */
-template <typename T_WIRE>
-class TwoWireInterface {
-  public:
-    TwoWireInterface(T_WIRE& wire, uint8_t addr) :
-        mWire(wire),
-        mAddr(addr)
-    {}
-
-    void begin() {}
-
-    void end() {}
-
-    void beginTransmission() {
-      mWire.beginTransmission(mAddr);
-    }
-
-    void write(uint8_t data) {
-      mWire.write(data);
-    }
-
-    void endTransmission() {
-      mWire.endTransmission();
-    }
-
-  private:
-    T_WIRE &mWire;
-    uint8_t const mAddr;
-};
+EventLog gEventLog;
 
 }
-
-#endif
+}

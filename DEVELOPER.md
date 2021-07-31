@@ -18,30 +18,24 @@ roughly like this:
                       LedModule.h
                           ^
                           |
-  +-----------------------+----------------+-------------------+
-  |                       |                |                   |
-  |                       |                |                   |
-ace_segment/direct/ ace_segment/hc595/  ace_segment/tm1637/ ace_segment/max7219/
- DirectModule.h      HybridModule.h     Tm1637Module.h      Max7219Module.h
- DirectFast4Module.h Hc595Module.h         /                /
-       \               /                  /                /
-        \             /                  /                /
-         v           v                  /                /
-       ace_segment/scanning/           /                /
-         ScanningModule.h             /                /
-         LedMatrix*.h                /                /
-                        \            |               /
-                         \           |              /
-                          v          v             v
-                           ace_segment/hw/
-                             ClockInterface.h
-                             GpioInterface.h
-                             SoftSpiInterface.h
-                             SoftSpiFastInterface.h
-                             HardSpiInterface.h
-                             HardSpiFastInterface.h
-                             SoftTmiInterface.h
-                             SoftTmiFastInterface.h
+  +-----------------------+----------+---------------+----------------+
+  |                       |          |               |                |
+  |                       |          |               |                |
+as/direct/          as/hc595/      as/tm1637/     as/max7219/     as/ht16k33/
+DirectModule.h      HybridModule.h Tm1637Module.h Max7219Module.h Ht16k33Module
+DirectFast4Module.h Hc595Module.h    |             /                /
+       \               /             |            /                /
+        \             /              |           /                /
+         v           v               |          /      -----------
+       ace_segment/scanning/         |         /      /
+         ScanningModule.h            |        /      /
+         LedMatrix*.h                |       /      /
+                         \           |      /      /
+                          \          |     /      /
+                           v         v    v      v
+                            ace_segment/hw/
+                            ClockInterface.h
+                            GpioInterface.h
 ```
 
 ## Hardware and Communication Abstraction
@@ -61,38 +55,44 @@ called directly. ("Zero-cost abstraction").
     * access GPIO pins
     * digitalWrite()
     * pinMode()
-* `SoftSpiInterface`
-    * software SPI
-* `SoftFastSpiInterface`
-    * software SPI using `digitalWriteFast` library on AVR processors
-* `HardSpiInterface`
-    * hardware SPI
-* `HardSpiFastInterface`
-    * hardware SPI using `digitalWriteFast` for controlling the LatchPin
-* `SoftTmiInterface`
-    * software implementation of the TM1637 protocol similar to I2C
-* `SoftTmiFastInterface`
-    * same as `SoftTmiInterface` but using `digitalWriteFast` library
+* AceSPI library
+    * `SimpleSpiInterface`
+        * software SPI
+    * `SimpleSpiFastInterface`
+        * software SPI using `digitalWriteFast` library on AVR processors
+    * `HardSpiInterface`
+        * hardware SPI
+    * `HardSpiFastInterface`
+        * hardware SPI using `digitalWriteFast` for controlling the LatchPin
+* AceTMI library
+    * `SimpleTmiInterface`
+        * software implementation of the TM1637 protocol similar to I2C
+    * `SimpleTmiFastInterface`
+        * same as `SimpleTmiInterface` but using `digitalWriteFast` library
+* AceWire library
+    * `TwoWireInterface`
+    * `SimpleWireInterface`
+    * `SimpleWireFastInterface`
 
-## LED Modules
+## Supported LED Modules
 
-* Direct
+* DirectModule, DirectFast4Module
     * All LedMatrix segment and digit pins are directly connect to the
       microcontroller.
     * The segment pins have current limiting resistors.
     * There may transistors on the digit pins to enable higher current.
     * Not all common Arduino microcontrollers have enough pins to support a
       4-digit LED segment module.
-* Single 74HC595 Shift Register
-    * LED segment pins are hooked up to a 74HC575 shfit register,
+* HybridModule
+    * Segment pins are hooked up to a single 74HC575 shfit register,
       which can be accessed through SPI (software or hardware)
-    * The digit pins are still directly connected to the microcontroller. If
-      there are only 4 digits on the LED module, then only 4 pins are needed on
-      the MCU.
+    * The digit pins are still directly connected to the microcontroller.
+        * If there are only 4 digits on the LED module, then only 4 pins are
+          needed on the MCU.
     * There are current limiting resistors between the LED segment pins and the
       shift register chip.
     * There may be transistors on digit pins to provide extra current.
-* Dual 74HC595 Shift Register
+* Hc595Module
     * Segment pins are wired to one 74HC575 shift register.
     * Digit pins are wired to another 74HC575 shift register.
     * The 2 shift registers are daisy chained, so that they can be
@@ -100,25 +100,28 @@ called directly. ("Zero-cost abstraction").
       16-bits.
     * The digit pins are assumed to be in the upper byte, the segment pins are
       in the lower byte.
-* TM1637
+* Tm1637Module
     * 1 to 6 digit LED modules using a TM1637 chip
     * Uses a custom protocol similar to I2C.
-* MAX7219
+* Max7219Module
     * 1 to 8 digit LED modules using a MAX7219 chip
     * Can be daisy chained (not yet supported).
     * Uses SPI.
+* Ht16k33Module
+    * 1 to 8 digit LED modules using a HT16K33 chip
+    * Uses I2C.
 
 ## LedMatrix Class
 
 The `LedMatrix` classes provide access to the LED diodes using one of the 3
-wiring configurations described above. There are 3 classes provided:
+wiring configurations:
 
 * LedMatrixDirect
 * LedMatrixSingleHc595
 * LedMatrixDualHc595
 
 These classes were originally design for a more general LED module, so they use
-slighlty more general terminologies. The digit pins are called "group" pins. And
+slightly more general terminologies. The digit pins are called "group" pins. And
 the segment pins are called "element" pins.
 
 The 74HC595 shift registers are controlled using SPI (Serial Peripheral
@@ -126,7 +129,7 @@ Interface). Most microcontrollers support either hardware SPI or software SPI.
 You can choose to use either modes, and the library provides 2 classes that
 allows this configuration:
 
-* `SoftSpiInterface`
+* `SimpleSpiInterface`
     * Uses `digitalWrite()` function to manually write the correct signal at the
       correct time. (Also called "big-banging").
 * `HardSpiInterface`
@@ -137,9 +140,9 @@ Since the 74HC595 shift registers can be communicated using 2 different methods,
 there are 5 combinations possible:
 
 * LedMatrixDirect
-* LedMatrixSingleHc595 + SoftSpiInterface
+* LedMatrixSingleHc595 + SimpleSpiInterface
 * LedMatrixSingleHc595 + HardSpiInterface
-* LedMatrixDualHc595 + SoftSpiInterface
+* LedMatrixDualHc595 + SimpleSpiInterface
 * LedMatrixDualHc595 + HardSpiInterface
 
 ## ScanningModule
@@ -159,14 +162,6 @@ activated at a precise moment in time, but when the frame rate is high enough,
 it as if the entire LED module is lit up.
     * `renderFieldNow()` - render the current field immediately
     * `renderFieldWhenReady()` - render the current field if the time is right
-
-## Tm1637Module
-
-An implementation of `LedModule` that uses a TM1637 chip.
-
-## Max7219Module
-
-An implementation of `LedModule` that uses a MAX7219 chip.
 
 ## Remap Arrays
 

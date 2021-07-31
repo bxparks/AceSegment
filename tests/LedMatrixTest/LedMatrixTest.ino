@@ -57,14 +57,14 @@ class LedMatrixDirectTest : public TestOnce {
   protected:
     void setup() override {
       ledMatrixDirect.begin();
-      TestableGpioInterface::sEventLog.clear();
+      gEventLog.clear();
     }
 };
 
 testF(LedMatrixDirectTest, begin) {
   ledMatrixDirect.begin();
-  assertEqual(24, TestableGpioInterface::sEventLog.getNumRecords());
-  assertTrue(TestableGpioInterface::sEventLog.assertEvents(24,
+  assertEqual(24, gEventLog.getNumRecords());
+  assertTrue(gEventLog.assertEvents(24,
       (int) EventType::kPinMode, 4, OUTPUT,
       (int) EventType::kDigitalWrite, 4, LOW,
       (int) EventType::kPinMode, 5, OUTPUT,
@@ -95,8 +95,8 @@ testF(LedMatrixDirectTest, begin) {
 
 testF(LedMatrixDirectTest, end) {
   ledMatrixDirect.end();
-  assertEqual(12, TestableGpioInterface::sEventLog.getNumRecords());
-  assertTrue(TestableGpioInterface::sEventLog.assertEvents(12,
+  assertEqual(12, gEventLog.getNumRecords());
+  assertTrue(gEventLog.assertEvents(12,
       (int) EventType::kPinMode, 4, INPUT,
       (int) EventType::kPinMode, 5, INPUT,
       (int) EventType::kPinMode, 6, INPUT,
@@ -115,22 +115,22 @@ testF(LedMatrixDirectTest, end) {
 
 testF(LedMatrixDirectTest, enableGroup) {
   ledMatrixDirect.enableGroup(1);
-  assertEqual(1, TestableGpioInterface::sEventLog.getNumRecords());
-  assertTrue(TestableGpioInterface::sEventLog.assertEvents(1,
+  assertEqual(1, gEventLog.getNumRecords());
+  assertTrue(gEventLog.assertEvents(1,
       (int) EventType::kDigitalWrite, 1, HIGH));
 }
 
 testF(LedMatrixDirectTest, disableGroup) {
   ledMatrixDirect.disableGroup(1);
-  assertEqual(1, TestableGpioInterface::sEventLog.getNumRecords());
-  assertTrue(TestableGpioInterface::sEventLog.assertEvents(1,
+  assertEqual(1, gEventLog.getNumRecords());
+  assertTrue(gEventLog.assertEvents(1,
       (int) EventType::kDigitalWrite, 1, LOW));
 }
 
 testF(LedMatrixDirectTest, drawElements) {
   ledMatrixDirect.drawElements(0x55);
-  assertEqual(8, TestableGpioInterface::sEventLog.getNumRecords());
-  assertTrue(TestableGpioInterface::sEventLog.assertEvents(8,
+  assertEqual(8, gEventLog.getNumRecords());
+  assertTrue(gEventLog.assertEvents(8,
       (int) EventType::kDigitalWrite, 4, HIGH,
       (int) EventType::kDigitalWrite, 5, LOW,
       (int) EventType::kDigitalWrite, 6, HIGH,
@@ -150,14 +150,14 @@ class LedMatrixSingleHc595Test : public TestOnce {
   protected:
     void setup() override {
       ledMatrixSingleHc595.begin();
-      TestableGpioInterface::sEventLog.clear();
+      gEventLog.clear();
     }
 };
 
 testF(LedMatrixSingleHc595Test, begin) {
   ledMatrixSingleHc595.begin();
-  assertEqual(8, TestableGpioInterface::sEventLog.getNumRecords());
-  assertTrue(TestableGpioInterface::sEventLog.assertEvents(8,
+  assertEqual(8, gEventLog.getNumRecords());
+  assertTrue(gEventLog.assertEvents(8,
       (int) EventType::kPinMode, 0, OUTPUT,
       (int) EventType::kDigitalWrite, 0, LOW,
       (int) EventType::kPinMode, 1, OUTPUT,
@@ -170,8 +170,8 @@ testF(LedMatrixSingleHc595Test, begin) {
 
 testF(LedMatrixSingleHc595Test, end) {
   ledMatrixSingleHc595.end();
-  assertEqual(4, TestableGpioInterface::sEventLog.getNumRecords());
-  assertTrue(TestableGpioInterface::sEventLog.assertEvents(4,
+  assertEqual(4, gEventLog.getNumRecords());
+  assertTrue(gEventLog.assertEvents(4,
       (int) EventType::kPinMode, 0, INPUT,
       (int) EventType::kPinMode, 1, INPUT,
       (int) EventType::kPinMode, 2, INPUT,
@@ -181,22 +181,22 @@ testF(LedMatrixSingleHc595Test, end) {
 
 testF(LedMatrixSingleHc595Test, enableGroup) {
   ledMatrixSingleHc595.enableGroup(1);
-  assertEqual(1, TestableGpioInterface::sEventLog.getNumRecords());
-  assertTrue(TestableGpioInterface::sEventLog.assertEvents(1,
+  assertEqual(1, gEventLog.getNumRecords());
+  assertTrue(gEventLog.assertEvents(1,
       (int) EventType::kDigitalWrite, 1, HIGH));
 }
 
 testF(LedMatrixSingleHc595Test, disableGroup) {
   ledMatrixSingleHc595.disableGroup(1);
-  assertEqual(1, TestableGpioInterface::sEventLog.getNumRecords());
-  assertTrue(TestableGpioInterface::sEventLog.assertEvents(1,
+  assertEqual(1, gEventLog.getNumRecords());
+  assertTrue(gEventLog.assertEvents(1,
       (int) EventType::kDigitalWrite, 1, LOW));
 }
 
 testF(LedMatrixSingleHc595Test, drawElements) {
   ledMatrixSingleHc595.drawElements(0x55);
-  assertEqual(1, spiInterface.mEventLog.getNumRecords());
-  assertTrue(spiInterface.mEventLog.assertEvents(1,
+  assertEqual(1, gEventLog.getNumRecords());
+  assertTrue(gEventLog.assertEvents(1,
       (int) EventType::kSpiSend8, 0x55
   ));
 }
@@ -209,36 +209,36 @@ class LedMatrixDualHc595Test : public TestOnce {
   protected:
     void setup() override {
       ledMatrixDualHc595.begin();
-      spiInterface.mEventLog.clear();
+      gEventLog.clear();
     }
 };
 
 testF(LedMatrixDualHc595Test, begin) {
   ledMatrixDualHc595.begin();
-  assertEqual(0, spiInterface.mEventLog.getNumRecords());
+  assertEqual(0, gEventLog.getNumRecords());
 }
 
 testF(LedMatrixDualHc595Test, end) {
   ledMatrixDualHc595.end();
-  assertEqual(0, spiInterface.mEventLog.getNumRecords());
+  assertEqual(0, gEventLog.getNumRecords());
 }
 
 testF(LedMatrixDualHc595Test, enableGroup) {
   ledMatrixDualHc595.mPrevElementPattern = 0x42;
   ledMatrixDualHc595.enableGroup(1);
 
-  assertEqual(1, spiInterface.mEventLog.getNumRecords());
+  assertEqual(1, gEventLog.getNumRecords());
   uint16_t expectedOutput = ((0x1 << 1) << 8) | 0x42;
-  assertTrue(spiInterface.mEventLog.assertEvents(1,
+  assertTrue(gEventLog.assertEvents(1,
       (int) EventType::kSpiSend16, expectedOutput));
 }
 
 testF(LedMatrixDualHc595Test, disableGroup) {
   ledMatrixDualHc595.disableGroup(2);
 
-  assertEqual(1, spiInterface.mEventLog.getNumRecords());
+  assertEqual(1, gEventLog.getNumRecords());
   uint16_t expectedOutput = 0x0000;
-  assertTrue(spiInterface.mEventLog.assertEvents(1,
+  assertTrue(gEventLog.assertEvents(1,
       (int) EventType::kSpiSend16, expectedOutput));
 }
 
@@ -246,8 +246,8 @@ testF(LedMatrixDualHc595Test, draw) {
   ledMatrixDualHc595.draw(3, 0x55);
 
   uint16_t expectedOutput = ((0x1 << 3) << 8) | 0x55;
-  assertEqual(1, spiInterface.mEventLog.getNumRecords());
-  assertTrue(spiInterface.mEventLog.assertEvents(1,
+  assertEqual(1, gEventLog.getNumRecords());
+  assertTrue(gEventLog.assertEvents(1,
     (int) EventType::kSpiSend16, expectedOutput
   ));
 }

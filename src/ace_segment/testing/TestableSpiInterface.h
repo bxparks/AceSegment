@@ -9,23 +9,20 @@ namespace testing {
 class TestableSpiInterface {
   public:
     void begin() const {
-      mEventLog.addSpiBegin();
+      gEventLog.addSpiBegin();
     }
 
     void end() const {
-      mEventLog.addSpiEnd();
+      gEventLog.addSpiEnd();
     }
 
     void send8(uint8_t value) const {
-      mEventLog.addSpiSend8(value);
+      gEventLog.addSpiSend8(value);
     }
 
     void send16(uint16_t value) const {
-      mEventLog.addSpiSend16(value);
+      gEventLog.addSpiSend16(value);
     }
-
-  public:
-    mutable EventLog mEventLog;
 };
 
 } // testing

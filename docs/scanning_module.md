@@ -269,8 +269,8 @@ const uint8_t CLOCK_PIN = 13; // SH_CP on 74HC595
 const uint16_t FRAMES_PER_SECOND = 60;
 
 // Common Cathode, with transistors on Group pins
-SoftSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-using LedMatrix = LedMatrixSingleHc595<SoftSpiInterface>;
+SimpleSpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
+using LedMatrix = LedMatrixSingleHc595<SimpleSpiInterface>;
 LedMatrix ledMatrix(
     spiInterface,
     kActiveHighPattern /*elementOnPattern*/,
@@ -290,7 +290,7 @@ void setupScanningModule() {
 ```
 
 The `LedMatrixSingleHc595` configuration using hardware SPI is *exactly*
-the same as above but with `HardSpiInterface` replacing `SoftSpiInterface`.
+the same as above but with `HardSpiInterface` replacing `SimpleSpiInterface`.
 
 <a name="LedMatrixDualHc595"></a>
 #### Digits and Segments on Dual 74HC595
@@ -379,8 +379,8 @@ The class hierarchy diagram looks like this:
 LedMatrixDirectFast4              \             /
                                    \           /
                                     v         v
-                                   SoftSpiInterface
-                                   SoftSpiFastInterface
+                                   SimpleSpiInterface
+                                   SimpleSpiFastInterface
                                    HardSpiInterface
                                    HardSpiFastInterface
 ```
@@ -628,7 +628,7 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   15, 9, 5, 2
 };
 
-using SpiInterface = SoftSpiInterface;
+using SpiInterface = SimpleSpiInterface;
 SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
 
 Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(

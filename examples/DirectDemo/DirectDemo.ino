@@ -1,6 +1,12 @@
 /*
- * A demo of a single, 4-digit, bare LED module with digit and segment pins
- * connected directly to the microcontroller.
+ * A demo of a 4-digit, bare LED module with digit and segment pins connected
+ * directly to the microcontroller. Displays the digits 0 to 3, then slowly
+ * rotates the digits to the left, while incrementing the brightness of the
+ * display. Uses the DirectModule class.
+ *
+ * Supported microcontroller environments:
+ *
+ *  * AUNITER_MICRO_CUSTOM_DIRECT: SparkFun Pro Micro
  */
 
 #include <Arduino.h>

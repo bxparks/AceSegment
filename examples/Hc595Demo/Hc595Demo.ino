@@ -1,21 +1,33 @@
 /*
- * A demo of the off-the-shelf 8-digit LED module from diymore.cc with the
- * segment pins connected to a 74HC595 shift register and the digit pins also
- * connected to a 74HC595 shift regstier. Uses the Hc595Module class.
+ * A demo of the 8-digit LED module from diymore.cc/robotdyn.com, or a custom
+ * LED module with the segment pins and digit pins connected to two 74HC595
+ * shift register chips. Displays the digits 0 to 3 or 0 to 7, then slowly
+ * rotates the digits to the left, while incrementing the brightness of the
+ * display. Uses the Hc595Module class.
+ *
+ * Supported microcontroller environments:
+ *
+ *  * AUNITER_MICRO_HC595: SparkFun Pro Micro + diymore.cc LED module
+ *  * AUNITER_MICRO_CUSTOM_DUAL: SparkFun Pro Micro + Custom LED module
+ *  * AUNITER_SAMD_HC595: SAMD21 M0 Mini + diymore.cc LED module
+ *  * AUNITER_STM32_HC595: STM32 F1 Blue Pill
+ *  * AUNITER_D1MINI_LARGE_HC595: WeMos D1 Mini ESP8266
+ *  * AUNITER_ESP32_HC595: ESP32 Dev Kit v1
  */
 
 #include <Arduino.h>
 #include <SPI.h>
 #include <AceCommon.h> // incrementMod()
+#include <AceSPI.h>
 #include <AceSegment.h> // Hc595Module, PatternWriter
 
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
+using ace_spi::HardSpiInterface;
+using ace_spi::SimpleSpiInterface;
 using ace_segment::Hc595Module;
 using ace_segment::PatternWriter;
-using ace_segment::HardSpiInterface;
-using ace_segment::SoftSpiInterface;
 using ace_segment::kDigitRemapArray8Hc595;
 using ace_segment::kByteOrderDigitHighSegmentLow;
 using ace_segment::kByteOrderSegmentHighDigitLow;
@@ -23,12 +35,12 @@ using ace_segment::kActiveLowPattern;
 using ace_segment::kActiveHighPattern;
 
 // Select interface protocol.
-#define INTERFACE_TYPE_SOFT_SPI 0
-#define INTERFACE_TYPE_SOFT_SPI_FAST 1
+#define INTERFACE_TYPE_SIMPLE_SPI 0
+#define INTERFACE_TYPE_SIMPLE_SPI_FAST 1
 #define INTERFACE_TYPE_HARD_SPI 2
 #define INTERFACE_TYPE_HARD_SPI_FAST 3
-#define INTERFACE_TYPE_SOFT_TMI 4
-#define INTERFACE_TYPE_SOFT_TMI_FAST 5
+#define INTERFACE_TYPE_SIMPLE_TMI 4
+#define INTERFACE_TYPE_SIMPLE_TMI_FAST 5
 
 // Some microcontrollers have 2 or more SPI buses. PRIMARY selects the default.
 // SECONDARY selects the alternate. I don't have a board with more than 2, but
@@ -52,7 +64,7 @@ using ace_segment::kActiveHighPattern;
   const uint8_t HC595_BYTE_ORDER = kByteOrderDigitHighSegmentLow;
   const uint8_t* const REMAP_ARRAY = nullptr;
 
-  #define INTERFACE_TYPE INTERFACE_TYPE_SOFT_SPI_FAST
+  #define INTERFACE_TYPE INTERFACE_TYPE_SIMPLE_SPI_FAST
   #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
   const uint8_t LATCH_PIN = 10;
   const uint8_t DATA_PIN = MOSI;
@@ -83,6 +95,20 @@ using ace_segment::kActiveHighPattern;
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
   #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
   const uint8_t LATCH_PIN = 10;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+  SPIClass& spiInstance = SPI;
+
+#elif defined(AUNITER_SAMD_HC595)
+  const uint8_t NUM_DIGITS = 8;
+  const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
+  const uint8_t DIGIT_ON_PATTERN = kActiveHighPattern;
+  const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
+  const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
+
+  #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
+  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
+  const uint8_t LATCH_PIN = SS;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
   SPIClass& spiInstance = SPI;
@@ -163,12 +189,12 @@ using ace_segment::kActiveHighPattern;
 //------------------------------------------------------------------
 
 #if INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI_FAST \
-    || INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI_FAST
+    || INTERFACE_TYPE == INTERFACE_TYPE_SIMPLE_SPI_FAST
   #include <digitalWriteFast.h>
-  #include <ace_segment/hw/SoftSpiFastInterface.h>
-  #include <ace_segment/hw/HardSpiFastInterface.h>
-  using ace_segment::SoftSpiFastInterface;
-  using ace_segment::HardSpiFastInterface;
+  #include <ace_spi/SimpleSpiFastInterface.h>
+  #include <ace_spi/HardSpiFastInterface.h>
+  using ace_spi::SimpleSpiFastInterface;
+  using ace_spi::HardSpiFastInterface;
 #endif
 
 // LED segment patterns.
@@ -190,11 +216,11 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   15, 9, 5, 2
 };
 
-#if INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI
-  using SpiInterface = SoftSpiInterface;
+#if INTERFACE_TYPE == INTERFACE_TYPE_SIMPLE_SPI
+  using SpiInterface = SimpleSpiInterface;
   SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-#elif INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI_FAST
-  using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+#elif INTERFACE_TYPE == INTERFACE_TYPE_SIMPLE_SPI_FAST
+  using SpiInterface = SimpleSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
 #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
   using SpiInterface = HardSpiInterface<SPIClass>;

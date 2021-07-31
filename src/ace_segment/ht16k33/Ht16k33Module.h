@@ -43,23 +43,24 @@ namespace ace_segment {
  * point after digit 1 (second from left) and the colon between digits 1 and 2
  * can be controlled independently and turned on at the same time.
  *
- * This class has the option of making the LED module behave like a normal
- * 4-digit LED module (witout a colon), or a 4-digit LED clock module (with a
- * colon). With the `enableColon` parameter set to false (default), the decimal
- * point (bit 7) of digit 1 controls the decimal point to the right of digit 1.
- * With `enableColon` set to true, the same bit controls the colon to the right
- * of digit 1.
+ * Unfortunately, the AceSegment library does *not* support controlling both the
+ * decimal point and the colon at the same time. Instead, this class provides
+ * the option of enabling one or the other, making the LED module behave like a
+ * normal 4-digit LED module (witout a colon), or a 4-digit LED clock module
+ * (with a colon). With the `enableColon` parameter set to false (default), the
+ * decimal point (bit 7) of digit 1 controls the decimal point to the right of
+ * digit 1. With `enableColon` set to true, the same bit controls the colon to
+ * the right of digit 1.
  *
- * Although the hardware is capable of turning on the decimal point and colon at
- * the same time, the AceSegment library does not support that mode. It does not
- * seem like a combination that is useful. Fortunately, this class does allow
- * the behavior of the colon segment to be changed at runtime using the
+ * The behavior of the colon segment to be changed at runtime as well using the
  * enableColon() method. You can display the time of a clock (`hh:mm`), then
  * display a normal number with a decimal point (`xx.yy`).
  *
- * @tparam T_WIREI the class that wraps the I2C Wire interface, usually
- *    WireInterface
- * @tparam T_DIGITS number of logical digits in the module
+ * @tparam T_WIREI the class that wraps the I2C Wire interface (one of
+ *    TwoWireInterface, SimpleWireInterface of SimpleWireFastInterface)
+ * @tparam T_DIGITS number of logical digits in the module. Currently this
+ *    should always be set to 4 because it is designed to support the 4-digit
+ *    LED modules found on Adafruit, Amazon or eBay.
  */
 template <typename T_WIREI, uint8_t T_DIGITS>
 class Ht16k33Module : public LedModule {
@@ -67,16 +68,20 @@ class Ht16k33Module : public LedModule {
     /**
      * Constructor.
      * @param wire instance of T_WIREI class
-     * @param remapArray (optional, nullable) a mapping of the physical digit
-     *    positions to their logical positions
+     * @param addr the 7-bit I2C addr
      * @param enableColon enable the colon segment to behave like a 4-digit
      *    LED module for clocks (displaying a colon in `hh:mm`). The
      *    decimal point (bit 7) of digit 1 (second from left) becomes wired
      *    to the colon segment. (default: false)
      */
-    explicit Ht16k33Module(T_WIREI& wire, bool enableColon = false) :
+    explicit Ht16k33Module(
+        T_WIREI& wire,
+        uint8_t addr,
+        bool enableColon = false
+    ) :
         LedModule(T_DIGITS),
         mWire(wire),
+        mAddr(addr),
         mBrightness(0),
         mEnableColon(enableColon)
     {}
@@ -148,12 +153,12 @@ class Ht16k33Module : public LedModule {
      * Unlike some LED modules, it can display both the decimal point on digit 1
      * as well as the colon segment at the same time. However, various writers
      * (e.g. ClockWriter) assumes that the most-significant-bit of digit 1 is
-     * connected to the colon. So if enableColon is set, make the logical
-     * mapping of that decimal point bit so the colon bit.
+     * connected to the colon. So if enableColon is set, map the decimal point
+     * bit to the colon bit.
      */
     void flush() {
       // Write digits.
-      mWire.beginTransmission();
+      mWire.beginTransmission(mAddr);
       mWire.write(0x00); // start at position 0
       // Loop over the 5 physical digit lines of this module.
       for (uint8_t chipPos = 0; chipPos < T_DIGITS + 1; ++chipPos) {
@@ -161,7 +166,7 @@ class Ht16k33Module : public LedModule {
         mWire.write(pattern); // ROW0-ROW7
         mWire.write(0); // ROW8-ROW15 unused
       }
-      mWire.endTransmission();
+      mWire.endTransmission(false); // HT16K33 supports repeated START
 
       // Write brightness.
       writeCommand(mBrightness | kBrightness);
@@ -173,7 +178,7 @@ class Ht16k33Module : public LedModule {
 
     /** Write a single byte command to the LED module. */
     void writeCommand(uint8_t command) {
-      mWire.beginTransmission();
+      mWire.beginTransmission(mAddr);
       mWire.write(command);
       mWire.endTransmission();
     }
@@ -220,8 +225,14 @@ class Ht16k33Module : public LedModule {
     static uint8_t const kDisplayOn  = 0x81;
     static uint8_t const kBrightness = 0xE0;
 
-    /** I2C Wire interface. */
-    T_WIREI& mWire;
+    /**
+     * I2C Wire interface. Copied by value instead of reference to avoid an
+     * extra layer of indirection.
+     */
+    T_WIREI mWire;
+
+    /** The 7-bit I2C address. */
+    uint8_t const mAddr;
 
     /** Pattern for each digit. */
     uint8_t mPatterns[T_DIGITS];

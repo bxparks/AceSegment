@@ -1,37 +1,44 @@
 /*
- * A demo of a 4-digit LED module with segment pins connected to a 74HC595 shift
- * register and the digit pins connected directly to the microcontroller. Uses
- * the HybridModule class.
+ * A demo of a custom 4-digit LED module with the segment pins connected to a
+ * 74HC595 shift register and the digit pins connected directly to the
+ * microcontroller. Displays the digits 0 to 3, then slowly rotates the digits
+ * to the left, while incrementing the brightness of the display. Uses the
+ * HybridModule class.
+ *
+ * Supported microcontroller environments:
+ *
+ *  * AUNITER_MICRO_CUSTOM_SINGLE: SparkFun Pro Micro
  */
 
 #include <Arduino.h>
 #include <AceCommon.h> // incrementMod()
+#include <AceSPI.h>
 #include <AceSegment.h> // HybridModule, PatternWriter
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 #include <digitalWriteFast.h>
-#include <ace_segment/hw/HardSpiFastInterface.h>
-#include <ace_segment/hw/SoftSpiFastInterface.h>
+#include <ace_spi/HardSpiFastInterface.h>
+#include <ace_spi/SimpleSpiFastInterface.h>
 #endif
 
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
-using ace_segment::SoftSpiInterface;
-using ace_segment::HardSpiInterface;
-using ace_segment::SoftSpiFastInterface;
-using ace_segment::HardSpiFastInterface;
+using ace_spi::SimpleSpiInterface;
+using ace_spi::HardSpiInterface;
+using ace_spi::SimpleSpiFastInterface;
+using ace_spi::HardSpiFastInterface;
 using ace_segment::HybridModule;
 using ace_segment::PatternWriter;
 using ace_segment::kActiveHighPattern;
 
 // Select interface protocol.
-#define INTERFACE_TYPE_SOFT_SPI 0
-#define INTERFACE_TYPE_SOFT_SPI_FAST 1
+#define INTERFACE_TYPE_SIMPLE_SPI 0
+#define INTERFACE_TYPE_SIMPLE_SPI_FAST 1
 #define INTERFACE_TYPE_HARD_SPI 2
 #define INTERFACE_TYPE_HARD_SPI_FAST 3
-#define INTERFACE_TYPE_SOFT_TMI 4
-#define INTERFACE_TYPE_SOFT_TMI_FAST 5
+#define INTERFACE_TYPE_SIMPLE_TMI 4
+#define INTERFACE_TYPE_SIMPLE_TMI_FAST 5
 
 // Some microcontrollers have 2 or more SPI buses. PRIMARY selects the default.
 // SECONDARY selects the alternate. I don't have a board with more than 2, but
@@ -90,11 +97,11 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
   15, 9, 5, 2
 };
 
-#if INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI
-  using SpiInterface = SoftSpiInterface;
+#if INTERFACE_TYPE == INTERFACE_TYPE_SIMPLE_SPI
+  using SpiInterface = SimpleSpiInterface;
   SpiInterface spiInterface(LATCH_PIN, DATA_PIN, CLOCK_PIN);
-#elif INTERFACE_TYPE == INTERFACE_TYPE_SOFT_SPI_FAST
-  using SpiInterface = SoftSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
+#elif INTERFACE_TYPE == INTERFACE_TYPE_SIMPLE_SPI_FAST
+  using SpiInterface = SimpleSpiFastInterface<LATCH_PIN, DATA_PIN, CLOCK_PIN>;
   SpiInterface spiInterface;
 #elif INTERFACE_TYPE == INTERFACE_TYPE_HARD_SPI
   using SpiInterface = HardSpiInterface<SPIClass>;
@@ -146,21 +153,29 @@ uint16_t prevUpdateMillis = 0;
 uint16_t prevStatsMillis = 0;
 #endif
 
+// Update the LedModule with new pattern and brightness every second.
 void updateDisplay() {
-  // Update the display
-  uint8_t j = digitIndex;
-  for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
-    patternWriter.writePatternAt(i, PATTERNS[j]);
-    // Write a decimal point every other digit, for demo purposes.
-    patternWriter.writeDecimalPointAt(i, j & 0x1);
-    incrementMod(j, (uint8_t) NUM_DIGITS);
-  }
-  incrementMod(digitIndex, (uint8_t) NUM_DIGITS);
+  static uint16_t prevUpdateMillis;
 
-  // Update the brightness
-  uint8_t brightness = BRIGHTNESS_LEVELS[brightnessIndex];
-  ledModule.setBrightness(brightness);
-  incrementMod(brightnessIndex, NUM_BRIGHTNESSES);
+  uint16_t nowMillis = millis();
+  if ((uint16_t) (nowMillis - prevUpdateMillis) >= 1000) {
+    prevUpdateMillis = nowMillis;
+
+    // Update the display
+    uint8_t j = digitIndex;
+    for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
+      patternWriter.writePatternAt(i, PATTERNS[j]);
+      // Write a decimal point every other digit, for demo purposes.
+      patternWriter.writeDecimalPointAt(i, j & 0x1);
+      incrementMod(j, (uint8_t) NUM_DIGITS);
+    }
+    incrementMod(digitIndex, (uint8_t) NUM_DIGITS);
+
+    // Update the brightness
+    uint8_t brightness = BRIGHTNESS_LEVELS[brightnessIndex];
+    ledModule.setBrightness(brightness);
+    incrementMod(brightnessIndex, NUM_BRIGHTNESSES);
+  }
 }
 
 // Call renderFieldWhenReady() as fast as possible. It uses an internal timer to

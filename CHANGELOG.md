@@ -1,6 +1,26 @@
 # Changelog
 
 * Unreleased
+* 0.8 (2021-07-30)
+    * Move I2C address into `beginTransmission()` method of `TwoWireInterface`,
+      `SimpleWireInterface` and `SimpleWireFastInterface`.
+        * More consistent with `TwoWire` class API.
+        * Allows multiple HT16K33 LED modules with different addresses to
+          share a single `WireInterface`.
+    * Add caution that `delayMicroseconds()` on AVR is not accurate for small
+      (less than 10) microseconds.
+    * Extract `hw/*Spi*Interface` classes into new
+      [AceSPI](https://github.com/bxparks/AceSPI) library.
+    * Extract `hw/*Tmi*Interface` classes into new
+      [AceTMI](https://github.com/bxparks/AceTMI) library.
+    * Extract `hw/*Wire*Interface` classes into new
+      [AceWire](https://github.com/bxparks/AceWire) library.
+    * `examples/WriterTester`: renamed from `examples/AceSegmentTester`
+    * Delete `keywords.txt`, takes too much effort to maintain.
+    * Add examples/MemoryBenchmark and examples/AutoBenchmark to gather
+      memory and CPU usage of various I2C implementations.
+    * Rename `SoftSpi*Interface` to `SimpleSpi*Interface`.
+    * Rename `SoftTmi*Interface` to `SimpleTmi*Interface`.
 * 0.7 (2021-06-16)
     * Support HT16K33 LED modules
         * Add `Ht16k33Module` class to support 4-digit LED display from

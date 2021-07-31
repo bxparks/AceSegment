@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.7.0</span>
+   &#160;<span id="projectnumber">0.8.0</span>
    </div>
    <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, HT16K33, or 74HC595 controller chips</div>
   </td>
@@ -175,7 +175,7 @@ class ace_segment::Hc595Module&lt; T_SPII, T_DIGITS, T_SUBFIELDS, T_CI &gt;</h3>
 <p>This is a convenience class that pairs together a <a class="el" href="classace__segment_1_1ScanningModule.html" title="An implementation of LedModule for display modules which do not have hardware controller chips,...">ScanningModule</a> and a <a class="el" href="classace__segment_1_1LedMatrixDualHc595.html" title="An LedMatrix that whose group pins are attached to one 74HC595 shift register and the element pins ar...">LedMatrixDualHc595</a> in a single class.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">T_SPII</td><td>interface to SPI, either <a class="el" href="classace__segment_1_1SoftSpiInterface.html" title="Software SPI using shiftOut().">SoftSpiInterface</a> or <a class="el" href="classace__segment_1_1HardSpiInterface.html" title="Hardware SPI interface to talk to one or two 74HC595 Shift Register chip(s), using the predefined SPI...">HardSpiInterface</a> </td></tr>
+    <tr><td class="paramname">T_SPII</td><td>class that implements the SPI interface, usually one of the classes in the AceSPI library: SimpleSpiInterface, SimpleSpiFastInterface, HardSpiInterface, HardSpiFastInterface. </td></tr>
     <tr><td class="paramname">T_DIGITS</td><td>number of LED digits </td></tr>
     <tr><td class="paramname">T_SUBFIELDS</td><td>number of subfields for each digit to get brightness control using PWM. The default is 1, but can be set to greater than 1 to get brightness control. </td></tr>
     <tr><td class="paramname">T_CI</td><td>class that provides access to Arduino clock functions (millis() and micros()). The default is <a class="el" href="classace__segment_1_1ClockInterface.html" title="A utility class (all methods are static) that provides a layer of indirection to Arduino clock functi...">ClockInterface</a>. </td></tr>
@@ -183,7 +183,7 @@ class ace_segment::Hc595Module&lt; T_SPII, T_DIGITS, T_SUBFIELDS, T_CI &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="Hc595Module_8h_source.html#l00073">73</a> of file <a class="el" href="Hc595Module_8h_source.html">Hc595Module.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Hc595Module_8h_source.html#l00075">75</a> of file <a class="el" href="Hc595Module_8h_source.html">Hc595Module.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ae3ce4d5d32c92c01df7a424c6e5e56cc"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae3ce4d5d32c92c01df7a424c6e5e56cc">&#9670;&nbsp;</a></span>Hc595Module()</h2>
@@ -256,7 +256,7 @@ template&lt;typename T_SPII , uint8_t T_DIGITS, uint8_t T_SUBFIELDS = 1, typenam
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="Hc595Module_8h_source.html#l00106">106</a> of file <a class="el" href="Hc595Module_8h_source.html">Hc595Module.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Hc595Module_8h_source.html#l00108">108</a> of file <a class="el" href="Hc595Module_8h_source.html">Hc595Module.h</a>.</p>
 
 </div>
 </div>

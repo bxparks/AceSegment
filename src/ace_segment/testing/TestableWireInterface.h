@@ -13,27 +13,24 @@ namespace testing {
 class TestableWireInterface {
   public:
     void begin() const {
-      mEventLog.addWireBegin();
+      gEventLog.addWireBegin();
     }
 
     void end() const {
-      mEventLog.addWireEnd();
+      gEventLog.addWireEnd();
     }
 
-    void beginTransmission() const {
-      mEventLog.addWireBeginTransmission();
+    void beginTransmission(uint8_t addr) const {
+      gEventLog.addWireBeginTransmission(addr);
     }
 
     void write(uint16_t data) const {
-      mEventLog.addWireWrite(data);
+      gEventLog.addWireWrite(data);
     }
 
     void endTransmission() const {
-      mEventLog.addWireEndTransmission();
+      gEventLog.addWireEndTransmission();
     }
-
-  public:
-    mutable EventLog mEventLog;
 };
 
 } // testing

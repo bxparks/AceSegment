@@ -18,10 +18,20 @@ the schematic below:
 
 The capacitors for `CLK` and `DIO` lines are 10 nF, which is about 50-100X
 larger than they should be. It causes the RC time constant to be about 100
-microseconds, which forces the `BIT_DELAY` parameter in the `SoftTmiInterface`
-and `SoftTmiFastInterface` classes to be 100 microseconds. According to the
-TM1637 datasheet, the controller chip should be able to handle a `BIT_DELAY` as
-low as 1 microsecond (i.e. 2 microseconds per full cycle, or 500 kHz).
+microseconds, which forces the `delayMicros` parameter in `SimpleTmiInterface`
+and the `DELAY_MICROS` parameter in `SimpleTmiFastInterface` to be 100
+microseconds. According to the TM1637 datasheet, the controller chip has a
+maximum clock frequency of 500 kHz (50% duty cycle), which implies a theoretical
+`DELAY_MICROS` of 1 microsecond.
+
+The actual minimum value for the `delayMicroseconds()` function might be as low
+as 0 for several reasons:
+
+* there is overhead in calling the `delayMicroseconds()` function
+* the implementation of the `delayMicroseconds()` function on AVR processors is
+  not accurate for small (less than 10) microseconds
+* there is overhead for the `digitalWrite()` or `digitalWriteFast()` functions
+* there is overhead in the bit-shifting and looping
 
 If you are handy with a soldering iron, you can remove the two 10 nF capacitors.
 The capacitors are located in different places depending on the size of the LED
@@ -30,10 +40,10 @@ capacitors is to use a multimeter and find the capacitors where one end of the
 capacitor is connected to `GND` and the other end of the capacitor is connected
 to either the `DIO` pin or the `CLK` pin.
 
-In theory, these capacitors should be replaced with ones in the
-range of 100 to 500 pF , to prevent interference from high frequency noise on
-the `CLK` and `DIO` lines. However, I have tested these modules with **no**
-capacitors on the `DIO` and `CLK` lines, and was able to use a `BIT_DELAY` as
+In theory, these capacitors should be replaced with ones in the range of 100 to
+500 pF , to prevent interference from high frequency noise on the `CLK` and
+`DIO` lines. However, I have tested these modules with **no** capacitors on the
+`DIO` and `CLK` lines, and was able to use a `delayMicros` or `DELAY_MICROS` as
 low as 1 microsecond.
 
 Here are the photos of the LED modules that I modified, where the red box marks

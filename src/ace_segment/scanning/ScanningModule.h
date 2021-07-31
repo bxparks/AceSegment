@@ -47,8 +47,8 @@ namespace ace_segment {
  *
  * This class depends on one of the implementations of the `LedMatrixBase` class
  * to multiplex the LED segments on the digits, and potentially  one of the of
- * `SoftSpiInterface` or `HardSpiInterface` classes if a 74HC595 shift register
- * chip is used.
+ * `SimpleSpiInterface` or `HardSpiInterface` classes if a 74HC595 shift
+ * register chip is used.
  *
  * A frame is divided into fields. A field is a partial rendering of a frame.
  * Normally, the one digit corresponds to one field. However if brightness

@@ -184,11 +184,12 @@ class EventLog {
       mNumRecords++;
     }
 
-    void addWireBeginTransmission() {
+    void addWireBeginTransmission(uint8_t addr) {
       if (mNumRecords >= kMaxRecords) return;
 
       Event& event = mEvents[mNumRecords];
       event.type = EventType::kWireBeginTransmission;
+      event.arg1 = addr;
       mNumRecords++;
     }
 
@@ -330,7 +331,10 @@ class EventLog {
           case EventType::kWireEnd:
             break;
 
-          case EventType::kWireBeginTransmission:
+          case EventType::kWireBeginTransmission: {
+              uint8_t value = va_arg(args, int);
+              if (value != event.arg1) return false;
+            }
             break;
 
           case EventType::kWireEndTransmission:
@@ -377,6 +381,9 @@ class EventLog {
     Event mEvents[kMaxRecords];
     uint8_t mNumRecords = 0;
 };
+
+// One global instance for testing.
+extern EventLog gEventLog;
 
 } // testing
 } // ace_segment

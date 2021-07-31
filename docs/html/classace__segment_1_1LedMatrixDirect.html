@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.7.0</span>
+   &#160;<span id="projectnumber">0.8.0</span>
    </div>
    <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, HT16K33, or 74HC595 controller chips</div>
   </td>
@@ -101,8 +101,8 @@ Collaboration diagram for ace_segment::LedMatrixDirect&lt; T_GPIOI &gt;:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:af3e107e571f515fa9837b1ec4b118569"><td class="memItemLeft" align="right" valign="top"><a id="af3e107e571f515fa9837b1ec4b118569"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>LedMatrixDirect</b> (uint8_t elementOnPattern, uint8_t groupOnPattern, uint8_t numElements, const uint8_t *elementPins, uint8_t numGroups, const uint8_t *groupPins)</td></tr>
+<tr class="memitem:af3e107e571f515fa9837b1ec4b118569"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedMatrixDirect.html#af3e107e571f515fa9837b1ec4b118569">LedMatrixDirect</a> (uint8_t elementOnPattern, uint8_t groupOnPattern, uint8_t numElements, const uint8_t *elementPins, uint8_t numGroups, const uint8_t *groupPins)</td></tr>
+<tr class="memdesc:af3e107e571f515fa9837b1ec4b118569"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="classace__segment_1_1LedMatrixDirect.html#af3e107e571f515fa9837b1ec4b118569">More...</a><br /></td></tr>
 <tr class="separator:af3e107e571f515fa9837b1ec4b118569"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a049a5710455d29f7a4f1815338348c92"><td class="memItemLeft" align="right" valign="top"><a id="a049a5710455d29f7a4f1815338348c92"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>begin</b> () const</td></tr>
@@ -179,7 +179,85 @@ class ace_segment::LedMatrixDirect&lt; T_GPIOI &gt;</h3>
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="LedMatrixDirect_8h_source.html#l00044">44</a> of file <a class="el" href="LedMatrixDirect_8h_source.html">LedMatrixDirect.h</a>.</p>
-</div><hr/>The documentation for this class was generated from the following file:<ul>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="af3e107e571f515fa9837b1ec4b118569"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af3e107e571f515fa9837b1ec4b118569">&#9670;&nbsp;</a></span>LedMatrixDirect()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T_GPIOI  = GpioInterface&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classace__segment_1_1LedMatrixDirect.html">ace_segment::LedMatrixDirect</a>&lt; T_GPIOI &gt;::<a class="el" href="classace__segment_1_1LedMatrixDirect.html">LedMatrixDirect</a> </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>elementOnPattern</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>groupOnPattern</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>numElements</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint8_t *&#160;</td>
+          <td class="paramname"><em>elementPins</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>numGroups</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint8_t *&#160;</td>
+          <td class="paramname"><em>groupPins</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">elementOnPattern</td><td>bit pattern that turns on the elements (segments) </td></tr>
+    <tr><td class="paramname">groupOnpattern</td><td>bit pattern that turns on the groups (digits) </td></tr>
+    <tr><td class="paramname">numElements</td><td>number of LED segments, almost always 8 </td></tr>
+    <tr><td class="paramname">elementPins</td><td>pointer to array of 'numElements' pin numbers </td></tr>
+    <tr><td class="paramname">numGroups</td><td>number of LED groups (digits) </td></tr>
+    <tr><td class="paramname">groupPins</td><td>pointer to array of 'numGroups' pin numbers </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="LedMatrixDirect_8h_source.html#l00055">55</a> of file <a class="el" href="LedMatrixDirect_8h_source.html">LedMatrixDirect.h</a>.</p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
 <li>/home/brian/src/AceSegment/src/ace_segment/scanning/<a class="el" href="LedMatrixDirect_8h_source.html">LedMatrixDirect.h</a></li>
 </ul>
 </div><!-- contents -->

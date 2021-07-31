@@ -80,11 +80,11 @@ constexpr uint8_t initialDirtyBits(uint8_t numBits) {
 /**
  * An implementation of LedModule using the TM1637 chip. The chip communicates
  * using a protocol that is electrically similar to I2C, but does not use an
- * address byte at the beginning of the protocol. We can use a software-based
- * I2C interface.
+ * address byte at the beginning of the protocol.
  *
- * @tparam T_TMII two wire protocol interface for TM1637, either
- *    SoftTmiInterface or SoftTmiFastInterface
+ * @tparam T_TMII class that implements the two wire protocol interface for
+ *    TM1637, usually one of the classes from the AceTMI library:
+ *    SimpleTmiInterface or SimpleTmiFastInterface.
  * @tparam T_DIGITS number of digits in the LED module (usually 4 or 6)
  */
 template <typename T_TMII, uint8_t T_DIGITS>
@@ -93,8 +93,7 @@ class Tm1637Module : public LedModule {
 
     /**
      * Constructor.
-     * @param tmiInterface instance of either SoftTmiInterface or
-     *    SoftTmiFastInterface
+     * @param tmiInterface instance of TM1637 interface class
      * @param remapArray (optional, nullable) a mapping of the logical digit
      *    positions to their physical positions, useful for 6-digt LED modules
      *    using the TM1637 chip whose digits are wired out of order
@@ -113,7 +112,7 @@ class Tm1637Module : public LedModule {
     //-----------------------------------------------------------------------
 
     /**
-     * Initialize the module. The SoftTmiInterface object must be initialized
+     * Initialize the module. The SimpleTmiInterface object must be initialized
      * separately.
      *
      * @param remapArray optional array of positions to handle LED modules whose
@@ -303,6 +302,7 @@ class Tm1637Module : public LedModule {
     friend class ::Tm1637ModuleTest_flushIncremental;
     friend class ::Tm1637ModuleTest_flush;
 
+    // These come from the TM1637 controller chip datasheet.
     static uint8_t const kDataCmdWriteDisplay = 0b01000000;
     static uint8_t const kDataCmdReadKeys =     0b01000010;
     static uint8_t const kDataCmdAutoAddress =  0b01000000;
@@ -317,7 +317,11 @@ class Tm1637Module : public LedModule {
 
     // The ordering of these fields is partially determined to save memory on
     // 32-bit processors.
-    const T_TMII& mTmiInterface;
+
+    // TM1637 interface object. Copied by value instead of reference to avoid an
+    // extra level of indirection.
+    const T_TMII mTmiInterface;
+
     const uint8_t* const mRemapArray;
     uint8_t mPatterns[T_DIGITS]; // maps to dirty bits [0, T_DIGITS-1]
     uint8_t mBrightness; // maps to dirty bit at T_DIGITS

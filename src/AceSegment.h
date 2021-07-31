@@ -36,13 +36,18 @@ SOFTWARE.
 #ifndef ACE_SEGMENT_ACE_SEGMENT_H
 #define ACE_SEGMENT_ACE_SEGMENT_H
 
+// Blacklist platforms using https://github.com/arduino/ArduinoCore-api due to
+// incompatibilities.
+#if defined(ARDUINO_API_VERSION)
+#error Platforms using ArduinoCore-API not supported
+#endif
+
+// Version format: xxyyzz == "xx.yy.zz"
+#define ACE_SEGMENT_VERSION 800
+#define ACE_SEGMENT_VERSION_STRING "0.8"
+
 #include "ace_segment/hw/ClockInterface.h"
 #include "ace_segment/hw/GpioInterface.h"
-#include "ace_segment/hw/SoftSpiInterface.h"
-#include "ace_segment/hw/HardSpiInterface.h"
-#include "ace_segment/hw/SoftTmiInterface.h"
-#include "ace_segment/hw/TwoWireInterface.h"
-#include "ace_segment/hw/SimpleWireInterface.h"
 #include "ace_segment/hw/remap.h"
 #include "ace_segment/scanning/LedMatrixDirect.h"
 #include "ace_segment/scanning/LedMatrixSingleHc595.h"
@@ -63,15 +68,5 @@ SOFTWARE.
 #include "ace_segment/writer/StringWriter.h"
 #include "ace_segment/writer/StringScroller.h"
 #include "ace_segment/writer/LevelWriter.h"
-
-// Blacklist platforms using https://github.com/arduino/ArduinoCore-api due to
-// incompatibilities.
-#if defined(ARDUINO_API_VERSION)
-#error Platforms using ArduinoCore-API not supported
-#endif
-
-// Version format: xxyyzz == "xx.yy.zz"
-#define ACE_SEGMENT_VERSION 700
-#define ACE_SEGMENT_VERSION_STRING "0.7"
 
 #endif

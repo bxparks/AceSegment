@@ -1,23 +1,32 @@
 /*
- * A simple demo of a single TM1637 LED module, with the digits [0,3] or [0,5]
+ * A demo of a single TM1637 LED module, with the digits [0,3] or [0,5]
  * scrolling to the left every second, and the brightness changing each
  * iteration.
+ *
+ * Supported microcontroller environments:
+ *
+ *  * AUNITER_MICRO_TM1637: SparkFun Pro Micro + 4-digit LED module
+ *  * AUNITER_MICRO_TM1637_6: SparkFun Pro Micro + 6-digit LED module
+ *  * AUNITER_STM32_TM1637: STM32 F1 Blue Pill + 4-digit LED module
+ *  * AUNITER_D1MINI_LARGE_TM1637: WeMos D1 Mini ESP8266
+ *  * AUNITER_ESP32_TM1637: ESP32 Dev Kit v1
  */
 
 #include <Arduino.h>
 #include <AceCommon.h> // incrementMod()
+#include <AceTMI.h>
 #include <AceSegment.h> // Tm1636Module, PatternWriter
 
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
+using ace_tmi::SimpleTmiInterface;
 using ace_segment::Tm1637Module;
 using ace_segment::PatternWriter;
-using ace_segment::SoftTmiInterface;
 using ace_segment::kDigitRemapArray6Tm1637;
 
-// Select TM1637 protocol version, either SoftTmiInterface or
-// SoftTmiFastInterface.
+// Select TM1637 protocol version, either SimpleTmiInterface or
+// SimpleTmiFastInterface.
 #define TMI_INTERFACE_TYPE_NORMAL 0
 #define TMI_INTERFACE_TYPE_FAST 1
 
@@ -58,6 +67,14 @@ using ace_segment::kDigitRemapArray6Tm1637;
   const uint8_t DIO_PIN = 9;
   const uint8_t NUM_DIGITS = 6;
 
+#elif defined(AUNITER_SAMD_TM1637)
+  #define TMI_INTERFACE_TYPE TMI_INTERFACE_TYPE_NORMAL
+  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
+
+  const uint8_t CLK_PIN = 13;
+  const uint8_t DIO_PIN = 11;
+  const uint8_t NUM_DIGITS = 4;
+
 #elif defined(AUNITER_STM32_TM1637)
   #define TMI_INTERFACE_TYPE TMI_INTERFACE_TYPE_NORMAL
   #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
@@ -90,22 +107,22 @@ using ace_segment::kDigitRemapArray6Tm1637;
 // AceSegment Configuration
 //------------------------------------------------------------------
 
-// For a SoftTmiInterface (non-fast), time to send 4 digits:
+// For a SimpleTmiInterface (non-fast), time to send 4 digits:
 // * 12 ms at 50 us delay, but does not work with off-the-shelf TM1637 module.
 // * 17 ms at 75 us delay.
 // * 22 ms at 100 us delay.
 // * 43 ms at 200 us delay.
-const uint16_t BIT_DELAY = 100;
+const uint8_t DELAY_MICROS = 100;
 
 #if TMI_INTERFACE_TYPE == TMI_INTERFACE_TYPE_NORMAL
-  using TmiInterface = SoftTmiInterface;
-  TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY);
+  using TmiInterface = SimpleTmiInterface;
+  TmiInterface tmiInterface(DIO_PIN, CLK_PIN, DELAY_MICROS);
 #elif TMI_INTERFACE_TYPE == TMI_INTERFACE_TYPE_FAST
   #include <digitalWriteFast.h>
-  #include <ace_segment/hw/SoftTmiFastInterface.h>
-  using ace_segment::SoftTmiFastInterface;
+  #include <ace_tmi/SimpleTmiFastInterface.h>
+  using ace_tmi::SimpleTmiFastInterface;
 
-  using TmiInterface = SoftTmiFastInterface<DIO_PIN, CLK_PIN, BIT_DELAY>;
+  using TmiInterface = SimpleTmiFastInterface<DIO_PIN, CLK_PIN, DELAY_MICROS>;
   TmiInterface tmiInterface;
 #else
   #error Unknown TMI_INTERFACE_TYPE

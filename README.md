@@ -26,7 +26,7 @@ into hardware-dependent components and hardware-independent components to allow
 application code to be written without worrying too much about the low-level
 details of the specific LED module.
 
-**Version**: 0.7 (2021-06-16)
+**Version**: 0.8 (2021-07-30)
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
@@ -61,14 +61,15 @@ consumption, but it is getting very close.
         * [Rendering the Hc595Module](#RenderingHc595Module)
     * [HybridModule](#HybridModule)
     * [DirectModule](#DirectModule)
-    * [PatternWriter](#PatternWriter)
-    * [NumberWriter](#NumberWriter)
-    * [ClockWriter](#ClockWriter)
-    * [TemperatureWriter](#TemperatureWriter)
-    * [CharWriter](#CharWriter)
-    * [StringWriter](#StringWriter)
-    * [LevelWriter](#LevelWriter)
-    * [StringScroller](#StringScroller)
+    * [Writers](#Writers)
+        * [PatternWriter](#PatternWriter)
+        * [NumberWriter](#NumberWriter)
+        * [ClockWriter](#ClockWriter)
+        * [TemperatureWriter](#TemperatureWriter)
+        * [CharWriter](#CharWriter)
+        * [StringWriter](#StringWriter)
+        * [LevelWriter](#LevelWriter)
+        * [StringScroller](#StringScroller)
 * [Advanced Usage](#AdvancedUsage)
     * [DigitalWriteFast on AVR](#DigitalWriteFast)
     * [Multiple SPI Buses](#MultipleSpiBuses)
@@ -118,6 +119,12 @@ The source files are organized as follows:
 This library depends on the following additional libraries:
 
 * AceCommon (https://github.com/bxparks/AceCommon)
+* AceSPI (https://github.com/bxparks/AceSPI)
+    * Needed by `Hc595Module`, `Max7219Module`, and `HybridModule`
+* AceTMI (https://github.com/bxparks/AceTMI)
+    * Needed by `Tm1637Module`
+* AceWire (https://github.com/bxparks/AceWire)
+    * Needed by `Ht16k33Module`
 
 The unit tests depend on:
 
@@ -160,8 +167,8 @@ The following example sketches are provided:
         * Demo of a HT16K33 LED module using `Ht16k33Module`
     * [Hc595Demo.ino](examples/Hc595Demo)
         * Demo of a 74HC595 LED module using `Hc595Module`
-    * [AceSegmentTester.ino](examples/AceSegmentTester)
-        * demo-reel through most of the features of the library
+    * [WriterTester.ino](examples/WriterTester)
+        * demo of the various `src/writer` classes
         * uses 2 buttons for "single step" debugging mode
         * depends on AceButton (https://github.com/bxparks/AceButton) library
 * Advanced
@@ -206,44 +213,29 @@ The following example sketches are provided:
 ### Classes
 
 Here are the classes in the library which will be most useful to the
-end-users, listed roughly from low-level to higher-level classes which often
-depend on the lower-level classes:
+end-users, listed roughly from low-level classes to higher-level classes:
 
-* `SpiInterface`
-    * Thin wrapper classes for communicating with LED modules that support SPI
-    * Used by `Max7219Module` and `Hc595Module`.
-    * There are 4 implementations.
-        * `SoftSpiInterface`
-            * Software SPI using `shiftOut()`
-        * `SoftSpiFastInterface`
-            * Software SPI using `digitalWriteFast()` on AVR processors
-        * `HardSpiInterface`
-            * Hardware SPI using `digitalWrite()` to control the latch pin.
-        * `HardSpiFastInterface`
-            * Hardware SPI using `digitalWriteFast()` to control the latch pin.
-* `TmiInterface`
-    * Thin wrapper classes to communicate with LED modules using the TM1637
-      protocol. Similar to I2C but not exactly the same.
-    * Used by `Tm1637Module` class.
-    * There are 2 implementations:
-        * `SoftTmiInterface`
-            * Implement the TM1637 protocol using `digitalWrite()`.
-        * `SoftTmiFastInterface`
-            * Implement the TM1637 protocol using `digitalWriteFast()`.
-* `WireInterface`
-    * Thin wrapper classes for communicating with LED modules using I2C.
-    * Used by `Ht16k33Module`.
-    * There are 3 implementations:
-        * `TwoWireInterface`
-            * Thin wrapper around I2C libraries which follow the API of
-              the `TwoWire` class in the pre-installed `<Wire.h>` library.
-            * Both hardware and software implementations are supported.
-        * `SimpleWireInterface`
-            * AceSegment's own software bitbanging library that implements just
-              enough I2C to communicate with the HT16K33 controller chip.
-        * `SimpleWireFastInterface`
-            * Same as `SimpleWireInterface` using one of the
-              `<digitalWriteFast.h>` libraries.
+* Communication Libraries
+    * [AceSPI](https://github.com/bxparks/AceSPI)
+        * Needed by `Hc595Module`, `Max7219Module`, and `HybridModule`.
+        * There are 4 implementations:
+            * `SimpleSpiInterface`
+            * `SimpleSpiFastInterface`
+            * `HardSpiInterface`
+            * `HardSpiFastInterface`
+    * [AceTMI](https://github.com/bxparks/AceTMI)
+        * Needed by `Tm1637Module`
+        * There are 2 implementations:
+            * `SimpleTmiInterface`
+                * Implement the TM1637 protocol using `digitalWrite()`.
+            * `SimpleTmiFastInterface`
+                * Implement the TM1637 protocol using `digitalWriteFast()`.
+    * [AceWire](https://github.com/bxparks/AceWire)
+        * Used by `Ht16k33Module`.
+        * There are 3 implementations:
+            * `TwoWireInterface`
+            * `SimpleWireInterface`
+            * `SimpleWireFastInterface`
 * `LedModule`
     * Base interface for all hardware dependent implementation of a
       seven-segment LED module.
@@ -314,16 +306,20 @@ PatternWriter  CharWriter NumberWriter ClockWriter TemperatureWriter LevelWriter
 --------------------------------|--------------------------------------------
                                 |               (hardware dependent)
                                 |
-      +-----------+-------+-----+------------+------------+-------------+
+      +-----------+-------------+------------+------------+-------------+
       |           |             |            |            |             |
-Tm1637Module  Max7219Module Hc595Module HybridModule DirectModule Ht16k33Module
-      |                \        |       /                               |
-      |                 \       |      /                                |
-      v                  v      v     v                                 v
-SoftTmiInterface         SoftSpiInterface                      TwoWireInterface
-SoftTmiFastInterface     SoftSpiFastInterface               SimpleWireInterface
-                         HardSpiInterface               SimpleWireFastInterface
-                         HardSpiFastInterface
+Tm1637Module  Max7219Module Hc595Module HybridModule Ht16k33Module DirectModule
+      |                  \       |         /              |
+      |                   \      |        /               |
+      v                    v     v       v                v
++---------------------+ +---------------------+ +----------------------+
+| AceTMI library      | | AceSPI library      | | AceWire library      |
+|---------------------| |---------------------| |----------------------|
+| SimpleTmiI'face     | | HardSpiI'face       | | TwoWireI'face        |
+| SimpleTmiFastI'face | | HardSpiFastI'face   | | SimpleWireI'face     |
++---------------------+ | SimpleSpiI'face     | | SimpleWireFastI'face |
+                        | SimpleSpiFastI'face | +----------------------+
+                        +---------------------+
 ```
 
 (The actual dependency among various classes is a bit more complicated than this
@@ -398,6 +394,7 @@ classes are defined in the `ace_segment` namespace. To use the code without
 prepending the `ace_segment::` prefix, use the `using` directive:
 
 ```C++
+#include <Arduino.h>
 #include <AceSegment.h>
 using namespace ace_segment;
 ```
@@ -511,11 +508,12 @@ The `T_TMII` template parameter is a class that implements the 2-wire protocol
 used by the TM1637 controller. It is a protocol that is very close to, but not
 quite the same as, I2C. This means that we cannot use the usual `Wire` library,
 but must implement a custom version. The library provides 2 implementations: the
-`SoftTmiInterface` compatible with all platforms, and `SoftTmiFastInterface`
+`SimpleTmiInterface` compatible with all platforms, and `SimpleTmiFastInterface`
 useful on AVR processors.
 
-The `tmiInterface` is an instance of `T_TMII`, which is either
-`SoftTmiInterface` or `SoftTmiFastInterface`.
+The `tmiInterface` is an instance of `T_TMII` which comes from the
+[AceTMI](https://github.com/bxparks/AceTMI) which provides
+`SimpleTmiInterface` or `SimpleTmiFastInterface`.
 
 The `remapArray` is an array of addresses which map the physical positions to
 their logical positions. This is not needed by the 4-digit TM1637 LED modules,
@@ -560,7 +558,10 @@ The configuration of the `Tm1637Module` class for the 4-digit module looks like
 this (c.f. [examples/Tm1637Demo](examples/Tm1637Demo)):
 
 ```C++
+#include <Arduino.h>
+#include <AceTMI.h>
 #include <AceSegment.h>
+using ace_tmi::SimpleTmiInterface;
 using namespace ace_segment;
 
 const uint8_t CLK_PIN = 10;
@@ -568,7 +569,7 @@ const uint8_t DIO_PIN = 9;
 const uint16_t BIT_DELAY = 100;
 const uint8_t NUM_DIGITS = 4;
 
-using TmiInterface = SoftTmiInterface;
+using TmiInterface = SimpleTmiInterface;
 TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY);
 Tm1637Module<TmiInterface, NUM_DIGITS> ledModule(tmiInterface);
 
@@ -627,7 +628,9 @@ more complicated because the digits are wired to be in the order of `2 1 0 5 4
 
 ```C++
 #include <Arduino.h>
+#include <AceTMI.h>
 #include <AceSegment.h>
+using ace_tmi::SimpleTmiInterface;
 using namespace ace_segment;
 
 const uint8_t CLK_PIN = 10;
@@ -635,7 +638,7 @@ const uint8_t DIO_PIN = 9;
 const uint16_t BIT_DELAY = 100;
 const uint8_t NUM_DIGITS = 4;
 
-using TmiInterface = SoftTmiInterface;
+using TmiInterface = SimpleTmiInterface;
 TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY);
 Tm1637Module<TmiInterface, NUM_DIGITS> ledModule(
     tmiInterface, kDigitRemapArray6Tm1637);
@@ -723,8 +726,9 @@ class Max7219Module : public LedModule {
 };
 ```
 
-The `T_SPII` template parameter is one of the SPI interface classes. The library
-provides 4 implementations: `SoftSpiInterface`, `SoftSpiFastInterface` (on AVR),
+The `T_SPII` template parameter is one of the SPI interface classes from the
+[AceSPI](https://github.com/bxparks/AceSPI) library, which provides 4
+implementations: `SimpleSpiInterface`, `SimpleSpiFastInterface` (on AVR),
 `HardSpiInterface` and `HardSpiFastInterface` (on AVR).
 
 The `T_DIGITS` is the number of digits in the LED module. Since this is a
@@ -746,7 +750,9 @@ this (c.f. [examples/Max7219Demo](examples/Max7219Demo)):
 ```C++
 #include <Arduino.h>
 #include <SPI.h>
+#include <AceSPI.h>
 #include <AceSegment.h>
+using ace_spi::HardSpiInterface;
 using namespace ace_segment;
 
 const uint8_t LATCH_PIN = 10;
@@ -819,7 +825,8 @@ The `Ht16k33Module` class looks like this:
 template <typename T_WIREI, uint8_t T_DIGITS>
 class Ht16k33Module : public LedModule {
   public:
-    explicit Ht16k33Module(T_WIREI& wire, bool enableColon = false);
+    explicit Ht16k33Module(
+        T_WIREI& wire, uint8_t addr, bool enableColon = false);
 
     void enableColon(bool enable);
     void begin();
@@ -834,12 +841,21 @@ class Ht16k33Module : public LedModule {
 };
 ```
 
-The `T_WIREI` template parameter is the class name of the Wire interface. There
-are 3 implementations: `TwoWireInterface`, `SimpleWireInterface`, and
+The `T_WIREI` template parameter is the class name of the Wire interface from
+the [AceWire](https://github.com/bxparks/AceWire) library which provides 3
+implementations: `TwoWireInterface`, `SimpleWireInterface`, and
 `SimpleWireFastInterface`.
 
 The `T_DIGITS` template parameter is the number of digits in the module. I have
-only seen 4 digit modules for sale.
+only seen 4 digit modules for sale, and the `Ht16k33Module` has specific code to
+support that hardware, so currently, the `T_DIGITS` should always be set to 4.
+If additional LED modules with different digits come on the market, the
+`Ht16k33Module` class will be extended, or a new class will be created.
+
+The `addr` parameter in the `Ht16k33Module` constructor is the I2C address of
+the HT16K33 controller chip. The base address is `0x70`. The LED module exposes
+3 jumpers that can be soldered in various combinations to change the I2C address
+one of the 8 addresses from 0x70 to 0x77.
 
 Most of the methods in this class are implementations of the virtual methods of
 `LedModule`.
@@ -849,19 +865,20 @@ LED module using I2C.
 
 The `enableColon` parameter and the `enableColon()` method determine whether the
 colon segment between Digit 1 and Digit 2 of the LED module is active. The
-4-digit HT16K33 LED clock modules from Adafruit (and its clones) allow the colon
-segment to be controlled independently of the decimal point of Digit 1. This is
-unlike other 4-digit clock modules which take over the control line for the
-decimal point of Digit 1 to the colon segment, causing that decimal point to
-become disabled.
+4-digit HT16K33 LED clock modules from Adafruit and its clones allow the colon
+segment to be controlled independently of the decimal point of Digit 1. But
+AceSegment does not support controlling both the decimal point and the colon
+segment *at the time same*. However, it allows selecting one or the other:
 
-The AceSegment library does not support controlling both the decimal point and
-the colon segment *at the time same*. However, it allows selecting one or the
-other. With `enableColon = false`, the LED module behave like any other 4-digit
-LED module with its decimal point on Digit 1. With `enableColon = true`, the LED
-module behaves like a clock module with a colon segment between Digit 1 and
-Digit 2. This behavior can be selected dynamically at runtime using the
-`enableColon()` function.
+* `enableColon = false`
+    * the module behave like a normal 4-digit LED module with its decimal
+      point on Digit 1.
+* `enableColon = true`
+    * the module behaves like a 4-digit clock module with a colon segment
+      between Digit 1 and Digit 2.
+
+The `enableColon` parameter can be changed dynamically at runtime using the
+`enableColon()` method.
 
 <a name="Ht16k33Module4"></a>
 #### HT16K33 Module with 4 Digits
@@ -872,7 +889,9 @@ module looks like this (c.f. [examples/Ht16k33Demo](examples/Ht16k33Demo)):
 ```C++
 #include <Arduino.h>
 #include <Wire.h>
+#include <AceWire.h>
 #include <AceSegment.h>
+using ace_wire::TwoWireInterface;
 using namespace ace_segment;
 
 const uint8_t HT16K33_I2C_ADDRESS = 0x70;
@@ -881,8 +900,9 @@ const uint8_t SDA_PIN = SDA;
 const uint8_t NUM_DIGITS = 4;
 
 using WireInterface = TwoWireInterface<TwoWire>;
-WireInterface wireInterface(Wire, HT16K33_I2C_ADDRESS);
-Ht16k33Module<WireInterface, NUM_DIGITS> ledModule(wireInterface);
+WireInterface wireInterface(Wire);
+Ht16k33Module<WireInterface, NUM_DIGITS> ledModule(
+    wireInterface, HT16K33_I2C_ADDRESS);
 
 PatternWriter patternWriter(ledModule);
 
@@ -977,9 +997,10 @@ class Hc595Module : public ScanningModule<[snip]> {
 ```
 
 There are 2 template parameters. The `T_SPII` specifies the SPI interface which
-will be used to communicate with the 74HC595 chips. There are 4 options:
-`SoftSpiInterface`, `SoftSpiFastInterface` (on AVR), `HardSpiInterface` and
-`HardSpiFastInterface` (on AVR).
+will be used to communicate with the 74HC595 chips. There are 4 options provided
+by the [AceSPI](https://github.com/bxparks/AceSPI) library: `SimpleSpiInterface`,
+`SimpleSpiFastInterface` (on AVR), `HardSpiInterface` and `HardSpiFastInterface`
+(on AVR).
 
 The `T_DIGITS` is the number of digits in the LED module. Since this is a
 compile-time constant, the `Hc595Module` class uses it to allocate a buffer of 8
@@ -1029,7 +1050,9 @@ this (c.f. [examples/Hc595Demo](examples/Hc595Demo):
 ```C++
 #include <Arduino.h>
 #include <SPI.h>
+#include <AceSPI.h>
 #include <AceSegment.h>
+using ace_spi::HardSpiInterface;
 using namespace ace_segment;
 
 const uint8_t NUM_DIGITS = 8;
@@ -1114,7 +1137,9 @@ Putting all these together, we get the following code which is similar to the
 ```C++
 #include <Arduino.h>
 #include <SPI.h>
+#include <AceSPI.h>
 #include <AceSegment.h>
+using ace_spi::HardSpiInterface;
 using namespace ace_segment;
 
 const uint8_t NUM_DIGITS = 4;
@@ -1218,7 +1243,9 @@ The `HybridModule` configuration looks like this (c.f.
 ```C++
 #include <Arduino.h>
 #include <SPI.h>
+#include <AceSPI.h>
 #include <AceSegment.h>
+using ace_spi::HardSpiInterface;
 using namespace ace_segment;
 
 const uint8_t NUM_DIGITS = 4;
@@ -1329,8 +1356,22 @@ void loop() {
 }
 ```
 
+<a name="Writers"></a>
+### Writers
+
+All LED module classes provide a unified API by implementing the `LedModule`
+interface. The API of the `LedModule` class is low-level and primitive by
+design, providing only 3 methods for rendering: `setPatternAt()`,
+`getPatternAt()`, and `setBrightness()`.
+
+To display numbers, letters, and other more complicated patterns, this library
+provides a set of "writer" classes which wrap around the `LedModule` class and
+provide more powerful rendering capabilities. If these pre-defined writer
+classes are not sufficient, applications can build additional "writer" classes
+to implement the required features.
+
 <a name="PatternWriter"></a>
-### PatternWriter
+#### PatternWriter
 
 The `PatternWriter` class is the most basic wrapper around an `LedModule`
 object, and provides more convenient interfaces to writing to the LED module. It
@@ -1381,7 +1422,7 @@ PatternWriter patternWriter(ledModule);
 ```
 
 <a name="NumberWriter"></a>
-### NumberWriter
+#### NumberWriter
 
 The `NumberWriter` can print integers to the `LedModule` using decimal (0-9) or
 hexadecimal (0-9A-F) formats. On platforms that support it (AVR and ESP8266),
@@ -1429,7 +1470,7 @@ symbols, so `[0,17]`:
 ![NumberWriter](docs/writers/number_writer_decimal.jpg)
 
 <a name="ClockWriter"></a>
-### ClockWriter
+#### ClockWriter
 
 There are special, 4 digit,  seven segment LED displays which replace the
 decimal point with the colon symbol ":" between the 2 digits on either side so
@@ -1464,7 +1505,7 @@ class ClockWriter {
 ![ClockWriter](docs/writers/clock_writer.jpg)
 
 <a name="TemperatureWriter"></a>
-### TemperatureWriter
+#### TemperatureWriter
 
 This class supports writing out temperatures in degrees Celsius or Fahrenheit.
 The public methods of this class looks something like this:
@@ -1492,7 +1533,7 @@ class TemperatureWriter {
 ![TemperatureWriter-Fahrenheit](docs/writers/temperature_writer_fahrenheit.jpg)
 
 <a name="CharWriter"></a>
-### CharWriter
+#### CharWriter
 
 It is possible to represent many of the ASCII characters in the range `[0,127]`
 on a seven-segment LED display, although some of the characters will necessarily
@@ -1528,7 +1569,7 @@ class CharWriter {
 ![CharWriter](docs/writers/char_writer.jpg)
 
 <a name="StringWriter"></a>
-### StringWriter
+#### StringWriter
 
 A `StringWriter` is a class that builds on top of the `CharWriter`. It knows how
 to write entirely strings into the LED display. The public methods look like:
@@ -1583,7 +1624,7 @@ stringWriter.clearToEnd(written);
 ![StringWriter](docs/writers/string_writer.jpg)
 
 <a name="LevelWriter"></a>
-### LevelWriter
+#### LevelWriter
 
 A `LevelWriter` writes a specified number of vertical bars (2 vertical
 bar per digit) to the LED display, emulating a level meter LED module.
@@ -1600,10 +1641,14 @@ class LevelWriter {
 };
 ```
 
+There are 2 vertical bars available per per digit. So the maximum level
+supported by a 4-digit LED module is 8, and an 8-digit LED module supports a
+maximum level of 16.
+
 ![LevelWriter](docs/writers/level_writer.jpg)
 
 <a name="StringScroller"></a>
-### StringScroller
+#### StringScroller
 
 A `StringScroller` is a class that builds on top of the `CharWriter`. It knows
 how to write entirely strings into the LED display. The public methods look
@@ -1659,32 +1704,54 @@ I have written versions of some lower-level classes to take advantage of
 
 * `scanning/LedMatrixDirectFast4.h`
     * Variant of `LedMatrixDirect` using `digitalWriteFast()`
-* `hw/SoftSpiFastInterface.h`
-    * Variant of `SoftSpiInterface.h` using  `digitalWriteFast()` for the
+* AceSPI - `ace_api/SimpleSpiFastInterface.h`
+    * Variant of `SimpleSpiInterface.h` using  `digitalWriteFast()` for the
       `MOSI`, `SCK` and `LATCH` pins
-* `hw/HardSpiFastInterface.h`
+* AceSPI - `ace_spi/HardSpiFastInterface.h`
     * Variant of `HardSpiInterface.h` using  `digitalWriteFast()` to toggle
       the `LATCH` pin, while the hardware SPI code controls the `MOSI` and `SCK`
       pins
-* `hw/SoftTmiFastInterface.h`
-    * Variant of `SoftTmiInterface.h` using `digitalWriteFast()`
+* AceTMI - `ace_spi/SimpleTmiFastInterface.h`
+    * Variant of `SimpleTmiInterface.h` using `digitalWriteFast()`
+* AceWire - `ace_wire/SimpleWireFastInterface.h`
+    * Variant of `SimpleWireInterface.h` using `digitalWriteFast()`
 
 Since these header files require an external `digitalWriteFast` library to be
 installed, and they are only valid for AVR processors, these header files are
-*not* included in the master `<AceSegment.h>` file. If you want to use them, you
-need to include these headers manually, like this:
+*not* included in the master `<AceSPI.h>`, `<AceTMI.h>` or `<AceWire.h` files.
+
+If you want to use the fast version of `<AceSPI.h>`, you need to include these
+headers manually, like this:
 
 ```C++
-#include <AceSegment.h> // do this first
-...
-
+#include <AceSPI.h>
 #if defined(ARDUINO_ARCH_AVR)
   #include <digitalWriteFast.h> // from 3rd party library
-  #include <ace_segment/hw/SoftSpiFastInterface.h>
-  #include <ace_segment/hw/HardSpiFastInterface.h>
-  #include <ace_segment/hw/SoftTmiFastInterface.h>
-  #include <ace_segment/direct/DirectFast4Module.h>
+  #include <ace_spi/SimpleSpiFastInterface.h>
+  #include <ace_spi/HardSpiFastInterface.h>
 #endif
+using ace_spi::SimpleSpiFastInterface;
+using ace_spi::HardSpiFastInterface;
+```
+
+If you want to use the fast versions of `<AceTMI.h>`, use something like this:
+
+```C++
+#include <AceTMI.h>
+#if defined(ARDUINO_ARCH_AVR)
+  #include <ace_tmi/SimpleTmiFastInterface.h>
+#endif
+using ace_tmi::SimpleTmiFastInterface;
+```
+
+If you want to use the fast versions of `<AceWire.h>`, use something like this:
+
+```C++
+#include <AceTMI.h>
+#if defined(ARDUINO_ARCH_AVR)
+  #include <ace_wire/SimpleWireFastInterface.h>
+#endif
+using ace_tmi::SoftWireFastInterface;
 ```
 
 The amount of flash memory saved can be between 100 to 700 bytes. This can make
@@ -1694,152 +1761,15 @@ meaningful differences on AVR processors, especially on the ATtiny85 with only
 <a name="MultipleSpiBuses"></a>
 ### Multiple SPI Buses
 
-Some processors (e.g. STM32, ESP32) have multiple hardware SPI buses. Here are
-some notes about how to configure them.
+Some microcontrollers (e.g. STM32, ESP32) support multiple hardware SPI buses.
+The AceSPI library (https://github.com/bxparks/AceSPI#MultipleSpiBuses) explains
+how to configure these alternate hardware buses. Example can be found in
+[examples/Max7219Demo](examples/Max7219Demo) and
+[examples/Hc595Demo](examples/Hc595Demo).
 
-#### STM32 (STM32F103)
-
-The STM32F103 "Blue Pill" has 2 SPI buses:
-* SPI1
-    * SS1 = PA4
-    * SCK1 = PA5
-    * MISO1 = PA6
-    * MOSI1 = PA7
-* SPI2
-    * SS2 = PB12
-    * SCK2 = PB13
-    * MISO2 = PB14
-    * MOSI2 = PB15
-
-The primary (default) SPI interface is used like this:
-
-```C++
-#include <Arduino.h>
-#include <SPI.h>
-#include <AceSegment.h>
-using namespace ace_segment;
-
-const uint8_t LATCH_PIN = SS;
-const uint8_t DATA_PIN = MOSI;
-const uint8_t CLOCK_PIN = SCK;
-
-HardSpiInterface<SPIClass> spiInterface(SPI, LATCH_PIN);
-
-Max7219Module<HardSpiInterface, NUM_DIGITS> max7219Module(
-    spiInterface, kDigitRemapArray8Max7219);
-
-void setupAceSegment() {
-  SPI.begin();
-  spiInterface.begin();
-  max7219Module.begin();
-}
-```
-
-The second SPI interface can be used like this:
-
-```C++
-#include <Arduino.h>
-#include <SPI.h>
-#include <AceSegment.h>
-using namespace ace_segment;
-
-const uint8_t LATCH_PIN = PB12;
-const uint8_t DATA_PIN = PB15;
-const uint8_t CLOCK_PIN = PB13;
-
-SPIClass SPISecondary(DATA_PIN, PB14 /*miso*/, CLOCK_PIN);
-HardSpiInterface<SPIClass> spiInterface(SPISecondary, LATCH_PIN);
-
-Max7219Module<HardSpiInterface, NUM_DIGITS> max7219Module(
-    spiInterface, kDigitRemapArray8Max7219);
-
-void setupAceSegment() {
-  SPISecondary.begin();
-  spiInterface.begin();
-  max7219Module.begin();
-}
-```
-
-#### ESP32
-
-The ESP32 has 4 SPI buses, of which 2 are available for general purposes. The
-default GPIO pin mappings are:
-
-* SPI2 (aka HSPI)
-    * MOSI = 13
-    * MISO = 12
-    * SS = 15
-    * SCK = 14
-* SPI3 (aka VSPI, default)
-    * MOSI = 23
-    * MISO = 19
-    * SS = 5
-    * SCK = 18
-
-(My understanding is that the ESP32 has some sort of GPIO pin remapping
-matrix that can reroute these pins to other pins, but my knowledge of this
-capability is limited.)
-
-The primary (default) `SPI` instance uses the `VSPI` bus and is used like this:
-
-```C++
-#include <Arduino.h>
-#include <SPI.h>
-#include <AceSegment.h>
-using namespace ace_segment;
-
-const uint8_t LATCH_PIN = SS;
-const uint8_t DATA_PIN = MOSI;
-const uint8_t CLOCK_PIN = SCK;
-
-HardSpiInterface<SPIClass> spiInterface(SPI, LATCH_PIN);
-
-Hc595Module<HardSpiInterface, NUM_DIGITS> hc595Module(
-    spiInterface,
-    SEGMENT_ON_PATTERN,
-    DIGIT_ON_PATTERN,
-    FRAMES_PER_SECOND,
-    HC595_BYTE_ORDER,
-    REMAP_ARRAY
-);
-
-void setupAceSegment() {
-  SPI.begin();
-  spiInterface.begin();
-  hc595Module.begin();
-}
-```
-
-The secondary `HSPI` bus can be used like this:
-
-```C++
-#include <Arduino.h>
-#include <SPI.h>
-#include <AceSegment.h>
-using namespace ace_segment;
-
-const uint8_t LATCH_PIN = 15;
-const uint8_t DATA_PIN = 13;
-const uint8_t CLOCK_PIN = 14;
-
-SPIClass SPISecondary(HSPI);
-HardSpiInterface<SPIClass> spiInterface(SPISecondary, LATCH_PIN);
-
-Hc595Module<HardSpiInterface, NUM_DIGITS> hc595Module(
-    spiInterface,
-    SEGMENT_ON_PATTERN,
-    DIGIT_ON_PATTERN,
-    FRAMES_PER_SECOND,
-    HC595_BYTE_ORDER,
-    REMAP_ARRAY
-);
-
-void setupAceSegment() {
-  SPISecondary.begin();
-  spiInterface.begin();
-  hc595Module.begin();
-}
-```
+With the software SPI classes in AceSPI (in other words, `SimpleSpiInterface` and
+`SimpleSpiFastInterface`) you can use any alternative GPIO pins which are suitable
+for SPI output.
 
 <a name="ScanningModule"></a>
 ### Custom Configuration of ScanningModule
@@ -1859,30 +1789,21 @@ Here are the sizes of the various classes on the 8-bit AVR microcontrollers
 (Arduino Uno, Nano, etc):
 
 ```
-sizeof(SoftTmiInterface): 3
-sizeof(SoftTmiFastInterface<4, 5, 100>): 1
-sizeof(SoftSpiInterface): 3
-sizeof(SoftSpiFastInterface<11, 12, 13>): 1
-sizeof(HardSpiInterface): 3
-sizeof(HardSpiFastInterface): 2
-sizeof(TwoWireInterface): 3
-sizeof(SimpleWireInterface): 4
-sizeof(SimpleWireFastInterface<2, 3, 10>): 1
 sizeof(LedMatrixDirect<>): 9
 sizeof(LedMatrixDirectFast4<6..13, 2..5>): 3
-sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 8
-sizeof(LedMatrixDualHc595<HardSpiInterface>): 8
+sizeof(LedMatrixSingleHc595<SimpleSpiInterface>): 9
+sizeof(LedMatrixDualHc595<HardSpiInterface>): 9
 sizeof(LedModule): 3
 sizeof(ScanningModule<LedMatrixBase, 4>): 22
 sizeof(DirectModule<4>): 31
 sizeof(DirectFast4Module<...>): 25
-sizeof(HybridModule<SoftSpiInterface, 4>): 30
-sizeof(Hc595Module<SoftSpiInterface, 8>): 46
-sizeof(Tm1637Module<SoftTmiInterface, 4>): 14
-sizeof(Tm1637Module<SoftTmiInterface, 6>): 16
-sizeof(Max7219Module<SoftSpiInterface, 8>): 16
-sizeof(Ht16k33Module<TwoWireInterface, 4>): 11
-sizeof(Ht16k33Module<SimpleWireInterface, 4>): 11
+sizeof(HybridModule<SimpleSpiInterface, 4>): 31
+sizeof(Hc595Module<SimpleSpiInterface, 8>): 47
+sizeof(Tm1637Module<SimpleTmiInterface, 4>): 15
+sizeof(Tm1637Module<SimpleTmiInterface, 6>): 17
+sizeof(Max7219Module<SimpleSpiInterface, 8>): 17
+sizeof(Ht16k33Module<TwoWireInterface, 4>): 12
+sizeof(Ht16k33Module<SimpleWireInterface, 4>): 15
 sizeof(PatternWriter): 2
 sizeof(NumberWriter): 2
 sizeof(ClockWriter): 3
@@ -1896,22 +1817,17 @@ sizeof(StringScroller): 8
 On 32-bit processors, these numbers look like this:
 
 ```
-sizeof(SoftTmiInterface): 3
-sizeof(SoftSpiInterface): 3
-sizeof(HardSpiInterface): 8
-sizeof(TwoWireInterface): 8
-sizeof(SimpleWireInterface): 4
 sizeof(LedMatrixDirect<>): 16
-sizeof(LedMatrixSingleHc595<SoftSpiInterface>): 16
-sizeof(LedMatrixDualHc595<HardSpiInterface>): 16
+sizeof(LedMatrixSingleHc595<SimpleSpiInterface>): 16
+sizeof(LedMatrixDualHc595<HardSpiInterface>): 20
 sizeof(LedModule): 8
 sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(DirectModule<4>): 48
-sizeof(HybridModule<SoftSpiInterface, 4>): 48
-sizeof(Hc595Module<SoftSpiInterface, 8>): 64
-sizeof(Tm1637Module<SoftTmiInterface, 4>): 24
-sizeof(Tm1637Module<SoftTmiInterface, 6>): 28
-sizeof(Max7219Module<SoftSpiInterface, 8>): 28
+sizeof(HybridModule<SimpleSpiInterface, 4>): 48
+sizeof(Hc595Module<SimpleSpiInterface, 8>): 64
+sizeof(Tm1637Module<SimpleTmiInterface, 4>): 20
+sizeof(Tm1637Module<SimpleTmiInterface, 6>): 24
+sizeof(Max7219Module<SimpleSpiInterface, 8>): 24
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 20
 sizeof(Ht16k33Module<SimpleWireInterface, 4>): 20
 sizeof(PatternWriter): 4
@@ -1945,27 +1861,27 @@ static memory consumptions for various configurations on an Arduino Nano
 | DirectModule                    |   1486/   64 |  1030/   53 |
 | DirectFast4Module               |   1250/   94 |   794/   83 |
 |---------------------------------+--------------+-------------|
-| Hybrid(SoftSpi)                 |   1508/   58 |  1052/   47 |
-| Hybrid(SoftSpiFast)             |   1400/   56 |   944/   45 |
-| Hybrid(HardSpi)                 |   1556/   60 |  1100/   49 |
-| Hybrid(HardSpiFast)             |   1506/   59 |  1050/   48 |
+| Hybrid(HardSpi)                 |   1560/   61 |  1104/   50 |
+| Hybrid(HardSpiFast)             |   1502/   59 |  1046/   48 |
+| Hybrid(SimpleSpi)               |   1514/   59 |  1058/   48 |
+| Hybrid(SimpleSpiFast)           |   1392/   54 |   936/   43 |
 |---------------------------------+--------------+-------------|
-| Hc595(SoftSpi)                  |   1486/   58 |  1030/   47 |
-| Hc595(SoftSpiFast)              |   1076/   56 |   620/   45 |
-| Hc595(HardSpi)                  |   1542/   60 |  1086/   49 |
-| Hc595(HardSpiFast)              |   1474/   59 |  1018/   48 |
+| Hc595(HardSpi)                  |   1538/   61 |  1082/   50 |
+| Hc595(HardSpiFast)              |   1470/   59 |  1014/   48 |
+| Hc595(SimpleSpi)                |   1478/   59 |  1022/   48 |
+| Hc595(SimpleSpiFast)            |   1068/   54 |   612/   43 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SoftTmi)                 |   1568/   38 |  1112/   27 |
-| Tm1637(SoftTmiFast)             |    920/   36 |   464/   25 |
+| Tm1637(SimpleTmi)               |   1480/   39 |  1024/   28 |
+| Tm1637(SimpleTmiFast)           |    916/   34 |   460/   23 |
 |---------------------------------+--------------+-------------|
-| Max7219(SoftSpi)                |   1214/   44 |   758/   33 |
-| Max7219(SoftSpiFast)            |    774/   42 |   318/   31 |
-| Max7219(HardSpi)                |   1290/   46 |   834/   35 |
-| Max7219(HardSpiFast)            |   1184/   45 |   728/   34 |
+| Max7219(HardSpi)                |   1268/   47 |   812/   36 |
+| Max7219(HardSpiFast)            |   1180/   45 |   724/   34 |
+| Max7219(SimpleSpi)              |   1184/   45 |   728/   34 |
+| Max7219(SimpleSpiFast)          |    766/   40 |   310/   29 |
 |---------------------------------+--------------+-------------|
-| Ht16k33(TwoWire)                |   2866/  251 |  2410/  240 |
-| Ht16k33(SimpleWire)             |   1558/   36 |  1102/   25 |
-| Ht16k33(SimpleWireFast)         |    968/   33 |   512/   22 |
+| Ht16k33(TwoWire)                |   2854/  251 |  2398/  240 |
+| Ht16k33(SimpleWire)             |   1480/   41 |  1024/   30 |
+| Ht16k33(SimpleWireFast)         |    946/   35 |   490/   24 |
 |---------------------------------+--------------+-------------|
 | StubModule                      |    494/   11 |    38/    0 |
 | PatternWriter+Stub              |    608/   26 |   152/   15 |
@@ -1988,29 +1904,20 @@ And here are the memory consumption numbers for an ESP8266:
 | baseline                        | 256700/26784 |     0/    0 |
 |---------------------------------+--------------+-------------|
 | DirectModule                    | 257784/27056 |  1084/  272 |
-| DirectFast4Module               |     -1/   -1 |    -1/   -1 |
 |---------------------------------+--------------+-------------|
-| Hybrid(SoftSpi)                 | 257856/27056 |  1156/  272 |
-| Hybrid(SoftSpiFast)             |     -1/   -1 |    -1/   -1 |
-| Hybrid(HardSpi)                 | 258928/27072 |  2228/  288 |
-| Hybrid(HardSpiFast)             |     -1/   -1 |    -1/   -1 |
+| Hybrid(HardSpi)                 | 258944/27072 |  2244/  288 |
+| Hybrid(SimpleSpi)               | 257872/27056 |  1172/  272 |
 |---------------------------------+--------------+-------------|
-| Hc595(SoftSpi)                  | 257756/27060 |  1056/  276 |
-| Hc595(SoftSpiFast)              |     -1/   -1 |    -1/   -1 |
-| Hc595(HardSpi)                  | 258924/27068 |  2224/  284 |
-| Hc595(HardSpiFast)              |     -1/   -1 |    -1/   -1 |
+| Hc595(HardSpi)                  | 258924/27076 |  2224/  292 |
+| Hc595(SimpleSpi)                | 257772/27060 |  1072/  276 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SoftTmi)                 | 257884/27028 |  1184/  244 |
-| Tm1637(SoftTmiFast)             |     -1/   -1 |    -1/   -1 |
+| Tm1637(SimpleTmi)               | 257932/27028 |  1232/  244 |
 |---------------------------------+--------------+-------------|
-| Max7219(SoftSpi)                | 257636/27028 |   936/  244 |
-| Max7219(SoftSpiFast)            |     -1/   -1 |    -1/   -1 |
-| Max7219(HardSpi)                | 258804/27044 |  2104/  260 |
-| Max7219(HardSpiFast)            |     -1/   -1 |    -1/   -1 |
+| Max7219(HardSpi)                | 258836/27044 |  2136/  260 |
+| Max7219(SimpleSpi)              | 257636/27028 |   936/  244 |
 |---------------------------------+--------------+-------------|
 | Ht16k33(TwoWire)                | 261364/27500 |  4664/  716 |
-| Ht16k33(SimpleWire)             | 257980/27028 |  1280/  244 |
-| Ht16k33(SimpleWireFast)         |     -1/   -1 |    -1/   -1 |
+| Ht16k33(SimpleWire)             | 258012/27028 |  1312/  244 |
 |---------------------------------+--------------+-------------|
 | StubModule                      | 256840/26996 |   140/  212 |
 | PatternWriter+Stub              | 256872/27004 |   172/  220 |
@@ -2033,56 +1940,57 @@ The CPU benchmark numbers can be seen in
 Here are the CPU numbers for an AVR processor:
 
 ```
-+-----------------------------------------+-------------------+---------+
-| Functionality                           |   min/  avg/  max | samples |
-|-----------------------------------------+-------------------+---------|
-| Direct(4)                               |    72/   82/   88 |      40 |
-| Direct(4,subfields)                     |     4/   13/   84 |     640 |
-| DirectFast4(4)                          |    28/   31/   36 |      40 |
-| DirectFast4(4,subfields)                |     4/    8/   36 |     640 |
-|-----------------------------------------+-------------------+---------|
-| Hybrid(4,SoftSpi)                       |   156/  161/  180 |      40 |
-| Hybrid(4,SoftSpi,subfields)             |     4/   22/  180 |     640 |
-| Hybrid(4,SoftSpiFast)                   |    28/   35/   40 |      40 |
-| Hybrid(4,SoftSpiFast,subfields)         |     4/    8/   40 |     640 |
-| Hybrid(4,HardSpi)                       |    36/   41/   52 |      40 |
-| Hybrid(4,HardSpi,subfields)             |     4/    9/   52 |     640 |
-| Hybrid(4,HardSpiFast)                   |    24/   28/   40 |      40 |
-| Hybrid(4,HardSpiFast,subfields)         |     4/    7/   40 |     640 |
-|-----------------------------------------+-------------------+---------|
-| Hc595(8,SoftSpi)                        |   268/  273/  308 |      80 |
-| Hc595(8,SoftSpi,subfields)              |     4/   36/  304 |    1280 |
-| Hc595(8,SoftSpiFast)                    |    24/   27/   36 |      80 |
-| Hc595(8,SoftSpiFast,subfields)          |     4/    8/   36 |    1280 |
-| Hc595(8,HardSpi)                        |    24/   30/   40 |      80 |
-| Hc595(8,HardSpi,subfields)              |     4/    8/   36 |    1280 |
-| Hc595(8,HardSpiFast)                    |    12/   16/   24 |      80 |
-| Hc595(8,HardSpiFast,subfields)          |     4/    6/   24 |    1280 |
-|-----------------------------------------+-------------------+---------|
-| Tm1637(4,SoftTmi,100us)                 | 22316/22346/22568 |      10 |
-| Tm1637(4,SoftTmi,100us,incremental)     |  3612/ 8809/10312 |      50 |
-| Tm1637(4,SoftTmiFast,100us)             | 21068/21098/21316 |      10 |
-| Tm1637(4,SoftTmiFast,100us,incremental) |  3412/ 8316/ 9768 |      50 |
-|-----------------------------------------+-------------------+---------|
-| Tm1637(4,SoftTmi,5us)                   |  2252/ 2282/ 2480 |      10 |
-| Tm1637(4,SoftTmi,5us,incremental)       |   364/  896/ 1124 |      50 |
-| Tm1637(4,SoftTmiFast,5us)               |  1000/ 1034/ 1112 |      10 |
-| Tm1637(4,SoftTmiFast,5us,incremental)   |   164/  403/  508 |      50 |
-|-----------------------------------------+-------------------+---------|
-| Tm1637(6,SoftTmi)                       | 28060/28092/28336 |      10 |
-| Tm1637(6,SoftTmi,incremental)           |  3612/ 9178/10308 |      70 |
-| Tm1637(6,SoftTmiFast)                   | 26484/26515/26736 |      10 |
-| Tm1637(6,SoftTmiFast,incremental)       |  3412/ 8664/ 9760 |      70 |
-|-----------------------------------------+-------------------+---------|
-| Max7219(8,SoftSpi)                      |  2380/ 2397/ 2628 |      20 |
-| Max7219(8,SoftSpiFast)                  |   208/  218/  236 |      20 |
-| Max7219(8,HardSpi)                      |   208/  221/  240 |      20 |
-| Max7219(8,HardSpiFast)                  |    96/  107/  116 |      20 |
-|-----------------------------------------+-------------------+---------|
-| Ht16k33(4,TwoWire)                      |   340/  344/  360 |      20 |
-| Ht16k33(4,SimpleWire)                   |  2560/ 2571/ 2652 |      20 |
-| Ht16k33(4,SimpleWireFast)               |   272/  283/  312 |      20 |
-+-----------------------------------------+-------------------+---------+
++-------------------------------------------+-------------------+---------+
+| Functionality                             |   min/  avg/  max | samples |
+|-------------------------------------------+-------------------+---------|
+| Direct(4)                                 |    76/   82/   88 |      40 |
+| Direct(4,subfields)                       |     4/   13/   84 |     640 |
+| DirectFast4(4)                            |    24/   30/   40 |      40 |
+| DirectFast4(4,subfields)                  |     4/    8/   36 |     640 |
+|-------------------------------------------+-------------------+---------|
+| Hybrid(4,HardSpi)                         |    32/   38/   44 |      40 |
+| Hybrid(4,HardSpi,subfields)               |     4/    8/   44 |     640 |
+| Hybrid(4,HardSpiFast)                     |    20/   25/   32 |      40 |
+| Hybrid(4,HardSpiFast,subfields)           |     4/    7/   32 |     640 |
+| Hybrid(4,SimpleSpi)                       |   152/  161/  176 |      40 |
+| Hybrid(4,SimpleSpi,subfields)             |     4/   22/  176 |     640 |
+| Hybrid(4,SimpleSpiFast)                   |    28/   32/   40 |      40 |
+| Hybrid(4,SimpleSpiFast,subfields)         |     4/    8/   36 |     640 |
+|-------------------------------------------+-------------------+---------|
+| Hc595(8,HardSpi)                          |    24/   30/   40 |      80 |
+| Hc595(8,HardSpi,subfields)                |     4/    8/   36 |    1280 |
+| Hc595(8,HardSpiFast)                      |    12/   16/   24 |      80 |
+| Hc595(8,HardSpiFast,subfields)            |     4/    6/   24 |    1280 |
+| Hc595(8,SimpleSpi)                        |   268/  273/  308 |      80 |
+| Hc595(8,SimpleSpi,subfields)              |     4/   36/  308 |    1280 |
+| Hc595(8,SimpleSpiFast)                    |    24/   27/   36 |      80 |
+| Hc595(8,SimpleSpiFast,subfields)          |     4/    8/   32 |    1280 |
+|-------------------------------------------+-------------------+---------|
+| Tm1637(4,SimpleTmi,100us)                 | 22312/22342/22576 |      10 |
+| Tm1637(4,SimpleTmi,100us,incremental)     |  3612/ 8807/10356 |      50 |
+| Tm1637(4,SimpleTmiFast,100us)             | 21068/21102/21376 |      10 |
+| Tm1637(4,SimpleTmiFast,100us,incremental) |  3412/ 8317/ 9828 |      50 |
+|-------------------------------------------+-------------------+---------|
+| Tm1637(4,SimpleTmi,5us)                   |  2244/ 2281/ 2472 |      10 |
+| Tm1637(4,SimpleTmi,5us,incremental)       |   364/  893/ 1128 |      50 |
+| Tm1637(4,SimpleTmiFast,5us)               |  1004/ 1035/ 1108 |      10 |
+| Tm1637(4,SimpleTmiFast,5us,incremental)   |   164/  404/  508 |      50 |
+|-------------------------------------------+-------------------+---------|
+| Tm1637(6,SimpleTmi,100us)                 | 28052/28089/28376 |      10 |
+| Tm1637(6,SimpleTmi,100us,incremental)     |  3612/ 9176/10356 |      70 |
+| Tm1637(6,SimpleTmiFast,100us)             | 26488/26523/26792 |      10 |
+| Tm1637(6,SimpleTmiFast,100us,incremental) |  3412/ 8665/ 9828 |      70 |
+|-------------------------------------------+-------------------+---------|
+| Max7219(8,HardSpi)                        |   208/  225/  240 |      20 |
+| Max7219(8,HardSpiFast)                    |    96/  106/  124 |      20 |
+| Max7219(8,SimpleSpi)                      |  2380/ 2390/ 2516 |      20 |
+| Max7219(8,SimpleSpiFast)                  |   208/  217/  240 |      20 |
+|-------------------------------------------+-------------------+---------|
+| Ht16k33(4,TwoWire,100kHz)                 |  1460/ 1464/ 1480 |      20 |
+| Ht16k33(4,TwoWire,400kHz)                 |   500/  508/  532 |      20 |
+| Ht16k33(4,SimpleWire,1us)                 |  2544/ 2556/ 2696 |      20 |
+| Ht16k33(4,SimpleWireFast,1us)             |   224/  232/  252 |      20 |
++-------------------------------------------+-------------------+---------+
 ```
 
 What is amazing is that if you use `digitalWriteFast()`, the software SPI is
@@ -2091,37 +1999,38 @@ just as fast as hardware SPI, **and** consumes 500 bytes of less flash memory.
 Here are the CPU numbers for an ESP8266:
 
 ```
-+-----------------------------------------+-------------------+---------+
-| Functionality                           |   min/  avg/  max | samples |
-|-----------------------------------------+-------------------+---------|
-| Direct(4)                               |    12/   13/   32 |      40 |
-| Direct(4,subfields)                     |     0/    2/   24 |     640 |
-|-----------------------------------------+-------------------+---------|
-| Hybrid(4,SoftSpi)                       |    29/   29/   42 |      40 |
-| Hybrid(4,SoftSpi,subfields)             |     0/    4/   41 |     640 |
-| Hybrid(4,HardSpi)                       |    12/   12/   28 |      40 |
-| Hybrid(4,HardSpi,subfields)             |     0/    2/   25 |     640 |
-|-----------------------------------------+-------------------+---------|
-| Hc595(8,SoftSpi)                        |    50/   50/   63 |      80 |
-| Hc595(8,SoftSpi,subfields)              |     0/    6/   66 |    1280 |
-| Hc595(8,HardSpi)                        |    14/   14/   23 |      80 |
-| Hc595(8,HardSpi,subfields)              |     0/    2/   29 |    1280 |
-|-----------------------------------------+-------------------+---------|
-| Tm1637(4,SoftTmi,100us)                 | 21496/21513/21540 |      10 |
-| Tm1637(4,SoftTmi,100us,incremental)     |  3481/ 8482/ 9773 |      50 |
-|-----------------------------------------+-------------------+---------|
-| Tm1637(4,SoftTmi,5us)                   |  1525/ 1525/ 1529 |      10 |
-| Tm1637(4,SoftTmi,5us,incremental)       |   247/  602/  694 |      50 |
-|-----------------------------------------+-------------------+---------|
-| Tm1637(6,SoftTmi)                       | 27024/27058/27123 |      10 |
-| Tm1637(6,SoftTmi,incremental)           |  3481/ 8837/ 9769 |      70 |
-|-----------------------------------------+-------------------+---------|
-| Max7219(8,SoftSpi)                      |   460/  460/  469 |      20 |
-| Max7219(8,HardSpi)                      |   125/  126/  134 |      20 |
-|-----------------------------------------+-------------------+---------|
-| Ht16k33(4,TwoWire)                      |   245/  246/  269 |      20 |
-| Ht16k33(4,SimpleWire)                   |  1338/ 1342/ 1369 |      20 |
-+-----------------------------------------+-------------------+---------+
++-------------------------------------------+-------------------+---------+
+| Functionality                             |   min/  avg/  max | samples |
+|-------------------------------------------+-------------------+---------|
+| Direct(4)                                 |    12/   12/   32 |      40 |
+| Direct(4,subfields)                       |     0/    2/   24 |     640 |
+|-------------------------------------------+-------------------+---------|
+| Hybrid(4,HardSpi)                         |    12/   12/   32 |      40 |
+| Hybrid(4,HardSpi,subfields)               |     0/    2/   24 |     640 |
+| Hybrid(4,SimpleSpi)                       |    29/   29/   41 |      40 |
+| Hybrid(4,SimpleSpi,subfields)             |     0/    4/   41 |     640 |
+|-------------------------------------------+-------------------+---------|
+| Hc595(8,HardSpi)                          |    14/   14/   22 |      80 |
+| Hc595(8,HardSpi,subfields)                |     0/    2/   26 |    1280 |
+| Hc595(8,SimpleSpi)                        |    50/   51/   63 |      80 |
+| Hc595(8,SimpleSpi,subfields)              |     0/    6/   63 |    1280 |
+|-------------------------------------------+-------------------+---------|
+| Tm1637(4,SimpleTmi,100us)                 | 21497/21508/21541 |      10 |
+| Tm1637(4,SimpleTmi,100us,incremental)     |  3481/ 8480/ 9753 |      50 |
+|-------------------------------------------+-------------------+---------|
+| Tm1637(4,SimpleTmi,5us)                   |  1526/ 1526/ 1526 |      10 |
+| Tm1637(4,SimpleTmi,5us,incremental)       |   248/  603/  718 |      50 |
+|-------------------------------------------+-------------------+---------|
+| Tm1637(6,SimpleTmi,100us)                 | 27025/27033/27057 |      10 |
+| Tm1637(6,SimpleTmi,100us,incremental)     |  3481/ 8837/ 9761 |      70 |
+|-------------------------------------------+-------------------+---------|
+| Max7219(8,HardSpi)                        |   125/  126/  141 |      20 |
+| Max7219(8,SimpleSpi)                      |   459/  460/  474 |      20 |
+|-------------------------------------------+-------------------+---------|
+| Ht16k33(4,TwoWire,100kHz)                 |  1322/ 1324/ 1354 |      20 |
+| Ht16k33(4,TwoWire,400kHz)                 |   347/  347/  351 |      20 |
+| Ht16k33(4,SimpleWire,1us)                 |  1330/ 1331/ 1350 |      20 |
++-------------------------------------------+-------------------+---------+
 ```
 
 On the ESP8266, the hardware SPI is about 4X faster, but it does consume 1200
@@ -2187,6 +2096,36 @@ them.
 * This library does not currently support daisy-chaining of the MAX7219
   controller or the 74HC595 controller to create LED modules with more than 8
   digits.
+* The `NumberWriter` class does not support floating point numbers.
+    * The primary reason is that I almost never use floating point numbers on
+      embedded microcontrollers. Most embedded processors do not have hardware
+      FPU, so floating point operations are implemented using software, which
+      consumes significant amounts of memory and CPU cycles.
+    * The second reason is that floating point formatting is very complex. There
+      are numerous options to consider. For example: left justified, right
+      justified, left pad with space, left padding with zeros, right padding
+      with space, right padding with zeros, specifying the number of digits
+      after the decimal point, and formating using scientific notation.
+    * With so many different formatting options to consider, the easiest
+      solution might be to defer this problem to the `vsnprintf()` function, to
+      convert a float to a string, then render that string on the LED module.
+      Except that on 8-bit AVR processors, the `vnsprintf()` function does not
+      support floating point numbers.
+    * The other potential solution is to use the `Print::print()` function to
+      print a float to a string buffer, such as the `PrintStr<N>` class in
+      [AceCommon](https://github.com/bxparks/AceCommon), then print the string
+      to the LED module. This might be the most practical solution on an Arduino
+      platform.
+    * In any case, I think the code for printing floating point numbers should
+      not go into the `NumberWriter` class, but into a new class called
+      something like `FloatWriter`. The `FloatWriter` class could pull in a
+      `NumberWriter` object and build on top of it.
+* The `Ht16k33Module` class does not support blinking the digits as supported by
+  the HT16K33 controller chip.
+    * It should be pretty simple to add.
+    * I have not done the work because I don't use this feature.
+* Some LED controllers (TM1637, HT16K33) have hardware support for scanning key
+  matrices. AceSegment does not support this feature.
 
 <a name="License"></a>
 ## License

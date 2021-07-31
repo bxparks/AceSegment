@@ -2,7 +2,7 @@
 # Makefile to compile and run Arduino programs natively on Linux or MacOS.
 
 APP_NAME := AutoBenchmark
-ARDUINO_LIBS := EpoxyMockDigitalWriteFast AceSegment AUnit AceCommon
+ARDUINO_LIBS := EpoxyMockDigitalWriteFast AceSegment AUnit AceCommon AceWire AceSPI AceTMI
 MORE_CLEAN := more_clean
 include ../../../EpoxyDuino/EpoxyDuino.mk
 
@@ -20,6 +20,13 @@ benchmarks: $(TARGETS)
 
 # The USB/ACM ports can change dynamically. Make sure that the microcontroller
 # is on the correct port before using these Make targets.
+#
+# When benchmarking the speed of Hardware I2C of the TwoWireInterface class
+# which uses the <Wire.h> library using hardware I2C, a real I2C device (e.g.
+# HT16K33) must exist on the bus so that the proper ACK comes back from the
+# device. Otherwise, the <Wire.h> library seems to terminate the transfer which
+# results in an abnormally small durations.
+
 nano.txt:
 	$(AUNITER_DIR)/auniter.sh upmon -o $@ --eof END nano:USB0
 
