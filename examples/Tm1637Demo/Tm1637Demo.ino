@@ -7,6 +7,7 @@
  *
  *  * AUNITER_MICRO_TM1637: SparkFun Pro Micro + 4-digit LED module
  *  * AUNITER_MICRO_TM1637_6: SparkFun Pro Micro + 6-digit LED module
+ *  * AUNITER_SAMD_TM1637: SAMD21 M0 Mini + 4-digit LED module
  *  * AUNITER_STM32_TM1637: STM32 F1 Blue Pill + 4-digit LED module
  *  * AUNITER_D1MINI_LARGE_TM1637: WeMos D1 Mini ESP8266
  *  * AUNITER_ESP32_TM1637: ESP32 Dev Kit v1
@@ -15,7 +16,7 @@
 #include <Arduino.h>
 #include <AceCommon.h> // incrementMod()
 #include <AceTMI.h>
-#include <AceSegment.h> // Tm1636Module, PatternWriter
+#include <AceSegment.h> // Tm1637Module, PatternWriter
 
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
