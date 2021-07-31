@@ -1,6 +1,7 @@
 # Changelog
 
 * Unreleased
+* 0.8 (2021-07-30)
     * Move I2C address into `beginTransmission()` method of `TwoWireInterface`,
       `SimpleWireInterface` and `SimpleWireFastInterface`.
         * More consistent with `TwoWire` class API.

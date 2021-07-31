@@ -14,7 +14,7 @@ by the runtime environment of the processor. For example, it often seems like
 the ESP8266 allocates flash memory in blocks of a certain quantity, so the
 calculated flash size can jump around in unexpected ways.
 
-**Version**: AceSegment v0.7
+**Version**: AceSegment v0.8
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -173,7 +173,7 @@ before substantional refactoring in 2021.
   results for Teensy 3.2 become lower by 3200 bytes of flash and 1100 bytes of
   static RAM.
 
-**v0.7+**
+**v0.8**
 
 * Extract communcation interfaces into AceSPI, AceTMI, and AceWire libraries.
   No change in memory consumption.

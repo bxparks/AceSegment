@@ -55,7 +55,7 @@ LED module:
 * `Ht16k33Module::flush()`
     * Sends out the buffered digits using I2C
 
-**Version**: AceSegment v0.7
+**Version**: AceSegment v0.8
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -177,7 +177,7 @@ number of `TimingStats::update()` calls that were made.
           dev boards that run AutoBenchmark. Prevents clock stretching even if
           no LED module is actually attached to the pins.
 
-**v0.7+**
+**v0.8**
 
 * Extract communication interfaces into AceSPI, AceTMI, and AceWire libraries.
   No change.
