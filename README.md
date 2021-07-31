@@ -3,15 +3,15 @@
 [![AUnit Tests](https://github.com/bxparks/AceSegment/actions/workflows/aunit_tests.yml/badge.svg)](https://github.com/bxparks/AceSegment/actions/workflows/aunit_tests.yml)
 
 An adjustable, configurable, and extensible framework for rendering seven
-segment LED displays on Arduino platforms. The library supports multiple types
+segment LED displays on Arduino platforms. The library supports many types
 of LED displays:
 
-* LED modules using the TM1637 controller chip over its custom 2 wire protocol
-* LED modules using the MAX7219/MAX7221 controller chip over SPI
-* LED modules using the HT16K33 controller chip over I2C
-* LED modules using two 74HC595 shift register chips over SPI
-* LED modules using a hybrid of one 74HC595 chip and direct GPIO connections
-* LED modules directly connected to the GPIO pins, no controller chips
+* modules using the TM1637 controller chip over its custom 2 wire protocol
+* modules using the MAX7219/MAX7221 controller chip over SPI
+* modules using the HT16K33 controller chip over I2C
+* modules using two 74HC595 shift register chips over SPI
+* modules using a hybrid of one 74HC595 chip and direct GPIO connections
+* modules directly connected to the GPIO pins, no controller chips
 
 The first 4 types are readily available from consumer sources such as Amazon and
 eBay, in multiple colors and sizes. The final 2 types of modules (hybrid and
@@ -25,6 +25,14 @@ mostly agnostic to the hardware differences. The AceSegment library is organized
 into hardware-dependent components and hardware-independent components to allow
 application code to be written without worrying too much about the low-level
 details of the specific LED module.
+
+This library is designed to ensure that client applications pay only for what
+they use. Most of the code is written as C++ templates to avoid creating static
+resources that cannot be optimized away. There is no direct dependency to the
+`<Wire.h>`, `<SPI.h>`, `<AceWire.h>`, `<AceSPI.h>`, or `<AceTMI.h>` libraries
+from this library. (On AVR processors, simply adding `#include <Wire.h>`
+increases flash usage by about 1100 bytes even if nothing is used from the
+`<Wire.h>` library.)
 
 **Version**: 0.8 (2021-07-30)
 
@@ -44,6 +52,10 @@ consumption, but it is getting very close.
     * [Classes](#Classes)
     * [Dependency Diagram](#DependencyDiagram)
     * [Digit and Segment Addressing](#DigitAndSegmentAddressing)
+    * [Hello Tm1637Module](#HelloTm1637Module)
+    * [Hello Max7219Module](#HelloMax7219Module)
+    * [Hello Ht16k33Module](#HelloHt16k33Module)
+    * [Hello Hc595Module](#HelloHc595Module)
 * [Usage](#Usage)
     * [Include Header and Namespace](#HeaderAndNamespace)
     * [LedModule](#LedModule)
@@ -159,18 +171,19 @@ Some of the examples may depend on:
 The following example sketches are provided:
 
 * Basic
+    * [HelloTm1637.ino](examples/HelloTm1637)
+    * [HelloMax7219.ino](examples/HelloMax7219)
+    * [HelloHt16k33.ino](examples/HelloHt16k33)
+    * [HelloHc595.ino](examples/HelloHc595)
+* Intermediate
     * [Tm1637Demo.ino](examples/Tm1637Demo)
-        * Demo of a TM1637 LED module using `Tm1637Module`
     * [Max7219Demo.ino](examples/Max7219Demo)
-        * Demo of a MAX7219 LED module using `Max7219Module`
     * [Ht16k33Demo.ino](examples/Ht16k33Demo)
-        * Demo of a HT16K33 LED module using `Ht16k33Module`
     * [Hc595Demo.ino](examples/Hc595Demo)
-        * Demo of a 74HC595 LED module using `Hc595Module`
     * [WriterTester.ino](examples/WriterTester)
         * demo of the various `src/writer` classes
-        * uses 2 buttons for "single step" debugging mode
         * depends on AceButton (https://github.com/bxparks/AceButton) library
+        * uses 2 buttons for "single step" debugging mode
 * Advanced
     * [DirectDemo.ino](examples/DirectDemo)
         * Demo of an LED module with no controller, all digit and segment pins
@@ -217,25 +230,25 @@ end-users, listed roughly from low-level classes to higher-level classes:
 
 * Communication Libraries
     * [AceSPI](https://github.com/bxparks/AceSPI)
-        * Needed by `Hc595Module`, `Max7219Module`, and `HybridModule`.
+        * Provides the SPI communication classes needed by `Hc595Module`,
+          `Max7219Module`, and `HybridModule`.
         * There are 4 implementations:
-            * `SimpleSpiInterface`
-            * `SimpleSpiFastInterface`
-            * `HardSpiInterface`
-            * `HardSpiFastInterface`
+            * `HardSpiInterface`: native `<SPI.h>` with `digitalWrite()`
+            * `HardSpiFastInterface`: native `<SPI.h>` with `digitalWriteFast()`
+            * `SimpleSpiInterface`: software SPI with `digitalWrite()`
+            * `SimpleSpiFastInterface`: software SPI with `digitalWriteFast()`
     * [AceTMI](https://github.com/bxparks/AceTMI)
-        * Needed by `Tm1637Module`
+        * Provides communication to the TM1637 controller chip needed by the
+          `Tm1637Module`
         * There are 2 implementations:
-            * `SimpleTmiInterface`
-                * Implement the TM1637 protocol using `digitalWrite()`.
-            * `SimpleTmiFastInterface`
-                * Implement the TM1637 protocol using `digitalWriteFast()`.
+            * `SimpleTmiInterface`: using `digitalWrite()`
+            * `SimpleTmiFastInterface`: using `digitalWriteFast()`
     * [AceWire](https://github.com/bxparks/AceWire)
-        * Used by `Ht16k33Module`.
+        * Provides the I2C communication classes Used by `Ht16k33Module`.
         * There are 3 implementations:
-            * `TwoWireInterface`
-            * `SimpleWireInterface`
-            * `SimpleWireFastInterface`
+            * `TwoWireInterface`: native `<Wire.h>`
+            * `SimpleWireInterface`: software I2C using `digitalWrite()`
+            * `SimpleWireFastInterface`: software I2C using `digitalWriteFast()`
 * `LedModule`
     * Base interface for all hardware dependent implementation of a
       seven-segment LED module.
@@ -381,6 +394,244 @@ Since it is impossible to predict all the different ways that the LED modules
 can be wired, various classes in the library allow the remapping array to be
 supplied by the library user. The [DEVELOPER.md](DEVELOPER.md) document has some
 preliminary notes about how to create a remap array.
+
+<a name="HelloTm1637Module"></a>
+### Hello Tm1637Module
+
+Here is the simple example program from
+[examples/HelloTm1637](examples/HelloTm1637). It writes the digits 0-3 into a
+4-digit LED module using the TM1637 chip, sets the brightness, then renders the
+digits by flushing the data bits to the TM1637 controller using the
+`SimpleTmiInterface` class from the AceTMI library.
+
+```C++
+#include <Arduino.h>
+#include <AceCommon.h> // incrementMod()
+#include <AceTMI.h>
+#include <AceSegment.h> // Tm1637Module, PatternWriter
+
+using ace_tmi::SimpleTmiInterface;
+using ace_segment::Tm1637Module;
+using ace_segment::NumberWriter;
+
+// Replace these with the PIN numbers of your dev board.
+const uint8_t CLK_PIN = A0;
+const uint8_t DIO_PIN = 9;
+const uint8_t NUM_DIGITS = 4;
+
+// Many TM1637 LED modules contain 10 nF capacitors on their DIO and CLK lines
+// which are unreasonably high. This forces a 100 microsecond delay between
+// bit transitions. If you remove those capacitors, you can set this as low as
+// 1-5 micros.
+const uint8_t DELAY_MICROS = 100;
+
+using TmiInterface = SimpleTmiInterface;
+TmiInterface tmiInterface(DIO_PIN, CLK_PIN, DELAY_MICROS);
+Tm1637Module<TmiInterface, NUM_DIGITS> ledModule(tmiInterface);
+NumberWriter numberWriter(ledModule);
+
+void setup() {
+  delay(1000);
+
+  tmiInterface.begin();
+  ledModule.begin();
+
+  numberWriter.writeHexCharAt(0, 0);
+  numberWriter.writeHexCharAt(1, 1);
+  numberWriter.writeHexCharAt(2, 2);
+  numberWriter.writeHexCharAt(3, 3);
+
+  ledModule.setBrightness(2);
+
+  ledModule.flush();
+}
+
+void loop() {}
+```
+
+<a name="HelloMax7219Module"></a>
+### Hello Max7219Module
+
+Here is the simple example program from
+[examples/HelloMax7219](examples/HelloMax7219). It writes the digits 0-7 into an
+8-digit LED module using the MAX7219 chip, sets the brightness, then renders the
+digits by flushing the data bits to the MAX7219 controller over SPI using the
+`HardSpiInterface` class from the AceSPI library.
+
+```C++
+#include <Arduino.h>
+#include <SPI.h> // SPIClass, SPI
+#include <AceSPI.h> // HardSpiInterface
+#include <AceSegment.h> // Max7219Module, NumberWriter
+
+using ace_spi::HardSpiInterface;
+using ace_segment::Max7219Module;
+using ace_segment::NumberWriter;
+using ace_segment::kDigitRemapArray8Max7219;
+
+// Replace these with the PIN numbers of your dev board.
+const uint8_t LATCH_PIN = 10;
+const uint8_t DATA_PIN = MOSI;
+const uint8_t CLOCK_PIN = SCK;
+const uint8_t NUM_DIGITS = 8;
+
+using SpiInterface = HardSpiInterface<SPIClass>;
+SpiInterface spiInterface(SPI, LATCH_PIN);
+Max7219Module<SpiInterface, NUM_DIGITS> ledModule(
+    spiInterface, kDigitRemapArray8Max7219);
+NumberWriter numberWriter(ledModule);
+
+void setup() {
+  delay(1000);
+
+  SPI.begin();
+  spiInterface.begin();
+  ledModule.begin();
+
+  numberWriter.writeHexCharAt(0, 0);
+  numberWriter.writeHexCharAt(1, 1);
+  numberWriter.writeHexCharAt(2, 2);
+  numberWriter.writeHexCharAt(3, 3);
+  numberWriter.writeHexCharAt(4, 4);
+  numberWriter.writeHexCharAt(5, 5);
+  numberWriter.writeHexCharAt(6, 6);
+  numberWriter.writeHexCharAt(7, 7);
+
+  ledModule.setBrightness(2);
+
+  ledModule.flush();
+}
+
+void loop() {}
+```
+
+<a name="HelloHt16k33Module"></a>
+### Hello Ht16k33Module
+
+Here is the simple example program from
+[examples/HelloHt16k33](examples/HelloHt16k33). It writes the digits 0-3 into a
+4-digit LED module using the HT16K33 chip, sets the brightness, then renders the
+digits by flushing the data bits to the HT16K33 controller over I2C using the
+`TwoWireInterface` class from the AceWire library.
+
+```C++
+#include <Arduino.h>
+#include <Wire.h> // TwoWire, Wire
+#include <AceWire.h> // TwoWireInterface
+#include <AceSegment.h> // Ht16k33Module, NumberWriter
+
+using ace_wire::TwoWireInterface;
+using ace_segment::Ht16k33Module;
+using ace_segment::NumberWriter;
+
+// Replace these with the PIN numbers of your dev board.
+const uint8_t SDA_PIN = SDA;
+const uint8_t SCL_PIN = SCL;
+const uint8_t HT16K33_I2C_ADDRESS = 0x70;
+const uint8_t NUM_DIGITS = 4;
+
+using WireInterface = TwoWireInterface<TwoWire>;
+WireInterface wireInterface(Wire);
+Ht16k33Module<WireInterface, NUM_DIGITS> ledModule(
+    wireInterface, HT16K33_I2C_ADDRESS);
+NumberWriter numberWriter(ledModule);
+
+void setup() {
+  delay(1000);
+
+  Wire.begin();
+  wireInterface.begin();
+  ledModule.begin();
+
+  numberWriter.writeHexCharAt(0, 0);
+  numberWriter.writeHexCharAt(1, 1);
+  numberWriter.writeHexCharAt(2, 2);
+  numberWriter.writeHexCharAt(3, 3);
+
+  ledModule.setBrightness(2);
+
+  ledModule.flush();
+}
+
+void loop() {}
+```
+
+<a name="HelloHc595Module"></a>
+### Hello Hc595Module
+
+Here is the simple example program from
+[examples/HelloHc595](examples/HelloHc595). It writes the digits 0-7 into an
+8-digit LED module using two 74HC595 chips, then renders the digits by flushing
+the data bits to the 74HC595 controllers over SPI using the `HardSpiInterface`
+class from the AceSPI library. The rendering must be multiplexed in the global
+`loop()` function because the 74HC595 turns on only a single segment of each
+digit at any given time. We have to strobe through all the segments faster than
+the human vision response time (~16 micros) to give the illusion of illuminating
+the entire display.
+
+```C++
+#include <Arduino.h>
+#include <SPI.h> // SPIClass, SPI
+#include <AceSPI.h> // HardSpiInterface
+#include <AceSegment.h> // Hc595Module, NumberWriter
+
+using ace_spi::HardSpiInterface;
+using ace_segment::Hc595Module;
+using ace_segment::NumberWriter;
+using ace_segment::kDigitRemapArray8Hc595;
+using ace_segment::kByteOrderSegmentHighDigitLow;
+using ace_segment::kActiveLowPattern;
+using ace_segment::kActiveHighPattern;
+
+// Replace these with the PIN numbers of your dev board.
+const uint8_t LATCH_PIN = 10;
+const uint8_t DATA_PIN = MOSI;
+const uint8_t CLOCK_PIN = SCK;
+const uint8_t NUM_DIGITS = 8;
+
+const uint8_t SEGMENT_ON_PATTERN = kActiveLowPattern;
+const uint8_t DIGIT_ON_PATTERN = kActiveHighPattern;
+const uint8_t HC595_BYTE_ORDER = kByteOrderSegmentHighDigitLow;
+const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
+const uint8_t NUM_SUBFIELDS = 1;
+const uint8_t FRAMES_PER_SECOND = 60;
+
+using SpiInterface = HardSpiInterface<SPIClass>;
+SpiInterface spiInterface(SPI, LATCH_PIN);
+Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
+    spiInterface,
+    SEGMENT_ON_PATTERN,
+    DIGIT_ON_PATTERN,
+    FRAMES_PER_SECOND,
+    HC595_BYTE_ORDER,
+    REMAP_ARRAY
+);
+NumberWriter numberWriter(ledModule);
+
+void setup() {
+  delay(1000);
+
+  SPI.begin();
+  spiInterface.begin();
+  ledModule.begin();
+
+  numberWriter.writeHexCharAt(0, 0);
+  numberWriter.writeHexCharAt(1, 1);
+  numberWriter.writeHexCharAt(2, 2);
+  numberWriter.writeHexCharAt(3, 3);
+  numberWriter.writeHexCharAt(4, 4);
+  numberWriter.writeHexCharAt(5, 5);
+  numberWriter.writeHexCharAt(6, 6);
+  numberWriter.writeHexCharAt(7, 7);
+
+  // Brightness not supported when NUM_SUBFIELDS == 1.
+  // ledModule.setBrightness(2);
+}
+
+void loop() {
+  ledModule.renderFieldWhenReady();
+}
+```
 
 <a name="Usage"></a>
 ## Usage
@@ -728,8 +979,8 @@ class Max7219Module : public LedModule {
 
 The `T_SPII` template parameter is one of the SPI interface classes from the
 [AceSPI](https://github.com/bxparks/AceSPI) library, which provides 4
-implementations: `SimpleSpiInterface`, `SimpleSpiFastInterface` (on AVR),
-`HardSpiInterface` and `HardSpiFastInterface` (on AVR).
+implementations: `HardSpiInterface`, `HardSpiFastInterface` (on AVR),
+`SimpleSpiInterface`, and `SimpleSpiFastInterface` (on AVR).
 
 The `T_DIGITS` is the number of digits in the LED module. Since this is a
 compile-time constant, the `Hc595Module` class uses it to allocate a buffer of 8
@@ -957,9 +1208,9 @@ The 8-digit module looks like this:
 
 ![HC595 LED Module](docs/hc595/hc595_8_digits.jpg)
 
-(I have not found a source for the 6-digit 74HC595 module. Probably because if
-you need only 6 digits, it is likely easier and cheaper to use a TM1637
-controller, rather than the 74HC595 controller.)
+(I have not found a retail seller for the 6-digit 74HC595 module. Maybe
+because if you need only 6 digits, it is likely easier and cheaper to use a
+TM1637 controller, rather than the 74HC595 controller.)
 
 The `Hc595Module` class looks roughly like this (simplified for ease of
 understanding):
@@ -998,9 +1249,9 @@ class Hc595Module : public ScanningModule<[snip]> {
 
 There are 2 template parameters. The `T_SPII` specifies the SPI interface which
 will be used to communicate with the 74HC595 chips. There are 4 options provided
-by the [AceSPI](https://github.com/bxparks/AceSPI) library: `SimpleSpiInterface`,
-`SimpleSpiFastInterface` (on AVR), `HardSpiInterface` and `HardSpiFastInterface`
-(on AVR).
+by the [AceSPI](https://github.com/bxparks/AceSPI) library: `HardSpiInterface`,
+`HardSpiFastInterface` (on AVR), `SimpleSpiInterface`, and
+`SimpleSpiFastInterface` (on AVR),
 
 The `T_DIGITS` is the number of digits in the LED module. Since this is a
 compile-time constant, the `Hc595Module` class uses it to allocate a buffer of 8
@@ -1729,9 +1980,9 @@ headers manually, like this:
   #include <digitalWriteFast.h> // from 3rd party library
   #include <ace_spi/SimpleSpiFastInterface.h>
   #include <ace_spi/HardSpiFastInterface.h>
+  using ace_spi::SimpleSpiFastInterface;
+  using ace_spi::HardSpiFastInterface;
 #endif
-using ace_spi::SimpleSpiFastInterface;
-using ace_spi::HardSpiFastInterface;
 ```
 
 If you want to use the fast versions of `<AceTMI.h>`, use something like this:
@@ -1740,8 +1991,8 @@ If you want to use the fast versions of `<AceTMI.h>`, use something like this:
 #include <AceTMI.h>
 #if defined(ARDUINO_ARCH_AVR)
   #include <ace_tmi/SimpleTmiFastInterface.h>
+  using ace_tmi::SimpleTmiFastInterface;
 #endif
-using ace_tmi::SimpleTmiFastInterface;
 ```
 
 If you want to use the fast versions of `<AceWire.h>`, use something like this:
@@ -1750,8 +2001,8 @@ If you want to use the fast versions of `<AceWire.h>`, use something like this:
 #include <AceTMI.h>
 #if defined(ARDUINO_ARCH_AVR)
   #include <ace_wire/SimpleWireFastInterface.h>
+  using ace_tmi::SoftWireFastInterface;
 #endif
-using ace_tmi::SoftWireFastInterface;
 ```
 
 The amount of flash memory saved can be between 100 to 700 bytes. This can make
@@ -1767,9 +2018,9 @@ how to configure these alternate hardware buses. Example can be found in
 [examples/Max7219Demo](examples/Max7219Demo) and
 [examples/Hc595Demo](examples/Hc595Demo).
 
-With the software SPI classes in AceSPI (in other words, `SimpleSpiInterface` and
-`SimpleSpiFastInterface`) you can use any alternative GPIO pins which are suitable
-for SPI output.
+With the software SPI classes in AceSPI (in other words, `SimpleSpiInterface`
+and `SimpleSpiFastInterface`) you can use any alternative GPIO pins which are
+suitable for SPI output.
 
 <a name="ScanningModule"></a>
 ### Custom Configuration of ScanningModule
