@@ -315,10 +315,10 @@ Tm1637Module  Max7219Module Hc595Module HybridModule Ht16k33Module DirectModule
 +---------------------+ +---------------------+ +----------------------+
 | AceTMI library      | | AceSPI library      | | AceWire library      |
 |---------------------| |---------------------| |----------------------|
-| SimpleTmiI'face     | | SimpleSpiI'face     | | TwoWireI'face        |
-| SimpleTmiFastI'face | | SimpleSpiFastI'face | | SimpleWireI'face     |
-+---------------------+ | HardSpiI'face       | | SimpleWireFastI'face |
-                        | HardSpiFastI'face   | +----------------------+
+| SimpleTmiI'face     | | HardSpiI'face       | | TwoWireI'face        |
+| SimpleTmiFastI'face | | HardSpiFastI'face   | | SimpleWireI'face     |
++---------------------+ | SimpleSpiI'face     | | SimpleWireFastI'face |
+                        | SimpleSpiFastI'face | +----------------------+
                         +---------------------+
 ```
 
