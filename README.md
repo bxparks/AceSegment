@@ -13,14 +13,23 @@ of LED displays:
 * modules using a hybrid of one 74HC595 chip and direct GPIO connections
 * modules directly connected to the GPIO pins, no controller chips
 
-The first 4 types are readily available from consumer sources such as Amazon and
-eBay, in multiple colors and sizes. The final 2 types of modules (hybrid and
-directly connected) are usually custom creations. The AceSegment library hopes
-to support as many of these configurations as possible within a single
-framework.
+The first 4 types are readily available from retail outlets such as Amazon and
+eBay, in multiple colors and sizes. They look like these:
+
+![TM1637 LED Module](docs/tm1637/tm1637_sample.jpg)
+
+![MAX7219 LED Module](docs/max7219/max7219_sample.jpg)
+
+![HT16K33 LED Module](docs/ht16k33/ht16k33_sample.jpg)
+
+![HC595 LED Module](docs/hc595/hc595_sample.jpg)
+
+The final 2 types of modules (hybrid and directly connected) are usually custom
+creations. The AceSegment library hopes to support as many seven-segment
+displays as practical within a single framework.
 
 Different types of seven-segment LED modules using different controller chips
-are similar enough to each other that code at the application layer should be
+are similar enough to each other that code at the application layer can be
 mostly agnostic to the hardware differences. The AceSegment library is organized
 into hardware-dependent components and hardware-independent components to allow
 application code to be written without worrying too much about the low-level
