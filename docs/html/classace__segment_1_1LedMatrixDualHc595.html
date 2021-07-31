@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.7.0</span>
+   &#160;<span id="projectnumber">0.8.0</span>
    </div>
    <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, HT16K33, or 74HC595 controller chips</div>
   </td>
@@ -102,6 +102,7 @@ Collaboration diagram for ace_segment::LedMatrixDualHc595&lt; T_SPII &gt;:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:aa32dd16e69cd42930243c083ee4dc287"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedMatrixDualHc595.html#aa32dd16e69cd42930243c083ee4dc287">LedMatrixDualHc595</a> (const T_SPII &amp;spiInterface, uint8_t elementOnPattern, uint8_t groupOnPattern, uint8_t byteOrder, const uint8_t *remapArrayInverted=nullptr)</td></tr>
+<tr class="memdesc:aa32dd16e69cd42930243c083ee4dc287"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="classace__segment_1_1LedMatrixDualHc595.html#aa32dd16e69cd42930243c083ee4dc287">More...</a><br /></td></tr>
 <tr class="separator:aa32dd16e69cd42930243c083ee4dc287"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2bcd8144fcfebeb453ff72ed951fb717"><td class="memItemLeft" align="right" valign="top"><a id="a2bcd8144fcfebeb453ff72ed951fb717"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>begin</b> () const</td></tr>
@@ -181,12 +182,12 @@ class ace_segment::LedMatrixDualHc595&lt; T_SPII &gt;</h3>
 <p>The group pins are assumed to be connected to the most significant byte. The element pins are connected to the least signficiant byte.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">T_SPII</td><td>interface to SPI, either <a class="el" href="classace__segment_1_1SoftSpiInterface.html" title="Software SPI using shiftOut().">SoftSpiInterface</a> or <a class="el" href="classace__segment_1_1HardSpiInterface.html" title="Hardware SPI interface to talk to one or two 74HC595 Shift Register chip(s), using the predefined SPI...">HardSpiInterface</a> </td></tr>
+    <tr><td class="paramname">T_SPII</td><td>class that implements the SPI interface, usually one of the classes in the AceSPI library: SimpleSpiInterface, SimpleSpiFastInterface, HardSpiInterface, HardSpiFastInterface. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="LedMatrixDualHc595_8h_source.html#l00054">54</a> of file <a class="el" href="LedMatrixDualHc595_8h_source.html">LedMatrixDualHc595.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LedMatrixDualHc595_8h_source.html#l00056">56</a> of file <a class="el" href="LedMatrixDualHc595_8h_source.html">LedMatrixDualHc595.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="aa32dd16e69cd42930243c083ee4dc287"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa32dd16e69cd42930243c083ee4dc287">&#9670;&nbsp;</a></span>LedMatrixDualHc595()</h2>
@@ -241,9 +242,11 @@ template&lt;typename T_SPII &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
+
+<p>Constructor. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">spiInterface</td><td>interface to the SPI protocol </td></tr>
+    <tr><td class="paramname">spiInterface</td><td>object that knows how to send SPI packets </td></tr>
     <tr><td class="paramname">elementOnPattern</td><td>bit pattern that turns on the elements </td></tr>
     <tr><td class="paramname">groupOnpattern</td><td>bit pattern that turns on the groups </td></tr>
     <tr><td class="paramname">byteOrder</td><td>determine order of group and element bytes </td></tr>
@@ -252,7 +255,7 @@ template&lt;typename T_SPII &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="LedMatrixDualHc595_8h_source.html#l00065">65</a> of file <a class="el" href="LedMatrixDualHc595_8h_source.html">LedMatrixDualHc595.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LedMatrixDualHc595_8h_source.html#l00068">68</a> of file <a class="el" href="LedMatrixDualHc595_8h_source.html">LedMatrixDualHc595.h</a>.</p>
 
 </div>
 </div>
@@ -286,7 +289,7 @@ template&lt;typename T_SPII &gt; </div>
 <p>Turn off the given group. </p>
 <p>Useful for blinking a group. </p>
 
-<p class="definition">Definition at line <a class="el" href="LedMatrixDualHc595_8h_source.html#l00125">125</a> of file <a class="el" href="LedMatrixDualHc595_8h_source.html">LedMatrixDualHc595.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LedMatrixDualHc595_8h_source.html#l00128">128</a> of file <a class="el" href="LedMatrixDualHc595_8h_source.html">LedMatrixDualHc595.h</a>.</p>
 
 </div>
 </div>
@@ -337,7 +340,7 @@ template&lt;typename T_SPII &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="LedMatrixDualHc595_8h_source.html#l00106">106</a> of file <a class="el" href="LedMatrixDualHc595_8h_source.html">LedMatrixDualHc595.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LedMatrixDualHc595_8h_source.html#l00109">109</a> of file <a class="el" href="LedMatrixDualHc595_8h_source.html">LedMatrixDualHc595.h</a>.</p>
 
 </div>
 </div>
@@ -370,7 +373,7 @@ template&lt;typename T_SPII &gt; </div>
 <p>Turn on the given group, using the previous segment pattern. </p>
 <p>Useful for blinking a group (e.g. a digit of an LED segment module). </p>
 
-<p class="definition">Definition at line <a class="el" href="LedMatrixDualHc595_8h_source.html#l00120">120</a> of file <a class="el" href="LedMatrixDualHc595_8h_source.html">LedMatrixDualHc595.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LedMatrixDualHc595_8h_source.html#l00123">123</a> of file <a class="el" href="LedMatrixDualHc595_8h_source.html">LedMatrixDualHc595.h</a>.</p>
 
 </div>
 </div>

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.7.0</span>
+   &#160;<span id="projectnumber">0.8.0</span>
    </div>
    <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, HT16K33, or 74HC595 controller chips</div>
   </td>
@@ -101,8 +101,8 @@ Collaboration diagram for ace_segment::LedMatrixSingleHc595&lt; T_SPII, T_GPIOI 
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a6f28a19b1a63df30dffbb573c3f16b9a"><td class="memItemLeft" align="right" valign="top"><a id="a6f28a19b1a63df30dffbb573c3f16b9a"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>LedMatrixSingleHc595</b> (const T_SPII &amp;spiInterface, uint8_t elementOnPattern, uint8_t groupOnPattern, uint8_t numGroups, const uint8_t *groupPins)</td></tr>
+<tr class="memitem:a6f28a19b1a63df30dffbb573c3f16b9a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedMatrixSingleHc595.html#a6f28a19b1a63df30dffbb573c3f16b9a">LedMatrixSingleHc595</a> (const T_SPII &amp;spiInterface, uint8_t elementOnPattern, uint8_t groupOnPattern, uint8_t numGroups, const uint8_t *groupPins)</td></tr>
+<tr class="memdesc:a6f28a19b1a63df30dffbb573c3f16b9a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="classace__segment_1_1LedMatrixSingleHc595.html#a6f28a19b1a63df30dffbb573c3f16b9a">More...</a><br /></td></tr>
 <tr class="separator:a6f28a19b1a63df30dffbb573c3f16b9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a604cf1f8ecacdef6cac68ce2533cd021"><td class="memItemLeft" align="right" valign="top"><a id="a604cf1f8ecacdef6cac68ce2533cd021"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>begin</b> () const</td></tr>
@@ -175,14 +175,85 @@ class ace_segment::LedMatrixSingleHc595&lt; T_SPII, T_GPIOI &gt;</h3>
 <p>latchPin/D10/SS &ndash; ST_CP (Phillips) / RCK (TI) / Pin 12 (rising) dataPin/D11/MOSI &ndash; DS (Phillips) / SER (TI) / Pin 14 clockPin/D13/SCK &ndash; SH_CP (Phillips) / SRCK (TI) / Pin 11 (rising)</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">T_SPII</td><td>interface to SPI, either <a class="el" href="classace__segment_1_1SoftSpiInterface.html" title="Software SPI using shiftOut().">SoftSpiInterface</a> or <a class="el" href="classace__segment_1_1HardSpiInterface.html" title="Hardware SPI interface to talk to one or two 74HC595 Shift Register chip(s), using the predefined SPI...">HardSpiInterface</a> </td></tr>
+    <tr><td class="paramname">T_SPII</td><td>class that implements the SPI interface, usually one of the classes in the AceSPI library: SimpleSpiInterface, SimpleSpiFastInterface, HardSpiInterface, HardSpiFastInterface. </td></tr>
     <tr><td class="paramname">T_GPIOI</td><td>(optional) interface to GPIO functions, default <a class="el" href="classace__segment_1_1GpioInterface.html" title="A utility lass that provides a thin layer of indirection to various GPIO functions.">GpioInterface</a> (note: 'GPI' is already taken on ESP8266) </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="LedMatrixSingleHc595_8h_source.html#l00051">51</a> of file <a class="el" href="LedMatrixSingleHc595_8h_source.html">LedMatrixSingleHc595.h</a>.</p>
-</div><hr/>The documentation for this class was generated from the following file:<ul>
+<p class="definition">Definition at line <a class="el" href="LedMatrixSingleHc595_8h_source.html#l00053">53</a> of file <a class="el" href="LedMatrixSingleHc595_8h_source.html">LedMatrixSingleHc595.h</a>.</p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a6f28a19b1a63df30dffbb573c3f16b9a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6f28a19b1a63df30dffbb573c3f16b9a">&#9670;&nbsp;</a></span>LedMatrixSingleHc595()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T_SPII , typename T_GPIOI  = GpioInterface&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classace__segment_1_1LedMatrixSingleHc595.html">ace_segment::LedMatrixSingleHc595</a>&lt; T_SPII, T_GPIOI &gt;::<a class="el" href="classace__segment_1_1LedMatrixSingleHc595.html">LedMatrixSingleHc595</a> </td>
+          <td>(</td>
+          <td class="paramtype">const T_SPII &amp;&#160;</td>
+          <td class="paramname"><em>spiInterface</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>elementOnPattern</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>groupOnPattern</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>numGroups</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint8_t *&#160;</td>
+          <td class="paramname"><em>groupPins</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">spiInterface</td><td>object that knows how to send SPI packets </td></tr>
+    <tr><td class="paramname">elementOnPattern</td><td>bit pattern that turns on the elements (segments) </td></tr>
+    <tr><td class="paramname">groupOnpattern</td><td>bit pattern that turns on the groups (digits) </td></tr>
+    <tr><td class="paramname">numGroups</td><td>number of LED groups (digits) </td></tr>
+    <tr><td class="paramname">groupPins</td><td>pointer to array of 'numGroups' pin numbers </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="LedMatrixSingleHc595_8h_source.html#l00063">63</a> of file <a class="el" href="LedMatrixSingleHc595_8h_source.html">LedMatrixSingleHc595.h</a>.</p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
 <li>/home/brian/src/AceSegment/src/ace_segment/scanning/<a class="el" href="LedMatrixSingleHc595_8h_source.html">LedMatrixSingleHc595.h</a></li>
 </ul>
 </div><!-- contents -->

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.7.0</span>
+   &#160;<span id="projectnumber">0.8.0</span>
    </div>
    <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, HT16K33, or 74HC595 controller chips</div>
   </td>
@@ -103,68 +103,68 @@ $(function() {
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160; </div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">namespace </span>ace_segment {</div>
 <div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160; </div>
-<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;<span class="keyword">template</span> &lt;</div>
-<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;    <span class="keyword">typename</span> T_SPII,</div>
-<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    uint8_t T_DIGITS,</div>
-<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    uint8_t T_SUBFIELDS = 1,</div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keyword">typename</span> T_CI = ClockInterface,</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keyword">typename</span> T_GPIOI = GpioInterface</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;&gt;</div>
-<div class="line"><a name="l00056"></a><span class="lineno"><a class="line" href="classace__segment_1_1HybridModule.html">   56</a></span>&#160;<span class="keyword">class </span><a class="code" href="classace__segment_1_1HybridModule.html">HybridModule</a> : <span class="keyword">public</span> <a class="code" href="classace__segment_1_1ScanningModule.html">ScanningModule</a>&lt;</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;    LedMatrixSingleHc595&lt;T_SPII, T_GPIOI&gt;,</div>
-<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    T_DIGITS,</div>
-<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    T_SUBFIELDS,</div>
-<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    T_CI</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;&gt; {</div>
-<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;  <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;    <span class="keyword">using</span> <a class="code" href="classace__segment_1_1ScanningModule.html">Super</a> = <a class="code" href="classace__segment_1_1ScanningModule.html">ScanningModule</a>&lt;</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        <a class="code" href="classace__segment_1_1LedMatrixSingleHc595.html">LedMatrixSingleHc595&lt;T_SPII, T_GPIOI&gt;</a>,</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        T_DIGITS,</div>
-<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        T_SUBFIELDS,</div>
-<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        T_CI</div>
-<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;    &gt;;</div>
-<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160; </div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;  <span class="keyword">public</span>:</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;    <a class="code" href="classace__segment_1_1HybridModule.html">HybridModule</a>(</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;        <span class="keyword">const</span> T_SPII&amp; spiInterface,</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        uint8_t segmentOnPattern,</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        uint8_t digitOnPattern,</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        uint8_t framesPerSecond,</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        <span class="keyword">const</span> uint8_t* digitPins</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    ) :</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        <a class="code" href="classace__segment_1_1ScanningModule.html">Super</a>(mLedMatrix, framesPerSecond),</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        mLedMatrix(</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;            spiInterface,</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;            segmentOnPattern <span class="comment">/*elementOnPattern*/</span>,</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;            digitOnPattern <span class="comment">/*groupOnPattern*/</span>,</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;            T_DIGITS <span class="comment">/*numGroups*/</span>,</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;            digitPins <span class="comment">/*groupPins*/</span></div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        )</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    {}</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160; </div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <span class="keywordtype">void</span> begin() {</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;      mLedMatrix.begin();</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;      <a class="code" href="classace__segment_1_1ScanningModule.html#ac0cf47c36ecb0529da5f99a0a8d1d503">Super::begin</a>();</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    }</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160; </div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <span class="keywordtype">void</span> end() {</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;      mLedMatrix.end();</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;      <a class="code" href="classace__segment_1_1ScanningModule.html#a1bc81a7c5ac4c1d5ee6e2d90259e606c">Super::end</a>();</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    }</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160; </div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;  <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <a class="code" href="classace__segment_1_1LedMatrixSingleHc595.html">LedMatrixSingleHc595&lt;T_SPII, T_GPIOI&gt;</a> mLedMatrix;</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;};</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; </div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;} <span class="comment">// ace_segment</span></div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160; </div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;<span class="keyword">template</span> &lt;</div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;    <span class="keyword">typename</span> T_SPII,</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    uint8_t T_DIGITS,</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    uint8_t T_SUBFIELDS = 1,</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;    <span class="keyword">typename</span> T_CI = ClockInterface,</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;    <span class="keyword">typename</span> T_GPIOI = GpioInterface</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;&gt;</div>
+<div class="line"><a name="l00057"></a><span class="lineno"><a class="line" href="classace__segment_1_1HybridModule.html">   57</a></span>&#160;<span class="keyword">class </span><a class="code" href="classace__segment_1_1HybridModule.html">HybridModule</a> : <span class="keyword">public</span> <a class="code" href="classace__segment_1_1ScanningModule.html">ScanningModule</a>&lt;</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    LedMatrixSingleHc595&lt;T_SPII, T_GPIOI&gt;,</div>
+<div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    T_DIGITS,</div>
+<div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    T_SUBFIELDS,</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;    T_CI</div>
+<div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;&gt; {</div>
+<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;  <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    <span class="keyword">using</span> <a class="code" href="classace__segment_1_1ScanningModule.html">Super</a> = <a class="code" href="classace__segment_1_1ScanningModule.html">ScanningModule</a>&lt;</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        <a class="code" href="classace__segment_1_1LedMatrixSingleHc595.html">LedMatrixSingleHc595&lt;T_SPII, T_GPIOI&gt;</a>,</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160;        T_DIGITS,</div>
+<div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;        T_SUBFIELDS,</div>
+<div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;        T_CI</div>
+<div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;    &gt;;</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160; </div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;  <span class="keyword">public</span>:</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    <a class="code" href="classace__segment_1_1HybridModule.html">HybridModule</a>(</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        <span class="keyword">const</span> T_SPII&amp; spiInterface,</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        uint8_t segmentOnPattern,</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        uint8_t digitOnPattern,</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        uint8_t framesPerSecond,</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        <span class="keyword">const</span> uint8_t* digitPins</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    ) :</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        <a class="code" href="classace__segment_1_1ScanningModule.html">Super</a>(mLedMatrix, framesPerSecond),</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        mLedMatrix(</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;            spiInterface,</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;            segmentOnPattern <span class="comment">/*elementOnPattern*/</span>,</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;            digitOnPattern <span class="comment">/*groupOnPattern*/</span>,</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;            T_DIGITS <span class="comment">/*numGroups*/</span>,</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;            digitPins <span class="comment">/*groupPins*/</span></div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        )</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    {}</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="keywordtype">void</span> begin() {</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;      mLedMatrix.begin();</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;      <a class="code" href="classace__segment_1_1ScanningModule.html#ac0cf47c36ecb0529da5f99a0a8d1d503">Super::begin</a>();</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    }</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160; </div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;    <span class="keywordtype">void</span> end() {</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;      mLedMatrix.end();</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;      <a class="code" href="classace__segment_1_1ScanningModule.html#a1bc81a7c5ac4c1d5ee6e2d90259e606c">Super::end</a>();</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    }</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160; </div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;  <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    <a class="code" href="classace__segment_1_1LedMatrixSingleHc595.html">LedMatrixSingleHc595&lt;T_SPII, T_GPIOI&gt;</a> mLedMatrix;</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;};</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160; </div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;} <span class="comment">// ace_segment</span></div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160; </div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="aclassace__segment_1_1ScanningModule_html_a1bc81a7c5ac4c1d5ee6e2d90259e606c"><div class="ttname"><a href="classace__segment_1_1ScanningModule.html#a1bc81a7c5ac4c1d5ee6e2d90259e606c">ace_segment::ScanningModule::end</a></div><div class="ttdeci">void end()</div><div class="ttdoc">A no-op end() function for consistency with other classes.</div><div class="ttdef"><b>Definition:</b> <a href="ScanningModule_8h_source.html#l00128">ScanningModule.h:128</a></div></div>
 <div class="ttc" id="aclassace__segment_1_1ScanningModule_html"><div class="ttname"><a href="classace__segment_1_1ScanningModule.html">ace_segment::ScanningModule</a></div><div class="ttdoc">An implementation of LedModule for display modules which do not have hardware controller chips,...</div><div class="ttdef"><b>Definition:</b> <a href="ScanningModule_8h_source.html#l00080">ScanningModule.h:80</a></div></div>
-<div class="ttc" id="aclassace__segment_1_1HybridModule_html"><div class="ttname"><a href="classace__segment_1_1HybridModule.html">ace_segment::HybridModule</a></div><div class="ttdoc">An implementation of LedModule class that supports an LED module using a single 74HC595 Shift Registe...</div><div class="ttdef"><b>Definition:</b> <a href="HybridModule_8h_source.html#l00056">HybridModule.h:56</a></div></div>
+<div class="ttc" id="aclassace__segment_1_1HybridModule_html"><div class="ttname"><a href="classace__segment_1_1HybridModule.html">ace_segment::HybridModule</a></div><div class="ttdoc">An implementation of LedModule class that supports an LED module using a single 74HC595 Shift Registe...</div><div class="ttdef"><b>Definition:</b> <a href="HybridModule_8h_source.html#l00057">HybridModule.h:57</a></div></div>
 <div class="ttc" id="aclassace__segment_1_1ScanningModule_html_ac0cf47c36ecb0529da5f99a0a8d1d503"><div class="ttname"><a href="classace__segment_1_1ScanningModule.html#ac0cf47c36ecb0529da5f99a0a8d1d503">ace_segment::ScanningModule::begin</a></div><div class="ttdeci">void begin()</div><div class="ttdoc">Configure the driver with the parameters given by in the constructor.</div><div class="ttdef"><b>Definition:</b> <a href="ScanningModule_8h_source.html#l00108">ScanningModule.h:108</a></div></div>
-<div class="ttc" id="aclassace__segment_1_1LedMatrixSingleHc595_html"><div class="ttname"><a href="classace__segment_1_1LedMatrixSingleHc595.html">ace_segment::LedMatrixSingleHc595</a></div><div class="ttdoc">An implementation of LedMatrixBase with an 74HC595 Shift Register chip on the segment pins,...</div><div class="ttdef"><b>Definition:</b> <a href="LedMatrixSingleHc595_8h_source.html#l00051">LedMatrixSingleHc595.h:51</a></div></div>
+<div class="ttc" id="aclassace__segment_1_1LedMatrixSingleHc595_html"><div class="ttname"><a href="classace__segment_1_1LedMatrixSingleHc595.html">ace_segment::LedMatrixSingleHc595</a></div><div class="ttdoc">An implementation of LedMatrixBase with an 74HC595 Shift Register chip on the segment pins,...</div><div class="ttdef"><b>Definition:</b> <a href="LedMatrixSingleHc595_8h_source.html#l00053">LedMatrixSingleHc595.h:53</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

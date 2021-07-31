@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.7.0</span>
+   &#160;<span id="projectnumber">0.8.0</span>
    </div>
    <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, HT16K33, or 74HC595 controller chips</div>
   </td>
@@ -67,16 +67,9 @@ $(function() {
 
 <h3><a id="index_b"></a>- b -</h3><ul>
 <li>begin()
-: <a class="el" href="classace__segment_1_1HardSpiFastInterface.html#a7b1c61ec8701902c2099eba2ee1bc59e">ace_segment::HardSpiFastInterface&lt; T_SPI, T_LATCH_PIN &gt;</a>
-, <a class="el" href="classace__segment_1_1HardSpiInterface.html#af169c60796199ff5e07c6b90b6315915">ace_segment::HardSpiInterface&lt; T_SPI &gt;</a>
-, <a class="el" href="classace__segment_1_1LedMatrixBase.html#a5c068db5e59b80d0884a1af616177f0e">ace_segment::LedMatrixBase</a>
+: <a class="el" href="classace__segment_1_1LedMatrixBase.html#a5c068db5e59b80d0884a1af616177f0e">ace_segment::LedMatrixBase</a>
 , <a class="el" href="classace__segment_1_1ScanningModule.html#ac0cf47c36ecb0529da5f99a0a8d1d503">ace_segment::ScanningModule&lt; T_LM, T_DIGITS, T_SUBFIELDS, T_CI &gt;</a>
-, <a class="el" href="classace__segment_1_1SimpleWireInterface.html#adef20b4b62c268520ca886709243a482">ace_segment::SimpleWireInterface</a>
-, <a class="el" href="classace__segment_1_1SoftTmiInterface.html#ace97eafae5b0867c6506b850125269e4">ace_segment::SoftTmiInterface</a>
 , <a class="el" href="classace__segment_1_1Tm1637Module.html#a4d398081a200564a787b2ebee1e7a699">ace_segment::Tm1637Module&lt; T_TMII, T_DIGITS &gt;</a>
-</li>
-<li>beginTransmission()
-: <a class="el" href="classace__segment_1_1SimpleWireInterface.html#a3682f46e9dca87537b7909baa0954bd9">ace_segment::SimpleWireInterface</a>
 </li>
 </ul>
 
@@ -139,12 +132,7 @@ $(function() {
 <li>end()
 : <a class="el" href="classace__segment_1_1LedMatrixBase.html#a36c163f093b05a7a25daf40d5842186f">ace_segment::LedMatrixBase</a>
 , <a class="el" href="classace__segment_1_1ScanningModule.html#a1bc81a7c5ac4c1d5ee6e2d90259e606c">ace_segment::ScanningModule&lt; T_LM, T_DIGITS, T_SUBFIELDS, T_CI &gt;</a>
-, <a class="el" href="classace__segment_1_1SimpleWireInterface.html#a67ba2b21eb1ed16d82a853044210cf10">ace_segment::SimpleWireInterface</a>
-, <a class="el" href="classace__segment_1_1SoftTmiInterface.html#a346fed9646fe25898b912cacab23364c">ace_segment::SoftTmiInterface</a>
 , <a class="el" href="classace__segment_1_1Tm1637Module.html#a7d731aa467e81a7be1f06bcffb2a5f64">ace_segment::Tm1637Module&lt; T_TMII, T_DIGITS &gt;</a>
-</li>
-<li>endTransmission()
-: <a class="el" href="classace__segment_1_1SimpleWireInterface.html#a21d5725d19921f6981eb7eeab1949ca0">ace_segment::SimpleWireInterface</a>
 </li>
 </ul>
 
@@ -211,7 +199,7 @@ $(function() {
 : <a class="el" href="classace__segment_1_1NumberWriter.html#abf1fc3ae5c324d1de2e3d5f196e5a0a8">ace_segment::NumberWriter</a>
 </li>
 <li>Ht16k33Module()
-: <a class="el" href="classace__segment_1_1Ht16k33Module.html#ad5a97827d1c639656c5685b61140f977">ace_segment::Ht16k33Module&lt; T_WIREI, T_DIGITS &gt;</a>
+: <a class="el" href="classace__segment_1_1Ht16k33Module.html#a0136851a409d3bba51c3cdf9aa4eb483">ace_segment::Ht16k33Module&lt; T_WIREI, T_DIGITS &gt;</a>
 </li>
 </ul>
 
@@ -260,8 +248,14 @@ $(function() {
 <li>LedMatrixBase()
 : <a class="el" href="classace__segment_1_1LedMatrixBase.html#ae46efc84d412faff4617fe461b912131">ace_segment::LedMatrixBase</a>
 </li>
+<li>LedMatrixDirect()
+: <a class="el" href="classace__segment_1_1LedMatrixDirect.html#af3e107e571f515fa9837b1ec4b118569">ace_segment::LedMatrixDirect&lt; T_GPIOI &gt;</a>
+</li>
 <li>LedMatrixDualHc595()
 : <a class="el" href="classace__segment_1_1LedMatrixDualHc595.html#aa32dd16e69cd42930243c083ee4dc287">ace_segment::LedMatrixDualHc595&lt; T_SPII &gt;</a>
+</li>
+<li>LedMatrixSingleHc595()
+: <a class="el" href="classace__segment_1_1LedMatrixSingleHc595.html#a6f28a19b1a63df30dffbb573c3f16b9a">ace_segment::LedMatrixSingleHc595&lt; T_SPII, T_GPIOI &gt;</a>
 </li>
 <li>ledModule()
 : <a class="el" href="classace__segment_1_1CharWriter.html#a44d4a19a3deee0f1ac1783dd2d610efc">ace_segment::CharWriter</a>
@@ -340,19 +334,6 @@ $(function() {
 <li>scrollRight()
 : <a class="el" href="classace__segment_1_1StringScroller.html#a1922aa83b67028a1f1dcf079abae0c8a">ace_segment::StringScroller</a>
 </li>
-<li>send16()
-: <a class="el" href="classace__segment_1_1HardSpiFastInterface.html#a10fc33e5abef65ef953feea781c46eab">ace_segment::HardSpiFastInterface&lt; T_SPI, T_LATCH_PIN &gt;</a>
-, <a class="el" href="classace__segment_1_1HardSpiInterface.html#a33830a0c90ab384052e5cd697224ef34">ace_segment::HardSpiInterface&lt; T_SPI &gt;</a>
-, <a class="el" href="classace__segment_1_1SoftSpiInterface.html#a50cbb4c7e056fa527e8b3904f2cf1f8c">ace_segment::SoftSpiInterface</a>
-</li>
-<li>send8()
-: <a class="el" href="classace__segment_1_1HardSpiFastInterface.html#ad0bd4e40284fad9edf1a730c2468b460">ace_segment::HardSpiFastInterface&lt; T_SPI, T_LATCH_PIN &gt;</a>
-, <a class="el" href="classace__segment_1_1HardSpiInterface.html#ab5293fa2d7fa995eb813a9c114129cbd">ace_segment::HardSpiInterface&lt; T_SPI &gt;</a>
-, <a class="el" href="classace__segment_1_1SoftSpiInterface.html#a9d59bbfd70a5366b2e6ce00c0c6443c0">ace_segment::SoftSpiInterface</a>
-</li>
-<li>sendByte()
-: <a class="el" href="classace__segment_1_1SoftTmiInterface.html#ad9b4c3a8a068b94449655b8633d13927">ace_segment::SoftTmiInterface</a>
-</li>
 <li>setBrightness()
 : <a class="el" href="classace__segment_1_1Ht16k33Module.html#a9af31d58a23e6205cc43155903a1df49">ace_segment::Ht16k33Module&lt; T_WIREI, T_DIGITS &gt;</a>
 , <a class="el" href="classace__segment_1_1LedModule.html#af14827ce8d21f44bd65b02f0880244fc">ace_segment::LedModule</a>
@@ -372,18 +353,6 @@ $(function() {
 , <a class="el" href="classace__segment_1_1Max7219Module.html#ab3ffdc2a383450671de2e294023db587">ace_segment::Max7219Module&lt; T_SPII, T_DIGITS &gt;</a>
 , <a class="el" href="classace__segment_1_1ScanningModule.html#ad8d910b9f0e97711faf19a899b6eded8">ace_segment::ScanningModule&lt; T_LM, T_DIGITS, T_SUBFIELDS, T_CI &gt;</a>
 , <a class="el" href="classace__segment_1_1Tm1637Module.html#a6e651be7571cb0a68b4f15b7aef487b8">ace_segment::Tm1637Module&lt; T_TMII, T_DIGITS &gt;</a>
-</li>
-<li>SimpleWireInterface()
-: <a class="el" href="classace__segment_1_1SimpleWireInterface.html#a8f3779abef097775430bcee7c0ca71c0">ace_segment::SimpleWireInterface</a>
-</li>
-<li>SoftTmiInterface()
-: <a class="el" href="classace__segment_1_1SoftTmiInterface.html#ac16eba9aecc0c5e413eba73b897ba5b8">ace_segment::SoftTmiInterface</a>
-</li>
-<li>startCondition()
-: <a class="el" href="classace__segment_1_1SoftTmiInterface.html#ab2e4679310300461994d520d443223ce">ace_segment::SoftTmiInterface</a>
-</li>
-<li>stopCondition()
-: <a class="el" href="classace__segment_1_1SoftTmiInterface.html#a47c4b4d5e5eb0434916939ddea3ce86e">ace_segment::SoftTmiInterface</a>
 </li>
 <li>StringScroller()
 : <a class="el" href="classace__segment_1_1StringScroller.html#a87dd6ef5474a30bd4f022f690423e72c">ace_segment::StringScroller</a>
@@ -405,9 +374,6 @@ $(function() {
 
 
 <h3><a id="index_w"></a>- w -</h3><ul>
-<li>write()
-: <a class="el" href="classace__segment_1_1SimpleWireInterface.html#aa36a94a4b1ff8adb205cc0a8c4254bc7">ace_segment::SimpleWireInterface</a>
-</li>
 <li>writeBcd2At()
 : <a class="el" href="classace__segment_1_1ClockWriter.html#afc4dd796b50deda456b4319134a47030">ace_segment::ClockWriter</a>
 </li>
@@ -463,7 +429,7 @@ $(function() {
 : <a class="el" href="classace__segment_1_1NumberWriter.html#a69b7ab86dea585c95e5547e231827b12">ace_segment::NumberWriter</a>
 </li>
 <li>writeStringAt()
-: <a class="el" href="classace__segment_1_1StringWriter.html#a438a77c7d459bbd875d288bdd0e8cccb">ace_segment::StringWriter</a>
+: <a class="el" href="classace__segment_1_1StringWriter.html#a6bd1098f384b81edc53f8ce33896cbcc">ace_segment::StringWriter</a>
 </li>
 <li>writeTempAt()
 : <a class="el" href="classace__segment_1_1TemperatureWriter.html#a01a15703c0396f4c3bb619fc43a935f5">ace_segment::TemperatureWriter</a>

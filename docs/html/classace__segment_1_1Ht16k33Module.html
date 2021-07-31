@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.7.0</span>
+   &#160;<span id="projectnumber">0.8.0</span>
    </div>
    <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, HT16K33, or 74HC595 controller chips</div>
   </td>
@@ -101,9 +101,9 @@ Collaboration diagram for ace_segment::Ht16k33Module&lt; T_WIREI, T_DIGITS &gt;:
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ad5a97827d1c639656c5685b61140f977"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1Ht16k33Module.html#ad5a97827d1c639656c5685b61140f977">Ht16k33Module</a> (T_WIREI &amp;wire, bool <a class="el" href="classace__segment_1_1Ht16k33Module.html#ac847aa1ced3161d514d76eac6e8fe824">enableColon</a>=false)</td></tr>
-<tr class="memdesc:ad5a97827d1c639656c5685b61140f977"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="classace__segment_1_1Ht16k33Module.html#ad5a97827d1c639656c5685b61140f977">More...</a><br /></td></tr>
-<tr class="separator:ad5a97827d1c639656c5685b61140f977"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0136851a409d3bba51c3cdf9aa4eb483"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1Ht16k33Module.html#a0136851a409d3bba51c3cdf9aa4eb483">Ht16k33Module</a> (T_WIREI &amp;wire, uint8_t addr, bool <a class="el" href="classace__segment_1_1Ht16k33Module.html#ac847aa1ced3161d514d76eac6e8fe824">enableColon</a>=false)</td></tr>
+<tr class="memdesc:a0136851a409d3bba51c3cdf9aa4eb483"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="classace__segment_1_1Ht16k33Module.html#a0136851a409d3bba51c3cdf9aa4eb483">More...</a><br /></td></tr>
+<tr class="separator:a0136851a409d3bba51c3cdf9aa4eb483"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4f788e32344a71422db1dc66df79b89a"><td class="memItemLeft" align="right" valign="top"><a id="a4f788e32344a71422db1dc66df79b89a"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>begin</b> ()</td></tr>
 <tr class="separator:a4f788e32344a71422db1dc66df79b89a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -155,20 +155,20 @@ class ace_segment::Ht16k33Module&lt; T_WIREI, T_DIGITS &gt;</h3>
 <p>An implementation of <a class="el" href="classace__segment_1_1LedModule.html" title="General interface that represents a generic seven-segment LED module with multiple digits.">LedModule</a> using the HT16K33 chip. </p>
 <p>The chip uses I2C for communication.</p>
 <p>This class is customized for the 4-digit LED module from Adafruit (<a href="https://www.adafruit.com/product/878">https://www.adafruit.com/product/878</a>) or one of its clones where the decimal point after digit 1 (second from left) and the colon between digits 1 and 2 can be controlled independently and turned on at the same time.</p>
-<p>This class has the option of making the LED module behave like a normal 4-digit LED module (witout a colon), or a 4-digit LED clock module (with a colon). With the <code>enableColon</code> parameter set to false (default), the decimal point (bit 7) of digit 1 controls the decimal point to the right of digit 1. With <code>enableColon</code> set to true, the same bit controls the colon to the right of digit 1.</p>
-<p>Although the hardware is capable of turning on the decimal point and colon at the same time, the AceSegment library does not support that mode. It does not seem like a combination that is useful. Fortunately, this class does allow the behavior of the colon segment to be changed at runtime using the <a class="el" href="classace__segment_1_1Ht16k33Module.html#ac847aa1ced3161d514d76eac6e8fe824" title="Set true to enable the colon segment on the module, which replaces the decimal point on digit 1 (seco...">enableColon()</a> method. You can display the time of a clock (<code>hh:mm</code>), then display a normal number with a decimal point (<code>xx.yy</code>).</p>
+<p>Unfortunately, the AceSegment library does <em>not</em> support controlling both the decimal point and the colon at the same time. Instead, this class provides the option of enabling one or the other, making the LED module behave like a normal 4-digit LED module (witout a colon), or a 4-digit LED clock module (with a colon). With the <code>enableColon</code> parameter set to false (default), the decimal point (bit 7) of digit 1 controls the decimal point to the right of digit 1. With <code>enableColon</code> set to true, the same bit controls the colon to the right of digit 1.</p>
+<p>The behavior of the colon segment to be changed at runtime as well using the <a class="el" href="classace__segment_1_1Ht16k33Module.html#ac847aa1ced3161d514d76eac6e8fe824" title="Set true to enable the colon segment on the module, which replaces the decimal point on digit 1 (seco...">enableColon()</a> method. You can display the time of a clock (<code>hh:mm</code>), then display a normal number with a decimal point (<code>xx.yy</code>).</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">T_WIREI</td><td>the class that wraps the I2C Wire interface, usually WireInterface </td></tr>
-    <tr><td class="paramname">T_DIGITS</td><td>number of logical digits in the module </td></tr>
+    <tr><td class="paramname">T_WIREI</td><td>the class that wraps the I2C Wire interface (one of TwoWireInterface, SimpleWireInterface of SimpleWireFastInterface) </td></tr>
+    <tr><td class="paramname">T_DIGITS</td><td>number of logical digits in the module. Currently this should always be set to 4 because it is designed to support the 4-digit LED modules found on Adafruit, Amazon or eBay. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="Ht16k33Module_8h_source.html#l00065">65</a> of file <a class="el" href="Ht16k33Module_8h_source.html">Ht16k33Module.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Ht16k33Module_8h_source.html#l00066">66</a> of file <a class="el" href="Ht16k33Module_8h_source.html">Ht16k33Module.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="ad5a97827d1c639656c5685b61140f977"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad5a97827d1c639656c5685b61140f977">&#9670;&nbsp;</a></span>Ht16k33Module()</h2>
+<a id="a0136851a409d3bba51c3cdf9aa4eb483"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0136851a409d3bba51c3cdf9aa4eb483">&#9670;&nbsp;</a></span>Ht16k33Module()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -183,6 +183,12 @@ template&lt;typename T_WIREI , uint8_t T_DIGITS&gt; </div>
           <td>(</td>
           <td class="paramtype">T_WIREI &amp;&#160;</td>
           <td class="paramname"><em>wire</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint8_t&#160;</td>
+          <td class="paramname"><em>addr</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -207,7 +213,7 @@ template&lt;typename T_WIREI , uint8_t T_DIGITS&gt; </div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">wire</td><td>instance of T_WIREI class </td></tr>
-    <tr><td class="paramname">remapArray</td><td>(optional, nullable) a mapping of the physical digit positions to their logical positions </td></tr>
+    <tr><td class="paramname">addr</td><td>the 7-bit I2C addr </td></tr>
     <tr><td class="paramname">enableColon</td><td>enable the colon segment to behave like a 4-digit LED module for clocks (displaying a colon in <code>hh:mm</code>). The decimal point (bit 7) of digit 1 (second from left) becomes wired to the colon segment. (default: false) </td></tr>
   </table>
   </dd>
@@ -248,7 +254,7 @@ template&lt;typename T_WIREI , uint8_t T_DIGITS&gt; </div>
 <p>This has the same meaning as the <code>enableColon</code> parameter in the constructor.</p>
 <p>You can enable the colon at runtime, just before the <a class="el" href="classace__segment_1_1Ht16k33Module.html#ad9225465a7ce3fa621eb8505edb77f6a" title="Send segment patterns of all digits.">flush()</a> method, to render a <code>hh:mm</code> clock display. Then you can call this method to disable the colon to enable the decimal point to render a <code>xx.yy</code> number. </p>
 
-<p class="definition">Definition at line <a class="el" href="Ht16k33Module_8h_source.html#l00108">108</a> of file <a class="el" href="Ht16k33Module_8h_source.html">Ht16k33Module.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Ht16k33Module_8h_source.html#l00113">113</a> of file <a class="el" href="Ht16k33Module_8h_source.html">Ht16k33Module.h</a>.</p>
 
 </div>
 </div>
@@ -287,9 +293,9 @@ template&lt;typename T_WIREI , uint8_t T_DIGITS&gt; </div>
 <li>digit 2 = COM3</li>
 <li>digit 3 = COM4</li>
 </ul>
-<p>Unlike some LED modules, it can display both the decimal point on digit 1 as well as the colon segment at the same time. However, various writers (e.g. <a class="el" href="classace__segment_1_1ClockWriter.html" title="The ClockWriter writes &quot;hh:mm&quot; and &quot;yyyy&quot; to the LedModule.">ClockWriter</a>) assumes that the most-significant-bit of digit 1 is connected to the colon. So if enableColon is set, make the logical mapping of that decimal point bit so the colon bit. </p>
+<p>Unlike some LED modules, it can display both the decimal point on digit 1 as well as the colon segment at the same time. However, various writers (e.g. <a class="el" href="classace__segment_1_1ClockWriter.html" title="The ClockWriter writes &quot;hh:mm&quot; and &quot;yyyy&quot; to the LedModule.">ClockWriter</a>) assumes that the most-significant-bit of digit 1 is connected to the colon. So if enableColon is set, map the decimal point bit to the colon bit. </p>
 
-<p class="definition">Definition at line <a class="el" href="Ht16k33Module_8h_source.html#l00154">154</a> of file <a class="el" href="Ht16k33Module_8h_source.html">Ht16k33Module.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Ht16k33Module_8h_source.html#l00159">159</a> of file <a class="el" href="Ht16k33Module_8h_source.html">Ht16k33Module.h</a>.</p>
 
 </div>
 </div>
@@ -324,7 +330,7 @@ template&lt;typename T_WIREI , uint8_t T_DIGITS&gt; </div>
 
 <p>Implements <a class="el" href="classace__segment_1_1LedModule.html#af14827ce8d21f44bd65b02f0880244fc">ace_segment::LedModule</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="Ht16k33Module_8h_source.html#l00127">127</a> of file <a class="el" href="Ht16k33Module_8h_source.html">Ht16k33Module.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Ht16k33Module_8h_source.html#l00132">132</a> of file <a class="el" href="Ht16k33Module_8h_source.html">Ht16k33Module.h</a>.</p>
 
 </div>
 </div>
