@@ -43,12 +43,11 @@ from this library. (On AVR processors, simply adding `#include <Wire.h>`
 increases flash usage by about 1100 bytes even if nothing is used from the
 `<Wire.h>` library.)
 
-**Version**: 0.8 (2021-07-30)
+**Version**: 0.8.1 (2021-07-31)
+
+**Status**: Ready for first public release.
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
-
-**Status**: This is a **work in progress**. It is not ready for public
-consumption, but it is getting very close.
 
 ## Table of Contents
 
