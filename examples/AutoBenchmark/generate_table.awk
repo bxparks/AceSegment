@@ -60,12 +60,12 @@ END {
   for (i = 0; i < TOTAL_BENCHMARKS; i++) {
     name = u[i]["name"]
     if (name ~ /^Direct\(4\)$/ \
-        || name ~ /^Hybrid\(4,SimpleSpi\)/ \
-        || name ~ /^Hc595\(8,SimpleSpi\)/ \
+        || name ~ /^Hybrid\(4,HardSpi\)/ \
+        || name ~ /^Hc595\(8,HardSpi\)/ \
         || name ~ /^Tm1637\(4,SimpleTmi,100us\)/ \
         || name ~ /^Tm1637\(4,SimpleTmi,5us\)/ \
         || name ~ /^Tm1637\(6,SimpleTmi,100us\)/ \
-        || name ~ /^Max7219\(8,SimpleSpi\)/ \
+        || name ~ /^Max7219\(8,HardSpi\)/ \
         || name ~ /^Ht16k33\(4,TwoWire,100kHz)/ \
     ) {
       printf("|-------------------------------------------+-------------------+---------|\n")

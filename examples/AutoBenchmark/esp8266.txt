@@ -1,9 +1,4 @@
 SIZEOF
-sizeof(SimpleTmiInterface): 3
-sizeof(SimpleSpiInterface): 3
-sizeof(HardSpiInterface): 8
-sizeof(TwoWireInterface): 4
-sizeof(SimpleWireInterface): 5
 sizeof(LedMatrixDirect<>): 16
 sizeof(LedMatrixSingleHc595<SimpleSpiInterface>): 16
 sizeof(LedMatrixDualHc595<HardSpiInterface>): 20
@@ -26,25 +21,25 @@ sizeof(StringWriter): 4
 sizeof(LevelWriter): 4
 sizeof(StringScroller): 12
 BENCHMARKS
-Direct(4) 12 13 32 40
-Direct(4,subfields) 0 2 25 640
-Hybrid(4,SimpleSpi) 29 29 42 40
-Hybrid(4,SimpleSpi,subfields) 0 3 41 640
-Hybrid(4,HardSpi) 12 12 24 40
+Direct(4) 12 12 32 40
+Direct(4,subfields) 0 2 24 640
+Hybrid(4,HardSpi) 12 12 32 40
 Hybrid(4,HardSpi,subfields) 0 2 24 640
-Hc595(8,SimpleSpi) 50 51 59 80
-Hc595(8,SimpleSpi,subfields) 0 6 63 1280
-Hc595(8,HardSpi) 14 14 26 80
+Hybrid(4,SimpleSpi) 29 29 41 40
+Hybrid(4,SimpleSpi,subfields) 0 4 41 640
+Hc595(8,HardSpi) 14 14 22 80
 Hc595(8,HardSpi,subfields) 0 2 26 1280
-Tm1637(4,SimpleTmi,100us) 21496 21504 21540 10
-Tm1637(4,SimpleTmi,100us,incremental) 3481 8479 9765 50
-Tm1637(4,SimpleTmi,5us) 1525 1526 1530 10
-Tm1637(4,SimpleTmi,5us,incremental) 248 602 695 50
-Tm1637(6,SimpleTmi,100us) 27024 27031 27044 10
-Tm1637(6,SimpleTmi,100us,incremental) 3481 8837 9753 70
-Max7219(8,SimpleSpi) 459 459 464 20
-Max7219(8,HardSpi) 125 125 134 20
-Ht16k33(4,TwoWire,100kHz) 1331 1332 1355 20
-Ht16k33(4,TwoWire,400kHz) 348 348 349 20
-Ht16k33(4,SimpleWire,1us) 1338 1341 1358 20
+Hc595(8,SimpleSpi) 50 51 63 80
+Hc595(8,SimpleSpi,subfields) 0 6 63 1280
+Tm1637(4,SimpleTmi,100us) 21497 21508 21541 10
+Tm1637(4,SimpleTmi,100us,incremental) 3481 8480 9753 50
+Tm1637(4,SimpleTmi,5us) 1526 1526 1526 10
+Tm1637(4,SimpleTmi,5us,incremental) 248 603 718 50
+Tm1637(6,SimpleTmi,100us) 27025 27033 27057 10
+Tm1637(6,SimpleTmi,100us,incremental) 3481 8837 9761 70
+Max7219(8,HardSpi) 125 126 141 20
+Max7219(8,SimpleSpi) 459 460 474 20
+Ht16k33(4,TwoWire,100kHz) 1322 1324 1354 20
+Ht16k33(4,TwoWire,400kHz) 347 347 351 20
+Ht16k33(4,SimpleWire,1us) 1330 1331 1350 20
 END

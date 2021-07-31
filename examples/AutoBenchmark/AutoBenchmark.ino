@@ -27,6 +27,11 @@ SOFTWARE.
  * rendering logic of various module classes (e.g. Tm1637Module, Max7219Module,
  * Ht16k33Module, Hc595Module). See the generated README.md for more
  * information.
+ *
+ * For accurate I2C timing information, an HT16K33 LED module must be attached
+ * to the I2C bus. Otherwise, some I2C libraries will detect the NACK from the
+ * non-existent device and return early, causing the timing numbers to be
+ * artificially small.
  */
 
 #include <Arduino.h>
@@ -855,51 +860,51 @@ void runBenchmarks() {
   runDirectFast4();
 #endif
 
+  // HybridModule
+  runHybridHardSpi();
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+  runHybridHardSpiFast();
+#endif
   runHybridSimpleSpi();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
   runHybridSimpleSpiFast();
 #endif
 
-  runHybridHardSpi();
+  // Hc595Module
+  runHc595HardSpi();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  runHybridHardSpiFast();
+  runHc595HardSpiFast();
 #endif
-
   runHc595SimpleSpi();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
   runHc595SimpleSpiFast();
 #endif
 
-  runHc595HardSpi();
-#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  runHc595HardSpiFast();
-#endif
-
+  // Tm1637Module
   runTm1637SimpleTmi();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
   runTm1637SimpleTmiFast();
 #endif
-
   runTm1637SimpleTmiShort();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
   runTm1637SimpleTmiFastShort();
 #endif
-
   runTm1637SixSimpleTmi();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
   runTm1637SixSimpleTmiFast();
 #endif
 
+  // Max7219Module
+  runMax7219HardSpi();
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+  runMax7219HardSpiFast();
+#endif
   runMax7219SimpleSpi();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
   runMax7219SimpleSpiFast();
 #endif
 
-  runMax7219HardSpi();
-#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  runMax7219HardSpiFast();
-#endif
-
+  // Ht16k33Module
   runHt16k33TwoWire100();
   runHt16k33TwoWire400();
   runHt16k33SimpleWire();
@@ -913,40 +918,7 @@ void runBenchmarks() {
 //-----------------------------------------------------------------------------
 
 void printSizeOf() {
-  SERIAL_PORT_MONITOR.print(F("sizeof(SimpleTmiInterface): "));
-  SERIAL_PORT_MONITOR.println(sizeof(SimpleTmiInterface));
-
-#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  SERIAL_PORT_MONITOR.print(F("sizeof(SimpleTmiFastInterface<4, 5, 100>): "));
-  SERIAL_PORT_MONITOR.println(sizeof(SimpleTmiFastInterface<4, 5, 100>));
-#endif
-
-  SERIAL_PORT_MONITOR.print(F("sizeof(SimpleSpiInterface): "));
-  SERIAL_PORT_MONITOR.println(sizeof(SimpleSpiInterface));
-
-#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  SERIAL_PORT_MONITOR.print(F("sizeof(SimpleSpiFastInterface<11, 12, 13>): "));
-  SERIAL_PORT_MONITOR.println(sizeof(SimpleSpiFastInterface<11, 12, 13>));
-#endif
-
-  SERIAL_PORT_MONITOR.print(F("sizeof(HardSpiInterface): "));
-  SERIAL_PORT_MONITOR.println(sizeof(HardSpiInterface<SPIClass>));
-
-#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  SERIAL_PORT_MONITOR.print(F("sizeof(HardSpiFastInterface): "));
-  SERIAL_PORT_MONITOR.println(sizeof(HardSpiFastInterface<SPIClass, 11>));
-#endif
-
-  SERIAL_PORT_MONITOR.print(F("sizeof(TwoWireInterface): "));
-  SERIAL_PORT_MONITOR.println(sizeof(TwoWireInterface<TwoWire>));
-
-  SERIAL_PORT_MONITOR.print(F("sizeof(SimpleWireInterface): "));
-  SERIAL_PORT_MONITOR.println(sizeof(SimpleWireInterface));
-
-#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  SERIAL_PORT_MONITOR.print(F("sizeof(SimpleWireFastInterface<2, 3, 10>): "));
-  SERIAL_PORT_MONITOR.println(sizeof(SimpleWireFastInterface<2, 3, 10>));
-#endif
+  // LedMatrixDirect, LedMatrixDirectFast
 
   SERIAL_PORT_MONITOR.print(F("sizeof(LedMatrixDirect<>): "));
   SERIAL_PORT_MONITOR.println(sizeof(LedMatrixDirect<>));
@@ -958,6 +930,8 @@ void printSizeOf() {
       2, 3, 4, 5
   >));
 #endif
+
+  // LedMatrix*, ScanningModule
 
   SERIAL_PORT_MONITOR.print(
       F("sizeof(LedMatrixSingleHc595<SimpleSpiInterface>): "));
@@ -986,6 +960,8 @@ void printSizeOf() {
   >));
 #endif
 
+  // HybridModule, Hc595Module, Tm1637Module, Max7219Module, Ht16k33Module
+
   SERIAL_PORT_MONITOR.print(F("sizeof(HybridModule<SimpleSpiInterface, 4>): "));
   SERIAL_PORT_MONITOR.println(sizeof(HybridModule<SimpleSpiInterface, 4>));
 
@@ -1011,6 +987,8 @@ void printSizeOf() {
   SERIAL_PORT_MONITOR.print(
       F("sizeof(Ht16k33Module<SimpleWireInterface, 4>): "));
   SERIAL_PORT_MONITOR.println(sizeof(Ht16k33Module<SimpleWireInterface, 4>));
+
+  // Writers
 
   SERIAL_PORT_MONITOR.print(F("sizeof(PatternWriter): "));
   SERIAL_PORT_MONITOR.println(sizeof(PatternWriter));
