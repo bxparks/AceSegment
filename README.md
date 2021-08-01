@@ -60,6 +60,7 @@ increases flash usage by about 1100 bytes even if nothing is used from the
     * [Classes](#Classes)
     * [Dependency Diagram](#DependencyDiagram)
     * [Digit and Segment Addressing](#DigitAndSegmentAddressing)
+    * [Remap Arrays](#RemapArrays)
     * [Hello Tm1637Module](#HelloTm1637Module)
     * [Hello Max7219Module](#HelloMax7219Module)
     * [Hello Ht16k33Module](#HelloHt16k33Module)
@@ -384,27 +385,33 @@ Digit 1 and Digit 2. In these modules, sometimes the decimal points for the
 other digits work normally, but sometimes, the remaining decimal points do not
 work at all.
 
-Sometimes the LED modules are hardwired to the controller chip so that the
+<a name="RemapArrays"></a>
+### Remap Arrays
+
+Sometimes the LED modules are hardwired to the controller chips so that the
 positions of the digits (and sometimes segments) do not not match the logical
-arrangement described above. Fortunately, we can rearrange the digit and segment
-bits in software so that everything is remapped to their correct places. For
-example, the diymore/robotdyn 6-digit TM1637 LED module is wired so that the
-digits are displayed like this:
+arrangement described above. For example, the diymore/robotdyn 6-digit TM1637
+LED module is wired so that the digits are displayed like this:
 
 ```
 2 1 0 5 4 3
 ```
 
-The `Tm1637Module` class can remap these digits into their correct order:
+Fortunately, we can rearrange the digit and segment bits in software so that
+everything is remapped to their correct places. The constructors for
+`Tm1637Module`, `Max7219Module`, and `Hc595Module` accept an optional parameter
+which describes the remapping of the digits. The library provides some
+predefined remap arrays which work for the LED modules that I obtained from the
+retail stores:
 
-```
-0 1 2 3 4 5
-```
+* `kDigitRemapArray8Max7219`: reverses the digits on the 8-digit MAX7219 modules
+* `kDigitRemapArray8Hc595`: swaps the 2 banks of 4-digits on the 8-digit 74HC595
+  modules
+* `kDigitRemapArray6Tm1637`: rearranges the digits on the 6-digit TM1637 modules
 
-Since it is impossible to predict all the different ways that the LED modules
-can be wired, various classes in the library allow the remapping array to be
-supplied by the library user. The [DEVELOPER.md](DEVELOPER.md) document has some
-preliminary notes about how to create a remap array.
+Custom remap arrays can be created for LED modules which use different ordering
+schemes. The [DEVELOPER.md](DEVELOPER.md) document has some preliminary notes
+about how to create a remap array.
 
 <a name="HelloTm1637Module"></a>
 ### Hello Tm1637Module
