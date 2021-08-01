@@ -344,7 +344,7 @@ Tm1637Module  Max7219Module Hc595Module HybridModule Ht16k33Module DirectModule
                         +---------------------+         |
                                 |                       |
                                 v                       v
-                            <SPI.h>                 <Wire.h>
+                             <SPI.h>                 <Wire.h>
 ```
 
 (The actual dependency among various classes is a bit more complicated than this
@@ -1855,7 +1855,7 @@ class CharWriter {
 #### StringWriter
 
 A `StringWriter` is a class that builds on top of the `CharWriter`. It knows how
-to write entirely strings into the LED display. The public methods look like:
+to write entire strings into the LED display. The public methods look like:
 
 ```C++
 class StringWriter {
@@ -1869,7 +1869,7 @@ class StringWriter {
     uint8_t writeStringAt(uint8_t pos, const char* cs, uint8_t numChar = 255);
 
     uint8_t writeStringAt(uint8_t pos, const __FlashStringHelper* fs,
-            uint8_t numChar = 255);
+        uint8_t numChar = 255);
 
     void clear();
     void clearToEnd(uint8_t pos);
@@ -1935,9 +1935,8 @@ maximum level of 16.
 <a name="StringScroller"></a>
 #### StringScroller
 
-A `StringScroller` is a class that builds on top of the `CharWriter`. It knows
-how to write entirely strings into the LED display. The public methods look
-like:
+A `StringScroller` is a class that builds on top of the `CharWriter`. It can
+scroll strings to the left and right. The public methods look like:
 
 ```C++
 class StringScroller {
