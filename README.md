@@ -138,9 +138,15 @@ The source files are organized as follows:
 <a name="Dependencies"></a>
 ### Dependencies
 
-This library depends on the following additional libraries:
+This library library has a direct dependency on:
 
 * AceCommon (https://github.com/bxparks/AceCommon)
+
+The following libraries are required for only certain classes in the library.
+All of them are listed in the `depends` clause of `library.properties` to make
+the installation easier, but they are pulled into the executable only if they
+are explicitly referenced by the calling application:
+
 * AceSPI (https://github.com/bxparks/AceSPI)
     * Needed by `Hc595Module`, `Max7219Module`, and `HybridModule`
 * AceTMI (https://github.com/bxparks/AceTMI)
