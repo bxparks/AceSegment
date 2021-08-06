@@ -2133,9 +2133,10 @@ example, if the `CharWriter` (which consumes about 300 bytes of flash on AVR) is
 not used, it is not loaded into the program.
 
 The full details are given in
-[examples/MemoryBenchmark](examples/MemoryBenchmark). Here are the flash and
-static memory consumptions for various configurations on an Arduino Nano
-(ATmega328):
+[examples/MemoryBenchmark](examples/MemoryBenchmark). Here are 2 samples of
+the flash and static memory consumptions.
+
+**Arduino Nano (ATmega328)**
 
 ```
 +--------------------------------------------------------------+
@@ -2180,7 +2181,7 @@ static memory consumptions for various configurations on an Arduino Nano
 +--------------------------------------------------------------+
 ```
 
-And here are the memory consumption numbers for an ESP8266:
+**ESP8266**
 
 ```
 +--------------------------------------------------------------+
@@ -2220,9 +2221,9 @@ And here are the memory consumption numbers for an ESP8266:
 ### CPU Cycles
 
 The CPU benchmark numbers can be seen in
-[examples/AutoBenchmark](examples/AutoBenchmark).
+[examples/AutoBenchmark](examples/AutoBenchmark). Here are 2 samples.
 
-Here are the CPU numbers for an AVR processor:
+**Arduino Nano (ATmega328)**
 
 ```
 +-------------------------------------------+-------------------+---------+
@@ -2281,7 +2282,7 @@ Here are the CPU numbers for an AVR processor:
 What is amazing is that if you use `digitalWriteFast()`, the software SPI is
 just as fast as hardware SPI, **and** consumes 500 bytes of less flash memory.
 
-Here are the CPU numbers for an ESP8266:
+**ESP8266**
 
 ```
 +-------------------------------------------+-------------------+---------+
