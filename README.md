@@ -1085,6 +1085,7 @@ be generic clones of the LED modules (https://www.adafruit.com/product/878)
 available from [Adafruit](https://www.adafruit.com), such as these:
 
 ![Adafruit HT16K33 LED Module](docs/ht16k33/adafruit_ht16k33_4_digits.jpg)
+
 ![Adafruit HT16K33 LED Module Front](docs/ht16k33/adafruit_ht16k33_backpack_front.jpg)
 ![Adafruit HT16K33 LED Module Front](docs/ht16k33/adafruit_ht16k33_backpack_back.jpg)
 
