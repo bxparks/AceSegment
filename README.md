@@ -104,6 +104,7 @@ increases flash usage by about 1100 bytes even if nothing is used from the
     * [Tool Chain](#ToolChain)
     * [Operating System](#OperatingSystem)
 * [Bugs And Limitations](#BugsAndLimitations)
+* [Alternative Libraries](#AlternativeLibraries)
 * [License](#License)
 * [Feedback and Support](#FeedbackAndSupport)
 * [Authors](#Authors)
@@ -2413,6 +2414,11 @@ them.
     * I have not done the work because I don't use this feature.
 * Some LED controllers (TM1637, HT16K33) have hardware support for scanning key
   matrices. AceSegment does not support this feature.
+
+<a name="AlternativeLibraries"></a>
+## Alternative Libraries
+
+Tracked using [AceSegment Wiki](https://github.com/bxparks/AceSegment/wiki).
 
 <a name="License"></a>
 ## License
