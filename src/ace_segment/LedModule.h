@@ -64,7 +64,7 @@ class LedModule {
     virtual void setPatternAt(uint8_t pos, uint8_t pattern) = 0;
 
     /** Get the led digit pattern at position pos. */
-    virtual uint8_t getPatternAt(uint8_t pos) = 0;
+    virtual uint8_t getPatternAt(uint8_t pos) const = 0;
 
     /**
      * Set global brightness of all digits. Different subclasses will interpret

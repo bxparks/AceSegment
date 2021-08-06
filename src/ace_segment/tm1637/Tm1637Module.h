@@ -148,7 +148,7 @@ class Tm1637Module : public LedModule {
       setDirtyBit(pos);
     }
 
-    uint8_t getPatternAt(uint8_t pos) override {
+    uint8_t getPatternAt(uint8_t pos) const override {
       return mPatterns[pos];
     }
 

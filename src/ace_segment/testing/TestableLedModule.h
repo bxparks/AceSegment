@@ -46,7 +46,7 @@ class TestableLedModule : public LedModule {
       mPatterns[pos] = pattern;
     }
 
-    uint8_t getPatternAt(uint8_t pos) override {
+    uint8_t getPatternAt(uint8_t pos) const override {
       return mPatterns[pos];
     }
 
