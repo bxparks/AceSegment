@@ -214,6 +214,8 @@ number of `TimingStats::update()` calls that were made.
 
 * Remove `virtual` keyword from `LedModule` methods.
     * No significant changes in execution time.
+* Templatize Writer classes on `T_LED_MODULE` instead of hardcoded `LedModule`.
+    * No significant changes in execution time.
 
 ## Results
 
