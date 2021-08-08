@@ -9,6 +9,7 @@
 #include <AceSegment.h> // Tm1637Module, NumberWriter
 
 using ace_tmi::SimpleTmiInterface;
+using ace_segment::LedModule;
 using ace_segment::Tm1637Module;
 using ace_segment::NumberWriter;
 
@@ -26,7 +27,7 @@ const uint8_t DELAY_MICROS = 100;
 using TmiInterface = SimpleTmiInterface;
 TmiInterface tmiInterface(DIO_PIN, CLK_PIN, DELAY_MICROS);
 Tm1637Module<TmiInterface, NUM_DIGITS> ledModule(tmiInterface);
-NumberWriter numberWriter(ledModule);
+NumberWriter<LedModule> numberWriter(ledModule);
 
 void setupAceSegment() {
 }

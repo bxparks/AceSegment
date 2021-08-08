@@ -10,6 +10,7 @@
 #include <AceSegment.h> // Max7219Module, NumberWriter
 
 using ace_spi::HardSpiInterface;
+using ace_segment::LedModule;
 using ace_segment::Max7219Module;
 using ace_segment::NumberWriter;
 using ace_segment::kDigitRemapArray8Max7219;
@@ -24,7 +25,7 @@ using SpiInterface = HardSpiInterface<SPIClass>;
 SpiInterface spiInterface(SPI, LATCH_PIN);
 Max7219Module<SpiInterface, NUM_DIGITS> ledModule(
     spiInterface, kDigitRemapArray8Max7219);
-NumberWriter numberWriter(ledModule);
+NumberWriter<LedModule> numberWriter(ledModule);
 
 void setup() {
   delay(1000);

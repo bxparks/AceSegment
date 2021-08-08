@@ -315,37 +315,37 @@ volatile int disableCompilerOptimization = 0;
 
   #elif FEATURE == FEATURE_PATTERN_WRITER
     StubModule stubModule;
-    PatternWriter patternWriter(stubModule);
+    PatternWriter<LedModule> patternWriter(stubModule);
 
   #elif FEATURE == FEATURE_NUMBER_WRITER
     StubModule stubModule;
-    NumberWriter numberWriter(stubModule);
+    NumberWriter<LedModule> numberWriter(stubModule);
 
   #elif FEATURE == FEATURE_CLOCK_WRITER
     StubModule stubModule;
-    ClockWriter clockWriter(stubModule);
+    ClockWriter<LedModule> clockWriter(stubModule);
 
   #elif FEATURE == FEATURE_TEMPERATURE_WRITER
     StubModule stubModule;
-    TemperatureWriter temperatureWriter(stubModule);
+    TemperatureWriter<LedModule> temperatureWriter(stubModule);
 
   #elif FEATURE == FEATURE_CHAR_WRITER
     StubModule stubModule;
-    CharWriter charWriter(stubModule);
+    CharWriter<LedModule> charWriter(stubModule);
 
   #elif FEATURE == FEATURE_STRING_WRITER
     StubModule stubModule;
-    CharWriter charWriter(stubModule);
-    StringWriter stringWriter(charWriter);
+    CharWriter<LedModule> charWriter(stubModule);
+    StringWriter<LedModule> stringWriter(charWriter);
 
   #elif FEATURE == FEATURE_STRING_SCROLLER
     StubModule stubModule;
-    CharWriter charWriter(stubModule);
-    StringScroller stringScroller(charWriter);
+    CharWriter<LedModule> charWriter(stubModule);
+    StringScroller<LedModule> stringScroller(charWriter);
 
   #elif FEATURE == FEATURE_LEVEL_WRITER
     StubModule stubModule;
-    LevelWriter levelWriter(stubModule);
+    LevelWriter<LedModule> levelWriter(stubModule);
 
   #else
     #error Unknown FEATURE

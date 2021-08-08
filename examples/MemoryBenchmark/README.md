@@ -202,6 +202,11 @@ before substantional refactoring in 2021.
       `Hc595Module`.
     * Decreases static ram usage by 7-8 bytes for all Module classes.
     * Further decreases flash usage by 10-70 bytes for various Writer classes.
+* Templatize Writer classes on `T_LED_MODULE` instead of hardcoding it to
+  `LedModule`.
+    * Seems to reduce flash size of some Writer classes on some platforms by
+      hundreds of bytes, I think because methods can be better inlined, and
+      unused methods are not compiled and linked in.
 
 ## Results
 
@@ -245,18 +250,18 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        |    260/   11 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| DirectModule                    |   1280/   57 |  1020/   46 |
-| DirectFast4Module               |   1026/   87 |   766/   76 |
+| DirectModule                    |   1296/   58 |  1036/   47 |
+| DirectFast4Module               |   1042/   88 |   782/   77 |
 |---------------------------------+--------------+-------------|
-| Hybrid(HardSpi)                 |   1664/   58 |  1404/   47 |
-| Hybrid(HardSpiFast)             |   1616/   56 |  1356/   45 |
-| Hybrid(SimpleSpi)               |   1306/   52 |  1046/   41 |
-| Hybrid(SimpleSpiFast)           |   1178/   47 |   918/   36 |
+| Hybrid(HardSpi)                 |   1680/   59 |  1420/   48 |
+| Hybrid(HardSpiFast)             |   1632/   57 |  1372/   46 |
+| Hybrid(SimpleSpi)               |   1322/   53 |  1062/   42 |
+| Hybrid(SimpleSpiFast)           |   1194/   48 |   934/   37 |
 |---------------------------------+--------------+-------------|
-| Hc595(HardSpi)                  |   1622/   58 |  1362/   47 |
-| Hc595(HardSpiFast)              |   1326/   56 |  1066/   45 |
-| Hc595(SimpleSpi)                |   1254/   52 |   994/   41 |
-| Hc595(SimpleSpiFast)            |    842/   47 |   582/   36 |
+| Hc595(HardSpi)                  |   1638/   59 |  1378/   48 |
+| Hc595(HardSpiFast)              |   1342/   57 |  1082/   46 |
+| Hc595(SimpleSpi)                |   1270/   53 |  1010/   42 |
+| Hc595(SimpleSpiFast)            |    858/   48 |   598/   37 |
 |---------------------------------+--------------+-------------|
 | Tm1637(SimpleTmi)               |   1132/   31 |   872/   20 |
 | Tm1637(SimpleTmiFast)           |    570/   26 |   310/   15 |
@@ -273,7 +278,7 @@ other `MemoryBenchmark` programs.)
 | StubModule                      |    322/   21 |    62/   10 |
 | PatternWriter+Stub              |    338/   23 |    78/   12 |
 | NumberWriter+Stub               |    418/   23 |   158/   12 |
-| ClockWriter+Stub                |    554/   24 |   294/   13 |
+| ClockWriter+Stub                |    490/   24 |   230/   13 |
 | TemperatureWriter+Stub          |    462/   23 |   202/   12 |
 | CharWriter+Stub                 |    520/   26 |   260/   15 |
 | StringWriter+Stub               |    748/   34 |   488/   23 |
@@ -295,18 +300,18 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        |    456/   11 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| DirectModule                    |   1518/   57 |  1062/   46 |
-| DirectFast4Module               |   1274/   87 |   818/   76 |
+| DirectModule                    |   1534/   58 |  1078/   47 |
+| DirectFast4Module               |   1290/   88 |   834/   77 |
 |---------------------------------+--------------+-------------|
-| Hybrid(HardSpi)                 |   1580/   54 |  1124/   43 |
-| Hybrid(HardSpiFast)             |   1522/   52 |  1066/   41 |
-| Hybrid(SimpleSpi)               |   1534/   52 |  1078/   41 |
-| Hybrid(SimpleSpiFast)           |   1412/   47 |   956/   36 |
+| Hybrid(HardSpi)                 |   1596/   55 |  1140/   44 |
+| Hybrid(HardSpiFast)             |   1538/   53 |  1082/   42 |
+| Hybrid(SimpleSpi)               |   1550/   53 |  1094/   42 |
+| Hybrid(SimpleSpiFast)           |   1428/   48 |   972/   37 |
 |---------------------------------+--------------+-------------|
-| Hc595(HardSpi)                  |   1534/   54 |  1078/   43 |
-| Hc595(HardSpiFast)              |   1468/   52 |  1012/   41 |
-| Hc595(SimpleSpi)                |   1474/   52 |  1018/   41 |
-| Hc595(SimpleSpiFast)            |   1066/   47 |   610/   36 |
+| Hc595(HardSpi)                  |   1552/   55 |  1096/   44 |
+| Hc595(HardSpiFast)              |   1478/   53 |  1022/   42 |
+| Hc595(SimpleSpi)                |   1492/   53 |  1036/   42 |
+| Hc595(SimpleSpiFast)            |   1082/   48 |   626/   37 |
 |---------------------------------+--------------+-------------|
 | Tm1637(SimpleTmi)               |   1424/   31 |   968/   20 |
 | Tm1637(SimpleTmiFast)           |    858/   26 |   402/   15 |
@@ -323,7 +328,7 @@ other `MemoryBenchmark` programs.)
 | StubModule                      |    522/   21 |    66/   10 |
 | PatternWriter+Stub              |    534/   23 |    78/   12 |
 | NumberWriter+Stub               |    630/   23 |   174/   12 |
-| ClockWriter+Stub                |    764/   24 |   308/   13 |
+| ClockWriter+Stub                |    700/   24 |   244/   13 |
 | TemperatureWriter+Stub          |    674/   23 |   218/   12 |
 | CharWriter+Stub                 |    718/   26 |   262/   15 |
 | StringWriter+Stub               |    970/   34 |   514/   23 |
@@ -345,18 +350,18 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        |   3472/  151 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| DirectModule                    |   4514/  197 |  1042/   46 |
-| DirectFast4Module               |   4156/  227 |   684/   76 |
+| DirectModule                    |   4530/  198 |  1058/   47 |
+| DirectFast4Module               |   4172/  228 |   700/   77 |
 |---------------------------------+--------------+-------------|
-| Hybrid(HardSpi)                 |   4576/  194 |  1104/   43 |
-| Hybrid(HardSpiFast)             |   4518/  192 |  1046/   41 |
-| Hybrid(SimpleSpi)               |   4530/  192 |  1058/   41 |
-| Hybrid(SimpleSpiFast)           |   4408/  187 |   936/   36 |
+| Hybrid(HardSpi)                 |   4592/  195 |  1120/   44 |
+| Hybrid(HardSpiFast)             |   4534/  193 |  1062/   42 |
+| Hybrid(SimpleSpi)               |   4546/  193 |  1074/   42 |
+| Hybrid(SimpleSpiFast)           |   4424/  188 |   952/   37 |
 |---------------------------------+--------------+-------------|
-| Hc595(HardSpi)                  |   4552/  194 |  1080/   43 |
-| Hc595(HardSpiFast)              |   4474/  192 |  1002/   41 |
-| Hc595(SimpleSpi)                |   4492/  192 |  1020/   41 |
-| Hc595(SimpleSpiFast)            |   3970/  187 |   498/   36 |
+| Hc595(HardSpi)                  |   4570/  195 |  1098/   44 |
+| Hc595(HardSpiFast)              |   4484/  193 |  1012/   42 |
+| Hc595(SimpleSpi)                |   4510/  193 |  1038/   42 |
+| Hc595(SimpleSpiFast)            |   3986/  188 |   514/   37 |
 |---------------------------------+--------------+-------------|
 | Tm1637(SimpleTmi)               |   4516/  171 |  1044/   20 |
 | Tm1637(SimpleTmiFast)           |   3836/  166 |   364/   15 |
@@ -373,7 +378,7 @@ other `MemoryBenchmark` programs.)
 | StubModule                      |   3500/  161 |    28/   10 |
 | PatternWriter+Stub              |   3512/  163 |    40/   12 |
 | NumberWriter+Stub               |   3608/  163 |   136/   12 |
-| ClockWriter+Stub                |   3742/  164 |   270/   13 |
+| ClockWriter+Stub                |   3678/  164 |   206/   13 |
 | TemperatureWriter+Stub          |   3652/  163 |   180/   12 |
 | CharWriter+Stub                 |   3696/  166 |   224/   15 |
 | StringWriter+Stub               |   3926/  174 |   454/   23 |
@@ -395,13 +400,13 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        |   9940/    0 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| DirectModule                    |  10652/    0 |   712/    0 |
+| DirectModule                    |  10660/    0 |   720/    0 |
 |---------------------------------+--------------+-------------|
-| Hybrid(HardSpi)                 |  11136/    0 |  1196/    0 |
-| Hybrid(SimpleSpi)               |  10712/    0 |   772/    0 |
+| Hybrid(HardSpi)                 |  11144/    0 |  1204/    0 |
+| Hybrid(SimpleSpi)               |  10720/    0 |   780/    0 |
 |---------------------------------+--------------+-------------|
-| Hc595(HardSpi)                  |  11128/    0 |  1188/    0 |
-| Hc595(SimpleSpi)                |  10628/    0 |   688/    0 |
+| Hc595(HardSpi)                  |  11136/    0 |  1196/    0 |
+| Hc595(SimpleSpi)                |  10636/    0 |   696/    0 |
 |---------------------------------+--------------+-------------|
 | Tm1637(SimpleTmi)               |  10660/    0 |   720/    0 |
 |---------------------------------+--------------+-------------|
@@ -413,12 +418,12 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | StubModule                      |  10140/    0 |   200/    0 |
 | PatternWriter+Stub              |  10156/    0 |   216/    0 |
-| NumberWriter+Stub               |  10452/    0 |   512/    0 |
+| NumberWriter+Stub               |  10236/    0 |   296/    0 |
 | ClockWriter+Stub                |  10300/    0 |   360/    0 |
-| TemperatureWriter+Stub          |  10540/    0 |   600/    0 |
-| CharWriter+Stub                 |  10340/    0 |   400/    0 |
-| StringWriter+Stub               |  10460/    0 |   520/    0 |
-| StringScroller+Stub             |  10476/    0 |   536/    0 |
+| TemperatureWriter+Stub          |  10264/    0 |   324/    0 |
+| CharWriter+Stub                 |  10308/    0 |   368/    0 |
+| StringWriter+Stub               |  10456/    0 |   516/    0 |
+| StringScroller+Stub             |  10448/    0 |   508/    0 |
 | LevelWriter+Stub                |  10216/    0 |   276/    0 |
 +--------------------------------------------------------------+
 
@@ -436,13 +441,13 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        |  21420/ 3536 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| DirectModule                    |  24172/ 3956 |  2752/  420 |
+| DirectModule                    |  24180/ 3956 |  2760/  420 |
 |---------------------------------+--------------+-------------|
-| Hybrid(HardSpi)                 |  26100/ 3968 |  4680/  432 |
-| Hybrid(SimpleSpi)               |  24244/ 3960 |  2824/  424 |
+| Hybrid(HardSpi)                 |  26104/ 3968 |  4684/  432 |
+| Hybrid(SimpleSpi)               |  24248/ 3960 |  2828/  424 |
 |---------------------------------+--------------+-------------|
-| Hc595(HardSpi)                  |  26060/ 3972 |  4640/  436 |
-| Hc595(SimpleSpi)                |  24160/ 3964 |  2740/  428 |
+| Hc595(HardSpi)                  |  26068/ 3972 |  4648/  436 |
+| Hc595(SimpleSpi)                |  24168/ 3964 |  2748/  428 |
 |---------------------------------+--------------+-------------|
 | Tm1637(SimpleTmi)               |  24308/ 3936 |  2888/  400 |
 |---------------------------------+--------------+-------------|
@@ -454,12 +459,12 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | StubModule                      |  21572/ 3900 |   152/  364 |
 | PatternWriter+Stub              |  21584/ 3904 |   164/  368 |
-| NumberWriter+Stub               |  21852/ 3904 |   432/  368 |
-| ClockWriter+Stub                |  21720/ 3908 |   300/  372 |
-| TemperatureWriter+Stub          |  21952/ 3904 |   532/  368 |
-| CharWriter+Stub                 |  21764/ 3912 |   344/  376 |
-| StringWriter+Stub               |  21888/ 3916 |   468/  380 |
-| StringScroller+Stub             |  21892/ 3924 |   472/  388 |
+| NumberWriter+Stub               |  21676/ 3904 |   256/  368 |
+| ClockWriter+Stub                |  21724/ 3908 |   304/  372 |
+| TemperatureWriter+Stub          |  21696/ 3904 |   276/  368 |
+| CharWriter+Stub                 |  21740/ 3912 |   320/  376 |
+| StringWriter+Stub               |  21876/ 3916 |   456/  380 |
+| StringScroller+Stub             |  21884/ 3924 |   464/  388 |
 | LevelWriter+Stub                |  21652/ 3904 |   232/  368 |
 +--------------------------------------------------------------+
 
@@ -482,7 +487,7 @@ other `MemoryBenchmark` programs.)
 | Hybrid(HardSpi)                 | 258896/27072 |  2196/  288 |
 | Hybrid(SimpleSpi)               | 257824/27056 |  1124/  272 |
 |---------------------------------+--------------+-------------|
-| Hc595(HardSpi)                  | 258876/27076 |  2176/  292 |
+| Hc595(HardSpi)                  | 258892/27076 |  2192/  292 |
 | Hc595(SimpleSpi)                | 257724/27060 |  1024/  276 |
 |---------------------------------+--------------+-------------|
 | Tm1637(SimpleTmi)               | 257868/27028 |  1168/  244 |
@@ -495,12 +500,12 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | StubModule                      | 256776/26996 |    76/  212 |
 | PatternWriter+Stub              | 256792/27004 |    92/  220 |
-| NumberWriter+Stub               | 257272/27004 |   572/  220 |
-| ClockWriter+Stub                | 257080/27004 |   380/  220 |
-| TemperatureWriter+Stub          | 257384/27004 |   684/  220 |
-| CharWriter+Stub                 | 257032/27012 |   332/  228 |
-| StringWriter+Stub               | 257200/27012 |   500/  228 |
-| StringScroller+Stub             | 257232/27020 |   532/  236 |
+| NumberWriter+Stub               | 256968/27004 |   268/  220 |
+| ClockWriter+Stub                | 257064/27004 |   364/  220 |
+| TemperatureWriter+Stub          | 257000/27004 |   300/  220 |
+| CharWriter+Stub                 | 256968/27012 |   268/  228 |
+| StringWriter+Stub               | 257264/27012 |   564/  228 |
+| StringScroller+Stub             | 257184/27020 |   484/  236 |
 | LevelWriter+Stub                | 256904/27004 |   204/  220 |
 +--------------------------------------------------------------+
 
@@ -518,13 +523,13 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        | 197748/13084 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| DirectModule                    | 200258/13568 |  2510/  484 |
+| DirectModule                    | 200262/13568 |  2514/  484 |
 |---------------------------------+--------------+-------------|
-| Hybrid(HardSpi)                 | 202570/13632 |  4822/  548 |
-| Hybrid(SimpleSpi)               | 200306/13576 |  2558/  492 |
+| Hybrid(HardSpi)                 | 202574/13632 |  4826/  548 |
+| Hybrid(SimpleSpi)               | 200310/13576 |  2562/  492 |
 |---------------------------------+--------------+-------------|
-| Hc595(HardSpi)                  | 202546/13632 |  4798/  548 |
-| Hc595(SimpleSpi)                | 200210/13576 |  2462/  492 |
+| Hc595(HardSpi)                  | 202554/13632 |  4806/  548 |
+| Hc595(SimpleSpi)                | 200218/13576 |  2470/  492 |
 |---------------------------------+--------------+-------------|
 | Tm1637(SimpleTmi)               | 200466/13552 |  2718/  468 |
 |---------------------------------+--------------+-------------|
@@ -536,12 +541,12 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | StubModule                      | 198940/13360 |  1192/  276 |
 | PatternWriter+Stub              | 198956/13368 |  1208/  284 |
-| NumberWriter+Stub               | 199328/13368 |  1580/  284 |
-| ClockWriter+Stub                | 199276/13368 |  1528/  284 |
-| TemperatureWriter+Stub          | 199444/13368 |  1696/  284 |
-| CharWriter+Stub                 | 199212/13376 |  1464/  292 |
-| StringWriter+Stub               | 199344/13376 |  1596/  292 |
-| StringScroller+Stub             | 199364/13384 |  1616/  300 |
+| NumberWriter+Stub               | 199064/13368 |  1316/  284 |
+| ClockWriter+Stub                | 199204/13368 |  1456/  284 |
+| TemperatureWriter+Stub          | 199080/13368 |  1332/  284 |
+| CharWriter+Stub                 | 199116/13376 |  1368/  292 |
+| StringWriter+Stub               | 199288/13376 |  1540/  292 |
+| StringScroller+Stub             | 199284/13384 |  1536/  300 |
 | LevelWriter+Stub                | 199068/13368 |  1320/  284 |
 +--------------------------------------------------------------+
 
@@ -560,13 +565,13 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        |  10880/ 4152 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| DirectModule                    |  11952/ 4396 |  1072/  244 |
+| DirectModule                    |  11960/ 4396 |  1080/  244 |
 |---------------------------------+--------------+-------------|
-| Hybrid(HardSpi)                 |  13024/ 4464 |  2144/  312 |
-| Hybrid(SimpleSpi)               |  11984/ 4400 |  1104/  248 |
+| Hybrid(HardSpi)                 |  13036/ 4464 |  2156/  312 |
+| Hybrid(SimpleSpi)               |  11992/ 4400 |  1112/  248 |
 |---------------------------------+--------------+-------------|
-| Hc595(HardSpi)                  |  12948/ 4468 |  2068/  316 |
-| Hc595(SimpleSpi)                |  11920/ 4404 |  1040/  252 |
+| Hc595(HardSpi)                  |  12960/ 4468 |  2080/  316 |
+| Hc595(SimpleSpi)                |  11932/ 4404 |  1052/  252 |
 |---------------------------------+--------------+-------------|
 | Tm1637(SimpleTmi)               |  12568/ 4376 |  1688/  224 |
 |---------------------------------+--------------+-------------|
@@ -578,11 +583,11 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | StubModule                      |  10940/ 4360 |    60/  208 |
 | PatternWriter+Stub              |  10956/ 4364 |    76/  212 |
-| NumberWriter+Stub               |  11444/ 4364 |   564/  212 |
-| ClockWriter+Stub                |  11076/ 4368 |   196/  216 |
-| TemperatureWriter+Stub          |  11560/ 4364 |   680/  212 |
-| CharWriter+Stub                 |  11136/ 4372 |   256/  220 |
-| StringWriter+Stub               |  11280/ 4376 |   400/  224 |
+| NumberWriter+Stub               |  11020/ 4364 |   140/  212 |
+| ClockWriter+Stub                |  11088/ 4368 |   208/  216 |
+| TemperatureWriter+Stub          |  11064/ 4364 |   184/  212 |
+| CharWriter+Stub                 |  11116/ 4372 |   236/  220 |
+| StringWriter+Stub               |  11292/ 4376 |   412/  224 |
 | StringScroller+Stub             |  11284/ 4384 |   404/  232 |
 | LevelWriter+Stub                |  11024/ 4364 |   144/  212 |
 +--------------------------------------------------------------+

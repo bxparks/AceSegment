@@ -70,6 +70,7 @@ using ace_spi::SimpleSpiInterface;
 using ace_tmi::SimpleTmiInterface;
 using ace_wire::TwoWireInterface;
 using ace_wire::SimpleWireInterface;
+using ace_segment::LedModule;
 using ace_segment::DirectModule;
 using ace_segment::HybridModule;
 using ace_segment::Hc595Module;
@@ -861,14 +862,14 @@ const uint8_t NUM_SUBFIELDS = 1;
   #error Unknown LED_DISPLAY_TYPE
 #endif
 
-PatternWriter patternWriter(ledModule);
-NumberWriter numberWriter(ledModule);
-ClockWriter clockWriter(ledModule);
-TemperatureWriter temperatureWriter(ledModule);
-CharWriter charWriter(ledModule);
-StringWriter stringWriter(charWriter);
-StringScroller stringScroller(charWriter);
-LevelWriter levelWriter(ledModule);
+PatternWriter<LedModule> patternWriter(ledModule);
+NumberWriter<LedModule> numberWriter(ledModule);
+ClockWriter<LedModule> clockWriter(ledModule);
+TemperatureWriter<LedModule> temperatureWriter(ledModule);
+CharWriter<LedModule> charWriter(ledModule);
+StringWriter<LedModule> stringWriter(charWriter);
+StringScroller<LedModule> stringScroller(charWriter);
+LevelWriter<LedModule> levelWriter(ledModule);
 
 // Setup the various resources.
 void setupAceSegment() {

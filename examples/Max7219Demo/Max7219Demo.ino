@@ -16,15 +16,15 @@
 #include <SPI.h> // SPI, SPIClass
 #include <AceCommon.h> // incrementMod()
 #include <AceSPI.h>
-#include <AceSegment.h> // Max7219Module, PatternWriter
+#include <AceSegment.h> // Max7219Module
 
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
 using ace_spi::HardSpiInterface;
 using ace_spi::SimpleSpiInterface;
+using ace_segment::LedModule;
 using ace_segment::Max7219Module;
-using ace_segment::PatternWriter;
 using ace_segment::kDigitRemapArray8Max7219;
 
 // Select interface protocol.
@@ -180,7 +180,6 @@ const uint8_t PATTERNS[NUM_DIGITS] = {
 
 Max7219Module<SpiInterface, NUM_DIGITS> ledModule(
     spiInterface, kDigitRemapArray8Max7219);
-PatternWriter patternWriter(ledModule);
 
 void setupAceSegment() {
 
@@ -209,9 +208,9 @@ void updateDisplay() {
 
     uint8_t j = digitIndex;
     for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
-      patternWriter.writePatternAt(i, PATTERNS[j]);
       // Write a decimal point every other digit, for demo purposes.
-      patternWriter.writeDecimalPointAt(i, j & 0x1);
+      uint8_t pattern = PATTERNS[j] | ((j & 0x1) ? 0x80 : 0x00);
+      ledModule.setPatternAt(i, pattern);
       incrementMod(j, (uint8_t) NUM_DIGITS);
     }
     incrementMod(digitIndex, (uint8_t) NUM_DIGITS);

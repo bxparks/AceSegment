@@ -27,7 +27,6 @@ SOFTWARE.
 
 #include <stdint.h>
 #include <Arduino.h> // pgm_read_byte()
-#include "../LedModule.h"
 
 namespace ace_segment {
 
@@ -39,17 +38,21 @@ namespace ace_segment {
  * This class is stateless and does not contain any virtual functions. If the
  * method calls are made on the PatternWriter object directly, the compiler can
  * optimize away the indirection and call LedModule methods directly.
+ *
+ * @tparam T_LED_MODULE the class of the underlying LED Module, often LedModule
+ *    but other classes with the same generic public methods can be substituted
  */
+template <typename T_LED_MODULE>
 class PatternWriter {
   public:
     /**
      * Constructor.
      * @param ledModule an instance of LedModule or one of its subclasses
      */
-    explicit PatternWriter(LedModule& ledModule) : mLedModule(ledModule) {}
+    explicit PatternWriter(T_LED_MODULE& ledModule) : mLedModule(ledModule) {}
 
     /** Return the underlying LedModule. */
-    LedModule& ledModule() const { return mLedModule; }
+    T_LED_MODULE& ledModule() const { return mLedModule; }
 
     /** Return the number of digits supported by this display instance. */
     uint8_t getNumDigits() const { return mLedModule.getNumDigits(); }
@@ -126,7 +129,7 @@ class PatternWriter {
     PatternWriter& operator=(const PatternWriter&) = delete;
 
   private:
-    LedModule& mLedModule;
+    T_LED_MODULE& mLedModule;
 };
 
 } // ace_segment

@@ -19,11 +19,11 @@ using namespace ace_segment::testing;
 const uint8_t NUM_DIGITS = 4;
 
 TestableLedModule<NUM_DIGITS> ledModule;
-NumberWriter numberWriter(ledModule);
-ClockWriter clockWriter(ledModule);
-TemperatureWriter temperatureWriter(ledModule);
-CharWriter charWriter(ledModule);
-StringWriter stringWriter(charWriter);
+NumberWriter<LedModule> numberWriter(ledModule);
+ClockWriter<LedModule> clockWriter(ledModule);
+TemperatureWriter<LedModule> temperatureWriter(ledModule);
+CharWriter<LedModule> charWriter(ledModule);
+StringWriter<LedModule> stringWriter(charWriter);
 
 // ----------------------------------------------------------------------
 // Tests for CharWriter.
@@ -117,7 +117,7 @@ testF(NumberWriterTest, writeHexCharAt) {
 testF(NumberWriterTest, writeHexCharAt_outOfBounds) {
   mPatterns[4] = 0;
 
-  numberWriter.writeHexCharAt(4, NumberWriter::kCharMinus);
+  numberWriter.writeHexCharAt(4, kHexCharMinus);
   numberWriter.writeDecimalPointAt(4);
   assertEqual(0, mPatterns[4]);
 }
@@ -245,8 +245,7 @@ testF(ClockWriterTest, writeChars2At) {
   assertEqual(0b00000110, mPatterns[0]);
   assertEqual(0b01011011, mPatterns[1]);
 
-  clockWriter.writeChars2At(
-      0, ClockWriter::kCharSpace, ClockWriter::kCharSpace);
+  clockWriter.writeChars2At(0, kHexCharSpace, kHexCharSpace);
   assertEqual(0b0, mPatterns[0]);
   assertEqual(0b0, mPatterns[1]);
 }
