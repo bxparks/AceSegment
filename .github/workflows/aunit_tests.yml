@@ -28,6 +28,7 @@ jobs:
     - name: Verify examples
       run: |
         make -C examples
+        make -C examples/MemoryBenchmark epoxy
 
     - name: Verify tests
       run: |

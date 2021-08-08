@@ -45,5 +45,8 @@ teensy32.txt:
 more_clean:
 	echo "Use 'make clean_benchmarks' to remove *.txt files"
 
+epoxy:
+	./validate_using_epoxy_duino.sh
+
 clean_benchmarks:
 	rm -f $(TARGETS)

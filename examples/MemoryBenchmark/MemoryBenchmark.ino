@@ -106,7 +106,7 @@ volatile int disableCompilerOptimization = 0;
         disableCompilerOptimization = pattern;
       }
 
-      uint8_t getPatternAt(uint8_t /*pos*/) override {
+      uint8_t getPatternAt(uint8_t /*pos*/) const override {
         return disableCompilerOptimization;
       }
   };
