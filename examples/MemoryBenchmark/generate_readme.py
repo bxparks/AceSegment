@@ -228,6 +228,11 @@ before substantional refactoring in 2021.
       `Hc595Module`.
     * Decreases static ram usage by 7-8 bytes for all Module classes.
     * Further decreases flash usage by 10-70 bytes for various Writer classes.
+* Templatize Writer classes on `T_LED_MODULE` instead of hardcoding it to
+  `LedModule`.
+    * Seems to reduce flash size of some Writer classes on some platforms by
+      hundreds of bytes, I think because methods can be better inlined, and
+      unused methods are not compiled and linked in.
 
 ## Results
 
