@@ -8,12 +8,11 @@
 #include <Arduino.h>
 #include <Wire.h> // TwoWire, Wire
 #include <AceWire.h> // TwoWireInterface
-#include <AceSegment.h> // Ht16k33Module, NumberWriter
+#include <AceSegment.h> // Ht16k33Module
 
 using ace_wire::TwoWireInterface;
 using ace_segment::LedModule;
 using ace_segment::Ht16k33Module;
-using ace_segment::NumberWriter;
 
 // Replace these with the PIN numbers of your dev board.
 const uint8_t SDA_PIN = SDA;
@@ -25,7 +24,21 @@ using WireInterface = TwoWireInterface<TwoWire>;
 WireInterface wireInterface(Wire);
 Ht16k33Module<WireInterface, NUM_DIGITS> ledModule(
     wireInterface, HT16K33_I2C_ADDRESS);
-NumberWriter<LedModule> numberWriter(ledModule);
+
+// LED segment patterns.
+const uint8_t NUM_PATTERNS = 10;
+const uint8_t PATTERNS[NUM_PATTERNS] = {
+  0b00111111, // 0
+  0b00000110, // 1
+  0b01011011, // 2
+  0b01001111, // 3
+  0b01100110, // 4
+  0b01101101, // 5
+  0b01111101, // 6
+  0b00000111, // 7
+  0b01111111, // 8
+  0b01101111, // 9
+};
 
 void setup() {
   delay(1000);
@@ -34,10 +47,10 @@ void setup() {
   wireInterface.begin();
   ledModule.begin();
 
-  numberWriter.writeHexCharAt(0, 0);
-  numberWriter.writeHexCharAt(1, 1);
-  numberWriter.writeHexCharAt(2, 2);
-  numberWriter.writeHexCharAt(3, 3);
+  ledModule.setPatternAt(0, PATTERNS[0]);
+  ledModule.setPatternAt(1, PATTERNS[1]);
+  ledModule.setPatternAt(2, PATTERNS[2]);
+  ledModule.setPatternAt(3, PATTERNS[3]);
 
   ledModule.setBrightness(2);
 

@@ -434,11 +434,10 @@ digits by flushing the data bits to the TM1637 controller using the
 #include <Arduino.h>
 #include <AceCommon.h> // incrementMod()
 #include <AceTMI.h>
-#include <AceSegment.h> // Tm1637Module, PatternWriter
+#include <AceSegment.h> // Tm1637Module
 
 using ace_tmi::SimpleTmiInterface;
 using ace_segment::Tm1637Module;
-using ace_segment::NumberWriter;
 
 // Replace these with the PIN numbers of your dev board.
 const uint8_t CLK_PIN = A0;
@@ -454,7 +453,20 @@ const uint8_t DELAY_MICROS = 100;
 using TmiInterface = SimpleTmiInterface;
 TmiInterface tmiInterface(DIO_PIN, CLK_PIN, DELAY_MICROS);
 Tm1637Module<TmiInterface, NUM_DIGITS> ledModule(tmiInterface);
-NumberWriter numberWriter(ledModule);
+
+const uint8_t NUM_PATTERNS = 10;
+const uint8_t PATTERNS[NUM_PATTERNS] = {
+  0b00111111, // 0
+  0b00000110, // 1
+  0b01011011, // 2
+  0b01001111, // 3
+  0b01100110, // 4
+  0b01101101, // 5
+  0b01111101, // 6
+  0b00000111, // 7
+  0b01111111, // 8
+  0b01101111, // 9
+};
 
 void setup() {
   delay(1000);
@@ -462,10 +474,10 @@ void setup() {
   tmiInterface.begin();
   ledModule.begin();
 
-  numberWriter.writeHexCharAt(0, 0);
-  numberWriter.writeHexCharAt(1, 1);
-  numberWriter.writeHexCharAt(2, 2);
-  numberWriter.writeHexCharAt(3, 3);
+  ledModule.setPatternAt(0, PATTERNS[0]);
+  ledModule.setPatternAt(1, PATTERNS[1]);
+  ledModule.setPatternAt(2, PATTERNS[2]);
+  ledModule.setPatternAt(3, PATTERNS[3]);
 
   ledModule.setBrightness(2);
 
@@ -488,11 +500,10 @@ digits by flushing the data bits to the MAX7219 controller over SPI using the
 #include <Arduino.h>
 #include <SPI.h> // SPIClass, SPI
 #include <AceSPI.h> // HardSpiInterface
-#include <AceSegment.h> // Max7219Module, NumberWriter
+#include <AceSegment.h> // Max7219Module
 
 using ace_spi::HardSpiInterface;
 using ace_segment::Max7219Module;
-using ace_segment::NumberWriter;
 using ace_segment::kDigitRemapArray8Max7219;
 
 // Replace these with the PIN numbers of your dev board.
@@ -505,7 +516,20 @@ using SpiInterface = HardSpiInterface<SPIClass>;
 SpiInterface spiInterface(SPI, LATCH_PIN);
 Max7219Module<SpiInterface, NUM_DIGITS> ledModule(
     spiInterface, kDigitRemapArray8Max7219);
-NumberWriter numberWriter(ledModule);
+
+const uint8_t NUM_PATTERNS = 10;
+const uint8_t PATTERNS[NUM_PATTERNS] = {
+  0b00111111, // 0
+  0b00000110, // 1
+  0b01011011, // 2
+  0b01001111, // 3
+  0b01100110, // 4
+  0b01101101, // 5
+  0b01111101, // 6
+  0b00000111, // 7
+  0b01111111, // 8
+  0b01101111, // 9
+};
 
 void setup() {
   delay(1000);
@@ -514,14 +538,14 @@ void setup() {
   spiInterface.begin();
   ledModule.begin();
 
-  numberWriter.writeHexCharAt(0, 0);
-  numberWriter.writeHexCharAt(1, 1);
-  numberWriter.writeHexCharAt(2, 2);
-  numberWriter.writeHexCharAt(3, 3);
-  numberWriter.writeHexCharAt(4, 4);
-  numberWriter.writeHexCharAt(5, 5);
-  numberWriter.writeHexCharAt(6, 6);
-  numberWriter.writeHexCharAt(7, 7);
+  ledModule.setPatternAt(0, PATTERNS[0]);
+  ledModule.setPatternAt(1, PATTERNS[1]);
+  ledModule.setPatternAt(2, PATTERNS[2]);
+  ledModule.setPatternAt(3, PATTERNS[3]);
+  ledModule.setPatternAt(4, PATTERNS[4]);
+  ledModule.setPatternAt(5, PATTERNS[5]);
+  ledModule.setPatternAt(6, PATTERNS[6]);
+  ledModule.setPatternAt(7, PATTERNS[7]);
 
   ledModule.setBrightness(2);
 
@@ -544,11 +568,10 @@ digits by flushing the data bits to the HT16K33 controller over I2C using the
 #include <Arduino.h>
 #include <Wire.h> // TwoWire, Wire
 #include <AceWire.h> // TwoWireInterface
-#include <AceSegment.h> // Ht16k33Module, NumberWriter
+#include <AceSegment.h> // Ht16k33Module
 
 using ace_wire::TwoWireInterface;
 using ace_segment::Ht16k33Module;
-using ace_segment::NumberWriter;
 
 // Replace these with the PIN numbers of your dev board.
 const uint8_t SDA_PIN = SDA;
@@ -560,7 +583,20 @@ using WireInterface = TwoWireInterface<TwoWire>;
 WireInterface wireInterface(Wire);
 Ht16k33Module<WireInterface, NUM_DIGITS> ledModule(
     wireInterface, HT16K33_I2C_ADDRESS);
-NumberWriter numberWriter(ledModule);
+
+const uint8_t NUM_PATTERNS = 10;
+const uint8_t PATTERNS[NUM_PATTERNS] = {
+  0b00111111, // 0
+  0b00000110, // 1
+  0b01011011, // 2
+  0b01001111, // 3
+  0b01100110, // 4
+  0b01101101, // 5
+  0b01111101, // 6
+  0b00000111, // 7
+  0b01111111, // 8
+  0b01101111, // 9
+};
 
 void setup() {
   delay(1000);
@@ -569,10 +605,14 @@ void setup() {
   wireInterface.begin();
   ledModule.begin();
 
-  numberWriter.writeHexCharAt(0, 0);
-  numberWriter.writeHexCharAt(1, 1);
-  numberWriter.writeHexCharAt(2, 2);
-  numberWriter.writeHexCharAt(3, 3);
+  ledModule.setPatternAt(0, PATTERNS[0]);
+  ledModule.setPatternAt(1, PATTERNS[1]);
+  ledModule.setPatternAt(2, PATTERNS[2]);
+  ledModule.setPatternAt(3, PATTERNS[3]);
+  ledModule.setPatternAt(4, PATTERNS[4]);
+  ledModule.setPatternAt(5, PATTERNS[5]);
+  ledModule.setPatternAt(6, PATTERNS[6]);
+  ledModule.setPatternAt(7, PATTERNS[7]);
 
   ledModule.setBrightness(2);
 
@@ -599,11 +639,10 @@ the entire display.
 #include <Arduino.h>
 #include <SPI.h> // SPIClass, SPI
 #include <AceSPI.h> // HardSpiInterface
-#include <AceSegment.h> // Hc595Module, NumberWriter
+#include <AceSegment.h> // Hc595Module
 
 using ace_spi::HardSpiInterface;
 using ace_segment::Hc595Module;
-using ace_segment::NumberWriter;
 using ace_segment::kDigitRemapArray8Hc595;
 using ace_segment::kByteOrderSegmentHighDigitLow;
 using ace_segment::kActiveLowPattern;
@@ -632,7 +671,20 @@ Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
     HC595_BYTE_ORDER,
     REMAP_ARRAY
 );
-NumberWriter numberWriter(ledModule);
+
+const uint8_t NUM_PATTERNS = 10;
+const uint8_t PATTERNS[NUM_PATTERNS] = {
+  0b00111111, // 0
+  0b00000110, // 1
+  0b01011011, // 2
+  0b01001111, // 3
+  0b01100110, // 4
+  0b01101101, // 5
+  0b01111101, // 6
+  0b00000111, // 7
+  0b01111111, // 8
+  0b01101111, // 9
+};
 
 void setup() {
   delay(1000);
@@ -641,14 +693,14 @@ void setup() {
   spiInterface.begin();
   ledModule.begin();
 
-  numberWriter.writeHexCharAt(0, 0);
-  numberWriter.writeHexCharAt(1, 1);
-  numberWriter.writeHexCharAt(2, 2);
-  numberWriter.writeHexCharAt(3, 3);
-  numberWriter.writeHexCharAt(4, 4);
-  numberWriter.writeHexCharAt(5, 5);
-  numberWriter.writeHexCharAt(6, 6);
-  numberWriter.writeHexCharAt(7, 7);
+  ledModule.setPatternAt(0, PATTERNS[0]);
+  ledModule.setPatternAt(1, PATTERNS[1]);
+  ledModule.setPatternAt(2, PATTERNS[2]);
+  ledModule.setPatternAt(3, PATTERNS[3]);
+  ledModule.setPatternAt(4, PATTERNS[4]);
+  ledModule.setPatternAt(5, PATTERNS[5]);
+  ledModule.setPatternAt(6, PATTERNS[6]);
+  ledModule.setPatternAt(7, PATTERNS[7]);
 
   // Brightness not supported when NUM_SUBFIELDS == 1.
   // ledModule.setBrightness(2);
