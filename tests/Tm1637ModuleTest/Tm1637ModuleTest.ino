@@ -106,6 +106,8 @@ test(Tm1637ModuleTest, flushIncremental) {
   ));
   assertFalse(tm1637Module.isDigitDirty(4));
   assertEqual(0, tm1637Module.mFlushStage);
+
+  assertFalse(tm1637Module.isFlushRequired());
 }
 
 test(Tm1637ModuleTest, flush) {
@@ -118,11 +120,6 @@ test(Tm1637ModuleTest, flush) {
   assertTrue(tm1637Module.isBrightnessDirty());
   tm1637Module.clearDigitsDirty();
   tm1637Module.clearBrightnessDirty();
-
-  // Calling flush() when nothing is dirty returns immediately.
-  gEventLog.clear();
-  tm1637Module.flush();
-  assertEqual(0, gEventLog.getNumRecords());
 
   // Set digit 0.
   tm1637Module.setPatternAt(1, 0x11);
@@ -165,6 +162,25 @@ test(Tm1637ModuleTest, flush) {
 
   assertFalse(tm1637Module.isBrightnessDirty());
   assertFalse(tm1637Module.isAnyDigitDirty());
+  assertFalse(tm1637Module.isFlushRequired());
+
+  tm1637Module.end();
+}
+
+test(Tm1637ModuleTest, isFlushRequired) {
+  tm1637Module.begin();
+  assertTrue(tm1637Module.isFlushRequired());
+
+  tm1637Module.flush();
+  assertFalse(tm1637Module.isFlushRequired());
+
+  tm1637Module.setPatternAt(0, 0);
+  assertTrue(tm1637Module.isFlushRequired());
+
+  tm1637Module.flush();
+  assertFalse(tm1637Module.isFlushRequired());
+
+  tm1637Module.end();
 }
 
 //----------------------------------------------------------------------------

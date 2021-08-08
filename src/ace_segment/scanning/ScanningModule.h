@@ -30,7 +30,8 @@ SOFTWARE.
 #include "../hw/ClockInterface.h" // ClockInterface
 #include "../LedModule.h"
 
-class ScanningModuleTest_displayCurrentField;
+class ScanningModuleTest_isAnyDigitDirty;
+class ScanningModuleTest_isBrightnessDirty;
 
 namespace ace_segment {
 
@@ -227,7 +228,8 @@ class ScanningModule : public LedModule {
     }
 
   private:
-    friend class ::ScanningModuleTest_displayCurrentField;
+    friend class ::ScanningModuleTest_isAnyDigitDirty;
+    friend class ::ScanningModuleTest_isBrightnessDirty;
 
     // disable copy-constructor and assignment operator
     ScanningModule(const ScanningModule&) = delete;

@@ -731,10 +731,10 @@ using namespace ace_segment;
 <a name="LedModule"></a>
 ### LedModule
 
-The `LedModule` class provides the minimal the general interface to assign LED
-segment bit patterns to specific digits, and to assign the global brightness. It
-is the parent class of all hardware-dependent classes which are targeted for
-specific controller chips. It looks like this:
+The `LedModule` class provides the minimal interface to assign LED segment bit
+patterns to specific digits, and to assign the global brightness. It is the
+parent class of all hardware-dependent classes which are targeted for specific
+controller chips. It looks like this:
 
 ```C++
 class LedModule {
@@ -743,7 +743,7 @@ class LedModule {
 
     uint8_t getNumDigits() const;
     void setPatternAt(uint8_t pos, uint8_t pattern);
-    uint8_t getPatternAt(uint8_t pos);
+    uint8_t getPatternAt(uint8_t pos) const;
     void setBrightness(uint8_t brightness);
 
   protected:
@@ -752,16 +752,18 @@ class LedModule {
 };
 ```
 
-The concrete subclass will be a template class which is given a compile-time
-constant that determines the size of internal buffer holds the LED segment bit
-patterns for each digit. The buffer is passed up to the `LedModule` parent class
-through the constructor.  Some LED controllers
-(e.g. TM1637, MAX7219) handle the multiplexing and refreshing of the LED
-segments, so the host microcontroller needs only to send out the bit patterns to
-the controller chips over SPI or some other protocol. Other controller chips,
-particularly the 74HC595, is a fairly dumb controller chip that requires the
-host microcontroller to perform the multiplexing itself. The bit patterns must
-be sent out to the controller chip with precise timing intervals.
+The subclasses will use C++ templates to accept a compile-time constant that
+allows the creation of an internal buffer to hold the LED segment bit patterns
+for each digit. The pointer to this internal buffer (`patterns`) is passed up to
+the `LedModule` parent class through the constructor.
+
+Some LED controllers (e.g. TM1637, MAX7219) handle the multiplexing and
+refreshing of the LED segments, so the host microcontroller needs only to send
+out the bit patterns to the controller chips over SPI or some other protocol.
+Other controller chips, particularly the 74HC595, is a fairly dumb controller
+chip that requires the host microcontroller to perform the multiplexing itself.
+The bit patterns must be sent out to the controller chip with precise timing
+intervals.
 
 The `setBrightness()` method controls the brightness of the entire LED module.
 The range of the `brightness` parameter is determined by the underlying
@@ -794,6 +796,12 @@ to the controller chip, is pushed down into the specific subclasses of
 `LedModule`. The rendering methods are called `flush()`, `flushIncremental()`,
 `renderNow()` or `renderWhenReady()`, Each controller chip has slightly
 different rendering logic.
+
+Early versions of the `LedModule` used `virtual` methods which consume
+additional flash memory, static memory, and CPU cycles. They were changed to be
+non-virtual, and various Writer classes which depended on the `LedModule` class
+were converted to C++ template classes that are based on a generic
+`T_LED_MODULE` type. No virtual methods are used in this the AceSegment library.
 
 <a name="Tm1637Module"></a>
 ### Tm1637Module
@@ -834,6 +842,7 @@ class Tm1637Module : public LedModule {
 
     void setDisplayOn(bool on = true);
 
+    bool isFlushRequired() const;
     void flush();
     void flushIncremental();
 };
@@ -881,6 +890,13 @@ digit to the LED module. After all the digits are sent, one more iteration sends
 the brightness information to the module. So the total number of iteration to
 update the entire LED module is `NUM_DIGITS + 1`. For `BIT_DELAY` of 100
 microseconds, `flushIncremental()` takes around 10 milliseconds per iteration.
+
+The `isFlushRequired()` can be used to optimize the call to `flush()` or
+`flushIncremental()` to only when it is necessary. This gives more CPU cycles to
+the microcontroller to do other things, but there is always the small risk of
+the LED display becoming out of sync with the internal state (e.g. if the
+module loses power or the two wire communication becomes corrupted). In simple
+applications, this optimization may not be needed.
 
 <a name="Tm1637Module4"></a>
 #### TM1637 Module With 4 Digits
@@ -1058,6 +1074,7 @@ class Max7219Module : public LedModule {
     // uint8_t getPatternAt(uint8_t pos);
     // void setBrightness(uint8_t brightness);
 
+    bool isFlushRequired() const;
     void flush();
 };
 ```
@@ -1073,6 +1090,13 @@ bytes to hold the LED segment bit patterns. This allocation is done at
 compile-time.
 
 The `flush()` method sends the bit patterns to the MAX7219 controller using SPI.
+
+The `isFlushRequired()` can be used to optimize the call to `flush()` to only
+when it is necessary. This gives more CPU cycles to the microcontroller to do
+other things, but there is always the small risk of the LED display becoming out
+of sync with the internal state (e.g. if the module loses power or the SPI
+communication becomes corrupted). In simple applications, this optimization may
+not be needed.
 
 <a name="Max7219Module8"></a>
 #### MAX7219 Module with 8 Digits
@@ -1175,6 +1199,7 @@ class Ht16k33Module : public LedModule {
     // uint8_t getPatternAt(uint8_t pos);
     // void setBrightness(uint8_t brightness);
 
+    bool isFlushRequired() const;
     void flush();
 };
 ```
@@ -1193,10 +1218,17 @@ If additional LED modules with different digits come on the market, the
 The `addr` parameter in the `Ht16k33Module` constructor is the I2C address of
 the HT16K33 controller chip. The base address is `0x70`. The LED module exposes
 3 jumpers that can be soldered in various combinations to change the I2C address
-one of the 8 addresses from 0x70 to 0x77.
+to one of the 8 addresses from 0x70 to 0x77.
 
 The `flush()` method sends all 4 digits as well as the brightness setting to the
 LED module using I2C.
+
+The `isFlushRequired()` can be used to optimize the call to `flush()` to only
+when it is necessary. This gives more CPU cycles to the microcontroller to do
+other things, but there is always the small risk of the LED display becoming out
+of sync with the internal state (e.g. if the module loses power or the I2C
+communication becomes corrupted). In simple applications, this optimization may
+not be needed.
 
 The `enableColon` parameter and the `enableColon()` method determine whether the
 colon segment between Digit 1 and Digit 2 of the LED module is active. The

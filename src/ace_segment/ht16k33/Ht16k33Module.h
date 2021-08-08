@@ -121,6 +121,11 @@ class Ht16k33Module : public LedModule {
     // Methods related to rendering.
     //-----------------------------------------------------------------------
 
+    /** Return true if flushing required. */
+    bool isFlushRequired() const {
+      return isAnyDigitDirty() || isBrightnessDirty();
+    }
+
     /**
      * Send segment patterns of all digits. Using the default 100kHz speed of
      * Wire, this takes about 1.2 millis to send 4 digits.
@@ -139,6 +144,9 @@ class Ht16k33Module : public LedModule {
      * (e.g. ClockWriter) assumes that the most-significant-bit of digit 1 is
      * connected to the colon. So if enableColon is set, map the decimal point
      * bit to the colon bit.
+     *
+     * The isFlushRequired() method can be used to optimize the number of calls
+     * to flush(), but often it is not necessary.
      */
     void flush() {
       // Write digits.
@@ -154,6 +162,9 @@ class Ht16k33Module : public LedModule {
 
       // Write brightness.
       writeCommand(getBrightness() | kBrightness);
+
+      clearDigitsDirty();
+      clearBrightnessDirty();
     }
 
   private:

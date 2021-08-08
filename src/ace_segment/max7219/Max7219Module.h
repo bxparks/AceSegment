@@ -152,6 +152,11 @@ class Max7219Module : public LedModule {
     // Methods related to rendering.
     //-----------------------------------------------------------------------
 
+    /** Return true if flushing required. */
+    bool isFlushRequired() const {
+      return isAnyDigitDirty() || isBrightnessDirty();
+    }
+
     /**
      * Send segment patterns of all digits. For a rough idea of how long
      * this function takes, here are the numbers on a 16 MHz AVR:
@@ -159,6 +164,9 @@ class Max7219Module : public LedModule {
      *  * HW SPI: 170 microseconds
      *  * SW SPI: 1800 microseconds
      *  * SW SPI Fast: 210 microseconds
+     *
+     * The isFlushRequired() method can be used to optimize the number of calls
+     * to flush(), but often it is not necessary.
      */
     void flush() {
       for (uint8_t chipPos = 0; chipPos < T_DIGITS; ++chipPos) {
@@ -173,6 +181,9 @@ class Max7219Module : public LedModule {
       }
 
       mSpiInterface.send16(kRegisterIntensity, getBrightness());
+
+      clearDigitsDirty();
+      clearBrightnessDirty();
     }
 
   private:

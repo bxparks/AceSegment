@@ -130,14 +130,19 @@ class Tm1637Module : public LedModule {
     // Methods related to rendering.
     //-----------------------------------------------------------------------
 
+    /** Return true if flushing required. */
+    bool isFlushRequired() const {
+      return isAnyDigitDirty() || isBrightnessDirty();
+    }
+
     /**
-     * Send segment patterns of all digits plus the brightness to the display,
-     * if any of the digits or brightness is dirty. Takes about 22 ms using a
-     * 100 microsecond delay.
+     * Send segment patterns of all digits plus the brightness to the display.
+     * Takes about 22 ms using a 100 microsecond delay.
+     *
+     * The isFlushRequired() method can be used to optimize the number of calls
+     * to flush(), but often it is not necessary.
      */
     void flush() {
-      if (! isAnyDigitDirty() && ! isBrightnessDirty()) return;
-
       // Update the brightness first
       mTmiInterface.startCondition();
       mTmiInterface.sendByte(kBrightnessCmd

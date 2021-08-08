@@ -28,7 +28,8 @@ class TestableWireInterface {
       gEventLog.addWireWrite(data);
     }
 
-    void endTransmission() const {
+    void endTransmission(bool sendStop = true) const {
+      (void) sendStop; // disable compiler warning
       gEventLog.addWireEndTransmission();
     }
 };
