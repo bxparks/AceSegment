@@ -19,7 +19,7 @@
 #include <SPI.h>
 #include <AceCommon.h> // incrementMod()
 #include <AceSPI.h>
-#include <AceSegment.h> // Hc595Module, PatternWriter
+#include <AceSegment.h> // Hc595Module
 
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
@@ -28,7 +28,6 @@ using ace_spi::HardSpiInterface;
 using ace_spi::SimpleSpiInterface;
 using ace_segment::LedModule;
 using ace_segment::Hc595Module;
-using ace_segment::PatternWriter;
 using ace_segment::kDigitRemapArray8Hc595;
 using ace_segment::kByteOrderDigitHighSegmentLow;
 using ace_segment::kByteOrderSegmentHighDigitLow;
@@ -241,9 +240,8 @@ Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
     HC595_BYTE_ORDER,
     REMAP_ARRAY
 );
-PatternWriter<LedModule> patternWriter(ledModule);
 
-// PatternWriter patterns
+// LED patterns
 const uint8_t PATTERNS[8] = {
   0b00111111, // 0
   0b00000110, // 1
@@ -282,9 +280,9 @@ void updateDisplay() {
     // Update the display
     uint8_t j = digitIndex;
     for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
-      patternWriter.writePatternAt(i, PATTERNS[j]);
       // Write a decimal point every other digit, for demo purposes.
-      patternWriter.writeDecimalPointAt(i, j & 0x1);
+      uint8_t pattern = PATTERNS[j] | ((j & 0x1) ? 0x80 : 0x00);
+      ledModule.setPatternAt(i, pattern);
       incrementMod(j, (uint8_t) NUM_DIGITS);
     }
     incrementMod(digitIndex, (uint8_t) NUM_DIGITS);

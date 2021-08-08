@@ -16,7 +16,7 @@
 #include <Arduino.h>
 #include <AceCommon.h> // incrementMod()
 #include <AceTMI.h>
-#include <AceSegment.h> // Tm1637Module, PatternWriter
+#include <AceSegment.h> // Tm1637Module
 
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
@@ -24,7 +24,6 @@ using ace_common::TimingStats;
 using ace_tmi::SimpleTmiInterface;
 using ace_segment::LedModule;
 using ace_segment::Tm1637Module;
-using ace_segment::PatternWriter;
 using ace_segment::kDigitRemapArray6Tm1637;
 
 // Select TM1637 protocol version, either SimpleTmiInterface or
@@ -137,7 +136,6 @@ const uint8_t DELAY_MICROS = 100;
 #endif
 
 Tm1637Module<TmiInterface, NUM_DIGITS> ledModule(tmiInterface, remapArray);
-PatternWriter<LedModule> patternWriter(ledModule);
 
 void setupAceSegment() {
   tmiInterface.begin();
@@ -171,9 +169,9 @@ void updateDisplay() {
     // Update the display
     uint8_t j = digitIndex;
     for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
-      patternWriter.writePatternAt(i, PATTERNS[j]);
       // Write a decimal point every other digit, for demo purposes.
-      patternWriter.writeDecimalPointAt(i, j & 0x1);
+      uint8_t pattern = PATTERNS[j] | ((j & 0x1) ? 0x80 : 0x00);
+      ledModule.setPatternAt(i, pattern);
       incrementMod(j, (uint8_t) NUM_DIGITS);
     }
     incrementMod(digitIndex, (uint8_t) NUM_DIGITS);
