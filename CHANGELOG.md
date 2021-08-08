@@ -2,6 +2,9 @@
 
 * Unreleased
     * Make `LedModule::getPatternAt()` into a `const` function.
+    * Change `LedModule` methods into non-virtual. There are no more virtual
+      methods in the entire library. Saves 10-60 byte of flash for Module
+      classes on AVR, and another 10-70 bytes of flash for the Writer classes.
 * 0.8.1 (2021-07-31)
     * Add `HelloTm1636`, `HelloMax7219`, `HelloHt16k33`, and `HelloHc595`
       examples to `examples/` and `README.md`.

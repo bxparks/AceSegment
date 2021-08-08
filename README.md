@@ -46,7 +46,7 @@ if nothing is used from the `<Wire.h>` library.)
 
 **Version**: 0.8.1 (2021-07-31)
 
-**Status**: Ready for first public release.
+**Status**: *Almost* ready for first public release.
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
