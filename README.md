@@ -37,15 +37,16 @@ details of the specific LED module.
 
 This library is designed to ensure that client applications pay only for what
 they use. Most of the code is written as C++ templates to avoid creating static
-resources that cannot be optimized away. There is no direct dependency to the
-`<Wire.h>`, `<SPI.h>`, `<AceWire.h>`, `<AceSPI.h>`, or `<AceTMI.h>` libraries
-from this library. (On AVR processors, simply adding `#include <Wire.h>`
-increases flash usage by about 1100 bytes even if nothing is used from the
-`<Wire.h>` library.)
+resources that cannot be optimized away. No virtual methods are used in this
+library, making the code size smaller and execution speed a little faster. There
+is no direct dependency to the `<Wire.h>`, `<SPI.h>`, `<AceWire.h>`,
+`<AceSPI.h>`, or `<AceTMI.h>` libraries from this library. (On AVR processors,
+simply adding `#include <Wire.h>` increases flash usage by about 1100 bytes even
+if nothing is used from the `<Wire.h>` library.)
 
 **Version**: 0.8.1 (2021-07-31)
 
-**Status**: Ready for first public release.
+**Status**: *Almost* ready for first public release.
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
@@ -678,24 +679,31 @@ using namespace ace_segment;
 <a name="LedModule"></a>
 ### LedModule
 
-The `LedModule` class is the general interface (with mostly pure virtual
-functions) which is the parent class of all hardware-dependent classes which are
-targeted for specific controller chips. It looks like this:
+The `LedModule` class provides the minimal the general interface to assign LED
+segment bit patterns to specific digits, and to assign the global brightness. It
+is the parent class of all hardware-dependent classes which are targeted for
+specific controller chips. It looks like this:
 
 ```C++
 class LedModule {
   public:
-    explicit LedModule(uint8_t numDigits);
+    explicit LedModule(uint8_t* patterns, uint8_t numDigits);
 
     uint8_t getNumDigits() const;
-    virtual void setPatternAt(uint8_t pos, uint8_t pattern) = 0;
-    virtual uint8_t getPatternAt(uint8_t pos) = 0;
-    virtual void setBrightness(uint8_t brightness) = 0;
+    void setPatternAt(uint8_t pos, uint8_t pattern);
+    uint8_t getPatternAt(uint8_t pos);
+    void setBrightness(uint8_t brightness);
+
+  protected:
+    void begin();
+    void end();
 };
 ```
 
-It assumes that each subclass has an internal buffer of bit patterns which
-will be sent out to the LED module at the appropriate time. Some LED controllers
+The concrete subclass will be a template class which is given a compile-time
+constant that determines the size of internal buffer holds the LED segment bit
+patterns for each digit. The buffer is passed up to the `LedModule` parent class
+through the constructor.  Some LED controllers
 (e.g. TM1637, MAX7219) handle the multiplexing and refreshing of the LED
 segments, so the host microcontroller needs only to send out the bit patterns to
 the controller chips over SPI or some other protocol. Other controller chips,
@@ -727,9 +735,7 @@ controller chip:
 If brightness control is enabled on the LED module using the 74HC595 chip, it
 can also support brightness control on a per-digit basis. But the interface for
 that feature is *not* part of the `LedModule` class because no other controller
-chip supports this feature. Adding another virtual method (`setBrightnessAt()`
-to `LedModule` would unnecessarily increase flash and static memory consumption
-for the other classes.
+chip supports this feature.
 
 The rendering of each digit and segment, and how the information is transferred
 to the controller chip, is pushed down into the specific subclasses of
@@ -768,10 +774,11 @@ class Tm1637Module : public LedModule {
     void begin();
     void end();
 
-    uint8_t getNumDigits() const { return T_DIGITS; }
-    void setPatternAt(uint8_t pos, uint8_t pattern) override;
-    uint8_t getPatternAt(uint8_t pos) override;
-    void setBrightness(uint8_t brightness) override;
+    // Following inherited from LedModule:
+    // uint8_t getNumDigits();
+    // void setPatternAt(uint8_t pos, uint8_t pattern);
+    // uint8_t getPatternAt(uint8_t pos);
+    // void setBrightness(uint8_t brightness);
 
     void setDisplayOn(bool on = true);
 
@@ -993,10 +1000,11 @@ class Max7219Module : public LedModule {
     void begin();
     void end();
 
-    uint8_t getNumDigits() const { return T_DIGITS; }
-    void setPatternAt(uint8_t pos, uint8_t pattern) override;
-    uint8_t getPatternAt(uint8_t pos) override;
-    void setBrightness(uint8_t brightness) override;
+    // Following inherited from LedModule:
+    // uint8_t getNumDigits();
+    // void setPatternAt(uint8_t pos, uint8_t pattern);
+    // uint8_t getPatternAt(uint8_t pos);
+    // void setBrightness(uint8_t brightness);
 
     void flush();
 };
@@ -1011,9 +1019,6 @@ The `T_DIGITS` is the number of digits in the LED module. Since this is a
 compile-time constant, the `Hc595Module` class uses it to allocate a buffer of 8
 bytes to hold the LED segment bit patterns. This allocation is done at
 compile-time.
-
-Most of the methods of the class are implementations of the virtual methods in
-the parent `LedModule` class.
 
 The `flush()` method sends the bit patterns to the MAX7219 controller using SPI.
 
@@ -1103,16 +1108,20 @@ template <typename T_WIREI, uint8_t T_DIGITS>
 class Ht16k33Module : public LedModule {
   public:
     explicit Ht16k33Module(
-        T_WIREI& wire, uint8_t addr, bool enableColon = false);
+        T_WIREI& wire,
+        uint8_t addr,
+        bool enableColon = false
+    );
 
     void enableColon(bool enable);
     void begin();
     void end();
 
-    uint8_t getNumDigits() const { return T_DIGITS; }
-    void setPatternAt(uint8_t pos, uint8_t pattern) override;
-    uint8_t getPatternAt(uint8_t pos) override;
-    void setBrightness(uint8_t brightness) override;
+    // Following inherited from LedModule:
+    // uint8_t getNumDigits();
+    // void setPatternAt(uint8_t pos, uint8_t pattern);
+    // uint8_t getPatternAt(uint8_t pos);
+    // void setBrightness(uint8_t brightness);
 
     void flush();
 };
@@ -1133,9 +1142,6 @@ The `addr` parameter in the `Ht16k33Module` constructor is the I2C address of
 the HT16K33 controller chip. The base address is `0x70`. The LED module exposes
 3 jumpers that can be soldered in various combinations to change the I2C address
 one of the 8 addresses from 0x70 to 0x77.
-
-Most of the methods in this class are implementations of the virtual methods of
-`LedModule`.
 
 The `flush()` method sends all 4 digits as well as the brightness setting to the
 LED module using I2C.
@@ -1261,9 +1267,11 @@ class Hc595Module : public ScanningModule<[snip]> {
     uint16_t getFieldsPerSecond() const;
     uint16_t getFieldsPerFrame() const;
 
-    uint8_t getNumDigits() const;
-    void setPatternAt(uint8_t pos, uint8_t pattern) override;
-    uint8_t getPatternAt(uint8_t pos) override;
+    // Following inherited from LedModule:
+    // uint8_t getNumDigits();
+    // void setPatternAt(uint8_t pos, uint8_t pattern);
+    // uint8_t getPatternAt(uint8_t pos);
+    // void setBrightness(uint8_t brightness);
 
     void setBrightness(uint8_t brightness) override;
     void setBrightnessAt(uint8_t pos, uint8_t brightness);
@@ -2086,17 +2094,17 @@ sizeof(LedMatrixDirect<>): 9
 sizeof(LedMatrixDirectFast4<6..13, 2..5>): 3
 sizeof(LedMatrixSingleHc595<SimpleSpiInterface>): 9
 sizeof(LedMatrixDualHc595<HardSpiInterface>): 9
-sizeof(LedModule): 3
-sizeof(ScanningModule<LedMatrixBase, 4>): 22
-sizeof(DirectModule<4>): 31
-sizeof(DirectFast4Module<...>): 25
-sizeof(HybridModule<SimpleSpiInterface, 4>): 31
-sizeof(Hc595Module<SimpleSpiInterface, 8>): 47
-sizeof(Tm1637Module<SimpleTmiInterface, 4>): 15
-sizeof(Tm1637Module<SimpleTmiInterface, 6>): 17
-sizeof(Max7219Module<SimpleSpiInterface, 8>): 17
-sizeof(Ht16k33Module<TwoWireInterface, 4>): 12
-sizeof(Ht16k33Module<SimpleWireInterface, 4>): 15
+sizeof(LedModule): 6
+sizeof(ScanningModule<LedMatrixBase, 4>): 25
+sizeof(DirectModule<4>): 34
+sizeof(DirectFast4Module<...>): 28
+sizeof(HybridModule<SimpleSpiInterface, 4>): 34
+sizeof(Hc595Module<SimpleSpiInterface, 8>): 50
+sizeof(Tm1637Module<SimpleTmiInterface, 4>): 17
+sizeof(Tm1637Module<SimpleTmiInterface, 6>): 19
+sizeof(Max7219Module<SimpleSpiInterface, 8>): 19
+sizeof(Ht16k33Module<TwoWireInterface, 4>): 14
+sizeof(Ht16k33Module<SimpleWireInterface, 4>): 17
 sizeof(PatternWriter): 2
 sizeof(NumberWriter): 2
 sizeof(ClockWriter): 3
@@ -2118,7 +2126,7 @@ sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(DirectModule<4>): 48
 sizeof(HybridModule<SimpleSpiInterface, 4>): 48
 sizeof(Hc595Module<SimpleSpiInterface, 8>): 64
-sizeof(Tm1637Module<SimpleTmiInterface, 4>): 20
+sizeof(Tm1637Module<SimpleTmiInterface, 4>): 24
 sizeof(Tm1637Module<SimpleTmiInterface, 6>): 24
 sizeof(Max7219Module<SimpleSpiInterface, 8>): 24
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 20
@@ -2152,40 +2160,40 @@ the flash and static memory consumptions.
 |---------------------------------+--------------+-------------|
 | baseline                        |    456/   11 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| DirectModule                    |   1486/   64 |  1030/   53 |
-| DirectFast4Module               |   1250/   94 |   794/   83 |
+| DirectModule                    |   1518/   57 |  1062/   46 |
+| DirectFast4Module               |   1274/   87 |   818/   76 |
 |---------------------------------+--------------+-------------|
-| Hybrid(HardSpi)                 |   1560/   61 |  1104/   50 |
-| Hybrid(HardSpiFast)             |   1502/   59 |  1046/   48 |
-| Hybrid(SimpleSpi)               |   1514/   59 |  1058/   48 |
-| Hybrid(SimpleSpiFast)           |   1392/   54 |   936/   43 |
+| Hybrid(HardSpi)                 |   1580/   54 |  1124/   43 |
+| Hybrid(HardSpiFast)             |   1522/   52 |  1066/   41 |
+| Hybrid(SimpleSpi)               |   1534/   52 |  1078/   41 |
+| Hybrid(SimpleSpiFast)           |   1412/   47 |   956/   36 |
 |---------------------------------+--------------+-------------|
-| Hc595(HardSpi)                  |   1538/   61 |  1082/   50 |
-| Hc595(HardSpiFast)              |   1470/   59 |  1014/   48 |
-| Hc595(SimpleSpi)                |   1478/   59 |  1022/   48 |
-| Hc595(SimpleSpiFast)            |   1068/   54 |   612/   43 |
+| Hc595(HardSpi)                  |   1534/   54 |  1078/   43 |
+| Hc595(HardSpiFast)              |   1468/   52 |  1012/   41 |
+| Hc595(SimpleSpi)                |   1474/   52 |  1018/   41 |
+| Hc595(SimpleSpiFast)            |   1066/   47 |   610/   36 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SimpleTmi)               |   1480/   39 |  1024/   28 |
-| Tm1637(SimpleTmiFast)           |    916/   34 |   460/   23 |
+| Tm1637(SimpleTmi)               |   1424/   31 |   968/   20 |
+| Tm1637(SimpleTmiFast)           |    858/   26 |   402/   15 |
 |---------------------------------+--------------+-------------|
-| Max7219(HardSpi)                |   1268/   47 |   812/   36 |
-| Max7219(HardSpiFast)            |   1180/   45 |   724/   34 |
-| Max7219(SimpleSpi)              |   1184/   45 |   728/   34 |
-| Max7219(SimpleSpiFast)          |    766/   40 |   310/   29 |
+| Max7219(HardSpi)                |   1260/   39 |   804/   28 |
+| Max7219(HardSpiFast)            |   1170/   37 |   714/   26 |
+| Max7219(SimpleSpi)              |   1174/   37 |   718/   26 |
+| Max7219(SimpleSpiFast)          |    756/   32 |   300/   21 |
 |---------------------------------+--------------+-------------|
-| Ht16k33(TwoWire)                |   2854/  251 |  2398/  240 |
-| Ht16k33(SimpleWire)             |   1480/   41 |  1024/   30 |
-| Ht16k33(SimpleWireFast)         |    946/   35 |   490/   24 |
+| Ht16k33(TwoWire)                |   2846/  243 |  2390/  232 |
+| Ht16k33(SimpleWire)             |   1450/   33 |   994/   22 |
+| Ht16k33(SimpleWireFast)         |    916/   27 |   460/   16 |
 |---------------------------------+--------------+-------------|
-| StubModule                      |    494/   11 |    38/    0 |
-| PatternWriter+Stub              |    608/   26 |   152/   15 |
-| NumberWriter+Stub               |    664/   26 |   208/   15 |
-| ClockWriter+Stub                |    782/   27 |   326/   16 |
-| TemperatureWriter+Stub          |    736/   26 |   280/   15 |
-| CharWriter+Stub                 |    778/   29 |   322/   18 |
-| StringWriter+Stub               |    998/   37 |   542/   26 |
-| StringScroller+Stub             |   1014/   43 |   558/   32 |
-| LevelWriter+Stub                |    694/   26 |   238/   15 |
+| StubModule                      |    522/   21 |    66/   10 |
+| PatternWriter+Stub              |    534/   23 |    78/   12 |
+| NumberWriter+Stub               |    630/   23 |   174/   12 |
+| ClockWriter+Stub                |    764/   24 |   308/   13 |
+| TemperatureWriter+Stub          |    674/   23 |   218/   12 |
+| CharWriter+Stub                 |    718/   26 |   262/   15 |
+| StringWriter+Stub               |    970/   34 |   514/   23 |
+| StringScroller+Stub             |   1016/   40 |   560/   29 |
+| LevelWriter+Stub                |    626/   23 |   170/   12 |
 +--------------------------------------------------------------+
 ```
 
@@ -2197,31 +2205,31 @@ the flash and static memory consumptions.
 |---------------------------------+--------------+-------------|
 | baseline                        | 256700/26784 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| DirectModule                    | 257784/27056 |  1084/  272 |
+| DirectModule                    | 257736/27056 |  1036/  272 |
 |---------------------------------+--------------+-------------|
-| Hybrid(HardSpi)                 | 258944/27072 |  2244/  288 |
-| Hybrid(SimpleSpi)               | 257872/27056 |  1172/  272 |
+| Hybrid(HardSpi)                 | 258896/27072 |  2196/  288 |
+| Hybrid(SimpleSpi)               | 257824/27056 |  1124/  272 |
 |---------------------------------+--------------+-------------|
-| Hc595(HardSpi)                  | 258924/27076 |  2224/  292 |
-| Hc595(SimpleSpi)                | 257772/27060 |  1072/  276 |
+| Hc595(HardSpi)                  | 258876/27076 |  2176/  292 |
+| Hc595(SimpleSpi)                | 257724/27060 |  1024/  276 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SimpleTmi)               | 257932/27028 |  1232/  244 |
+| Tm1637(SimpleTmi)               | 257868/27028 |  1168/  244 |
 |---------------------------------+--------------+-------------|
-| Max7219(HardSpi)                | 258836/27044 |  2136/  260 |
-| Max7219(SimpleSpi)              | 257636/27028 |   936/  244 |
+| Max7219(HardSpi)                | 258804/27044 |  2104/  260 |
+| Max7219(SimpleSpi)              | 257604/27028 |   904/  244 |
 |---------------------------------+--------------+-------------|
-| Ht16k33(TwoWire)                | 261364/27500 |  4664/  716 |
-| Ht16k33(SimpleWire)             | 258012/27028 |  1312/  244 |
+| Ht16k33(TwoWire)                | 261348/27500 |  4648/  716 |
+| Ht16k33(SimpleWire)             | 257980/27028 |  1280/  244 |
 |---------------------------------+--------------+-------------|
-| StubModule                      | 256840/26996 |   140/  212 |
-| PatternWriter+Stub              | 256872/27004 |   172/  220 |
-| NumberWriter+Stub               | 257336/27004 |   636/  220 |
-| ClockWriter+Stub                | 257160/27004 |   460/  220 |
-| TemperatureWriter+Stub          | 257448/27004 |   748/  220 |
-| CharWriter+Stub                 | 257096/27012 |   396/  228 |
-| StringWriter+Stub               | 257264/27012 |   564/  228 |
-| StringScroller+Stub             | 257296/27020 |   596/  236 |
-| LevelWriter+Stub                | 256984/27004 |   284/  220 |
+| StubModule                      | 256776/26996 |    76/  212 |
+| PatternWriter+Stub              | 256792/27004 |    92/  220 |
+| NumberWriter+Stub               | 257272/27004 |   572/  220 |
+| ClockWriter+Stub                | 257080/27004 |   380/  220 |
+| TemperatureWriter+Stub          | 257384/27004 |   684/  220 |
+| CharWriter+Stub                 | 257032/27012 |   332/  228 |
+| StringWriter+Stub               | 257200/27012 |   500/  228 |
+| StringScroller+Stub             | 257232/27020 |   532/  236 |
+| LevelWriter+Stub                | 256904/27004 |   204/  220 |
 +--------------------------------------------------------------+
 ```
 
@@ -2237,53 +2245,53 @@ The CPU benchmark numbers can be seen in
 +-------------------------------------------+-------------------+---------+
 | Functionality                             |   min/  avg/  max | samples |
 |-------------------------------------------+-------------------+---------|
-| Direct(4)                                 |    76/   82/   88 |      40 |
-| Direct(4,subfields)                       |     4/   13/   84 |     640 |
-| DirectFast4(4)                            |    24/   30/   40 |      40 |
-| DirectFast4(4,subfields)                  |     4/    8/   36 |     640 |
+| Direct(4)                                 |    76/   83/   92 |      40 |
+| Direct(4,subfields)                       |     4/   15/   96 |     640 |
+| DirectFast4(4)                            |    28/   33/   40 |      40 |
+| DirectFast4(4,subfields)                  |     4/    9/   36 |     640 |
 |-------------------------------------------+-------------------+---------|
-| Hybrid(4,HardSpi)                         |    32/   38/   44 |      40 |
-| Hybrid(4,HardSpi,subfields)               |     4/    8/   44 |     640 |
-| Hybrid(4,HardSpiFast)                     |    20/   25/   32 |      40 |
-| Hybrid(4,HardSpiFast,subfields)           |     4/    7/   32 |     640 |
-| Hybrid(4,SimpleSpi)                       |   152/  161/  176 |      40 |
-| Hybrid(4,SimpleSpi,subfields)             |     4/   22/  176 |     640 |
-| Hybrid(4,SimpleSpiFast)                   |    28/   32/   40 |      40 |
-| Hybrid(4,SimpleSpiFast,subfields)         |     4/    8/   36 |     640 |
+| Hybrid(4,HardSpi)                         |    36/   41/   56 |      40 |
+| Hybrid(4,HardSpi,subfields)               |     4/   10/   48 |     640 |
+| Hybrid(4,HardSpiFast)                     |    24/   27/   36 |      40 |
+| Hybrid(4,HardSpiFast,subfields)           |     4/    9/   36 |     640 |
+| Hybrid(4,SimpleSpi)                       |   156/  163/  184 |      40 |
+| Hybrid(4,SimpleSpi,subfields)             |     4/   24/  172 |     640 |
+| Hybrid(4,SimpleSpiFast)                   |    28/   34/   44 |      40 |
+| Hybrid(4,SimpleSpiFast,subfields)         |     4/   10/   40 |     640 |
 |-------------------------------------------+-------------------+---------|
-| Hc595(8,HardSpi)                          |    24/   30/   40 |      80 |
-| Hc595(8,HardSpi,subfields)                |     4/    8/   36 |    1280 |
-| Hc595(8,HardSpiFast)                      |    12/   16/   24 |      80 |
-| Hc595(8,HardSpiFast,subfields)            |     4/    6/   24 |    1280 |
-| Hc595(8,SimpleSpi)                        |   268/  273/  308 |      80 |
-| Hc595(8,SimpleSpi,subfields)              |     4/   36/  308 |    1280 |
-| Hc595(8,SimpleSpiFast)                    |    24/   27/   36 |      80 |
-| Hc595(8,SimpleSpiFast,subfields)          |     4/    8/   32 |    1280 |
+| Hc595(8,HardSpi)                          |    28/   32/   40 |      80 |
+| Hc595(8,HardSpi,subfields)                |     4/   10/   44 |    1280 |
+| Hc595(8,HardSpiFast)                      |    16/   19/   32 |      80 |
+| Hc595(8,HardSpiFast,subfields)            |     4/    9/   28 |    1280 |
+| Hc595(8,SimpleSpi)                        |   268/  275/  308 |      80 |
+| Hc595(8,SimpleSpi,subfields)              |     4/   39/  308 |    1280 |
+| Hc595(8,SimpleSpiFast)                    |    24/   30/   40 |      80 |
+| Hc595(8,SimpleSpiFast,subfields)          |     4/   10/   36 |    1280 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi,100us)                 | 22312/22342/22576 |      10 |
+| Tm1637(4,SimpleTmi,100us)                 | 22312/22344/22580 |      10 |
 | Tm1637(4,SimpleTmi,100us,incremental)     |  3612/ 8807/10356 |      50 |
-| Tm1637(4,SimpleTmiFast,100us)             | 21068/21102/21376 |      10 |
-| Tm1637(4,SimpleTmiFast,100us,incremental) |  3412/ 8317/ 9828 |      50 |
+| Tm1637(4,SimpleTmiFast,100us)             | 21064/21100/21364 |      10 |
+| Tm1637(4,SimpleTmiFast,100us,incremental) |  3412/ 8316/ 9828 |      50 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi,5us)                   |  2244/ 2281/ 2472 |      10 |
-| Tm1637(4,SimpleTmi,5us,incremental)       |   364/  893/ 1128 |      50 |
-| Tm1637(4,SimpleTmiFast,5us)               |  1004/ 1035/ 1108 |      10 |
-| Tm1637(4,SimpleTmiFast,5us,incremental)   |   164/  404/  508 |      50 |
+| Tm1637(4,SimpleTmi,5us)                   |  2248/ 2283/ 2480 |      10 |
+| Tm1637(4,SimpleTmi,5us,incremental)       |   364/  894/ 1124 |      50 |
+| Tm1637(4,SimpleTmiFast,5us)               |  1000/ 1034/ 1120 |      10 |
+| Tm1637(4,SimpleTmiFast,5us,incremental)   |   164/  403/  508 |      50 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(6,SimpleTmi,100us)                 | 28052/28089/28376 |      10 |
+| Tm1637(6,SimpleTmi,100us)                 | 28056/28090/28376 |      10 |
 | Tm1637(6,SimpleTmi,100us,incremental)     |  3612/ 9176/10356 |      70 |
-| Tm1637(6,SimpleTmiFast,100us)             | 26488/26523/26792 |      10 |
-| Tm1637(6,SimpleTmiFast,100us,incremental) |  3412/ 8665/ 9828 |      70 |
+| Tm1637(6,SimpleTmiFast,100us)             | 26484/26518/26788 |      10 |
+| Tm1637(6,SimpleTmiFast,100us,incremental) |  3412/ 8664/ 9820 |      70 |
 |-------------------------------------------+-------------------+---------|
-| Max7219(8,HardSpi)                        |   208/  225/  240 |      20 |
-| Max7219(8,HardSpiFast)                    |    96/  106/  124 |      20 |
-| Max7219(8,SimpleSpi)                      |  2380/ 2390/ 2516 |      20 |
-| Max7219(8,SimpleSpiFast)                  |   208/  217/  240 |      20 |
+| Max7219(8,HardSpi)                        |   208/  226/  240 |      20 |
+| Max7219(8,HardSpiFast)                    |    96/  108/  116 |      20 |
+| Max7219(8,SimpleSpi)                      |  2380/ 2390/ 2520 |      20 |
+| Max7219(8,SimpleSpiFast)                  |   208/  218/  236 |      20 |
 |-------------------------------------------+-------------------+---------|
-| Ht16k33(4,TwoWire,100kHz)                 |  1460/ 1464/ 1480 |      20 |
-| Ht16k33(4,TwoWire,400kHz)                 |   500/  508/  532 |      20 |
-| Ht16k33(4,SimpleWire,1us)                 |  2544/ 2556/ 2696 |      20 |
-| Ht16k33(4,SimpleWireFast,1us)             |   224/  232/  252 |      20 |
+| Ht16k33(4,TwoWire,100kHz)                 |  1460/ 1463/ 1496 |      20 |
+| Ht16k33(4,TwoWire,400kHz)                 |   500/  507/  532 |      20 |
+| Ht16k33(4,SimpleWire,1us)                 |  2544/ 2556/ 2684 |      20 |
+| Ht16k33(4,SimpleWireFast,1us)             |   224/  233/  252 |      20 |
 +-------------------------------------------+-------------------+---------+
 ```
 
@@ -2296,34 +2304,34 @@ just as fast as hardware SPI, **and** consumes 500 bytes of less flash memory.
 +-------------------------------------------+-------------------+---------+
 | Functionality                             |   min/  avg/  max | samples |
 |-------------------------------------------+-------------------+---------|
-| Direct(4)                                 |    12/   12/   32 |      40 |
-| Direct(4,subfields)                       |     0/    2/   24 |     640 |
+| Direct(4)                                 |    12/   14/   40 |      40 |
+| Direct(4,subfields)                       |     1/    2/   32 |     640 |
 |-------------------------------------------+-------------------+---------|
-| Hybrid(4,HardSpi)                         |    12/   12/   32 |      40 |
-| Hybrid(4,HardSpi,subfields)               |     0/    2/   24 |     640 |
-| Hybrid(4,SimpleSpi)                       |    29/   29/   41 |      40 |
-| Hybrid(4,SimpleSpi,subfields)             |     0/    4/   41 |     640 |
+| Hybrid(4,HardSpi)                         |    12/   12/   24 |      40 |
+| Hybrid(4,HardSpi,subfields)               |     1/    2/   28 |     640 |
+| Hybrid(4,SimpleSpi)                       |    29/   30/   49 |      40 |
+| Hybrid(4,SimpleSpi,subfields)             |     1/    4/   49 |     640 |
 |-------------------------------------------+-------------------+---------|
-| Hc595(8,HardSpi)                          |    14/   14/   22 |      80 |
-| Hc595(8,HardSpi,subfields)                |     0/    2/   26 |    1280 |
-| Hc595(8,SimpleSpi)                        |    50/   51/   63 |      80 |
-| Hc595(8,SimpleSpi,subfields)              |     0/    6/   63 |    1280 |
+| Hc595(8,HardSpi)                          |    15/   15/   31 |      80 |
+| Hc595(8,HardSpi,subfields)                |     1/    3/   35 |    1280 |
+| Hc595(8,SimpleSpi)                        |    51/   51/   67 |      80 |
+| Hc595(8,SimpleSpi,subfields)              |     1/    7/   72 |    1280 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi,100us)                 | 21497/21508/21541 |      10 |
-| Tm1637(4,SimpleTmi,100us,incremental)     |  3481/ 8480/ 9753 |      50 |
+| Tm1637(4,SimpleTmi,100us)                 | 21498/21504/21546 |      10 |
+| Tm1637(4,SimpleTmi,100us,incremental)     |  3481/ 8478/ 9745 |      50 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi,5us)                   |  1526/ 1526/ 1526 |      10 |
-| Tm1637(4,SimpleTmi,5us,incremental)       |   248/  603/  718 |      50 |
+| Tm1637(4,SimpleTmi,5us)                   |  1528/ 1528/ 1531 |      10 |
+| Tm1637(4,SimpleTmi,5us,incremental)       |   248/  603/  696 |      50 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(6,SimpleTmi,100us)                 | 27025/27033/27057 |      10 |
-| Tm1637(6,SimpleTmi,100us,incremental)     |  3481/ 8837/ 9761 |      70 |
+| Tm1637(6,SimpleTmi,100us)                 | 27027/27030/27047 |      10 |
+| Tm1637(6,SimpleTmi,100us,incremental)     |  3481/ 8834/ 9745 |      70 |
 |-------------------------------------------+-------------------+---------|
-| Max7219(8,HardSpi)                        |   125/  126/  141 |      20 |
-| Max7219(8,SimpleSpi)                      |   459/  460/  474 |      20 |
+| Max7219(8,HardSpi)                        |   126/  126/  138 |      20 |
+| Max7219(8,SimpleSpi)                      |   460/  461/  472 |      20 |
 |-------------------------------------------+-------------------+---------|
-| Ht16k33(4,TwoWire,100kHz)                 |  1322/ 1324/ 1354 |      20 |
-| Ht16k33(4,TwoWire,400kHz)                 |   347/  347/  351 |      20 |
-| Ht16k33(4,SimpleWire,1us)                 |  1330/ 1331/ 1350 |      20 |
+| Ht16k33(4,TwoWire,100kHz)                 |  1322/ 1326/ 1357 |      20 |
+| Ht16k33(4,TwoWire,400kHz)                 |   347/  347/  348 |      20 |
+| Ht16k33(4,SimpleWire,1us)                 |  1330/ 1332/ 1354 |      20 |
 +-------------------------------------------+-------------------+---------+
 ```
 

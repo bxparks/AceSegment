@@ -210,6 +210,11 @@ number of `TimingStats::update()` calls that were made.
       Teensy 3.2, where `SimpleWireInterface` becomes competitive with 400 kHz
       of `<Wire.h>`.
 
+**v0.8+**
+
+* Remove `virtual` keyword from `LedModule` methods.
+    * No significant changes in execution time.
+
 ## Results
 
 The following tables show the number of microseconds taken by:

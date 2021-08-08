@@ -7,7 +7,7 @@ sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(DirectModule<4>): 48
 sizeof(HybridModule<SimpleSpiInterface, 4>): 48
 sizeof(Hc595Module<SimpleSpiInterface, 8>): 64
-sizeof(Tm1637Module<SimpleTmiInterface, 4>): 20
+sizeof(Tm1637Module<SimpleTmiInterface, 4>): 24
 sizeof(Tm1637Module<SimpleTmiInterface, 6>): 24
 sizeof(Max7219Module<SimpleSpiInterface, 8>): 24
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 20
@@ -21,25 +21,25 @@ sizeof(StringWriter): 4
 sizeof(LevelWriter): 4
 sizeof(StringScroller): 12
 BENCHMARKS
-Direct(4) 15 15 20 40
-Direct(4,subfields) 1 3 27 640
+Direct(4) 15 15 16 40
+Direct(4,subfields) 1 3 23 640
 Hybrid(4,HardSpi) 43 43 48 40
-Hybrid(4,HardSpi,subfields) 1 6 64 640
-Hybrid(4,SimpleSpi) 42 43 47 40
+Hybrid(4,HardSpi,subfields) 1 6 52 640
+Hybrid(4,SimpleSpi) 43 43 47 40
 Hybrid(4,SimpleSpi,subfields) 1 6 64 640
-Hc595(8,HardSpi) 44 44 49 80
+Hc595(8,HardSpi) 44 44 50 80
 Hc595(8,HardSpi,subfields) 1 6 53 1280
-Hc595(8,SimpleSpi) 76 76 81 80
-Hc595(8,SimpleSpi,subfields) 1 10 85 1280
-Tm1637(4,SimpleTmi,100us) 22407 22408 22410 10
-Tm1637(4,SimpleTmi,100us,incremental) 3628 8837 10143 50
-Tm1637(4,SimpleTmi,5us) 2449 2453 2458 10
-Tm1637(4,SimpleTmi,5us,incremental) 397 969 1135 50
-Tm1637(6,SimpleTmi,100us) 28163 28167 28169 10
-Tm1637(6,SimpleTmi,100us,incremental) 3627 9207 10141 70
-Max7219(8,HardSpi) 392 394 397 20
-Max7219(8,SimpleSpi) 687 690 692 20
-Ht16k33(4,TwoWire,100kHz) 1322 1322 1326 20
-Ht16k33(4,TwoWire,400kHz) 407 407 412 20
-Ht16k33(4,SimpleWire,1us) 2973 2974 2976 20
+Hc595(8,SimpleSpi) 76 76 82 80
+Hc595(8,SimpleSpi,subfields) 1 10 97 1280
+Tm1637(4,SimpleTmi,100us) 22406 22412 22419 10
+Tm1637(4,SimpleTmi,100us,incremental) 3629 8838 10147 50
+Tm1637(4,SimpleTmi,5us) 2459 2463 2468 10
+Tm1637(4,SimpleTmi,5us,incremental) 398 971 1135 50
+Tm1637(6,SimpleTmi,100us) 28174 28180 28193 10
+Tm1637(6,SimpleTmi,100us,incremental) 3629 9211 10146 70
+Max7219(8,HardSpi) 394 396 400 20
+Max7219(8,SimpleSpi) 688 691 694 20
+Ht16k33(4,TwoWire,100kHz) 1322 1322 1327 20
+Ht16k33(4,TwoWire,400kHz) 407 408 412 20
+Ht16k33(4,SimpleWire,1us) 2987 2991 2992 20
 END

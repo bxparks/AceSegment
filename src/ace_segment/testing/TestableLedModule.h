@@ -38,16 +38,14 @@ namespace testing {
 template <uint8_t T_DIGITS>
 class TestableLedModule : public LedModule {
   public:
-    explicit TestableLedModule() : LedModule(T_DIGITS) {}
+    explicit TestableLedModule() : LedModule(mPatterns, T_DIGITS) {}
 
-    void setBrightness(uint8_t /*brightness*/) override {}
-
-    void setPatternAt(uint8_t pos, uint8_t pattern) override {
-      mPatterns[pos] = pattern;
+    void begin() {
+      LedModule::begin();
     }
 
-    uint8_t getPatternAt(uint8_t pos) const override {
-      return mPatterns[pos];
+    void end() {
+      LedModule::end();
     }
 
     uint8_t* getPatterns() { return mPatterns; }

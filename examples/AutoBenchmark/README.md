@@ -186,6 +186,11 @@ number of `TimingStats::update()` calls that were made.
       Teensy 3.2, where `SimpleWireInterface` becomes competitive with 400 kHz
       of `<Wire.h>`.
 
+**v0.8+**
+
+* Remove `virtual` keyword from `LedModule` methods.
+    * No significant changes in execution time.
+
 ## Results
 
 The following tables show the number of microseconds taken by:
@@ -262,17 +267,17 @@ sizeof(LedMatrixDirect<>): 9
 sizeof(LedMatrixDirectFast4<6..13, 2..5>): 3
 sizeof(LedMatrixSingleHc595<SimpleSpiInterface>): 9
 sizeof(LedMatrixDualHc595<HardSpiInterface>): 9
-sizeof(LedModule): 3
-sizeof(ScanningModule<LedMatrixBase, 4>): 22
-sizeof(DirectModule<4>): 31
-sizeof(DirectFast4Module<...>): 25
-sizeof(HybridModule<SimpleSpiInterface, 4>): 31
-sizeof(Hc595Module<SimpleSpiInterface, 8>): 47
-sizeof(Tm1637Module<SimpleTmiInterface, 4>): 15
-sizeof(Tm1637Module<SimpleTmiInterface, 6>): 17
-sizeof(Max7219Module<SimpleSpiInterface, 8>): 17
-sizeof(Ht16k33Module<TwoWireInterface, 4>): 12
-sizeof(Ht16k33Module<SimpleWireInterface, 4>): 15
+sizeof(LedModule): 6
+sizeof(ScanningModule<LedMatrixBase, 4>): 25
+sizeof(DirectModule<4>): 34
+sizeof(DirectFast4Module<...>): 28
+sizeof(HybridModule<SimpleSpiInterface, 4>): 34
+sizeof(Hc595Module<SimpleSpiInterface, 8>): 50
+sizeof(Tm1637Module<SimpleTmiInterface, 4>): 17
+sizeof(Tm1637Module<SimpleTmiInterface, 6>): 19
+sizeof(Max7219Module<SimpleSpiInterface, 8>): 19
+sizeof(Ht16k33Module<TwoWireInterface, 4>): 14
+sizeof(Ht16k33Module<SimpleWireInterface, 4>): 17
 sizeof(PatternWriter): 2
 sizeof(NumberWriter): 2
 sizeof(ClockWriter): 3
@@ -286,53 +291,53 @@ CPU:
 +-------------------------------------------+-------------------+---------+
 | Functionality                             |   min/  avg/  max | samples |
 |-------------------------------------------+-------------------+---------|
-| Direct(4)                                 |    76/   82/   88 |      40 |
-| Direct(4,subfields)                       |     4/   13/   84 |     640 |
-| DirectFast4(4)                            |    24/   30/   40 |      40 |
-| DirectFast4(4,subfields)                  |     4/    8/   36 |     640 |
+| Direct(4)                                 |    76/   83/   92 |      40 |
+| Direct(4,subfields)                       |     4/   15/   96 |     640 |
+| DirectFast4(4)                            |    28/   33/   40 |      40 |
+| DirectFast4(4,subfields)                  |     4/    9/   36 |     640 |
 |-------------------------------------------+-------------------+---------|
-| Hybrid(4,HardSpi)                         |    32/   38/   44 |      40 |
-| Hybrid(4,HardSpi,subfields)               |     4/    8/   44 |     640 |
-| Hybrid(4,HardSpiFast)                     |    20/   25/   32 |      40 |
-| Hybrid(4,HardSpiFast,subfields)           |     4/    7/   32 |     640 |
-| Hybrid(4,SimpleSpi)                       |   152/  161/  176 |      40 |
-| Hybrid(4,SimpleSpi,subfields)             |     4/   22/  176 |     640 |
-| Hybrid(4,SimpleSpiFast)                   |    28/   32/   40 |      40 |
-| Hybrid(4,SimpleSpiFast,subfields)         |     4/    8/   36 |     640 |
+| Hybrid(4,HardSpi)                         |    36/   41/   56 |      40 |
+| Hybrid(4,HardSpi,subfields)               |     4/   10/   48 |     640 |
+| Hybrid(4,HardSpiFast)                     |    24/   27/   36 |      40 |
+| Hybrid(4,HardSpiFast,subfields)           |     4/    9/   36 |     640 |
+| Hybrid(4,SimpleSpi)                       |   156/  163/  184 |      40 |
+| Hybrid(4,SimpleSpi,subfields)             |     4/   24/  172 |     640 |
+| Hybrid(4,SimpleSpiFast)                   |    28/   34/   44 |      40 |
+| Hybrid(4,SimpleSpiFast,subfields)         |     4/   10/   40 |     640 |
 |-------------------------------------------+-------------------+---------|
-| Hc595(8,HardSpi)                          |    24/   30/   40 |      80 |
-| Hc595(8,HardSpi,subfields)                |     4/    8/   36 |    1280 |
-| Hc595(8,HardSpiFast)                      |    12/   16/   24 |      80 |
-| Hc595(8,HardSpiFast,subfields)            |     4/    6/   24 |    1280 |
-| Hc595(8,SimpleSpi)                        |   268/  273/  308 |      80 |
-| Hc595(8,SimpleSpi,subfields)              |     4/   36/  308 |    1280 |
-| Hc595(8,SimpleSpiFast)                    |    24/   27/   36 |      80 |
-| Hc595(8,SimpleSpiFast,subfields)          |     4/    8/   32 |    1280 |
+| Hc595(8,HardSpi)                          |    28/   32/   40 |      80 |
+| Hc595(8,HardSpi,subfields)                |     4/   10/   44 |    1280 |
+| Hc595(8,HardSpiFast)                      |    16/   19/   32 |      80 |
+| Hc595(8,HardSpiFast,subfields)            |     4/    9/   28 |    1280 |
+| Hc595(8,SimpleSpi)                        |   268/  275/  308 |      80 |
+| Hc595(8,SimpleSpi,subfields)              |     4/   39/  308 |    1280 |
+| Hc595(8,SimpleSpiFast)                    |    24/   30/   40 |      80 |
+| Hc595(8,SimpleSpiFast,subfields)          |     4/   10/   36 |    1280 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi,100us)                 | 22312/22342/22576 |      10 |
+| Tm1637(4,SimpleTmi,100us)                 | 22312/22344/22580 |      10 |
 | Tm1637(4,SimpleTmi,100us,incremental)     |  3612/ 8807/10356 |      50 |
-| Tm1637(4,SimpleTmiFast,100us)             | 21068/21102/21376 |      10 |
-| Tm1637(4,SimpleTmiFast,100us,incremental) |  3412/ 8317/ 9828 |      50 |
+| Tm1637(4,SimpleTmiFast,100us)             | 21064/21100/21364 |      10 |
+| Tm1637(4,SimpleTmiFast,100us,incremental) |  3412/ 8316/ 9828 |      50 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi,5us)                   |  2244/ 2281/ 2472 |      10 |
-| Tm1637(4,SimpleTmi,5us,incremental)       |   364/  893/ 1128 |      50 |
-| Tm1637(4,SimpleTmiFast,5us)               |  1004/ 1035/ 1108 |      10 |
-| Tm1637(4,SimpleTmiFast,5us,incremental)   |   164/  404/  508 |      50 |
+| Tm1637(4,SimpleTmi,5us)                   |  2248/ 2283/ 2480 |      10 |
+| Tm1637(4,SimpleTmi,5us,incremental)       |   364/  894/ 1124 |      50 |
+| Tm1637(4,SimpleTmiFast,5us)               |  1000/ 1034/ 1120 |      10 |
+| Tm1637(4,SimpleTmiFast,5us,incremental)   |   164/  403/  508 |      50 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(6,SimpleTmi,100us)                 | 28052/28089/28376 |      10 |
+| Tm1637(6,SimpleTmi,100us)                 | 28056/28090/28376 |      10 |
 | Tm1637(6,SimpleTmi,100us,incremental)     |  3612/ 9176/10356 |      70 |
-| Tm1637(6,SimpleTmiFast,100us)             | 26488/26523/26792 |      10 |
-| Tm1637(6,SimpleTmiFast,100us,incremental) |  3412/ 8665/ 9828 |      70 |
+| Tm1637(6,SimpleTmiFast,100us)             | 26484/26518/26788 |      10 |
+| Tm1637(6,SimpleTmiFast,100us,incremental) |  3412/ 8664/ 9820 |      70 |
 |-------------------------------------------+-------------------+---------|
-| Max7219(8,HardSpi)                        |   208/  225/  240 |      20 |
-| Max7219(8,HardSpiFast)                    |    96/  106/  124 |      20 |
-| Max7219(8,SimpleSpi)                      |  2380/ 2390/ 2516 |      20 |
-| Max7219(8,SimpleSpiFast)                  |   208/  217/  240 |      20 |
+| Max7219(8,HardSpi)                        |   208/  226/  240 |      20 |
+| Max7219(8,HardSpiFast)                    |    96/  108/  116 |      20 |
+| Max7219(8,SimpleSpi)                      |  2380/ 2390/ 2520 |      20 |
+| Max7219(8,SimpleSpiFast)                  |   208/  218/  236 |      20 |
 |-------------------------------------------+-------------------+---------|
-| Ht16k33(4,TwoWire,100kHz)                 |  1460/ 1464/ 1480 |      20 |
-| Ht16k33(4,TwoWire,400kHz)                 |   500/  508/  532 |      20 |
-| Ht16k33(4,SimpleWire,1us)                 |  2544/ 2556/ 2696 |      20 |
-| Ht16k33(4,SimpleWireFast,1us)             |   224/  232/  252 |      20 |
+| Ht16k33(4,TwoWire,100kHz)                 |  1460/ 1463/ 1496 |      20 |
+| Ht16k33(4,TwoWire,400kHz)                 |   500/  507/  532 |      20 |
+| Ht16k33(4,SimpleWire,1us)                 |  2544/ 2556/ 2684 |      20 |
+| Ht16k33(4,SimpleWireFast,1us)             |   224/  233/  252 |      20 |
 +-------------------------------------------+-------------------+---------+
 
 ```
@@ -350,17 +355,17 @@ sizeof(LedMatrixDirect<>): 9
 sizeof(LedMatrixDirectFast4<6..13, 2..5>): 3
 sizeof(LedMatrixSingleHc595<SimpleSpiInterface>): 9
 sizeof(LedMatrixDualHc595<HardSpiInterface>): 9
-sizeof(LedModule): 3
-sizeof(ScanningModule<LedMatrixBase, 4>): 22
-sizeof(DirectModule<4>): 31
-sizeof(DirectFast4Module<...>): 25
-sizeof(HybridModule<SimpleSpiInterface, 4>): 31
-sizeof(Hc595Module<SimpleSpiInterface, 8>): 47
-sizeof(Tm1637Module<SimpleTmiInterface, 4>): 15
-sizeof(Tm1637Module<SimpleTmiInterface, 6>): 17
-sizeof(Max7219Module<SimpleSpiInterface, 8>): 17
-sizeof(Ht16k33Module<TwoWireInterface, 4>): 12
-sizeof(Ht16k33Module<SimpleWireInterface, 4>): 15
+sizeof(LedModule): 6
+sizeof(ScanningModule<LedMatrixBase, 4>): 25
+sizeof(DirectModule<4>): 34
+sizeof(DirectFast4Module<...>): 28
+sizeof(HybridModule<SimpleSpiInterface, 4>): 34
+sizeof(Hc595Module<SimpleSpiInterface, 8>): 50
+sizeof(Tm1637Module<SimpleTmiInterface, 4>): 17
+sizeof(Tm1637Module<SimpleTmiInterface, 6>): 19
+sizeof(Max7219Module<SimpleSpiInterface, 8>): 19
+sizeof(Ht16k33Module<TwoWireInterface, 4>): 14
+sizeof(Ht16k33Module<SimpleWireInterface, 4>): 17
 sizeof(PatternWriter): 2
 sizeof(NumberWriter): 2
 sizeof(ClockWriter): 3
@@ -374,53 +379,53 @@ CPU:
 +-------------------------------------------+-------------------+---------+
 | Functionality                             |   min/  avg/  max | samples |
 |-------------------------------------------+-------------------+---------|
-| Direct(4)                                 |    72/   76/   84 |      40 |
-| Direct(4,subfields)                       |     4/   13/   88 |     640 |
-| DirectFast4(4)                            |    24/   27/   36 |      40 |
-| DirectFast4(4,subfields)                  |     4/    8/   32 |     640 |
+| Direct(4)                                 |    76/   79/   88 |      40 |
+| Direct(4,subfields)                       |     4/   15/   84 |     640 |
+| DirectFast4(4)                            |    28/   29/   36 |      40 |
+| DirectFast4(4,subfields)                  |     4/    9/   36 |     640 |
 |-------------------------------------------+-------------------+---------|
-| Hybrid(4,HardSpi)                         |    32/   37/   48 |      40 |
-| Hybrid(4,HardSpi,subfields)               |     4/    9/   44 |     640 |
-| Hybrid(4,HardSpiFast)                     |    20/   24/   32 |      40 |
-| Hybrid(4,HardSpiFast,subfields)           |     4/    7/   32 |     640 |
-| Hybrid(4,SimpleSpi)                       |   144/  150/  160 |      40 |
-| Hybrid(4,SimpleSpi,subfields)             |     4/   21/  160 |     640 |
-| Hybrid(4,SimpleSpiFast)                   |    28/   29/   36 |      40 |
-| Hybrid(4,SimpleSpiFast,subfields)         |     4/    8/   36 |     640 |
+| Hybrid(4,HardSpi)                         |    36/   40/   52 |      40 |
+| Hybrid(4,HardSpi,subfields)               |     4/   10/   44 |     640 |
+| Hybrid(4,HardSpiFast)                     |    24/   26/   32 |      40 |
+| Hybrid(4,HardSpiFast,subfields)           |     4/    9/   32 |     640 |
+| Hybrid(4,SimpleSpi)                       |   148/  153/  160 |      40 |
+| Hybrid(4,SimpleSpi,subfields)             |     4/   23/  164 |     640 |
+| Hybrid(4,SimpleSpiFast)                   |    28/   31/   36 |      40 |
+| Hybrid(4,SimpleSpiFast,subfields)         |     4/   10/   40 |     640 |
 |-------------------------------------------+-------------------+---------|
-| Hc595(8,HardSpi)                          |    28/   30/   36 |      80 |
-| Hc595(8,HardSpi,subfields)                |     4/    8/   36 |    1280 |
-| Hc595(8,HardSpiFast)                      |    12/   14/   24 |      80 |
-| Hc595(8,HardSpiFast,subfields)            |     4/    6/   20 |    1280 |
-| Hc595(8,SimpleSpi)                        |   252/  256/  268 |      80 |
-| Hc595(8,SimpleSpi,subfields)              |     4/   35/  268 |    1280 |
-| Hc595(8,SimpleSpiFast)                    |    24/   25/   32 |      80 |
-| Hc595(8,SimpleSpiFast,subfields)          |     4/    8/   32 |    1280 |
+| Hc595(8,HardSpi)                          |    28/   31/   40 |      80 |
+| Hc595(8,HardSpi,subfields)                |     4/   10/   36 |    1280 |
+| Hc595(8,HardSpiFast)                      |    16/   18/   24 |      80 |
+| Hc595(8,HardSpiFast,subfields)            |     4/    9/   24 |    1280 |
+| Hc595(8,SimpleSpi)                        |   252/  257/  264 |      80 |
+| Hc595(8,SimpleSpi,subfields)              |     4/   37/  268 |    1280 |
+| Hc595(8,SimpleSpiFast)                    |    24/   28/   36 |      80 |
+| Hc595(8,SimpleSpiFast,subfields)          |     4/   10/   36 |    1280 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi,100us)                 | 22436/22442/22452 |      10 |
+| Tm1637(4,SimpleTmi,100us)                 | 22436/22443/22452 |      10 |
 | Tm1637(4,SimpleTmi,100us,incremental)     |  3632/ 8851/10164 |      50 |
-| Tm1637(4,SimpleTmiFast,100us)             | 21180/21186/21192 |      10 |
-| Tm1637(4,SimpleTmiFast,100us,incremental) |  3428/ 8355/ 9592 |      50 |
+| Tm1637(4,SimpleTmiFast,100us)             | 21172/21184/21192 |      10 |
+| Tm1637(4,SimpleTmiFast,100us,incremental) |  3428/ 8354/ 9596 |      50 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi,5us)                   |  2264/ 2265/ 2268 |      10 |
-| Tm1637(4,SimpleTmi,5us,incremental)       |   368/  896/ 1032 |      50 |
-| Tm1637(4,SimpleTmiFast,5us)               |  1008/ 1010/ 1012 |      10 |
-| Tm1637(4,SimpleTmiFast,5us,incremental)   |   164/  401/  468 |      50 |
+| Tm1637(4,SimpleTmi,5us)                   |  2264/ 2268/ 2272 |      10 |
+| Tm1637(4,SimpleTmi,5us,incremental)       |   368/  897/ 1036 |      50 |
+| Tm1637(4,SimpleTmiFast,5us)               |  1004/ 1007/ 1008 |      10 |
+| Tm1637(4,SimpleTmiFast,5us,incremental)   |   164/  399/  464 |      50 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(6,SimpleTmi,100us)                 | 28204/28214/28228 |      10 |
+| Tm1637(6,SimpleTmi,100us)                 | 28208/28216/28232 |      10 |
 | Tm1637(6,SimpleTmi,100us,incremental)     |  3628/ 9223/10164 |      70 |
-| Tm1637(6,SimpleTmiFast,100us)             | 26628/26634/26644 |      10 |
-| Tm1637(6,SimpleTmiFast,100us,incremental) |  3428/ 8707/ 9596 |      70 |
+| Tm1637(6,SimpleTmiFast,100us)             | 26620/26630/26640 |      10 |
+| Tm1637(6,SimpleTmiFast,100us,incremental) |  3428/ 8705/ 9596 |      70 |
 |-------------------------------------------+-------------------+---------|
-| Max7219(8,HardSpi)                        |   220/  224/  232 |      20 |
-| Max7219(8,HardSpiFast)                    |    96/  101/  112 |      20 |
-| Max7219(8,SimpleSpi)                      |  2244/ 2247/ 2256 |      20 |
-| Max7219(8,SimpleSpiFast)                  |   208/  211/  220 |      20 |
+| Max7219(8,HardSpi)                        |   220/  223/  228 |      20 |
+| Max7219(8,HardSpiFast)                    |    96/  100/  108 |      20 |
+| Max7219(8,SimpleSpi)                      |  2244/ 2246/ 2256 |      20 |
+| Max7219(8,SimpleSpiFast)                  |   208/  210/  216 |      20 |
 |-------------------------------------------+-------------------+---------|
-| Ht16k33(4,TwoWire,100kHz)                 |  1460/ 1463/ 1468 |      20 |
+| Ht16k33(4,TwoWire,100kHz)                 |  1456/ 1463/ 1472 |      20 |
 | Ht16k33(4,TwoWire,400kHz)                 |   500/  503/  504 |      20 |
-| Ht16k33(4,SimpleWire,1us)                 |  2556/ 2564/ 2572 |      20 |
-| Ht16k33(4,SimpleWireFast,1us)             |   224/  226/  232 |      20 |
+| Ht16k33(4,SimpleWire,1us)                 |  2556/ 2563/ 2572 |      20 |
+| Ht16k33(4,SimpleWireFast,1us)             |   224/  227/  236 |      20 |
 +-------------------------------------------+-------------------+---------+
 
 ```
@@ -441,7 +446,7 @@ sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(DirectModule<4>): 48
 sizeof(HybridModule<SimpleSpiInterface, 4>): 48
 sizeof(Hc595Module<SimpleSpiInterface, 8>): 64
-sizeof(Tm1637Module<SimpleTmiInterface, 4>): 20
+sizeof(Tm1637Module<SimpleTmiInterface, 4>): 24
 sizeof(Tm1637Module<SimpleTmiInterface, 6>): 24
 sizeof(Max7219Module<SimpleSpiInterface, 8>): 24
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 20
@@ -459,34 +464,34 @@ CPU:
 +-------------------------------------------+-------------------+---------+
 | Functionality                             |   min/  avg/  max | samples |
 |-------------------------------------------+-------------------+---------|
-| Direct(4)                                 |    24/   24/   28 |      40 |
-| Direct(4,subfields)                       |     2/    5/   29 |     640 |
+| Direct(4)                                 |    25/   25/   29 |      40 |
+| Direct(4,subfields)                       |     3/    5/   30 |     640 |
 |-------------------------------------------+-------------------+---------|
-| Hybrid(4,HardSpi)                         |    24/   24/   29 |      40 |
-| Hybrid(4,HardSpi,subfields)               |     2/    5/   29 |     640 |
-| Hybrid(4,SimpleSpi)                       |    53/   53/   57 |      40 |
-| Hybrid(4,SimpleSpi,subfields)             |     2/    8/   58 |     640 |
+| Hybrid(4,HardSpi)                         |    25/   25/   29 |      40 |
+| Hybrid(4,HardSpi,subfields)               |     3/    5/   30 |     640 |
+| Hybrid(4,SimpleSpi)                       |    54/   55/   59 |      40 |
+| Hybrid(4,SimpleSpi,subfields)             |     3/    9/   60 |     640 |
 |-------------------------------------------+-------------------+---------|
-| Hc595(8,HardSpi)                          |    24/   24/   28 |      80 |
-| Hc595(8,HardSpi,subfields)                |     3/    5/   28 |    1280 |
-| Hc595(8,SimpleSpi)                        |    91/   92/   96 |      80 |
-| Hc595(8,SimpleSpi,subfields)              |     3/   13/   97 |    1280 |
+| Hc595(8,HardSpi)                          |    25/   25/   30 |      80 |
+| Hc595(8,HardSpi,subfields)                |     4/    7/   30 |    1280 |
+| Hc595(8,SimpleSpi)                        |    93/   94/  100 |      80 |
+| Hc595(8,SimpleSpi,subfields)              |     4/   15/  100 |    1280 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi,100us)                 | 22207/22210/22217 |      10 |
-| Tm1637(4,SimpleTmi,100us,incremental)     |  3595/ 8758/10053 |      50 |
+| Tm1637(4,SimpleTmi,100us)                 | 22213/22218/22225 |      10 |
+| Tm1637(4,SimpleTmi,100us,incremental)     |  3596/ 8761/10054 |      50 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi,5us)                   |  2105/ 2106/ 2109 |      10 |
-| Tm1637(4,SimpleTmi,5us,incremental)       |   341/  832/  955 |      50 |
+| Tm1637(4,SimpleTmi,5us)                   |  2109/ 2109/ 2115 |      10 |
+| Tm1637(4,SimpleTmi,5us,incremental)       |   342/  833/  957 |      50 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(6,SimpleTmi,100us)                 | 27919/27921/27926 |      10 |
-| Tm1637(6,SimpleTmi,100us,incremental)     |  3597/ 9127/10051 |      70 |
+| Tm1637(6,SimpleTmi,100us)                 | 27924/27929/27935 |      10 |
+| Tm1637(6,SimpleTmi,100us,incremental)     |  3596/ 9129/10057 |      70 |
 |-------------------------------------------+-------------------+---------|
-| Max7219(8,HardSpi)                        |   201/  202/  206 |      20 |
-| Max7219(8,SimpleSpi)                      |   812/  814/  816 |      20 |
+| Max7219(8,HardSpi)                        |   202/  203/  208 |      20 |
+| Max7219(8,SimpleSpi)                      |   822/  825/  827 |      20 |
 |-------------------------------------------+-------------------+---------|
-| Ht16k33(4,TwoWire,100kHz)                 |  1343/ 1343/ 1347 |      20 |
-| Ht16k33(4,TwoWire,400kHz)                 |   381/  381/  385 |      20 |
-| Ht16k33(4,SimpleWire,1us)                 |  2077/ 2077/ 2079 |      20 |
+| Ht16k33(4,TwoWire,100kHz)                 |  1341/ 1342/ 1348 |      20 |
+| Ht16k33(4,TwoWire,400kHz)                 |   379/  380/  384 |      20 |
+| Ht16k33(4,SimpleWire,1us)                 |  2068/ 2068/ 2073 |      20 |
 +-------------------------------------------+-------------------+---------+
 
 ```
@@ -507,7 +512,7 @@ sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(DirectModule<4>): 48
 sizeof(HybridModule<SimpleSpiInterface, 4>): 48
 sizeof(Hc595Module<SimpleSpiInterface, 8>): 64
-sizeof(Tm1637Module<SimpleTmiInterface, 4>): 20
+sizeof(Tm1637Module<SimpleTmiInterface, 4>): 24
 sizeof(Tm1637Module<SimpleTmiInterface, 6>): 24
 sizeof(Max7219Module<SimpleSpiInterface, 8>): 24
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 20
@@ -525,34 +530,34 @@ CPU:
 +-------------------------------------------+-------------------+---------+
 | Functionality                             |   min/  avg/  max | samples |
 |-------------------------------------------+-------------------+---------|
-| Direct(4)                                 |    15/   15/   20 |      40 |
-| Direct(4,subfields)                       |     1/    3/   27 |     640 |
+| Direct(4)                                 |    15/   15/   16 |      40 |
+| Direct(4,subfields)                       |     1/    3/   23 |     640 |
 |-------------------------------------------+-------------------+---------|
 | Hybrid(4,HardSpi)                         |    43/   43/   48 |      40 |
-| Hybrid(4,HardSpi,subfields)               |     1/    6/   64 |     640 |
-| Hybrid(4,SimpleSpi)                       |    42/   43/   47 |      40 |
+| Hybrid(4,HardSpi,subfields)               |     1/    6/   52 |     640 |
+| Hybrid(4,SimpleSpi)                       |    43/   43/   47 |      40 |
 | Hybrid(4,SimpleSpi,subfields)             |     1/    6/   64 |     640 |
 |-------------------------------------------+-------------------+---------|
-| Hc595(8,HardSpi)                          |    44/   44/   49 |      80 |
+| Hc595(8,HardSpi)                          |    44/   44/   50 |      80 |
 | Hc595(8,HardSpi,subfields)                |     1/    6/   53 |    1280 |
-| Hc595(8,SimpleSpi)                        |    76/   76/   81 |      80 |
-| Hc595(8,SimpleSpi,subfields)              |     1/   10/   85 |    1280 |
+| Hc595(8,SimpleSpi)                        |    76/   76/   82 |      80 |
+| Hc595(8,SimpleSpi,subfields)              |     1/   10/   97 |    1280 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi,100us)                 | 22407/22408/22410 |      10 |
-| Tm1637(4,SimpleTmi,100us,incremental)     |  3628/ 8837/10143 |      50 |
+| Tm1637(4,SimpleTmi,100us)                 | 22406/22412/22419 |      10 |
+| Tm1637(4,SimpleTmi,100us,incremental)     |  3629/ 8838/10147 |      50 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi,5us)                   |  2449/ 2453/ 2458 |      10 |
-| Tm1637(4,SimpleTmi,5us,incremental)       |   397/  969/ 1135 |      50 |
+| Tm1637(4,SimpleTmi,5us)                   |  2459/ 2463/ 2468 |      10 |
+| Tm1637(4,SimpleTmi,5us,incremental)       |   398/  971/ 1135 |      50 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(6,SimpleTmi,100us)                 | 28163/28167/28169 |      10 |
-| Tm1637(6,SimpleTmi,100us,incremental)     |  3627/ 9207/10141 |      70 |
+| Tm1637(6,SimpleTmi,100us)                 | 28174/28180/28193 |      10 |
+| Tm1637(6,SimpleTmi,100us,incremental)     |  3629/ 9211/10146 |      70 |
 |-------------------------------------------+-------------------+---------|
-| Max7219(8,HardSpi)                        |   392/  394/  397 |      20 |
-| Max7219(8,SimpleSpi)                      |   687/  690/  692 |      20 |
+| Max7219(8,HardSpi)                        |   394/  396/  400 |      20 |
+| Max7219(8,SimpleSpi)                      |   688/  691/  694 |      20 |
 |-------------------------------------------+-------------------+---------|
-| Ht16k33(4,TwoWire,100kHz)                 |  1322/ 1322/ 1326 |      20 |
-| Ht16k33(4,TwoWire,400kHz)                 |   407/  407/  412 |      20 |
-| Ht16k33(4,SimpleWire,1us)                 |  2973/ 2974/ 2976 |      20 |
+| Ht16k33(4,TwoWire,100kHz)                 |  1322/ 1322/ 1327 |      20 |
+| Ht16k33(4,TwoWire,400kHz)                 |   407/  408/  412 |      20 |
+| Ht16k33(4,SimpleWire,1us)                 |  2987/ 2991/ 2992 |      20 |
 +-------------------------------------------+-------------------+---------+
 
 ```
@@ -573,7 +578,7 @@ sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(DirectModule<4>): 48
 sizeof(HybridModule<SimpleSpiInterface, 4>): 48
 sizeof(Hc595Module<SimpleSpiInterface, 8>): 64
-sizeof(Tm1637Module<SimpleTmiInterface, 4>): 20
+sizeof(Tm1637Module<SimpleTmiInterface, 4>): 24
 sizeof(Tm1637Module<SimpleTmiInterface, 6>): 24
 sizeof(Max7219Module<SimpleSpiInterface, 8>): 24
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 20
@@ -591,34 +596,34 @@ CPU:
 +-------------------------------------------+-------------------+---------+
 | Functionality                             |   min/  avg/  max | samples |
 |-------------------------------------------+-------------------+---------|
-| Direct(4)                                 |    12/   12/   32 |      40 |
-| Direct(4,subfields)                       |     0/    2/   24 |     640 |
+| Direct(4)                                 |    12/   14/   40 |      40 |
+| Direct(4,subfields)                       |     1/    2/   32 |     640 |
 |-------------------------------------------+-------------------+---------|
-| Hybrid(4,HardSpi)                         |    12/   12/   32 |      40 |
-| Hybrid(4,HardSpi,subfields)               |     0/    2/   24 |     640 |
-| Hybrid(4,SimpleSpi)                       |    29/   29/   41 |      40 |
-| Hybrid(4,SimpleSpi,subfields)             |     0/    4/   41 |     640 |
+| Hybrid(4,HardSpi)                         |    12/   12/   24 |      40 |
+| Hybrid(4,HardSpi,subfields)               |     1/    2/   28 |     640 |
+| Hybrid(4,SimpleSpi)                       |    29/   30/   49 |      40 |
+| Hybrid(4,SimpleSpi,subfields)             |     1/    4/   49 |     640 |
 |-------------------------------------------+-------------------+---------|
-| Hc595(8,HardSpi)                          |    14/   14/   22 |      80 |
-| Hc595(8,HardSpi,subfields)                |     0/    2/   26 |    1280 |
-| Hc595(8,SimpleSpi)                        |    50/   51/   63 |      80 |
-| Hc595(8,SimpleSpi,subfields)              |     0/    6/   63 |    1280 |
+| Hc595(8,HardSpi)                          |    15/   15/   31 |      80 |
+| Hc595(8,HardSpi,subfields)                |     1/    3/   35 |    1280 |
+| Hc595(8,SimpleSpi)                        |    51/   51/   67 |      80 |
+| Hc595(8,SimpleSpi,subfields)              |     1/    7/   72 |    1280 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi,100us)                 | 21497/21508/21541 |      10 |
-| Tm1637(4,SimpleTmi,100us,incremental)     |  3481/ 8480/ 9753 |      50 |
+| Tm1637(4,SimpleTmi,100us)                 | 21498/21504/21546 |      10 |
+| Tm1637(4,SimpleTmi,100us,incremental)     |  3481/ 8478/ 9745 |      50 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi,5us)                   |  1526/ 1526/ 1526 |      10 |
-| Tm1637(4,SimpleTmi,5us,incremental)       |   248/  603/  718 |      50 |
+| Tm1637(4,SimpleTmi,5us)                   |  1528/ 1528/ 1531 |      10 |
+| Tm1637(4,SimpleTmi,5us,incremental)       |   248/  603/  696 |      50 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(6,SimpleTmi,100us)                 | 27025/27033/27057 |      10 |
-| Tm1637(6,SimpleTmi,100us,incremental)     |  3481/ 8837/ 9761 |      70 |
+| Tm1637(6,SimpleTmi,100us)                 | 27027/27030/27047 |      10 |
+| Tm1637(6,SimpleTmi,100us,incremental)     |  3481/ 8834/ 9745 |      70 |
 |-------------------------------------------+-------------------+---------|
-| Max7219(8,HardSpi)                        |   125/  126/  141 |      20 |
-| Max7219(8,SimpleSpi)                      |   459/  460/  474 |      20 |
+| Max7219(8,HardSpi)                        |   126/  126/  138 |      20 |
+| Max7219(8,SimpleSpi)                      |   460/  461/  472 |      20 |
 |-------------------------------------------+-------------------+---------|
-| Ht16k33(4,TwoWire,100kHz)                 |  1322/ 1324/ 1354 |      20 |
-| Ht16k33(4,TwoWire,400kHz)                 |   347/  347/  351 |      20 |
-| Ht16k33(4,SimpleWire,1us)                 |  1330/ 1331/ 1350 |      20 |
+| Ht16k33(4,TwoWire,100kHz)                 |  1322/ 1326/ 1357 |      20 |
+| Ht16k33(4,TwoWire,400kHz)                 |   347/  347/  348 |      20 |
+| Ht16k33(4,SimpleWire,1us)                 |  1330/ 1332/ 1354 |      20 |
 +-------------------------------------------+-------------------+---------+
 
 ```
@@ -639,7 +644,7 @@ sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(DirectModule<4>): 48
 sizeof(HybridModule<SimpleSpiInterface, 4>): 48
 sizeof(Hc595Module<SimpleSpiInterface, 8>): 64
-sizeof(Tm1637Module<SimpleTmiInterface, 4>): 20
+sizeof(Tm1637Module<SimpleTmiInterface, 4>): 24
 sizeof(Tm1637Module<SimpleTmiInterface, 6>): 24
 sizeof(Max7219Module<SimpleSpiInterface, 8>): 24
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 20
@@ -657,34 +662,34 @@ CPU:
 +-------------------------------------------+-------------------+---------+
 | Functionality                             |   min/  avg/  max | samples |
 |-------------------------------------------+-------------------+---------|
-| Direct(4)                                 |     2/    2/    8 |      40 |
+| Direct(4)                                 |     2/    3/   11 |      40 |
 | Direct(4,subfields)                       |     0/    1/    7 |     640 |
 |-------------------------------------------+-------------------+---------|
-| Hybrid(4,HardSpi)                         |    10/   10/   19 |      40 |
-| Hybrid(4,HardSpi,subfields)               |     0/    1/   18 |     640 |
-| Hybrid(4,SimpleSpi)                       |     4/    4/    9 |      40 |
+| Hybrid(4,HardSpi)                         |    10/   10/   14 |      40 |
+| Hybrid(4,HardSpi,subfields)               |     0/    1/   15 |     640 |
+| Hybrid(4,SimpleSpi)                       |     4/    4/   12 |      40 |
 | Hybrid(4,SimpleSpi,subfields)             |     0/    1/    9 |     640 |
 |-------------------------------------------+-------------------+---------|
-| Hc595(8,HardSpi)                          |    11/   11/   19 |      80 |
-| Hc595(8,HardSpi,subfields)                |     0/    2/   19 |    1280 |
-| Hc595(8,SimpleSpi)                        |     7/    7/    9 |      80 |
-| Hc595(8,SimpleSpi,subfields)              |     0/    1/   15 |    1280 |
+| Hc595(8,HardSpi)                          |    11/   11/   15 |      80 |
+| Hc595(8,HardSpi,subfields)                |     1/    2/   20 |    1280 |
+| Hc595(8,SimpleSpi)                        |     7/    7/   16 |      80 |
+| Hc595(8,SimpleSpi,subfields)              |     1/    1/   16 |    1280 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi,100us)                 | 21235/21240/21249 |      10 |
-| Tm1637(4,SimpleTmi,100us,incremental)     |  3435/ 8374/ 9620 |      50 |
+| Tm1637(4,SimpleTmi,100us)                 | 21230/21238/21245 |      10 |
+| Tm1637(4,SimpleTmi,100us,incremental)     |  3436/ 8375/ 9619 |      50 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi,5us)                   |  1273/ 1278/ 1285 |      10 |
-| Tm1637(4,SimpleTmi,5us,incremental)       |   205/  505/  587 |      50 |
+| Tm1637(4,SimpleTmi,5us)                   |  1274/ 1278/ 1287 |      10 |
+| Tm1637(4,SimpleTmi,5us,incremental)       |   205/  504/  585 |      50 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(6,SimpleTmi,100us)                 | 26691/26698/26705 |      10 |
-| Tm1637(6,SimpleTmi,100us,incremental)     |  3435/ 8727/ 9618 |      70 |
+| Tm1637(6,SimpleTmi,100us)                 | 26695/26699/26705 |      10 |
+| Tm1637(6,SimpleTmi,100us,incremental)     |  3436/ 8728/ 9618 |      70 |
 |-------------------------------------------+-------------------+---------|
-| Max7219(8,HardSpi)                        |    90/   91/   99 |      20 |
-| Max7219(8,SimpleSpi)                      |    60/   60/   68 |      20 |
+| Max7219(8,HardSpi)                        |    90/   91/   98 |      20 |
+| Max7219(8,SimpleSpi)                      |    60/   61/   68 |      20 |
 |-------------------------------------------+-------------------+---------|
-| Ht16k33(4,TwoWire,100kHz)                 |  1382/ 1384/ 1393 |      20 |
+| Ht16k33(4,TwoWire,100kHz)                 |  1382/ 1383/ 1390 |      20 |
 | Ht16k33(4,TwoWire,400kHz)                 |   422/  422/  423 |      20 |
-| Ht16k33(4,SimpleWire,1us)                 |   827/  831/  837 |      20 |
+| Ht16k33(4,SimpleWire,1us)                 |   825/  832/  837 |      20 |
 +-------------------------------------------+-------------------+---------+
 
 ```
@@ -706,7 +711,7 @@ sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(DirectModule<4>): 48
 sizeof(HybridModule<SimpleSpiInterface, 4>): 48
 sizeof(Hc595Module<SimpleSpiInterface, 8>): 64
-sizeof(Tm1637Module<SimpleTmiInterface, 4>): 20
+sizeof(Tm1637Module<SimpleTmiInterface, 4>): 24
 sizeof(Tm1637Module<SimpleTmiInterface, 6>): 24
 sizeof(Max7219Module<SimpleSpiInterface, 8>): 24
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 20
@@ -724,34 +729,34 @@ CPU:
 +-------------------------------------------+-------------------+---------+
 | Functionality                             |   min/  avg/  max | samples |
 |-------------------------------------------+-------------------+---------|
-| Direct(4)                                 |     5/    6/    9 |      40 |
-| Direct(4,subfields)                       |     0/    1/   10 |     640 |
+| Direct(4)                                 |     6/    6/    9 |      40 |
+| Direct(4,subfields)                       |     0/    1/    9 |     640 |
 |-------------------------------------------+-------------------+---------|
-| Hybrid(4,HardSpi)                         |     4/    4/    8 |      40 |
+| Hybrid(4,HardSpi)                         |     4/    4/    5 |      40 |
 | Hybrid(4,HardSpi,subfields)               |     0/    1/    5 |     640 |
-| Hybrid(4,SimpleSpi)                       |    10/   10/   12 |      40 |
-| Hybrid(4,SimpleSpi,subfields)             |     0/    1/   12 |     640 |
+| Hybrid(4,SimpleSpi)                       |    10/   10/   11 |      40 |
+| Hybrid(4,SimpleSpi,subfields)             |     0/    1/   11 |     640 |
 |-------------------------------------------+-------------------+---------|
-| Hc595(8,HardSpi)                          |     5/    5/    8 |      80 |
-| Hc595(8,HardSpi,subfields)                |     1/    1/    7 |    1280 |
-| Hc595(8,SimpleSpi)                        |    16/   16/   19 |      80 |
-| Hc595(8,SimpleSpi,subfields)              |     0/    2/   20 |    1280 |
+| Hc595(8,HardSpi)                          |     5/    5/    9 |      80 |
+| Hc595(8,HardSpi,subfields)                |     1/    2/    7 |    1280 |
+| Hc595(8,SimpleSpi)                        |    17/   17/   18 |      80 |
+| Hc595(8,SimpleSpi,subfields)              |     1/    3/   21 |    1280 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi,100us)                 | 21153/21153/21158 |      10 |
-| Tm1637(4,SimpleTmi,100us,incremental)     |  3425/ 8340/ 9573 |      50 |
+| Tm1637(4,SimpleTmi,100us)                 | 21183/21185/21189 |      10 |
+| Tm1637(4,SimpleTmi,100us,incremental)     |  3424/ 8341/ 9577 |      50 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi,5us)                   |  1153/ 1154/ 1158 |      10 |
-| Tm1637(4,SimpleTmi,5us,incremental)       |   187/  454/  527 |      50 |
+| Tm1637(4,SimpleTmi,5us)                   |  1156/ 1157/ 1161 |      10 |
+| Tm1637(4,SimpleTmi,5us,incremental)       |   187/  458/  531 |      50 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(6,SimpleTmi,100us)                 | 26585/26587/26592 |      10 |
-| Tm1637(6,SimpleTmi,100us,incremental)     |  3425/ 8692/ 9574 |      70 |
+| Tm1637(6,SimpleTmi,100us)                 | 26638/26640/26642 |      10 |
+| Tm1637(6,SimpleTmi,100us,incremental)     |  3425/ 8691/ 9575 |      70 |
 |-------------------------------------------+-------------------+---------|
-| Max7219(8,HardSpi)                        |    38/   38/   40 |      20 |
+| Max7219(8,HardSpi)                        |    40/   40/   41 |      20 |
 | Max7219(8,SimpleSpi)                      |   150/  150/  153 |      20 |
 |-------------------------------------------+-------------------+---------|
 | Ht16k33(4,TwoWire,100kHz)                 |  1310/ 1311/ 1312 |      20 |
-| Ht16k33(4,TwoWire,400kHz)                 |   361/  361/  365 |      20 |
-| Ht16k33(4,SimpleWire,1us)                 |   578/  580/  587 |      20 |
+| Ht16k33(4,TwoWire,400kHz)                 |   360/  360/  363 |      20 |
+| Ht16k33(4,SimpleWire,1us)                 |   600/  602/  607 |      20 |
 +-------------------------------------------+-------------------+---------+
 
 ```

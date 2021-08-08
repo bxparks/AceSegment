@@ -220,6 +220,15 @@ before substantional refactoring in 2021.
     * The 32-bit processors have so much more flash memory than 8-bit
       processors, I think this tradeoff is worth it.
 
+**v0.8+**
+
+* Remove `virtual` keyword from `LedModule` methods.
+    * Decreases flash usage by 60 bytes for `Tm1637Module`, 14 bytes for
+      `Max7219Module`, 32 bytes for `Ht16k33Module`, and 2-14 bytes for
+      `Hc595Module`.
+    * Decreases static ram usage by 7-8 bytes for all Module classes.
+    * Further decreases flash usage by 10-70 bytes for various Writer classes.
+
 ## Results
 
 The following shows the flash and static memory sizes of the `MemoryBenchmark`

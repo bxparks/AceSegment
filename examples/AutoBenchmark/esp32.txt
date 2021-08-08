@@ -7,7 +7,7 @@ sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(DirectModule<4>): 48
 sizeof(HybridModule<SimpleSpiInterface, 4>): 48
 sizeof(Hc595Module<SimpleSpiInterface, 8>): 64
-sizeof(Tm1637Module<SimpleTmiInterface, 4>): 20
+sizeof(Tm1637Module<SimpleTmiInterface, 4>): 24
 sizeof(Tm1637Module<SimpleTmiInterface, 6>): 24
 sizeof(Max7219Module<SimpleSpiInterface, 8>): 24
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 20
@@ -21,25 +21,25 @@ sizeof(StringWriter): 4
 sizeof(LevelWriter): 4
 sizeof(StringScroller): 12
 BENCHMARKS
-Direct(4) 2 2 8 40
+Direct(4) 2 3 11 40
 Direct(4,subfields) 0 1 7 640
-Hybrid(4,HardSpi) 10 10 19 40
-Hybrid(4,HardSpi,subfields) 0 1 18 640
-Hybrid(4,SimpleSpi) 4 4 9 40
+Hybrid(4,HardSpi) 10 10 14 40
+Hybrid(4,HardSpi,subfields) 0 1 15 640
+Hybrid(4,SimpleSpi) 4 4 12 40
 Hybrid(4,SimpleSpi,subfields) 0 1 9 640
-Hc595(8,HardSpi) 11 11 19 80
-Hc595(8,HardSpi,subfields) 0 2 19 1280
-Hc595(8,SimpleSpi) 7 7 9 80
-Hc595(8,SimpleSpi,subfields) 0 1 15 1280
-Tm1637(4,SimpleTmi,100us) 21235 21240 21249 10
-Tm1637(4,SimpleTmi,100us,incremental) 3435 8374 9620 50
-Tm1637(4,SimpleTmi,5us) 1273 1278 1285 10
-Tm1637(4,SimpleTmi,5us,incremental) 205 505 587 50
-Tm1637(6,SimpleTmi,100us) 26691 26698 26705 10
-Tm1637(6,SimpleTmi,100us,incremental) 3435 8727 9618 70
-Max7219(8,HardSpi) 90 91 99 20
-Max7219(8,SimpleSpi) 60 60 68 20
-Ht16k33(4,TwoWire,100kHz) 1382 1384 1393 20
+Hc595(8,HardSpi) 11 11 15 80
+Hc595(8,HardSpi,subfields) 1 2 20 1280
+Hc595(8,SimpleSpi) 7 7 16 80
+Hc595(8,SimpleSpi,subfields) 1 1 16 1280
+Tm1637(4,SimpleTmi,100us) 21230 21238 21245 10
+Tm1637(4,SimpleTmi,100us,incremental) 3436 8375 9619 50
+Tm1637(4,SimpleTmi,5us) 1274 1278 1287 10
+Tm1637(4,SimpleTmi,5us,incremental) 205 504 585 50
+Tm1637(6,SimpleTmi,100us) 26695 26699 26705 10
+Tm1637(6,SimpleTmi,100us,incremental) 3436 8728 9618 70
+Max7219(8,HardSpi) 90 91 98 20
+Max7219(8,SimpleSpi) 60 61 68 20
+Ht16k33(4,TwoWire,100kHz) 1382 1383 1390 20
 Ht16k33(4,TwoWire,400kHz) 422 422 423 20
-Ht16k33(4,SimpleWire,1us) 827 831 837 20
+Ht16k33(4,SimpleWire,1us) 825 832 837 20
 END

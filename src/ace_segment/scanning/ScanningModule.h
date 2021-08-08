@@ -94,7 +94,7 @@ class ScanningModule : public LedModule {
         const T_LM& ledMatrix,
         uint8_t framesPerSecond
     ):
-        LedModule(T_DIGITS),
+        LedModule(mPatterns, T_DIGITS),
         mLedMatrix(ledMatrix),
         mFramesPerSecond(framesPerSecond)
     {}
@@ -106,6 +106,8 @@ class ScanningModule : public LedModule {
      * time.
      */
     void begin() {
+      LedModule::begin();
+
       // Set up durations for the renderFieldWhenReady() polling function.
       mMicrosPerField = (uint32_t) 1000000UL / getFieldsPerSecond();
       mLastRenderFieldMicros = T_CI::micros();
@@ -125,39 +127,25 @@ class ScanningModule : public LedModule {
 
 
     /** A no-op end() function for consistency with other classes. */
-    void end() {}
+    void end() {
+      LedModule::end();
+    }
 
     //-----------------------------------------------------------------------
     // Implement the LedModule interface.
     //-----------------------------------------------------------------------
-
-    /** Get the number of digits. */
-    uint8_t getNumDigits() const { return T_DIGITS; }
-
-    void setPatternAt(uint8_t pos, uint8_t pattern) override {
-      mPatterns[pos] = pattern;
-    }
-
-    uint8_t getPatternAt(uint8_t pos) const override {
-      return mPatterns[pos];
-    }
-
-    /**
-     * @copydoc
-     *
-     * See the documentation for setBrightnessAt() for information about the
-     * range of values of `brightness` and how it is interpreted.
-     */
-    void setBrightness(uint8_t brightness) override {
-      for (uint8_t i = 0; i < T_DIGITS; i++) {
-        setBrightnessAt(i, brightness);
-      }
-    }
-
-    //-----------------------------------------------------------------------
     // Additional brightness control. ScanningModule allows brightness to be
     // defined on a per-digit basis.
     //-----------------------------------------------------------------------
+
+    /** Update the global brightness if it's dirty. */
+    void updateBrightness() {
+      if (isBrightnessDirty()) {
+        for (uint8_t i = 0; i < T_DIGITS; i++) {
+          setBrightnessAt(i, getBrightness());
+        }
+      }
+    }
 
     /**
      * Set the brightness for a given pos, leaving pattern unchanged.
@@ -239,6 +227,7 @@ class ScanningModule : public LedModule {
      * handler.
      */
     void renderFieldNow() {
+      updateBrightness();
       if (T_SUBFIELDS > 1) {
         displayCurrentFieldModulated();
       } else {
@@ -301,10 +290,10 @@ class ScanningModule : public LedModule {
     const T_LM& mLedMatrix;
 
     /** Pattern for each digit. */
-    volatile uint8_t mPatterns[T_DIGITS];
+    uint8_t mPatterns[T_DIGITS];
 
     /** Brightness for each digit. Unused if T_SUBFIELDS <= 1. */
-    volatile uint8_t mBrightnesses[T_DIGITS];
+    uint8_t mBrightnesses[T_DIGITS];
 
     //-----------------------------------------------------------------------
     // Variables needed by renderFieldWhenReady() to render frames and fields at
