@@ -96,19 +96,10 @@ volatile int disableCompilerOptimization = 0;
   // isolated from the underlying LedModule implementations.
   class StubModule : public LedModule {
     public:
-      StubModule() : LedModule(NUM_DIGITS) {}
+      StubModule() : LedModule(mPatterns, NUM_DIGITS) {}
 
-      void setBrightness(uint8_t brightness) override {
-        disableCompilerOptimization = brightness;
-      }
-
-      void setPatternAt(uint8_t /*pos*/, uint8_t pattern) override {
-        disableCompilerOptimization = pattern;
-      }
-
-      uint8_t getPatternAt(uint8_t /*pos*/) const override {
-        return disableCompilerOptimization;
-      }
+    private:
+      uint8_t mPatterns[NUM_DIGITS];
   };
 
   #if FEATURE == FEATURE_DIRECT_MODULE

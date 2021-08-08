@@ -15,7 +15,6 @@
 using aunit::TestRunner;
 using ace_segment::testing::TestableWireInterface;
 using ace_segment::testing::EventType;
-using ace_segment::internal::initialDirtyBits;
 using ace_segment::Ht16k33Module;
 
 //----------------------------------------------------------------------------

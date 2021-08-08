@@ -116,10 +116,9 @@ class Max7219Module : public LedModule {
         const T_SPII& spiInterface,
         const uint8_t* remapArray = nullptr
     ) :
-        LedModule(T_DIGITS),
+        LedModule(mPatterns, T_DIGITS),
         mSpiInterface(spiInterface),
-        mRemapArray(remapArray),
-        mBrightness(1) // set to 1 to avoid using uninitialized value
+        mRemapArray(remapArray)
     {}
 
     //-----------------------------------------------------------------------
@@ -127,7 +126,12 @@ class Max7219Module : public LedModule {
     //-----------------------------------------------------------------------
 
     void begin() {
+      LedModule::begin();
+
       memset(mPatterns, 0, T_DIGITS);
+
+      // Set to a non-zero value to avoid using uninitialized value.
+      setBrightness(1);
 
       // **WARNING**: Do NOT set this smaller than 3, or you may damage the
       // controller chip due to excessive current. See the MAX7219 datasheet for
@@ -140,25 +144,8 @@ class Max7219Module : public LedModule {
 
     void end() {
       mSpiInterface.send16(kRegisterShutdown, 0x0); // turn off
-    }
 
-    //-----------------------------------------------------------------------
-    // Implement the LedModule interface
-    //-----------------------------------------------------------------------
-
-    /** Return the number of digits supported by this display instance. */
-    uint8_t getNumDigits() const { return T_DIGITS; }
-
-    void setPatternAt(uint8_t pos, uint8_t pattern) override {
-      mPatterns[pos] = pattern;
-    }
-
-    uint8_t getPatternAt(uint8_t pos) const override {
-      return mPatterns[pos];
-    }
-
-    void setBrightness(uint8_t brightness) override {
-      mBrightness = brightness & 0xF;
+      LedModule::end();
     }
 
     //-----------------------------------------------------------------------
@@ -185,7 +172,7 @@ class Max7219Module : public LedModule {
         mSpiInterface.send16(chipPos + 1, convertedPattern);
       }
 
-      mSpiInterface.send16(kRegisterIntensity, mBrightness);
+      mSpiInterface.send16(kRegisterIntensity, getBrightness());
     }
 
   private:
@@ -221,9 +208,6 @@ class Max7219Module : public LedModule {
 
     /** Pattern for each digit. */
     uint8_t mPatterns[T_DIGITS];
-
-    /** Brightness 0 - 15 */
-    uint8_t mBrightness;
 };
 
 }
