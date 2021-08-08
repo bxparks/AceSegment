@@ -32,6 +32,7 @@ using ace_common::incrementModOffset;
 using ace_common::TimingStats;
 using ace_spi::SimpleSpiInterface;
 using ace_spi::HardSpiInterface;
+using ace_segment::LedModule;
 using ace_segment::LedMatrixDirect;
 using ace_segment::LedMatrixDirectFast4;
 using ace_segment::LedMatrixSingleHc595;
@@ -254,7 +255,7 @@ const uint8_t BRIGHTNESS_LEVELS[NUM_BRIGHTNESSES] = {
 // NUM_SUBFIELDS levels of brightness.
 ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS>
     ledModule(ledMatrix, FRAMES_PER_SECOND);
-PatternWriter patternWriter(ledModule);
+PatternWriter<LedModule> patternWriter(ledModule);
 
 // PatternWriter patterns
 const uint8_t PATTERNS[NUM_DIGITS] = {

@@ -23,6 +23,7 @@ using ace_common::incrementModOffset;
 using ace_common::TimingStats;
 using ace_spi::HardSpiInterface;
 using ace_spi::SimpleSpiInterface;
+using ace_segment::LedModule;
 using ace_segment::Max7219Module;
 using ace_segment::PatternWriter;
 using ace_segment::kDigitRemapArray8Max7219;
@@ -180,7 +181,7 @@ const uint8_t PATTERNS[NUM_DIGITS] = {
 
 Max7219Module<SpiInterface, NUM_DIGITS> ledModule(
     spiInterface, kDigitRemapArray8Max7219);
-PatternWriter patternWriter(ledModule);
+PatternWriter<LedModule> patternWriter(ledModule);
 
 void setupAceSegment() {
 

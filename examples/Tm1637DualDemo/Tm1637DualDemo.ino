@@ -22,6 +22,7 @@ using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
 using ace_tmi::SimpleTmiInterface;
+using ace_segment::LedModule;
 using ace_segment::Tm1637Module;
 using ace_segment::PatternWriter;
 
@@ -102,8 +103,8 @@ const uint8_t DELAY_MICROS = 100;
   #error Unknown TMI_INTERFACE_TYPE
 #endif
 
-PatternWriter display1(ledModule1);
-PatternWriter display2(ledModule2);
+PatternWriter<LedModule> display1(ledModule1);
+PatternWriter<LedModule> display2(ledModule2);
 
 void setupAceSegment() {
   tmiInterface1.begin();

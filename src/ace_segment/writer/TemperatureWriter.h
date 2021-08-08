@@ -26,7 +26,6 @@ SOFTWARE.
 #define ACE_SEGMENT_TEMPERATURE_WRITER_H
 
 #include <stdint.h>
-#include "../LedModule.h"
 #include "NumberWriter.h"
 
 namespace ace_segment {
@@ -34,7 +33,11 @@ namespace ace_segment {
 /**
  * The TemperatureWriter supports writing integer temperature values in Celcius
  * or Farenheit. Negative values are supported.
+ *
+ * @tparam T_LED_MODULE the class of the underlying LED Module, often LedModule
+ *    but other classes with the same generic public methods can be substituted
  */
+template <typename T_LED_MODULE>
 class TemperatureWriter {
   public:
     /** The superscript degree symbol for temperature. */
@@ -51,15 +54,17 @@ class TemperatureWriter {
      *
      * @param ledModule instance of LedModule
      */
-    explicit TemperatureWriter(LedModule& ledModule) :
+    explicit TemperatureWriter(T_LED_MODULE& ledModule) :
         mNumberWriter(ledModule)
     {}
 
     /** Get the underlying LedModule. */
-    LedModule& ledModule() { return mNumberWriter.ledModule(); }
+    T_LED_MODULE& ledModule() { return mNumberWriter.ledModule(); }
 
     /** Get the underlying PatternWriter. */
-    PatternWriter& patternWriter() { return mNumberWriter.patternWriter(); }
+    PatternWriter<T_LED_MODULE>& patternWriter() {
+      return mNumberWriter.patternWriter();
+    }
 
     /**
      * Write signed integer temperature without deg or unit within the boxSize.
@@ -121,7 +126,7 @@ class TemperatureWriter {
     TemperatureWriter(const TemperatureWriter&) = delete;
     TemperatureWriter& operator=(const TemperatureWriter&) = delete;
 
-    NumberWriter mNumberWriter;
+    NumberWriter<T_LED_MODULE> mNumberWriter;
 };
 
 } // ace_segment

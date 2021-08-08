@@ -28,6 +28,7 @@ using ace_spi::SimpleSpiInterface;
 using ace_spi::HardSpiInterface;
 using ace_spi::SimpleSpiFastInterface;
 using ace_spi::HardSpiFastInterface;
+using ace_segment::LedModule;
 using ace_segment::HybridModule;
 using ace_segment::PatternWriter;
 using ace_segment::kActiveHighPattern;
@@ -121,7 +122,7 @@ HybridModule<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
     FRAMES_PER_SECOND,
     DIGIT_PINS
 );
-PatternWriter patternWriter(ledModule);
+PatternWriter<LedModule> patternWriter(ledModule);
 
 // PatternWriter patterns
 const uint8_t PATTERNS[NUM_DIGITS] = {

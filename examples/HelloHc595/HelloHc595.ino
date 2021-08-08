@@ -14,6 +14,7 @@
 #include <AceSegment.h> // Hc595Module, NumberWriter
 
 using ace_spi::HardSpiInterface;
+using ace_segment::LedModule;
 using ace_segment::Hc595Module;
 using ace_segment::NumberWriter;
 using ace_segment::kDigitRemapArray8Hc595;
@@ -44,7 +45,7 @@ Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
     HC595_BYTE_ORDER,
     REMAP_ARRAY
 );
-NumberWriter numberWriter(ledModule);
+NumberWriter<LedModule> numberWriter(ledModule);
 
 void setup() {
   delay(1000);

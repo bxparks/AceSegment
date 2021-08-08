@@ -27,7 +27,6 @@ SOFTWARE.
 
 #include <stdint.h>
 #include <AceCommon.h> // FlashString
-#include "../LedModule.h"
 #include "CharWriter.h"
 
 class __FlashStringHelper;
@@ -38,22 +37,28 @@ namespace ace_segment {
  * Class that writes out a string, collapsing '.' characters into the decimal
  * point of the previous character. In other words, "0.1.2.3" takes up 4 digits,
  * not 7 digits.
+ *
+ * @tparam T_LED_MODULE the class of the underlying LED Module, often LedModule
+ *    but other classes with the same generic public methods can be substituted
  */
+template <typename T_LED_MODULE>
 class StringWriter {
   public:
     /** Constructor. */
-    explicit StringWriter(CharWriter& charWriter) :
+    explicit StringWriter(CharWriter<T_LED_MODULE>& charWriter) :
         mCharWriter(charWriter)
     {}
 
     /** Get the underlying LedModule. */
-    LedModule& ledModule() { return mCharWriter.ledModule(); }
+    T_LED_MODULE& ledModule() { return mCharWriter.ledModule(); }
 
     /** Get the underlying PatternWriter. */
-    PatternWriter& patternWriter() { return mCharWriter.patternWriter(); }
+    PatternWriter<T_LED_MODULE>& patternWriter() {
+      return mCharWriter.patternWriter();
+    }
 
     /** Get the underlying CharWriter. */
-    CharWriter& charWriter() { return mCharWriter; }
+    CharWriter<T_LED_MODULE>& charWriter() { return mCharWriter; }
 
     /**
      * Write c-string `cs` at specified position `pos` up to `numChar`
@@ -138,7 +143,7 @@ class StringWriter {
     }
 
   private:
-    CharWriter& mCharWriter;
+    CharWriter<T_LED_MODULE>& mCharWriter;
 };
 
 }

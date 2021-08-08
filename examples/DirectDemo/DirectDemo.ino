@@ -15,6 +15,7 @@
 
 using ace_common::incrementMod;
 using ace_common::TimingStats;
+using ace_segment::LedModule;
 using ace_segment::DirectModule;
 using ace_segment::PatternWriter;
 using ace_segment::kActiveLowPattern;
@@ -74,7 +75,7 @@ DirectModule<NUM_DIGITS, NUM_SUBFIELDS> ledModule(
     SEGMENT_PINS,
     DIGIT_PINS);
 
-PatternWriter patternWriter(ledModule);
+PatternWriter<LedModule> patternWriter(ledModule);
 
 // PatternWriter patterns
 const uint8_t PATTERNS[NUM_DIGITS] = {

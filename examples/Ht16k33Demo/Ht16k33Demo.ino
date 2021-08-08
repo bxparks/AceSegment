@@ -23,6 +23,7 @@ using ace_common::incrementModOffset;
 using ace_common::TimingStats;
 using ace_wire::TwoWireInterface;
 using ace_wire::SimpleWireInterface;
+using ace_segment::LedModule;
 using ace_segment::Ht16k33Module;
 using ace_segment::PatternWriter;
 
@@ -205,7 +206,7 @@ const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 
 Ht16k33Module<WireInterface, NUM_DIGITS> ledModule(
     wireInterface, HT16K33_I2C_ADDRESS);
-PatternWriter patternWriter(ledModule);
+PatternWriter<LedModule> patternWriter(ledModule);
 
 void setupAceSegment() {
 #if WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_HARD

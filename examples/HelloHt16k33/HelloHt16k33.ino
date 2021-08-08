@@ -11,6 +11,7 @@
 #include <AceSegment.h> // Ht16k33Module, NumberWriter
 
 using ace_wire::TwoWireInterface;
+using ace_segment::LedModule;
 using ace_segment::Ht16k33Module;
 using ace_segment::NumberWriter;
 
@@ -24,7 +25,7 @@ using WireInterface = TwoWireInterface<TwoWire>;
 WireInterface wireInterface(Wire);
 Ht16k33Module<WireInterface, NUM_DIGITS> ledModule(
     wireInterface, HT16K33_I2C_ADDRESS);
-NumberWriter numberWriter(ledModule);
+NumberWriter<LedModule> numberWriter(ledModule);
 
 void setup() {
   delay(1000);

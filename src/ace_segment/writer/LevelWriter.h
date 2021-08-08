@@ -34,7 +34,11 @@ namespace ace_segment {
  * Emulate a level led module using a left vertical bar and a right
  * vertical bar on each digit. Since each digit can represent 2 levels, the
  * range of levels for the entire LED display is `[0, 2*numDigits]`.
+ *
+ * @tparam T_LED_MODULE the class of the underlying LED Module, often LedModule
+ *    but other classes with the same generic public methods can be substituted
  */
+template <typename T_LED_MODULE>
 class LevelWriter {
   private:
     // left vertical bar
@@ -44,15 +48,15 @@ class LevelWriter {
 
   public:
     /** Constructor. */
-    explicit LevelWriter(LedModule& ledModule) :
+    explicit LevelWriter(T_LED_MODULE& ledModule) :
         mPatternWriter(ledModule)
         {}
 
     /** Get the underlying LedModule. */
-    LedModule& ledModule() { return mPatternWriter.ledModule(); }
+    T_LED_MODULE& ledModule() { return mPatternWriter.ledModule(); }
 
     /** Get the underlying PatternWriter. */
-    PatternWriter& patternWriter() { return mPatternWriter; }
+    PatternWriter<T_LED_MODULE>& patternWriter() { return mPatternWriter; }
 
     /**
      * Return the maximum level supported by this LED display. The range is [0,
@@ -85,7 +89,7 @@ class LevelWriter {
     LevelWriter& operator=(const LevelWriter&) = delete;
 
   private:
-    PatternWriter mPatternWriter;
+    PatternWriter<T_LED_MODULE> mPatternWriter;
 };
 
 }

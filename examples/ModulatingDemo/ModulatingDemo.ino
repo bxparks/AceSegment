@@ -33,6 +33,7 @@
 
 using ace_common::incrementMod;
 using ace_spi::HardSpiInterface;
+using ace_segment::LedModule;
 using ace_segment::kByteOrderSegmentHighDigitLow;
 using ace_segment::kDigitRemapArray8Hc595;
 using ace_segment::kActiveLowPattern;
@@ -359,7 +360,7 @@ void setupAceSegment() {
 //------------------------------------------------------------------
 
 void setupPulseDisplay() {
-  NumberWriter numberWriter(ledModule);
+  NumberWriter<LedModule> numberWriter(ledModule);
   for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
     numberWriter.writeHexCharAt(i, i);
   }

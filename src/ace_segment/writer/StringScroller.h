@@ -35,22 +35,28 @@ namespace ace_segment {
 
 /**
  * Class that scrolls a string left or right.
+ *
+ * @tparam T_LED_MODULE the class of the underlying LED Module, often LedModule
+ *    but other classes with the same generic public methods can be substituted
  */
+template <typename T_LED_MODULE>
 class StringScroller {
   public:
     /** Constructor. */
-    explicit StringScroller(CharWriter& charWriter) :
+    explicit StringScroller(CharWriter<T_LED_MODULE>& charWriter) :
         mCharWriter(charWriter)
     {}
 
     /** Get the underlying LedModule. */
-    LedModule& ledModule() { return mCharWriter.ledModule(); }
+    T_LED_MODULE& ledModule() { return mCharWriter.ledModule(); }
 
     /** Get the underlying PatternWriter. */
-    PatternWriter& patternWriter() { return mCharWriter.patternWriter(); }
+    PatternWriter<T_LED_MODULE>& patternWriter() {
+      return mCharWriter.patternWriter();
+    }
 
     /** Get the underlying LedModule. */
-    CharWriter& charWriter() { return mCharWriter; }
+    CharWriter<T_LED_MODULE>& charWriter() { return mCharWriter; }
 
     /** Return the number of digits supported by this display instance. */
     uint8_t getNumDigits() const { return mCharWriter.getNumDigits(); }
@@ -150,7 +156,7 @@ class StringScroller {
   private:
     // The order of these fields is partially motivated to reduce memory
     // consumption on 32-bit processors.
-    CharWriter& mCharWriter;
+    CharWriter<T_LED_MODULE>& mCharWriter;
     const void* mString;
     int16_t mStringPos; // can become negative
     uint8_t mStringLength;

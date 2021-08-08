@@ -42,7 +42,7 @@ namespace ace_segment {
 // Segment: DP G F E D C B A
 //    Bits: 7  6 5 4 3 2 1 0
 //
-const uint8_t NumberWriter::kHexCharPatterns[kNumHexChars] PROGMEM = {
+const uint8_t kHexCharPatterns[kNumHexCharPatterns] PROGMEM = {
   0b00111111, /* 0 */
   0b00000110, /* 1 */
   0b01011011, /* 2 */
@@ -62,85 +62,5 @@ const uint8_t NumberWriter::kHexCharPatterns[kNumHexChars] PROGMEM = {
   0b00000000, /* (space) */
   0b01000000, /* - */
 };
-
-void NumberWriter::writeInternalHexCharAt(uint8_t pos, hexchar_t c) {
-  uint8_t pattern = pgm_read_byte(&kHexCharPatterns[(uint8_t) c]);
-  mPatternWriter.writePatternAt(pos, pattern);
-}
-
-uint8_t NumberWriter::writeUnsignedDecimalAt(
-    uint8_t pos,
-    uint16_t num,
-    int8_t boxSize) {
-
-  const uint8_t bufSize = 5;
-  hexchar_t buf[bufSize];
-  uint8_t start = toDecimal(num, buf, bufSize);
-
-  return writeHexCharsInsideBoxAt(
-      pos, &buf[start], bufSize - start, boxSize);
-}
-
-uint8_t NumberWriter::writeSignedDecimalAt(
-    uint8_t pos,
-    int16_t num,
-    int8_t boxSize) {
-
-  // Even -32768 turns into +32768, which is exactly what we want
-  bool negative = num < 0;
-  uint16_t absNum = negative ? -num : num;
-
-  const uint8_t bufSize = 6;
-  hexchar_t buf[bufSize];
-  uint8_t start = toDecimal(absNum, buf, bufSize);
-  if (negative) {
-    buf[--start] = kCharMinus;
-  }
-
-  return writeHexCharsInsideBoxAt(
-      pos, &buf[start], bufSize - start, boxSize);
-}
-
-uint8_t NumberWriter::writeHexCharsInsideBoxAt(
-    uint8_t pos,
-    const hexchar_t s[],
-    uint8_t len,
-    int8_t boxSize) {
-
-  uint8_t absBoxSize = (boxSize < 0) ? -boxSize : boxSize;
-
-  // if the box is too small, print normally
-  if (len >= absBoxSize) {
-    writeInternalHexCharsAt(pos, s, len);
-    return len;
-  }
-
-  // Print either left justified or right justified inside box
-  uint8_t padSize = absBoxSize - len;
-  if (boxSize < 0) {
-    // left justified
-    writeInternalHexCharsAt(pos, s, len);
-    pos += len;
-    while (padSize--) writeInternalHexCharAt(pos++, kCharSpace);
-  } else {
-    // right justified
-    while (padSize--) writeInternalHexCharAt(pos++, kCharSpace);
-    writeInternalHexCharsAt(pos, s, len);
-  }
-
-  return absBoxSize;
-}
-
-void NumberWriter::writeUnsignedDecimal2At(uint8_t pos, uint8_t num) {
-  if (num >= 100) {
-    writeHexCharAt(pos++, 9);
-    writeHexCharAt(pos++, 9);
-  } else {
-    uint8_t high = num / 10;
-    uint8_t low = num - high * 10;
-    writeHexCharAt(pos++, (high == 0) ? kCharSpace : high);
-    writeHexCharAt(pos++, low);
-  }
-}
 
 } // ace_segment

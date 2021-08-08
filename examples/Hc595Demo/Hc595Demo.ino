@@ -26,6 +26,7 @@ using ace_common::incrementModOffset;
 using ace_common::TimingStats;
 using ace_spi::HardSpiInterface;
 using ace_spi::SimpleSpiInterface;
+using ace_segment::LedModule;
 using ace_segment::Hc595Module;
 using ace_segment::PatternWriter;
 using ace_segment::kDigitRemapArray8Hc595;
@@ -240,7 +241,7 @@ Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
     HC595_BYTE_ORDER,
     REMAP_ARRAY
 );
-PatternWriter patternWriter(ledModule);
+PatternWriter<LedModule> patternWriter(ledModule);
 
 // PatternWriter patterns
 const uint8_t PATTERNS[8] = {

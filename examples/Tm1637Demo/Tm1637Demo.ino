@@ -22,6 +22,7 @@ using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
 using ace_tmi::SimpleTmiInterface;
+using ace_segment::LedModule;
 using ace_segment::Tm1637Module;
 using ace_segment::PatternWriter;
 using ace_segment::kDigitRemapArray6Tm1637;
@@ -136,7 +137,7 @@ const uint8_t DELAY_MICROS = 100;
 #endif
 
 Tm1637Module<TmiInterface, NUM_DIGITS> ledModule(tmiInterface, remapArray);
-PatternWriter patternWriter(ledModule);
+PatternWriter<LedModule> patternWriter(ledModule);
 
 void setupAceSegment() {
   tmiInterface.begin();
