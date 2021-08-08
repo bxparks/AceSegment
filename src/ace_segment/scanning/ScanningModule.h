@@ -119,6 +119,7 @@ class ScanningModule : public LedModule {
       mPattern = 0;
 
       // Set initial patterns and global brightness.
+      mIsDigitBrightnessDirty = false;
       mLedMatrix.clear();
       if (T_SUBFIELDS > 1) {
         setBrightness(T_SUBFIELDS / 2); // half brightness
@@ -132,20 +133,9 @@ class ScanningModule : public LedModule {
     }
 
     //-----------------------------------------------------------------------
-    // Implement the LedModule interface.
-    //-----------------------------------------------------------------------
     // Additional brightness control. ScanningModule allows brightness to be
     // defined on a per-digit basis.
     //-----------------------------------------------------------------------
-
-    /** Update the global brightness if it's dirty. */
-    void updateBrightness() {
-      if (isBrightnessDirty()) {
-        for (uint8_t i = 0; i < T_DIGITS; i++) {
-          setBrightnessAt(i, getBrightness());
-        }
-      }
-    }
 
     /**
      * Set the brightness for a given pos, leaving pattern unchanged.
@@ -174,6 +164,7 @@ class ScanningModule : public LedModule {
       if (pos >= T_DIGITS) return;
       mBrightnesses[pos] = (brightness >= T_SUBFIELDS)
           ? T_SUBFIELDS : brightness;
+      mIsDigitBrightnessDirty = true;
     }
 
     //-----------------------------------------------------------------------
@@ -282,6 +273,21 @@ class ScanningModule : public LedModule {
       }
     }
 
+    /**
+     * Transfer the global brightness to the per-digit brightness and update the
+     * appropriate flags.
+     */
+    void updateBrightness() {
+      if (isBrightnessDirty()) {
+        for (uint8_t i = 0; i < T_DIGITS; i++) {
+          setBrightnessAt(i, getBrightness());
+        }
+
+        // Clear the global brightness dirty flag.
+        clearBrightnessDirty();
+      }
+    }
+
   private:
     // The ordering of the fields below partially motivated to save memory on
     // 32-bit processors.
@@ -313,6 +319,9 @@ class ScanningModule : public LedModule {
     // Variables needed to keep track of the multiplexing of the digits,
     // and PWM of a single digit.
     //-----------------------------------------------------------------------
+
+    /** Dirty flag for any of the digit-specific brightness. */
+    bool mIsDigitBrightnessDirty;
 
     /**
      * Within the renderFieldNow() method, mCurrentDigit is the current
