@@ -26,15 +26,6 @@ BEGIN {
   labels[17] = "Ht16k33(TwoWire)";
   labels[18] = "Ht16k33(SimpleWire)";
   labels[19] = "Ht16k33(SimpleWireFast)";
-  labels[20] = "StubModule";
-  labels[21] = "PatternWriter+Stub";
-  labels[22] = "NumberWriter+Stub";
-  labels[23] = "ClockWriter+Stub";
-  labels[24] = "TemperatureWriter+Stub";
-  labels[25] = "CharWriter+Stub";
-  labels[26] = "StringWriter+Stub";
-  labels[27] = "StringScroller+Stub";
-  labels[28] = "LevelWriter+Stub";
   record_index = 0
 }
 {
@@ -60,24 +51,22 @@ END {
 
   printf("+--------------------------------------------------------------+\n")
   printf("| functionality                   |  flash/  ram |       delta |\n")
-  printf("|---------------------------------+--------------+-------------|\n")
-  printf("| %-31s | %6d/%5d | %5d/%5d |\n",
-    labels[0], u[0]["flash"], u[0]["ram"], u[0]["d_flash"], u[0]["d_ram"])
-  for (i = 1 ; i < NUM_ENTRIES; i++) {
+  for (i = 0 ; i < NUM_ENTRIES; i++) {
     if (u[i]["flash"] == "-1") continue
 
-    if (labels[i] ~ /DirectModule/ \
-        || labels[i] ~ /Hybrid\(HardSpi\)/ \
-        || labels[i] ~ /Hc595\(HardSpi\)/ \
-        || labels[i] ~ /Tm1637\(SimpleTmi\)/ \
-        || labels[i] ~ /Max7219\(HardSpi\)/ \
-        || labels[i] ~ /Ht16k33\(TwoWire\)/ \
-        || labels[i] ~ /^StubModule$/) {
+    name = labels[i]
+    if (name ~ /baseline/ \
+        || name ~ /DirectModule/ \
+        || name ~ /Hybrid\(HardSpi\)/ \
+        || name ~ /Hc595\(HardSpi\)/ \
+        || name ~ /Tm1637\(SimpleTmi\)/ \
+        || name ~ /Max7219\(HardSpi\)/ \
+        || name ~ /Ht16k33\(TwoWire\)/) {
       printf(\
         "|---------------------------------+--------------+-------------|\n")
     }
     printf("| %-31s | %6d/%5d | %5d/%5d |\n",
-        labels[i], u[i]["flash"], u[i]["ram"], u[i]["d_flash"], u[i]["d_ram"])
+        name, u[i]["flash"], u[i]["ram"], u[i]["d_flash"], u[i]["d_ram"])
   }
   printf("+--------------------------------------------------------------+\n")
 }
