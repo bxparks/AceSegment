@@ -14,7 +14,7 @@ by the runtime environment of the processor. For example, it often seems like
 the ESP8266 allocates flash memory in blocks of a certain quantity, so the
 calculated flash size can jump around in unexpected ways.
 
-**Version**: AceSegment v0.8.1
+**Version**: AceSegment v0.8.2
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -208,6 +208,11 @@ before substantional refactoring in 2021.
       hundreds of bytes, I think because methods can be better inlined, and
       unused methods are not compiled and linked in.
 
+**v0.8.1+**
+
+* Add `isFlushRequired()` and clear appropriate flags after `flush()`.
+    * Increases flash consumption by about 8 bytes on AVR.
+
 ## Results
 
 The following shows the flash and static memory sizes of the `MemoryBenchmark`
@@ -266,14 +271,14 @@ other `MemoryBenchmark` programs.)
 | Tm1637(SimpleTmi)               |   1132/   31 |   872/   20 |
 | Tm1637(SimpleTmiFast)           |    570/   26 |   310/   15 |
 |---------------------------------+--------------+-------------|
-| Max7219(HardSpi)                |   1316/   43 |  1056/   32 |
-| Max7219(HardSpiFast)            |    992/   41 |   732/   30 |
-| Max7219(SimpleSpi)              |    952/   37 |   692/   26 |
-| Max7219(SimpleSpiFast)          |    538/   32 |   278/   21 |
+| Max7219(HardSpi)                |   1324/   43 |  1064/   32 |
+| Max7219(HardSpiFast)            |   1000/   41 |   740/   30 |
+| Max7219(SimpleSpi)              |    960/   37 |   700/   26 |
+| Max7219(SimpleSpiFast)          |    546/   32 |   286/   21 |
 |---------------------------------+--------------+-------------|
-| Ht16k33(TwoWire)                |   1294/   69 |  1034/   58 |
-| Ht16k33(SimpleWire)             |   1166/   33 |   906/   22 |
-| Ht16k33(SimpleWireFast)         |    648/   27 |   388/   16 |
+| Ht16k33(TwoWire)                |   1302/   69 |  1042/   58 |
+| Ht16k33(SimpleWire)             |   1174/   33 |   914/   22 |
+| Ht16k33(SimpleWireFast)         |    656/   27 |   396/   16 |
 |---------------------------------+--------------+-------------|
 | StubModule                      |    322/   21 |    62/   10 |
 | PatternWriter+Stub              |    338/   23 |    78/   12 |
@@ -316,14 +321,14 @@ other `MemoryBenchmark` programs.)
 | Tm1637(SimpleTmi)               |   1424/   31 |   968/   20 |
 | Tm1637(SimpleTmiFast)           |    858/   26 |   402/   15 |
 |---------------------------------+--------------+-------------|
-| Max7219(HardSpi)                |   1260/   39 |   804/   28 |
-| Max7219(HardSpiFast)            |   1170/   37 |   714/   26 |
-| Max7219(SimpleSpi)              |   1174/   37 |   718/   26 |
-| Max7219(SimpleSpiFast)          |    756/   32 |   300/   21 |
+| Max7219(HardSpi)                |   1268/   39 |   812/   28 |
+| Max7219(HardSpiFast)            |   1180/   37 |   724/   26 |
+| Max7219(SimpleSpi)              |   1182/   37 |   726/   26 |
+| Max7219(SimpleSpiFast)          |    764/   32 |   308/   21 |
 |---------------------------------+--------------+-------------|
-| Ht16k33(TwoWire)                |   2846/  243 |  2390/  232 |
-| Ht16k33(SimpleWire)             |   1450/   33 |   994/   22 |
-| Ht16k33(SimpleWireFast)         |    916/   27 |   460/   16 |
+| Ht16k33(TwoWire)                |   2856/  243 |  2400/  232 |
+| Ht16k33(SimpleWire)             |   1458/   33 |  1002/   22 |
+| Ht16k33(SimpleWireFast)         |    926/   27 |   470/   16 |
 |---------------------------------+--------------+-------------|
 | StubModule                      |    522/   21 |    66/   10 |
 | PatternWriter+Stub              |    534/   23 |    78/   12 |
@@ -366,14 +371,14 @@ other `MemoryBenchmark` programs.)
 | Tm1637(SimpleTmi)               |   4516/  171 |  1044/   20 |
 | Tm1637(SimpleTmiFast)           |   3836/  166 |   364/   15 |
 |---------------------------------+--------------+-------------|
-| Max7219(HardSpi)                |   4330/  179 |   858/   28 |
-| Max7219(HardSpiFast)            |   4228/  177 |   756/   26 |
-| Max7219(SimpleSpi)              |   4244/  177 |   772/   26 |
-| Max7219(SimpleSpiFast)          |   3712/  172 |   240/   21 |
+| Max7219(HardSpi)                |   4338/  179 |   866/   28 |
+| Max7219(HardSpiFast)            |   4238/  177 |   766/   26 |
+| Max7219(SimpleSpi)              |   4252/  177 |   780/   26 |
+| Max7219(SimpleSpiFast)          |   3720/  172 |   248/   21 |
 |---------------------------------+--------------+-------------|
-| Ht16k33(TwoWire)                |   5830/  383 |  2358/  232 |
-| Ht16k33(SimpleWire)             |   4542/  173 |  1070/   22 |
-| Ht16k33(SimpleWireFast)         |   3892/  167 |   420/   16 |
+| Ht16k33(TwoWire)                |   5840/  383 |  2368/  232 |
+| Ht16k33(SimpleWire)             |   4550/  173 |  1078/   22 |
+| Ht16k33(SimpleWireFast)         |   3902/  167 |   430/   16 |
 |---------------------------------+--------------+-------------|
 | StubModule                      |   3500/  161 |    28/   10 |
 | PatternWriter+Stub              |   3512/  163 |    40/   12 |
@@ -408,13 +413,13 @@ other `MemoryBenchmark` programs.)
 | Hc595(HardSpi)                  |  11136/    0 |  1196/    0 |
 | Hc595(SimpleSpi)                |  10636/    0 |   696/    0 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SimpleTmi)               |  10660/    0 |   720/    0 |
+| Tm1637(SimpleTmi)               |  10648/    0 |   708/    0 |
 |---------------------------------+--------------+-------------|
-| Max7219(HardSpi)                |  10968/    0 |  1028/    0 |
-| Max7219(SimpleSpi)              |  10464/    0 |   524/    0 |
+| Max7219(HardSpi)                |  10976/    0 |  1036/    0 |
+| Max7219(SimpleSpi)              |  10472/    0 |   532/    0 |
 |---------------------------------+--------------+-------------|
-| Ht16k33(TwoWire)                |  11740/    0 |  1800/    0 |
-| Ht16k33(SimpleWire)             |  10704/    0 |   764/    0 |
+| Ht16k33(TwoWire)                |  11748/    0 |  1808/    0 |
+| Ht16k33(SimpleWire)             |  10712/    0 |   772/    0 |
 |---------------------------------+--------------+-------------|
 | StubModule                      |  10140/    0 |   200/    0 |
 | PatternWriter+Stub              |  10156/    0 |   216/    0 |
@@ -449,13 +454,13 @@ other `MemoryBenchmark` programs.)
 | Hc595(HardSpi)                  |  26068/ 3972 |  4648/  436 |
 | Hc595(SimpleSpi)                |  24168/ 3964 |  2748/  428 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SimpleTmi)               |  24308/ 3936 |  2888/  400 |
+| Tm1637(SimpleTmi)               |  24300/ 3936 |  2880/  400 |
 |---------------------------------+--------------+-------------|
-| Max7219(HardSpi)                |  25936/ 3940 |  4516/  404 |
-| Max7219(SimpleSpi)              |  24032/ 3932 |  2612/  396 |
+| Max7219(HardSpi)                |  25940/ 3940 |  4520/  404 |
+| Max7219(SimpleSpi)              |  24036/ 3932 |  2616/  396 |
 |---------------------------------+--------------+-------------|
-| Ht16k33(TwoWire)                |  28644/ 4116 |  7224/  580 |
-| Ht16k33(SimpleWire)             |  24352/ 3932 |  2932/  396 |
+| Ht16k33(TwoWire)                |  28648/ 4116 |  7228/  580 |
+| Ht16k33(SimpleWire)             |  24356/ 3932 |  2936/  396 |
 |---------------------------------+--------------+-------------|
 | StubModule                      |  21572/ 3900 |   152/  364 |
 | PatternWriter+Stub              |  21584/ 3904 |   164/  368 |
@@ -490,10 +495,10 @@ other `MemoryBenchmark` programs.)
 | Hc595(HardSpi)                  | 258892/27076 |  2192/  292 |
 | Hc595(SimpleSpi)                | 257724/27060 |  1024/  276 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SimpleTmi)               | 257868/27028 |  1168/  244 |
+| Tm1637(SimpleTmi)               | 257852/27028 |  1152/  244 |
 |---------------------------------+--------------+-------------|
 | Max7219(HardSpi)                | 258804/27044 |  2104/  260 |
-| Max7219(SimpleSpi)              | 257604/27028 |   904/  244 |
+| Max7219(SimpleSpi)              | 257620/27028 |   920/  244 |
 |---------------------------------+--------------+-------------|
 | Ht16k33(TwoWire)                | 261348/27500 |  4648/  716 |
 | Ht16k33(SimpleWire)             | 257980/27028 |  1280/  244 |
@@ -531,13 +536,13 @@ other `MemoryBenchmark` programs.)
 | Hc595(HardSpi)                  | 202554/13632 |  4806/  548 |
 | Hc595(SimpleSpi)                | 200218/13576 |  2470/  492 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SimpleTmi)               | 200466/13552 |  2718/  468 |
+| Tm1637(SimpleTmi)               | 200446/13552 |  2698/  468 |
 |---------------------------------+--------------+-------------|
-| Max7219(HardSpi)                | 202456/13592 |  4708/  508 |
-| Max7219(SimpleSpi)              | 200052/13536 |  2304/  452 |
+| Max7219(HardSpi)                | 202432/13592 |  4684/  508 |
+| Max7219(SimpleSpi)              | 200068/13536 |  2320/  452 |
 |---------------------------------+--------------+-------------|
-| Ht16k33(TwoWire)                | 209690/14280 | 11942/ 1196 |
-| Ht16k33(SimpleWire)             | 200526/13552 |  2778/  468 |
+| Ht16k33(TwoWire)                | 209698/14280 | 11950/ 1196 |
+| Ht16k33(SimpleWire)             | 200534/13552 |  2786/  468 |
 |---------------------------------+--------------+-------------|
 | StubModule                      | 198940/13360 |  1192/  276 |
 | PatternWriter+Stub              | 198956/13368 |  1208/  284 |
@@ -575,11 +580,11 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | Tm1637(SimpleTmi)               |  12568/ 4376 |  1688/  224 |
 |---------------------------------+--------------+-------------|
-| Max7219(HardSpi)                |  13356/ 4436 |  2476/  284 |
-| Max7219(SimpleSpi)              |  11868/ 4372 |   988/  220 |
+| Max7219(HardSpi)                |  13364/ 4436 |  2484/  284 |
+| Max7219(SimpleSpi)              |  11876/ 4372 |   996/  220 |
 |---------------------------------+--------------+-------------|
-| Ht16k33(TwoWire)                |  14496/ 5036 |  3616/  884 |
-| Ht16k33(SimpleWire)             |  13516/ 4376 |  2636/  224 |
+| Ht16k33(TwoWire)                |  14500/ 5036 |  3620/  884 |
+| Ht16k33(SimpleWire)             |  13520/ 4376 |  2640/  224 |
 |---------------------------------+--------------+-------------|
 | StubModule                      |  10940/ 4360 |    60/  208 |
 | PatternWriter+Stub              |  10956/ 4364 |    76/  212 |

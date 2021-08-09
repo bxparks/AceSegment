@@ -7,6 +7,10 @@
       classes on AVR, and another 10-70 bytes of flash for the Writer classes.
     * Templatize Writer classes on `T_LED_MODULE` instead of hardcoding the
       dependency to `LedModule`.
+    * Add `isFlushRequired()` to modules which implement the `flush()` method
+      (`Tm1637Module`, `Max7219Module`, `Ht16k33Module`).
+        * Clear dirty flags as needed after `flush()`. Adds about 8 bytes of
+          flash on AVR.
 * 0.8.1 (2021-07-31)
     * Add `HelloTm1636`, `HelloMax7219`, `HelloHt16k33`, and `HelloHc595`
       examples to `examples/` and `README.md`.

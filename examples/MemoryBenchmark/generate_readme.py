@@ -40,7 +40,7 @@ by the runtime environment of the processor. For example, it often seems like
 the ESP8266 allocates flash memory in blocks of a certain quantity, so the
 calculated flash size can jump around in unexpected ways.
 
-**Version**: AceSegment v0.8.1
+**Version**: AceSegment v0.8.2
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -233,6 +233,11 @@ before substantional refactoring in 2021.
     * Seems to reduce flash size of some Writer classes on some platforms by
       hundreds of bytes, I think because methods can be better inlined, and
       unused methods are not compiled and linked in.
+
+**v0.8.1+**
+
+* Add `isFlushRequired()` and clear appropriate flags after `flush()`.
+    * Increases flash consumption by about 8 bytes on AVR.
 
 ## Results
 
