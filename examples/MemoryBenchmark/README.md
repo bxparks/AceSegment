@@ -14,7 +14,7 @@ by the runtime environment of the processor. For example, it often seems like
 the ESP8266 allocates flash memory in blocks of a certain quantity, so the
 calculated flash size can jump around in unexpected ways.
 
-**Version**: AceSegment v0.8.1
+**Version**: AceSegment v0.8.2
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -194,6 +194,22 @@ before substantional refactoring in 2021.
     * The 32-bit processors have so much more flash memory than 8-bit
       processors, I think this tradeoff is worth it.
 
+**v0.8.2**
+
+* Remove `virtual` keyword from `LedModule` methods.
+    * Decreases flash usage by 60 bytes for `Tm1637Module`, 14 bytes for
+      `Max7219Module`, 32 bytes for `Ht16k33Module`, and 2-14 bytes for
+      `Hc595Module`.
+    * Decreases static ram usage by 7-8 bytes for all Module classes.
+    * Further decreases flash usage by 10-70 bytes for various Writer classes.
+* Templatize Writer classes on `T_LED_MODULE` instead of hardcoding it to
+  `LedModule`.
+    * Seems to reduce flash size of some Writer classes on some platforms by
+      hundreds of bytes, I think because methods can be better inlined, and
+      unused methods are not compiled and linked in.
+* Add `isFlushRequired()` and clear appropriate flags after `flush()`.
+    * Increases flash consumption by about 8 bytes on AVR.
+
 ## Results
 
 The following shows the flash and static memory sizes of the `MemoryBenchmark`
@@ -236,40 +252,40 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        |    260/   11 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| DirectModule                    |   1248/   64 |   988/   53 |
-| DirectFast4Module               |   1012/   94 |   752/   83 |
+| DirectModule                    |   1296/   58 |  1036/   47 |
+| DirectFast4Module               |   1042/   88 |   782/   77 |
 |---------------------------------+--------------+-------------|
-| Hybrid(HardSpi)                 |   1646/   65 |  1386/   54 |
-| Hybrid(HardSpiFast)             |   1598/   63 |  1338/   52 |
-| Hybrid(SimpleSpi)               |   1288/   59 |  1028/   48 |
-| Hybrid(SimpleSpiFast)           |   1160/   54 |   900/   43 |
+| Hybrid(HardSpi)                 |   1680/   59 |  1420/   48 |
+| Hybrid(HardSpiFast)             |   1632/   57 |  1372/   46 |
+| Hybrid(SimpleSpi)               |   1322/   53 |  1062/   42 |
+| Hybrid(SimpleSpiFast)           |   1194/   48 |   934/   37 |
 |---------------------------------+--------------+-------------|
-| Hc595(HardSpi)                  |   1604/   65 |  1344/   54 |
-| Hc595(HardSpiFast)              |   1310/   63 |  1050/   52 |
-| Hc595(SimpleSpi)                |   1260/   59 |  1000/   48 |
-| Hc595(SimpleSpiFast)            |    848/   54 |   588/   43 |
+| Hc595(HardSpi)                  |   1638/   59 |  1378/   48 |
+| Hc595(HardSpiFast)              |   1342/   57 |  1082/   46 |
+| Hc595(SimpleSpi)                |   1270/   53 |  1010/   42 |
+| Hc595(SimpleSpiFast)            |    858/   48 |   598/   37 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SimpleTmi)               |   1192/   39 |   932/   28 |
-| Tm1637(SimpleTmiFast)           |    630/   34 |   370/   23 |
+| Tm1637(SimpleTmi)               |   1132/   31 |   872/   20 |
+| Tm1637(SimpleTmiFast)           |    570/   26 |   310/   15 |
 |---------------------------------+--------------+-------------|
-| Max7219(HardSpi)                |   1326/   51 |  1066/   40 |
-| Max7219(HardSpiFast)            |   1006/   49 |   746/   38 |
-| Max7219(SimpleSpi)              |    962/   45 |   702/   34 |
-| Max7219(SimpleSpiFast)          |    550/   40 |   290/   29 |
+| Max7219(HardSpi)                |   1324/   43 |  1064/   32 |
+| Max7219(HardSpiFast)            |   1000/   41 |   740/   30 |
+| Max7219(SimpleSpi)              |    960/   37 |   700/   26 |
+| Max7219(SimpleSpiFast)          |    546/   32 |   286/   21 |
 |---------------------------------+--------------+-------------|
-| Ht16k33(TwoWire)                |   1326/   77 |  1066/   66 |
-| Ht16k33(SimpleWire)             |   1198/   41 |   938/   30 |
-| Ht16k33(SimpleWireFast)         |    680/   35 |   420/   24 |
+| Ht16k33(TwoWire)                |   1302/   69 |  1042/   58 |
+| Ht16k33(SimpleWire)             |   1174/   33 |   914/   22 |
+| Ht16k33(SimpleWireFast)         |    656/   27 |   396/   16 |
 |---------------------------------+--------------+-------------|
-| StubModule                      |    296/   11 |    36/    0 |
-| PatternWriter+Stub              |    412/   26 |   152/   15 |
-| NumberWriter+Stub               |    456/   26 |   196/   15 |
-| ClockWriter+Stub                |    568/   27 |   308/   16 |
-| TemperatureWriter+Stub          |    524/   26 |   264/   15 |
-| CharWriter+Stub                 |    582/   29 |   322/   18 |
-| StringWriter+Stub               |    784/   37 |   524/   26 |
-| StringScroller+Stub             |    814/   43 |   554/   32 |
-| LevelWriter+Stub                |    490/   26 |   230/   15 |
+| StubModule                      |    322/   21 |    62/   10 |
+| PatternWriter+Stub              |    338/   23 |    78/   12 |
+| NumberWriter+Stub               |    418/   23 |   158/   12 |
+| ClockWriter+Stub                |    490/   24 |   230/   13 |
+| TemperatureWriter+Stub          |    462/   23 |   202/   12 |
+| CharWriter+Stub                 |    520/   26 |   260/   15 |
+| StringWriter+Stub               |    748/   34 |   488/   23 |
+| StringScroller+Stub             |    804/   40 |   544/   29 |
+| LevelWriter+Stub                |    424/   23 |   164/   12 |
 +--------------------------------------------------------------+
 
 ```
@@ -286,40 +302,40 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        |    456/   11 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| DirectModule                    |   1486/   64 |  1030/   53 |
-| DirectFast4Module               |   1250/   94 |   794/   83 |
+| DirectModule                    |   1534/   58 |  1078/   47 |
+| DirectFast4Module               |   1290/   88 |   834/   77 |
 |---------------------------------+--------------+-------------|
-| Hybrid(HardSpi)                 |   1560/   61 |  1104/   50 |
-| Hybrid(HardSpiFast)             |   1502/   59 |  1046/   48 |
-| Hybrid(SimpleSpi)               |   1514/   59 |  1058/   48 |
-| Hybrid(SimpleSpiFast)           |   1392/   54 |   936/   43 |
+| Hybrid(HardSpi)                 |   1596/   55 |  1140/   44 |
+| Hybrid(HardSpiFast)             |   1538/   53 |  1082/   42 |
+| Hybrid(SimpleSpi)               |   1550/   53 |  1094/   42 |
+| Hybrid(SimpleSpiFast)           |   1428/   48 |   972/   37 |
 |---------------------------------+--------------+-------------|
-| Hc595(HardSpi)                  |   1538/   61 |  1082/   50 |
-| Hc595(HardSpiFast)              |   1470/   59 |  1014/   48 |
-| Hc595(SimpleSpi)                |   1478/   59 |  1022/   48 |
-| Hc595(SimpleSpiFast)            |   1068/   54 |   612/   43 |
+| Hc595(HardSpi)                  |   1552/   55 |  1096/   44 |
+| Hc595(HardSpiFast)              |   1478/   53 |  1022/   42 |
+| Hc595(SimpleSpi)                |   1492/   53 |  1036/   42 |
+| Hc595(SimpleSpiFast)            |   1082/   48 |   626/   37 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SimpleTmi)               |   1480/   39 |  1024/   28 |
-| Tm1637(SimpleTmiFast)           |    916/   34 |   460/   23 |
+| Tm1637(SimpleTmi)               |   1424/   31 |   968/   20 |
+| Tm1637(SimpleTmiFast)           |    858/   26 |   402/   15 |
 |---------------------------------+--------------+-------------|
-| Max7219(HardSpi)                |   1268/   47 |   812/   36 |
-| Max7219(HardSpiFast)            |   1180/   45 |   724/   34 |
-| Max7219(SimpleSpi)              |   1184/   45 |   728/   34 |
-| Max7219(SimpleSpiFast)          |    766/   40 |   310/   29 |
+| Max7219(HardSpi)                |   1268/   39 |   812/   28 |
+| Max7219(HardSpiFast)            |   1180/   37 |   724/   26 |
+| Max7219(SimpleSpi)              |   1182/   37 |   726/   26 |
+| Max7219(SimpleSpiFast)          |    764/   32 |   308/   21 |
 |---------------------------------+--------------+-------------|
-| Ht16k33(TwoWire)                |   2854/  251 |  2398/  240 |
-| Ht16k33(SimpleWire)             |   1480/   41 |  1024/   30 |
-| Ht16k33(SimpleWireFast)         |    946/   35 |   490/   24 |
+| Ht16k33(TwoWire)                |   2856/  243 |  2400/  232 |
+| Ht16k33(SimpleWire)             |   1458/   33 |  1002/   22 |
+| Ht16k33(SimpleWireFast)         |    926/   27 |   470/   16 |
 |---------------------------------+--------------+-------------|
-| StubModule                      |    494/   11 |    38/    0 |
-| PatternWriter+Stub              |    608/   26 |   152/   15 |
-| NumberWriter+Stub               |    664/   26 |   208/   15 |
-| ClockWriter+Stub                |    782/   27 |   326/   16 |
-| TemperatureWriter+Stub          |    736/   26 |   280/   15 |
-| CharWriter+Stub                 |    778/   29 |   322/   18 |
-| StringWriter+Stub               |    998/   37 |   542/   26 |
-| StringScroller+Stub             |   1014/   43 |   558/   32 |
-| LevelWriter+Stub                |    694/   26 |   238/   15 |
+| StubModule                      |    522/   21 |    66/   10 |
+| PatternWriter+Stub              |    534/   23 |    78/   12 |
+| NumberWriter+Stub               |    630/   23 |   174/   12 |
+| ClockWriter+Stub                |    700/   24 |   244/   13 |
+| TemperatureWriter+Stub          |    674/   23 |   218/   12 |
+| CharWriter+Stub                 |    718/   26 |   262/   15 |
+| StringWriter+Stub               |    970/   34 |   514/   23 |
+| StringScroller+Stub             |   1016/   40 |   560/   29 |
+| LevelWriter+Stub                |    626/   23 |   170/   12 |
 +--------------------------------------------------------------+
 
 ```
@@ -336,40 +352,40 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        |   3472/  151 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| DirectModule                    |   4482/  204 |  1010/   53 |
-| DirectFast4Module               |   4132/  234 |   660/   83 |
+| DirectModule                    |   4530/  198 |  1058/   47 |
+| DirectFast4Module               |   4172/  228 |   700/   77 |
 |---------------------------------+--------------+-------------|
-| Hybrid(HardSpi)                 |   4556/  201 |  1084/   50 |
-| Hybrid(HardSpiFast)             |   4498/  199 |  1026/   48 |
-| Hybrid(SimpleSpi)               |   4510/  199 |  1038/   48 |
-| Hybrid(SimpleSpiFast)           |   4388/  194 |   916/   43 |
+| Hybrid(HardSpi)                 |   4592/  195 |  1120/   44 |
+| Hybrid(HardSpiFast)             |   4534/  193 |  1062/   42 |
+| Hybrid(SimpleSpi)               |   4546/  193 |  1074/   42 |
+| Hybrid(SimpleSpiFast)           |   4424/  188 |   952/   37 |
 |---------------------------------+--------------+-------------|
-| Hc595(HardSpi)                  |   4534/  201 |  1062/   50 |
-| Hc595(HardSpiFast)              |   4454/  199 |   982/   48 |
-| Hc595(SimpleSpi)                |   4474/  199 |  1002/   48 |
-| Hc595(SimpleSpiFast)            |   3950/  194 |   478/   43 |
+| Hc595(HardSpi)                  |   4570/  195 |  1098/   44 |
+| Hc595(HardSpiFast)              |   4484/  193 |  1012/   42 |
+| Hc595(SimpleSpi)                |   4510/  193 |  1038/   42 |
+| Hc595(SimpleSpiFast)            |   3986/  188 |   514/   37 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SimpleTmi)               |   4550/  179 |  1078/   28 |
-| Tm1637(SimpleTmiFast)           |   3872/  174 |   400/   23 |
+| Tm1637(SimpleTmi)               |   4516/  171 |  1044/   20 |
+| Tm1637(SimpleTmiFast)           |   3836/  166 |   364/   15 |
 |---------------------------------+--------------+-------------|
-| Max7219(HardSpi)                |   4338/  187 |   866/   36 |
-| Max7219(HardSpiFast)            |   4238/  185 |   766/   34 |
-| Max7219(SimpleSpi)              |   4254/  185 |   782/   34 |
-| Max7219(SimpleSpiFast)          |   3722/  180 |   250/   29 |
+| Max7219(HardSpi)                |   4338/  179 |   866/   28 |
+| Max7219(HardSpiFast)            |   4238/  177 |   766/   26 |
+| Max7219(SimpleSpi)              |   4252/  177 |   780/   26 |
+| Max7219(SimpleSpiFast)          |   3720/  172 |   248/   21 |
 |---------------------------------+--------------+-------------|
-| Ht16k33(TwoWire)                |   5838/  391 |  2366/  240 |
-| Ht16k33(SimpleWire)             |   4550/  181 |  1078/   30 |
-| Ht16k33(SimpleWireFast)         |   3900/  175 |   428/   24 |
+| Ht16k33(TwoWire)                |   5840/  383 |  2368/  232 |
+| Ht16k33(SimpleWire)             |   4550/  173 |  1078/   22 |
+| Ht16k33(SimpleWireFast)         |   3902/  167 |   430/   16 |
 |---------------------------------+--------------+-------------|
-| StubModule                      |   3508/  151 |    36/    0 |
-| PatternWriter+Stub              |   3564/  166 |    92/   15 |
-| NumberWriter+Stub               |   3620/  166 |   148/   15 |
-| ClockWriter+Stub                |   3738/  167 |   266/   16 |
-| TemperatureWriter+Stub          |   3692/  166 |   220/   15 |
-| CharWriter+Stub                 |   3734/  169 |   262/   18 |
-| StringWriter+Stub               |   3954/  177 |   482/   26 |
-| StringScroller+Stub             |   3970/  183 |   498/   32 |
-| LevelWriter+Stub                |   3650/  166 |   178/   15 |
+| StubModule                      |   3500/  161 |    28/   10 |
+| PatternWriter+Stub              |   3512/  163 |    40/   12 |
+| NumberWriter+Stub               |   3608/  163 |   136/   12 |
+| ClockWriter+Stub                |   3678/  164 |   206/   13 |
+| TemperatureWriter+Stub          |   3652/  163 |   180/   12 |
+| CharWriter+Stub                 |   3696/  166 |   224/   15 |
+| StringWriter+Stub               |   3926/  174 |   454/   23 |
+| StringScroller+Stub             |   3972/  180 |   500/   29 |
+| LevelWriter+Stub                |   3604/  163 |   132/   12 |
 +--------------------------------------------------------------+
 
 ```
@@ -388,29 +404,29 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | DirectModule                    |  10660/    0 |   720/    0 |
 |---------------------------------+--------------+-------------|
-| Hybrid(HardSpi)                 |  11136/    0 |  1196/    0 |
+| Hybrid(HardSpi)                 |  11144/    0 |  1204/    0 |
 | Hybrid(SimpleSpi)               |  10720/    0 |   780/    0 |
 |---------------------------------+--------------+-------------|
 | Hc595(HardSpi)                  |  11136/    0 |  1196/    0 |
-| Hc595(SimpleSpi)                |  10632/    0 |   692/    0 |
+| Hc595(SimpleSpi)                |  10636/    0 |   696/    0 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SimpleTmi)               |  10672/    0 |   732/    0 |
+| Tm1637(SimpleTmi)               |  10648/    0 |   708/    0 |
 |---------------------------------+--------------+-------------|
-| Max7219(HardSpi)                |  10996/    0 |  1056/    0 |
-| Max7219(SimpleSpi)              |  10488/    0 |   548/    0 |
+| Max7219(HardSpi)                |  10976/    0 |  1036/    0 |
+| Max7219(SimpleSpi)              |  10472/    0 |   532/    0 |
 |---------------------------------+--------------+-------------|
-| Ht16k33(TwoWire)                |  11764/    0 |  1824/    0 |
-| Ht16k33(SimpleWire)             |  10720/    0 |   780/    0 |
+| Ht16k33(TwoWire)                |  11748/    0 |  1808/    0 |
+| Ht16k33(SimpleWire)             |  10712/    0 |   772/    0 |
 |---------------------------------+--------------+-------------|
-| StubModule                      |  10184/    0 |   244/    0 |
-| PatternWriter+Stub              |  10208/    0 |   268/    0 |
-| NumberWriter+Stub               |  10500/    0 |   560/    0 |
-| ClockWriter+Stub                |  10348/    0 |   408/    0 |
-| TemperatureWriter+Stub          |  10576/    0 |   636/    0 |
-| CharWriter+Stub                 |  10392/    0 |   452/    0 |
-| StringWriter+Stub               |  10524/    0 |   584/    0 |
-| StringScroller+Stub             |  10520/    0 |   580/    0 |
-| LevelWriter+Stub                |  10268/    0 |   328/    0 |
+| StubModule                      |  10140/    0 |   200/    0 |
+| PatternWriter+Stub              |  10156/    0 |   216/    0 |
+| NumberWriter+Stub               |  10236/    0 |   296/    0 |
+| ClockWriter+Stub                |  10300/    0 |   360/    0 |
+| TemperatureWriter+Stub          |  10264/    0 |   324/    0 |
+| CharWriter+Stub                 |  10308/    0 |   368/    0 |
+| StringWriter+Stub               |  10456/    0 |   516/    0 |
+| StringScroller+Stub             |  10448/    0 |   508/    0 |
+| LevelWriter+Stub                |  10216/    0 |   276/    0 |
 +--------------------------------------------------------------+
 
 ```
@@ -427,31 +443,31 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        |  21420/ 3536 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| DirectModule                    |  24176/ 3956 |  2756/  420 |
+| DirectModule                    |  24180/ 3956 |  2760/  420 |
 |---------------------------------+--------------+-------------|
-| Hybrid(HardSpi)                 |  26096/ 3968 |  4676/  432 |
-| Hybrid(SimpleSpi)               |  24240/ 3960 |  2820/  424 |
+| Hybrid(HardSpi)                 |  26104/ 3968 |  4684/  432 |
+| Hybrid(SimpleSpi)               |  24248/ 3960 |  2828/  424 |
 |---------------------------------+--------------+-------------|
-| Hc595(HardSpi)                  |  26052/ 3972 |  4632/  436 |
-| Hc595(SimpleSpi)                |  24156/ 3964 |  2736/  428 |
+| Hc595(HardSpi)                  |  26068/ 3972 |  4648/  436 |
+| Hc595(SimpleSpi)                |  24168/ 3964 |  2748/  428 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SimpleTmi)               |  24332/ 3932 |  2912/  396 |
+| Tm1637(SimpleTmi)               |  24300/ 3936 |  2880/  400 |
 |---------------------------------+--------------+-------------|
-| Max7219(HardSpi)                |  25956/ 3944 |  4536/  408 |
-| Max7219(SimpleSpi)              |  24064/ 3932 |  2644/  396 |
+| Max7219(HardSpi)                |  25940/ 3940 |  4520/  404 |
+| Max7219(SimpleSpi)              |  24036/ 3932 |  2616/  396 |
 |---------------------------------+--------------+-------------|
-| Ht16k33(TwoWire)                |  28668/ 4116 |  7248/  580 |
-| Ht16k33(SimpleWire)             |  24376/ 3932 |  2956/  396 |
+| Ht16k33(TwoWire)                |  28648/ 4116 |  7228/  580 |
+| Ht16k33(SimpleWire)             |  24356/ 3932 |  2936/  396 |
 |---------------------------------+--------------+-------------|
-| StubModule                      |  21616/ 3900 |   196/  364 |
-| PatternWriter+Stub              |  21636/ 3904 |   216/  368 |
-| NumberWriter+Stub               |  21904/ 3904 |   484/  368 |
-| ClockWriter+Stub                |  21784/ 3908 |   364/  372 |
-| TemperatureWriter+Stub          |  21996/ 3904 |   576/  368 |
-| CharWriter+Stub                 |  21824/ 3912 |   404/  376 |
-| StringWriter+Stub               |  21964/ 3916 |   544/  380 |
-| StringScroller+Stub             |  21944/ 3924 |   524/  388 |
-| LevelWriter+Stub                |  21692/ 3904 |   272/  368 |
+| StubModule                      |  21572/ 3900 |   152/  364 |
+| PatternWriter+Stub              |  21584/ 3904 |   164/  368 |
+| NumberWriter+Stub               |  21676/ 3904 |   256/  368 |
+| ClockWriter+Stub                |  21724/ 3908 |   304/  372 |
+| TemperatureWriter+Stub          |  21696/ 3904 |   276/  368 |
+| CharWriter+Stub                 |  21740/ 3912 |   320/  376 |
+| StringWriter+Stub               |  21876/ 3916 |   456/  380 |
+| StringScroller+Stub             |  21884/ 3924 |   464/  388 |
+| LevelWriter+Stub                |  21652/ 3904 |   232/  368 |
 +--------------------------------------------------------------+
 
 ```
@@ -468,31 +484,31 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        | 256700/26784 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| DirectModule                    | 257784/27056 |  1084/  272 |
+| DirectModule                    | 257736/27056 |  1036/  272 |
 |---------------------------------+--------------+-------------|
-| Hybrid(HardSpi)                 | 258944/27072 |  2244/  288 |
-| Hybrid(SimpleSpi)               | 257872/27056 |  1172/  272 |
+| Hybrid(HardSpi)                 | 258896/27072 |  2196/  288 |
+| Hybrid(SimpleSpi)               | 257824/27056 |  1124/  272 |
 |---------------------------------+--------------+-------------|
-| Hc595(HardSpi)                  | 258924/27076 |  2224/  292 |
-| Hc595(SimpleSpi)                | 257772/27060 |  1072/  276 |
+| Hc595(HardSpi)                  | 258892/27076 |  2192/  292 |
+| Hc595(SimpleSpi)                | 257724/27060 |  1024/  276 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SimpleTmi)               | 257932/27028 |  1232/  244 |
+| Tm1637(SimpleTmi)               | 257852/27028 |  1152/  244 |
 |---------------------------------+--------------+-------------|
-| Max7219(HardSpi)                | 258836/27044 |  2136/  260 |
-| Max7219(SimpleSpi)              | 257636/27028 |   936/  244 |
+| Max7219(HardSpi)                | 258804/27044 |  2104/  260 |
+| Max7219(SimpleSpi)              | 257620/27028 |   920/  244 |
 |---------------------------------+--------------+-------------|
-| Ht16k33(TwoWire)                | 261364/27500 |  4664/  716 |
-| Ht16k33(SimpleWire)             | 258012/27028 |  1312/  244 |
+| Ht16k33(TwoWire)                | 261348/27500 |  4648/  716 |
+| Ht16k33(SimpleWire)             | 257980/27028 |  1280/  244 |
 |---------------------------------+--------------+-------------|
-| StubModule                      | 256840/26996 |   140/  212 |
-| PatternWriter+Stub              | 256872/27004 |   172/  220 |
-| NumberWriter+Stub               | 257336/27004 |   636/  220 |
-| ClockWriter+Stub                | 257160/27004 |   460/  220 |
-| TemperatureWriter+Stub          | 257448/27004 |   748/  220 |
-| CharWriter+Stub                 | 257096/27012 |   396/  228 |
+| StubModule                      | 256776/26996 |    76/  212 |
+| PatternWriter+Stub              | 256792/27004 |    92/  220 |
+| NumberWriter+Stub               | 256968/27004 |   268/  220 |
+| ClockWriter+Stub                | 257064/27004 |   364/  220 |
+| TemperatureWriter+Stub          | 257000/27004 |   300/  220 |
+| CharWriter+Stub                 | 256968/27012 |   268/  228 |
 | StringWriter+Stub               | 257264/27012 |   564/  228 |
-| StringScroller+Stub             | 257296/27020 |   596/  236 |
-| LevelWriter+Stub                | 256984/27004 |   284/  220 |
+| StringScroller+Stub             | 257184/27020 |   484/  236 |
+| LevelWriter+Stub                | 256904/27004 |   204/  220 |
 +--------------------------------------------------------------+
 
 ```
@@ -509,31 +525,31 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        | 197748/13084 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| DirectModule                    | 200482/13568 |  2734/  484 |
+| DirectModule                    | 200262/13568 |  2514/  484 |
 |---------------------------------+--------------+-------------|
-| Hybrid(HardSpi)                 | 202794/13632 |  5046/  548 |
-| Hybrid(SimpleSpi)               | 200530/13576 |  2782/  492 |
+| Hybrid(HardSpi)                 | 202574/13632 |  4826/  548 |
+| Hybrid(SimpleSpi)               | 200310/13576 |  2562/  492 |
 |---------------------------------+--------------+-------------|
-| Hc595(HardSpi)                  | 202766/13632 |  5018/  548 |
-| Hc595(SimpleSpi)                | 200426/13576 |  2678/  492 |
+| Hc595(HardSpi)                  | 202554/13632 |  4806/  548 |
+| Hc595(SimpleSpi)                | 200218/13576 |  2470/  492 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SimpleTmi)               | 200690/13544 |  2942/  460 |
+| Tm1637(SimpleTmi)               | 200446/13552 |  2698/  468 |
 |---------------------------------+--------------+-------------|
-| Max7219(HardSpi)                | 202692/13592 |  4944/  508 |
-| Max7219(SimpleSpi)              | 200292/13536 |  2544/  452 |
+| Max7219(HardSpi)                | 202432/13592 |  4684/  508 |
+| Max7219(SimpleSpi)              | 200068/13536 |  2320/  452 |
 |---------------------------------+--------------+-------------|
-| Ht16k33(TwoWire)                | 209930/14280 | 12182/ 1196 |
-| Ht16k33(SimpleWire)             | 200762/13552 |  3014/  468 |
+| Ht16k33(TwoWire)                | 209698/14280 | 11950/ 1196 |
+| Ht16k33(SimpleWire)             | 200534/13552 |  2786/  468 |
 |---------------------------------+--------------+-------------|
-| StubModule                      | 199196/13360 |  1448/  276 |
-| PatternWriter+Stub              | 199256/13368 |  1508/  284 |
-| NumberWriter+Stub               | 199580/13368 |  1832/  284 |
-| ClockWriter+Stub                | 199528/13368 |  1780/  284 |
-| TemperatureWriter+Stub          | 199700/13368 |  1952/  284 |
-| CharWriter+Stub                 | 199468/13376 |  1720/  292 |
-| StringWriter+Stub               | 199604/13376 |  1856/  292 |
-| StringScroller+Stub             | 199604/13384 |  1856/  300 |
-| LevelWriter+Stub                | 199364/13368 |  1616/  284 |
+| StubModule                      | 198940/13360 |  1192/  276 |
+| PatternWriter+Stub              | 198956/13368 |  1208/  284 |
+| NumberWriter+Stub               | 199064/13368 |  1316/  284 |
+| ClockWriter+Stub                | 199204/13368 |  1456/  284 |
+| TemperatureWriter+Stub          | 199080/13368 |  1332/  284 |
+| CharWriter+Stub                 | 199116/13376 |  1368/  292 |
+| StringWriter+Stub               | 199288/13376 |  1540/  292 |
+| StringScroller+Stub             | 199284/13384 |  1536/  300 |
+| LevelWriter+Stub                | 199068/13368 |  1320/  284 |
 +--------------------------------------------------------------+
 
 ```
@@ -551,31 +567,31 @@ other `MemoryBenchmark` programs.)
 |---------------------------------+--------------+-------------|
 | baseline                        |  10880/ 4152 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| DirectModule                    |  11968/ 4396 |  1088/  244 |
+| DirectModule                    |  11960/ 4396 |  1080/  244 |
 |---------------------------------+--------------+-------------|
-| Hybrid(HardSpi)                 |  13044/ 4464 |  2164/  312 |
-| Hybrid(SimpleSpi)               |  12004/ 4400 |  1124/  248 |
+| Hybrid(HardSpi)                 |  13036/ 4464 |  2156/  312 |
+| Hybrid(SimpleSpi)               |  11992/ 4400 |  1112/  248 |
 |---------------------------------+--------------+-------------|
-| Hc595(HardSpi)                  |  12968/ 4468 |  2088/  316 |
-| Hc595(SimpleSpi)                |  11940/ 4404 |  1060/  252 |
+| Hc595(HardSpi)                  |  12960/ 4468 |  2080/  316 |
+| Hc595(SimpleSpi)                |  11932/ 4404 |  1052/  252 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SimpleTmi)               |  12620/ 4372 |  1740/  220 |
+| Tm1637(SimpleTmi)               |  12568/ 4376 |  1688/  224 |
 |---------------------------------+--------------+-------------|
-| Max7219(HardSpi)                |  13384/ 4440 |  2504/  288 |
-| Max7219(SimpleSpi)              |  11904/ 4372 |  1024/  220 |
+| Max7219(HardSpi)                |  13364/ 4436 |  2484/  284 |
+| Max7219(SimpleSpi)              |  11876/ 4372 |   996/  220 |
 |---------------------------------+--------------+-------------|
-| Ht16k33(TwoWire)                |  14528/ 5036 |  3648/  884 |
-| Ht16k33(SimpleWire)             |  13548/ 4376 |  2668/  224 |
+| Ht16k33(TwoWire)                |  14500/ 5036 |  3620/  884 |
+| Ht16k33(SimpleWire)             |  13520/ 4376 |  2640/  224 |
 |---------------------------------+--------------+-------------|
-| StubModule                      |  10988/ 4356 |   108/  204 |
-| PatternWriter+Stub              |  11028/ 4360 |   148/  208 |
-| NumberWriter+Stub               |  11468/ 4360 |   588/  208 |
-| ClockWriter+Stub                |  11156/ 4364 |   276/  212 |
-| TemperatureWriter+Stub          |  11608/ 4360 |   728/  208 |
-| CharWriter+Stub                 |  11188/ 4368 |   308/  216 |
-| StringWriter+Stub               |  11376/ 4372 |   496/  220 |
-| StringScroller+Stub             |  11376/ 4380 |   496/  228 |
-| LevelWriter+Stub                |  11132/ 4360 |   252/  208 |
+| StubModule                      |  10940/ 4360 |    60/  208 |
+| PatternWriter+Stub              |  10956/ 4364 |    76/  212 |
+| NumberWriter+Stub               |  11020/ 4364 |   140/  212 |
+| ClockWriter+Stub                |  11088/ 4368 |   208/  216 |
+| TemperatureWriter+Stub          |  11064/ 4364 |   184/  212 |
+| CharWriter+Stub                 |  11116/ 4372 |   236/  220 |
+| StringWriter+Stub               |  11292/ 4376 |   412/  224 |
+| StringScroller+Stub             |  11284/ 4384 |   404/  232 |
+| LevelWriter+Stub                |  11024/ 4364 |   144/  212 |
 +--------------------------------------------------------------+
 
 ```

@@ -96,19 +96,10 @@ volatile int disableCompilerOptimization = 0;
   // isolated from the underlying LedModule implementations.
   class StubModule : public LedModule {
     public:
-      StubModule() : LedModule(NUM_DIGITS) {}
+      StubModule() : LedModule(mPatterns, NUM_DIGITS) {}
 
-      void setBrightness(uint8_t brightness) override {
-        disableCompilerOptimization = brightness;
-      }
-
-      void setPatternAt(uint8_t /*pos*/, uint8_t pattern) override {
-        disableCompilerOptimization = pattern;
-      }
-
-      uint8_t getPatternAt(uint8_t /*pos*/) override {
-        return disableCompilerOptimization;
-      }
+    private:
+      uint8_t mPatterns[NUM_DIGITS];
   };
 
   #if FEATURE == FEATURE_DIRECT_MODULE
@@ -324,37 +315,37 @@ volatile int disableCompilerOptimization = 0;
 
   #elif FEATURE == FEATURE_PATTERN_WRITER
     StubModule stubModule;
-    PatternWriter patternWriter(stubModule);
+    PatternWriter<LedModule> patternWriter(stubModule);
 
   #elif FEATURE == FEATURE_NUMBER_WRITER
     StubModule stubModule;
-    NumberWriter numberWriter(stubModule);
+    NumberWriter<LedModule> numberWriter(stubModule);
 
   #elif FEATURE == FEATURE_CLOCK_WRITER
     StubModule stubModule;
-    ClockWriter clockWriter(stubModule);
+    ClockWriter<LedModule> clockWriter(stubModule);
 
   #elif FEATURE == FEATURE_TEMPERATURE_WRITER
     StubModule stubModule;
-    TemperatureWriter temperatureWriter(stubModule);
+    TemperatureWriter<LedModule> temperatureWriter(stubModule);
 
   #elif FEATURE == FEATURE_CHAR_WRITER
     StubModule stubModule;
-    CharWriter charWriter(stubModule);
+    CharWriter<LedModule> charWriter(stubModule);
 
   #elif FEATURE == FEATURE_STRING_WRITER
     StubModule stubModule;
-    CharWriter charWriter(stubModule);
-    StringWriter stringWriter(charWriter);
+    CharWriter<LedModule> charWriter(stubModule);
+    StringWriter<LedModule> stringWriter(charWriter);
 
   #elif FEATURE == FEATURE_STRING_SCROLLER
     StubModule stubModule;
-    CharWriter charWriter(stubModule);
-    StringScroller stringScroller(charWriter);
+    CharWriter<LedModule> charWriter(stubModule);
+    StringScroller<LedModule> stringScroller(charWriter);
 
   #elif FEATURE == FEATURE_LEVEL_WRITER
     StubModule stubModule;
-    LevelWriter levelWriter(stubModule);
+    LevelWriter<LedModule> levelWriter(stubModule);
 
   #else
     #error Unknown FEATURE

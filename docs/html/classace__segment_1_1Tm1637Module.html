@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.8.1</span>
+   &#160;<span id="projectnumber">0.8.2</span>
    </div>
    <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, HT16K33, or 74HC595 controller chips</div>
   </td>
@@ -110,37 +110,42 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a7d731aa467e81a7be1f06bcffb2a5f64"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1Tm1637Module.html#a7d731aa467e81a7be1f06bcffb2a5f64">end</a> ()</td></tr>
 <tr class="memdesc:a7d731aa467e81a7be1f06bcffb2a5f64"><td class="mdescLeft">&#160;</td><td class="mdescRight">Signal end of usage.  <a href="classace__segment_1_1Tm1637Module.html#a7d731aa467e81a7be1f06bcffb2a5f64">More...</a><br /></td></tr>
 <tr class="separator:a7d731aa467e81a7be1f06bcffb2a5f64"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae1783b845117e4d10960794d4c14bdda"><td class="memItemLeft" align="right" valign="top"><a id="ae1783b845117e4d10960794d4c14bdda"></a>
-uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1Tm1637Module.html#ae1783b845117e4d10960794d4c14bdda">getNumDigits</a> () const</td></tr>
-<tr class="memdesc:ae1783b845117e4d10960794d4c14bdda"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the number of digits supported by this display instance. <br /></td></tr>
-<tr class="separator:ae1783b845117e4d10960794d4c14bdda"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6e651be7571cb0a68b4f15b7aef487b8"><td class="memItemLeft" align="right" valign="top"><a id="a6e651be7571cb0a68b4f15b7aef487b8"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1Tm1637Module.html#a6e651be7571cb0a68b4f15b7aef487b8">setPatternAt</a> (uint8_t pos, uint8_t pattern) override</td></tr>
-<tr class="memdesc:a6e651be7571cb0a68b4f15b7aef487b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the led digit pattern at position pos. <br /></td></tr>
-<tr class="separator:a6e651be7571cb0a68b4f15b7aef487b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a06fccb55acd2957f6dcbe45f97a1600c"><td class="memItemLeft" align="right" valign="top"><a id="a06fccb55acd2957f6dcbe45f97a1600c"></a>
-uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1Tm1637Module.html#a06fccb55acd2957f6dcbe45f97a1600c">getPatternAt</a> (uint8_t pos) override</td></tr>
-<tr class="memdesc:a06fccb55acd2957f6dcbe45f97a1600c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the led digit pattern at position pos. <br /></td></tr>
-<tr class="separator:a06fccb55acd2957f6dcbe45f97a1600c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8332f872f1dead39572668f6bf70d579"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1Tm1637Module.html#a8332f872f1dead39572668f6bf70d579">setBrightness</a> (uint8_t brightness) override</td></tr>
-<tr class="memdesc:a8332f872f1dead39572668f6bf70d579"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set global brightness of all digits.  <a href="classace__segment_1_1Tm1637Module.html#a8332f872f1dead39572668f6bf70d579">More...</a><br /></td></tr>
-<tr class="separator:a8332f872f1dead39572668f6bf70d579"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae86f7df1dc791d44feaad9253f6df184"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1Tm1637Module.html#ae86f7df1dc791d44feaad9253f6df184">setDisplayOn</a> (bool on=true)</td></tr>
 <tr class="memdesc:ae86f7df1dc791d44feaad9253f6df184"><td class="mdescLeft">&#160;</td><td class="mdescRight">Turn off the entire display.  <a href="classace__segment_1_1Tm1637Module.html#ae86f7df1dc791d44feaad9253f6df184">More...</a><br /></td></tr>
 <tr class="separator:ae86f7df1dc791d44feaad9253f6df184"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a97c42e50234ac856880703978b1dcaac"><td class="memItemLeft" align="right" valign="top"><a id="a97c42e50234ac856880703978b1dcaac"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1Tm1637Module.html#a97c42e50234ac856880703978b1dcaac">isFlushRequired</a> () const</td></tr>
+<tr class="memdesc:a97c42e50234ac856880703978b1dcaac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if flushing required. <br /></td></tr>
+<tr class="separator:a97c42e50234ac856880703978b1dcaac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af3a100b0d07125af76aaf8ea10bc597c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1Tm1637Module.html#af3a100b0d07125af76aaf8ea10bc597c">flush</a> ()</td></tr>
-<tr class="memdesc:af3a100b0d07125af76aaf8ea10bc597c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send segment patterns of all digits plus the brightness to the display, if any of the digits or brightness is dirty.  <a href="classace__segment_1_1Tm1637Module.html#af3a100b0d07125af76aaf8ea10bc597c">More...</a><br /></td></tr>
+<tr class="memdesc:af3a100b0d07125af76aaf8ea10bc597c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send segment patterns of all digits plus the brightness to the display.  <a href="classace__segment_1_1Tm1637Module.html#af3a100b0d07125af76aaf8ea10bc597c">More...</a><br /></td></tr>
 <tr class="separator:af3a100b0d07125af76aaf8ea10bc597c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1bf9dcdafb5b1a08a18da697d29e5235"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1Tm1637Module.html#a1bf9dcdafb5b1a08a18da697d29e5235">flushIncremental</a> ()</td></tr>
 <tr class="memdesc:a1bf9dcdafb5b1a08a18da697d29e5235"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update only a single digit or the brightness.  <a href="classace__segment_1_1Tm1637Module.html#a1bf9dcdafb5b1a08a18da697d29e5235">More...</a><br /></td></tr>
 <tr class="separator:a1bf9dcdafb5b1a08a18da697d29e5235"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classace__segment_1_1LedModule"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classace__segment_1_1LedModule')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classace__segment_1_1LedModule.html">ace_segment::LedModule</a></td></tr>
-<tr class="memitem:a5941f3f6bcee5c757cb3983a4542b61f inherit pub_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#a5941f3f6bcee5c757cb3983a4542b61f">LedModule</a> (uint8_t numDigits)</td></tr>
-<tr class="memdesc:a5941f3f6bcee5c757cb3983a4542b61f inherit pub_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="classace__segment_1_1LedModule.html#a5941f3f6bcee5c757cb3983a4542b61f">More...</a><br /></td></tr>
-<tr class="separator:a5941f3f6bcee5c757cb3983a4542b61f inherit pub_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5b458f082ece47f08d0640ad3168cab1 inherit pub_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#a5b458f082ece47f08d0640ad3168cab1">getNumDigits</a> () const</td></tr>
-<tr class="memdesc:a5b458f082ece47f08d0640ad3168cab1 inherit pub_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the number of digits supported by this display instance.  <a href="classace__segment_1_1LedModule.html#a5b458f082ece47f08d0640ad3168cab1">More...</a><br /></td></tr>
+<tr class="memitem:a4228fa75eb4c92c207423e91b755b05b inherit pub_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#a4228fa75eb4c92c207423e91b755b05b">LedModule</a> (uint8_t *patterns, uint8_t numDigits)</td></tr>
+<tr class="memdesc:a4228fa75eb4c92c207423e91b755b05b inherit pub_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="classace__segment_1_1LedModule.html#a4228fa75eb4c92c207423e91b755b05b">More...</a><br /></td></tr>
+<tr class="separator:a4228fa75eb4c92c207423e91b755b05b inherit pub_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b458f082ece47f08d0640ad3168cab1 inherit pub_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top"><a id="a5b458f082ece47f08d0640ad3168cab1"></a>
+uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#a5b458f082ece47f08d0640ad3168cab1">getNumDigits</a> () const</td></tr>
+<tr class="memdesc:a5b458f082ece47f08d0640ad3168cab1 inherit pub_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the number of digits supported by this display instance. <br /></td></tr>
 <tr class="separator:a5b458f082ece47f08d0640ad3168cab1 inherit pub_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a94f8a66e505096d137c78edc519b0386 inherit pub_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top"><a id="a94f8a66e505096d137c78edc519b0386"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#a94f8a66e505096d137c78edc519b0386">setPatternAt</a> (uint8_t pos, uint8_t pattern)</td></tr>
+<tr class="memdesc:a94f8a66e505096d137c78edc519b0386 inherit pub_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the led digit pattern at position pos. <br /></td></tr>
+<tr class="separator:a94f8a66e505096d137c78edc519b0386 inherit pub_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a50688891c17deead2fb2075a0d88c189 inherit pub_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top"><a id="a50688891c17deead2fb2075a0d88c189"></a>
+uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#a50688891c17deead2fb2075a0d88c189">getPatternAt</a> (uint8_t pos) const</td></tr>
+<tr class="memdesc:a50688891c17deead2fb2075a0d88c189 inherit pub_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the led digit pattern at position pos. <br /></td></tr>
+<tr class="separator:a50688891c17deead2fb2075a0d88c189 inherit pub_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab6cb9fa9e4aa2af6a3ad134dba32ab59 inherit pub_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#ab6cb9fa9e4aa2af6a3ad134dba32ab59">setBrightness</a> (uint8_t brightness)</td></tr>
+<tr class="memdesc:ab6cb9fa9e4aa2af6a3ad134dba32ab59 inherit pub_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set global brightness of all digits.  <a href="classace__segment_1_1LedModule.html#ab6cb9fa9e4aa2af6a3ad134dba32ab59">More...</a><br /></td></tr>
+<tr class="separator:ab6cb9fa9e4aa2af6a3ad134dba32ab59 inherit pub_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed70d70812a3f5d1335b0073f6542afb inherit pub_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top"><a id="aed70d70812a3f5d1335b0073f6542afb"></a>
+uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#aed70d70812a3f5d1335b0073f6542afb">getBrightness</a> () const</td></tr>
+<tr class="memdesc:aed70d70812a3f5d1335b0073f6542afb inherit pub_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current brightness. <br /></td></tr>
+<tr class="separator:aed70d70812a3f5d1335b0073f6542afb inherit pub_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
@@ -150,6 +155,49 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>::Tm1637ModuleTest_f
 <tr class="memitem:a3fee3357aeff32f301877dc9c4657197"><td class="memItemLeft" align="right" valign="top"><a id="a3fee3357aeff32f301877dc9c4657197"></a>
 class&#160;</td><td class="memItemRight" valign="bottom"><b>::Tm1637ModuleTest_flush</b></td></tr>
 <tr class="separator:a3fee3357aeff32f301877dc9c4657197"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
+Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pro_methods_classace__segment_1_1LedModule"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classace__segment_1_1LedModule')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classace__segment_1_1LedModule.html">ace_segment::LedModule</a></td></tr>
+<tr class="memitem:a99ce3bfda3383cef80302a91ea5ca651 inherit pro_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top"><a id="a99ce3bfda3383cef80302a91ea5ca651"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#a99ce3bfda3383cef80302a91ea5ca651">begin</a> ()</td></tr>
+<tr class="memdesc:a99ce3bfda3383cef80302a91ea5ca651 inherit pro_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclasses should call this from its own <a class="el" href="classace__segment_1_1LedModule.html#a99ce3bfda3383cef80302a91ea5ca651" title="Subclasses should call this from its own begin().">begin()</a>. <br /></td></tr>
+<tr class="separator:a99ce3bfda3383cef80302a91ea5ca651 inherit pro_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a21e81151039cccd5ba4332af79767955 inherit pro_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#a21e81151039cccd5ba4332af79767955">end</a> ()</td></tr>
+<tr class="memdesc:a21e81151039cccd5ba4332af79767955 inherit pro_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclasses should call this from its own <a class="el" href="classace__segment_1_1LedModule.html#a21e81151039cccd5ba4332af79767955" title="Subclasses should call this from its own end().">end()</a>.  <a href="classace__segment_1_1LedModule.html#a21e81151039cccd5ba4332af79767955">More...</a><br /></td></tr>
+<tr class="separator:a21e81151039cccd5ba4332af79767955 inherit pro_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a04715054af6342e92499cb2811f535ad inherit pro_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top"><a id="a04715054af6342e92499cb2811f535ad"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#a04715054af6342e92499cb2811f535ad">setDigitDirty</a> (uint8_t pos)</td></tr>
+<tr class="memdesc:a04715054af6342e92499cb2811f535ad inherit pro_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the dirty bit of digit <code>pos</code>. <br /></td></tr>
+<tr class="separator:a04715054af6342e92499cb2811f535ad inherit pro_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a71df19084b9cd07bb2783aa756eec77a inherit pro_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top"><a id="a71df19084b9cd07bb2783aa756eec77a"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#a71df19084b9cd07bb2783aa756eec77a">clearDigitDirty</a> (uint8_t pos)</td></tr>
+<tr class="memdesc:a71df19084b9cd07bb2783aa756eec77a inherit pro_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the dirty bit of digit <code>pos</code>. <br /></td></tr>
+<tr class="separator:a71df19084b9cd07bb2783aa756eec77a inherit pro_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa229594cd55abe99c88643d78d8a4b16 inherit pro_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top"><a id="aa229594cd55abe99c88643d78d8a4b16"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#aa229594cd55abe99c88643d78d8a4b16">isDigitDirty</a> (uint8_t pos) const</td></tr>
+<tr class="memdesc:aa229594cd55abe99c88643d78d8a4b16 inherit pro_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check the dirty bit of digit <code>pos</code>. <br /></td></tr>
+<tr class="separator:aa229594cd55abe99c88643d78d8a4b16 inherit pro_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a327ac2b7eba7f2020aa20a4fc1ccf1 inherit pro_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top"><a id="a4a327ac2b7eba7f2020aa20a4fc1ccf1"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#a4a327ac2b7eba7f2020aa20a4fc1ccf1">clearDigitsDirty</a> ()</td></tr>
+<tr class="memdesc:a4a327ac2b7eba7f2020aa20a4fc1ccf1 inherit pro_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear dirty bits of all digits. <br /></td></tr>
+<tr class="separator:a4a327ac2b7eba7f2020aa20a4fc1ccf1 inherit pro_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a38e455547e6f822c60361aadf15a99b7 inherit pro_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top"><a id="a38e455547e6f822c60361aadf15a99b7"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#a38e455547e6f822c60361aadf15a99b7">isAnyDigitDirty</a> () const</td></tr>
+<tr class="memdesc:a38e455547e6f822c60361aadf15a99b7 inherit pro_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if any digits are dirty. <br /></td></tr>
+<tr class="separator:a38e455547e6f822c60361aadf15a99b7 inherit pro_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa31d2399ab4048ea5ae3040c6ea61398 inherit pro_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top"><a id="aa31d2399ab4048ea5ae3040c6ea61398"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#aa31d2399ab4048ea5ae3040c6ea61398">isBrightnessDirty</a> () const</td></tr>
+<tr class="memdesc:aa31d2399ab4048ea5ae3040c6ea61398 inherit pro_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the brightness level is dirty. <br /></td></tr>
+<tr class="separator:aa31d2399ab4048ea5ae3040c6ea61398 inherit pro_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb8708d2e8733baa60d3e52ea178b20e inherit pro_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top"><a id="abb8708d2e8733baa60d3e52ea178b20e"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#abb8708d2e8733baa60d3e52ea178b20e">setBrightnessDirty</a> ()</td></tr>
+<tr class="memdesc:abb8708d2e8733baa60d3e52ea178b20e inherit pro_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mark the brightness as dirty. <br /></td></tr>
+<tr class="separator:abb8708d2e8733baa60d3e52ea178b20e inherit pro_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaf02d648ff844e35d1969aaaa4aff0fd inherit pro_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top"><a id="aaf02d648ff844e35d1969aaaa4aff0fd"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#aaf02d648ff844e35d1969aaaa4aff0fd">clearBrightnessDirty</a> ()</td></tr>
+<tr class="memdesc:aaf02d648ff844e35d1969aaaa4aff0fd inherit pro_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the dirty bit for brightness. <br /></td></tr>
+<tr class="separator:aaf02d648ff844e35d1969aaaa4aff0fd inherit pro_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename T_TMII, uint8_t T_DIGITS&gt;<br />
@@ -165,7 +213,7 @@ class ace_segment::Tm1637Module&lt; T_TMII, T_DIGITS &gt;</h3>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00091">91</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00075">75</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a9cc401ceeed8292b26a93d5dcc08312e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9cc401ceeed8292b26a93d5dcc08312e">&#9670;&nbsp;</a></span>Tm1637Module()</h2>
@@ -212,7 +260,7 @@ template&lt;typename T_TMII , uint8_t T_DIGITS&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00101">101</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00085">85</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
 
 </div>
 </div>
@@ -243,15 +291,9 @@ template&lt;typename T_TMII , uint8_t T_DIGITS&gt; </div>
 </div><div class="memdoc">
 
 <p>Initialize the module. </p>
-<p>The SimpleTmiInterface object must be initialized separately.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">remapArray</td><td>optional array of positions to handle LED modules whose digit ordering is physically different than the logical ordering (where digit 0 is on the left, and digit (T_DIGITS-1) is on the far right). </td></tr>
-  </table>
-  </dd>
-</dl>
+<p>The SimpleTmiInterface object must be initialized separately. </p>
 
-<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00123">123</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00102">102</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
 
 </div>
 </div>
@@ -283,7 +325,7 @@ template&lt;typename T_TMII , uint8_t T_DIGITS&gt; </div>
 <p>Signal end of usage. </p>
 <p>Currently does nothing. </p>
 
-<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00137">137</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00112">112</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
 
 </div>
 </div>
@@ -312,10 +354,11 @@ template&lt;typename T_TMII , uint8_t T_DIGITS&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Send segment patterns of all digits plus the brightness to the display, if any of the digits or brightness is dirty. </p>
-<p>Takes about 22 ms using a 100 microsecond delay. </p>
+<p>Send segment patterns of all digits plus the brightness to the display. </p>
+<p>Takes about 22 ms using a 100 microsecond delay.</p>
+<p>The <a class="el" href="classace__segment_1_1Tm1637Module.html#a97c42e50234ac856880703978b1dcaac" title="Return true if flushing required.">isFlushRequired()</a> method can be used to optimize the number of calls to <a class="el" href="classace__segment_1_1Tm1637Module.html#af3a100b0d07125af76aaf8ea10bc597c" title="Send segment patterns of all digits plus the brightness to the display.">flush()</a>, but often it is not necessary. </p>
 
-<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00186">186</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00145">145</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
 
 </div>
 </div>
@@ -346,49 +389,14 @@ template&lt;typename T_TMII , uint8_t T_DIGITS&gt; </div>
 
 <p>Update only a single digit or the brightness. </p>
 <p>This method must be called (T_DIGITS + 1) times to update the digits of entire module, including the brightness which is updated using a separate step. Uses the mFlushStage and the mIsDirty bit array to update only the part that needs updating.</p>
-<p>This method should be used if the processor cannot be blocked for the entire duration of the <a class="el" href="classace__segment_1_1Tm1637Module.html#af3a100b0d07125af76aaf8ea10bc597c" title="Send segment patterns of all digits plus the brightness to the display, if any of the digits or brigh...">flush()</a> method (e.g. on the ESP8266, which will cause a WDT reset when it is blocked for more than 20-40 ms).</p>
+<p>This method should be used if the processor cannot be blocked for the entire duration of the <a class="el" href="classace__segment_1_1Tm1637Module.html#af3a100b0d07125af76aaf8ea10bc597c" title="Send segment patterns of all digits plus the brightness to the display.">flush()</a> method (e.g. on the ESP8266, which will cause a WDT reset when it is blocked for more than 20-40 ms).</p>
 <p>Using 100 micro delay, I see the following durations:</p>
 <p>1) If brightness is updated on every iteration, I get 'min/avg/max:4/494/13780', so a maximum of 14 ms, which is still a little bit high.</p>
 <p>2) If brightness is updated during its own mFlushStage (== T_DIGITS), then I see <code>min/avg/max:4/492/10152</code>, saving about 3.5ms from the latency. The side effect is a slightly flicker when the display and brightness changes at the same time, because this incrementally updating function makes those changes in 2 steps.</p>
-<p>The incremental flushing must use fixed addressing mode to write specific digits, which adds extra commands to the wire protocol to the LED module. If this algorithm is used to send all the digits in one-shot, then this method is about 50% slower (30 ms), compared to <a class="el" href="classace__segment_1_1Tm1637Module.html#af3a100b0d07125af76aaf8ea10bc597c" title="Send segment patterns of all digits plus the brightness to the display, if any of the digits or brigh...">flush()</a> (22 ms).</p>
+<p>The incremental flushing must use fixed addressing mode to write specific digits, which adds extra commands to the wire protocol to the LED module. If this algorithm is used to send all the digits in one-shot, then this method is about 50% slower (30 ms), compared to <a class="el" href="classace__segment_1_1Tm1637Module.html#af3a100b0d07125af76aaf8ea10bc597c" title="Send segment patterns of all digits plus the brightness to the display.">flush()</a> (22 ms).</p>
 <p>Technical note: The TM1637 datasheet seems to suggest that the brightness must always be sent after a set of digits are sent. However, experimentation shows that the brightness can be sent as an independent transimission, so this method splits out each digit and the brightness as separate iterations. </p>
 
-<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00248">248</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
-
-</div>
-</div>
-<a id="a8332f872f1dead39572668f6bf70d579"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8332f872f1dead39572668f6bf70d579">&#9670;&nbsp;</a></span>setBrightness()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename T_TMII , uint8_t T_DIGITS&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classace__segment_1_1Tm1637Module.html">ace_segment::Tm1637Module</a>&lt; T_TMII, T_DIGITS &gt;::setBrightness </td>
-          <td>(</td>
-          <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>brightness</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Set global brightness of all digits. </p>
-<p>Different subclasses will interpret the brightness integer value differently. </p>
-
-<p>Implements <a class="el" href="classace__segment_1_1LedModule.html#af14827ce8d21f44bd65b02f0880244fc">ace_segment::LedModule</a>.</p>
-
-<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00155">155</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00208">208</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
 
 </div>
 </div>
@@ -421,7 +429,7 @@ template&lt;typename T_TMII , uint8_t T_DIGITS&gt; </div>
 <p>Turn off the entire display. </p>
 <p>The brightness is not affected so when it is turned back on, the previous brightness will be used. </p>
 
-<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00168">168</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00124">124</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
 
 </div>
 </div>

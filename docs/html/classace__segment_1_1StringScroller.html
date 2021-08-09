@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.17"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>AceSegment: ace_segment::StringScroller Class Reference</title>
+<title>AceSegment: ace_segment::StringScroller&lt; T_LED_MODULE &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.8.1</span>
+   &#160;<span id="projectnumber">0.8.2</span>
    </div>
    <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, HT16K33, or 74HC595 controller chips</div>
   </td>
@@ -71,7 +71,7 @@ $(function() {
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classace__segment_1_1StringScroller-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">ace_segment::StringScroller Class Reference</div>  </div>
+<div class="title">ace_segment::StringScroller&lt; T_LED_MODULE &gt; Class Template Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
@@ -82,65 +82,76 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a87dd6ef5474a30bd4f022f690423e72c"><td class="memItemLeft" align="right" valign="top"><a id="a87dd6ef5474a30bd4f022f690423e72c"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringScroller.html#a87dd6ef5474a30bd4f022f690423e72c">StringScroller</a> (<a class="el" href="classace__segment_1_1CharWriter.html">CharWriter</a> &amp;<a class="el" href="classace__segment_1_1StringScroller.html#a137bd481081e0fff39f32fcd458119f3">charWriter</a>)</td></tr>
-<tr class="memdesc:a87dd6ef5474a30bd4f022f690423e72c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br /></td></tr>
-<tr class="separator:a87dd6ef5474a30bd4f022f690423e72c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1eca87eeeec4a5037b38af6153c2f7ce"><td class="memItemLeft" align="right" valign="top"><a id="a1eca87eeeec4a5037b38af6153c2f7ce"></a>
-<a class="el" href="classace__segment_1_1LedModule.html">LedModule</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringScroller.html#a1eca87eeeec4a5037b38af6153c2f7ce">ledModule</a> ()</td></tr>
-<tr class="memdesc:a1eca87eeeec4a5037b38af6153c2f7ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the underlying <a class="el" href="classace__segment_1_1LedModule.html" title="General interface that represents a generic seven-segment LED module with multiple digits.">LedModule</a>. <br /></td></tr>
-<tr class="separator:a1eca87eeeec4a5037b38af6153c2f7ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af1d5723c7a1acd828f6f57e8d1c1c72e"><td class="memItemLeft" align="right" valign="top"><a id="af1d5723c7a1acd828f6f57e8d1c1c72e"></a>
-<a class="el" href="classace__segment_1_1PatternWriter.html">PatternWriter</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringScroller.html#af1d5723c7a1acd828f6f57e8d1c1c72e">patternWriter</a> ()</td></tr>
-<tr class="memdesc:af1d5723c7a1acd828f6f57e8d1c1c72e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the underlying <a class="el" href="classace__segment_1_1PatternWriter.html" title="Write LED segment patterns to the underlying LedModule.">PatternWriter</a>. <br /></td></tr>
-<tr class="separator:af1d5723c7a1acd828f6f57e8d1c1c72e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a137bd481081e0fff39f32fcd458119f3"><td class="memItemLeft" align="right" valign="top"><a id="a137bd481081e0fff39f32fcd458119f3"></a>
-<a class="el" href="classace__segment_1_1CharWriter.html">CharWriter</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringScroller.html#a137bd481081e0fff39f32fcd458119f3">charWriter</a> ()</td></tr>
-<tr class="memdesc:a137bd481081e0fff39f32fcd458119f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the underlying <a class="el" href="classace__segment_1_1LedModule.html" title="General interface that represents a generic seven-segment LED module with multiple digits.">LedModule</a>. <br /></td></tr>
-<tr class="separator:a137bd481081e0fff39f32fcd458119f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab5bb266afefb6578d8a0d524629001e1"><td class="memItemLeft" align="right" valign="top"><a id="ab5bb266afefb6578d8a0d524629001e1"></a>
-uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringScroller.html#ab5bb266afefb6578d8a0d524629001e1">getNumDigits</a> () const</td></tr>
-<tr class="memdesc:ab5bb266afefb6578d8a0d524629001e1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the number of digits supported by this display instance. <br /></td></tr>
-<tr class="separator:ab5bb266afefb6578d8a0d524629001e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae776ccdf7789ff01b13da06579322396"><td class="memItemLeft" align="right" valign="top"><a id="ae776ccdf7789ff01b13da06579322396"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringScroller.html#ae776ccdf7789ff01b13da06579322396">initScrollLeft</a> (const char *s)</td></tr>
-<tr class="memdesc:ae776ccdf7789ff01b13da06579322396"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set scroll string, clear the display, and prepare to scroll left. <br /></td></tr>
-<tr class="separator:ae776ccdf7789ff01b13da06579322396"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a66d4f36cd356a5835ceabbcce8ba1335"><td class="memItemLeft" align="right" valign="top"><a id="a66d4f36cd356a5835ceabbcce8ba1335"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringScroller.html#a66d4f36cd356a5835ceabbcce8ba1335">initScrollLeft</a> (const __FlashStringHelper *fs)</td></tr>
-<tr class="memdesc:a66d4f36cd356a5835ceabbcce8ba1335"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set scroll string, clear the display, and prepare to scroll left. <br /></td></tr>
-<tr class="separator:a66d4f36cd356a5835ceabbcce8ba1335"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0caa03a42a4cd64794e379cdf7662742"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringScroller.html#a0caa03a42a4cd64794e379cdf7662742">scrollLeft</a> ()</td></tr>
-<tr class="memdesc:a0caa03a42a4cd64794e379cdf7662742"><td class="mdescLeft">&#160;</td><td class="mdescRight">Scroll one position left.  <a href="classace__segment_1_1StringScroller.html#a0caa03a42a4cd64794e379cdf7662742">More...</a><br /></td></tr>
-<tr class="separator:a0caa03a42a4cd64794e379cdf7662742"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a72210a4181d9ae0266f9a0932a5a63d5"><td class="memItemLeft" align="right" valign="top"><a id="a72210a4181d9ae0266f9a0932a5a63d5"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringScroller.html#a72210a4181d9ae0266f9a0932a5a63d5">initScrollRight</a> (const char *s)</td></tr>
-<tr class="memdesc:a72210a4181d9ae0266f9a0932a5a63d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set scroll string, clear the display, and prepare to scroll right. <br /></td></tr>
-<tr class="separator:a72210a4181d9ae0266f9a0932a5a63d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8a3bde2eec0f2ff76b3d610dcead48d5"><td class="memItemLeft" align="right" valign="top"><a id="a8a3bde2eec0f2ff76b3d610dcead48d5"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringScroller.html#a8a3bde2eec0f2ff76b3d610dcead48d5">initScrollRight</a> (const __FlashStringHelper *fs)</td></tr>
-<tr class="memdesc:a8a3bde2eec0f2ff76b3d610dcead48d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set scroll string, clear the display, and prepare to scroll right. <br /></td></tr>
-<tr class="separator:a8a3bde2eec0f2ff76b3d610dcead48d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1922aa83b67028a1f1dcf079abae0c8a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringScroller.html#a1922aa83b67028a1f1dcf079abae0c8a">scrollRight</a> ()</td></tr>
-<tr class="memdesc:a1922aa83b67028a1f1dcf079abae0c8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Scroll one position left.  <a href="classace__segment_1_1StringScroller.html#a1922aa83b67028a1f1dcf079abae0c8a">More...</a><br /></td></tr>
-<tr class="separator:a1922aa83b67028a1f1dcf079abae0c8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ffe6e513c6da0b4d822921e1b99a0eb"><td class="memItemLeft" align="right" valign="top"><a id="a3ffe6e513c6da0b4d822921e1b99a0eb"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringScroller.html#a3ffe6e513c6da0b4d822921e1b99a0eb">StringScroller</a> (<a class="el" href="classace__segment_1_1CharWriter.html">CharWriter</a>&lt; T_LED_MODULE &gt; &amp;<a class="el" href="classace__segment_1_1StringScroller.html#a7a22724d92da893b59408943b6564008">charWriter</a>)</td></tr>
+<tr class="memdesc:a3ffe6e513c6da0b4d822921e1b99a0eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor. <br /></td></tr>
+<tr class="separator:a3ffe6e513c6da0b4d822921e1b99a0eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab69225111f4903976beffe7f7cb27ac5"><td class="memItemLeft" align="right" valign="top"><a id="ab69225111f4903976beffe7f7cb27ac5"></a>
+T_LED_MODULE &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringScroller.html#ab69225111f4903976beffe7f7cb27ac5">ledModule</a> ()</td></tr>
+<tr class="memdesc:ab69225111f4903976beffe7f7cb27ac5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the underlying <a class="el" href="classace__segment_1_1LedModule.html" title="General interface that represents a generic seven-segment LED module with multiple digits.">LedModule</a>. <br /></td></tr>
+<tr class="separator:ab69225111f4903976beffe7f7cb27ac5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeae94ffa7ed0ac65a3956d962e5b75d1"><td class="memItemLeft" align="right" valign="top"><a id="aeae94ffa7ed0ac65a3956d962e5b75d1"></a>
+<a class="el" href="classace__segment_1_1PatternWriter.html">PatternWriter</a>&lt; T_LED_MODULE &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringScroller.html#aeae94ffa7ed0ac65a3956d962e5b75d1">patternWriter</a> ()</td></tr>
+<tr class="memdesc:aeae94ffa7ed0ac65a3956d962e5b75d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the underlying <a class="el" href="classace__segment_1_1PatternWriter.html" title="Write LED segment patterns to the underlying LedModule.">PatternWriter</a>. <br /></td></tr>
+<tr class="separator:aeae94ffa7ed0ac65a3956d962e5b75d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7a22724d92da893b59408943b6564008"><td class="memItemLeft" align="right" valign="top"><a id="a7a22724d92da893b59408943b6564008"></a>
+<a class="el" href="classace__segment_1_1CharWriter.html">CharWriter</a>&lt; T_LED_MODULE &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringScroller.html#a7a22724d92da893b59408943b6564008">charWriter</a> ()</td></tr>
+<tr class="memdesc:a7a22724d92da893b59408943b6564008"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the underlying <a class="el" href="classace__segment_1_1LedModule.html" title="General interface that represents a generic seven-segment LED module with multiple digits.">LedModule</a>. <br /></td></tr>
+<tr class="separator:a7a22724d92da893b59408943b6564008"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac70037cd50bfe1a80f6156cde68f51d4"><td class="memItemLeft" align="right" valign="top"><a id="ac70037cd50bfe1a80f6156cde68f51d4"></a>
+uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringScroller.html#ac70037cd50bfe1a80f6156cde68f51d4">getNumDigits</a> () const</td></tr>
+<tr class="memdesc:ac70037cd50bfe1a80f6156cde68f51d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the number of digits supported by this display instance. <br /></td></tr>
+<tr class="separator:ac70037cd50bfe1a80f6156cde68f51d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0eec3eb45939243dc8632dba4ceabd4b"><td class="memItemLeft" align="right" valign="top"><a id="a0eec3eb45939243dc8632dba4ceabd4b"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringScroller.html#a0eec3eb45939243dc8632dba4ceabd4b">initScrollLeft</a> (const char *s)</td></tr>
+<tr class="memdesc:a0eec3eb45939243dc8632dba4ceabd4b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set scroll string, clear the display, and prepare to scroll left. <br /></td></tr>
+<tr class="separator:a0eec3eb45939243dc8632dba4ceabd4b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aca04582172b81e68e181e10e98930893"><td class="memItemLeft" align="right" valign="top"><a id="aca04582172b81e68e181e10e98930893"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringScroller.html#aca04582172b81e68e181e10e98930893">initScrollLeft</a> (const __FlashStringHelper *fs)</td></tr>
+<tr class="memdesc:aca04582172b81e68e181e10e98930893"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set scroll string, clear the display, and prepare to scroll left. <br /></td></tr>
+<tr class="separator:aca04582172b81e68e181e10e98930893"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a633d294d5d38fccb85b52837d53b5622"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringScroller.html#a633d294d5d38fccb85b52837d53b5622">scrollLeft</a> ()</td></tr>
+<tr class="memdesc:a633d294d5d38fccb85b52837d53b5622"><td class="mdescLeft">&#160;</td><td class="mdescRight">Scroll one position left.  <a href="classace__segment_1_1StringScroller.html#a633d294d5d38fccb85b52837d53b5622">More...</a><br /></td></tr>
+<tr class="separator:a633d294d5d38fccb85b52837d53b5622"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a537f9e8ba56d2b2b781748c0e31b583b"><td class="memItemLeft" align="right" valign="top"><a id="a537f9e8ba56d2b2b781748c0e31b583b"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringScroller.html#a537f9e8ba56d2b2b781748c0e31b583b">initScrollRight</a> (const char *s)</td></tr>
+<tr class="memdesc:a537f9e8ba56d2b2b781748c0e31b583b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set scroll string, clear the display, and prepare to scroll right. <br /></td></tr>
+<tr class="separator:a537f9e8ba56d2b2b781748c0e31b583b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab06eeb36c6753cadf094ebfb88f33773"><td class="memItemLeft" align="right" valign="top"><a id="ab06eeb36c6753cadf094ebfb88f33773"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringScroller.html#ab06eeb36c6753cadf094ebfb88f33773">initScrollRight</a> (const __FlashStringHelper *fs)</td></tr>
+<tr class="memdesc:ab06eeb36c6753cadf094ebfb88f33773"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set scroll string, clear the display, and prepare to scroll right. <br /></td></tr>
+<tr class="separator:ab06eeb36c6753cadf094ebfb88f33773"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a4ac4f53ba4adc7a5411cbc4c47a42e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1StringScroller.html#a4a4ac4f53ba4adc7a5411cbc4c47a42e">scrollRight</a> ()</td></tr>
+<tr class="memdesc:a4a4ac4f53ba4adc7a5411cbc4c47a42e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Scroll one position left.  <a href="classace__segment_1_1StringScroller.html#a4a4ac4f53ba4adc7a5411cbc4c47a42e">More...</a><br /></td></tr>
+<tr class="separator:a4a4ac4f53ba4adc7a5411cbc4c47a42e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Class that scrolls a string left or right. </p>
+<div class="textblock"><h3>template&lt;typename T_LED_MODULE&gt;<br />
+class ace_segment::StringScroller&lt; T_LED_MODULE &gt;</h3>
 
-<p class="definition">Definition at line <a class="el" href="StringScroller_8h_source.html#l00039">39</a> of file <a class="el" href="StringScroller_8h_source.html">StringScroller.h</a>.</p>
+<p>Class that scrolls a string left or right. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">T_LED_MODULE</td><td>the class of the underlying LED Module, often <a class="el" href="classace__segment_1_1LedModule.html" title="General interface that represents a generic seven-segment LED module with multiple digits.">LedModule</a> but other classes with the same generic public methods can be substituted </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="StringScroller_8h_source.html#l00043">43</a> of file <a class="el" href="StringScroller_8h_source.html">StringScroller.h</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a0caa03a42a4cd64794e379cdf7662742"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0caa03a42a4cd64794e379cdf7662742">&#9670;&nbsp;</a></span>scrollLeft()</h2>
+<a id="a633d294d5d38fccb85b52837d53b5622"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a633d294d5d38fccb85b52837d53b5622">&#9670;&nbsp;</a></span>scrollLeft()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;typename T_LED_MODULE &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool ace_segment::StringScroller::scrollLeft </td>
+          <td class="memname">bool <a class="el" href="classace__segment_1_1StringScroller.html">ace_segment::StringScroller</a>&lt; T_LED_MODULE &gt;::scrollLeft </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -156,21 +167,23 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <p>Scroll one position left. </p>
 <p>Return true when the scrolling is done and the display is cleared </p>
 
-<p class="definition">Definition at line <a class="el" href="StringScroller_8h_source.html#l00080">80</a> of file <a class="el" href="StringScroller_8h_source.html">StringScroller.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="StringScroller_8h_source.html#l00086">86</a> of file <a class="el" href="StringScroller_8h_source.html">StringScroller.h</a>.</p>
 
 </div>
 </div>
-<a id="a1922aa83b67028a1f1dcf079abae0c8a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1922aa83b67028a1f1dcf079abae0c8a">&#9670;&nbsp;</a></span>scrollRight()</h2>
+<a id="a4a4ac4f53ba4adc7a5411cbc4c47a42e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4a4ac4f53ba4adc7a5411cbc4c47a42e">&#9670;&nbsp;</a></span>scrollRight()</h2>
 
 <div class="memitem">
 <div class="memproto">
+<div class="memtemplate">
+template&lt;typename T_LED_MODULE &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool ace_segment::StringScroller::scrollRight </td>
+          <td class="memname">bool <a class="el" href="classace__segment_1_1StringScroller.html">ace_segment::StringScroller</a>&lt; T_LED_MODULE &gt;::scrollRight </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -186,7 +199,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <p>Scroll one position left. </p>
 <p>Return true when the scrolling is done and the display is cleared </p>
 
-<p class="definition">Definition at line <a class="el" href="StringScroller_8h_source.html#l00111">111</a> of file <a class="el" href="StringScroller_8h_source.html">StringScroller.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="StringScroller_8h_source.html#l00117">117</a> of file <a class="el" href="StringScroller_8h_source.html">StringScroller.h</a>.</p>
 
 </div>
 </div>

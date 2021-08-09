@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.8.1</span>
+   &#160;<span id="projectnumber">0.8.2</span>
    </div>
    <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, HT16K33, or 74HC595 controller chips</div>
   </td>
@@ -115,142 +115,136 @@ $(function() {
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;        uint8_t addr,</div>
 <div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;        <span class="keywordtype">bool</span> <a class="code" href="classace__segment_1_1Ht16k33Module.html#ac847aa1ced3161d514d76eac6e8fe824">enableColon</a> = <span class="keyword">false</span></div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    ) :</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        <a class="code" href="classace__segment_1_1LedModule.html">LedModule</a>(T_DIGITS),</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        <a class="code" href="classace__segment_1_1LedModule.html">LedModule</a>(mPatterns, T_DIGITS),</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        mWire(wire),</div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        mAddr(addr),</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        mBrightness(0),</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        mEnableColon(<a class="code" href="classace__segment_1_1Ht16k33Module.html#ac847aa1ced3161d514d76eac6e8fe824">enableColon</a>)</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    {}</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160; </div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="comment">//-----------------------------------------------------------------------</span></div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <span class="comment">// Initialization, termination, and configuration.</span></div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;    <span class="comment">//-----------------------------------------------------------------------</span></div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160; </div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <span class="keywordtype">void</span> begin() {</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;      memset(mPatterns, 0, T_DIGITS);</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;      writeCommand(kSystemOn);</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;      writeCommand(kDisplayOn);</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    }</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160; </div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;    <span class="keywordtype">void</span> end() {</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;      writeCommand(kDisplayOff);</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;      writeCommand(kSystemOff);</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;    }</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        mEnableColon(<a class="code" href="classace__segment_1_1Ht16k33Module.html#ac847aa1ced3161d514d76eac6e8fe824">enableColon</a>)</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    {}</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160; </div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <span class="comment">//-----------------------------------------------------------------------</span></div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="comment">// Initialization, termination, and configuration.</span></div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;    <span class="comment">//-----------------------------------------------------------------------</span></div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <span class="keywordtype">void</span> begin() {</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;      <a class="code" href="classace__segment_1_1LedModule.html#a99ce3bfda3383cef80302a91ea5ca651">LedModule::begin</a>();</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160; </div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;      memset(mPatterns, 0, T_DIGITS);</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;      writeCommand(kSystemOn);</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;      writeCommand(kDisplayOn);</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;    }</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160; </div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;    <span class="keywordtype">void</span> end() {</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;      writeCommand(kDisplayOff);</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;      writeCommand(kSystemOff);</div>
 <div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160; </div>
-<div class="line"><a name="l00113"></a><span class="lineno"><a class="line" href="classace__segment_1_1Ht16k33Module.html#ac847aa1ced3161d514d76eac6e8fe824">  113</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classace__segment_1_1Ht16k33Module.html#ac847aa1ced3161d514d76eac6e8fe824">enableColon</a>(<span class="keywordtype">bool</span> enable) {</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;      mEnableColon = enable;</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    }</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160; </div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <span class="comment">//-----------------------------------------------------------------------</span></div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <span class="comment">// Implement the LedModule interface</span></div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    <span class="comment">//-----------------------------------------------------------------------</span></div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160; </div>
-<div class="line"><a name="l00122"></a><span class="lineno"><a class="line" href="classace__segment_1_1Ht16k33Module.html#a5fe5ca252eaf1140c549787f0ee2be90">  122</a></span>&#160;    uint8_t <a class="code" href="classace__segment_1_1Ht16k33Module.html#a5fe5ca252eaf1140c549787f0ee2be90">getNumDigits</a>()<span class="keyword"> const </span>{ <span class="keywordflow">return</span> T_DIGITS; }</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;      <a class="code" href="classace__segment_1_1LedModule.html#a21e81151039cccd5ba4332af79767955">LedModule::end</a>();</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;    }</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160; </div>
+<div class="line"><a name="l00116"></a><span class="lineno"><a class="line" href="classace__segment_1_1Ht16k33Module.html#ac847aa1ced3161d514d76eac6e8fe824">  116</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classace__segment_1_1Ht16k33Module.html#ac847aa1ced3161d514d76eac6e8fe824">enableColon</a>(<span class="keywordtype">bool</span> enable) {</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;      mEnableColon = enable;</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    }</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160; </div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;    <span class="comment">//-----------------------------------------------------------------------</span></div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    <span class="comment">// Methods related to rendering.</span></div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    <span class="comment">//-----------------------------------------------------------------------</span></div>
 <div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160; </div>
-<div class="line"><a name="l00124"></a><span class="lineno"><a class="line" href="classace__segment_1_1Ht16k33Module.html#a93ee10ff02da9f2de0e546b21965f9d7">  124</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classace__segment_1_1Ht16k33Module.html#a93ee10ff02da9f2de0e546b21965f9d7">setPatternAt</a>(uint8_t pos, uint8_t pattern)<span class="keyword"> override </span>{</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;      mPatterns[pos] = pattern;</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    }</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160; </div>
-<div class="line"><a name="l00128"></a><span class="lineno"><a class="line" href="classace__segment_1_1Ht16k33Module.html#a36a6cd33f1f214b1a13b60cc70019857">  128</a></span>&#160;    uint8_t <a class="code" href="classace__segment_1_1Ht16k33Module.html#a36a6cd33f1f214b1a13b60cc70019857">getPatternAt</a>(uint8_t pos)<span class="keyword"> override </span>{</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;      <span class="keywordflow">return</span> mPatterns[pos];</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    }</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160; </div>
-<div class="line"><a name="l00132"></a><span class="lineno"><a class="line" href="classace__segment_1_1Ht16k33Module.html#a9af31d58a23e6205cc43155903a1df49">  132</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classace__segment_1_1Ht16k33Module.html#a9af31d58a23e6205cc43155903a1df49">setBrightness</a>(uint8_t brightness)<span class="keyword"> override </span>{</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;      mBrightness = brightness &amp; 0xF;</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    }</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160; </div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="comment">//-----------------------------------------------------------------------</span></div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    <span class="comment">// Methods related to rendering.</span></div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    <span class="comment">//-----------------------------------------------------------------------</span></div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160; </div>
-<div class="line"><a name="l00159"></a><span class="lineno"><a class="line" href="classace__segment_1_1Ht16k33Module.html#ad9225465a7ce3fa621eb8505edb77f6a">  159</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classace__segment_1_1Ht16k33Module.html#ad9225465a7ce3fa621eb8505edb77f6a">flush</a>() {</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;      <span class="comment">// Write digits.</span></div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;      mWire.beginTransmission(mAddr);</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;      mWire.write(0x00); <span class="comment">// start at position 0</span></div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;      <span class="comment">// Loop over the 5 physical digit lines of this module.</span></div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;      <span class="keywordflow">for</span> (uint8_t chipPos = 0; chipPos &lt; T_DIGITS + 1; ++chipPos) {</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;        uint8_t pattern = patternForChipPos(chipPos, mPatterns, mEnableColon);</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;        mWire.write(pattern); <span class="comment">// ROW0-ROW7</span></div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;        mWire.write(0); <span class="comment">// ROW8-ROW15 unused</span></div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;      }</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;      mWire.endTransmission(<span class="keyword">false</span>); <span class="comment">// HT16K33 supports repeated START</span></div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160; </div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;      <span class="comment">// Write brightness.</span></div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;      writeCommand(mBrightness | kBrightness);</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    }</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160; </div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;  <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;    <span class="keyword">friend</span> class ::Ht16k33ModuleTest_patternForChipPos_colonDisabled;</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;    <span class="keyword">friend</span> class ::Ht16k33ModuleTest_patternForChipPos_colonEnabled;</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160; </div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    <span class="keywordtype">void</span> writeCommand(uint8_t command) {</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;      mWire.beginTransmission(mAddr);</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;      mWire.write(command);</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;      mWire.endTransmission();</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;    }</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160; </div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;    <span class="keyword">static</span> uint8_t patternForChipPos(</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;        uint8_t chipPos, <span class="keyword">const</span> uint8_t patterns[], <span class="keywordtype">bool</span> <a class="code" href="classace__segment_1_1Ht16k33Module.html#ac847aa1ced3161d514d76eac6e8fe824">enableColon</a>) {</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;      <span class="keywordflow">switch</span> (chipPos) {</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;        <span class="keywordflow">case</span> 0:</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;          <span class="keywordflow">return</span> patterns[0];</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;        <span class="keywordflow">case</span> 1: {</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;          uint8_t pattern = patterns[1];</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;          <span class="keywordflow">return</span> (<a class="code" href="classace__segment_1_1Ht16k33Module.html#ac847aa1ced3161d514d76eac6e8fe824">enableColon</a>) ? pattern &amp; 0x7F : pattern;</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;        }</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;        <span class="keywordflow">case</span> 2: {</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;          <span class="keywordflow">if</span> (<a class="code" href="classace__segment_1_1Ht16k33Module.html#ac847aa1ced3161d514d76eac6e8fe824">enableColon</a>) {</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;            <span class="comment">// Connect the colon bit 7 on logical digit 1 (that was stripped</span></div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;            <span class="comment">// above) and send to the colon segment at physical digit COM2. It</span></div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;            <span class="comment">// looks like on the 4-digit HT16K33 modules that I got, the colon</span></div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;            <span class="comment">// is connected to ROW1 (i.e. 0x02) instead of ROW7 (i.e. 0x80) that</span></div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;            <span class="comment">// I would have expected.</span></div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;            <span class="keywordtype">bool</span> hasColon = patterns[1] &amp; 0x80;</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;            <span class="keywordflow">return</span> hasColon ? 0x02 : 0x00;</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;          } <span class="keywordflow">else</span> {</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;            <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;          }</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;        }</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;        <span class="keywordflow">case</span> 3:</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;          <span class="keywordflow">return</span> patterns[2];</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;        <span class="keywordflow">case</span> 4:</div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;          <span class="keywordflow">return</span> patterns[3];</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;        <span class="keywordflow">default</span>:</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;          <span class="keywordflow">return</span> 0;</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;      }</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    }</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160; </div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;  <span class="keyword">private</span>:</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    <span class="keyword">static</span> uint8_t <span class="keyword">const</span> kSystemOff  = 0x20;</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    <span class="keyword">static</span> uint8_t <span class="keyword">const</span> kSystemOn   = 0x21;</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    <span class="keyword">static</span> uint8_t <span class="keyword">const</span> kDisplayOff = 0x80;</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    <span class="keyword">static</span> uint8_t <span class="keyword">const</span> kDisplayOn  = 0x81;</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    <span class="keyword">static</span> uint8_t <span class="keyword">const</span> kBrightness = 0xE0;</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160; </div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    T_WIREI mWire;</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160; </div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;    uint8_t <span class="keyword">const</span> mAddr;</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160; </div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    uint8_t mPatterns[T_DIGITS];</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160; </div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    uint8_t mBrightness;</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160; </div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    <span class="keywordtype">bool</span> mEnableColon;</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;};</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160; </div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;}</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160; </div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00125"></a><span class="lineno"><a class="line" href="classace__segment_1_1Ht16k33Module.html#a97e16c862a4d92012e6758fc6955017d">  125</a></span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="classace__segment_1_1Ht16k33Module.html#a97e16c862a4d92012e6758fc6955017d">isFlushRequired</a>()<span class="keyword"> const </span>{</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;      <span class="keywordflow">return</span> <a class="code" href="classace__segment_1_1LedModule.html#a38e455547e6f822c60361aadf15a99b7">isAnyDigitDirty</a>() || <a class="code" href="classace__segment_1_1LedModule.html#aa31d2399ab4048ea5ae3040c6ea61398">isBrightnessDirty</a>();</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    }</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160; </div>
+<div class="line"><a name="l00151"></a><span class="lineno"><a class="line" href="classace__segment_1_1Ht16k33Module.html#ad9225465a7ce3fa621eb8505edb77f6a">  151</a></span>&#160;    <span class="keywordtype">void</span> <a class="code" href="classace__segment_1_1Ht16k33Module.html#ad9225465a7ce3fa621eb8505edb77f6a">flush</a>() {</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;      <span class="comment">// Write digits.</span></div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;      mWire.beginTransmission(mAddr);</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;      mWire.write(0x00); <span class="comment">// start at position 0</span></div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;      <span class="comment">// Loop over the 5 physical digit lines of this module.</span></div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;      <span class="keywordflow">for</span> (uint8_t chipPos = 0; chipPos &lt; T_DIGITS + 1; ++chipPos) {</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;        uint8_t pattern = patternForChipPos(chipPos, mPatterns, mEnableColon);</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;        mWire.write(pattern); <span class="comment">// ROW0-ROW7</span></div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;        mWire.write(0); <span class="comment">// ROW8-ROW15 unused</span></div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;      }</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;      mWire.endTransmission(<span class="keyword">false</span>); <span class="comment">// HT16K33 supports repeated START</span></div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160; </div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;      <span class="comment">// Write brightness.</span></div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;      writeCommand(<a class="code" href="classace__segment_1_1LedModule.html#aed70d70812a3f5d1335b0073f6542afb">getBrightness</a>() | kBrightness);</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160; </div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;      <a class="code" href="classace__segment_1_1LedModule.html#a4a327ac2b7eba7f2020aa20a4fc1ccf1">clearDigitsDirty</a>();</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;      <a class="code" href="classace__segment_1_1LedModule.html#aaf02d648ff844e35d1969aaaa4aff0fd">clearBrightnessDirty</a>();</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    }</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160; </div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;  <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    <span class="keyword">friend</span> class ::Ht16k33ModuleTest_patternForChipPos_colonDisabled;</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    <span class="keyword">friend</span> class ::Ht16k33ModuleTest_patternForChipPos_colonEnabled;</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160; </div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    <span class="keywordtype">void</span> writeCommand(uint8_t command) {</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;      mWire.beginTransmission(mAddr);</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;      mWire.write(command);</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;      mWire.endTransmission();</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    }</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160; </div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    <span class="keyword">static</span> uint8_t patternForChipPos(</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;        uint8_t chipPos, <span class="keyword">const</span> uint8_t patterns[], <span class="keywordtype">bool</span> <a class="code" href="classace__segment_1_1Ht16k33Module.html#ac847aa1ced3161d514d76eac6e8fe824">enableColon</a>) {</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;      <span class="keywordflow">switch</span> (chipPos) {</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;        <span class="keywordflow">case</span> 0:</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;          <span class="keywordflow">return</span> patterns[0];</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;        <span class="keywordflow">case</span> 1: {</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;          uint8_t pattern = patterns[1];</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;          <span class="keywordflow">return</span> (<a class="code" href="classace__segment_1_1Ht16k33Module.html#ac847aa1ced3161d514d76eac6e8fe824">enableColon</a>) ? pattern &amp; 0x7F : pattern;</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;        }</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;        <span class="keywordflow">case</span> 2: {</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;          <span class="keywordflow">if</span> (<a class="code" href="classace__segment_1_1Ht16k33Module.html#ac847aa1ced3161d514d76eac6e8fe824">enableColon</a>) {</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;            <span class="comment">// Connect the colon bit 7 on logical digit 1 (that was stripped</span></div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;            <span class="comment">// above) and send to the colon segment at physical digit COM2. It</span></div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;            <span class="comment">// looks like on the 4-digit HT16K33 modules that I got, the colon</span></div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;            <span class="comment">// is connected to ROW1 (i.e. 0x02) instead of ROW7 (i.e. 0x80) that</span></div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;            <span class="comment">// I would have expected.</span></div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;            <span class="keywordtype">bool</span> hasColon = patterns[1] &amp; 0x80;</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;            <span class="keywordflow">return</span> hasColon ? 0x02 : 0x00;</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;          } <span class="keywordflow">else</span> {</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;            <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;          }</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;        }</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;        <span class="keywordflow">case</span> 3:</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;          <span class="keywordflow">return</span> patterns[2];</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;        <span class="keywordflow">case</span> 4:</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;          <span class="keywordflow">return</span> patterns[3];</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;        <span class="keywordflow">default</span>:</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;          <span class="keywordflow">return</span> 0;</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;      }</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;    }</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160; </div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;  <span class="keyword">private</span>:</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;    <span class="keyword">static</span> uint8_t <span class="keyword">const</span> kSystemOff  = 0x20;</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;    <span class="keyword">static</span> uint8_t <span class="keyword">const</span> kSystemOn   = 0x21;</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;    <span class="keyword">static</span> uint8_t <span class="keyword">const</span> kDisplayOff = 0x80;</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    <span class="keyword">static</span> uint8_t <span class="keyword">const</span> kDisplayOn  = 0x81;</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    <span class="keyword">static</span> uint8_t <span class="keyword">const</span> kBrightness = 0xE0;</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160; </div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    T_WIREI mWire;</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160; </div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    uint8_t <span class="keyword">const</span> mAddr;</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160; </div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    uint8_t mPatterns[T_DIGITS];</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160; </div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    <span class="keywordtype">bool</span> mEnableColon;</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;};</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160; </div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;}</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160; </div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;<span class="preprocessor">#endif</span></div>
 </div><!-- fragment --></div><!-- contents -->
+<div class="ttc" id="aclassace__segment_1_1LedModule_html_a4a327ac2b7eba7f2020aa20a4fc1ccf1"><div class="ttname"><a href="classace__segment_1_1LedModule.html#a4a327ac2b7eba7f2020aa20a4fc1ccf1">ace_segment::LedModule::clearDigitsDirty</a></div><div class="ttdeci">void clearDigitsDirty()</div><div class="ttdoc">Clear dirty bits of all digits.</div><div class="ttdef"><b>Definition:</b> <a href="LedModule_8h_source.html#l00126">LedModule.h:126</a></div></div>
+<div class="ttc" id="aclassace__segment_1_1Ht16k33Module_html_a97e16c862a4d92012e6758fc6955017d"><div class="ttname"><a href="classace__segment_1_1Ht16k33Module.html#a97e16c862a4d92012e6758fc6955017d">ace_segment::Ht16k33Module::isFlushRequired</a></div><div class="ttdeci">bool isFlushRequired() const</div><div class="ttdoc">Return true if flushing required.</div><div class="ttdef"><b>Definition:</b> <a href="Ht16k33Module_8h_source.html#l00125">Ht16k33Module.h:125</a></div></div>
 <div class="ttc" id="aclassace__segment_1_1LedModule_html"><div class="ttname"><a href="classace__segment_1_1LedModule.html">ace_segment::LedModule</a></div><div class="ttdoc">General interface that represents a generic seven-segment LED module with multiple digits.</div><div class="ttdef"><b>Definition:</b> <a href="LedModule_8h_source.html#l00044">LedModule.h:44</a></div></div>
 <div class="ttc" id="aclassace__segment_1_1Ht16k33Module_html"><div class="ttname"><a href="classace__segment_1_1Ht16k33Module.html">ace_segment::Ht16k33Module</a></div><div class="ttdoc">An implementation of LedModule using the HT16K33 chip.</div><div class="ttdef"><b>Definition:</b> <a href="Ht16k33Module_8h_source.html#l00066">Ht16k33Module.h:66</a></div></div>
+<div class="ttc" id="aclassace__segment_1_1LedModule_html_a38e455547e6f822c60361aadf15a99b7"><div class="ttname"><a href="classace__segment_1_1LedModule.html#a38e455547e6f822c60361aadf15a99b7">ace_segment::LedModule::isAnyDigitDirty</a></div><div class="ttdeci">bool isAnyDigitDirty() const</div><div class="ttdoc">Return true if any digits are dirty.</div><div class="ttdef"><b>Definition:</b> <a href="LedModule_8h_source.html#l00131">LedModule.h:131</a></div></div>
 <div class="ttc" id="aclassace__segment_1_1Ht16k33Module_html_a0136851a409d3bba51c3cdf9aa4eb483"><div class="ttname"><a href="classace__segment_1_1Ht16k33Module.html#a0136851a409d3bba51c3cdf9aa4eb483">ace_segment::Ht16k33Module::Ht16k33Module</a></div><div class="ttdeci">Ht16k33Module(T_WIREI &amp;wire, uint8_t addr, bool enableColon=false)</div><div class="ttdoc">Constructor.</div><div class="ttdef"><b>Definition:</b> <a href="Ht16k33Module_8h_source.html#l00077">Ht16k33Module.h:77</a></div></div>
-<div class="ttc" id="aclassace__segment_1_1Ht16k33Module_html_a36a6cd33f1f214b1a13b60cc70019857"><div class="ttname"><a href="classace__segment_1_1Ht16k33Module.html#a36a6cd33f1f214b1a13b60cc70019857">ace_segment::Ht16k33Module::getPatternAt</a></div><div class="ttdeci">uint8_t getPatternAt(uint8_t pos) override</div><div class="ttdoc">Get the led digit pattern at position pos.</div><div class="ttdef"><b>Definition:</b> <a href="Ht16k33Module_8h_source.html#l00128">Ht16k33Module.h:128</a></div></div>
-<div class="ttc" id="aclassace__segment_1_1Ht16k33Module_html_a9af31d58a23e6205cc43155903a1df49"><div class="ttname"><a href="classace__segment_1_1Ht16k33Module.html#a9af31d58a23e6205cc43155903a1df49">ace_segment::Ht16k33Module::setBrightness</a></div><div class="ttdeci">void setBrightness(uint8_t brightness) override</div><div class="ttdoc">Set global brightness of all digits.</div><div class="ttdef"><b>Definition:</b> <a href="Ht16k33Module_8h_source.html#l00132">Ht16k33Module.h:132</a></div></div>
-<div class="ttc" id="aclassace__segment_1_1Ht16k33Module_html_a93ee10ff02da9f2de0e546b21965f9d7"><div class="ttname"><a href="classace__segment_1_1Ht16k33Module.html#a93ee10ff02da9f2de0e546b21965f9d7">ace_segment::Ht16k33Module::setPatternAt</a></div><div class="ttdeci">void setPatternAt(uint8_t pos, uint8_t pattern) override</div><div class="ttdoc">Set the led digit pattern at position pos.</div><div class="ttdef"><b>Definition:</b> <a href="Ht16k33Module_8h_source.html#l00124">Ht16k33Module.h:124</a></div></div>
-<div class="ttc" id="aclassace__segment_1_1Ht16k33Module_html_a5fe5ca252eaf1140c549787f0ee2be90"><div class="ttname"><a href="classace__segment_1_1Ht16k33Module.html#a5fe5ca252eaf1140c549787f0ee2be90">ace_segment::Ht16k33Module::getNumDigits</a></div><div class="ttdeci">uint8_t getNumDigits() const</div><div class="ttdoc">Return the number of digits supported by this display instance.</div><div class="ttdef"><b>Definition:</b> <a href="Ht16k33Module_8h_source.html#l00122">Ht16k33Module.h:122</a></div></div>
-<div class="ttc" id="aclassace__segment_1_1Ht16k33Module_html_ac847aa1ced3161d514d76eac6e8fe824"><div class="ttname"><a href="classace__segment_1_1Ht16k33Module.html#ac847aa1ced3161d514d76eac6e8fe824">ace_segment::Ht16k33Module::enableColon</a></div><div class="ttdeci">void enableColon(bool enable)</div><div class="ttdoc">Set true to enable the colon segment on the module, which replaces the decimal point on digit 1 (seco...</div><div class="ttdef"><b>Definition:</b> <a href="Ht16k33Module_8h_source.html#l00113">Ht16k33Module.h:113</a></div></div>
-<div class="ttc" id="aclassace__segment_1_1Ht16k33Module_html_ad9225465a7ce3fa621eb8505edb77f6a"><div class="ttname"><a href="classace__segment_1_1Ht16k33Module.html#ad9225465a7ce3fa621eb8505edb77f6a">ace_segment::Ht16k33Module::flush</a></div><div class="ttdeci">void flush()</div><div class="ttdoc">Send segment patterns of all digits.</div><div class="ttdef"><b>Definition:</b> <a href="Ht16k33Module_8h_source.html#l00159">Ht16k33Module.h:159</a></div></div>
+<div class="ttc" id="aclassace__segment_1_1LedModule_html_a99ce3bfda3383cef80302a91ea5ca651"><div class="ttname"><a href="classace__segment_1_1LedModule.html#a99ce3bfda3383cef80302a91ea5ca651">ace_segment::LedModule::begin</a></div><div class="ttdeci">void begin()</div><div class="ttdoc">Subclasses should call this from its own begin().</div><div class="ttdef"><b>Definition:</b> <a href="LedModule_8h_source.html#l00093">LedModule.h:93</a></div></div>
+<div class="ttc" id="aclassace__segment_1_1LedModule_html_aaf02d648ff844e35d1969aaaa4aff0fd"><div class="ttname"><a href="classace__segment_1_1LedModule.html#aaf02d648ff844e35d1969aaaa4aff0fd">ace_segment::LedModule::clearBrightnessDirty</a></div><div class="ttdeci">void clearBrightnessDirty()</div><div class="ttdoc">Clear the dirty bit for brightness.</div><div class="ttdef"><b>Definition:</b> <a href="LedModule_8h_source.html#l00146">LedModule.h:146</a></div></div>
+<div class="ttc" id="aclassace__segment_1_1LedModule_html_a21e81151039cccd5ba4332af79767955"><div class="ttname"><a href="classace__segment_1_1LedModule.html#a21e81151039cccd5ba4332af79767955">ace_segment::LedModule::end</a></div><div class="ttdeci">void end()</div><div class="ttdoc">Subclasses should call this from its own end().</div><div class="ttdef"><b>Definition:</b> <a href="LedModule_8h_source.html#l00108">LedModule.h:108</a></div></div>
+<div class="ttc" id="aclassace__segment_1_1LedModule_html_aed70d70812a3f5d1335b0073f6542afb"><div class="ttname"><a href="classace__segment_1_1LedModule.html#aed70d70812a3f5d1335b0073f6542afb">ace_segment::LedModule::getBrightness</a></div><div class="ttdeci">uint8_t getBrightness() const</div><div class="ttdoc">Get the current brightness.</div><div class="ttdef"><b>Definition:</b> <a href="LedModule_8h_source.html#l00087">LedModule.h:87</a></div></div>
+<div class="ttc" id="aclassace__segment_1_1LedModule_html_aa31d2399ab4048ea5ae3040c6ea61398"><div class="ttname"><a href="classace__segment_1_1LedModule.html#aa31d2399ab4048ea5ae3040c6ea61398">ace_segment::LedModule::isBrightnessDirty</a></div><div class="ttdeci">bool isBrightnessDirty() const</div><div class="ttdoc">Check if the brightness level is dirty.</div><div class="ttdef"><b>Definition:</b> <a href="LedModule_8h_source.html#l00136">LedModule.h:136</a></div></div>
+<div class="ttc" id="aclassace__segment_1_1Ht16k33Module_html_ac847aa1ced3161d514d76eac6e8fe824"><div class="ttname"><a href="classace__segment_1_1Ht16k33Module.html#ac847aa1ced3161d514d76eac6e8fe824">ace_segment::Ht16k33Module::enableColon</a></div><div class="ttdeci">void enableColon(bool enable)</div><div class="ttdoc">Set true to enable the colon segment on the module, which replaces the decimal point on digit 1 (seco...</div><div class="ttdef"><b>Definition:</b> <a href="Ht16k33Module_8h_source.html#l00116">Ht16k33Module.h:116</a></div></div>
+<div class="ttc" id="aclassace__segment_1_1Ht16k33Module_html_ad9225465a7ce3fa621eb8505edb77f6a"><div class="ttname"><a href="classace__segment_1_1Ht16k33Module.html#ad9225465a7ce3fa621eb8505edb77f6a">ace_segment::Ht16k33Module::flush</a></div><div class="ttdeci">void flush()</div><div class="ttdoc">Send segment patterns of all digits.</div><div class="ttdef"><b>Definition:</b> <a href="Ht16k33Module_8h_source.html#l00151">Ht16k33Module.h:151</a></div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
 Generated by &#160;<a href="http://www.doxygen.org/index.html">

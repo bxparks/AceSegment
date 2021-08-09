@@ -11,11 +11,11 @@
 #include <Arduino.h>
 #include <SPI.h> // SPIClass, SPI
 #include <AceSPI.h> // HardSpiInterface
-#include <AceSegment.h> // Hc595Module, NumberWriter
+#include <AceSegment.h> // Hc595Module
 
 using ace_spi::HardSpiInterface;
+using ace_segment::LedModule;
 using ace_segment::Hc595Module;
-using ace_segment::NumberWriter;
 using ace_segment::kDigitRemapArray8Hc595;
 using ace_segment::kByteOrderSegmentHighDigitLow;
 using ace_segment::kActiveLowPattern;
@@ -44,7 +44,21 @@ Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
     HC595_BYTE_ORDER,
     REMAP_ARRAY
 );
-NumberWriter numberWriter(ledModule);
+
+// LED segment patterns.
+const uint8_t NUM_PATTERNS = 10;
+const uint8_t PATTERNS[NUM_PATTERNS] = {
+  0b00111111, // 0
+  0b00000110, // 1
+  0b01011011, // 2
+  0b01001111, // 3
+  0b01100110, // 4
+  0b01101101, // 5
+  0b01111101, // 6
+  0b00000111, // 7
+  0b01111111, // 8
+  0b01101111, // 9
+};
 
 void setup() {
   delay(1000);
@@ -53,14 +67,14 @@ void setup() {
   spiInterface.begin();
   ledModule.begin();
 
-  numberWriter.writeHexCharAt(0, 0);
-  numberWriter.writeHexCharAt(1, 1);
-  numberWriter.writeHexCharAt(2, 2);
-  numberWriter.writeHexCharAt(3, 3);
-  numberWriter.writeHexCharAt(4, 4);
-  numberWriter.writeHexCharAt(5, 5);
-  numberWriter.writeHexCharAt(6, 6);
-  numberWriter.writeHexCharAt(7, 7);
+  ledModule.setPatternAt(0, PATTERNS[0]);
+  ledModule.setPatternAt(1, PATTERNS[1]);
+  ledModule.setPatternAt(2, PATTERNS[2]);
+  ledModule.setPatternAt(3, PATTERNS[3]);
+  ledModule.setPatternAt(4, PATTERNS[4]);
+  ledModule.setPatternAt(5, PATTERNS[5]);
+  ledModule.setPatternAt(6, PATTERNS[6]);
+  ledModule.setPatternAt(7, PATTERNS[7]);
 
   // Brightness not supported when NUM_SUBFIELDS == 1.
   // ledModule.setBrightness(2);

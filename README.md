@@ -37,15 +37,16 @@ details of the specific LED module.
 
 This library is designed to ensure that client applications pay only for what
 they use. Most of the code is written as C++ templates to avoid creating static
-resources that cannot be optimized away. There is no direct dependency to the
-`<Wire.h>`, `<SPI.h>`, `<AceWire.h>`, `<AceSPI.h>`, or `<AceTMI.h>` libraries
-from this library. (On AVR processors, simply adding `#include <Wire.h>`
-increases flash usage by about 1100 bytes even if nothing is used from the
-`<Wire.h>` library.)
+resources that cannot be optimized away. No virtual methods are used in this
+library, making the code size smaller and execution speed a little faster. There
+is no direct dependency to the `<Wire.h>`, `<SPI.h>`, `<AceWire.h>`,
+`<AceSPI.h>`, or `<AceTMI.h>` libraries from this library. (On AVR processors,
+simply adding `#include <Wire.h>` increases flash usage by about 1100 bytes even
+if nothing is used from the `<Wire.h>` library.)
 
-**Version**: 0.8.1 (2021-07-31)
+**Version**: 0.8.2 (2021-08-09)
 
-**Status**: Ready for first public release.
+**Status**: *Almost* ready for first public release.
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
@@ -60,6 +61,7 @@ increases flash usage by about 1100 bytes even if nothing is used from the
     * [Classes](#Classes)
     * [Dependency Diagram](#DependencyDiagram)
     * [Digit and Segment Addressing](#DigitAndSegmentAddressing)
+    * [Remap Arrays](#RemapArrays)
     * [Hello Tm1637Module](#HelloTm1637Module)
     * [Hello Max7219Module](#HelloMax7219Module)
     * [Hello Ht16k33Module](#HelloHt16k33Module)
@@ -103,6 +105,7 @@ increases flash usage by about 1100 bytes even if nothing is used from the
     * [Tool Chain](#ToolChain)
     * [Operating System](#OperatingSystem)
 * [Bugs And Limitations](#BugsAndLimitations)
+* [Alternative Libraries](#AlternativeLibraries)
 * [License](#License)
 * [Feedback and Support](#FeedbackAndSupport)
 * [Authors](#Authors)
@@ -136,9 +139,15 @@ The source files are organized as follows:
 <a name="Dependencies"></a>
 ### Dependencies
 
-This library depends on the following additional libraries:
+This library library has a direct dependency on:
 
 * AceCommon (https://github.com/bxparks/AceCommon)
+
+The following libraries are required for only certain classes in the library.
+All of them are listed in the `depends` clause of `library.properties` to make
+the installation easier, but they are pulled into the executable only if they
+are explicitly referenced by the calling application:
+
 * AceSPI (https://github.com/bxparks/AceSPI)
     * Needed by `Hc595Module`, `Max7219Module`, and `HybridModule`
 * AceTMI (https://github.com/bxparks/AceTMI)
@@ -343,7 +352,7 @@ Tm1637Module  Max7219Module Hc595Module HybridModule Ht16k33Module DirectModule
                         +---------------------+         |
                                 |                       |
                                 v                       v
-                            <SPI.h>                 <Wire.h>
+                             <SPI.h>                 <Wire.h>
 ```
 
 (The actual dependency among various classes is a bit more complicated than this
@@ -384,27 +393,33 @@ Digit 1 and Digit 2. In these modules, sometimes the decimal points for the
 other digits work normally, but sometimes, the remaining decimal points do not
 work at all.
 
-Sometimes the LED modules are hardwired to the controller chip so that the
+<a name="RemapArrays"></a>
+### Remap Arrays
+
+Sometimes the LED modules are hardwired to the controller chips so that the
 positions of the digits (and sometimes segments) do not not match the logical
-arrangement described above. Fortunately, we can rearrange the digit and segment
-bits in software so that everything is remapped to their correct places. For
-example, the diymore/robotdyn 6-digit TM1637 LED module is wired so that the
-digits are displayed like this:
+arrangement described above. For example, the diymore/robotdyn 6-digit TM1637
+LED module is wired so that the digits are displayed like this:
 
 ```
 2 1 0 5 4 3
 ```
 
-The `Tm1637Module` class can remap these digits into their correct order:
+Fortunately, we can rearrange the digit and segment bits in software so that
+everything is remapped to their correct places. The constructors for
+`Tm1637Module`, `Max7219Module`, and `Hc595Module` accept an optional parameter
+which describes the remapping of the digits. The library provides some
+predefined remap arrays which work for the LED modules that I obtained from the
+retail stores:
 
-```
-0 1 2 3 4 5
-```
+* `kDigitRemapArray8Max7219`: reverses the digits on the 8-digit MAX7219 modules
+* `kDigitRemapArray8Hc595`: swaps the 2 banks of 4-digits on the 8-digit 74HC595
+  modules
+* `kDigitRemapArray6Tm1637`: rearranges the digits on the 6-digit TM1637 modules
 
-Since it is impossible to predict all the different ways that the LED modules
-can be wired, various classes in the library allow the remapping array to be
-supplied by the library user. The [DEVELOPER.md](DEVELOPER.md) document has some
-preliminary notes about how to create a remap array.
+Custom remap arrays can be created for LED modules which use different ordering
+schemes. The [DEVELOPER.md](DEVELOPER.md) document has some preliminary notes
+about how to create a remap array.
 
 <a name="HelloTm1637Module"></a>
 ### Hello Tm1637Module
@@ -419,11 +434,10 @@ digits by flushing the data bits to the TM1637 controller using the
 #include <Arduino.h>
 #include <AceCommon.h> // incrementMod()
 #include <AceTMI.h>
-#include <AceSegment.h> // Tm1637Module, PatternWriter
+#include <AceSegment.h> // Tm1637Module
 
 using ace_tmi::SimpleTmiInterface;
 using ace_segment::Tm1637Module;
-using ace_segment::NumberWriter;
 
 // Replace these with the PIN numbers of your dev board.
 const uint8_t CLK_PIN = A0;
@@ -439,7 +453,20 @@ const uint8_t DELAY_MICROS = 100;
 using TmiInterface = SimpleTmiInterface;
 TmiInterface tmiInterface(DIO_PIN, CLK_PIN, DELAY_MICROS);
 Tm1637Module<TmiInterface, NUM_DIGITS> ledModule(tmiInterface);
-NumberWriter numberWriter(ledModule);
+
+const uint8_t NUM_PATTERNS = 10;
+const uint8_t PATTERNS[NUM_PATTERNS] = {
+  0b00111111, // 0
+  0b00000110, // 1
+  0b01011011, // 2
+  0b01001111, // 3
+  0b01100110, // 4
+  0b01101101, // 5
+  0b01111101, // 6
+  0b00000111, // 7
+  0b01111111, // 8
+  0b01101111, // 9
+};
 
 void setup() {
   delay(1000);
@@ -447,10 +474,10 @@ void setup() {
   tmiInterface.begin();
   ledModule.begin();
 
-  numberWriter.writeHexCharAt(0, 0);
-  numberWriter.writeHexCharAt(1, 1);
-  numberWriter.writeHexCharAt(2, 2);
-  numberWriter.writeHexCharAt(3, 3);
+  ledModule.setPatternAt(0, PATTERNS[0]);
+  ledModule.setPatternAt(1, PATTERNS[1]);
+  ledModule.setPatternAt(2, PATTERNS[2]);
+  ledModule.setPatternAt(3, PATTERNS[3]);
 
   ledModule.setBrightness(2);
 
@@ -473,11 +500,10 @@ digits by flushing the data bits to the MAX7219 controller over SPI using the
 #include <Arduino.h>
 #include <SPI.h> // SPIClass, SPI
 #include <AceSPI.h> // HardSpiInterface
-#include <AceSegment.h> // Max7219Module, NumberWriter
+#include <AceSegment.h> // Max7219Module
 
 using ace_spi::HardSpiInterface;
 using ace_segment::Max7219Module;
-using ace_segment::NumberWriter;
 using ace_segment::kDigitRemapArray8Max7219;
 
 // Replace these with the PIN numbers of your dev board.
@@ -490,7 +516,20 @@ using SpiInterface = HardSpiInterface<SPIClass>;
 SpiInterface spiInterface(SPI, LATCH_PIN);
 Max7219Module<SpiInterface, NUM_DIGITS> ledModule(
     spiInterface, kDigitRemapArray8Max7219);
-NumberWriter numberWriter(ledModule);
+
+const uint8_t NUM_PATTERNS = 10;
+const uint8_t PATTERNS[NUM_PATTERNS] = {
+  0b00111111, // 0
+  0b00000110, // 1
+  0b01011011, // 2
+  0b01001111, // 3
+  0b01100110, // 4
+  0b01101101, // 5
+  0b01111101, // 6
+  0b00000111, // 7
+  0b01111111, // 8
+  0b01101111, // 9
+};
 
 void setup() {
   delay(1000);
@@ -499,14 +538,14 @@ void setup() {
   spiInterface.begin();
   ledModule.begin();
 
-  numberWriter.writeHexCharAt(0, 0);
-  numberWriter.writeHexCharAt(1, 1);
-  numberWriter.writeHexCharAt(2, 2);
-  numberWriter.writeHexCharAt(3, 3);
-  numberWriter.writeHexCharAt(4, 4);
-  numberWriter.writeHexCharAt(5, 5);
-  numberWriter.writeHexCharAt(6, 6);
-  numberWriter.writeHexCharAt(7, 7);
+  ledModule.setPatternAt(0, PATTERNS[0]);
+  ledModule.setPatternAt(1, PATTERNS[1]);
+  ledModule.setPatternAt(2, PATTERNS[2]);
+  ledModule.setPatternAt(3, PATTERNS[3]);
+  ledModule.setPatternAt(4, PATTERNS[4]);
+  ledModule.setPatternAt(5, PATTERNS[5]);
+  ledModule.setPatternAt(6, PATTERNS[6]);
+  ledModule.setPatternAt(7, PATTERNS[7]);
 
   ledModule.setBrightness(2);
 
@@ -529,11 +568,10 @@ digits by flushing the data bits to the HT16K33 controller over I2C using the
 #include <Arduino.h>
 #include <Wire.h> // TwoWire, Wire
 #include <AceWire.h> // TwoWireInterface
-#include <AceSegment.h> // Ht16k33Module, NumberWriter
+#include <AceSegment.h> // Ht16k33Module
 
 using ace_wire::TwoWireInterface;
 using ace_segment::Ht16k33Module;
-using ace_segment::NumberWriter;
 
 // Replace these with the PIN numbers of your dev board.
 const uint8_t SDA_PIN = SDA;
@@ -545,7 +583,20 @@ using WireInterface = TwoWireInterface<TwoWire>;
 WireInterface wireInterface(Wire);
 Ht16k33Module<WireInterface, NUM_DIGITS> ledModule(
     wireInterface, HT16K33_I2C_ADDRESS);
-NumberWriter numberWriter(ledModule);
+
+const uint8_t NUM_PATTERNS = 10;
+const uint8_t PATTERNS[NUM_PATTERNS] = {
+  0b00111111, // 0
+  0b00000110, // 1
+  0b01011011, // 2
+  0b01001111, // 3
+  0b01100110, // 4
+  0b01101101, // 5
+  0b01111101, // 6
+  0b00000111, // 7
+  0b01111111, // 8
+  0b01101111, // 9
+};
 
 void setup() {
   delay(1000);
@@ -554,10 +605,14 @@ void setup() {
   wireInterface.begin();
   ledModule.begin();
 
-  numberWriter.writeHexCharAt(0, 0);
-  numberWriter.writeHexCharAt(1, 1);
-  numberWriter.writeHexCharAt(2, 2);
-  numberWriter.writeHexCharAt(3, 3);
+  ledModule.setPatternAt(0, PATTERNS[0]);
+  ledModule.setPatternAt(1, PATTERNS[1]);
+  ledModule.setPatternAt(2, PATTERNS[2]);
+  ledModule.setPatternAt(3, PATTERNS[3]);
+  ledModule.setPatternAt(4, PATTERNS[4]);
+  ledModule.setPatternAt(5, PATTERNS[5]);
+  ledModule.setPatternAt(6, PATTERNS[6]);
+  ledModule.setPatternAt(7, PATTERNS[7]);
 
   ledModule.setBrightness(2);
 
@@ -584,11 +639,10 @@ the entire display.
 #include <Arduino.h>
 #include <SPI.h> // SPIClass, SPI
 #include <AceSPI.h> // HardSpiInterface
-#include <AceSegment.h> // Hc595Module, NumberWriter
+#include <AceSegment.h> // Hc595Module
 
 using ace_spi::HardSpiInterface;
 using ace_segment::Hc595Module;
-using ace_segment::NumberWriter;
 using ace_segment::kDigitRemapArray8Hc595;
 using ace_segment::kByteOrderSegmentHighDigitLow;
 using ace_segment::kActiveLowPattern;
@@ -617,7 +671,20 @@ Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
     HC595_BYTE_ORDER,
     REMAP_ARRAY
 );
-NumberWriter numberWriter(ledModule);
+
+const uint8_t NUM_PATTERNS = 10;
+const uint8_t PATTERNS[NUM_PATTERNS] = {
+  0b00111111, // 0
+  0b00000110, // 1
+  0b01011011, // 2
+  0b01001111, // 3
+  0b01100110, // 4
+  0b01101101, // 5
+  0b01111101, // 6
+  0b00000111, // 7
+  0b01111111, // 8
+  0b01101111, // 9
+};
 
 void setup() {
   delay(1000);
@@ -626,14 +693,14 @@ void setup() {
   spiInterface.begin();
   ledModule.begin();
 
-  numberWriter.writeHexCharAt(0, 0);
-  numberWriter.writeHexCharAt(1, 1);
-  numberWriter.writeHexCharAt(2, 2);
-  numberWriter.writeHexCharAt(3, 3);
-  numberWriter.writeHexCharAt(4, 4);
-  numberWriter.writeHexCharAt(5, 5);
-  numberWriter.writeHexCharAt(6, 6);
-  numberWriter.writeHexCharAt(7, 7);
+  ledModule.setPatternAt(0, PATTERNS[0]);
+  ledModule.setPatternAt(1, PATTERNS[1]);
+  ledModule.setPatternAt(2, PATTERNS[2]);
+  ledModule.setPatternAt(3, PATTERNS[3]);
+  ledModule.setPatternAt(4, PATTERNS[4]);
+  ledModule.setPatternAt(5, PATTERNS[5]);
+  ledModule.setPatternAt(6, PATTERNS[6]);
+  ledModule.setPatternAt(7, PATTERNS[7]);
 
   // Brightness not supported when NUM_SUBFIELDS == 1.
   // ledModule.setBrightness(2);
@@ -664,30 +731,35 @@ using namespace ace_segment;
 <a name="LedModule"></a>
 ### LedModule
 
-The `LedModule` class is the general interface (with mostly pure virtual
-functions) which is the parent class of all hardware-dependent classes which are
-targeted for specific controller chips. It looks like this:
+The `LedModule` class provides the minimal interface to assign LED segment bit
+patterns to specific digits, and to assign the global brightness. It is the
+parent class of all hardware-dependent classes which are targeted for specific
+controller chips. It looks like this:
 
 ```C++
 class LedModule {
   public:
-    explicit LedModule(uint8_t numDigits);
+    explicit LedModule(uint8_t* patterns, uint8_t numDigits);
 
     uint8_t getNumDigits() const;
-    virtual void setPatternAt(uint8_t pos, uint8_t pattern) = 0;
-    virtual uint8_t getPatternAt(uint8_t pos) = 0;
-    virtual void setBrightness(uint8_t brightness) = 0;
+    void setPatternAt(uint8_t pos, uint8_t pattern);
+    uint8_t getPatternAt(uint8_t pos) const;
+    void setBrightness(uint8_t brightness);
 };
 ```
 
-It assumes that each subclass has an internal buffer of bit patterns which
-will be sent out to the LED module at the appropriate time. Some LED controllers
-(e.g. TM1637, MAX7219) handle the multiplexing and refreshing of the LED
-segments, so the host microcontroller needs only to send out the bit patterns to
-the controller chips over SPI or some other protocol. Other controller chips,
-particularly the 74HC595, is a fairly dumb controller chip that requires the
-host microcontroller to perform the multiplexing itself. The bit patterns must
-be sent out to the controller chip with precise timing intervals.
+The subclasses will use C++ templates to accept a compile-time constant that
+allows the creation of an internal buffer to hold the LED segment bit patterns
+for each digit. The pointer to this internal buffer (`patterns`) is passed up to
+the `LedModule` parent class through the constructor.
+
+Some LED controllers (e.g. TM1637, MAX7219) handle the multiplexing and
+refreshing of the LED segments, so the host microcontroller needs only to send
+out the bit patterns to the controller chips over SPI or some other protocol.
+Other controller chips, particularly the 74HC595, is a fairly dumb controller
+chip that requires the host microcontroller to perform the multiplexing itself.
+The bit patterns must be sent out to the controller chip with precise timing
+intervals.
 
 The `setBrightness()` method controls the brightness of the entire LED module.
 The range of the `brightness` parameter is determined by the underlying
@@ -713,15 +785,19 @@ controller chip:
 If brightness control is enabled on the LED module using the 74HC595 chip, it
 can also support brightness control on a per-digit basis. But the interface for
 that feature is *not* part of the `LedModule` class because no other controller
-chip supports this feature. Adding another virtual method (`setBrightnessAt()`
-to `LedModule` would unnecessarily increase flash and static memory consumption
-for the other classes.
+chip supports this feature.
 
 The rendering of each digit and segment, and how the information is transferred
 to the controller chip, is pushed down into the specific subclasses of
 `LedModule`. The rendering methods are called `flush()`, `flushIncremental()`,
 `renderNow()` or `renderWhenReady()`, Each controller chip has slightly
 different rendering logic.
+
+Early versions of the `LedModule` used `virtual` methods which consume
+additional flash memory, static memory, and CPU cycles. They were changed to be
+non-virtual, and various Writer classes which depended on the `LedModule` class
+were converted to C++ template classes that are based on a generic
+`T_LED_MODULE` type. No virtual methods are used in this the AceSegment library.
 
 <a name="Tm1637Module"></a>
 ### Tm1637Module
@@ -754,13 +830,15 @@ class Tm1637Module : public LedModule {
     void begin();
     void end();
 
-    uint8_t getNumDigits() const { return T_DIGITS; }
-    void setPatternAt(uint8_t pos, uint8_t pattern) override;
-    uint8_t getPatternAt(uint8_t pos) override;
-    void setBrightness(uint8_t brightness) override;
+    // Following inherited from LedModule:
+    // uint8_t getNumDigits();
+    // void setPatternAt(uint8_t pos, uint8_t pattern);
+    // uint8_t getPatternAt(uint8_t pos);
+    // void setBrightness(uint8_t brightness);
 
     void setDisplayOn(bool on = true);
 
+    bool isFlushRequired() const;
     void flush();
     void flushIncremental();
 };
@@ -808,6 +886,13 @@ digit to the LED module. After all the digits are sent, one more iteration sends
 the brightness information to the module. So the total number of iteration to
 update the entire LED module is `NUM_DIGITS + 1`. For `BIT_DELAY` of 100
 microseconds, `flushIncremental()` takes around 10 milliseconds per iteration.
+
+The `isFlushRequired()` can be used to optimize the call to `flush()` or
+`flushIncremental()` to only when it is necessary. This gives more CPU cycles to
+the microcontroller to do other things, but there is always the small risk of
+the LED display becoming out of sync with the internal state (e.g. if the
+module loses power or the two wire communication becomes corrupted). In simple
+applications, this optimization may not be needed.
 
 <a name="Tm1637Module4"></a>
 #### TM1637 Module With 4 Digits
@@ -979,11 +1064,13 @@ class Max7219Module : public LedModule {
     void begin();
     void end();
 
-    uint8_t getNumDigits() const { return T_DIGITS; }
-    void setPatternAt(uint8_t pos, uint8_t pattern) override;
-    uint8_t getPatternAt(uint8_t pos) override;
-    void setBrightness(uint8_t brightness) override;
+    // Following inherited from LedModule:
+    // uint8_t getNumDigits();
+    // void setPatternAt(uint8_t pos, uint8_t pattern);
+    // uint8_t getPatternAt(uint8_t pos);
+    // void setBrightness(uint8_t brightness);
 
+    bool isFlushRequired() const;
     void flush();
 };
 ```
@@ -998,10 +1085,14 @@ compile-time constant, the `Hc595Module` class uses it to allocate a buffer of 8
 bytes to hold the LED segment bit patterns. This allocation is done at
 compile-time.
 
-Most of the methods of the class are implementations of the virtual methods in
-the parent `LedModule` class.
-
 The `flush()` method sends the bit patterns to the MAX7219 controller using SPI.
+
+The `isFlushRequired()` can be used to optimize the call to `flush()` to only
+when it is necessary. This gives more CPU cycles to the microcontroller to do
+other things, but there is always the small risk of the LED display becoming out
+of sync with the internal state (e.g. if the module loses power or the SPI
+communication becomes corrupted). In simple applications, this optimization may
+not be needed.
 
 <a name="Max7219Module8"></a>
 #### MAX7219 Module with 8 Digits
@@ -1078,6 +1169,7 @@ be generic clones of the LED modules (https://www.adafruit.com/product/878)
 available from [Adafruit](https://www.adafruit.com), such as these:
 
 ![Adafruit HT16K33 LED Module](docs/ht16k33/adafruit_ht16k33_4_digits.jpg)
+
 ![Adafruit HT16K33 LED Module Front](docs/ht16k33/adafruit_ht16k33_backpack_front.jpg)
 ![Adafruit HT16K33 LED Module Front](docs/ht16k33/adafruit_ht16k33_backpack_back.jpg)
 
@@ -1088,17 +1180,22 @@ template <typename T_WIREI, uint8_t T_DIGITS>
 class Ht16k33Module : public LedModule {
   public:
     explicit Ht16k33Module(
-        T_WIREI& wire, uint8_t addr, bool enableColon = false);
+        T_WIREI& wire,
+        uint8_t addr,
+        bool enableColon = false
+    );
 
     void enableColon(bool enable);
     void begin();
     void end();
 
-    uint8_t getNumDigits() const { return T_DIGITS; }
-    void setPatternAt(uint8_t pos, uint8_t pattern) override;
-    uint8_t getPatternAt(uint8_t pos) override;
-    void setBrightness(uint8_t brightness) override;
+    // Following inherited from LedModule:
+    // uint8_t getNumDigits();
+    // void setPatternAt(uint8_t pos, uint8_t pattern);
+    // uint8_t getPatternAt(uint8_t pos);
+    // void setBrightness(uint8_t brightness);
 
+    bool isFlushRequired() const;
     void flush();
 };
 ```
@@ -1117,13 +1214,17 @@ If additional LED modules with different digits come on the market, the
 The `addr` parameter in the `Ht16k33Module` constructor is the I2C address of
 the HT16K33 controller chip. The base address is `0x70`. The LED module exposes
 3 jumpers that can be soldered in various combinations to change the I2C address
-one of the 8 addresses from 0x70 to 0x77.
-
-Most of the methods in this class are implementations of the virtual methods of
-`LedModule`.
+to one of the 8 addresses from 0x70 to 0x77.
 
 The `flush()` method sends all 4 digits as well as the brightness setting to the
 LED module using I2C.
+
+The `isFlushRequired()` can be used to optimize the call to `flush()` to only
+when it is necessary. This gives more CPU cycles to the microcontroller to do
+other things, but there is always the small risk of the LED display becoming out
+of sync with the internal state (e.g. if the module loses power or the I2C
+communication becomes corrupted). In simple applications, this optimization may
+not be needed.
 
 The `enableColon` parameter and the `enableColon()` method determine whether the
 colon segment between Digit 1 and Digit 2 of the LED module is active. The
@@ -1246,9 +1347,11 @@ class Hc595Module : public ScanningModule<[snip]> {
     uint16_t getFieldsPerSecond() const;
     uint16_t getFieldsPerFrame() const;
 
-    uint8_t getNumDigits() const;
-    void setPatternAt(uint8_t pos, uint8_t pattern) override;
-    uint8_t getPatternAt(uint8_t pos) override;
+    // Following inherited from LedModule:
+    // uint8_t getNumDigits();
+    // void setPatternAt(uint8_t pos, uint8_t pattern);
+    // uint8_t getPatternAt(uint8_t pos);
+    // void setBrightness(uint8_t brightness);
 
     void setBrightness(uint8_t brightness) override;
     void setBrightnessAt(uint8_t pos, uint8_t brightness);
@@ -1848,7 +1951,7 @@ class CharWriter {
 #### StringWriter
 
 A `StringWriter` is a class that builds on top of the `CharWriter`. It knows how
-to write entirely strings into the LED display. The public methods look like:
+to write entire strings into the LED display. The public methods look like:
 
 ```C++
 class StringWriter {
@@ -1862,7 +1965,7 @@ class StringWriter {
     uint8_t writeStringAt(uint8_t pos, const char* cs, uint8_t numChar = 255);
 
     uint8_t writeStringAt(uint8_t pos, const __FlashStringHelper* fs,
-            uint8_t numChar = 255);
+        uint8_t numChar = 255);
 
     void clear();
     void clearToEnd(uint8_t pos);
@@ -1928,9 +2031,8 @@ maximum level of 16.
 <a name="StringScroller"></a>
 #### StringScroller
 
-A `StringScroller` is a class that builds on top of the `CharWriter`. It knows
-how to write entirely strings into the LED display. The public methods look
-like:
+A `StringScroller` is a class that builds on top of the `CharWriter`. It can
+scroll strings to the left and right. The public methods look like:
 
 ```C++
 class StringScroller {
@@ -2072,17 +2174,17 @@ sizeof(LedMatrixDirect<>): 9
 sizeof(LedMatrixDirectFast4<6..13, 2..5>): 3
 sizeof(LedMatrixSingleHc595<SimpleSpiInterface>): 9
 sizeof(LedMatrixDualHc595<HardSpiInterface>): 9
-sizeof(LedModule): 3
-sizeof(ScanningModule<LedMatrixBase, 4>): 22
-sizeof(DirectModule<4>): 31
-sizeof(DirectFast4Module<...>): 25
-sizeof(HybridModule<SimpleSpiInterface, 4>): 31
-sizeof(Hc595Module<SimpleSpiInterface, 8>): 47
-sizeof(Tm1637Module<SimpleTmiInterface, 4>): 15
-sizeof(Tm1637Module<SimpleTmiInterface, 6>): 17
-sizeof(Max7219Module<SimpleSpiInterface, 8>): 17
-sizeof(Ht16k33Module<TwoWireInterface, 4>): 12
-sizeof(Ht16k33Module<SimpleWireInterface, 4>): 15
+sizeof(LedModule): 6
+sizeof(ScanningModule<LedMatrixBase, 4>): 26
+sizeof(DirectModule<4>): 35
+sizeof(DirectFast4Module<...>): 29
+sizeof(HybridModule<SimpleSpiInterface, 4>): 35
+sizeof(Hc595Module<SimpleSpiInterface, 8>): 51
+sizeof(Tm1637Module<SimpleTmiInterface, 4>): 17
+sizeof(Tm1637Module<SimpleTmiInterface, 6>): 19
+sizeof(Max7219Module<SimpleSpiInterface, 8>): 19
+sizeof(Ht16k33Module<TwoWireInterface, 4>): 14
+sizeof(Ht16k33Module<SimpleWireInterface, 4>): 17
 sizeof(PatternWriter): 2
 sizeof(NumberWriter): 2
 sizeof(ClockWriter): 3
@@ -2104,7 +2206,7 @@ sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(DirectModule<4>): 48
 sizeof(HybridModule<SimpleSpiInterface, 4>): 48
 sizeof(Hc595Module<SimpleSpiInterface, 8>): 64
-sizeof(Tm1637Module<SimpleTmiInterface, 4>): 20
+sizeof(Tm1637Module<SimpleTmiInterface, 4>): 24
 sizeof(Tm1637Module<SimpleTmiInterface, 6>): 24
 sizeof(Max7219Module<SimpleSpiInterface, 8>): 24
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 20
@@ -2127,9 +2229,10 @@ example, if the `CharWriter` (which consumes about 300 bytes of flash on AVR) is
 not used, it is not loaded into the program.
 
 The full details are given in
-[examples/MemoryBenchmark](examples/MemoryBenchmark). Here are the flash and
-static memory consumptions for various configurations on an Arduino Nano
-(ATmega328):
+[examples/MemoryBenchmark](examples/MemoryBenchmark). Here are 2 samples of
+the flash and static memory consumptions.
+
+**Arduino Nano (ATmega328)**
 
 ```
 +--------------------------------------------------------------+
@@ -2137,44 +2240,44 @@ static memory consumptions for various configurations on an Arduino Nano
 |---------------------------------+--------------+-------------|
 | baseline                        |    456/   11 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| DirectModule                    |   1486/   64 |  1030/   53 |
-| DirectFast4Module               |   1250/   94 |   794/   83 |
+| DirectModule                    |   1534/   58 |  1078/   47 |
+| DirectFast4Module               |   1290/   88 |   834/   77 |
 |---------------------------------+--------------+-------------|
-| Hybrid(HardSpi)                 |   1560/   61 |  1104/   50 |
-| Hybrid(HardSpiFast)             |   1502/   59 |  1046/   48 |
-| Hybrid(SimpleSpi)               |   1514/   59 |  1058/   48 |
-| Hybrid(SimpleSpiFast)           |   1392/   54 |   936/   43 |
+| Hybrid(HardSpi)                 |   1596/   55 |  1140/   44 |
+| Hybrid(HardSpiFast)             |   1538/   53 |  1082/   42 |
+| Hybrid(SimpleSpi)               |   1550/   53 |  1094/   42 |
+| Hybrid(SimpleSpiFast)           |   1428/   48 |   972/   37 |
 |---------------------------------+--------------+-------------|
-| Hc595(HardSpi)                  |   1538/   61 |  1082/   50 |
-| Hc595(HardSpiFast)              |   1470/   59 |  1014/   48 |
-| Hc595(SimpleSpi)                |   1478/   59 |  1022/   48 |
-| Hc595(SimpleSpiFast)            |   1068/   54 |   612/   43 |
+| Hc595(HardSpi)                  |   1552/   55 |  1096/   44 |
+| Hc595(HardSpiFast)              |   1478/   53 |  1022/   42 |
+| Hc595(SimpleSpi)                |   1492/   53 |  1036/   42 |
+| Hc595(SimpleSpiFast)            |   1082/   48 |   626/   37 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SimpleTmi)               |   1480/   39 |  1024/   28 |
-| Tm1637(SimpleTmiFast)           |    916/   34 |   460/   23 |
+| Tm1637(SimpleTmi)               |   1424/   31 |   968/   20 |
+| Tm1637(SimpleTmiFast)           |    858/   26 |   402/   15 |
 |---------------------------------+--------------+-------------|
-| Max7219(HardSpi)                |   1268/   47 |   812/   36 |
-| Max7219(HardSpiFast)            |   1180/   45 |   724/   34 |
-| Max7219(SimpleSpi)              |   1184/   45 |   728/   34 |
-| Max7219(SimpleSpiFast)          |    766/   40 |   310/   29 |
+| Max7219(HardSpi)                |   1260/   39 |   804/   28 |
+| Max7219(HardSpiFast)            |   1170/   37 |   714/   26 |
+| Max7219(SimpleSpi)              |   1174/   37 |   718/   26 |
+| Max7219(SimpleSpiFast)          |    756/   32 |   300/   21 |
 |---------------------------------+--------------+-------------|
-| Ht16k33(TwoWire)                |   2854/  251 |  2398/  240 |
-| Ht16k33(SimpleWire)             |   1480/   41 |  1024/   30 |
-| Ht16k33(SimpleWireFast)         |    946/   35 |   490/   24 |
+| Ht16k33(TwoWire)                |   2846/  243 |  2390/  232 |
+| Ht16k33(SimpleWire)             |   1450/   33 |   994/   22 |
+| Ht16k33(SimpleWireFast)         |    916/   27 |   460/   16 |
 |---------------------------------+--------------+-------------|
-| StubModule                      |    494/   11 |    38/    0 |
-| PatternWriter+Stub              |    608/   26 |   152/   15 |
-| NumberWriter+Stub               |    664/   26 |   208/   15 |
-| ClockWriter+Stub                |    782/   27 |   326/   16 |
-| TemperatureWriter+Stub          |    736/   26 |   280/   15 |
-| CharWriter+Stub                 |    778/   29 |   322/   18 |
-| StringWriter+Stub               |    998/   37 |   542/   26 |
-| StringScroller+Stub             |   1014/   43 |   558/   32 |
-| LevelWriter+Stub                |    694/   26 |   238/   15 |
+| StubModule                      |    522/   21 |    66/   10 |
+| PatternWriter+Stub              |    534/   23 |    78/   12 |
+| NumberWriter+Stub               |    630/   23 |   174/   12 |
+| ClockWriter+Stub                |    700/   24 |   244/   13 |
+| TemperatureWriter+Stub          |    674/   23 |   218/   12 |
+| CharWriter+Stub                 |    718/   26 |   262/   15 |
+| StringWriter+Stub               |    970/   34 |   514/   23 |
+| StringScroller+Stub             |   1016/   40 |   560/   29 |
+| LevelWriter+Stub                |    626/   23 |   170/   12 |
 +--------------------------------------------------------------+
 ```
 
-And here are the memory consumption numbers for an ESP8266:
+**ESP8266**
 
 ```
 +--------------------------------------------------------------+
@@ -2182,31 +2285,31 @@ And here are the memory consumption numbers for an ESP8266:
 |---------------------------------+--------------+-------------|
 | baseline                        | 256700/26784 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| DirectModule                    | 257784/27056 |  1084/  272 |
+| DirectModule                    | 257736/27056 |  1036/  272 |
 |---------------------------------+--------------+-------------|
-| Hybrid(HardSpi)                 | 258944/27072 |  2244/  288 |
-| Hybrid(SimpleSpi)               | 257872/27056 |  1172/  272 |
+| Hybrid(HardSpi)                 | 258896/27072 |  2196/  288 |
+| Hybrid(SimpleSpi)               | 257824/27056 |  1124/  272 |
 |---------------------------------+--------------+-------------|
-| Hc595(HardSpi)                  | 258924/27076 |  2224/  292 |
-| Hc595(SimpleSpi)                | 257772/27060 |  1072/  276 |
+| Hc595(HardSpi)                  | 258892/27076 |  2192/  292 |
+| Hc595(SimpleSpi)                | 257724/27060 |  1024/  276 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SimpleTmi)               | 257932/27028 |  1232/  244 |
+| Tm1637(SimpleTmi)               | 257868/27028 |  1168/  244 |
 |---------------------------------+--------------+-------------|
-| Max7219(HardSpi)                | 258836/27044 |  2136/  260 |
-| Max7219(SimpleSpi)              | 257636/27028 |   936/  244 |
+| Max7219(HardSpi)                | 258804/27044 |  2104/  260 |
+| Max7219(SimpleSpi)              | 257604/27028 |   904/  244 |
 |---------------------------------+--------------+-------------|
-| Ht16k33(TwoWire)                | 261364/27500 |  4664/  716 |
-| Ht16k33(SimpleWire)             | 258012/27028 |  1312/  244 |
+| Ht16k33(TwoWire)                | 261348/27500 |  4648/  716 |
+| Ht16k33(SimpleWire)             | 257980/27028 |  1280/  244 |
 |---------------------------------+--------------+-------------|
-| StubModule                      | 256840/26996 |   140/  212 |
-| PatternWriter+Stub              | 256872/27004 |   172/  220 |
-| NumberWriter+Stub               | 257336/27004 |   636/  220 |
-| ClockWriter+Stub                | 257160/27004 |   460/  220 |
-| TemperatureWriter+Stub          | 257448/27004 |   748/  220 |
-| CharWriter+Stub                 | 257096/27012 |   396/  228 |
+| StubModule                      | 256776/26996 |    76/  212 |
+| PatternWriter+Stub              | 256792/27004 |    92/  220 |
+| NumberWriter+Stub               | 256968/27004 |   268/  220 |
+| ClockWriter+Stub                | 257064/27004 |   364/  220 |
+| TemperatureWriter+Stub          | 257000/27004 |   300/  220 |
+| CharWriter+Stub                 | 256968/27012 |   268/  228 |
 | StringWriter+Stub               | 257264/27012 |   564/  228 |
-| StringScroller+Stub             | 257296/27020 |   596/  236 |
-| LevelWriter+Stub                | 256984/27004 |   284/  220 |
+| StringScroller+Stub             | 257184/27020 |   484/  236 |
+| LevelWriter+Stub                | 256904/27004 |   204/  220 |
 +--------------------------------------------------------------+
 ```
 
@@ -2214,101 +2317,101 @@ And here are the memory consumption numbers for an ESP8266:
 ### CPU Cycles
 
 The CPU benchmark numbers can be seen in
-[examples/AutoBenchmark](examples/AutoBenchmark).
+[examples/AutoBenchmark](examples/AutoBenchmark). Here are 2 samples.
 
-Here are the CPU numbers for an AVR processor:
+**Arduino Nano (ATmega328)**
 
 ```
 +-------------------------------------------+-------------------+---------+
 | Functionality                             |   min/  avg/  max | samples |
 |-------------------------------------------+-------------------+---------|
-| Direct(4)                                 |    76/   82/   88 |      40 |
-| Direct(4,subfields)                       |     4/   13/   84 |     640 |
-| DirectFast4(4)                            |    24/   30/   40 |      40 |
-| DirectFast4(4,subfields)                  |     4/    8/   36 |     640 |
+| Direct(4)                                 |    80/   83/   88 |      40 |
+| Direct(4,subfields)                       |     4/   14/   88 |     640 |
+| DirectFast4(4)                            |    28/   30/   44 |      40 |
+| DirectFast4(4,subfields)                  |     4/    9/   36 |     640 |
 |-------------------------------------------+-------------------+---------|
-| Hybrid(4,HardSpi)                         |    32/   38/   44 |      40 |
-| Hybrid(4,HardSpi,subfields)               |     4/    8/   44 |     640 |
-| Hybrid(4,HardSpiFast)                     |    20/   25/   32 |      40 |
-| Hybrid(4,HardSpiFast,subfields)           |     4/    7/   32 |     640 |
-| Hybrid(4,SimpleSpi)                       |   152/  161/  176 |      40 |
-| Hybrid(4,SimpleSpi,subfields)             |     4/   22/  176 |     640 |
+| Hybrid(4,HardSpi)                         |    36/   41/   52 |      40 |
+| Hybrid(4,HardSpi,subfields)               |     4/    9/   44 |     640 |
+| Hybrid(4,HardSpiFast)                     |    20/   26/   32 |      40 |
+| Hybrid(4,HardSpiFast,subfields)           |     4/    8/   32 |     640 |
+| Hybrid(4,SimpleSpi)                       |   152/  162/  176 |      40 |
+| Hybrid(4,SimpleSpi,subfields)             |     4/   23/  180 |     640 |
 | Hybrid(4,SimpleSpiFast)                   |    28/   32/   40 |      40 |
-| Hybrid(4,SimpleSpiFast,subfields)         |     4/    8/   36 |     640 |
+| Hybrid(4,SimpleSpiFast,subfields)         |     4/    9/   40 |     640 |
 |-------------------------------------------+-------------------+---------|
-| Hc595(8,HardSpi)                          |    24/   30/   40 |      80 |
-| Hc595(8,HardSpi,subfields)                |     4/    8/   36 |    1280 |
-| Hc595(8,HardSpiFast)                      |    12/   16/   24 |      80 |
-| Hc595(8,HardSpiFast,subfields)            |     4/    6/   24 |    1280 |
-| Hc595(8,SimpleSpi)                        |   268/  273/  308 |      80 |
-| Hc595(8,SimpleSpi,subfields)              |     4/   36/  308 |    1280 |
-| Hc595(8,SimpleSpiFast)                    |    24/   27/   36 |      80 |
-| Hc595(8,SimpleSpiFast,subfields)          |     4/    8/   32 |    1280 |
+| Hc595(8,HardSpi)                          |    24/   31/   44 |      80 |
+| Hc595(8,HardSpi,subfields)                |     4/    9/   36 |    1280 |
+| Hc595(8,HardSpiFast)                      |    12/   18/   28 |      80 |
+| Hc595(8,HardSpiFast,subfields)            |     4/    8/   28 |    1280 |
+| Hc595(8,SimpleSpi)                        |   268/  274/  304 |      80 |
+| Hc595(8,SimpleSpi,subfields)              |     4/   38/  300 |    1280 |
+| Hc595(8,SimpleSpiFast)                    |    24/   28/   40 |      80 |
+| Hc595(8,SimpleSpiFast,subfields)          |     4/    9/   40 |    1280 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi,100us)                 | 22312/22342/22576 |      10 |
-| Tm1637(4,SimpleTmi,100us,incremental)     |  3612/ 8807/10356 |      50 |
-| Tm1637(4,SimpleTmiFast,100us)             | 21068/21102/21376 |      10 |
-| Tm1637(4,SimpleTmiFast,100us,incremental) |  3412/ 8317/ 9828 |      50 |
+| Tm1637(4,SimpleTmi,100us)                 | 22312/22343/22576 |      10 |
+| Tm1637(4,SimpleTmi,100us,incremental)     |  3612/ 8807/10360 |      50 |
+| Tm1637(4,SimpleTmiFast,100us)             | 21064/21099/21368 |      10 |
+| Tm1637(4,SimpleTmiFast,100us,incremental) |  3412/ 8316/ 9828 |      50 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi,5us)                   |  2244/ 2281/ 2472 |      10 |
-| Tm1637(4,SimpleTmi,5us,incremental)       |   364/  893/ 1128 |      50 |
-| Tm1637(4,SimpleTmiFast,5us)               |  1004/ 1035/ 1108 |      10 |
-| Tm1637(4,SimpleTmiFast,5us,incremental)   |   164/  404/  508 |      50 |
+| Tm1637(4,SimpleTmi,5us)                   |  2248/ 2284/ 2484 |      10 |
+| Tm1637(4,SimpleTmi,5us,incremental)       |   364/  894/ 1124 |      50 |
+| Tm1637(4,SimpleTmiFast,5us)               |  1000/ 1032/ 1104 |      10 |
+| Tm1637(4,SimpleTmiFast,5us,incremental)   |   164/  402/  508 |      50 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(6,SimpleTmi,100us)                 | 28052/28089/28376 |      10 |
-| Tm1637(6,SimpleTmi,100us,incremental)     |  3612/ 9176/10356 |      70 |
-| Tm1637(6,SimpleTmiFast,100us)             | 26488/26523/26792 |      10 |
-| Tm1637(6,SimpleTmiFast,100us,incremental) |  3412/ 8665/ 9828 |      70 |
+| Tm1637(6,SimpleTmi,100us)                 | 28056/28090/28368 |      10 |
+| Tm1637(6,SimpleTmi,100us,incremental)     |  3612/ 9177/10356 |      70 |
+| Tm1637(6,SimpleTmiFast,100us)             | 26484/26519/26788 |      10 |
+| Tm1637(6,SimpleTmiFast,100us,incremental) |  3412/ 8664/ 9820 |      70 |
 |-------------------------------------------+-------------------+---------|
-| Max7219(8,HardSpi)                        |   208/  225/  240 |      20 |
-| Max7219(8,HardSpiFast)                    |    96/  106/  124 |      20 |
+| Max7219(8,HardSpi)                        |   208/  225/  236 |      20 |
+| Max7219(8,HardSpiFast)                    |   100/  107/  124 |      20 |
 | Max7219(8,SimpleSpi)                      |  2380/ 2390/ 2516 |      20 |
-| Max7219(8,SimpleSpiFast)                  |   208/  217/  240 |      20 |
+| Max7219(8,SimpleSpiFast)                  |   208/  218/  240 |      20 |
 |-------------------------------------------+-------------------+---------|
-| Ht16k33(4,TwoWire,100kHz)                 |  1460/ 1464/ 1480 |      20 |
-| Ht16k33(4,TwoWire,400kHz)                 |   500/  508/  532 |      20 |
+| Ht16k33(4,TwoWire,100kHz)                 |  1460/ 1463/ 1476 |      20 |
+| Ht16k33(4,TwoWire,400kHz)                 |   500/  507/  524 |      20 |
 | Ht16k33(4,SimpleWire,1us)                 |  2544/ 2556/ 2696 |      20 |
-| Ht16k33(4,SimpleWireFast,1us)             |   224/  232/  252 |      20 |
+| Ht16k33(4,SimpleWireFast,1us)             |   224/  234/  256 |      20 |
 +-------------------------------------------+-------------------+---------+
 ```
 
 What is amazing is that if you use `digitalWriteFast()`, the software SPI is
 just as fast as hardware SPI, **and** consumes 500 bytes of less flash memory.
 
-Here are the CPU numbers for an ESP8266:
+**ESP8266**
 
 ```
 +-------------------------------------------+-------------------+---------+
 | Functionality                             |   min/  avg/  max | samples |
 |-------------------------------------------+-------------------+---------|
-| Direct(4)                                 |    12/   12/   32 |      40 |
-| Direct(4,subfields)                       |     0/    2/   24 |     640 |
+| Direct(4)                                 |    12/   13/   36 |      40 |
+| Direct(4,subfields)                       |     1/    2/   33 |     640 |
 |-------------------------------------------+-------------------+---------|
-| Hybrid(4,HardSpi)                         |    12/   12/   32 |      40 |
-| Hybrid(4,HardSpi,subfields)               |     0/    2/   24 |     640 |
-| Hybrid(4,SimpleSpi)                       |    29/   29/   41 |      40 |
-| Hybrid(4,SimpleSpi,subfields)             |     0/    4/   41 |     640 |
+| Hybrid(4,HardSpi)                         |    12/   12/   25 |      40 |
+| Hybrid(4,HardSpi,subfields)               |     1/    2/   24 |     640 |
+| Hybrid(4,SimpleSpi)                       |    29/   29/   42 |      40 |
+| Hybrid(4,SimpleSpi,subfields)             |     1/    4/   50 |     640 |
 |-------------------------------------------+-------------------+---------|
-| Hc595(8,HardSpi)                          |    14/   14/   22 |      80 |
-| Hc595(8,HardSpi,subfields)                |     0/    2/   26 |    1280 |
-| Hc595(8,SimpleSpi)                        |    50/   51/   63 |      80 |
-| Hc595(8,SimpleSpi,subfields)              |     0/    6/   63 |    1280 |
+| Hc595(8,HardSpi)                          |    14/   14/   31 |      80 |
+| Hc595(8,HardSpi,subfields)                |     0/    2/   31 |    1280 |
+| Hc595(8,SimpleSpi)                        |    50/   51/   68 |      80 |
+| Hc595(8,SimpleSpi,subfields)              |     0/    6/   68 |    1280 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi,100us)                 | 21497/21508/21541 |      10 |
-| Tm1637(4,SimpleTmi,100us,incremental)     |  3481/ 8480/ 9753 |      50 |
+| Tm1637(4,SimpleTmi,100us)                 | 21496/21502/21548 |      10 |
+| Tm1637(4,SimpleTmi,100us,incremental)     |  3481/ 8478/ 9749 |      50 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi,5us)                   |  1526/ 1526/ 1526 |      10 |
-| Tm1637(4,SimpleTmi,5us,incremental)       |   248/  603/  718 |      50 |
+| Tm1637(4,SimpleTmi,5us)                   |  1525/ 1525/ 1526 |      10 |
+| Tm1637(4,SimpleTmi,5us,incremental)       |   247/  602/  691 |      50 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(6,SimpleTmi,100us)                 | 27025/27033/27057 |      10 |
-| Tm1637(6,SimpleTmi,100us,incremental)     |  3481/ 8837/ 9761 |      70 |
+| Tm1637(6,SimpleTmi,100us)                 | 27023/27026/27043 |      10 |
+| Tm1637(6,SimpleTmi,100us,incremental)     |  3481/ 8834/ 9745 |      70 |
 |-------------------------------------------+-------------------+---------|
-| Max7219(8,HardSpi)                        |   125/  126/  141 |      20 |
-| Max7219(8,SimpleSpi)                      |   459/  460/  474 |      20 |
+| Max7219(8,HardSpi)                        |   126/  126/  138 |      20 |
+| Max7219(8,SimpleSpi)                      |   460/  460/  472 |      20 |
 |-------------------------------------------+-------------------+---------|
-| Ht16k33(4,TwoWire,100kHz)                 |  1322/ 1324/ 1354 |      20 |
-| Ht16k33(4,TwoWire,400kHz)                 |   347/  347/  351 |      20 |
-| Ht16k33(4,SimpleWire,1us)                 |  1330/ 1331/ 1350 |      20 |
+| Ht16k33(4,TwoWire,100kHz)                 |  1322/ 1325/ 1350 |      20 |
+| Ht16k33(4,TwoWire,400kHz)                 |   347/  348/  363 |      20 |
+| Ht16k33(4,SimpleWire,1us)                 |  1328/ 1330/ 1353 |      20 |
 +-------------------------------------------+-------------------+---------+
 ```
 
@@ -2405,6 +2508,11 @@ them.
     * I have not done the work because I don't use this feature.
 * Some LED controllers (TM1637, HT16K33) have hardware support for scanning key
   matrices. AceSegment does not support this feature.
+
+<a name="AlternativeLibraries"></a>
+## Alternative Libraries
+
+Tracked using [AceSegment Wiki](https://github.com/bxparks/AceSegment/wiki).
 
 <a name="License"></a>
 ## License

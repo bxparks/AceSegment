@@ -30,37 +30,30 @@ SOFTWARE.
 
 namespace ace_segment {
 
+/** The "A" character for "AM". */
+const uint8_t kPatternA = 0b01110111;
+
+/** The "P" character for "PM". */
+const uint8_t kPatternP = 0b01110011;
+
 /**
  * The ClockWriter writes "hh:mm" and "yyyy" to the LedModule. A few other
  * characters are supported.
  */
+template <typename T_LED_MODULE>
 class ClockWriter {
   public:
-    using hexchar_t = NumberWriter::hexchar_t;
-
-    /** Blank digit. */
-    static const hexchar_t kCharSpace = NumberWriter::kCharSpace;
-
-    /** A minus ("-") sign. */
-    static const hexchar_t kCharMinus = NumberWriter::kCharMinus;
-
-    /** The "A" character for "AM". */
-    static const uint8_t kPatternA = 0b01110111;
-
-    /** The "P" character for "PM". */
-    static const uint8_t kPatternP = 0b01110011;
-
     /**
      * Constructor.
      *
-     * @param ledModule instance of LedModule
+     * @param ledModule instance of T_LED_MODULE
      * @param colonDigit The digit which has the colon (":") character,
      *    mapped to bit 7 (i.e. 'H' segment). In many 4-digit LED clock
      *    display modules, this is digit 1 (counting from the left, 0-based,
      *    so the second digit from the left).
      */
     explicit ClockWriter(
-        LedModule& ledModule,
+        T_LED_MODULE& ledModule,
         uint8_t colonDigit = 1
     ) :
         mNumberWriter(ledModule),
@@ -68,13 +61,15 @@ class ClockWriter {
     {}
 
     /** Get the underlying LedModule. */
-    LedModule& ledModule() { return mNumberWriter.ledModule(); }
+    T_LED_MODULE& ledModule() { return mNumberWriter.ledModule(); }
 
     /** Get the underlying PatternWriter. */
-    PatternWriter& patternWriter() { return mNumberWriter.patternWriter(); }
+    PatternWriter<T_LED_MODULE>& patternWriter() {
+      return mNumberWriter.patternWriter();
+    }
 
     /** Get the underlying NumberWriter. */
-    NumberWriter& numberWriter() { return mNumberWriter; }
+    NumberWriter<T_LED_MODULE>& numberWriter() { return mNumberWriter; }
 
     /** Write the hexchar_t 'c' at 'pos'. */
     void writeCharAt(uint8_t pos, hexchar_t c) {
@@ -99,8 +94,8 @@ class ClockWriter {
     void writeBcd2At(uint8_t pos, uint8_t bcd) {
       uint8_t high = (bcd & 0xF0) >> 4;
       uint8_t low = (bcd & 0x0F);
-      if (high > 9) high = kCharSpace;
-      if (low > 9) low = kCharSpace;
+      if (high > 9) high = kHexCharSpace;
+      if (low > 9) low = kHexCharSpace;
       writeChars2At(pos, high, low);
     }
 
@@ -111,7 +106,7 @@ class ClockWriter {
      */
     void writeDec2At(uint8_t pos, uint8_t d) {
       if (d >= 100) {
-        writeChars2At(pos++, kCharSpace, kCharSpace);
+        writeChars2At(pos++, kHexCharSpace, kHexCharSpace);
       } else {
         uint8_t bcd = ace_common::decToBcd(d);
         writeBcd2At(pos, bcd);
@@ -159,7 +154,7 @@ class ClockWriter {
     ClockWriter(const ClockWriter&) = delete;
     ClockWriter& operator=(const ClockWriter&) = delete;
 
-    NumberWriter mNumberWriter;
+    NumberWriter<T_LED_MODULE> mNumberWriter;
     uint8_t const mColonDigit;
 };
 

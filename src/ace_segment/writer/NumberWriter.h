@@ -30,59 +30,66 @@ SOFTWARE.
 
 namespace ace_segment {
 
+/** Total number of characters in the kHexCharPatterns[] set. */
+const uint8_t kNumHexCharPatterns = 18;
+
+/** Bit pattern map for hex characters. */
+extern const uint8_t kHexCharPatterns[kNumHexCharPatterns];
+
+/**
+ * The type of the character set supported by many methods in the NumberWriter
+ * class usually containing the string "HexChar" in its name. This custom
+ * character set is not ASCII to save flash memory. It is a restricted set that
+ * starts with 0 and goes up to 0xF to support hexadecimal digits. In addition,
+ * the character set adds few more characters for convenience:
+ *
+ *  * kHexCharSpace = 0x10 = space character
+ *  * kHexCharMinus = 0x11 = minus character
+ *
+ * The `hexchar_t` typedef is an alias for `uint8_t` and unfortunately, C++
+ * will not prevent mixing a normal `char` or `uint8_t` with a `hexchar_t`.
+ * However, it does make the documentation of the various methods more
+ * self-explanatory.
+ */
+typedef uint8_t hexchar_t;
+
+/** The code point in kHexCharPatterns[] corresponding to a space character. */
+const hexchar_t kHexCharSpace = 0x10;
+
+/** The code point in kHexCharPatterns[] corresponding to a minus character. */
+const hexchar_t kHexCharMinus = 0x11;
+
 /**
  * The NumberWriter supports converting decimal and hexadecimal numbers to
  * segment patterns expected by LedModule. The character set includes 0 to F,
- * and a few other characters which should be self-explanatory: kCharSpace and
- * kCharMinus.
+ * and a few other characters which should be self-explanatory: kHexCharSpace
+ * and kHexCharMinus.
+ *
+ * @tparam T_LED_MODULE the class of the underlying LED Module, often LedModule
+ *    but other classes with the same generic public methods can be substituted
  */
+template <typename T_LED_MODULE>
 class NumberWriter {
   public:
-    /**
-     * The type of the character set supported by many methods in this class,
-     * usually containing the string "HexChar" in its name. This custom
-     * character set is not ASCII to save flash memory. It is a restricted set
-     * that starts with 0 and goes up to 0xF to support hexadecimal digits. In
-     * addition, the character set adds few more characters for convenience:
-     *
-     *  * kCharSpace = 0x10 = space character
-     *  * kCharMinus = 0x11 = minus character
-     *
-     * The `hexchar_t` typedef is an alias for `uint8_t` and unfortunately, C++
-     * will not prevent mixing a normal `char` or `uint8_t` with a `hexchar_t`.
-     * However, it does make the documentation of the various methods more
-     * self-explanatory.
-     */
-    typedef uint8_t hexchar_t;
-
-    /** Total number of characters in the HexCharacter set. */
-    static const uint8_t kNumHexChars = 18;
-
-    /** A space character. */
-    static const hexchar_t kCharSpace = 0x10;
-
-    /** A minus character. */
-    static const hexchar_t kCharMinus = 0x11;
-
     /** Constructor. */
-    explicit NumberWriter(LedModule& ledModule) :
+    explicit NumberWriter(T_LED_MODULE& ledModule) :
         mPatternWriter(ledModule)
     {}
 
     /** Get the underlying LedModule. */
-    LedModule& ledModule() { return mPatternWriter.ledModule(); }
+    T_LED_MODULE& ledModule() { return mPatternWriter.ledModule(); }
 
     /** Get the underlying PatternWriter. */
-    PatternWriter& patternWriter() { return mPatternWriter; }
+    PatternWriter<T_LED_MODULE>& patternWriter() { return mPatternWriter; }
 
     /**
      * Write the hex character `c` at position `pos`. If `c` falls outside the
-     * valid range of the kHexCharPatterns set, a `kCharSpace` character is
+     * valid range of the kHexCharPatterns set, a `kHexCharSpace` character is
      * printed instead.
      */
     void writeHexCharAt(uint8_t pos, hexchar_t c) {
       writeInternalHexCharAt(
-          pos, ((uint8_t) c < kNumHexChars) ? c : kCharSpace);
+          pos, ((uint8_t) c < kNumHexCharPatterns) ? c : kHexCharSpace);
     }
 
     /** Write the `len` hex characters given by `s` starting at `pos`. */
@@ -127,13 +134,36 @@ class NumberWriter {
     uint8_t writeUnsignedDecimalAt(
         uint8_t pos,
         uint16_t num,
-        int8_t boxSize = 0);
+        int8_t boxSize = 0) {
+
+      const uint8_t bufSize = 5;
+      hexchar_t buf[bufSize];
+      uint8_t start = toDecimal(num, buf, bufSize);
+
+      return writeHexCharsInsideBoxAt(
+          pos, &buf[start], bufSize - start, boxSize);
+    }
 
     /** Same as writeUnsignedDecimalAt() but prepends a '-' sign if negative. */
     uint8_t writeSignedDecimalAt(
         uint8_t pos,
         int16_t num,
-        int8_t boxSize = 0);
+        int8_t boxSize = 0) {
+
+      // Even -32768 turns into +32768, which is exactly what we want
+      bool negative = num < 0;
+      uint16_t absNum = negative ? -num : num;
+
+      const uint8_t bufSize = 6;
+      hexchar_t buf[bufSize];
+      uint8_t start = toDecimal(absNum, buf, bufSize);
+      if (negative) {
+        buf[--start] = kHexCharMinus;
+      }
+
+      return writeHexCharsInsideBoxAt(
+          pos, &buf[start], bufSize - start, boxSize);
+    }
 
     /**
      * Write the 2 digit decimal number at pos. This method always writes 2
@@ -143,7 +173,17 @@ class NumberWriter {
      * This method is meant to be a lighter version of writeUnsignedDecimalAt()
      * when only 2 digits are needed. Seems to save about 110 bytes of flash.
      */
-    void writeUnsignedDecimal2At(uint8_t pos, uint8_t num);
+    void writeUnsignedDecimal2At(uint8_t pos, uint8_t num) {
+      if (num >= 100) {
+        writeHexCharAt(pos++, 9);
+        writeHexCharAt(pos++, 9);
+      } else {
+        uint8_t high = num / 10;
+        uint8_t low = num - high * 10;
+        writeHexCharAt(pos++, (high == 0) ? kHexCharSpace : high);
+        writeHexCharAt(pos++, low);
+      }
+    }
 
     /**
      * Write the decimal point for the pos. Clock LED modules will attach the
@@ -169,7 +209,10 @@ class NumberWriter {
     NumberWriter& operator=(const NumberWriter&) = delete;
 
     /** Similar to writeHexCharAt() without performing bounds check. */
-    void writeInternalHexCharAt(uint8_t pos, hexchar_t c);
+    void writeInternalHexCharAt(uint8_t pos, hexchar_t c) {
+      uint8_t pattern = pgm_read_byte(&kHexCharPatterns[(uint8_t) c]);
+      mPatternWriter.writePatternAt(pos, pattern);
+    }
 
     /** Similar to writeHexCharsAt() without performing bounds check. */
     void writeInternalHexCharsAt(uint8_t pos, const hexchar_t s[],
@@ -189,7 +232,31 @@ class NumberWriter {
         uint8_t pos,
         const hexchar_t s[],
         uint8_t len,
-        int8_t boxSize);
+        int8_t boxSize) {
+
+      uint8_t absBoxSize = (boxSize < 0) ? -boxSize : boxSize;
+
+      // if the box is too small, print normally
+      if (len >= absBoxSize) {
+        writeInternalHexCharsAt(pos, s, len);
+        return len;
+      }
+
+      // Print either left justified or right justified inside box
+      uint8_t padSize = absBoxSize - len;
+      if (boxSize < 0) {
+        // left justified
+        writeInternalHexCharsAt(pos, s, len);
+        pos += len;
+        while (padSize--) writeInternalHexCharAt(pos++, kHexCharSpace);
+      } else {
+        // right justified
+        while (padSize--) writeInternalHexCharAt(pos++, kHexCharSpace);
+        writeInternalHexCharsAt(pos, s, len);
+      }
+
+      return absBoxSize;
+    }
 
     /**
      * Convert the integer num to an array of HexChar in the provided buf, with
@@ -219,10 +286,7 @@ class NumberWriter {
     }
 
   private:
-    /** Bit pattern map for hex characters. */
-    static const uint8_t kHexCharPatterns[kNumHexChars];
-
-    PatternWriter mPatternWriter;
+    PatternWriter<T_LED_MODULE> mPatternWriter;
 };
 
 }

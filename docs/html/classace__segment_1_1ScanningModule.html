@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.8.1</span>
+   &#160;<span id="projectnumber">0.8.2</span>
    </div>
    <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, HT16K33, or 74HC595 controller chips</div>
   </td>
@@ -111,20 +111,6 @@ Public Member Functions</h2></td></tr>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1ScanningModule.html#a1bc81a7c5ac4c1d5ee6e2d90259e606c">end</a> ()</td></tr>
 <tr class="memdesc:a1bc81a7c5ac4c1d5ee6e2d90259e606c"><td class="mdescLeft">&#160;</td><td class="mdescRight">A no-op <a class="el" href="classace__segment_1_1ScanningModule.html#a1bc81a7c5ac4c1d5ee6e2d90259e606c" title="A no-op end() function for consistency with other classes.">end()</a> function for consistency with other classes. <br /></td></tr>
 <tr class="separator:a1bc81a7c5ac4c1d5ee6e2d90259e606c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afd217b4f96eec772b4046ab847b4737c"><td class="memItemLeft" align="right" valign="top"><a id="afd217b4f96eec772b4046ab847b4737c"></a>
-uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1ScanningModule.html#afd217b4f96eec772b4046ab847b4737c">getNumDigits</a> () const</td></tr>
-<tr class="memdesc:afd217b4f96eec772b4046ab847b4737c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of digits. <br /></td></tr>
-<tr class="separator:afd217b4f96eec772b4046ab847b4737c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad8d910b9f0e97711faf19a899b6eded8"><td class="memItemLeft" align="right" valign="top"><a id="ad8d910b9f0e97711faf19a899b6eded8"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1ScanningModule.html#ad8d910b9f0e97711faf19a899b6eded8">setPatternAt</a> (uint8_t pos, uint8_t pattern) override</td></tr>
-<tr class="memdesc:ad8d910b9f0e97711faf19a899b6eded8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the led digit pattern at position pos. <br /></td></tr>
-<tr class="separator:ad8d910b9f0e97711faf19a899b6eded8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a252a96e7f48aa499d93fbc6c45f28927"><td class="memItemLeft" align="right" valign="top"><a id="a252a96e7f48aa499d93fbc6c45f28927"></a>
-uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1ScanningModule.html#a252a96e7f48aa499d93fbc6c45f28927">getPatternAt</a> (uint8_t pos) override</td></tr>
-<tr class="memdesc:a252a96e7f48aa499d93fbc6c45f28927"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the led digit pattern at position pos. <br /></td></tr>
-<tr class="separator:a252a96e7f48aa499d93fbc6c45f28927"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae494091ac9aa47d84b47cc77f068ee89"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1ScanningModule.html#ae494091ac9aa47d84b47cc77f068ee89">setBrightness</a> (uint8_t brightness) override</td></tr>
-<tr class="separator:ae494091ac9aa47d84b47cc77f068ee89"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aea3b11435229958e33321c6e1d0e8553"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1ScanningModule.html#aea3b11435229958e33321c6e1d0e8553">setBrightnessAt</a> (uint8_t pos, uint8_t brightness)</td></tr>
 <tr class="memdesc:aea3b11435229958e33321c6e1d0e8553"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the brightness for a given pos, leaving pattern unchanged.  <a href="classace__segment_1_1ScanningModule.html#aea3b11435229958e33321c6e1d0e8553">More...</a><br /></td></tr>
 <tr class="separator:aea3b11435229958e33321c6e1d0e8553"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -150,18 +136,80 @@ uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <tr class="memdesc:ac6a00935339bb99f7a13e514a7252c77"><td class="mdescLeft">&#160;</td><td class="mdescRight">Render the current field immediately.  <a href="classace__segment_1_1ScanningModule.html#ac6a00935339bb99f7a13e514a7252c77">More...</a><br /></td></tr>
 <tr class="separator:ac6a00935339bb99f7a13e514a7252c77"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classace__segment_1_1LedModule"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classace__segment_1_1LedModule')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classace__segment_1_1LedModule.html">ace_segment::LedModule</a></td></tr>
-<tr class="memitem:a5941f3f6bcee5c757cb3983a4542b61f inherit pub_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#a5941f3f6bcee5c757cb3983a4542b61f">LedModule</a> (uint8_t numDigits)</td></tr>
-<tr class="memdesc:a5941f3f6bcee5c757cb3983a4542b61f inherit pub_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="classace__segment_1_1LedModule.html#a5941f3f6bcee5c757cb3983a4542b61f">More...</a><br /></td></tr>
-<tr class="separator:a5941f3f6bcee5c757cb3983a4542b61f inherit pub_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5b458f082ece47f08d0640ad3168cab1 inherit pub_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#a5b458f082ece47f08d0640ad3168cab1">getNumDigits</a> () const</td></tr>
-<tr class="memdesc:a5b458f082ece47f08d0640ad3168cab1 inherit pub_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the number of digits supported by this display instance.  <a href="classace__segment_1_1LedModule.html#a5b458f082ece47f08d0640ad3168cab1">More...</a><br /></td></tr>
+<tr class="memitem:a4228fa75eb4c92c207423e91b755b05b inherit pub_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#a4228fa75eb4c92c207423e91b755b05b">LedModule</a> (uint8_t *patterns, uint8_t numDigits)</td></tr>
+<tr class="memdesc:a4228fa75eb4c92c207423e91b755b05b inherit pub_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="classace__segment_1_1LedModule.html#a4228fa75eb4c92c207423e91b755b05b">More...</a><br /></td></tr>
+<tr class="separator:a4228fa75eb4c92c207423e91b755b05b inherit pub_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b458f082ece47f08d0640ad3168cab1 inherit pub_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top"><a id="a5b458f082ece47f08d0640ad3168cab1"></a>
+uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#a5b458f082ece47f08d0640ad3168cab1">getNumDigits</a> () const</td></tr>
+<tr class="memdesc:a5b458f082ece47f08d0640ad3168cab1 inherit pub_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the number of digits supported by this display instance. <br /></td></tr>
 <tr class="separator:a5b458f082ece47f08d0640ad3168cab1 inherit pub_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a94f8a66e505096d137c78edc519b0386 inherit pub_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top"><a id="a94f8a66e505096d137c78edc519b0386"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#a94f8a66e505096d137c78edc519b0386">setPatternAt</a> (uint8_t pos, uint8_t pattern)</td></tr>
+<tr class="memdesc:a94f8a66e505096d137c78edc519b0386 inherit pub_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the led digit pattern at position pos. <br /></td></tr>
+<tr class="separator:a94f8a66e505096d137c78edc519b0386 inherit pub_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a50688891c17deead2fb2075a0d88c189 inherit pub_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top"><a id="a50688891c17deead2fb2075a0d88c189"></a>
+uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#a50688891c17deead2fb2075a0d88c189">getPatternAt</a> (uint8_t pos) const</td></tr>
+<tr class="memdesc:a50688891c17deead2fb2075a0d88c189 inherit pub_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the led digit pattern at position pos. <br /></td></tr>
+<tr class="separator:a50688891c17deead2fb2075a0d88c189 inherit pub_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab6cb9fa9e4aa2af6a3ad134dba32ab59 inherit pub_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#ab6cb9fa9e4aa2af6a3ad134dba32ab59">setBrightness</a> (uint8_t brightness)</td></tr>
+<tr class="memdesc:ab6cb9fa9e4aa2af6a3ad134dba32ab59 inherit pub_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set global brightness of all digits.  <a href="classace__segment_1_1LedModule.html#ab6cb9fa9e4aa2af6a3ad134dba32ab59">More...</a><br /></td></tr>
+<tr class="separator:ab6cb9fa9e4aa2af6a3ad134dba32ab59 inherit pub_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed70d70812a3f5d1335b0073f6542afb inherit pub_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top"><a id="aed70d70812a3f5d1335b0073f6542afb"></a>
+uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#aed70d70812a3f5d1335b0073f6542afb">getBrightness</a> () const</td></tr>
+<tr class="memdesc:aed70d70812a3f5d1335b0073f6542afb inherit pub_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current brightness. <br /></td></tr>
+<tr class="separator:aed70d70812a3f5d1335b0073f6542afb inherit pub_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
 Friends</h2></td></tr>
-<tr class="memitem:aa6874feebc69ff5aec859eb1bb83348b"><td class="memItemLeft" align="right" valign="top"><a id="aa6874feebc69ff5aec859eb1bb83348b"></a>
-class&#160;</td><td class="memItemRight" valign="bottom"><b>::ScanningModuleTest_displayCurrentField</b></td></tr>
-<tr class="separator:aa6874feebc69ff5aec859eb1bb83348b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a031e398eee27364eb97d4a1595ed6e5a"><td class="memItemLeft" align="right" valign="top"><a id="a031e398eee27364eb97d4a1595ed6e5a"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>::ScanningModuleTest_isAnyDigitDirty</b></td></tr>
+<tr class="separator:a031e398eee27364eb97d4a1595ed6e5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a48ebf3c2482e546b272283a839f6e41b"><td class="memItemLeft" align="right" valign="top"><a id="a48ebf3c2482e546b272283a839f6e41b"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>::ScanningModuleTest_isBrightnessDirty</b></td></tr>
+<tr class="separator:a48ebf3c2482e546b272283a839f6e41b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
+Additional Inherited Members</h2></td></tr>
+<tr class="inherit_header pro_methods_classace__segment_1_1LedModule"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classace__segment_1_1LedModule')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classace__segment_1_1LedModule.html">ace_segment::LedModule</a></td></tr>
+<tr class="memitem:a99ce3bfda3383cef80302a91ea5ca651 inherit pro_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top"><a id="a99ce3bfda3383cef80302a91ea5ca651"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#a99ce3bfda3383cef80302a91ea5ca651">begin</a> ()</td></tr>
+<tr class="memdesc:a99ce3bfda3383cef80302a91ea5ca651 inherit pro_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclasses should call this from its own <a class="el" href="classace__segment_1_1LedModule.html#a99ce3bfda3383cef80302a91ea5ca651" title="Subclasses should call this from its own begin().">begin()</a>. <br /></td></tr>
+<tr class="separator:a99ce3bfda3383cef80302a91ea5ca651 inherit pro_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a21e81151039cccd5ba4332af79767955 inherit pro_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#a21e81151039cccd5ba4332af79767955">end</a> ()</td></tr>
+<tr class="memdesc:a21e81151039cccd5ba4332af79767955 inherit pro_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subclasses should call this from its own <a class="el" href="classace__segment_1_1LedModule.html#a21e81151039cccd5ba4332af79767955" title="Subclasses should call this from its own end().">end()</a>.  <a href="classace__segment_1_1LedModule.html#a21e81151039cccd5ba4332af79767955">More...</a><br /></td></tr>
+<tr class="separator:a21e81151039cccd5ba4332af79767955 inherit pro_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a04715054af6342e92499cb2811f535ad inherit pro_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top"><a id="a04715054af6342e92499cb2811f535ad"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#a04715054af6342e92499cb2811f535ad">setDigitDirty</a> (uint8_t pos)</td></tr>
+<tr class="memdesc:a04715054af6342e92499cb2811f535ad inherit pro_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the dirty bit of digit <code>pos</code>. <br /></td></tr>
+<tr class="separator:a04715054af6342e92499cb2811f535ad inherit pro_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a71df19084b9cd07bb2783aa756eec77a inherit pro_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top"><a id="a71df19084b9cd07bb2783aa756eec77a"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#a71df19084b9cd07bb2783aa756eec77a">clearDigitDirty</a> (uint8_t pos)</td></tr>
+<tr class="memdesc:a71df19084b9cd07bb2783aa756eec77a inherit pro_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the dirty bit of digit <code>pos</code>. <br /></td></tr>
+<tr class="separator:a71df19084b9cd07bb2783aa756eec77a inherit pro_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa229594cd55abe99c88643d78d8a4b16 inherit pro_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top"><a id="aa229594cd55abe99c88643d78d8a4b16"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#aa229594cd55abe99c88643d78d8a4b16">isDigitDirty</a> (uint8_t pos) const</td></tr>
+<tr class="memdesc:aa229594cd55abe99c88643d78d8a4b16 inherit pro_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check the dirty bit of digit <code>pos</code>. <br /></td></tr>
+<tr class="separator:aa229594cd55abe99c88643d78d8a4b16 inherit pro_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a327ac2b7eba7f2020aa20a4fc1ccf1 inherit pro_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top"><a id="a4a327ac2b7eba7f2020aa20a4fc1ccf1"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#a4a327ac2b7eba7f2020aa20a4fc1ccf1">clearDigitsDirty</a> ()</td></tr>
+<tr class="memdesc:a4a327ac2b7eba7f2020aa20a4fc1ccf1 inherit pro_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear dirty bits of all digits. <br /></td></tr>
+<tr class="separator:a4a327ac2b7eba7f2020aa20a4fc1ccf1 inherit pro_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a38e455547e6f822c60361aadf15a99b7 inherit pro_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top"><a id="a38e455547e6f822c60361aadf15a99b7"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#a38e455547e6f822c60361aadf15a99b7">isAnyDigitDirty</a> () const</td></tr>
+<tr class="memdesc:a38e455547e6f822c60361aadf15a99b7 inherit pro_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if any digits are dirty. <br /></td></tr>
+<tr class="separator:a38e455547e6f822c60361aadf15a99b7 inherit pro_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa31d2399ab4048ea5ae3040c6ea61398 inherit pro_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top"><a id="aa31d2399ab4048ea5ae3040c6ea61398"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#aa31d2399ab4048ea5ae3040c6ea61398">isBrightnessDirty</a> () const</td></tr>
+<tr class="memdesc:aa31d2399ab4048ea5ae3040c6ea61398 inherit pro_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the brightness level is dirty. <br /></td></tr>
+<tr class="separator:aa31d2399ab4048ea5ae3040c6ea61398 inherit pro_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb8708d2e8733baa60d3e52ea178b20e inherit pro_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top"><a id="abb8708d2e8733baa60d3e52ea178b20e"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#abb8708d2e8733baa60d3e52ea178b20e">setBrightnessDirty</a> ()</td></tr>
+<tr class="memdesc:abb8708d2e8733baa60d3e52ea178b20e inherit pro_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mark the brightness as dirty. <br /></td></tr>
+<tr class="separator:abb8708d2e8733baa60d3e52ea178b20e inherit pro_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaf02d648ff844e35d1969aaaa4aff0fd inherit pro_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top"><a id="aaf02d648ff844e35d1969aaaa4aff0fd"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#aaf02d648ff844e35d1969aaaa4aff0fd">clearBrightnessDirty</a> ()</td></tr>
+<tr class="memdesc:aaf02d648ff844e35d1969aaaa4aff0fd inherit pro_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clear the dirty bit for brightness. <br /></td></tr>
+<tr class="separator:aaf02d648ff844e35d1969aaaa4aff0fd inherit pro_methods_classace__segment_1_1LedModule"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><h3>template&lt;typename T_LM, uint8_t T_DIGITS, uint8_t T_SUBFIELDS = 1, typename T_CI = ClockInterface&gt;<br />
@@ -183,7 +231,7 @@ class ace_segment::ScanningModule&lt; T_LM, T_DIGITS, T_SUBFIELDS, T_CI &gt;</h3
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ScanningModule_8h_source.html#l00080">80</a> of file <a class="el" href="ScanningModule_8h_source.html">ScanningModule.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ScanningModule_8h_source.html#l00081">81</a> of file <a class="el" href="ScanningModule_8h_source.html">ScanningModule.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="aa4e9ffaca62613fa76e885565716e5a4"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa4e9ffaca62613fa76e885565716e5a4">&#9670;&nbsp;</a></span>ScanningModule()</h2>
@@ -233,7 +281,7 @@ template&lt;typename T_LM , uint8_t T_DIGITS, uint8_t T_SUBFIELDS = 1, typename 
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ScanningModule_8h_source.html#l00093">93</a> of file <a class="el" href="ScanningModule_8h_source.html">ScanningModule.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ScanningModule_8h_source.html#l00094">94</a> of file <a class="el" href="ScanningModule_8h_source.html">ScanningModule.h</a>.</p>
 
 </div>
 </div>
@@ -266,7 +314,7 @@ template&lt;typename T_LM , uint8_t T_DIGITS, uint8_t T_SUBFIELDS = 1, typename 
 <p>Configure the driver with the parameters given by in the constructor. </p>
 <p>Normally, this should be called only once after construction. Unit tests will sometimes change a parameter of FakeDriver and call this a second time. </p>
 
-<p class="definition">Definition at line <a class="el" href="ScanningModule_8h_source.html#l00108">108</a> of file <a class="el" href="ScanningModule_8h_source.html">ScanningModule.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ScanningModule_8h_source.html#l00109">109</a> of file <a class="el" href="ScanningModule_8h_source.html">ScanningModule.h</a>.</p>
 
 </div>
 </div>
@@ -298,7 +346,7 @@ template&lt;typename T_LM , uint8_t T_DIGITS, uint8_t T_SUBFIELDS = 1, typename 
 <p>Return micros per field. </p>
 <p>This is how often <a class="el" href="classace__segment_1_1ScanningModule.html#ac6a00935339bb99f7a13e514a7252c77" title="Render the current field immediately.">renderFieldNow()</a> must be called from a timer interrupt. </p>
 
-<p class="definition">Definition at line <a class="el" href="ScanningModule_8h_source.html#l00210">210</a> of file <a class="el" href="ScanningModule_8h_source.html">ScanningModule.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ScanningModule_8h_source.html#l00190">190</a> of file <a class="el" href="ScanningModule_8h_source.html">ScanningModule.h</a>.</p>
 
 </div>
 </div>
@@ -331,7 +379,7 @@ template&lt;typename T_LM , uint8_t T_DIGITS, uint8_t T_SUBFIELDS = 1, typename 
 <p>If modulation is off (i.e. T_SUBFIELDS == 1), then the field corresponds to the single digit. If modulation is enabled (T_SUBFIELDS &gt; 1), then each digit is PWM modulated over T_SUBFIELDS number of renderings.</p>
 <p>This method is intended to be called directly from a timer interrupt handler. </p>
 
-<p class="definition">Definition at line <a class="el" href="ScanningModule_8h_source.html#l00241">241</a> of file <a class="el" href="ScanningModule_8h_source.html">ScanningModule.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ScanningModule_8h_source.html#l00221">221</a> of file <a class="el" href="ScanningModule_8h_source.html">ScanningModule.h</a>.</p>
 
 </div>
 </div>
@@ -364,42 +412,7 @@ template&lt;typename T_LM , uint8_t T_DIGITS, uint8_t T_SUBFIELDS = 1, typename 
 <p>This is a polling method, so call this slightly more frequently than <a class="el" href="classace__segment_1_1ScanningModule.html#a11de5fb5716aa5650406994ca827a7c7" title="Return the fields per second.">getFieldsPerSecond()</a> per second.</p>
 <dl class="section return"><dt>Returns</dt><dd>Returns true if <a class="el" href="classace__segment_1_1ScanningModule.html#ac6a00935339bb99f7a13e514a7252c77" title="Render the current field immediately.">renderFieldNow()</a> was called and the field was rendered. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ScanningModule_8h_source.html#l00220">220</a> of file <a class="el" href="ScanningModule_8h_source.html">ScanningModule.h</a>.</p>
-
-</div>
-</div>
-<a id="ae494091ac9aa47d84b47cc77f068ee89"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae494091ac9aa47d84b47cc77f068ee89">&#9670;&nbsp;</a></span>setBrightness()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename T_LM , uint8_t T_DIGITS, uint8_t T_SUBFIELDS = 1, typename T_CI  = ClockInterface&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="classace__segment_1_1ScanningModule.html">ace_segment::ScanningModule</a>&lt; T_LM, T_DIGITS, T_SUBFIELDS, T_CI &gt;::setBrightness </td>
-          <td>(</td>
-          <td class="paramtype">uint8_t&#160;</td>
-          <td class="paramname"><em>brightness</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p></p>
-<p>See the documentation for <a class="el" href="classace__segment_1_1ScanningModule.html#aea3b11435229958e33321c6e1d0e8553" title="Set the brightness for a given pos, leaving pattern unchanged.">setBrightnessAt()</a> for information about the range of values of <code>brightness</code> and how it is interpreted. </p>
-
-<p>Implements <a class="el" href="classace__segment_1_1LedModule.html#af14827ce8d21f44bd65b02f0880244fc">ace_segment::LedModule</a>.</p>
-
-<p class="definition">Definition at line <a class="el" href="ScanningModule_8h_source.html#l00151">151</a> of file <a class="el" href="ScanningModule_8h_source.html">ScanningModule.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ScanningModule_8h_source.html#l00200">200</a> of file <a class="el" href="ScanningModule_8h_source.html">ScanningModule.h</a>.</p>
 
 </div>
 </div>
@@ -444,7 +457,7 @@ template&lt;typename T_LM , uint8_t T_DIGITS, uint8_t T_SUBFIELDS = 1, typename 
 <p>The maximum brightness should is exactly <code>T_SUBFIELDS</code> which turns on the LED 100% of the time. The minimum brightness is 0, which turns OFF the digit. For example, if <code>T_SUBFIELDS==16</code>, the the maximum brightness is 16 which turns ON the digit 100% of the time. The relative brightness of each brightness level is in units of 1/T_SUBFIELDS.</p>
 <p>The brightness scale is <em>not</em> normalized to [0,255]. A previous version of this class tried to do that, but I found that this introduced discretization errors which made it difficult to control the brightness at intermediate values. For example, suppose T_SUBFIELDS=16. If we changed the normalized brightness value from 32 to 40, it was impossible to determine without actually running the program if the 2 values actually differed in brightness. Instead, the calling program is expected to keep track of the value of T_SUBFIELDS, and create an array of brightness values in these raw units. The side benefit of using raw brightness values is that it makes displayCurrentFieldModulated() easier to implement. </p>
 
-<p class="definition">Definition at line <a class="el" href="ScanningModule_8h_source.html#l00185">185</a> of file <a class="el" href="ScanningModule_8h_source.html">ScanningModule.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ScanningModule_8h_source.html#l00164">164</a> of file <a class="el" href="ScanningModule_8h_source.html">ScanningModule.h</a>.</p>
 
 </div>
 </div>

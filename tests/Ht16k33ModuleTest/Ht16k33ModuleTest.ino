@@ -14,11 +14,10 @@
 
 using aunit::TestRunner;
 using ace_segment::testing::TestableWireInterface;
-using ace_segment::testing::EventType;
-using ace_segment::internal::initialDirtyBits;
 using ace_segment::Ht16k33Module;
 
 //----------------------------------------------------------------------------
+
 const uint8_t NUM_DIGITS = 4;
 const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 TestableWireInterface wireInterface;
@@ -51,6 +50,22 @@ test(Ht16k33ModuleTest, patternForChipPos_colonEnabled) {
   assertEqual(
       0x03|0x80,
       ht16k33Module.patternForChipPos(4, patterns, enableColon));
+}
+
+test(Ht16k33ModuleTest, isFlushRequired) {
+  ht16k33Module.begin();
+  assertTrue(ht16k33Module.isFlushRequired());
+
+  ht16k33Module.flush();
+  assertFalse(ht16k33Module.isFlushRequired());
+
+  ht16k33Module.setPatternAt(0, 0);
+  assertTrue(ht16k33Module.isFlushRequired());
+
+  ht16k33Module.flush();
+  assertFalse(ht16k33Module.isFlushRequired());
+
+  ht16k33Module.end();
 }
 
 //----------------------------------------------------------------------------

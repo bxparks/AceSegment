@@ -10,7 +10,7 @@
  *  * AUNITER_MICRO_CUSTOM_SINGLE: Pro Micro + Custom Single 74HC595 module
  *  * AUNITER_MICRO_CUSTOM_DUAL: Pro Micro + Custom Dual 74HC595 module
  *  * AUNITER_MICRO_HC595: Pro Micro + diymore.cc 74HC595 module
- *  * AUNITER_SAMD_HT16K33: SAMD21 M0 Mini + diymore.cc 74HC595 module
+ *  * AUNITER_SAMD_HC595: SAMD21 M0 Mini + diymore.cc 74HC595 module
  *  * AUNITER_STM32_HC595: STM32 F1 Blue Pill+ diymore.cc 74HC595 module
  *  * AUNITER_D1MINI_LARGE_HC595: WeMos D1 Mini + diymore.cc 74HC595 module
  *  * AUNITER_ESP32_HC595: ESP32 dev kit v1 + diymore.cc 74HC595 module
@@ -33,6 +33,7 @@
 
 using ace_common::incrementMod;
 using ace_spi::HardSpiInterface;
+using ace_segment::LedModule;
 using ace_segment::kByteOrderSegmentHighDigitLow;
 using ace_segment::kDigitRemapArray8Hc595;
 using ace_segment::kActiveLowPattern;
@@ -40,7 +41,6 @@ using ace_segment::kActiveHighPattern;
 using ace_segment::DirectModule;
 using ace_segment::HybridModule;
 using ace_segment::Hc595Module;
-using ace_segment::NumberWriter;
 
 #ifndef ENABLE_SERIAL_DEBUG
 #define ENABLE_SERIAL_DEBUG 0
@@ -243,6 +243,18 @@ using ace_segment::NumberWriter;
 // Configurations for AceSegment
 //------------------------------------------------------------------
 
+// LED segment patterns for up to 8 digits.
+const uint8_t PATTERNS[8] = {
+  0b00111111, // 0
+  0b00000110, // 1
+  0b01011011, // 2
+  0b01001111, // 3
+  0b01100110, // 4
+  0b01101101, // 5
+  0b01111101, // 6
+  0b00000111, // 7
+};
+
 // Total fields/second
 //      = FRAMES_PER_SECOND * NUM_SUBFIELDS * NUM_DIGITS
 //      = 60 * 16 * 4
@@ -359,9 +371,8 @@ void setupAceSegment() {
 //------------------------------------------------------------------
 
 void setupPulseDisplay() {
-  NumberWriter numberWriter(ledModule);
   for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
-    numberWriter.writeHexCharAt(i, i);
+    ledModule.setPatternAt(i, PATTERNS[i]);
   }
 }
 

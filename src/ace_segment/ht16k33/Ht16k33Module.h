@@ -79,10 +79,9 @@ class Ht16k33Module : public LedModule {
         uint8_t addr,
         bool enableColon = false
     ) :
-        LedModule(T_DIGITS),
+        LedModule(mPatterns, T_DIGITS),
         mWire(wire),
         mAddr(addr),
-        mBrightness(0),
         mEnableColon(enableColon)
     {}
 
@@ -91,6 +90,8 @@ class Ht16k33Module : public LedModule {
     //-----------------------------------------------------------------------
 
     void begin() {
+      LedModule::begin();
+
       memset(mPatterns, 0, T_DIGITS);
       writeCommand(kSystemOn);
       writeCommand(kDisplayOn);
@@ -99,6 +100,8 @@ class Ht16k33Module : public LedModule {
     void end() {
       writeCommand(kDisplayOff);
       writeCommand(kSystemOff);
+
+      LedModule::end();
     }
 
     /**
@@ -115,27 +118,13 @@ class Ht16k33Module : public LedModule {
     }
 
     //-----------------------------------------------------------------------
-    // Implement the LedModule interface
-    //-----------------------------------------------------------------------
-
-    /** Return the number of digits supported by this display instance. */
-    uint8_t getNumDigits() const { return T_DIGITS; }
-
-    void setPatternAt(uint8_t pos, uint8_t pattern) override {
-      mPatterns[pos] = pattern;
-    }
-
-    uint8_t getPatternAt(uint8_t pos) override {
-      return mPatterns[pos];
-    }
-
-    void setBrightness(uint8_t brightness) override {
-      mBrightness = brightness & 0xF;
-    }
-
-    //-----------------------------------------------------------------------
     // Methods related to rendering.
     //-----------------------------------------------------------------------
+
+    /** Return true if flushing required. */
+    bool isFlushRequired() const {
+      return isAnyDigitDirty() || isBrightnessDirty();
+    }
 
     /**
      * Send segment patterns of all digits. Using the default 100kHz speed of
@@ -155,6 +144,9 @@ class Ht16k33Module : public LedModule {
      * (e.g. ClockWriter) assumes that the most-significant-bit of digit 1 is
      * connected to the colon. So if enableColon is set, map the decimal point
      * bit to the colon bit.
+     *
+     * The isFlushRequired() method can be used to optimize the number of calls
+     * to flush(), but often it is not necessary.
      */
     void flush() {
       // Write digits.
@@ -169,7 +161,10 @@ class Ht16k33Module : public LedModule {
       mWire.endTransmission(false); // HT16K33 supports repeated START
 
       // Write brightness.
-      writeCommand(mBrightness | kBrightness);
+      writeCommand(getBrightness() | kBrightness);
+
+      clearDigitsDirty();
+      clearBrightnessDirty();
     }
 
   private:
@@ -236,9 +231,6 @@ class Ht16k33Module : public LedModule {
 
     /** Pattern for each digit. */
     uint8_t mPatterns[T_DIGITS];
-
-    /** Brightness 0 - 15 */
-    uint8_t mBrightness;
 
     /** Enable colon. */
     bool mEnableColon;

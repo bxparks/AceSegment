@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['numberwriter_160',['NumberWriter',['../classace__segment_1_1NumberWriter.html#abb61529de2cbf876061915895d68f01d',1,'ace_segment::NumberWriter::NumberWriter()'],['../classace__segment_1_1ClockWriter.html#a47b6acf282d7e31a816bee00e2d1db57',1,'ace_segment::ClockWriter::numberWriter()']]]
+  ['numberwriter_172',['NumberWriter',['../classace__segment_1_1NumberWriter.html#af630d8428ac2c36ee138c6d1560c0491',1,'ace_segment::NumberWriter::NumberWriter()'],['../classace__segment_1_1ClockWriter.html#a0c67d9d52008fccf0d83199b8a1ffdcc',1,'ace_segment::ClockWriter::numberWriter()']]]
 ];

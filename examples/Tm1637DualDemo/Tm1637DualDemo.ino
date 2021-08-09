@@ -22,8 +22,8 @@ using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
 using ace_tmi::SimpleTmiInterface;
+using ace_segment::LedModule;
 using ace_segment::Tm1637Module;
-using ace_segment::PatternWriter;
 
 // Select TM1637 protocol version, either SimpleTmiInterface or
 // SimpleTmiFastInterface.
@@ -102,9 +102,6 @@ const uint8_t DELAY_MICROS = 100;
   #error Unknown TMI_INTERFACE_TYPE
 #endif
 
-PatternWriter display1(ledModule1);
-PatternWriter display2(ledModule2);
-
 void setupAceSegment() {
   tmiInterface1.begin();
   tmiInterface2.begin();
@@ -139,13 +136,10 @@ void updateDisplay() {
     // Update the display
     uint8_t j = digitIndex;
     for (uint8_t i = 0; i < NUM_DIGITS; ++i) {
-      display1.writePatternAt(i, PATTERNS[j]);
-      display2.writePatternAt(i, PATTERNS[j]);
-
       // Write a decimal point every other digit, for demo purposes.
-      display1.writeDecimalPointAt(i, j & 0x1);
-      display2.writeDecimalPointAt(i, j & 0x1);
-
+      uint8_t pattern = PATTERNS[j] | ((j & 0x1) ? 0x80 : 0x00);
+      ledModule1.setPatternAt(i, pattern);
+      ledModule2.setPatternAt(i, pattern);
       incrementMod(j, (uint8_t) NUM_DIGITS);
     }
     incrementMod(digitIndex, (uint8_t) NUM_DIGITS);

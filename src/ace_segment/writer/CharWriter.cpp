@@ -27,14 +27,6 @@ SOFTWARE.
 
 namespace ace_segment {
 
-// A poor-man's '?': 0b10000011
-//static const uint8_t UNKNOWN = 0b10000011;
-
-// Set unknown character to be blank. The problem with '?' is that some LED
-// modules don't have an active decimal point on all digits, so the '?' does not
-// look right.
-static const uint8_t UNKNOWN = 0b00000000;
-
 // Bit patterns for ASCII characters (0 - 127).
 // Adapted from https://github.com/dmadison/LED-Segment-ASCII.
 //
@@ -50,39 +42,39 @@ static const uint8_t UNKNOWN = 0b00000000;
 // Segment: DP G F E D C B A
 //    Bits: 7  6 5 4 3 2 1 0
 //
-const uint8_t CharWriter::kCharPatterns[] PROGMEM = {
-     UNKNOWN, /* 00 */
-     UNKNOWN, /* 01 */
-     UNKNOWN, /* 02 */
-     UNKNOWN, /* 03 */
-     UNKNOWN, /* 04 */
-     UNKNOWN, /* 05 */
-     UNKNOWN, /* 06 */
-     UNKNOWN, /* 07 */
-     UNKNOWN, /* 08 */
-     UNKNOWN, /* 09 */
-     UNKNOWN, /* 10 */
-     UNKNOWN, /* 11 */
-     UNKNOWN, /* 12 */
-     UNKNOWN, /* 13 */
-     UNKNOWN, /* 14 */
-     UNKNOWN, /* 15 */
-     UNKNOWN, /* 16 */
-     UNKNOWN, /* 17 */
-     UNKNOWN, /* 18 */
-     UNKNOWN, /* 19 */
-     UNKNOWN, /* 20 */
-     UNKNOWN, /* 21 */
-     UNKNOWN, /* 22 */
-     UNKNOWN, /* 23 */
-     UNKNOWN, /* 24 */
-     UNKNOWN, /* 25 */
-     UNKNOWN, /* 26 */
-     UNKNOWN, /* 27 */
-     UNKNOWN, /* 28 */
-     UNKNOWN, /* 29 */
-     UNKNOWN, /* 30 */
-     UNKNOWN, /* 31 */
+const uint8_t kCharPatterns[] PROGMEM = {
+  kCharUnknown, /* 00 */
+  kCharUnknown, /* 01 */
+  kCharUnknown, /* 02 */
+  kCharUnknown, /* 03 */
+  kCharUnknown, /* 04 */
+  kCharUnknown, /* 05 */
+  kCharUnknown, /* 06 */
+  kCharUnknown, /* 07 */
+  kCharUnknown, /* 08 */
+  kCharUnknown, /* 09 */
+  kCharUnknown, /* 10 */
+  kCharUnknown, /* 11 */
+  kCharUnknown, /* 12 */
+  kCharUnknown, /* 13 */
+  kCharUnknown, /* 14 */
+  kCharUnknown, /* 15 */
+  kCharUnknown, /* 16 */
+  kCharUnknown, /* 17 */
+  kCharUnknown, /* 18 */
+  kCharUnknown, /* 19 */
+  kCharUnknown, /* 20 */
+  kCharUnknown, /* 21 */
+  kCharUnknown, /* 22 */
+  kCharUnknown, /* 23 */
+  kCharUnknown, /* 24 */
+  kCharUnknown, /* 25 */
+  kCharUnknown, /* 26 */
+  kCharUnknown, /* 27 */
+  kCharUnknown, /* 28 */
+  kCharUnknown, /* 29 */
+  kCharUnknown, /* 30 */
+  kCharUnknown, /* 31 */
   0b00000000, /* (space) */
   0b10000110, /* ! */
   0b00100010, /* " */
@@ -178,19 +170,7 @@ const uint8_t CharWriter::kCharPatterns[] PROGMEM = {
   0b00110000, /* | */
   0b01110000, /* } */
   0b00000001, /* ~ */
-     UNKNOWN, /* (del) */
+  kCharUnknown, /* (del) */
 };
-
-uint8_t CharWriter::getPattern(char c) const {
-  uint8_t pattern = ((mNumChars == 0) || ((uint8_t) c < mNumChars))
-      ? pgm_read_byte(&mCharPatterns[(uint8_t) c])
-      : UNKNOWN;
-  return pattern;
-}
-
-void CharWriter::writeCharAt(uint8_t pos, char c) {
-  if (pos >= mPatternWriter.getNumDigits()) return;
-  mPatternWriter.writePatternAt(pos, getPattern(c));
-}
 
 }

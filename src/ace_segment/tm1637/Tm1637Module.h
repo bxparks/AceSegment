@@ -61,22 +61,6 @@ static const uint16_t kDefaultTm1637DelayMicros = 100;
  */
 extern const uint8_t kDigitRemapArray6Tm1637[6];
 
-namespace internal {
-
-/**
- * Return a bit mask that sets the lower `numBits` bits to 1. For example, if
- * `numBits=4`, then we want 0b00001111 or 0x0F. The general expression to get
- * this result is `2^N - 1`. The exponential operation can be performed using a
- * left bit-shift. I believe this expression is well-defined in the C++ language
- * even if `numBits == 8` because `(1 << 8)` is 0x100, and `0x100 - 1` is `0xFF`
- * using unsigned integer arithmetics.
- */
-constexpr uint8_t initialDirtyBits(uint8_t numBits) {
-  return ((uint16_t) 0x1 << numBits) - 1;
-}
-
-} // namespace internal
-
 /**
  * An implementation of LedModule using the TM1637 chip. The chip communicates
  * using a protocol that is electrically similar to I2C, but does not use an
@@ -102,7 +86,7 @@ class Tm1637Module : public LedModule {
         const T_TMII& tmiInterface,
         const uint8_t* remapArray = nullptr
     ) :
-        LedModule(T_DIGITS),
+        LedModule(mPatterns, T_DIGITS),
         mTmiInterface(tmiInterface),
         mRemapArray(remapArray)
     {}
@@ -114,47 +98,19 @@ class Tm1637Module : public LedModule {
     /**
      * Initialize the module. The SimpleTmiInterface object must be initialized
      * separately.
-     *
-     * @param remapArray optional array of positions to handle LED modules whose
-     *    digit ordering is physically different than the logical ordering
-     *    (where digit 0 is on the left, and digit (T_DIGITS-1) is on the far
-     *    right).
      */
     void begin() {
+      LedModule::begin();
+
       memset(mPatterns, 0, T_DIGITS);
-      mBrightness = kBrightnessCmd | kBrightnessLevelOn | 0x7;
-
-      // Initially, we want to set all the dirty bits for digits and brightness,
-      // so that they are sent to the LED module upon the first flush() or
-      // flushIncremental(). The number of dirty bits required is `T_DIGITS +
-      // 1` because we use an extra bit for the brightness.
-      mIsDirty = internal::initialDirtyBits(T_DIGITS + 1);
-
+      setDisplayOn(true);
+      setBrightness(0x7);
       mFlushStage = 0;
     }
 
     /** Signal end of usage. Currently does nothing. */
-    void end() {}
-
-    //-----------------------------------------------------------------------
-    // Implement the LedModule interface
-    //-----------------------------------------------------------------------
-
-    /** Return the number of digits supported by this display instance. */
-    uint8_t getNumDigits() const { return T_DIGITS; }
-
-    void setPatternAt(uint8_t pos, uint8_t pattern) override {
-      mPatterns[pos] = pattern;
-      setDirtyBit(pos);
-    }
-
-    uint8_t getPatternAt(uint8_t pos) override {
-      return mPatterns[pos];
-    }
-
-    void setBrightness(uint8_t brightness) override {
-      mBrightness = (mBrightness & ~0x7) | (brightness & 0x7);
-      setDirtyBit(kBrightnessDirtyBit);
+    void end() {
+      LedModule::end();
     }
 
     //-----------------------------------------------------------------------
@@ -166,29 +122,32 @@ class Tm1637Module : public LedModule {
      * turned back on, the previous brightness will be used.
      */
     void setDisplayOn(bool on = true) {
-      if (on) {
-        mBrightness |= kBrightnessLevelOn;
-      } else {
-        mBrightness &= ~kBrightnessLevelOn;
-      }
-      setDirtyBit(kBrightnessDirtyBit);
+      mDisplayOn = on;
+      setBrightness(getBrightness()); // mark the brightness dirty
     }
 
     //-----------------------------------------------------------------------
     // Methods related to rendering.
     //-----------------------------------------------------------------------
 
+    /** Return true if flushing required. */
+    bool isFlushRequired() const {
+      return isAnyDigitDirty() || isBrightnessDirty();
+    }
+
     /**
-     * Send segment patterns of all digits plus the brightness to the display,
-     * if any of the digits or brightness is dirty. Takes about 22 ms using a
-     * 100 microsecond delay.
+     * Send segment patterns of all digits plus the brightness to the display.
+     * Takes about 22 ms using a 100 microsecond delay.
+     *
+     * The isFlushRequired() method can be used to optimize the number of calls
+     * to flush(), but often it is not necessary.
      */
     void flush() {
-      if (! mIsDirty) return;
-
       // Update the brightness first
       mTmiInterface.startCondition();
-      mTmiInterface.sendByte(mBrightness);
+      mTmiInterface.sendByte(kBrightnessCmd
+          | (mDisplayOn ? kBrightnessLevelOn : 0x0)
+          | (getBrightness() & 0xF));
       mTmiInterface.stopCondition();
 
       // Update the digits using auto incrementing mode.
@@ -209,7 +168,8 @@ class Tm1637Module : public LedModule {
       }
       mTmiInterface.stopCondition();
 
-      mIsDirty = 0x0;
+      clearDigitsDirty();
+      clearBrightnessDirty();
     }
 
     /**
@@ -248,11 +208,13 @@ class Tm1637Module : public LedModule {
     void flushIncremental() {
       if (mFlushStage == T_DIGITS) {
         // Update brightness.
-        if (isDirtyBit(T_DIGITS)) {
+        if (isBrightnessDirty()) {
           mTmiInterface.startCondition();
-          mTmiInterface.sendByte(mBrightness);
+          mTmiInterface.sendByte(kBrightnessCmd
+              | (mDisplayOn ? kBrightnessLevelOn : 0x0)
+              | (getBrightness() & 0xF));
           mTmiInterface.stopCondition();
-          clearDirtyBit(T_DIGITS);
+          clearBrightnessDirty();
         }
       } else {
         // Remap the logical position used by the controller to the actual
@@ -261,7 +223,7 @@ class Tm1637Module : public LedModule {
         // position 2 when sending the byte to controller digit 0.
         const uint8_t chipPos = mFlushStage;
         const uint8_t physicalPos = remapLogicalToPhysical(chipPos);
-        if (isDirtyBit(physicalPos)) {
+        if (isDigitDirty(physicalPos)) {
           // Update changed digit.
           mTmiInterface.startCondition();
           mTmiInterface.sendByte(kDataCmdFixedAddress);
@@ -271,7 +233,7 @@ class Tm1637Module : public LedModule {
           mTmiInterface.sendByte(kAddressCmd | chipPos);
           mTmiInterface.sendByte(mPatterns[physicalPos]);
           mTmiInterface.stopCondition();
-          clearDirtyBit(physicalPos);
+          clearDigitDirty(physicalPos);
         }
       }
 
@@ -280,18 +242,6 @@ class Tm1637Module : public LedModule {
     }
 
   private:
-    void setDirtyBit(uint8_t bit) {
-      mIsDirty |= (0x1 << bit);
-    }
-
-    void clearDirtyBit(uint8_t bit) {
-      mIsDirty &= ~(0x1 << bit);
-    }
-
-    bool isDirtyBit(uint8_t bit) const {
-      return mIsDirty & (0x1 << bit);
-    }
-
     /** Convert a logical position into the physical position. */
     uint8_t remapLogicalToPhysical(uint8_t pos) const {
       return mRemapArray ? mRemapArray[pos] : pos;
@@ -311,10 +261,6 @@ class Tm1637Module : public LedModule {
     static uint8_t const kBrightnessCmd =       0b10000000;
     static uint8_t const kBrightnessLevelOn =   0b00001000;
 
-    // Use the bit at position 'T_DIGITS' as the dirty bit for brightness.
-    // A TM1637 can have a maximum of 6 T_DIGITS, so we are safe.
-    static uint8_t const kBrightnessDirtyBit = T_DIGITS;
-
     // The ordering of these fields is partially determined to save memory on
     // 32-bit processors.
 
@@ -323,9 +269,8 @@ class Tm1637Module : public LedModule {
     const T_TMII mTmiInterface;
 
     const uint8_t* const mRemapArray;
-    uint8_t mPatterns[T_DIGITS]; // maps to dirty bits [0, T_DIGITS-1]
-    uint8_t mBrightness; // maps to dirty bit at T_DIGITS
-    uint8_t mIsDirty; // bit array
+    uint8_t mPatterns[T_DIGITS];
+    bool mDisplayOn;
     uint8_t mFlushStage; // [0, T_DIGITS], with T_DIGITS for brightness update
 };
 

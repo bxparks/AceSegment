@@ -16,19 +16,7 @@ using aunit::TestRunner;
 using ace_segment::testing::TestableTmiInterface;
 using ace_segment::testing::EventType;
 using ace_segment::testing::gEventLog;
-using ace_segment::internal::initialDirtyBits;
 using ace_segment::Tm1637Module;
-
-//----------------------------------------------------------------------------
-
-test(Tm1637ModuleTest, initialDirtyBits) {
-  assertEqual(0b0, initialDirtyBits(0));
-  assertEqual(0b1, initialDirtyBits(1));
-  assertEqual(0b11, initialDirtyBits(2));
-  assertEqual(0b111, initialDirtyBits(3));
-  assertEqual(0b1111111, initialDirtyBits(7));
-  assertEqual(0b11111111, initialDirtyBits(8));
-}
 
 //----------------------------------------------------------------------------
 
@@ -41,27 +29,29 @@ test(Tm1637ModuleTest, flushIncremental) {
   tm1637Module.begin();
   gEventLog.clear();
 
-  // Verify dirty bits initial start dirty, 4 digit bits + 1 brightness bit
-  assertEqual(0x1F, tm1637Module.mIsDirty);
-  tm1637Module.mIsDirty = 0x0;
+  // Verify dirty bits initial start dirty.
+  assertTrue(tm1637Module.isAnyDigitDirty());
+  assertTrue(tm1637Module.isBrightnessDirty());
+  tm1637Module.clearDigitsDirty();
+  tm1637Module.clearBrightnessDirty();
 
   // Verify mFlushStage
   assertEqual(0, tm1637Module.mFlushStage);
 
   // Set digit 0.
   tm1637Module.setPatternAt(1, 0x11);
-  assertEqual(0x1 << 1, tm1637Module.mIsDirty);
+  assertTrue(tm1637Module.isDigitDirty(1));
 
   // Set brightness.
   tm1637Module.setBrightness(2);
-  assertEqual((0x1 << NUM_DIGITS) | (0x1 << 1), tm1637Module.mIsDirty);
+  assertTrue(tm1637Module.isBrightnessDirty());
 
   // Iteration 0 sends digit 0, which did not change, so send nothing.
   assertEqual(0, tm1637Module.mFlushStage);
   gEventLog.clear();
   tm1637Module.flushIncremental();
   assertEqual(0, gEventLog.getNumRecords());
-  assertFalse(tm1637Module.isDirtyBit(0));
+  assertFalse(tm1637Module.isDigitDirty(0));
   assertEqual(1, tm1637Module.mFlushStage);
 
   // Iteration 1 sends digit 1, which changed, so send digit 1;
@@ -81,7 +71,7 @@ test(Tm1637ModuleTest, flushIncremental) {
     (int) EventType::kTmiSendByte, 0x11,
     (int) EventType::kTmiStopCondition
   ));
-  assertFalse(tm1637Module.isDirtyBit(1));
+  assertFalse(tm1637Module.isDigitDirty(1));
   assertEqual(2, tm1637Module.mFlushStage);
 
   // Iteration 2 sends digit 3, which sends nothing.
@@ -89,7 +79,7 @@ test(Tm1637ModuleTest, flushIncremental) {
   gEventLog.clear();
   tm1637Module.flushIncremental();
   assertEqual(0, gEventLog.getNumRecords());
-  assertFalse(tm1637Module.isDirtyBit(2));
+  assertFalse(tm1637Module.isDigitDirty(2));
   assertEqual(3, tm1637Module.mFlushStage);
 
   // Iteration 3 sends digit 3, which sends nothing.
@@ -97,7 +87,7 @@ test(Tm1637ModuleTest, flushIncremental) {
   gEventLog.clear();
   tm1637Module.flushIncremental();
   assertEqual(0, gEventLog.getNumRecords());
-  assertFalse(tm1637Module.isDirtyBit(3));
+  assertFalse(tm1637Module.isDigitDirty(3));
   assertEqual(4, tm1637Module.mFlushStage);
 
   // Iteration 4 sends brightness, which changed, so sends package.
@@ -114,9 +104,10 @@ test(Tm1637ModuleTest, flushIncremental) {
           | 2,
     (int) EventType::kTmiStopCondition
   ));
-  assertFalse(tm1637Module.isDirtyBit(4));
-  assertEqual(0x0, tm1637Module.mIsDirty);
+  assertFalse(tm1637Module.isDigitDirty(4));
   assertEqual(0, tm1637Module.mFlushStage);
+
+  assertFalse(tm1637Module.isFlushRequired());
 }
 
 test(Tm1637ModuleTest, flush) {
@@ -125,21 +116,18 @@ test(Tm1637ModuleTest, flush) {
   gEventLog.clear();
 
   // Verify dirty bits initial start dirty, 4 digit bits + 1 brightness bit
-  assertEqual(0x1F, tm1637Module.mIsDirty);
-  tm1637Module.mIsDirty = 0x0;
-
-  // Calling flush() when nothing is dirty returns immediately.
-  gEventLog.clear();
-  tm1637Module.flush();
-  assertEqual(0, gEventLog.getNumRecords());
+  assertTrue(tm1637Module.isAnyDigitDirty());
+  assertTrue(tm1637Module.isBrightnessDirty());
+  tm1637Module.clearDigitsDirty();
+  tm1637Module.clearBrightnessDirty();
 
   // Set digit 0.
   tm1637Module.setPatternAt(1, 0x11);
-  assertEqual(0x1 << 1, tm1637Module.mIsDirty);
+  assertTrue(tm1637Module.isDigitDirty(1));
 
   // Set brightness.
   tm1637Module.setBrightness(2);
-  assertEqual((0x1 << NUM_DIGITS) | (0x1 << 1), tm1637Module.mIsDirty);
+  assertTrue(tm1637Module.isBrightnessDirty());
 
   // Calling flush() sends everything.
   gEventLog.clear();
@@ -171,7 +159,28 @@ test(Tm1637ModuleTest, flush) {
     (int) EventType::kTmiSendByte, 0x00,
     (int) EventType::kTmiStopCondition
   ));
-  assertEqual(0x0, tm1637Module.mIsDirty);
+
+  assertFalse(tm1637Module.isBrightnessDirty());
+  assertFalse(tm1637Module.isAnyDigitDirty());
+  assertFalse(tm1637Module.isFlushRequired());
+
+  tm1637Module.end();
+}
+
+test(Tm1637ModuleTest, isFlushRequired) {
+  tm1637Module.begin();
+  assertTrue(tm1637Module.isFlushRequired());
+
+  tm1637Module.flush();
+  assertFalse(tm1637Module.isFlushRequired());
+
+  tm1637Module.setPatternAt(0, 0);
+  assertTrue(tm1637Module.isFlushRequired());
+
+  tm1637Module.flush();
+  assertFalse(tm1637Module.isFlushRequired());
+
+  tm1637Module.end();
 }
 
 //----------------------------------------------------------------------------
