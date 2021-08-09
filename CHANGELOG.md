@@ -1,6 +1,7 @@
 # Changelog
 
 * Unreleased
+* 0.8.2 (2021-08-09)
     * Make `LedModule::getPatternAt()` into a `const` function.
     * Change `LedModule` methods into non-virtual. There are no more virtual
       methods in the entire library. Saves 10-60 byte of flash for Module

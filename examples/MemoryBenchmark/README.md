@@ -194,7 +194,7 @@ before substantional refactoring in 2021.
     * The 32-bit processors have so much more flash memory than 8-bit
       processors, I think this tradeoff is worth it.
 
-**v0.8+**
+**v0.8.2**
 
 * Remove `virtual` keyword from `LedModule` methods.
     * Decreases flash usage by 60 bytes for `Tm1637Module`, 14 bytes for
@@ -207,9 +207,6 @@ before substantional refactoring in 2021.
     * Seems to reduce flash size of some Writer classes on some platforms by
       hundreds of bytes, I think because methods can be better inlined, and
       unused methods are not compiled and linked in.
-
-**v0.8.1+**
-
 * Add `isFlushRequired()` and clear appropriate flags after `flush()`.
     * Increases flash consumption by about 8 bytes on AVR.
 
