@@ -1,12 +1,14 @@
 var searchData=
 [
-  ['scanningmodule_165',['ScanningModule',['../classace__segment_1_1ScanningModule.html#aa4e9ffaca62613fa76e885565716e5a4',1,'ace_segment::ScanningModule']]],
-  ['scrollleft_166',['scrollLeft',['../classace__segment_1_1StringScroller.html#a0caa03a42a4cd64794e379cdf7662742',1,'ace_segment::StringScroller']]],
-  ['scrollright_167',['scrollRight',['../classace__segment_1_1StringScroller.html#a1922aa83b67028a1f1dcf079abae0c8a',1,'ace_segment::StringScroller']]],
-  ['setbrightness_168',['setBrightness',['../classace__segment_1_1Ht16k33Module.html#a9af31d58a23e6205cc43155903a1df49',1,'ace_segment::Ht16k33Module::setBrightness()'],['../classace__segment_1_1LedModule.html#af14827ce8d21f44bd65b02f0880244fc',1,'ace_segment::LedModule::setBrightness()'],['../classace__segment_1_1Max7219Module.html#a02d352bc047f92c99600a21d84e232f4',1,'ace_segment::Max7219Module::setBrightness()'],['../classace__segment_1_1ScanningModule.html#ae494091ac9aa47d84b47cc77f068ee89',1,'ace_segment::ScanningModule::setBrightness()'],['../classace__segment_1_1Tm1637Module.html#a8332f872f1dead39572668f6bf70d579',1,'ace_segment::Tm1637Module::setBrightness()']]],
-  ['setbrightnessat_169',['setBrightnessAt',['../classace__segment_1_1ScanningModule.html#aea3b11435229958e33321c6e1d0e8553',1,'ace_segment::ScanningModule']]],
-  ['setdisplayon_170',['setDisplayOn',['../classace__segment_1_1Tm1637Module.html#ae86f7df1dc791d44feaad9253f6df184',1,'ace_segment::Tm1637Module']]],
-  ['setpatternat_171',['setPatternAt',['../classace__segment_1_1Ht16k33Module.html#a93ee10ff02da9f2de0e546b21965f9d7',1,'ace_segment::Ht16k33Module::setPatternAt()'],['../classace__segment_1_1LedModule.html#a0c3836b5db41bc7a2c7d49f15a7e300d',1,'ace_segment::LedModule::setPatternAt()'],['../classace__segment_1_1Max7219Module.html#ab3ffdc2a383450671de2e294023db587',1,'ace_segment::Max7219Module::setPatternAt()'],['../classace__segment_1_1ScanningModule.html#ad8d910b9f0e97711faf19a899b6eded8',1,'ace_segment::ScanningModule::setPatternAt()'],['../classace__segment_1_1Tm1637Module.html#a6e651be7571cb0a68b4f15b7aef487b8',1,'ace_segment::Tm1637Module::setPatternAt()']]],
-  ['stringscroller_172',['StringScroller',['../classace__segment_1_1StringScroller.html#a87dd6ef5474a30bd4f022f690423e72c',1,'ace_segment::StringScroller']]],
-  ['stringwriter_173',['StringWriter',['../classace__segment_1_1StringWriter.html#af63058f8d90de08fa54c725d2c9f92b5',1,'ace_segment::StringWriter']]]
+  ['scanningmodule_177',['ScanningModule',['../classace__segment_1_1ScanningModule.html#aa4e9ffaca62613fa76e885565716e5a4',1,'ace_segment::ScanningModule']]],
+  ['scrollleft_178',['scrollLeft',['../classace__segment_1_1StringScroller.html#a633d294d5d38fccb85b52837d53b5622',1,'ace_segment::StringScroller']]],
+  ['scrollright_179',['scrollRight',['../classace__segment_1_1StringScroller.html#a4a4ac4f53ba4adc7a5411cbc4c47a42e',1,'ace_segment::StringScroller']]],
+  ['setbrightness_180',['setBrightness',['../classace__segment_1_1LedModule.html#ab6cb9fa9e4aa2af6a3ad134dba32ab59',1,'ace_segment::LedModule']]],
+  ['setbrightnessat_181',['setBrightnessAt',['../classace__segment_1_1ScanningModule.html#aea3b11435229958e33321c6e1d0e8553',1,'ace_segment::ScanningModule']]],
+  ['setbrightnessdirty_182',['setBrightnessDirty',['../classace__segment_1_1LedModule.html#abb8708d2e8733baa60d3e52ea178b20e',1,'ace_segment::LedModule']]],
+  ['setdigitdirty_183',['setDigitDirty',['../classace__segment_1_1LedModule.html#a04715054af6342e92499cb2811f535ad',1,'ace_segment::LedModule']]],
+  ['setdisplayon_184',['setDisplayOn',['../classace__segment_1_1Tm1637Module.html#ae86f7df1dc791d44feaad9253f6df184',1,'ace_segment::Tm1637Module']]],
+  ['setpatternat_185',['setPatternAt',['../classace__segment_1_1LedModule.html#a94f8a66e505096d137c78edc519b0386',1,'ace_segment::LedModule']]],
+  ['stringscroller_186',['StringScroller',['../classace__segment_1_1StringScroller.html#a3ffe6e513c6da0b4d822921e1b99a0eb',1,'ace_segment::StringScroller']]],
+  ['stringwriter_187',['StringWriter',['../classace__segment_1_1StringWriter.html#a1db3ac016159e8ff0b8d5ca009c6f197',1,'ace_segment::StringWriter']]]
 ];
