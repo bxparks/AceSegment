@@ -1,5 +1,5 @@
 /*
- * A program which compiles various LedModule and Writer objects with different
+ * A program which compiles various LedModule objects with different
  * LED configurations to determine the flash and static memory sizes from the
  * output of the compiler. See the generated README.md for details.
  */
@@ -35,15 +35,6 @@
 #define FEATURE_HT16K33_TWO_WIRE 17
 #define FEATURE_HT16K33_SIMPLE_WIRE 18
 #define FEATURE_HT16K33_SIMPLE_WIRE_FAST 19
-#define FEATURE_STUB_MODULE 20
-#define FEATURE_PATTERN_WRITER 21
-#define FEATURE_NUMBER_WRITER 22
-#define FEATURE_CLOCK_WRITER 23
-#define FEATURE_TEMPERATURE_WRITER 24
-#define FEATURE_CHAR_WRITER 25
-#define FEATURE_STRING_WRITER 26
-#define FEATURE_STRING_SCROLLER 27
-#define FEATURE_LEVEL_WRITER 28
 
 // A volatile integer to prevent the compiler from optimizing away the entire
 // program.
@@ -91,16 +82,6 @@ volatile int disableCompilerOptimization = 0;
   const uint8_t SCL_PIN = 3;
   const uint8_t DELAY_MICROS = 4;
   const uint8_t HT16K33_I2C_ADDRESS = 0x70;
-
-  // A stub LedModule to allow various Writer classes to be created, but mostly
-  // isolated from the underlying LedModule implementations.
-  class StubModule : public LedModule {
-    public:
-      StubModule() : LedModule(mPatterns, NUM_DIGITS) {}
-
-    private:
-      uint8_t mPatterns[NUM_DIGITS];
-  };
 
   #if FEATURE == FEATURE_DIRECT_MODULE
     // Common Anode, with transitions on Group pins
@@ -310,43 +291,6 @@ volatile int disableCompilerOptimization = 0;
     Ht16k33Module<WireInterface, NUM_DIGITS> ht16k33Module(
         wireInterface, HT16K33_I2C_ADDRESS);
 
-  #elif FEATURE == FEATURE_STUB_MODULE
-    StubModule stubModule;
-
-  #elif FEATURE == FEATURE_PATTERN_WRITER
-    StubModule stubModule;
-    PatternWriter<LedModule> patternWriter(stubModule);
-
-  #elif FEATURE == FEATURE_NUMBER_WRITER
-    StubModule stubModule;
-    NumberWriter<LedModule> numberWriter(stubModule);
-
-  #elif FEATURE == FEATURE_CLOCK_WRITER
-    StubModule stubModule;
-    ClockWriter<LedModule> clockWriter(stubModule);
-
-  #elif FEATURE == FEATURE_TEMPERATURE_WRITER
-    StubModule stubModule;
-    TemperatureWriter<LedModule> temperatureWriter(stubModule);
-
-  #elif FEATURE == FEATURE_CHAR_WRITER
-    StubModule stubModule;
-    CharWriter<LedModule> charWriter(stubModule);
-
-  #elif FEATURE == FEATURE_STRING_WRITER
-    StubModule stubModule;
-    CharWriter<LedModule> charWriter(stubModule);
-    StringWriter<LedModule> stringWriter(charWriter);
-
-  #elif FEATURE == FEATURE_STRING_SCROLLER
-    StubModule stubModule;
-    CharWriter<LedModule> charWriter(stubModule);
-    StringScroller<LedModule> stringScroller(charWriter);
-
-  #elif FEATURE == FEATURE_LEVEL_WRITER
-    StubModule stubModule;
-    LevelWriter<LedModule> levelWriter(stubModule);
-
   #else
     #error Unknown FEATURE
 
@@ -522,31 +466,6 @@ void loop() {
 
 #elif FEATURE == FEATURE_STUB_MODULE
   stubModule.setPatternAt(0, 0xff);
-
-#elif FEATURE == FEATURE_PATTERN_WRITER
-  patternWriter.writePatternAt(0, 0x3C);
-
-#elif FEATURE == FEATURE_NUMBER_WRITER
-  numberWriter.writeUnsignedDecimalAt(0, 42);
-
-#elif FEATURE == FEATURE_CLOCK_WRITER
-  clockWriter.writeHourMinute(10, 45);
-
-#elif FEATURE == FEATURE_TEMPERATURE_WRITER
-  temperatureWriter.writeTempDegCAt(0, 22 /*temp*/, 4 /*boxSize*/);
-
-#elif FEATURE == FEATURE_CHAR_WRITER
-  charWriter.writeCharAt(0, 'a');
-
-#elif FEATURE == FEATURE_STRING_WRITER
-  stringWriter.writeStringAt(0, "Hello");
-
-#elif FEATURE == FEATURE_STRING_SCROLLER
-  stringScroller.initScrollLeft("Hello");
-  stringScroller.scrollLeft();
-
-#elif FEATURE == FEATURE_LEVEL_WRITER
-  levelWriter.writeLevel(3);
 
 #else
   #error Unknown FEATURE

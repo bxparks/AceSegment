@@ -280,14 +280,6 @@ sizeof(Tm1637Module<SimpleTmiInterface, 6>): 19
 sizeof(Max7219Module<SimpleSpiInterface, 8>): 19
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 14
 sizeof(Ht16k33Module<SimpleWireInterface, 4>): 17
-sizeof(PatternWriter): 2
-sizeof(NumberWriter): 2
-sizeof(ClockWriter): 3
-sizeof(TemperatureWriter): 2
-sizeof(CharWriter): 5
-sizeof(StringWriter): 2
-sizeof(LevelWriter): 2
-sizeof(StringScroller): 8
 
 CPU:
 +-------------------------------------------+-------------------+---------+
@@ -368,14 +360,6 @@ sizeof(Tm1637Module<SimpleTmiInterface, 6>): 19
 sizeof(Max7219Module<SimpleSpiInterface, 8>): 19
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 14
 sizeof(Ht16k33Module<SimpleWireInterface, 4>): 17
-sizeof(PatternWriter): 2
-sizeof(NumberWriter): 2
-sizeof(ClockWriter): 3
-sizeof(TemperatureWriter): 2
-sizeof(CharWriter): 5
-sizeof(StringWriter): 2
-sizeof(LevelWriter): 2
-sizeof(StringScroller): 8
 
 CPU:
 +-------------------------------------------+-------------------+---------+
@@ -453,14 +437,6 @@ sizeof(Tm1637Module<SimpleTmiInterface, 6>): 24
 sizeof(Max7219Module<SimpleSpiInterface, 8>): 24
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 20
 sizeof(Ht16k33Module<SimpleWireInterface, 4>): 20
-sizeof(PatternWriter): 4
-sizeof(NumberWriter): 4
-sizeof(ClockWriter): 8
-sizeof(TemperatureWriter): 4
-sizeof(CharWriter): 12
-sizeof(StringWriter): 4
-sizeof(LevelWriter): 4
-sizeof(StringScroller): 12
 
 CPU:
 +-------------------------------------------+-------------------+---------+
@@ -519,14 +495,6 @@ sizeof(Tm1637Module<SimpleTmiInterface, 6>): 24
 sizeof(Max7219Module<SimpleSpiInterface, 8>): 24
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 20
 sizeof(Ht16k33Module<SimpleWireInterface, 4>): 20
-sizeof(PatternWriter): 4
-sizeof(NumberWriter): 4
-sizeof(ClockWriter): 8
-sizeof(TemperatureWriter): 4
-sizeof(CharWriter): 12
-sizeof(StringWriter): 4
-sizeof(LevelWriter): 4
-sizeof(StringScroller): 12
 
 CPU:
 +-------------------------------------------+-------------------+---------+
@@ -585,14 +553,6 @@ sizeof(Tm1637Module<SimpleTmiInterface, 6>): 24
 sizeof(Max7219Module<SimpleSpiInterface, 8>): 24
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 20
 sizeof(Ht16k33Module<SimpleWireInterface, 4>): 20
-sizeof(PatternWriter): 4
-sizeof(NumberWriter): 4
-sizeof(ClockWriter): 8
-sizeof(TemperatureWriter): 4
-sizeof(CharWriter): 12
-sizeof(StringWriter): 4
-sizeof(LevelWriter): 4
-sizeof(StringScroller): 12
 
 CPU:
 +-------------------------------------------+-------------------+---------+
@@ -651,14 +611,6 @@ sizeof(Tm1637Module<SimpleTmiInterface, 6>): 24
 sizeof(Max7219Module<SimpleSpiInterface, 8>): 24
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 20
 sizeof(Ht16k33Module<SimpleWireInterface, 4>): 20
-sizeof(PatternWriter): 4
-sizeof(NumberWriter): 4
-sizeof(ClockWriter): 8
-sizeof(TemperatureWriter): 4
-sizeof(CharWriter): 12
-sizeof(StringWriter): 4
-sizeof(LevelWriter): 4
-sizeof(StringScroller): 12
 
 CPU:
 +-------------------------------------------+-------------------+---------+
@@ -718,14 +670,6 @@ sizeof(Tm1637Module<SimpleTmiInterface, 6>): 24
 sizeof(Max7219Module<SimpleSpiInterface, 8>): 24
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 20
 sizeof(Ht16k33Module<SimpleWireInterface, 4>): 20
-sizeof(PatternWriter): 4
-sizeof(NumberWriter): 4
-sizeof(ClockWriter): 8
-sizeof(TemperatureWriter): 4
-sizeof(CharWriter): 12
-sizeof(StringWriter): 4
-sizeof(LevelWriter): 4
-sizeof(StringScroller): 12
 
 CPU:
 +-------------------------------------------+-------------------+---------+

@@ -236,10 +236,14 @@ before substantional refactoring in 2021.
 * Add `isFlushRequired()` and clear appropriate flags after `flush()`.
     * Increases flash consumption by about 8 bytes on AVR.
 
+**v0.8.2+**
+
+* Moved Writer classes to AceSegmentWriter library.
+
 ## Results
 
 The following shows the flash and static memory sizes of the `MemoryBenchmark`
-program for various `LedModule` configurations and various Writer classes.
+program for various LED modules.
 
 * `ClockInterface`, `GpioInterface` (usually optimized away by the compiler)
 * `SimpleSpiInterface`, `SimpleSpiFastInterface`, `HardSpiInterface`,
@@ -251,20 +255,6 @@ program for various `LedModule` configurations and various Writer classes.
 * `Tm1637Module`
 * `Max7219Module`
 * `Ht16k33Module`
-* `NumberWriter`
-* `ClockWriter`
-* `TemperatureWriter`
-* `CharWriter`
-* `StringWriter`
-* `StringScroller`
-* `LevelWriter`
-
-The `StubModule` is a dummy subclass of `LedModule` needed to create the
-various Writers. To get a better flash consumption of the Writer classes, this
-stub class should be subtracted from the numbers below. (Ideally, the
-`generate_table.awk` script should do this automatically, but I'm trying to keep
-that script more general to avoid maintenance overhead when it is copied into
-other `MemoryBenchmark` programs.)
 
 ### ATtiny85
 

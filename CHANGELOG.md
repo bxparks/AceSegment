@@ -1,6 +1,8 @@
 # Changelog
 
 * Unreleased
+    * Move Writer classes to
+      [AceSegmentWriter](https://github.com/bxparks/AceSegment) library.
 * 0.8.2 (2021-08-09)
     * Make `LedModule::getPatternAt()` into a `const` function.
     * Change `LedModule` methods into non-virtual. There are no more virtual
