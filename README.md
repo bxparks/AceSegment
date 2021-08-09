@@ -134,10 +134,10 @@ This library library has a direct dependency on:
 
 * AceCommon (https://github.com/bxparks/AceCommon)
 
-The following libraries are recommended for use with this library.
-All of them are listed in the `depends` clause of `library.properties` to make
-the installation easier, but they are pulled into the executable only if they
-are explicitly referenced by the calling application:
+The following libraries are listed in the `depends` clause of
+`library.properties` so that they are automatically installed by the Arduino
+Library Manager for convenience. However these libraries are pulled into the
+executable only when the client application explicitly uses them.
 
 * AceSPI (https://github.com/bxparks/AceSPI)
     * Needed by `Hc595Module`, `Max7219Module`, and `HybridModule`
@@ -145,6 +145,11 @@ are explicitly referenced by the calling application:
     * Needed by `Tm1637Module`
 * AceWire (https://github.com/bxparks/AceWire)
     * Needed by `Ht16k33Module`
+
+The following library is a companion library to AceSegment that provides more
+powerful and convenient "Writer" classes. It is not listed in the `depends`
+clause, so must be installed manually:
+
 * AceSegmentWriter (https://github.com/bxparks/AceSegmentWriter)
     * Provides more powerful and convenient classes to write quantities
       (numbers, characters, strings, etc) to the LED module.
