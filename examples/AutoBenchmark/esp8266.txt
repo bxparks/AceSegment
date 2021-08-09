@@ -22,24 +22,24 @@ sizeof(LevelWriter): 4
 sizeof(StringScroller): 12
 BENCHMARKS
 Direct(4) 12 13 36 40
-Direct(4,subfields) 1 2 33 640
-Hybrid(4,HardSpi) 12 12 25 40
-Hybrid(4,HardSpi,subfields) 1 2 24 640
-Hybrid(4,SimpleSpi) 29 29 42 40
+Direct(4,subfields) 1 2 32 640
+Hybrid(4,HardSpi) 12 12 24 40
+Hybrid(4,HardSpi,subfields) 1 2 25 640
+Hybrid(4,SimpleSpi) 29 29 45 40
 Hybrid(4,SimpleSpi,subfields) 1 4 50 640
 Hc595(8,HardSpi) 14 14 31 80
 Hc595(8,HardSpi,subfields) 0 2 31 1280
-Hc595(8,SimpleSpi) 50 51 68 80
-Hc595(8,SimpleSpi,subfields) 0 6 68 1280
-Tm1637(4,SimpleTmi,100us) 21496 21502 21548 10
+Hc595(8,SimpleSpi) 50 51 67 80
+Hc595(8,SimpleSpi,subfields) 0 6 67 1280
+Tm1637(4,SimpleTmi,100us) 21496 21502 21543 10
 Tm1637(4,SimpleTmi,100us,incremental) 3481 8478 9749 50
-Tm1637(4,SimpleTmi,5us) 1525 1525 1526 10
-Tm1637(4,SimpleTmi,5us,incremental) 247 602 691 50
-Tm1637(6,SimpleTmi,100us) 27023 27026 27043 10
+Tm1637(4,SimpleTmi,5us) 1524 1525 1528 10
+Tm1637(4,SimpleTmi,5us,incremental) 248 602 691 50
+Tm1637(6,SimpleTmi,100us) 27023 27025 27043 10
 Tm1637(6,SimpleTmi,100us,incremental) 3481 8834 9745 70
 Max7219(8,HardSpi) 126 126 138 20
-Max7219(8,SimpleSpi) 460 460 472 20
-Ht16k33(4,TwoWire,100kHz) 1322 1325 1350 20
-Ht16k33(4,TwoWire,400kHz) 347 348 363 20
-Ht16k33(4,SimpleWire,1us) 1328 1330 1353 20
+Max7219(8,SimpleSpi) 460 461 472 20
+Ht16k33(4,TwoWire,100kHz) 1322 1324 1346 20
+Ht16k33(4,TwoWire,400kHz) 347 347 351 20
+Ht16k33(4,SimpleWire,1us) 1328 1329 1348 20
 END
