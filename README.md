@@ -745,10 +745,6 @@ class LedModule {
     void setPatternAt(uint8_t pos, uint8_t pattern);
     uint8_t getPatternAt(uint8_t pos) const;
     void setBrightness(uint8_t brightness);
-
-  protected:
-    void begin();
-    void end();
 };
 ```
 
