@@ -1,9 +1,8 @@
 var searchData=
 [
-  ['ledmatrixbase_163',['LedMatrixBase',['../classace__segment_1_1LedMatrixBase.html#ae46efc84d412faff4617fe461b912131',1,'ace_segment::LedMatrixBase']]],
-  ['ledmatrixdirect_164',['LedMatrixDirect',['../classace__segment_1_1LedMatrixDirect.html#af3e107e571f515fa9837b1ec4b118569',1,'ace_segment::LedMatrixDirect']]],
-  ['ledmatrixdualhc595_165',['LedMatrixDualHc595',['../classace__segment_1_1LedMatrixDualHc595.html#aa32dd16e69cd42930243c083ee4dc287',1,'ace_segment::LedMatrixDualHc595']]],
-  ['ledmatrixsinglehc595_166',['LedMatrixSingleHc595',['../classace__segment_1_1LedMatrixSingleHc595.html#a6f28a19b1a63df30dffbb573c3f16b9a',1,'ace_segment::LedMatrixSingleHc595']]],
-  ['ledmodule_167',['ledModule',['../classace__segment_1_1CharWriter.html#a34f44c15131efbc4d893dc24d50efb1a',1,'ace_segment::CharWriter::ledModule()'],['../classace__segment_1_1ClockWriter.html#ad8946a14056fb0db7d109ae09308d00a',1,'ace_segment::ClockWriter::ledModule()'],['../classace__segment_1_1LevelWriter.html#a68253028952e93666c203a9cbc74c1b9',1,'ace_segment::LevelWriter::ledModule()'],['../classace__segment_1_1NumberWriter.html#ab322593037e120b1f1dc62efcee8458c',1,'ace_segment::NumberWriter::ledModule()'],['../classace__segment_1_1PatternWriter.html#af0439215620a2a9f6b0765456939a086',1,'ace_segment::PatternWriter::ledModule()'],['../classace__segment_1_1StringScroller.html#ab69225111f4903976beffe7f7cb27ac5',1,'ace_segment::StringScroller::ledModule()'],['../classace__segment_1_1StringWriter.html#a4d53107a595995857a2f3667c442e725',1,'ace_segment::StringWriter::ledModule()'],['../classace__segment_1_1TemperatureWriter.html#a4e53ae702464fc95ec2f549f1bdb7564',1,'ace_segment::TemperatureWriter::ledModule()'],['../classace__segment_1_1LedModule.html#a4228fa75eb4c92c207423e91b755b05b',1,'ace_segment::LedModule::LedModule()']]],
-  ['levelwriter_168',['LevelWriter',['../classace__segment_1_1LevelWriter.html#a253501a39a4e0a1b04d9f4850305d523',1,'ace_segment::LevelWriter']]]
+  ['ledmatrixbase_104',['LedMatrixBase',['../classace__segment_1_1LedMatrixBase.html#ae46efc84d412faff4617fe461b912131',1,'ace_segment::LedMatrixBase']]],
+  ['ledmatrixdirect_105',['LedMatrixDirect',['../classace__segment_1_1LedMatrixDirect.html#af3e107e571f515fa9837b1ec4b118569',1,'ace_segment::LedMatrixDirect']]],
+  ['ledmatrixdualhc595_106',['LedMatrixDualHc595',['../classace__segment_1_1LedMatrixDualHc595.html#aa32dd16e69cd42930243c083ee4dc287',1,'ace_segment::LedMatrixDualHc595']]],
+  ['ledmatrixsinglehc595_107',['LedMatrixSingleHc595',['../classace__segment_1_1LedMatrixSingleHc595.html#a6f28a19b1a63df30dffbb573c3f16b9a',1,'ace_segment::LedMatrixSingleHc595']]],
+  ['ledmodule_108',['LedModule',['../classace__segment_1_1LedModule.html#a4228fa75eb4c92c207423e91b755b05b',1,'ace_segment::LedModule']]]
 ];

@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['numberwriter_54',['NumberWriter',['../classace__segment_1_1NumberWriter.html',1,'ace_segment::NumberWriter&lt; T_LED_MODULE &gt;'],['../classace__segment_1_1NumberWriter.html#af630d8428ac2c36ee138c6d1560c0491',1,'ace_segment::NumberWriter::NumberWriter()'],['../classace__segment_1_1ClockWriter.html#a0c67d9d52008fccf0d83199b8a1ffdcc',1,'ace_segment::ClockWriter::numberWriter()']]]
+  ['renderfieldnow_43',['renderFieldNow',['../classace__segment_1_1ScanningModule.html#ac6a00935339bb99f7a13e514a7252c77',1,'ace_segment::ScanningModule']]],
+  ['renderfieldwhenready_44',['renderFieldWhenReady',['../classace__segment_1_1ScanningModule.html#a31c1fcc0f98a937137752914398de85b',1,'ace_segment::ScanningModule']]]
 ];
