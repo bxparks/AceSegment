@@ -987,32 +987,6 @@ void printSizeOf() {
   SERIAL_PORT_MONITOR.print(
       F("sizeof(Ht16k33Module<SimpleWireInterface, 4>): "));
   SERIAL_PORT_MONITOR.println(sizeof(Ht16k33Module<SimpleWireInterface, 4>));
-
-  // Writers
-
-  SERIAL_PORT_MONITOR.print(F("sizeof(PatternWriter): "));
-  SERIAL_PORT_MONITOR.println(sizeof(PatternWriter<LedModule>));
-
-  SERIAL_PORT_MONITOR.print(F("sizeof(NumberWriter): "));
-  SERIAL_PORT_MONITOR.println(sizeof(NumberWriter<LedModule>));
-
-  SERIAL_PORT_MONITOR.print(F("sizeof(ClockWriter): "));
-  SERIAL_PORT_MONITOR.println(sizeof(ClockWriter<LedModule>));
-
-  SERIAL_PORT_MONITOR.print(F("sizeof(TemperatureWriter): "));
-  SERIAL_PORT_MONITOR.println(sizeof(TemperatureWriter<LedModule>));
-
-  SERIAL_PORT_MONITOR.print(F("sizeof(CharWriter): "));
-  SERIAL_PORT_MONITOR.println(sizeof(CharWriter<LedModule>));
-
-  SERIAL_PORT_MONITOR.print(F("sizeof(StringWriter): "));
-  SERIAL_PORT_MONITOR.println(sizeof(StringWriter<LedModule>));
-
-  SERIAL_PORT_MONITOR.print(F("sizeof(LevelWriter): "));
-  SERIAL_PORT_MONITOR.println(sizeof(LevelWriter<LedModule>));
-
-  SERIAL_PORT_MONITOR.print(F("sizeof(StringScroller): "));
-  SERIAL_PORT_MONITOR.println(sizeof(StringScroller<LedModule>));
 }
 
 //-----------------------------------------------------------------------------

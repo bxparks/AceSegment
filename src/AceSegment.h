@@ -43,8 +43,8 @@ SOFTWARE.
 #endif
 
 // Version format: xxyyzz == "xx.yy.zz"
-#define ACE_SEGMENT_VERSION 802
-#define ACE_SEGMENT_VERSION_STRING "0.8.2"
+#define ACE_SEGMENT_VERSION 900
+#define ACE_SEGMENT_VERSION_STRING "0.9"
 
 #include "ace_segment/hw/ClockInterface.h"
 #include "ace_segment/hw/GpioInterface.h"
@@ -60,13 +60,5 @@ SOFTWARE.
 #include "ace_segment/tm1637/Tm1637Module.h"
 #include "ace_segment/max7219/Max7219Module.h"
 #include "ace_segment/ht16k33/Ht16k33Module.h"
-#include "ace_segment/writer/PatternWriter.h"
-#include "ace_segment/writer/NumberWriter.h"
-#include "ace_segment/writer/ClockWriter.h"
-#include "ace_segment/writer/TemperatureWriter.h"
-#include "ace_segment/writer/CharWriter.h"
-#include "ace_segment/writer/StringWriter.h"
-#include "ace_segment/writer/StringScroller.h"
-#include "ace_segment/writer/LevelWriter.h"
 
 #endif

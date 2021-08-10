@@ -10,10 +10,6 @@ are organized in subdirectories under `src/ace_segment`. The dependency graph is
 roughly like this:
 
 ```
-                    ace_segment/writer/
-                      *Writer.h
-                          |
-                          v
                     ace_segment/
                       LedModule.h
                           ^
@@ -179,8 +175,7 @@ These arrays are created using the following procedure:
 
 1. Write the segment patterns for the numbers 0 to N-1 to the led module at
    their natural positions using the `LedModule::setPattern(pos, pattern)`
-   method. For example, `setPattern(0, kPattern0)`, `setPattern(1, kPattern1)`,
-   etc. The patterns are available in `NumberWriter.cpp` or `CharWriter.cpp`.
+   method.
 1. Observe the patterns that are actually displayed on the LED module. For
    example, on the 6-digit TM1637 modules, "0 1 2 3 4 5" is displayed as "2 1 0
    5 4 3".
@@ -232,51 +227,3 @@ physicalToLogical:  2 0 1 5 3 4
 
 logicalToPhysical:  1 2 0 4 5 3
 ```
-
-## Writers
-
-Writer classes provide mappings between characters, numbers or digits into
-specific LED segment patterns using an internal "font" table. These classes use
-the `LedModule` interface (implemented by `ScanningModule`), so in theory,
-other types of LED displays could be used by these Writer classes.
-
-This library currently provides the following Writer and Scroller classes:
-
-* `PatternWriter` (previously named `LedDisplay`)
-    * `writePatternAt()`
-    * `writePatternAt_P()`
-    * `WritePatternsAt()`
-    * `WritePatternsAt_P()`
-    * `clear()`
-    * `clearToEnd()`
-* `NumberWriter`
-    * `writeHexCharAt()`
-    * `writeHexByteAt()`
-    * `writeHexWordAt()`
-    * `writeSignedDecimalAt()`
-    * `writeUnsignedDecimalAt()`
-    * `writeUnsignedDecimal2At()`
-    * `clear()`
-    * `clearToEnd()`
-* `ClockWriter`
-    * `writeCharAt()`
-    * `writeChar2At()`
-    * `writeBcd2At()`
-    * `writeDec2At()`
-    * `writeDec4At()`
-    * `writeHourMinute(hh, mm)`
-    * `writeColon()`
-* `TemperatureWriter`
-    * display temperature in C and F units
-    * `writeTempAt()`
-    * `writeTempDegAt()`
-    * `writeTempDegCAt()`
-    * `writeTempDegFAt()`
-* `CharWriter`
-    * `writeCharAt()`
-* `StringWriter`
-    * `writeStringAt(uint8_t pos, const char* cs)`
-    * `writeStringAt(uint8_t pos, const __FlashStringHelper* fs)`
-    * `clearToEnd()`
-* `StringScoller`
-    * scroll string left and right

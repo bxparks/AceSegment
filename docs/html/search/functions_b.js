@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['patternwriter_173',['patternWriter',['../classace__segment_1_1CharWriter.html#adbc63fbbc01f8f8d1e4d14f4ffe2cb4a',1,'ace_segment::CharWriter::patternWriter()'],['../classace__segment_1_1ClockWriter.html#ab1b5eb72b870ea43a7a64679007a5299',1,'ace_segment::ClockWriter::patternWriter()'],['../classace__segment_1_1LevelWriter.html#acc502c6e683fd62ba6ce229df5ea7f25',1,'ace_segment::LevelWriter::patternWriter()'],['../classace__segment_1_1NumberWriter.html#a4ca5e12add7c4f5a867463d924b03d84',1,'ace_segment::NumberWriter::patternWriter()'],['../classace__segment_1_1StringScroller.html#aeae94ffa7ed0ac65a3956d962e5b75d1',1,'ace_segment::StringScroller::patternWriter()'],['../classace__segment_1_1StringWriter.html#a9cf7cebb01631d79a88a7ee608101048',1,'ace_segment::StringWriter::patternWriter()'],['../classace__segment_1_1TemperatureWriter.html#a111bf069f2f5eb04fc6962e265029445',1,'ace_segment::TemperatureWriter::patternWriter()'],['../classace__segment_1_1PatternWriter.html#a756881556540ea0e296eb2bb4bcfc69c',1,'ace_segment::PatternWriter::PatternWriter()']]],
-  ['pinmode_174',['pinMode',['../classace__segment_1_1GpioInterface.html#a75e29a37bdcfdfdc2e42a7d556ef945b',1,'ace_segment::GpioInterface']]]
+  ['renderfieldnow_113',['renderFieldNow',['../classace__segment_1_1ScanningModule.html#ac6a00935339bb99f7a13e514a7252c77',1,'ace_segment::ScanningModule']]],
+  ['renderfieldwhenready_114',['renderFieldWhenReady',['../classace__segment_1_1ScanningModule.html#a31c1fcc0f98a937137752914398de85b',1,'ace_segment::ScanningModule']]]
 ];

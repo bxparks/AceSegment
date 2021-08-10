@@ -14,14 +14,6 @@ sizeof(Tm1637Module<SimpleTmiInterface, 6>): 19
 sizeof(Max7219Module<SimpleSpiInterface, 8>): 19
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 14
 sizeof(Ht16k33Module<SimpleWireInterface, 4>): 17
-sizeof(PatternWriter): 2
-sizeof(NumberWriter): 2
-sizeof(ClockWriter): 3
-sizeof(TemperatureWriter): 2
-sizeof(CharWriter): 5
-sizeof(StringWriter): 2
-sizeof(LevelWriter): 2
-sizeof(StringScroller): 8
 BENCHMARKS
 Direct(4) 80 83 88 40
 Direct(4,subfields) 4 14 88 640

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.8.2</span>
+   &#160;<span id="projectnumber">0.9</span>
    </div>
    <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, HT16K33, or 74HC595 controller chips</div>
   </td>
@@ -341,7 +341,7 @@ template&lt;typename T_WIREI , uint8_t T_DIGITS&gt; </div>
 <li>digit 2 = COM3</li>
 <li>digit 3 = COM4</li>
 </ul>
-<p>Unlike some LED modules, it can display both the decimal point on digit 1 as well as the colon segment at the same time. However, various writers (e.g. <a class="el" href="classace__segment_1_1ClockWriter.html" title="The ClockWriter writes &quot;hh:mm&quot; and &quot;yyyy&quot; to the LedModule.">ClockWriter</a>) assumes that the most-significant-bit of digit 1 is connected to the colon. So if enableColon is set, map the decimal point bit to the colon bit.</p>
+<p>Unlike some LED modules, it can display both the decimal point on digit 1 as well as the colon segment at the same time. However, various writers (e.g. ClockWriter) assumes that the most-significant-bit of digit 1 is connected to the colon. So if enableColon is set, map the decimal point bit to the colon bit.</p>
 <p>The <a class="el" href="classace__segment_1_1Ht16k33Module.html#a97e16c862a4d92012e6758fc6955017d" title="Return true if flushing required.">isFlushRequired()</a> method can be used to optimize the number of calls to <a class="el" href="classace__segment_1_1Ht16k33Module.html#ad9225465a7ce3fa621eb8505edb77f6a" title="Send segment patterns of all digits.">flush()</a>, but often it is not necessary. </p>
 
 <p class="definition">Definition at line <a class="el" href="Ht16k33Module_8h_source.html#l00151">151</a> of file <a class="el" href="Ht16k33Module_8h_source.html">Ht16k33Module.h</a>.</p>

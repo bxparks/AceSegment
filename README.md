@@ -44,7 +44,7 @@ is no direct dependency to the `<Wire.h>`, `<SPI.h>`, `<AceWire.h>`,
 simply adding `#include <Wire.h>` increases flash usage by about 1100 bytes even
 if nothing is used from the `<Wire.h>` library.)
 
-**Version**: 0.8.2 (2021-08-09)
+**Version**: 0.9 (2021-08-10)
 
 **Status**: *Almost* ready for first public release.
 
@@ -83,15 +83,6 @@ if nothing is used from the `<Wire.h>` library.)
         * [Rendering the Hc595Module](#RenderingHc595Module)
     * [HybridModule](#HybridModule)
     * [DirectModule](#DirectModule)
-    * [Writers](#Writers)
-        * [PatternWriter](#PatternWriter)
-        * [NumberWriter](#NumberWriter)
-        * [ClockWriter](#ClockWriter)
-        * [TemperatureWriter](#TemperatureWriter)
-        * [CharWriter](#CharWriter)
-        * [StringWriter](#StringWriter)
-        * [LevelWriter](#LevelWriter)
-        * [StringScroller](#StringScroller)
 * [Advanced Usage](#AdvancedUsage)
     * [DigitalWriteFast on AVR](#DigitalWriteFast)
     * [Multiple SPI Buses](#MultipleSpiBuses)
@@ -143,10 +134,10 @@ This library library has a direct dependency on:
 
 * AceCommon (https://github.com/bxparks/AceCommon)
 
-The following libraries are required for only certain classes in the library.
-All of them are listed in the `depends` clause of `library.properties` to make
-the installation easier, but they are pulled into the executable only if they
-are explicitly referenced by the calling application:
+The following libraries are listed in the `depends` clause of
+`library.properties` so that they are automatically installed by the Arduino
+Library Manager for convenience. However these libraries are pulled into the
+executable only when the client application explicitly uses them.
 
 * AceSPI (https://github.com/bxparks/AceSPI)
     * Needed by `Hc595Module`, `Max7219Module`, and `HybridModule`
@@ -155,13 +146,20 @@ are explicitly referenced by the calling application:
 * AceWire (https://github.com/bxparks/AceWire)
     * Needed by `Ht16k33Module`
 
+The following library is a companion library to AceSegment that provides more
+powerful and convenient "Writer" classes. It is not listed in the `depends`
+clause, so must be installed manually:
+
+* AceSegmentWriter (https://github.com/bxparks/AceSegmentWriter)
+    * Provides more powerful and convenient classes to write quantities
+      (numbers, characters, strings, etc) to the LED module.
+
 The unit tests depend on:
 
 * AUnit (https://github.com/bxparks/AUnit)
 
 Some of the examples may depend on:
 
-* AceButton (https://github.com/bxparks/AceButton)
 * TimerOne (https://github.com/PaulStoffregen/TimerOne)
 * one of the DigitalWriteFast libraries, for example:
     * https://github.com/watterott/Arduino-Libs/tree/master/digitalWriteFast
@@ -197,10 +195,6 @@ The following example sketches are provided:
     * [Max7219Demo.ino](examples/Max7219Demo)
     * [Ht16k33Demo.ino](examples/Ht16k33Demo)
     * [Hc595Demo.ino](examples/Hc595Demo)
-    * [WriterTester.ino](examples/WriterTester)
-        * demo of the various `src/writer` classes
-        * depends on AceButton (https://github.com/bxparks/AceButton) library
-        * uses 2 buttons for "single step" debugging mode
 * Advanced
     * [DirectDemo.ino](examples/DirectDemo)
         * Demo of an LED module with no controller, all digit and segment pins
@@ -284,57 +278,37 @@ end-users, listed roughly from low-level classes to higher-level classes:
     * `DirectModule`
         * An implementation with all segment and digit pins connected directly
           to the microcontroller.
-* Writers
-    * Helper classes built on top of the `LedModule` which provide higher-level
-      interface to the LED module, such as printing numbers, time (hh:mm),
-      and ASCII characters and strings.
-    * `PatternWriter`
-        * Class that knows how to write segment bit patterns to an `LedModule`.
-        * Other Writer classes are built upon this by composition.
-    * `NumberWriter`
-        * A class that writes integers in decimal or hexadecimal format to the
-          `LedModule`.
-        * A few additional characters are supported: `kCharSpace`, `kCharMinus`
-    * `ClockWriter`
-        * A class that writes a clock string "hh:mm" to `LedModule`.
-        * A few additional symbols are supported: `kCharSpace`, `kCharMinus` and
-          `kPatternA` ("A" for AM) and `kPatternP` ("P" for PM).
-    * `TemperatureWriter`
-        * A class that writes temperatures with a degrees symbol or optionally
-          with "C" or "F" symbol.
-    * `CharWriter`
-        * A class that convert an ASCII character represented by a `char` (code
-          0-127) to a bit pattern used by `SegmentDriver` class.
-        * Not all ASCII characters can be rendered on a seven segment display
-          legibly but the `CharWriter` tries its best.
-    * `StringWriter`
-        * A class that prints strings of `char` to a `CharWriter`, which in
-          turns, prints to the `LedModule`.
-    * `StringScoller`
-        * Scroll a string left and right.
-    * `LevelWriter`
-        * Display specified number of bars from left to right, 2 bars per digit.
+* Writer classes
+    * The [AceSegmentWriter](https://github.com/bxparks/AceWire) companion
+      library provides more powerful and convenient classes to write numbers,
+      characters, and strings to the LED modules.
 
 <a name="DependencyDiagram"></a>
 ### Dependency Diagram
 
-The conceptual dependency diagram among these classes looks something like this:
+The conceptual dependency diagram among these classes and the companion
+libraries (AceTMI, AceSPI, AceWire, AceSegmentWriter) looks something like this:
 
 ```
-             StringScroller
-             StringWriter
-                   |
-                   V
-PatternWriter  CharWriter NumberWriter ClockWriter TemperatureWriter LevelWriter
-         \          \           |     /                /                /
-          -------    -------    |    / ----------------       ----------
-                 \          \   |   / /                      /
-                  ---------\ \  |  / / /---------------------
-                            v v v v v v
+                      +---------------------+
+                      | AceSegmentWriter    |
+                      |---------------------|
+                      | PatternWriter       |
+                      | NumberWriter        |
+                      | ClockWriter         |
+                      | TemperatureWriter   |
+                      | CharWriter          |
+                      | StringWriter        |
+                      | LevelWriter         |
+                      | StringScroller      |
+                      +---------------------+
+                                |
+                                | (optional)
+                                v
                              LedModule
-                                ^               (hardware independent)
---------------------------------|--------------------------------------------
-                                |               (hardware dependent)
+                                ^                        (hardware independent)
+--------------------------------|----------------------------------------------
+                                |                          (hardware dependent)
                                 |
       +-----------+-------------+------------+------------+-------------+
       |           |             |            |            |             |
@@ -745,6 +719,7 @@ class LedModule {
     void setPatternAt(uint8_t pos, uint8_t pattern);
     uint8_t getPatternAt(uint8_t pos) const;
     void setBrightness(uint8_t brightness);
+    uint8_t getBrightness() const;
 };
 ```
 
@@ -797,7 +772,7 @@ Early versions of the `LedModule` used `virtual` methods which consume
 additional flash memory, static memory, and CPU cycles. They were changed to be
 non-virtual, and various Writer classes which depended on the `LedModule` class
 were converted to C++ template classes that are based on a generic
-`T_LED_MODULE` type. No virtual methods are used in this the AceSegment library.
+`T_LED_MODULE` type. No virtual methods are used in the AceSegment library.
 
 <a name="Tm1637Module"></a>
 ### Tm1637Module
@@ -920,8 +895,6 @@ using TmiInterface = SimpleTmiInterface;
 TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY);
 Tm1637Module<TmiInterface, NUM_DIGITS> ledModule(tmiInterface);
 
-PatternWriter patternWriter(ledModule);
-
 void setupAceSegment() {
   tmiInterface.begin();
   ledModule.begin();
@@ -989,8 +962,6 @@ using TmiInterface = SimpleTmiInterface;
 TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY);
 Tm1637Module<TmiInterface, NUM_DIGITS> ledModule(
     tmiInterface, kDigitRemapArray6Tm1637);
-
-PatternWriter patternWriter(ledModule);
 
 void setupAceSegment() {
   tmiInterface.begin();
@@ -1117,8 +1088,6 @@ using SpiInterface = HardSpiInterface<SPIClass>;
 SpiInterface spiInterface(SPI, LATCH_PIN);
 Max7219Module<SpiInterface, NUM_DIGITS> ledModule(
     spiInterface, kDigitRemapArray8Max7219);
-
-PatternWriter patternWriter(ledModule);
 
 void setupAceSegment() {
   SPI.begin();
@@ -1266,8 +1235,6 @@ using WireInterface = TwoWireInterface<TwoWire>;
 WireInterface wireInterface(Wire);
 Ht16k33Module<WireInterface, NUM_DIGITS> ledModule(
     wireInterface, HT16K33_I2C_ADDRESS);
-
-PatternWriter patternWriter(ledModule);
 
 void setupAceSegment() {
   Wire.begin();
@@ -1444,8 +1411,6 @@ Hc595Module<SpiInterface, NUM_DIGITS> ledModule(
     REMAP_ARRAY
 );
 
-PatternWriter patternWriter(ledModule);
-
 void setupAceSegment() {
   SPI.begin();
   spiInterface.begin();
@@ -1530,8 +1495,6 @@ Hc595Module<SpiInterface, NUM_DIGITS> ledModule(
     HC595_BYTE_ORDER,
     REMAP_ARRAY
 );
-
-PatternWriter patternWriter(ledModule);
 
 void setupAceSegment() {
   SPI.begin();
@@ -1632,8 +1595,6 @@ HybridModule<SpiInterface, NUM_DIGITS> ledModule(
     DIGIT_PINS
 );
 
-PatternWriter patternWriter(ledModule);
-
 void setupAceSegment() {
   SPI.begin();
   spiInterface.begin();
@@ -1698,8 +1659,6 @@ DirectModule<NUM_DIGITS, NUM_SUBFIELDS> ledModule(
     SEGMENT_PINS,
     DIGIT_PINS);
 
-PatternWriter patternWriter(ledModule);
-
 void setupAceSegment() {
   ledModule.begin();
 }
@@ -1720,350 +1679,6 @@ void loop() {
   ...
 }
 ```
-
-<a name="Writers"></a>
-### Writers
-
-All LED module classes provide a unified API by implementing the `LedModule`
-interface. The API of the `LedModule` class is low-level and primitive by
-design, providing only 3 methods for rendering: `setPatternAt()`,
-`getPatternAt()`, and `setBrightness()`.
-
-To display numbers, letters, and other more complicated patterns, this library
-provides a set of "writer" classes which wrap around the `LedModule` class and
-provide more powerful rendering capabilities. If these pre-defined writer
-classes are not sufficient, applications can build additional "writer" classes
-to implement the required features.
-
-<a name="PatternWriter"></a>
-#### PatternWriter
-
-The `PatternWriter` class is the most basic wrapper around an `LedModule`
-object, and provides more convenient interfaces to writing to the LED module. It
-provides the following features on top of `LedModule`:
-
-* Validation is performed on the digit `pos` parameter. If the `pos` is not
-  valid, then the method returns immediately without performing any action.
-* Entire strings (both normall strings and `PROGMEM` strings) can be written
-  to the led module.
-* The `writeDecimalPointAt()` convenience function adds a decimal point at the
-  specified `pos` location.
-* The `clear()` and `clearToEnd()` functions provide ways to clear the LED
-  display.
-* Note that the brightness control (`setBrightness()`) remains on the
-  `LedModule` and is not exposed through the `PatternWriter` class.
-
-The public methods of the class looks like this (not all public methods shown):
-
-```C++
-class PatternWriter {
-  public:
-    explicit PatternWriter(LedModule& ledModule);
-
-    uint8_t getNumDigits() const;
-
-    void writePatternAt(uint8_t pos, uint8_t pattern);
-    void writePatternsAt(uint8_t pos, const uint8_t patterns[], uint8_t len);
-    void writePatternsAt_P(uint8_t pos, const uint8_t patterns[], uint8_t len);
-    void writeDecimalPointAt(uint8_t pos, bool state = true);
-
-    void clear();
-    void clearToEnd(uint8_t pos);
-
-    void setBrightness(uint8_t brightness);
-};
-```
-
-The decimal point is stored as bit 7 (the most significant bit) of the `uint8_t`
-byte for a given digit. This bit is cleared by the other `writePatternAt()` or
-`writePatternsAt()` functions. So the `writeDecimalPointAt()` should be called
-**after** the other write methods are called.
-
-After a specific, hardware-dependent instance of `LedModule` is created, the
-`PatternWriter` is created by wrapping around the `LedModule`, like this:
-
-```C++
-PatternWriter patternWriter(ledModule);
-```
-
-<a name="NumberWriter"></a>
-#### NumberWriter
-
-The `NumberWriter` can print integers to the `LedModule` using decimal (0-9) or
-hexadecimal (0-9A-F) formats. On platforms that support it (AVR and ESP8266),
-the bit mapping table is stored in flash memory to conserve static memory.
-
-The public methods of this class looks something like this:
-
-```C++
-class NumberWriter {
-  public:
-    typedef uint8_t hexchar_t;
-    static const hexchar_t kCharSpace = 0x10;
-    static const hexchar_t kCharMinus = 0x11;
-
-    explicit NumberWriter(LedModule& ledModule);
-
-    LedModule& ledModule();
-    PatternWriter& patternWriter();
-
-    void writeHexCharAt(uint8_t pos, hexchar_t c);
-    void writeHexCharsAt(uint8_t pos, hexchar_t [], uint8_t len);
-
-    void writeHexByteAt(uint8_t pos, uint8_t b);
-    void writeHexWordAt(uint8_t pos, uint16_t w);
-
-    void writeUnsignedDecimalAt(uint8_t pos, uint16_t num, int8_t boxSize = 0);
-    void writeSignedDecimalAt(uint8_t pos, int16_t num, int8_t boxSize = 0);
-    void writeUnsignedDecimal2At(uint8_t pos, uint8_t num);
-
-    void clear();
-    void clearToEnd(uint8_t pos);
-};
-```
-
-The `hexchar_t` type semantically represents the character set supported by this
-class. It is implemented as an alias for `uint8_t`, which unfortunately means
-that the C++ compiler will not warn about mixing this type with another
-`uint8_t`. The range of this character set is from `[0,15]` plus 2 additional
-symbols, so `[0,17]`:
-
-* `NumberWriter::kCharSpace`
-* `NumberWriter::kCharMinus`
-
-![NumberWriter](docs/writers/number_writer_hex.jpg)
-
-![NumberWriter](docs/writers/number_writer_decimal.jpg)
-
-<a name="ClockWriter"></a>
-#### ClockWriter
-
-There are special, 4 digit,  seven segment LED displays which replace the
-decimal point with the colon symbol ":" between the 2 digits on either side so
-that it can display a time in the format "hh:mm".
-
-The public methods of this class look like this:
-
-```C++
-class ClockWriter {
-  public:
-    using hexchar_t = NumberWriter::hexchar_t;
-    static const hexchar_t kCharSpace = NumberWriter::kCharSpace;
-    static const hexchar_t kCharMinus = NumberWriter::kCharMinus;
-    static const uint8_t kPatternA = 0b01110111;
-    static const uint8_t kPatternP = 0b01110011;
-
-    explicit ClockWriter(LedModule& ledModule, uint8_t colonDigit = 1);
-
-    LedModule& ledModule();
-    PatternWriter& patternWriter();
-    NumberWriter& numberWriter();
-
-    void writeCharAt(uint8_t pos, hexchar_t c);
-    void writeChar2At(uint8_t pos, hexchar_t c0, hexchar_t c1);
-
-    void writeBcd2At(uint8_t pos, uint8_t bcd);
-    void writeDec2At(uint8_t pos, uint8_t d);
-    void writeDec4At(uint8_t pos, uint16_t dd);
-
-    void writeHourMinute(uint8_t hh, uint8_t mm);
-    void writeColon(bool state = true);
-};
-```
-
-You can write the letters `A` and `P` using the underlying `patternWriter()`:
-
-```C++
-uint8_t pos = ...;
-ClockWriter clockWriter(...);
-clockWriter.patternWriter().writePatternAt(pos, ClockWriter::kPatternA);
-```
-
-![ClockWriter](docs/writers/clock_writer.jpg)
-
-<a name="TemperatureWriter"></a>
-#### TemperatureWriter
-
-This class supports writing out temperatures in degrees Celsius or Fahrenheit.
-The public methods of this class looks something like this:
-
-```C++
-class TemperatureWriter {
-  public:
-    static const uint8_t kPatternDegree = 0b01100011;
-    static const uint8_t kPatternC = 0b00111001;
-    static const uint8_t kPatternF = 0b01110001;
-
-    explicit TemperatureWriter(LedModule& ledModule);
-
-    LedModule& ledModule();
-    PatternWriter& patternWriter();
-
-    uint8_t writeTempAt(uint8_t pos, int16_t temp, boxSize = 0);
-    uint8_t writeTempDegAt(uint8_t pos, int16_t temp, boxSize = 0);
-    uint8_t writeTempDegCAt(uint8_t pos, int16_t temp, boxSize = 0);
-    uint8_t writeTempDegFAt(uint8_t pos, int16_t temp, boxSize = 0);
-};
-```
-
-![TemperatureWriter-Celsius](docs/writers/temperature_writer_celsius.jpg)
-
-![TemperatureWriter-Fahrenheit](docs/writers/temperature_writer_fahrenheit.jpg)
-
-<a name="CharWriter"></a>
-#### CharWriter
-
-It is possible to represent many of the ASCII characters in the range `[0,127]`
-on a seven-segment LED display, although some of the characters will necessarily
-be crude given the limited number of segments. The `CharWriter` contains a
-[mapping of ASCII](https://github.com/dmadison/LED-Segment-ASCII) characters
-to seven-segment bit patterns. On platforms that support it (AVR and
-ESP8266), the bit pattern array is stored in flash memory to conserve static
-memory.
-
-The public methods of this class looks like this:
-
-```C++
-class CharWriter {
-  public:
-    static const uint8_t kCharPatterns[];
-    static const uint8_t kNumChars = 128;
-
-    explicit CharWriter(
-        LedModule& ledModule,
-        const uint8_t charPatterns[] = kCharPatterns,
-        uint8_t numChars = kNumChars
-    );
-
-    LedModule& ledModule();
-    PatternWriter& patternWriter();
-
-    void writeCharAt(uint8_t pos, char c);
-
-    uint8_t getNumChars() const;
-    uint8_t getPattern(char c) const;
-};
-```
-
-![CharWriter](docs/writers/char_writer.jpg)
-
-<a name="StringWriter"></a>
-#### StringWriter
-
-A `StringWriter` is a class that builds on top of the `CharWriter`. It knows how
-to write entire strings into the LED display. The public methods look like:
-
-```C++
-class StringWriter {
-  public:
-    explicit StringWriter(CharWriter& charWriter);
-
-    LedModule& ledModule();
-    PatternWriter& patternWriter();
-    CharWriter& charWriter();
-
-    uint8_t writeStringAt(uint8_t pos, const char* cs, uint8_t numChar = 255);
-
-    uint8_t writeStringAt(uint8_t pos, const __FlashStringHelper* fs,
-        uint8_t numChar = 255);
-
-    void clear();
-    void clearToEnd(uint8_t pos);
-};
-```
-
-The implementation of `writeStringAt()` is straightforward except for the
-handling of a decimal point. A seven segment LED digit contains a small LED for
-the decimal point. Instead of taking up an entire digit for a single '.'
-character, we can collapse the '.' character into the decimal point indicator of
-the previous character on the left.
-
-The optional `numChar` parameter limits the number of characters in the string
-to write. The default value is 255 which is expected to be larger than the
-largest LED module that will be used with AceSegment, so the default value will
-print the entire string.
-
-The actual number of LED digits written is returned by `writeStringAt()`. For
-example, writing `"1.2"` returns 2 because the decimal point was merged into the
-previous digit and only 2 digits are written.
-
-The `clearToEnd()` method clears the LED display from the given `pos` to the end
-of the display.
-
-The following sequence of calls will write the given string and clear all digits
-after the end of the string:
-
-```C++
-CharWriter charWriter(ledModule);
-StringWriter stringWriter(charWriter);
-
-uint8_t written = stringWriter.writeStringAt(0, s);
-stringWriter.clearToEnd(written);
-```
-
-![StringWriter](docs/writers/string_writer.jpg)
-
-<a name="LevelWriter"></a>
-#### LevelWriter
-
-A `LevelWriter` writes a specified number of vertical bars (2 vertical
-bar per digit) to the LED display, emulating a level meter LED module.
-
-```C++
-class LevelWriter {
-  public:
-    explicit LevelWriter(LedModule& ledModule);
-
-    LedModule& ledModule();
-    PatternWriter& patternWriter();
-
-    uint8_t getMaxLevel() const;
-    void writeLevel(uint8_t level);
-};
-```
-
-There are 2 vertical bars available per per digit. So the maximum level
-supported by a 4-digit LED module is 8, and an 8-digit LED module supports a
-maximum level of 16.
-
-![LevelWriter](docs/writers/level_writer.jpg)
-
-<a name="StringScroller"></a>
-#### StringScroller
-
-A `StringScroller` is a class that builds on top of the `CharWriter`. It can
-scroll strings to the left and right. The public methods look like:
-
-```C++
-class StringScroller {
-  public:
-    explicit StringScroller(CharWriter& charWriter);
-
-    LedModule& ledModule();
-    PatternWriter& patternWriter();
-    CharWriter& charWriter();
-
-    void initScrollLeft(const char* s);
-    void initScrollLeft(const __FlashStringHelper* s);
-    bool scrollLeft();
-
-    void initScrollRight(const char* s);
-    void initScrollRight(const __FlashStringHelper* s);
-    bool scrollRight();
-};
-```
-
-To scroll a string to the left, initialize the string using `initScrollLeft()`,
-then call `scrollLeft()` to shift one position to the left. The string scrolls
-into the first digit on the right. When the scrolling is finished, the display
-becomes blank, and the `scrollLeft()` method returns `true` to indicate
-`isDone`.
-
-Similarly to scroll to the right, initialize the string using
-`initScrollRight()`, then call `scrollRight()` to shift to the right. The string
-scrolls into the first digit on the left. When the scrolling is finished, the
-display becomes blank, and the `scrollRight()` method returns `true` to indicate
-`isDone`.
 
 <a name="AdvancedUsage"></a>
 ## Advanced Usage
@@ -2185,14 +1800,6 @@ sizeof(Tm1637Module<SimpleTmiInterface, 6>): 19
 sizeof(Max7219Module<SimpleSpiInterface, 8>): 19
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 14
 sizeof(Ht16k33Module<SimpleWireInterface, 4>): 17
-sizeof(PatternWriter): 2
-sizeof(NumberWriter): 2
-sizeof(ClockWriter): 3
-sizeof(TemperatureWriter): 2
-sizeof(CharWriter): 5
-sizeof(StringWriter): 2
-sizeof(LevelWriter): 2
-sizeof(StringScroller): 8
 ```
 
 On 32-bit processors, these numbers look like this:
@@ -2211,26 +1818,14 @@ sizeof(Tm1637Module<SimpleTmiInterface, 6>): 24
 sizeof(Max7219Module<SimpleSpiInterface, 8>): 24
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 20
 sizeof(Ht16k33Module<SimpleWireInterface, 4>): 20
-sizeof(PatternWriter): 4
-sizeof(NumberWriter): 4
-sizeof(ClockWriter): 8
-sizeof(TemperatureWriter): 4
-sizeof(CharWriter): 12
-sizeof(StringWriter): 4
-sizeof(LevelWriter): 4
-sizeof(StringScroller): 12
 ```
 
 <a name="FlashAndStaticMemory"></a>
 ### Flash And Static Memory
 
-For the most part, the user pays only for the feature that is being used. For
-example, if the `CharWriter` (which consumes about 300 bytes of flash on AVR) is
-not used, it is not loaded into the program.
-
-The full details are given in
-[examples/MemoryBenchmark](examples/MemoryBenchmark). Here are 2 samples of
-the flash and static memory consumptions.
+For the most part, the user pays only for the feature that is being used. The
+full details are given in [examples/MemoryBenchmark](examples/MemoryBenchmark).
+Here are 2 samples of the flash and static memory consumptions.
 
 **Arduino Nano (ATmega328)**
 
@@ -2264,16 +1859,6 @@ the flash and static memory consumptions.
 | Ht16k33(TwoWire)                |   2846/  243 |  2390/  232 |
 | Ht16k33(SimpleWire)             |   1450/   33 |   994/   22 |
 | Ht16k33(SimpleWireFast)         |    916/   27 |   460/   16 |
-|---------------------------------+--------------+-------------|
-| StubModule                      |    522/   21 |    66/   10 |
-| PatternWriter+Stub              |    534/   23 |    78/   12 |
-| NumberWriter+Stub               |    630/   23 |   174/   12 |
-| ClockWriter+Stub                |    700/   24 |   244/   13 |
-| TemperatureWriter+Stub          |    674/   23 |   218/   12 |
-| CharWriter+Stub                 |    718/   26 |   262/   15 |
-| StringWriter+Stub               |    970/   34 |   514/   23 |
-| StringScroller+Stub             |   1016/   40 |   560/   29 |
-| LevelWriter+Stub                |    626/   23 |   170/   12 |
 +--------------------------------------------------------------+
 ```
 
@@ -2300,16 +1885,6 @@ the flash and static memory consumptions.
 |---------------------------------+--------------+-------------|
 | Ht16k33(TwoWire)                | 261348/27500 |  4648/  716 |
 | Ht16k33(SimpleWire)             | 257980/27028 |  1280/  244 |
-|---------------------------------+--------------+-------------|
-| StubModule                      | 256776/26996 |    76/  212 |
-| PatternWriter+Stub              | 256792/27004 |    92/  220 |
-| NumberWriter+Stub               | 256968/27004 |   268/  220 |
-| ClockWriter+Stub                | 257064/27004 |   364/  220 |
-| TemperatureWriter+Stub          | 257000/27004 |   300/  220 |
-| CharWriter+Stub                 | 256968/27012 |   268/  228 |
-| StringWriter+Stub               | 257264/27012 |   564/  228 |
-| StringScroller+Stub             | 257184/27020 |   484/  236 |
-| LevelWriter+Stub                | 256904/27004 |   204/  220 |
 +--------------------------------------------------------------+
 ```
 
@@ -2478,30 +2053,6 @@ them.
 * This library does not currently support daisy-chaining of the MAX7219
   controller or the 74HC595 controller to create LED modules with more than 8
   digits.
-* The `NumberWriter` class does not support floating point numbers.
-    * The primary reason is that I almost never use floating point numbers on
-      embedded microcontrollers. Most embedded processors do not have hardware
-      FPU, so floating point operations are implemented using software, which
-      consumes significant amounts of memory and CPU cycles.
-    * The second reason is that floating point formatting is very complex. There
-      are numerous options to consider. For example: left justified, right
-      justified, left pad with space, left padding with zeros, right padding
-      with space, right padding with zeros, specifying the number of digits
-      after the decimal point, and formating using scientific notation.
-    * With so many different formatting options to consider, the easiest
-      solution might be to defer this problem to the `vsnprintf()` function, to
-      convert a float to a string, then render that string on the LED module.
-      Except that on 8-bit AVR processors, the `vnsprintf()` function does not
-      support floating point numbers.
-    * The other potential solution is to use the `Print::print()` function to
-      print a float to a string buffer, such as the `PrintStr<N>` class in
-      [AceCommon](https://github.com/bxparks/AceCommon), then print the string
-      to the LED module. This might be the most practical solution on an Arduino
-      platform.
-    * In any case, I think the code for printing floating point numbers should
-      not go into the `NumberWriter` class, but into a new class called
-      something like `FloatWriter`. The `FloatWriter` class could pull in a
-      `NumberWriter` object and build on top of it.
 * The `Ht16k33Module` class does not support blinking the digits as supported by
   the HT16K33 controller chip.
     * It should be pretty simple to add.
