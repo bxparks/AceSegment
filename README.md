@@ -1149,7 +1149,7 @@ template <typename T_WIREI, uint8_t T_DIGITS>
 class Ht16k33Module : public LedModule {
   public:
     explicit Ht16k33Module(
-        T_WIREI& wire,
+        T_WIREI& wireInterface,
         uint8_t addr,
         bool enableColon = false
     );
