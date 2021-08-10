@@ -12,6 +12,9 @@ associated the `LedMatrix` classes. These low-level classes are mostly hidden
 from public view, but they form the building blocks for implementing the
 `Hc595Module`, `HybridModule` and `DirectModule` classes.
 
+**Warning**: This document is hard to keep up-to-date. There may be a number of
+bugs or missing pieces in the code fragments below.
+
 ## Table of Contents
 
 * [LED Wiring](#LedWiring)
@@ -191,7 +194,6 @@ LedMatrix ledMatrix(
     DIGIT_PINS);
 ScanningModule<LedMatrix, NUM_DIGITS> scanningModule(
     ledMatrix, FRAMES_PER_SECOND);
-PatternWriter patternWriter(scanningModule);
 ...
 
 void setupScanningModule() {
@@ -279,7 +281,6 @@ LedMatrix ledMatrix(
     DIGIT_PINS):
 ScanningModule<LedMatrix, NUM_DIGITS> scanningModule(
     ledMatrix, FRAMES_PER_SECOND);
-PatternWriter patternWriter(scanningModule);
 ...
 
 void setupScanningModule() {
@@ -342,7 +343,6 @@ LedMatrix ledMatrix(
     kActiveHighPattern /*groupOnPattern*/);
 ScanningModule<LedMatrix, NUM_DIGITS> scanningModule(
     ledMatrix, FRAMES_PER_SECOND);
-PatternWriter patternWriter(scanningModule);
 ...
 
 void setupScanningModule() {
@@ -398,22 +398,29 @@ classes.
 
 A series of resources must be built up to finally create an instance of
 `ScanningModule`. For an LED module using direct scanning, the `ScanningModule`
-is used, and the resource creation occurs in roughly 5 stages, with the objects
+is used, and the resource creation occurs in roughly 4 stages, with the objects
 in the later stages depending on the objects created in the earlier stage:
 
-1. The SpiInterface object determines whether software SPI or hardware SPI is
-   used. Needed only by `LedMatrixSingleHc595` and
+1. Create the `SpiInterface` object that determines whether software SPI or
+   hardware SPI is used. Needed only by `LedMatrixSingleHc595` and
    `LedMatrixDualHc595` classes.
-1. The LedMatrix object determine how the LEDs are wired and how to
+1. Create the LedMatrix object that determines how the LEDs are wired and how to
    communicate to the LED segments.
-1. The `ScanningModule` represents the actual LED segment module using
-   direct scanning, or scanning through an 74HC595 shift register chip.
-1. The various Writer classes which translate higher level characters and
-   strings into bit patterns used by `LedModule`.
+1. Create the `ScanningModule` object that represents the actual LED segment
+   module using direct scanning, or scanning through an 74HC595 shift register
+   chip.
+1. (Optional) Create the various Writer classes from the
+   [AceSegmentWriter](https://github.com/bxparks/AceSegmentWriter) library which
+   can write numbers, characters, and strings to the LED module.
 
 A typical resource creation code looks like this:
 
 ```C++
+#include <AceSegment.h>
+#include <AceSegmentWriter.h> // NumberWriter (optional)
+
+using namespace ace_segment;
+
 const uint8_t NUM_SEGMENTS = 8;
 const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 11, 12, 13, 14, 15};
 const uint8_t NUM_DIGITS = 4;
@@ -432,12 +439,8 @@ LedMatrix ledMatrix(
 ScanningModule<LedMatrix, NUM_DIGITS> scanningModule(
     ledMatrix, FRAMES_PER_SECOND);
 
-PatternWriter patternWriter(scanningModule);
-NumberWriter numberWriter(scanningModule);
-ClockWriter clockWriter(scanningModule);
-CharWriter charWriter(scanningModule);
-StringWriter stringWriter(scanningModule);
-...
+// NumberWriter from AceSegmentWriter library
+NumberWriter<LedModule> numberWriter(scanningModule);
 
 void setupAceSegment() {
   ledMatrix.begin();
@@ -510,7 +513,6 @@ LedMatrix ledMatrix(
     kActiveHighPattern /*groupOnPattern*/);
 ScanningModule<LedMatrix, NUM_DIGITS, NUM_SUBFIELDS> scanningModule(
     ledMatrix, FRAMES_PER_SECOND);
-PatternWriter patternWriter(scanningModule);
 ```
 
 Each digit is rendered 16 times within a single field, and modulated using pulse
@@ -606,7 +608,7 @@ this:
 ```C++
 #include <Arduino.h>
 #include <AceCommon.h> // incrementMod()
-#include <AceSegment.h> // Hc595Module, PatternWriter
+#include <AceSegment.h> // Hc595Module
 #include <TimerOne.h> // Timer1
 
 using namespace ace_segment;
@@ -640,8 +642,6 @@ Hc595Module<SpiInterface, NUM_DIGITS, NUM_SUBFIELDS> ledModule(
     REMAP_ARRAY
 );
 
-PatternWriter patternWriter(ledModule);
-
 void setupAceSegment() {
   spiInterface.begin();
   ledModule.begin();
@@ -657,7 +657,7 @@ void setupTimer() {
 }
 
 void updateDisplay() {
-  // Use the 'patternWriter' to update LED segment patterns.
+  ...
 }
 
 void setup() {
