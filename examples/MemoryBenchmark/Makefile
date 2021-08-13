@@ -42,11 +42,11 @@ esp32.txt:
 teensy32.txt:
 	./collect.sh --ide teensy32 $@
 
-more_clean:
-	echo "Use 'make clean_benchmarks' to remove *.txt files"
-
 epoxy:
 	./validate_using_epoxy_duino.sh
+
+more_clean:
+	echo "Use 'make clean_benchmarks' to remove *.txt files"
 
 clean_benchmarks:
 	rm -f $(TARGETS)

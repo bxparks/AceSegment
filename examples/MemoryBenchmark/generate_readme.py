@@ -240,6 +240,16 @@ before substantional refactoring in 2021.
 
 * Moved Writer classes to AceSegmentWriter library.
 
+**v0.9+**
+
+* Add `beginTransmission()`, `endTransmission()`, `transfer()`, and
+  `transfer16()` methods to AceSPI library, which become the building blocks for
+  the `send8()` and `send16()` convenience fnctions.
+    * Seems to increase flash usage by about 20 bytes on AVR for
+    * `HardSpiInterface` and `HardSpiFastInterface`, even though nothing really
+      changed functionally.
+    * On 32-bit processors, no significant difference.
+
 ## Results
 
 The following shows the flash and static memory sizes of the `MemoryBenchmark`
