@@ -24,8 +24,9 @@ class TestableTmiInterface {
       gEventLog.addTmiStopCondition();
     }
 
-    void sendByte(uint8_t data) const {
+    uint8_t write(uint8_t data) const {
       gEventLog.addTmiSendByte(data);
+      return 0;
     }
 };
 
