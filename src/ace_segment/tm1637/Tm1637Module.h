@@ -143,18 +143,12 @@ class Tm1637Module : public LedModule {
      * to flush(), but often it is not necessary.
      */
     void flush() {
-      // Update the brightness first
-      mTmiInterface.startCondition();
-      mTmiInterface.sendByte(kBrightnessCmd
-          | (mDisplayOn ? kBrightnessLevelOn : 0x0)
-          | (getBrightness() & 0xF));
-      mTmiInterface.stopCondition();
-
-      // Update the digits using auto incrementing mode.
+      // Command1: Update the digits using auto incrementing mode.
       mTmiInterface.startCondition();
       mTmiInterface.sendByte(kDataCmdAutoAddress);
       mTmiInterface.stopCondition();
 
+      // Command2: Send the LED patterns.
       mTmiInterface.startCondition();
       mTmiInterface.sendByte(kAddressCmd);
       for (uint8_t chipPos = 0; chipPos < T_DIGITS; ++chipPos) {
@@ -166,6 +160,16 @@ class Tm1637Module : public LedModule {
         uint8_t effectivePattern = mPatterns[physicalPos];
         mTmiInterface.sendByte(effectivePattern);
       }
+      mTmiInterface.stopCondition();
+
+      // Command3: Update the brightness last. This matches the recommendation
+      // given in the Titan Micro TM1637 datasheet. But experimentation shows
+      // that things seems to work even if brightness is sent first, before the
+      // digit patterns.
+      mTmiInterface.startCondition();
+      mTmiInterface.sendByte(kBrightnessCmd
+          | (mDisplayOn ? kBrightnessLevelOn : 0x0)
+          | (getBrightness() & 0xF));
       mTmiInterface.stopCondition();
 
       clearDigitsDirty();
