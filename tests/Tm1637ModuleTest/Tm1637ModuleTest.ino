@@ -135,13 +135,6 @@ test(Tm1637ModuleTest, flush) {
   assertEqual(13, gEventLog.getNumRecords());
   assertTrue(gEventLog.assertEvents(
     13,
-    // brightness
-    (int) EventType::kTmiStartCondition,
-    (int) EventType::kTmiSendByte,
-        Tm1637Module<TestableTmiInterface, NUM_DIGITS>::kBrightnessCmd
-          | Tm1637Module<TestableTmiInterface, NUM_DIGITS>::kBrightnessLevelOn
-          | 2,
-    (int) EventType::kTmiStopCondition,
 
     // auto increment mode
     (int) EventType::kTmiStartCondition,
@@ -157,6 +150,14 @@ test(Tm1637ModuleTest, flush) {
     (int) EventType::kTmiSendByte, 0x11,
     (int) EventType::kTmiSendByte, 0x00,
     (int) EventType::kTmiSendByte, 0x00,
+    (int) EventType::kTmiStopCondition,
+
+    // brightness
+    (int) EventType::kTmiStartCondition,
+    (int) EventType::kTmiSendByte,
+        Tm1637Module<TestableTmiInterface, NUM_DIGITS>::kBrightnessCmd
+          | Tm1637Module<TestableTmiInterface, NUM_DIGITS>::kBrightnessLevelOn
+          | 2,
     (int) EventType::kTmiStopCondition
   ));
 
