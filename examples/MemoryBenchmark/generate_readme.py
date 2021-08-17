@@ -40,7 +40,7 @@ by the runtime environment of the processor. For example, it often seems like
 the ESP8266 allocates flash memory in blocks of a certain quantity, so the
 calculated flash size can jump around in unexpected ways.
 
-**Version**: AceSegment v0.9
+**Version**: AceSegment v0.9.1
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -239,6 +239,16 @@ before substantional refactoring in 2021.
 **v0.9**
 
 * Moved Writer classes to AceSegmentWriter library.
+
+**v0.9+**
+
+* Add `beginTransmission()`, `endTransmission()`, `transfer()`, and
+  `transfer16()` methods to AceSPI library, which become the building blocks for
+  the `send8()` and `send16()` convenience fnctions.
+    * Seems to increase flash usage by about 20 bytes on AVR for
+    * `HardSpiInterface` and `HardSpiFastInterface`, even though nothing really
+      changed functionally.
+    * On 32-bit processors, no significant difference.
 
 ## Results
 

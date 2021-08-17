@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.9</span>
+   &#160;<span id="projectnumber">0.9.1</span>
    </div>
    <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, MAX7219, HT16K33, or 74HC595 controller chips</div>
   </td>
@@ -101,9 +101,9 @@ Collaboration diagram for ace_segment::Ht16k33Module&lt; T_WIREI, T_DIGITS &gt;:
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a0136851a409d3bba51c3cdf9aa4eb483"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1Ht16k33Module.html#a0136851a409d3bba51c3cdf9aa4eb483">Ht16k33Module</a> (T_WIREI &amp;wire, uint8_t addr, bool <a class="el" href="classace__segment_1_1Ht16k33Module.html#ac847aa1ced3161d514d76eac6e8fe824">enableColon</a>=false)</td></tr>
-<tr class="memdesc:a0136851a409d3bba51c3cdf9aa4eb483"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="classace__segment_1_1Ht16k33Module.html#a0136851a409d3bba51c3cdf9aa4eb483">More...</a><br /></td></tr>
-<tr class="separator:a0136851a409d3bba51c3cdf9aa4eb483"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af36ff9ba6dffb7c445cdf0b4c6a1761f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1Ht16k33Module.html#af36ff9ba6dffb7c445cdf0b4c6a1761f">Ht16k33Module</a> (T_WIREI &amp;wireInterface, uint8_t addr, bool <a class="el" href="classace__segment_1_1Ht16k33Module.html#ac847aa1ced3161d514d76eac6e8fe824">enableColon</a>=false)</td></tr>
+<tr class="memdesc:af36ff9ba6dffb7c445cdf0b4c6a1761f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="classace__segment_1_1Ht16k33Module.html#af36ff9ba6dffb7c445cdf0b4c6a1761f">More...</a><br /></td></tr>
+<tr class="separator:af36ff9ba6dffb7c445cdf0b4c6a1761f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4f788e32344a71422db1dc66df79b89a"><td class="memItemLeft" align="right" valign="top"><a id="a4f788e32344a71422db1dc66df79b89a"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>begin</b> ()</td></tr>
 <tr class="separator:a4f788e32344a71422db1dc66df79b89a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -215,8 +215,8 @@ class ace_segment::Ht16k33Module&lt; T_WIREI, T_DIGITS &gt;</h3>
 
 <p class="definition">Definition at line <a class="el" href="Ht16k33Module_8h_source.html#l00066">66</a> of file <a class="el" href="Ht16k33Module_8h_source.html">Ht16k33Module.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a0136851a409d3bba51c3cdf9aa4eb483"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0136851a409d3bba51c3cdf9aa4eb483">&#9670;&nbsp;</a></span>Ht16k33Module()</h2>
+<a id="af36ff9ba6dffb7c445cdf0b4c6a1761f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af36ff9ba6dffb7c445cdf0b4c6a1761f">&#9670;&nbsp;</a></span>Ht16k33Module()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -230,7 +230,7 @@ template&lt;typename T_WIREI , uint8_t T_DIGITS&gt; </div>
           <td class="memname"><a class="el" href="classace__segment_1_1Ht16k33Module.html">ace_segment::Ht16k33Module</a>&lt; T_WIREI, T_DIGITS &gt;::<a class="el" href="classace__segment_1_1Ht16k33Module.html">Ht16k33Module</a> </td>
           <td>(</td>
           <td class="paramtype">T_WIREI &amp;&#160;</td>
-          <td class="paramname"><em>wire</em>, </td>
+          <td class="paramname"><em>wireInterface</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -260,7 +260,7 @@ template&lt;typename T_WIREI , uint8_t T_DIGITS&gt; </div>
 <p>Constructor. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">wire</td><td>instance of T_WIREI class </td></tr>
+    <tr><td class="paramname">wireInterface</td><td>instance of T_WIREI class </td></tr>
     <tr><td class="paramname">addr</td><td>the 7-bit I2C addr </td></tr>
     <tr><td class="paramname">enableColon</td><td>enable the colon segment to behave like a 4-digit LED module for clocks (displaying a colon in <code>hh:mm</code>). The decimal point (bit 7) of digit 1 (second from left) becomes wired to the colon segment. (default: false) </td></tr>
   </table>

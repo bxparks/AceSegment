@@ -67,7 +67,7 @@ class Ht16k33Module : public LedModule {
   public:
     /**
      * Constructor.
-     * @param wire instance of T_WIREI class
+     * @param wireInterface instance of T_WIREI class
      * @param addr the 7-bit I2C addr
      * @param enableColon enable the colon segment to behave like a 4-digit
      *    LED module for clocks (displaying a colon in `hh:mm`). The
@@ -75,12 +75,12 @@ class Ht16k33Module : public LedModule {
      *    to the colon segment. (default: false)
      */
     explicit Ht16k33Module(
-        T_WIREI& wire,
+        T_WIREI& wireInterface,
         uint8_t addr,
         bool enableColon = false
     ) :
         LedModule(mPatterns, T_DIGITS),
-        mWire(wire),
+        mWireInterface(wireInterface),
         mAddr(addr),
         mEnableColon(enableColon)
     {}
@@ -150,15 +150,15 @@ class Ht16k33Module : public LedModule {
      */
     void flush() {
       // Write digits.
-      mWire.beginTransmission(mAddr);
-      mWire.write(0x00); // start at position 0
+      mWireInterface.beginTransmission(mAddr);
+      mWireInterface.write(0x00); // start at position 0
       // Loop over the 5 physical digit lines of this module.
       for (uint8_t chipPos = 0; chipPos < T_DIGITS + 1; ++chipPos) {
         uint8_t pattern = patternForChipPos(chipPos, mPatterns, mEnableColon);
-        mWire.write(pattern); // ROW0-ROW7
-        mWire.write(0); // ROW8-ROW15 unused
+        mWireInterface.write(pattern); // ROW0-ROW7
+        mWireInterface.write(0); // ROW8-ROW15 unused
       }
-      mWire.endTransmission(false); // HT16K33 supports repeated START
+      mWireInterface.endTransmission(false); // HT16K33 supports repeated START
 
       // Write brightness.
       writeCommand(getBrightness() | kBrightness);
@@ -173,9 +173,9 @@ class Ht16k33Module : public LedModule {
 
     /** Write a single byte command to the LED module. */
     void writeCommand(uint8_t command) {
-      mWire.beginTransmission(mAddr);
-      mWire.write(command);
-      mWire.endTransmission();
+      mWireInterface.beginTransmission(mAddr);
+      mWireInterface.write(command);
+      mWireInterface.endTransmission();
     }
 
     /**
@@ -224,7 +224,7 @@ class Ht16k33Module : public LedModule {
      * I2C Wire interface. Copied by value instead of reference to avoid an
      * extra layer of indirection.
      */
-    T_WIREI mWire;
+    T_WIREI mWireInterface;
 
     /** The 7-bit I2C address. */
     uint8_t const mAddr;

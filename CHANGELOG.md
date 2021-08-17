@@ -1,6 +1,9 @@
 # Changelog
 
 * Unreleased
+* 0.9.1 (2021-08-17)
+    * Internal updates to maintain compatibility with changes in AceTMI, AceSPI,
+      and AceWire.
 * 0.9 (2021-08-10)
     * Move Writer classes to
       [AceSegmentWriter](https://github.com/bxparks/AceSegment) library.

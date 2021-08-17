@@ -143,20 +143,14 @@ class Tm1637Module : public LedModule {
      * to flush(), but often it is not necessary.
      */
     void flush() {
-      // Update the brightness first
+      // Command1: Update the digits using auto incrementing mode.
       mTmiInterface.startCondition();
-      mTmiInterface.sendByte(kBrightnessCmd
-          | (mDisplayOn ? kBrightnessLevelOn : 0x0)
-          | (getBrightness() & 0xF));
+      mTmiInterface.write(kDataCmdAutoAddress);
       mTmiInterface.stopCondition();
 
-      // Update the digits using auto incrementing mode.
+      // Command2: Send the LED patterns.
       mTmiInterface.startCondition();
-      mTmiInterface.sendByte(kDataCmdAutoAddress);
-      mTmiInterface.stopCondition();
-
-      mTmiInterface.startCondition();
-      mTmiInterface.sendByte(kAddressCmd);
+      mTmiInterface.write(kAddressCmd);
       for (uint8_t chipPos = 0; chipPos < T_DIGITS; ++chipPos) {
         // Remap the logical position used by the controller to the actual
         // position. For example, if the controller digit 0 appears at physical
@@ -164,8 +158,18 @@ class Tm1637Module : public LedModule {
         // position 2 when sending the byte to controller digit 0.
         uint8_t physicalPos = remapLogicalToPhysical(chipPos);
         uint8_t effectivePattern = mPatterns[physicalPos];
-        mTmiInterface.sendByte(effectivePattern);
+        mTmiInterface.write(effectivePattern);
       }
+      mTmiInterface.stopCondition();
+
+      // Command3: Update the brightness last. This matches the recommendation
+      // given in the Titan Micro TM1637 datasheet. But experimentation shows
+      // that things seems to work even if brightness is sent first, before the
+      // digit patterns.
+      mTmiInterface.startCondition();
+      mTmiInterface.write(kBrightnessCmd
+          | (mDisplayOn ? kBrightnessLevelOn : 0x0)
+          | (getBrightness() & 0xF));
       mTmiInterface.stopCondition();
 
       clearDigitsDirty();
@@ -210,7 +214,7 @@ class Tm1637Module : public LedModule {
         // Update brightness.
         if (isBrightnessDirty()) {
           mTmiInterface.startCondition();
-          mTmiInterface.sendByte(kBrightnessCmd
+          mTmiInterface.write(kBrightnessCmd
               | (mDisplayOn ? kBrightnessLevelOn : 0x0)
               | (getBrightness() & 0xF));
           mTmiInterface.stopCondition();
@@ -226,12 +230,12 @@ class Tm1637Module : public LedModule {
         if (isDigitDirty(physicalPos)) {
           // Update changed digit.
           mTmiInterface.startCondition();
-          mTmiInterface.sendByte(kDataCmdFixedAddress);
+          mTmiInterface.write(kDataCmdFixedAddress);
           mTmiInterface.stopCondition();
 
           mTmiInterface.startCondition();
-          mTmiInterface.sendByte(kAddressCmd | chipPos);
-          mTmiInterface.sendByte(mPatterns[physicalPos]);
+          mTmiInterface.write(kAddressCmd | chipPos);
+          mTmiInterface.write(mPatterns[physicalPos]);
           mTmiInterface.stopCondition();
           clearDigitDirty(physicalPos);
         }
