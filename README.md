@@ -303,7 +303,7 @@ libraries (AceTMI, AceSPI, AceWire, AceSegmentWriter) looks something like this:
                       | StringScroller      |
                       +---------------------+
                                 |
-                                | (optional)
+                                | (recommended, but optional)
                                 v
                              LedModule
                                 ^                        (hardware independent)
@@ -606,8 +606,8 @@ the data bits to the 74HC595 controllers over SPI using the `HardSpiInterface`
 class from the AceSPI library. The rendering must be multiplexed in the global
 `loop()` function because the 74HC595 turns on only a single segment of each
 digit at any given time. We have to strobe through all the segments faster than
-the human vision response time (~16 micros) to give the illusion of illuminating
-the entire display.
+the human vision response time (~16 ms) to give the illusion of illuminating the
+entire display.
 
 ```C++
 #include <Arduino.h>
@@ -711,6 +711,8 @@ parent class of all hardware-dependent classes which are targeted for specific
 controller chips. It looks like this:
 
 ```C++
+namespace ace_segment {
+
 class LedModule {
   public:
     explicit LedModule(uint8_t* patterns, uint8_t numDigits);
@@ -721,6 +723,8 @@ class LedModule {
     void setBrightness(uint8_t brightness);
     uint8_t getBrightness() const;
 };
+
+}
 ```
 
 The subclasses will use C++ templates to accept a compile-time constant that
@@ -794,6 +798,8 @@ robotdyn.com seem have either 4 digits or 6 digits.
 The `Tm1637Module` class looks like this:
 
 ```C++
+namespace ace_segment {
+
 template <typename T_TMII, uint8_t T_DIGITS>
 class Tm1637Module : public LedModule {
   public:
@@ -817,6 +823,8 @@ class Tm1637Module : public LedModule {
     void flush();
     void flushIncremental();
 };
+
+}
 ```
 
 The `T_TMII` template parameter is a class that implements the 2-wire protocol
@@ -884,7 +892,7 @@ this (c.f. [examples/Tm1637Demo](examples/Tm1637Demo)):
 #include <AceTMI.h>
 #include <AceSegment.h>
 using ace_tmi::SimpleTmiInterface;
-using namespace ace_segment;
+using ace_segment::Tm1637Module;
 
 const uint8_t CLK_PIN = 10;
 const uint8_t DIO_PIN = 9;
@@ -951,7 +959,8 @@ more complicated because the digits are wired to be in the order of `2 1 0 5 4
 #include <AceTMI.h>
 #include <AceSegment.h>
 using ace_tmi::SimpleTmiInterface;
-using namespace ace_segment;
+using ace_segment::Tm1637Module;
+using ace_segment::kDigitRemapArray6Tm1637;
 
 const uint8_t CLK_PIN = 10;
 const uint8_t DIO_PIN = 9;
@@ -1024,6 +1033,8 @@ I have not found a circuit schematic for this module.
 The `Max7219Module` class looks like this:
 
 ```C++
+namespace ace_segment {
+
 template <typename T_SPII, uint8_t T_DIGITS>
 class Max7219Module : public LedModule {
   public:
@@ -1044,6 +1055,8 @@ class Max7219Module : public LedModule {
     bool isFlushRequired() const;
     void flush();
 };
+
+}
 ```
 
 The `T_SPII` template parameter is one of the SPI interface classes from the
@@ -1077,7 +1090,8 @@ this (c.f. [examples/Max7219Demo](examples/Max7219Demo)):
 #include <AceSPI.h>
 #include <AceSegment.h>
 using ace_spi::HardSpiInterface;
-using namespace ace_segment;
+using ace_segment::Max7219Module;
+using ace_segment::kDigitRemapArray8Max7219;
 
 const uint8_t LATCH_PIN = 10;
 const uint8_t DATA_PIN = MOSI;
@@ -1145,6 +1159,8 @@ available from [Adafruit](https://www.adafruit.com), such as these:
 The `Ht16k33Module` class looks like this:
 
 ```C++
+namespace ace_segment {
+
 template <typename T_WIREI, uint8_t T_DIGITS>
 class Ht16k33Module : public LedModule {
   public:
@@ -1167,6 +1183,8 @@ class Ht16k33Module : public LedModule {
     bool isFlushRequired() const;
     void flush();
 };
+
+}
 ```
 
 The `T_WIREI` template parameter is the class name of the Wire interface from
@@ -1220,11 +1238,11 @@ module looks like this (c.f. [examples/Ht16k33Demo](examples/Ht16k33Demo)):
 
 ```C++
 #include <Arduino.h>
-#include <Wire.h>
+#include <Wire.h> // TwoWire, Wire
 #include <AceWire.h>
 #include <AceSegment.h>
 using ace_wire::TwoWireInterface;
-using namespace ace_segment;
+using ace_segment::Ht16k33Module;
 
 const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 const uint8_t SCL_PIN = SCL;
@@ -1295,6 +1313,8 @@ The `Hc595Module` class looks roughly like this (simplified for ease of
 understanding):
 
 ```C++
+namespace ace_segment {
+
 template <typename T_SPII, uint8_t T_DIGITS>
 class Hc595Module : public ScanningModule<[snip]> {
   public:
@@ -1314,18 +1334,20 @@ class Hc595Module : public ScanningModule<[snip]> {
     uint16_t getFieldsPerSecond() const;
     uint16_t getFieldsPerFrame() const;
 
-    // Following inherited from LedModule:
+    // Following inherited from LedModule through ScanningModule:
     // uint8_t getNumDigits();
     // void setPatternAt(uint8_t pos, uint8_t pattern);
     // uint8_t getPatternAt(uint8_t pos);
     // void setBrightness(uint8_t brightness);
 
-    void setBrightness(uint8_t brightness) override;
+    void setBrightness(uint8_t brightness);
     void setBrightnessAt(uint8_t pos, uint8_t brightness);
 
     bool renderFieldWhenReady();
     void renderFieldNow();
 };
+
+}
 ```
 
 There are 2 template parameters. The `T_SPII` specifies the SPI interface which
@@ -1381,11 +1403,15 @@ this (c.f. [examples/Hc595Demo](examples/Hc595Demo):
 
 ```C++
 #include <Arduino.h>
-#include <SPI.h>
+#include <SPI.h> // SPIClass, SPI
 #include <AceSPI.h>
 #include <AceSegment.h>
 using ace_spi::HardSpiInterface;
-using namespace ace_segment;
+using ace_segment::Hc595Module;
+using ace_segment::kDigitRemapArray8Hc595;
+using ace_segment::kByteOrderSegmentHighDigitLow;
+using ace_segment::kActiveLowPattern;
+using ace_segment::kActiveHighPattern;
 
 const uint8_t NUM_DIGITS = 8;
 const uint8_t FRAMES_PER_SECOND = 60;
@@ -1466,11 +1492,13 @@ Putting all these together, we get the following code which is similar to the
 
 ```C++
 #include <Arduino.h>
-#include <SPI.h>
+#include <SPI.h> // SPIClass, SPI
 #include <AceSPI.h>
 #include <AceSegment.h>
 using ace_spi::HardSpiInterface;
-using namespace ace_segment;
+using ace_segment::Hc595Module;
+using ace_segment::kByteOrderDigitHighSegmentLow;
+using ace_segment::kActiveLowPattern;
 
 const uint8_t NUM_DIGITS = 4;
 const uint8_t FRAMES_PER_SECOND = 60;
@@ -1533,7 +1561,7 @@ second, or every 5 milliseconds.
 The rendering the LED module is split into 2 parts:
 
 * a *frame* is one complete rendering of the LED display (4 digits),
-* a *field* is a partial rendering of a single frame (a single digit).
+* a *field* is a partial rendering of a single frame (usually a single digit).
 
 A frame rate of about 60Hz will be sufficient to prevent obvious flickering of
 the LED. For a 4-digit LED, that requires rendering 240 fields per second. The
@@ -1570,11 +1598,12 @@ The `HybridModule` configuration looks like this (c.f.
 
 ```C++
 #include <Arduino.h>
-#include <SPI.h>
+#include <SPI.h> // SPIClass, SPI
 #include <AceSPI.h>
 #include <AceSegment.h>
 using ace_spi::HardSpiInterface;
-using namespace ace_segment;
+using ace_segment::HybridModule;
+using ace_segment::kActiveHighPattern;
 
 const uint8_t NUM_DIGITS = 4;
 const uint8_t FRAMES_PER_SECOND = 60;
@@ -1642,7 +1671,8 @@ The `DirectModule` configuration looks like this (c.f.
 ```C++
 #include <Arduino.h>
 #include <AceSegment.h>
-using namespace ace_segment;
+using ace_segment::DirectModule;
+using ace_segment::kActiveLowPattern;
 
 const uint8_t NUM_DIGITS = 4;
 const uint8_t NUM_SEGMENTS = 8;
@@ -1746,7 +1776,7 @@ If you want to use the fast versions of `<AceWire.h>`, use something like this:
 #include <AceTMI.h>
 #if defined(ARDUINO_ARCH_AVR)
   #include <ace_wire/SimpleWireFastInterface.h>
-  using ace_tmi::SoftWireFastInterface;
+  using ace_wire::SimpleWireFastInterface;
 #endif
 ```
 
@@ -1892,7 +1922,8 @@ Here are 2 samples of the flash and static memory consumptions.
 ### CPU Cycles
 
 The CPU benchmark numbers can be seen in
-[examples/AutoBenchmark](examples/AutoBenchmark). Here are 2 samples.
+[examples/AutoBenchmark](examples/AutoBenchmark). Here are 2 samples. All
+timing numbers are in units of microseconds.
 
 **Arduino Nano (ATmega328)**
 
@@ -2016,8 +2047,8 @@ test these as often:
 
 * ATtiny85 (8 MHz ATtiny85)
 * Arduino Pro Mini (16 MHz ATmega328P)
-* Teensy LC (48 MHz ARM Cortex-M0+)
 * Mini Mega 2560 (Arduino Mega 2560 compatible, 16 MHz ATmega2560)
+* Teensy LC (48 MHz ARM Cortex-M0+)
 
 The following boards are **not** supported:
 
@@ -2053,10 +2084,13 @@ them.
 * This library does not currently support daisy-chaining of the MAX7219
   controller or the 74HC595 controller to create LED modules with more than 8
   digits.
-* The `Ht16k33Module` class does not support blinking the digits as supported by
-  the HT16K33 controller chip.
-    * It should be pretty simple to add.
-    * I have not done the work because I don't use this feature.
+* `Ht16k33Module`
+    * The `Ht16k33Module` class does not support blinking the digits using
+      the built-in hardware feature of the HT16K33 controller chip.
+        * Should be relatively simple to add, but I have not done the work
+          because I don't use this feature.
+    * The HT16K33 chip supports up to 16 segments per digit, but AceSegment
+      supports only 8 segments per digit.
 * Some LED controllers (TM1637, HT16K33) have hardware support for scanning key
   matrices. AceSegment does not support this feature.
 
