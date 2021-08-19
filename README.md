@@ -46,7 +46,7 @@ if nothing is used from the `<Wire.h>` library.)
 
 **Version**: 0.9.1 (2021-08-17)
 
-**Status**: *Almost* ready for first public release.
+**Status**: First public release at 0.9.1.
 
 **Changelog**: [CHANGELOG.md](CHANGELOG.md)
 
@@ -104,17 +104,16 @@ if nothing is used from the `<Wire.h>` library.)
 <a name="Installation"></a>
 ## Installation
 
-The latest stable release will eventually be available in the Arduino IDE
-Library Manager. Search for "AceSegment". Click install. (It is not there
-yet.)
+The latest stable release isbe available in the Arduino IDE Library Manager.
+Search for "AceSegment". Click install.
 
 The development version can be installed by cloning the
 [GitHub repository](https://github.com/bxparks/AceSegment), checking out the
-`develop` branch, then manually copying over the contents to the `./libraries`
-directory used by the Arduino IDE. (The result is a directory named
-`./libraries/AceSegment`.)
+default `develop` branch, then manually copying over to or symlinking from the
+`./libraries` directory used by the Arduino IDE. (The result is a directory
+or a link named `./libraries/AceSegment`.)
 
-The `master` branch contains the stable release.
+The `master` branch contains the stable releases.
 
 <a name="SourceCode"></a>
 ### Source Code
