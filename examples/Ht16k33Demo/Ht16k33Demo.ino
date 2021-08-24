@@ -166,6 +166,7 @@ const uint8_t HT16K33_I2C_ADDRESS = 0x70;
   using WireInterface = TwoWireInterface<SoftwareWire>;
   WireInterface wireInterface(softwareWire);
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SOFT_WIRE
+  #warning Using https://github.com/stevemarple/SoftWire
   #include <SoftWire.h>
   const uint8_t SOFT_WIRE_BUFFER_SIZE = 32;
   uint8_t rxBuffer[SOFT_WIRE_BUFFER_SIZE];
