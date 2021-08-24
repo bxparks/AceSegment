@@ -40,7 +40,7 @@ using ace_segment::Ht16k33Module;
 // https://github.com/Testato/SoftwareWire (AVR only)
 #define WIRE_INTERFACE_TYPE_SOFTWARE_WIRE 3
 
-// https://github.com/stevemarple/SoftWire (doesn't work, don't know why)
+// https://github.com/stevemarple/SoftWire
 #define WIRE_INTERFACE_TYPE_SOFT_WIRE 4
 
 // https://github.com/RaemondBW/SWire
@@ -166,8 +166,10 @@ const uint8_t HT16K33_I2C_ADDRESS = 0x70;
   using WireInterface = TwoWireInterface<SoftwareWire>;
   WireInterface wireInterface(softwareWire);
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SOFT_WIRE
-  #warning https://github.com/stevemarple/SoftWire (does not work)
   #include <SoftWire.h>
+  const uint8_t SOFT_WIRE_BUFFER_SIZE = 32;
+  uint8_t rxBuffer[SOFT_WIRE_BUFFER_SIZE];
+  uint8_t txBuffer[SOFT_WIRE_BUFFER_SIZE];
   SoftWire softWire(SDA_PIN, SCL_PIN);
   using WireInterface = TwoWireInterface<SoftWire>;
   WireInterface wireInterface(softWire);
@@ -216,6 +218,8 @@ void setupAceSegment() {
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SOFTWARE_WIRE
   softwareWire.begin();
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SOFT_WIRE
+  softWire.setRxBuffer(rxBuffer, SOFT_WIRE_BUFFER_SIZE);
+  softWire.setTxBuffer(txBuffer, SOFT_WIRE_BUFFER_SIZE);
   softWire.begin();
 #elif WIRE_INTERFACE_TYPE == WIRE_INTERFACE_TYPE_SWIRE
   SWire.begin(SDA_PIN, SCL_PIN);
