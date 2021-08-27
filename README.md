@@ -405,8 +405,7 @@ digits by flushing the data bits to the TM1637 controller using the
 
 ```C++
 #include <Arduino.h>
-#include <AceCommon.h> // incrementMod()
-#include <AceTMI.h>
+#include <AceTMI.h> // SimpleTmiInterface
 #include <AceSegment.h> // Tm1637Module
 
 using ace_tmi::SimpleTmiInterface;
