@@ -733,10 +733,9 @@ the `LedModule` parent class through the constructor.
 Some LED controllers (e.g. TM1637, MAX7219) handle the multiplexing and
 refreshing of the LED segments, so the host microcontroller needs only to send
 out the bit patterns to the controller chips over SPI or some other protocol.
-Other controller chips, particularly the 74HC595, is a fairly dumb controller
-chip that requires the host microcontroller to perform the multiplexing itself.
-The bit patterns must be sent out to the controller chip with precise timing
-intervals.
+Other controller chips, particularly the 74HC595, are not as capable and require
+the host microcontroller to perform the multiplexing by itself. The bit patterns
+must be sent out to the controller chip with precise timing intervals.
 
 The `setBrightness()` method controls the brightness of the entire LED module.
 The range of the `brightness` parameter is determined by the underlying
