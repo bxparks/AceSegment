@@ -22,9 +22,9 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.10.0</span>
+   &#160;<span id="projectnumber">0.11.0</span>
    </div>
-   <div id="projectbrief">A framework for rendering seven segment LED displays using the TM1637, TM1638, MAX7219, HT16K33, or 74HC595 controller chips</div>
+   <div id="projectbrief">A library for rendering seven segment LED displays using the TM1637, TM1638, MAX7219, HT16K33, or 74HC595 controller chips</div>
   </td>
  </tr>
  </tbody>
@@ -207,7 +207,7 @@ class ace_segment::Tm1637Module&lt; T_TMII, T_DIGITS &gt;</h3>
 <p>The chip communicates using a protocol that is electrically similar to I2C, but does not use an address byte at the beginning of the protocol.</p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
-    <tr><td class="paramname">T_TMII</td><td>class that implements the two wire protocol interface for TM1637, usually one of the classes from the AceTMI library: SimpleTmiInterface or SimpleTmiFastInterface. </td></tr>
+    <tr><td class="paramname">T_TMII</td><td>class that implements the two wire protocol interface for TM1637, usually one of the classes from the AceTMI library: SimpleTmi1637Interface or SimpleTmi1637FastInterface. </td></tr>
     <tr><td class="paramname">T_DIGITS</td><td>number of digits in the LED module (usually 4 or 6) </td></tr>
   </table>
   </dd>
@@ -291,7 +291,7 @@ template&lt;typename T_TMII , uint8_t T_DIGITS&gt; </div>
 </div><div class="memdoc">
 
 <p>Initialize the module. </p>
-<p>The SimpleTmiInterface object must be initialized separately. </p>
+<p>The SimpleTmi1637Interface object must be initialized separately. </p>
 
 <p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00102">102</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
 
