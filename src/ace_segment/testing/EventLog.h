@@ -34,20 +34,30 @@ namespace testing {
 enum class EventType : uint8_t {
   kDigitalWrite,
   kPinMode,
+  // SpiInterface
   kSpiBegin,
   kSpiEnd,
   kSpiSend8,
   kSpiSend16,
+  // TmiInterface
   kTmiBegin,
   kTmiEnd,
   kTmiStartCondition,
   kTmiStopCondition,
   kTmiSendByte,
+  // Tmi1638Interface
+  kTmi1638Begin,
+  kTmi1638End,
+  kTmi1638BeginTransaction,
+  kTmi1638EndTransaction,
+  kTmi1638Write,
+  // WireInterface
   kWireBegin,
   kWireEnd,
   kWireBeginTransmission,
   kWireEndTransmission,
   kWireWrite,
+  // LedMatrix
   kLedMatrixDraw,
   kLedMatrixEnableGroup,
   kLedMatrixDisableGroup,
@@ -162,6 +172,49 @@ class EventLog {
 
       Event& event = mEvents[mNumRecords];
       event.type = EventType::kTmiSendByte;
+      event.arg1 = data;
+      mNumRecords++;
+    }
+
+    //-------------------------------------------------------------------------
+
+    void addTmi1638Begin() {
+      if (mNumRecords >= kMaxRecords) return;
+
+      Event& event = mEvents[mNumRecords];
+      event.type = EventType::kTmi1638Begin;
+      mNumRecords++;
+    }
+
+    void addTmi1638End() {
+      if (mNumRecords >= kMaxRecords) return;
+
+      Event& event = mEvents[mNumRecords];
+      event.type = EventType::kTmi1638End;
+      mNumRecords++;
+    }
+
+    void addTmi1638BeginTransaction() {
+      if (mNumRecords >= kMaxRecords) return;
+
+      Event& event = mEvents[mNumRecords];
+      event.type = EventType::kTmi1638BeginTransaction;
+      mNumRecords++;
+    }
+
+    void addTmi1638EndTransaction() {
+      if (mNumRecords >= kMaxRecords) return;
+
+      Event& event = mEvents[mNumRecords];
+      event.type = EventType::kTmi1638EndTransaction;
+      mNumRecords++;
+    }
+
+    void addTmi1638Write(uint8_t data) {
+      if (mNumRecords >= kMaxRecords) return;
+
+      Event& event = mEvents[mNumRecords];
+      event.type = EventType::kTmi1638Write;
       event.arg1 = data;
       mNumRecords++;
     }
@@ -289,6 +342,8 @@ class EventLog {
             }
             break;
 
+          //------------------------------------------------------------------
+
           case EventType::kSpiBegin:
             break;
 
@@ -307,6 +362,8 @@ class EventLog {
             }
             break;
 
+          //------------------------------------------------------------------
+
           case EventType::kTmiBegin:
             break;
 
@@ -324,6 +381,28 @@ class EventLog {
               if (value != event.arg1) return false;
             }
             break;
+
+          //------------------------------------------------------------------
+
+          case EventType::kTmi1638Begin:
+            break;
+
+          case EventType::kTmi1638End:
+            break;
+
+          case EventType::kTmi1638BeginTransaction:
+            break;
+
+          case EventType::kTmi1638EndTransaction:
+            break;
+
+          case EventType::kTmi1638Write: {
+              uint8_t value = va_arg(args, int);
+              if (value != event.arg1) return false;
+            }
+            break;
+
+          //------------------------------------------------------------------
 
           case EventType::kWireBegin:
             break;
@@ -345,6 +424,8 @@ class EventLog {
               if (value != event.arg1) return false;
             }
             break;
+
+          //------------------------------------------------------------------
 
           case EventType::kLedMatrixDraw: {
               uint8_t group = va_arg(args, int);
