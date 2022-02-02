@@ -2343,8 +2343,11 @@ them.
           because I don't use this feature.
     * The HT16K33 chip supports up to 16 segments per digit, but AceSegment
       supports only 8 segments per digit.
-* Some LED controllers (TM1637, HT16K33) have hardware support for scanning key
-  matrices. AceSegment does not support this feature.
+* `Tm1638Module`
+    * The TM1638 chip supports up to 10 segments per digit, but AceSegment
+    * supports only 8 segments per digit.
+* Some LED controllers (e.g. TM1637, TM1638, HT16K33) have hardware support for
+  scanning key matrices. AceSegment does not support this feature.
 
 <a name="AlternativeLibraries"></a>
 ## Alternative Libraries
