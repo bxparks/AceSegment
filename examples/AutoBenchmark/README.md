@@ -416,64 +416,6 @@ CPU:
 
 ```
 
-### SAMD21 M0 Mini
-
-* 48 MHz ARM Cortex-M0+
-* Arduino IDE 1.8.13
-* Sparkfun SAMD Core 1.8.3
-
-```
-Sizes of Objects:
-sizeof(LedMatrixDirect<>): 16
-sizeof(LedMatrixSingleHc595<SimpleSpiInterface>): 16
-sizeof(LedMatrixDualHc595<HardSpiInterface>): 20
-sizeof(LedModule): 8
-sizeof(ScanningModule<LedMatrixBase, 4>): 32
-sizeof(DirectModule<4>): 48
-sizeof(HybridModule<SimpleSpiInterface, 4>): 48
-sizeof(Hc595Module<SimpleSpiInterface, 8>): 64
-sizeof(Tm1637Module<SimpleTmiInterface, 4>): 24
-sizeof(Tm1637Module<SimpleTmiInterface, 6>): 24
-sizeof(Max7219Module<SimpleSpiInterface, 8>): 24
-sizeof(Ht16k33Module<TwoWireInterface, 4>): 20
-sizeof(Ht16k33Module<SimpleWireInterface, 4>): 20
-
-CPU:
-+-------------------------------------------+-------------------+---------+
-| Functionality                             |   min/  avg/  max | samples |
-|-------------------------------------------+-------------------+---------|
-| Direct(4)                                 |    24/   24/   28 |      40 |
-| Direct(4,subfields)                       |     3/    5/   28 |     640 |
-|-------------------------------------------+-------------------+---------|
-| Hybrid(4,HardSpi)                         |    24/   25/   28 |      40 |
-| Hybrid(4,HardSpi,subfields)               |     3/    5/   27 |     640 |
-| Hybrid(4,SimpleSpi)                       |    52/   52/   57 |      40 |
-| Hybrid(4,SimpleSpi,subfields)             |     3/    8/   55 |     640 |
-|-------------------------------------------+-------------------+---------|
-| Hc595(8,HardSpi)                          |    24/   24/   28 |      80 |
-| Hc595(8,HardSpi,subfields)                |     3/    5/   29 |    1280 |
-| Hc595(8,SimpleSpi)                        |    89/   90/   95 |      80 |
-| Hc595(8,SimpleSpi,subfields)              |     3/   13/   95 |    1280 |
-|-------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi,100us)                 | 22218/22222/22227 |      10 |
-| Tm1637(4,SimpleTmi,100us,incremental)     |  3599/ 8763/10057 |      50 |
-|-------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi,5us)                   |  2114/ 2114/ 2118 |      10 |
-| Tm1637(4,SimpleTmi,5us,incremental)       |   343/  835/  959 |      50 |
-|-------------------------------------------+-------------------+---------|
-| Tm1637(6,SimpleTmi,100us)                 | 27932/27936/27941 |      10 |
-| Tm1637(6,SimpleTmi,100us,incremental)     |  3597/ 9131/10059 |      70 |
-|-------------------------------------------+-------------------+---------|
-| Max7219(8,HardSpi)                        |   202/  202/  208 |      20 |
-| Max7219(8,SimpleSpi)                      |   794/  797/  798 |      20 |
-|-------------------------------------------+-------------------+---------|
-| Ht16k33(4,TwoWire,100kHz)                 |  1342/ 1343/ 1347 |      20 |
-| Ht16k33(4,TwoWire,400kHz)                 |   380/  381/  385 |      20 |
-| Ht16k33(4,SimpleWire,1us)                 |  2084/ 2084/ 2088 |      20 |
-+-------------------------------------------+-------------------+---------+
-
-```
-
 ### STM32
 
 * STM32 "Blue Pill", STM32F103C8, 72 MHz ARM Cortex-M3

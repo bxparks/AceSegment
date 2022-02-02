@@ -33,7 +33,6 @@ produces the following files:
 ```
 nano.txt
 micro.txt
-samd.txt
 stm32.txt
 esp8266.txt
 esp32.txt
@@ -214,6 +213,16 @@ before substantional refactoring in 2021.
 
 * Moved Writer classes to AceSegmentWriter library.
 
+**v0.9+**
+
+* Add `beginTransmission()`, `endTransmission()`, `transfer()`, and
+  `transfer16()` methods to AceSPI library, which become the building blocks for
+  the `send8()` and `send16()` convenience fnctions.
+    * Seems to increase flash usage by about 20 bytes on AVR for
+    * `HardSpiInterface` and `HardSpiFastInterface`, even though nothing really
+      changed functionally.
+    * On 32-bit processors, no significant difference.
+
 ## Results
 
 The following shows the flash and static memory sizes of the `MemoryBenchmark`
@@ -346,37 +355,6 @@ program for various LED modules.
 | Ht16k33(TwoWire)                |   5840/  383 |  2368/  232 |
 | Ht16k33(SimpleWire)             |   4550/  173 |  1078/   22 |
 | Ht16k33(SimpleWireFast)         |   3902/  167 |   430/   16 |
-+--------------------------------------------------------------+
-
-```
-
-### SAMD21 M0 Mini
-
-* 48 MHz ARM Cortex-M0+
-* Arduino IDE 1.8.13
-* Sparkfun SAMD Core 1.8.3
-
-```
-+--------------------------------------------------------------+
-| functionality                   |  flash/  ram |       delta |
-|---------------------------------+--------------+-------------|
-| baseline                        |   9940/    0 |     0/    0 |
-|---------------------------------+--------------+-------------|
-| DirectModule                    |  10660/    0 |   720/    0 |
-|---------------------------------+--------------+-------------|
-| Hybrid(HardSpi)                 |  11144/    0 |  1204/    0 |
-| Hybrid(SimpleSpi)               |  10720/    0 |   780/    0 |
-|---------------------------------+--------------+-------------|
-| Hc595(HardSpi)                  |  11136/    0 |  1196/    0 |
-| Hc595(SimpleSpi)                |  10636/    0 |   696/    0 |
-|---------------------------------+--------------+-------------|
-| Tm1637(SimpleTmi)               |  10648/    0 |   708/    0 |
-|---------------------------------+--------------+-------------|
-| Max7219(HardSpi)                |  10972/    0 |  1032/    0 |
-| Max7219(SimpleSpi)              |  10472/    0 |   532/    0 |
-|---------------------------------+--------------+-------------|
-| Ht16k33(TwoWire)                |  11748/    0 |  1808/    0 |
-| Ht16k33(SimpleWire)             |  10712/    0 |   772/    0 |
 +--------------------------------------------------------------+
 
 ```

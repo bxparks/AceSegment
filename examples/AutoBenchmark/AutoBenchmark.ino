@@ -92,14 +92,6 @@ const uint8_t BIT_DELAY_SHORT = 5;
   const uint8_t CLK_PIN = 4;
   const uint8_t DIO_PIN = 5;
 
-#elif defined(ARDUINO_ARCH_SAMD)
-  const uint8_t DIGIT_PINS[NUM_DIGITS] = {2, 3, 4, 5};
-  const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {6, 7, 8, 9, 10, 11, 12, 13};
-
-  // TM1637
-  const uint8_t CLK_PIN = 2;
-  const uint8_t DIO_PIN = 3;
-
 #elif defined(ARDUINO_ARCH_STM32)
   // I think this is the F1, because there exists a ARDUINO_ARCH_STM32F4
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {2, 3, 4, 5};

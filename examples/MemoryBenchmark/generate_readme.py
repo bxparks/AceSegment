@@ -12,8 +12,6 @@ nano_results = check_output(
     "./generate_table.awk < nano.txt", shell=True, text=True)
 micro_results = check_output(
     "./generate_table.awk < micro.txt", shell=True, text=True)
-samd_results = check_output(
-    "./generate_table.awk < samd.txt", shell=True, text=True)
 stm32_results = check_output(
     "./generate_table.awk < stm32.txt", shell=True, text=True)
 esp8266_results = check_output(
@@ -59,7 +57,6 @@ produces the following files:
 ```
 nano.txt
 micro.txt
-samd.txt
 stm32.txt
 esp8266.txt
 esp32.txt
@@ -294,16 +291,6 @@ program for various LED modules.
 
 ```
 {micro_results}
-```
-
-### SAMD21 M0 Mini
-
-* 48 MHz ARM Cortex-M0+
-* Arduino IDE 1.8.13
-* Sparkfun SAMD Core 1.8.3
-
-```
-{samd_results}
 ```
 
 ### STM32 Blue Pill
