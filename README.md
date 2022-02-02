@@ -234,6 +234,9 @@ The following example sketches are provided:
           to render the LED display.
         * Uses the `TimerOne` (https://github.com/PaulStoffregen/TimerOne)
           library
+        * CAUTION: See note about interrupt-safety at the top of the
+          [Hc595InterruptDemo.ino](examples/Hc595InterruptDemo/Hc595InterruptDemo.ino)
+          file.
 * Benchmarks
     * [AutoBenchmark.ino](examples/AutoBenchmark): performs CPU benchmarking of
       most of the supported configurations of the framework
