@@ -9,8 +9,8 @@ sizeof(DirectModule<4>): 35
 sizeof(DirectFast4Module<...>): 29
 sizeof(HybridModule<SimpleSpiInterface, 4>): 35
 sizeof(Hc595Module<SimpleSpiInterface, 8>): 51
-sizeof(Tm1637Module<SimpleTmiInterface, 4>): 17
-sizeof(Tm1637Module<SimpleTmiInterface, 6>): 19
+sizeof(Tm1637Module<SimpleTmi1637Interface, 4>): 17
+sizeof(Tm1637Module<SimpleTmi1637Interface, 6>): 19
 sizeof(Tm1638Module<SimpleTmi1638Interface, 8>): 21
 sizeof(Max7219Module<SimpleSpiInterface, 8>): 19
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 14

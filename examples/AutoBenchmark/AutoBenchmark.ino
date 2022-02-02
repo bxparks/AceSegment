@@ -47,7 +47,7 @@ SOFTWARE.
 #include <digitalWriteFast.h>
 #include <ace_spi/SimpleSpiFastInterface.h>
 #include <ace_spi/HardSpiFastInterface.h>
-#include <ace_tmi/SimpleTmiFastInterface.h>
+#include <ace_tmi/SimpleTmi1637FastInterface.h>
 #include <ace_tmi/SimpleTmi1638FastInterface.h>
 #include <ace_wire/SimpleWireFastInterface.h>
 #include <ace_segment/direct/DirectFast4Module.h>
@@ -586,7 +586,7 @@ void runTm1637Benchmark(
 }
 
 void runTm1637SimpleTmi() {
-  using TmiInterface = SimpleTmiInterface;
+  using TmiInterface = SimpleTmi1637Interface;
   TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY);
   tmiInterface.begin();
 
@@ -602,7 +602,7 @@ void runTm1637SimpleTmi() {
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 void runTm1637SimpleTmiFast() {
-  using TmiInterface = SimpleTmiFastInterface<DIO_PIN, CLK_PIN, BIT_DELAY>;
+  using TmiInterface = SimpleTmi1637FastInterface<DIO_PIN, CLK_PIN, BIT_DELAY>;
   TmiInterface tmiInterface;
   tmiInterface.begin();
 
@@ -620,7 +620,7 @@ void runTm1637SimpleTmiFast() {
 
 // Use 5 micros instead of 100 micros.
 void runTm1637SimpleTmiShort() {
-  using TmiInterface = SimpleTmiInterface;
+  using TmiInterface = SimpleTmi1637Interface;
   TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY_SHORT);
   tmiInterface.begin();
 
@@ -636,7 +636,7 @@ void runTm1637SimpleTmiShort() {
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
 void runTm1637SimpleTmiFastShort() {
-  using TmiInterface = SimpleTmiFastInterface<
+  using TmiInterface = SimpleTmi1637FastInterface<
       DIO_PIN, CLK_PIN, BIT_DELAY_SHORT>;
   TmiInterface tmiInterface;
   tmiInterface.begin();
@@ -1001,12 +1001,12 @@ void printSizeOf() {
   SERIAL_PORT_MONITOR.println(sizeof(Hc595Module<SimpleSpiInterface, 8>));
 
   SERIAL_PORT_MONITOR.print(
-      F("sizeof(Tm1637Module<SimpleTmiInterface, 4>): "));
-  SERIAL_PORT_MONITOR.println(sizeof(Tm1637Module<SimpleTmiInterface, 4>));
+      F("sizeof(Tm1637Module<SimpleTmi1637Interface, 4>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(Tm1637Module<SimpleTmi1637Interface, 4>));
 
   SERIAL_PORT_MONITOR.print(
-      F("sizeof(Tm1637Module<SimpleTmiInterface, 6>): "));
-  SERIAL_PORT_MONITOR.println(sizeof(Tm1637Module<SimpleTmiInterface, 6>));
+      F("sizeof(Tm1637Module<SimpleTmi1637Interface, 6>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(Tm1637Module<SimpleTmi1637Interface, 6>));
 
   SERIAL_PORT_MONITOR.print(
       F("sizeof(Tm1638Module<SimpleTmi1638Interface, 8>): "));

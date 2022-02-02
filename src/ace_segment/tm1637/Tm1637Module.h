@@ -68,7 +68,7 @@ extern const uint8_t kDigitRemapArray6Tm1637[6];
  *
  * @tparam T_TMII class that implements the two wire protocol interface for
  *    TM1637, usually one of the classes from the AceTMI library:
- *    SimpleTmiInterface or SimpleTmiFastInterface.
+ *    SimpleTmi1637Interface or SimpleTmi1637FastInterface.
  * @tparam T_DIGITS number of digits in the LED module (usually 4 or 6)
  */
 template <typename T_TMII, uint8_t T_DIGITS>
@@ -96,8 +96,8 @@ class Tm1637Module : public LedModule {
     //-----------------------------------------------------------------------
 
     /**
-     * Initialize the module. The SimpleTmiInterface object must be initialized
-     * separately.
+     * Initialize the module. The SimpleTmi1637Interface object must be
+     * initialized separately.
      */
     void begin() {
       LedModule::begin();

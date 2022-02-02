@@ -1,7 +1,7 @@
 # TM1637 LED Module Capacitor Removal
 
 There are at least two types of TM1637 LED modules which seem to be readily
-available on Amazon and eBay currently. 
+available on Amazon and eBay currently.
 
 * One type is labeled as being manufactured by diymore.cc and is available is 5
   different colors (white, red, yellow, green, and blue).  They manufactured on
@@ -18,11 +18,11 @@ the schematic below:
 
 The capacitors for `CLK` and `DIO` lines are 10 nF, which is about 50-100X
 larger than they should be. It causes the RC time constant to be about 100
-microseconds, which forces the `delayMicros` parameter in `SimpleTmiInterface`
-and the `DELAY_MICROS` parameter in `SimpleTmiFastInterface` to be 100
-microseconds. According to the TM1637 datasheet, the controller chip has a
-maximum clock frequency of 500 kHz (50% duty cycle), which implies a theoretical
-`DELAY_MICROS` of 1 microsecond.
+microseconds, which forces the `delayMicros` parameter in
+`SimpleTmi1637Interface` and the `DELAY_MICROS` parameter in
+`SimpleTmi1637FastInterface` to be 100 microseconds. According to the TM1637
+datasheet, the controller chip has a maximum clock frequency of 500 kHz (50%
+duty cycle), which implies a theoretical `DELAY_MICROS` of 1 microsecond.
 
 The actual minimum value for the `delayMicroseconds()` function might be as low
 as 0 for several reasons:

@@ -265,8 +265,8 @@ end-users, listed roughly from low-level classes to higher-level classes:
         * Provides communication to the TM1637 controller chip needed by the
           `Tm1637Module`
         * There are 2 implementations:
-            * `SimpleTmiInterface`: using `digitalWrite()`
-            * `SimpleTmiFastInterface`: using `digitalWriteFast()`
+            * `SimpleTmi1637Interface`: using `digitalWrite()`
+            * `SimpleTmi1637FastInterface`: using `digitalWriteFast()`
     * [AceWire](https://github.com/bxparks/AceWire)
         * Provides the I2C communication classes Used by `Ht16k33Module`.
         * There are 3 implementations:
@@ -415,14 +415,14 @@ Here is the simple example program from
 [examples/HelloTm1637](examples/HelloTm1637). It writes the digits 0-3 into a
 4-digit LED module using the TM1637 chip, sets the brightness, then renders the
 digits by flushing the data bits to the TM1637 controller using the
-`SimpleTmiInterface` class from the AceTMI library.
+`SimpleTmi1637Interface` class from the AceTMI library.
 
 ```C++
 #include <Arduino.h>
-#include <AceTMI.h> // SimpleTmiInterface
+#include <AceTMI.h> // SimpleTmi1637Interface
 #include <AceSegment.h> // Tm1637Module
 
-using ace_tmi::SimpleTmiInterface;
+using ace_tmi::SimpleTmi1637Interface;
 using ace_segment::Tm1637Module;
 
 // Replace these with the PIN numbers of your dev board.
@@ -436,7 +436,7 @@ const uint8_t NUM_DIGITS = 4;
 // 1-5 micros.
 const uint8_t DELAY_MICROS = 100;
 
-using TmiInterface = SimpleTmiInterface;
+using TmiInterface = SimpleTmi1637Interface;
 TmiInterface tmiInterface(DIO_PIN, CLK_PIN, DELAY_MICROS);
 Tm1637Module<TmiInterface, NUM_DIGITS> ledModule(tmiInterface);
 
@@ -913,8 +913,8 @@ used by the TM1637 controller. It is a protocol that is very close to, but not
 quite the same as, I2C. This means that we cannot use the usual `<Wire.h>`
 library, but must implement a custom version. The
 [AceTMI](https://github.com/bxparks/AceTMI) library provides 2 implementations:
-the `SimpleTmiInterface` compatible with all platforms, and
-`SimpleTmiFastInterface` useful on AVR processors.
+the `SimpleTmi1637Interface` compatible with all platforms, and
+`SimpleTmi1637FastInterface` useful on AVR processors.
 
 The `remapArray` is an array of addresses which map the physical positions to
 their logical positions. This is not needed by the 4-digit TM1637 LED modules,
@@ -970,7 +970,7 @@ this (c.f. [examples/Tm1637Demo](examples/Tm1637Demo)):
 #include <Arduino.h>
 #include <AceTMI.h>
 #include <AceSegment.h>
-using ace_tmi::SimpleTmiInterface;
+using ace_tmi::SimpleTmi1637Interface;
 using ace_segment::Tm1637Module;
 
 const uint8_t CLK_PIN = 10;
@@ -978,7 +978,7 @@ const uint8_t DIO_PIN = 9;
 const uint8_t BIT_DELAY = 100;
 const uint8_t NUM_DIGITS = 4;
 
-using TmiInterface = SimpleTmiInterface;
+using TmiInterface = SimpleTmi1637Interface;
 TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY);
 Tm1637Module<TmiInterface, NUM_DIGITS> ledModule(tmiInterface);
 
@@ -1037,7 +1037,7 @@ more complicated because the digits are wired to be in the order of `2 1 0 5 4
 #include <Arduino.h>
 #include <AceTMI.h>
 #include <AceSegment.h>
-using ace_tmi::SimpleTmiInterface;
+using ace_tmi::SimpleTmi1637Interface;
 using ace_segment::Tm1637Module;
 using ace_segment::kDigitRemapArray6Tm1637;
 
@@ -1046,7 +1046,7 @@ const uint8_t DIO_PIN = 9;
 const uint8_t BIT_DELAY = 100;
 const uint8_t NUM_DIGITS = 4;
 
-using TmiInterface = SimpleTmiInterface;
+using TmiInterface = SimpleTmi1637Interface;
 TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY);
 Tm1637Module<TmiInterface, NUM_DIGITS> ledModule(
     tmiInterface, kDigitRemapArray6Tm1637);
@@ -1952,8 +1952,8 @@ I have written versions of some lower-level classes to take advantage of
     * Variant of `HardSpiInterface.h` using  `digitalWriteFast()` to toggle
       the `LATCH` pin, while the hardware SPI code controls the `MOSI` and `SCK`
       pins
-* AceTMI - `ace_spi/SimpleTmiFastInterface.h`
-    * Variant of `SimpleTmiInterface.h` using `digitalWriteFast()`
+* AceTMI - `ace_spi/SimpleTmi1637FastInterface.h`
+    * Variant of `SimpleTmi1637Interface.h` using `digitalWriteFast()`
 * AceWire - `ace_wire/SimpleWireFastInterface.h`
     * Variant of `SimpleWireInterface.h` using `digitalWriteFast()`
 
@@ -1980,8 +1980,8 @@ If you want to use the fast versions of `<AceTMI.h>`, use something like this:
 ```C++
 #include <AceTMI.h>
 #if defined(ARDUINO_ARCH_AVR)
-  #include <ace_tmi/SimpleTmiFastInterface.h>
-  using ace_tmi::SimpleTmiFastInterface;
+  #include <ace_tmi/SimpleTmi1637FastInterface.h>
+  using ace_tmi::SimpleTmi1637FastInterface;
 #endif
 ```
 
@@ -2040,8 +2040,8 @@ sizeof(DirectModule<4>): 35
 sizeof(DirectFast4Module<...>): 29
 sizeof(HybridModule<SimpleSpiInterface, 4>): 35
 sizeof(Hc595Module<SimpleSpiInterface, 8>): 51
-sizeof(Tm1637Module<SimpleTmiInterface, 4>): 17
-sizeof(Tm1637Module<SimpleTmiInterface, 6>): 19
+sizeof(Tm1637Module<SimpleTmi1637Interface, 4>): 17
+sizeof(Tm1637Module<SimpleTmi1637Interface, 6>): 19
 sizeof(Tm1638Module<SimpleTmi1638Interface, 8>): 21
 sizeof(Max7219Module<SimpleSpiInterface, 8>): 19
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 14
@@ -2059,8 +2059,8 @@ sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(DirectModule<4>): 48
 sizeof(HybridModule<SimpleSpiInterface, 4>): 48
 sizeof(Hc595Module<SimpleSpiInterface, 8>): 64
-sizeof(Tm1637Module<SimpleTmiInterface, 4>): 24
-sizeof(Tm1637Module<SimpleTmiInterface, 6>): 24
+sizeof(Tm1637Module<SimpleTmi1637Interface, 4>): 24
+sizeof(Tm1637Module<SimpleTmi1637Interface, 6>): 24
 sizeof(Tm1638Module<SimpleTmi1638Interface, 8>): 28
 sizeof(Max7219Module<SimpleSpiInterface, 8>): 24
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 20

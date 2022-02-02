@@ -136,10 +136,10 @@ before substantional refactoring in 2021.
   changes are due to some removal/addition of some methods in `PatternWriter`.
 * Add memory usage for `Tm1637Module`. Seems to consume something in between
   similar to the `ScanningModule` w/ SW SPI and `ScanningModule` with HW SPI.
-* Add memory usage for `Tm1637Module` using `SimpleTmiFastInterface` which uses
-  `digitalWriteFast` library for AVR processors. Saves 662 - 776 bytes of flash
-  on AVR processors compared to `Tm1637Module` using normal
-  `SimpleTmiInterface`.
+* Add memory usage for `Tm1637Module` using `SimpleTmi1637FastInterface` which
+  uses `digitalWriteFast` library for AVR processors. Saves 662 - 776 bytes of
+  flash on AVR processors compared to `Tm1637Module` using normal
+  `SimpleTmi1637Interface`.
 * Save 150-200 bytes of flash on AVR processors by lifting all of the
   `PatternWriter::writePatternAt()` type of methods to `PatternWriter`, making
   them non-virtual, then funneling these methods through just 2 lower-level
@@ -180,8 +180,8 @@ before substantional refactoring in 2021.
   `HardSpiFastInterface`) becomes slightly smaller (30 bytes of flash, 2 bytes
   of static RAM on AVR) due to removal of explicit `pinMode(dataPin, X)` and
   `pinMode(clockPin, X)`. These are deferred to `SPIClass::begin()`.
-* Extract out `readAck()`, saving 10 bytes of flash for `SimpleTmiInterface` and
-  6 bytes of flash for `SimpleTmiFastInterface`.
+* Extract out `readAck()`, saving 10 bytes of flash for `SimpleTmi1637Interface` and
+  6 bytes of flash for `SimpleTmi1637FastInterface`.
 * Add `Ht16k33Module(SimpleWire)` and `Ht16k33Module(SimpleWireFast)`.
 * Rename `LedDisplay` to `PatternWriter` and remove one layer of abstraction.
   Saves 10-22 bytes of flash and 2 bytes of static RAM for most Writer
