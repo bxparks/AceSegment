@@ -156,8 +156,8 @@ before substantional refactoring in 2021.
   `HardSpiFastInterface`) becomes slightly smaller (30 bytes of flash, 2 bytes
   of static RAM on AVR) due to removal of explicit `pinMode(dataPin, X)` and
   `pinMode(clockPin, X)`. These are deferred to `SPIClass::begin()`.
-* Extract out `readAck()`, saving 10 bytes of flash for `SimpleTmi1637Interface`
-  and 6 bytes of flash for `SimpleTmi1637FastInterface`.
+* Extract out `readAck()`, saving 10 bytes of flash for `SimpleTmi1637Interface` and
+  6 bytes of flash for `SimpleTmi1637FastInterface`.
 * Add `Ht16k33Module(SimpleWire)` and `Ht16k33Module(SimpleWireFast)`.
 * Rename `LedDisplay` to `PatternWriter` and remove one layer of abstraction.
   Saves 10-22 bytes of flash and 2 bytes of static RAM for most Writer
@@ -185,7 +185,7 @@ before substantional refactoring in 2021.
       of indirection through a pointer to the interface objects.
     * On AVR processors, this saves between 0 to 90 bytes of flash on most
       configurations. The most significant savings occur with the following:
-        * Tm1637Module(SimpleTmi) saves 90 bytes,
+        * Tm1637Module(SimpleTmi1637) saves 90 bytes,
         * Ht16k33Module(SimpleWire) saves 68 bytes of flash,
         * Max7219Module(SimpleSpi) saves 30 bytes of flash.
     * On 32-bit processors, the flash consumption usually goes *up* by 4-20
@@ -213,11 +213,11 @@ before substantional refactoring in 2021.
 
 * Moved Writer classes to AceSegmentWriter library.
 
-**v0.9+**
+**v0.10**
 
 * Add `beginTransmission()`, `endTransmission()`, `transfer()`, and
   `transfer16()` methods to AceSPI library, which become the building blocks for
-  the `send8()` and `send16()` convenience fnctions.
+  the `send8()` and `send16()` convenience functions.
     * Seems to increase flash usage by about 20 bytes on AVR for
     * `HardSpiInterface` and `HardSpiFastInterface`, even though nothing really
       changed functionally.
@@ -266,8 +266,8 @@ program for various LED modules.
 | Hc595(SimpleSpi)                |   1270/   53 |  1010/   42 |
 | Hc595(SimpleSpiFast)            |    868/   48 |   608/   37 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SimpleTmi)               |   1132/   31 |   872/   20 |
-| Tm1637(SimpleTmiFast)           |    570/   26 |   310/   15 |
+| Tm1637(SimpleTmi1637)           |   1132/   31 |   872/   20 |
+| Tm1637(SimpleTmi1637Fast)       |    570/   26 |   310/   15 |
 |---------------------------------+--------------+-------------|
 | Tm1638(SimpleTmi1638)           |    968/   32 |   708/   21 |
 | Tm1638(SimpleTmi1638Fast)       |    512/   25 |   252/   14 |
@@ -309,8 +309,8 @@ program for various LED modules.
 | Hc595(SimpleSpi)                |   1492/   53 |  1036/   42 |
 | Hc595(SimpleSpiFast)            |   1094/   48 |   638/   37 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SimpleTmi)               |   1424/   31 |   968/   20 |
-| Tm1637(SimpleTmiFast)           |    858/   26 |   402/   15 |
+| Tm1637(SimpleTmi1637)           |   1424/   31 |   968/   20 |
+| Tm1637(SimpleTmi1637Fast)       |    858/   26 |   402/   15 |
 |---------------------------------+--------------+-------------|
 | Tm1638(SimpleTmi1638)           |   1264/   32 |   808/   21 |
 | Tm1638(SimpleTmi1638Fast)       |    762/   25 |   306/   14 |
@@ -352,8 +352,8 @@ program for various LED modules.
 | Hc595(SimpleSpi)                |   4510/  193 |  1038/   42 |
 | Hc595(SimpleSpiFast)            |   3998/  188 |   526/   37 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SimpleTmi)               |   4516/  171 |  1044/   20 |
-| Tm1637(SimpleTmiFast)           |   3836/  166 |   364/   15 |
+| Tm1637(SimpleTmi1637)           |   4516/  171 |  1044/   20 |
+| Tm1637(SimpleTmi1637Fast)       |   3836/  166 |   364/   15 |
 |---------------------------------+--------------+-------------|
 | Tm1638(SimpleTmi1638)           |   4356/  172 |   884/   21 |
 | Tm1638(SimpleTmi1638Fast)       |   3740/  165 |   268/   14 |
@@ -390,7 +390,7 @@ program for various LED modules.
 | Hc595(HardSpi)                  |  26572/ 3976 |  4692/  436 |
 | Hc595(SimpleSpi)                |  24688/ 3968 |  2808/  428 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SimpleTmi)               |  24816/ 3940 |  2936/  400 |
+| Tm1637(SimpleTmi1637)           |  24816/ 3940 |  2936/  400 |
 |---------------------------------+--------------+-------------|
 | Tm1638(SimpleTmi1638)           |  24564/ 3940 |  2684/  400 |
 |---------------------------------+--------------+-------------|
@@ -423,7 +423,7 @@ program for various LED modules.
 | Hc595(HardSpi)                  | 262661/28272 |  2572/  380 |
 | Hc595(SimpleSpi)                | 261509/28256 |  1420/  364 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SimpleTmi)               | 261625/28224 |  1536/  332 |
+| Tm1637(SimpleTmi1637)           | 261625/28224 |  1536/  332 |
 |---------------------------------+--------------+-------------|
 | Tm1638(SimpleTmi1638)           | 261385/28224 |  1296/  332 |
 |---------------------------------+--------------+-------------|
@@ -456,7 +456,7 @@ program for various LED modules.
 | Hc595(HardSpi)                  | 210665/16596 |  6164/  536 |
 | Hc595(SimpleSpi)                | 208425/16540 |  3924/  480 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SimpleTmi)               | 208685/16516 |  4184/  456 |
+| Tm1637(SimpleTmi1637)           | 208685/16516 |  4184/  456 |
 |---------------------------------+--------------+-------------|
 | Tm1638(SimpleTmi1638)           | 208421/16516 |  3920/  456 |
 |---------------------------------+--------------+-------------|
@@ -490,7 +490,7 @@ program for various LED modules.
 | Hc595(HardSpi)                  |  12296/ 4468 |  2080/  316 |
 | Hc595(SimpleSpi)                |  11696/ 4404 |  1480/  252 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SimpleTmi)               |  11904/ 4376 |  1688/  224 |
+| Tm1637(SimpleTmi1637)           |  11904/ 4376 |  1688/  224 |
 |---------------------------------+--------------+-------------|
 | Tm1638(SimpleTmi1638)           |  11456/ 4376 |  1240/  224 |
 |---------------------------------+--------------+-------------|

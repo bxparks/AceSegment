@@ -24,10 +24,10 @@ Hc595(8,HardSpi) 11 11 16 80
 Hc595(8,HardSpi,subfields) 0 1 19 1280
 Hc595(8,SimpleSpi) 7 7 15 80
 Hc595(8,SimpleSpi,subfields) 0 1 15 1280
-Tm1637(4,SimpleTmi,100us) 21215 21217 21224 10
-Tm1637(4,SimpleTmi,100us,incremental) 3434 8367 9611 50
-Tm1637(4,SimpleTmi,5us) 1264 1267 1273 10
-Tm1637(4,SimpleTmi,5us,incremental) 204 501 579 50
+Tm1637(4,SimpleTmi1637,100us) 21215 21217 21224 10
+Tm1637(4,SimpleTmi1637,100us,incremental) 3434 8367 9611 50
+Tm1637(4,SimpleTmi1637,5us) 1264 1267 1273 10
+Tm1637(4,SimpleTmi1637,5us,incremental) 204 501 579 50
 Tm1638(8,SimpleTmi1638,1us) 799 812 821 10
 Max7219(8,HardSpi) 92 92 100 20
 Max7219(8,SimpleSpi) 63 63 72 20

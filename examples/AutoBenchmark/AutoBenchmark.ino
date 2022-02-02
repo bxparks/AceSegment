@@ -592,9 +592,10 @@ void runTm1637SimpleTmi() {
 
   Tm1637Module<TmiInterface, 4> tm1637Module(tmiInterface);
   tm1637Module.begin();
-  runTm1637Benchmark(F("Tm1637(4,SimpleTmi,100us)"), tm1637Module, 4, false);
   runTm1637Benchmark(
-      F("Tm1637(4,SimpleTmi,100us,incremental)"), tm1637Module, 4, true);
+      F("Tm1637(4,SimpleTmi1637,100us)"), tm1637Module, 4, false);
+  runTm1637Benchmark(
+      F("Tm1637(4,SimpleTmi1637,100us,incremental)"), tm1637Module, 4, true);
   tm1637Module.end();
 
   tmiInterface.end();
@@ -609,9 +610,10 @@ void runTm1637SimpleTmiFast() {
   Tm1637Module<TmiInterface, 4> tm1637Module(tmiInterface);
   tm1637Module.begin();
   runTm1637Benchmark(
-      F("Tm1637(4,SimpleTmiFast,100us)"), tm1637Module, 4, false);
+      F("Tm1637(4,SimpleTmi1637Fast,100us)"), tm1637Module, 4, false);
   runTm1637Benchmark(
-      F("Tm1637(4,SimpleTmiFast,100us,incremental)"), tm1637Module, 4, true);
+      F("Tm1637(4,SimpleTmi1637Fast,100us,incremental)"),
+      tm1637Module, 4, true);
   tm1637Module.end();
 
   tmiInterface.end();
@@ -626,9 +628,9 @@ void runTm1637SimpleTmiShort() {
 
   Tm1637Module<TmiInterface, 4> tm1637Module(tmiInterface);
   tm1637Module.begin();
-  runTm1637Benchmark(F("Tm1637(4,SimpleTmi,5us)"), tm1637Module, 4, false);
+  runTm1637Benchmark(F("Tm1637(4,SimpleTmi1637,5us)"), tm1637Module, 4, false);
   runTm1637Benchmark(
-      F("Tm1637(4,SimpleTmi,5us,incremental)"), tm1637Module, 4, true);
+      F("Tm1637(4,SimpleTmi1637,5us,incremental)"), tm1637Module, 4, true);
   tm1637Module.end();
 
   tmiInterface.end();
@@ -643,9 +645,10 @@ void runTm1637SimpleTmiFastShort() {
 
   Tm1637Module<TmiInterface, 4> tm1637Module(tmiInterface);
   tm1637Module.begin();
-  runTm1637Benchmark(F("Tm1637(4,SimpleTmiFast,5us)"), tm1637Module, 4, false);
   runTm1637Benchmark(
-      F("Tm1637(4,SimpleTmiFast,5us,incremental)"), tm1637Module, 4, true);
+      F("Tm1637(4,SimpleTmi1637Fast,5us)"), tm1637Module, 4, false);
+  runTm1637Benchmark(
+      F("Tm1637(4,SimpleTmi1637Fast,5us,incremental)"), tm1637Module, 4, true);
   tm1637Module.end();
 
   tmiInterface.end();

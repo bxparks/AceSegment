@@ -209,7 +209,7 @@ before substantional refactoring in 2021.
       of indirection through a pointer to the interface objects.
     * On AVR processors, this saves between 0 to 90 bytes of flash on most
       configurations. The most significant savings occur with the following:
-        * Tm1637Module(SimpleTmi) saves 90 bytes,
+        * Tm1637Module(SimpleTmi1637) saves 90 bytes,
         * Ht16k33Module(SimpleWire) saves 68 bytes of flash,
         * Max7219Module(SimpleSpi) saves 30 bytes of flash.
     * On 32-bit processors, the flash consumption usually goes *up* by 4-20
@@ -237,11 +237,11 @@ before substantional refactoring in 2021.
 
 * Moved Writer classes to AceSegmentWriter library.
 
-**v0.9+**
+**v0.10**
 
 * Add `beginTransmission()`, `endTransmission()`, `transfer()`, and
   `transfer16()` methods to AceSPI library, which become the building blocks for
-  the `send8()` and `send16()` convenience fnctions.
+  the `send8()` and `send16()` convenience functions.
     * Seems to increase flash usage by about 20 bytes on AVR for
     * `HardSpiInterface` and `HardSpiFastInterface`, even though nothing really
       changed functionally.
