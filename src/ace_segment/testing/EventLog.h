@@ -39,12 +39,12 @@ enum class EventType : uint8_t {
   kSpiEnd,
   kSpiSend8,
   kSpiSend16,
-  // TmiInterface
-  kTmiBegin,
-  kTmiEnd,
-  kTmiStartCondition,
-  kTmiStopCondition,
-  kTmiSendByte,
+  // Tmi1637Interface
+  kTmi1637Begin,
+  kTmi1637End,
+  kTmi1637StartCondition,
+  kTmi1637StopCondition,
+  kTmi1637SendByte,
   // Tmi1638Interface
   kTmi1638Begin,
   kTmi1638End,
@@ -135,43 +135,43 @@ class EventLog {
 
     //-------------------------------------------------------------------------
 
-    void addTmiBegin() {
+    void addTmi1637Begin() {
       if (mNumRecords >= kMaxRecords) return;
 
       Event& event = mEvents[mNumRecords];
-      event.type = EventType::kTmiBegin;
+      event.type = EventType::kTmi1637Begin;
       mNumRecords++;
     }
 
-    void addTmiEnd() {
+    void addTmi1637End() {
       if (mNumRecords >= kMaxRecords) return;
 
       Event& event = mEvents[mNumRecords];
-      event.type = EventType::kTmiEnd;
+      event.type = EventType::kTmi1637End;
       mNumRecords++;
     }
 
-    void addTmiStartCondition() {
+    void addTmi1637StartCondition() {
       if (mNumRecords >= kMaxRecords) return;
 
       Event& event = mEvents[mNumRecords];
-      event.type = EventType::kTmiStartCondition;
+      event.type = EventType::kTmi1637StartCondition;
       mNumRecords++;
     }
 
-    void addTmiStopCondition() {
+    void addTmi1637StopCondition() {
       if (mNumRecords >= kMaxRecords) return;
 
       Event& event = mEvents[mNumRecords];
-      event.type = EventType::kTmiStopCondition;
+      event.type = EventType::kTmi1637StopCondition;
       mNumRecords++;
     }
 
-    void addTmiSendByte(uint8_t data) {
+    void addTmi1637SendByte(uint8_t data) {
       if (mNumRecords >= kMaxRecords) return;
 
       Event& event = mEvents[mNumRecords];
-      event.type = EventType::kTmiSendByte;
+      event.type = EventType::kTmi1637SendByte;
       event.arg1 = data;
       mNumRecords++;
     }
@@ -364,19 +364,19 @@ class EventLog {
 
           //------------------------------------------------------------------
 
-          case EventType::kTmiBegin:
+          case EventType::kTmi1637Begin:
             break;
 
-          case EventType::kTmiEnd:
+          case EventType::kTmi1637End:
             break;
 
-          case EventType::kTmiStopCondition:
+          case EventType::kTmi1637StopCondition:
             break;
 
-          case EventType::kTmiStartCondition:
+          case EventType::kTmi1637StartCondition:
             break;
 
-          case EventType::kTmiSendByte: {
+          case EventType::kTmi1637SendByte: {
               uint8_t value = va_arg(args, int);
               if (value != event.arg1) return false;
             }

@@ -6,26 +6,26 @@
 namespace ace_segment {
 namespace testing {
 
-class TestableTmiInterface {
+class TestableTmi1637Interface {
   public:
     void begin() const {
-      gEventLog.addTmiBegin();
+      gEventLog.addTmi1637Begin();
     }
 
     void end() const {
-      gEventLog.addTmiEnd();
+      gEventLog.addTmi1637End();
     }
 
     void startCondition() const {
-      gEventLog.addTmiStartCondition();
+      gEventLog.addTmi1637StartCondition();
     }
 
     void stopCondition() const {
-      gEventLog.addTmiStopCondition();
+      gEventLog.addTmi1637StopCondition();
     }
 
     uint8_t write(uint8_t data) const {
-      gEventLog.addTmiSendByte(data);
+      gEventLog.addTmi1637SendByte(data);
       return 0;
     }
 };
