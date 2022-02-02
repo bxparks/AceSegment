@@ -22,7 +22,8 @@ using ace_segment::Tm1637Module;
 
 const uint8_t NUM_DIGITS = 4;
 TestableTmiInterface tmiInterface;
-Tm1637Module<TestableTmiInterface, NUM_DIGITS> tm1637Module(tmiInterface);
+using TmModule = Tm1637Module<TestableTmiInterface, NUM_DIGITS>;
+TmModule tm1637Module(tmiInterface);
 
 test(Tm1637ModuleTest, flushIncremental) {
   tmiInterface.begin();
@@ -62,12 +63,10 @@ test(Tm1637ModuleTest, flushIncremental) {
   assertTrue(gEventLog.assertEvents(
     7,
     (int) EventType::kTmiStartCondition,
-    (int) EventType::kTmiSendByte,
-        Tm1637Module<TestableTmiInterface, NUM_DIGITS>::kDataCmdFixedAddress,
+    (int) EventType::kTmiSendByte, TmModule::kDataCmdFixedAddress,
     (int) EventType::kTmiStopCondition,
     (int) EventType::kTmiStartCondition,
-    (int) EventType::kTmiSendByte,
-        Tm1637Module<TestableTmiInterface, NUM_DIGITS>::kAddressCmd | 0x1,
+    (int) EventType::kTmiSendByte, TmModule::kAddressCmd | 0x1,
     (int) EventType::kTmiSendByte, 0x11,
     (int) EventType::kTmiStopCondition
   ));
@@ -99,9 +98,7 @@ test(Tm1637ModuleTest, flushIncremental) {
     3,
     (int) EventType::kTmiStartCondition,
     (int) EventType::kTmiSendByte,
-        Tm1637Module<TestableTmiInterface, NUM_DIGITS>::kBrightnessCmd
-          | Tm1637Module<TestableTmiInterface, NUM_DIGITS>::kBrightnessLevelOn
-          | 2,
+        TmModule::kBrightnessCmd | TmModule::kBrightnessLevelOn | 2,
     (int) EventType::kTmiStopCondition
   ));
   assertFalse(tm1637Module.isDigitDirty(4));
@@ -121,7 +118,7 @@ test(Tm1637ModuleTest, flush) {
   tm1637Module.clearDigitsDirty();
   tm1637Module.clearBrightnessDirty();
 
-  // Set digit 0.
+  // Set digit 1.
   tm1637Module.setPatternAt(1, 0x11);
   assertTrue(tm1637Module.isDigitDirty(1));
 
@@ -136,28 +133,24 @@ test(Tm1637ModuleTest, flush) {
   assertTrue(gEventLog.assertEvents(
     13,
 
-    // auto increment mode
+    // auto increment mode (3 records)
     (int) EventType::kTmiStartCondition,
-    (int) EventType::kTmiSendByte,
-        Tm1637Module<TestableTmiInterface, NUM_DIGITS>::kDataCmdAutoAddress,
+    (int) EventType::kTmiSendByte, TmModule::kDataCmdAutoAddress,
     (int) EventType::kTmiStopCondition,
 
-    // send 4 digits
+    // send 4 digits (7 records)
     (int) EventType::kTmiStartCondition,
-    (int) EventType::kTmiSendByte,
-        Tm1637Module<TestableTmiInterface, NUM_DIGITS>::kAddressCmd,
+    (int) EventType::kTmiSendByte, TmModule::kAddressCmd,
     (int) EventType::kTmiSendByte, 0x00,
     (int) EventType::kTmiSendByte, 0x11,
     (int) EventType::kTmiSendByte, 0x00,
     (int) EventType::kTmiSendByte, 0x00,
     (int) EventType::kTmiStopCondition,
 
-    // brightness
+    // brightness (3 records)
     (int) EventType::kTmiStartCondition,
     (int) EventType::kTmiSendByte,
-        Tm1637Module<TestableTmiInterface, NUM_DIGITS>::kBrightnessCmd
-          | Tm1637Module<TestableTmiInterface, NUM_DIGITS>::kBrightnessLevelOn
-          | 2,
+        TmModule::kBrightnessCmd | TmModule::kBrightnessLevelOn | 2,
     (int) EventType::kTmiStopCondition
   ));
 
@@ -180,6 +173,9 @@ test(Tm1637ModuleTest, isFlushRequired) {
 
   tm1637Module.flush();
   assertFalse(tm1637Module.isFlushRequired());
+
+  tm1637Module.setBrightness(1);
+  assertTrue(tm1637Module.isFlushRequired());
 
   tm1637Module.end();
 }
