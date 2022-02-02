@@ -6,7 +6,8 @@ An adjustable, configurable, and extensible framework for rendering seven
 segment LED displays on Arduino platforms. The library supports many types
 of LED displays:
 
-* modules using the TM1637 controller chip over its custom 2 wire protocol
+* modules using the TM1637 controller chip over its custom 2-wire protocol
+* modules using the TM1638 controller chip over its custom 3-wire protocol
 * modules using the MAX7219/MAX7221 controller chip over SPI
 * modules using the HT16K33 controller chip over I2C
 * modules using two 74HC595 shift register chips over SPI
@@ -17,6 +18,8 @@ The first 4 types are readily available from retail outlets such as Amazon and
 eBay, in multiple colors and sizes. They look like these:
 
 ![TM1637 LED Module](docs/tm1637/tm1637_sample.jpg)
+
+![TM1638 LED Module](docs/tm1638/tm1638_8_buttons_sample.jpg)
 
 ![MAX7219 LED Module](docs/max7219/max7219_sample.jpg)
 
@@ -63,6 +66,7 @@ if nothing is used from the `<Wire.h>` library.)
     * [Digit and Segment Addressing](#DigitAndSegmentAddressing)
     * [Remap Arrays](#RemapArrays)
     * [Hello Tm1637Module](#HelloTm1637Module)
+    * [Hello Tm1638Module](#HelloTm1638Module)
     * [Hello Max7219Module](#HelloMax7219Module)
     * [Hello Ht16k33Module](#HelloHt16k33Module)
     * [Hello Hc595Module](#HelloHc595Module)
@@ -73,6 +77,8 @@ if nothing is used from the `<Wire.h>` library.)
         * [TM1637 Module With 4 Digits](#Tm1637Module4)
         * [TM1637 Module With 6 Digits](#Tm1637Module6)
         * [TM1637 Capacitor Removal](#Tm1637CapacitorRemoval)
+    * [Tm1638Module](#Tm1638Module)
+        * [TM1638 Module With 8 Digits](#Tm1638Module8)
     * [Max7219Module](#Max7219Module)
         * [MAX7219 Module With 8 Digits](#Max7219Module8)
     * [Ht16k33Module](#Ht16k33Module)
@@ -141,7 +147,7 @@ executable only when the client application explicitly uses them.
 * AceSPI (https://github.com/bxparks/AceSPI)
     * Needed by `Hc595Module`, `Max7219Module`, and `HybridModule`
 * AceTMI (https://github.com/bxparks/AceTMI)
-    * Needed by `Tm1637Module`
+    * Needed by `Tm1637Module` and `Tm1638Module`
 * AceWire (https://github.com/bxparks/AceWire)
     * Needed by `Ht16k33Module`
 
@@ -186,11 +192,13 @@ The following example sketches are provided:
 
 * Basic
     * [HelloTm1637.ino](examples/HelloTm1637)
+    * [HelloTm1638.ino](examples/HelloTm1638)
     * [HelloMax7219.ino](examples/HelloMax7219)
     * [HelloHt16k33.ino](examples/HelloHt16k33)
     * [HelloHc595.ino](examples/HelloHc595)
 * Intermediate
     * [Tm1637Demo.ino](examples/Tm1637Demo)
+    * [Tm1638Demo.ino](examples/Tm1638Demo)
     * [Max7219Demo.ino](examples/Max7219Demo)
     * [Ht16k33Demo.ino](examples/Ht16k33Demo)
     * [Hc595Demo.ino](examples/Hc595Demo)
@@ -312,7 +320,7 @@ libraries (AceTMI, AceSPI, AceWire, AceSegmentWriter) looks something like this:
       +-----------+-------------+------------+------------+-------------+
       |           |             |            |            |             |
 Tm1637Module  Max7219Module Hc595Module HybridModule Ht16k33Module DirectModule
-      |                  \       |         /              |
+Tm1638Module             \       |         /              |
       |                   \      |        /               |
       v                    v     v       v                v
 +---------------------+ +---------------------+ +----------------------+
@@ -450,6 +458,76 @@ void setup() {
   ledModule.setPatternAt(1, PATTERNS[1]);
   ledModule.setPatternAt(2, PATTERNS[2]);
   ledModule.setPatternAt(3, PATTERNS[3]);
+
+  ledModule.setBrightness(2);
+
+  ledModule.flush();
+}
+
+void loop() {}
+```
+
+<a name="HelloTm1638Module"></a>
+### Hello Tm1638Module
+
+Here is the simple example program from
+[examples/HelloTm1638](examples/HelloTm1638). It writes the digits 0-7 into an
+8-digit LED module using the TM1638 chip, sets the brightness, then renders the
+digits by flushing the data bits to the TM1638 controller using the
+`SimpleTmi1638Interface` class from the AceTMI library.
+
+```C++
+#include <Arduino.h>
+#include <AceTMI.h> // SimpleTmi1638Interface
+#include <AceSegment.h> // Tm1638Module
+
+using ace_tmi::SimpleTmi1638Interface;
+using ace_segment::Tm1638Module;
+
+// Replace these with the PIN numbers of your dev board.
+// The TM1638 protocol is very similar to SPI, so I often use the SPI pins.
+const uint8_t CLK_PIN = SCK;
+const uint8_t DIO_PIN = MOSI;
+const uint8_t STB_PIN = SS;
+const uint8_t NUM_DIGITS = 8;
+
+// My TM1638 LED module contains no filtering capacitor on the DIO, CLK, and STB
+// lines. So it should support the highest clock frequency using a 1 micro
+// transition delay.
+const uint8_t DELAY_MICROS = 1;
+
+using TmiInterface = SimpleTmi1638Interface;
+TmiInterface tmiInterface(DIO_PIN, CLK_PIN, STB_PIN, DELAY_MICROS);
+Tm1638Module<TmiInterface, NUM_DIGITS> ledModule(tmiInterface);
+
+const uint8_t NUM_PATTERNS = 10;
+const uint8_t PATTERNS[NUM_PATTERNS] = {
+  0b00111111, // 0
+  0b00000110, // 1
+  0b01011011, // 2
+  0b01001111, // 3
+  0b01100110, // 4
+  0b01101101, // 5
+  0b01111101, // 6
+  0b00000111, // 7
+  0b01111111, // 8
+  0b01101111, // 9
+};
+
+void setup() {
+  delay(1000);
+
+  tmiInterface.begin();
+  ledModule.begin();
+
+  ledModule.setPatternAt(0, PATTERNS[0]);
+  ledModule.setPatternAt(1, PATTERNS[1]);
+  ledModule.setPatternAt(2, PATTERNS[2]);
+  ledModule.setPatternAt(3, PATTERNS[3]);
+  ledModule.setPatternAt(4, PATTERNS[4]);
+  ledModule.setPatternAt(5, PATTERNS[5]);
+  ledModule.setPatternAt(6, PATTERNS[6]);
+  ledModule.setPatternAt(7, PATTERNS[7]);
 
   ledModule.setBrightness(2);
 
@@ -826,25 +904,23 @@ class Tm1637Module : public LedModule {
 
 The `T_TMII` template parameter is a class that implements the 2-wire protocol
 used by the TM1637 controller. It is a protocol that is very close to, but not
-quite the same as, I2C. This means that we cannot use the usual `Wire` library,
-but must implement a custom version. The library provides 2 implementations: the
-`SimpleTmiInterface` compatible with all platforms, and `SimpleTmiFastInterface`
-useful on AVR processors.
-
-The `tmiInterface` is an instance of `T_TMII` which comes from the
-[AceTMI](https://github.com/bxparks/AceTMI) which provides
-`SimpleTmiInterface` or `SimpleTmiFastInterface`.
+quite the same as, I2C. This means that we cannot use the usual `<Wire.h>`
+library, but must implement a custom version. The
+[AceTMI](https://github.com/bxparks/AceTMI) library provides 2 implementations:
+the `SimpleTmiInterface` compatible with all platforms, and
+`SimpleTmiFastInterface` useful on AVR processors.
 
 The `remapArray` is an array of addresses which map the physical positions to
 their logical positions. This is not needed by the 4-digit TM1637 LED modules,
 but the 6-digit TM1637 LED modules commonly available on Amazon or eBay are
 wired so that the digits need remapping.
 
-Most of the methods of the class are inherited from the `LedModule`.
+Most of the methods of the class are inherited from the `LedModule`. To reduce
+flash consumption, these inherited methods are deliberately non-virtual.
 
 The `setDisplayOn()` method exposes the feature of the TM1637 chip where the
-display can be turned on and off independent of the brightness. When the display
-is turned back on, it resumes the previous brightness.
+display can be turned on and off independently of the brightness. When the
+display is turned back on, it resumes the previous brightness.
 
 The `flush()` method sends all digits and the brightness information to the
 TM1637 chip in a single transmission. The total amount of time needed to
@@ -893,7 +969,7 @@ using ace_segment::Tm1637Module;
 
 const uint8_t CLK_PIN = 10;
 const uint8_t DIO_PIN = 9;
-const uint16_t BIT_DELAY = 100;
+const uint8_t BIT_DELAY = 100;
 const uint8_t NUM_DIGITS = 4;
 
 using TmiInterface = SimpleTmiInterface;
@@ -961,7 +1037,7 @@ using ace_segment::kDigitRemapArray6Tm1637;
 
 const uint8_t CLK_PIN = 10;
 const uint8_t DIO_PIN = 9;
-const uint16_t BIT_DELAY = 100;
+const uint8_t BIT_DELAY = 100;
 const uint8_t NUM_DIGITS = 4;
 
 using TmiInterface = SimpleTmiInterface;
@@ -1013,6 +1089,142 @@ After removing them, I verified that these TM1637 LED modules will work with a
 work). The transmission time for `flush()` becomes proportionally faster. For
 example, using 5 microsecond `BIT_DELAY` allows `flush()` to take only 1 to 2.3
 milliseconds instead of 22 milliseconds.
+
+<a name="Tm1638Module"></a>
+### Tm1638Module
+
+LED modules based on the Titan TM1638 controller chips are available on Amazon
+and eBay. There seems to be 2 kinds:
+
+* one with an 8-digit LED display with 8 microswitches and an additional set of
+  8 discrete LEDs
+* one with an 8-digit LED display with 16 microswitches but no other LEDs
+
+I have tested only the one with the 8 buttons so far. The TM1638 controller chip
+supports 10 LED segments on each digit. The dedicate LEDs are connected to the
+9th bit of each digit.
+
+The `Tm1638Module` class looks like this:
+
+```C++
+namespace ace_segment {
+
+template <typename T_TMII, uint8_t T_DIGITS>
+class Tm1638Module : public LedModule {
+  public:
+    explicit Tm1638Module(
+        const T_TMII& tmiInterface,
+        const uint8_t* remapArray = nullptr
+    );
+
+    void begin();
+    void end();
+
+    // Following inherited from LedModule:
+    // uint8_t getNumDigits();
+    // void setPatternAt(uint8_t pos, uint8_t pattern);
+    // uint8_t getPatternAt(uint8_t pos);
+    // void setBrightness(uint8_t brightness);
+
+    void setDisplayOn(bool on = true);
+
+    bool isFlushRequired() const;
+    void flush();
+};
+
+}
+```
+
+The `T_TMII` template parameter is a class that implements the 2-wire protocol
+used by the TM1638 controller. It is a protocol that is very close to, but not
+quite the same as, SPI. This means that we cannot use the usual `<SPI.h>`
+library, but must implement a custom version. The
+[AceTMI](https://github.com/bxparks/AceTMI) library provides provides 2
+implementations: the `SimpleTmi1638Interface` compatible with all platforms, and
+`SimpleTmi1638FastInterface` useful on AVR processors.
+
+The `remapArray` is an array of addresses which map the physical positions to
+their logical positions. This was not needed by the 8-digit TM1638 LED modules
+that I received, but maybe useful for other LED modules which configure the
+ordering of the LED digits in a different way.
+
+Most of the methods of the class are inherited from the `LedModule`. To reduce
+flash consumption, these inherited methods are deliberately non-virtual.
+
+The `setDisplayOn()` method exposes the feature of the TM1638 chip where the
+display can be turned on and off independently of the brightness. When the
+display is turned back on, it resumes the previous brightness.
+
+The `flush()` method sends all digits and the brightness information to the
+TM1638 chip in a single transmission. The total amount of time needed to
+complete the `flush()` method is mostly dependent on the value of the
+`BIT_DELAY` parameter. On an AVR processor, this method can take as little as
+200 microseconds when using `SimpleTmi1638FastInterface` or as much as 2200
+microseconds when using the normal `SimpleTmi1638Interface`.
+
+The `BIT_DELAY` value controls the speed of the communication to the TM1638
+controller. If the DIO, CLK, and STB lines have minimal (or no) filtering
+capacitors, this value can be as low as 1 microseconds to potentially give a
+throughput of 500 kbps.
+
+The `isFlushRequired()` can be used to optimize the call to `flush()` to only
+when it is necessary. This gives more CPU cycles to the microcontroller to do
+other things, but there is always the small risk of the LED display becoming out
+of sync with the internal state (e.g. if the module loses power or the
+communication becomes corrupted). In simple applications, this optimization may
+not be needed.
+
+<a name="Tm1638Module8"></a>
+#### TM1638 Module With 8 Digits
+
+![TM1638 LED Module](docs/tm1638/tm1638_8_buttons_sample.jpg)
+
+The configuration of the `Tm1638Module` class for the 8-digit module looks like
+this (c.f. [examples/Tm1638Demo](examples/Tm1638Demo)):
+
+```C++
+#include <Arduino.h>
+#include <AceTMI.h>
+#include <AceSegment.h>
+using ace_tmi::SimpleTmi1638Interface;
+using ace_segment::Tm1638Module;
+
+const uint8_t CLK_PIN = SCK;
+const uint8_t DIO_PIN = MOSI;
+const uint8_t STB_PIN = SS;
+const uint8_t BIT_DELAY = 1;
+const uint8_t NUM_DIGITS = 8;
+
+using TmiInterface = SimpleTmi1638Interface;
+TmiInterface tmiInterface(DIO_PIN, CLK_PIN, STB_PIN, BIT_DELAY);
+Tm1638Module<TmiInterface, NUM_DIGITS> ledModule(tmiInterface);
+
+void setupAceSegment() {
+  tmiInterface.begin();
+  ledModule.begin();
+}
+
+// Flush to LED module every 100 millis.
+void flushModule() {
+  static uint16_t prevFlushMillis;
+
+  uint16_t nowMillis = millis();
+  if ((uint16_t) (nowMillis - prevFlushMillis) >= 100) {
+    prevFlushMillis = nowMillis;
+    ledModule.flush();
+  }
+}
+
+void setup() {
+  setupAceSegment();
+  ...
+}
+
+void loop() {
+  flushModule();
+  ...
+}
+```
 
 <a name="Max7219Module"></a>
 ### Max7219Module
@@ -1824,6 +2036,7 @@ sizeof(HybridModule<SimpleSpiInterface, 4>): 35
 sizeof(Hc595Module<SimpleSpiInterface, 8>): 51
 sizeof(Tm1637Module<SimpleTmiInterface, 4>): 17
 sizeof(Tm1637Module<SimpleTmiInterface, 6>): 19
+sizeof(Tm1638Module<SimpleTmi1638Interface, 8>): 21
 sizeof(Max7219Module<SimpleSpiInterface, 8>): 19
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 14
 sizeof(Ht16k33Module<SimpleWireInterface, 4>): 17
@@ -1842,6 +2055,7 @@ sizeof(HybridModule<SimpleSpiInterface, 4>): 48
 sizeof(Hc595Module<SimpleSpiInterface, 8>): 64
 sizeof(Tm1637Module<SimpleTmiInterface, 4>): 24
 sizeof(Tm1637Module<SimpleTmiInterface, 6>): 24
+sizeof(Tm1638Module<SimpleTmi1638Interface, 8>): 28
 sizeof(Max7219Module<SimpleSpiInterface, 8>): 24
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 20
 sizeof(Ht16k33Module<SimpleWireInterface, 4>): 20
@@ -1865,27 +2079,30 @@ Here are 2 samples of the flash and static memory consumptions.
 | DirectModule                    |   1534/   58 |  1078/   47 |
 | DirectFast4Module               |   1290/   88 |   834/   77 |
 |---------------------------------+--------------+-------------|
-| Hybrid(HardSpi)                 |   1596/   55 |  1140/   44 |
-| Hybrid(HardSpiFast)             |   1538/   53 |  1082/   42 |
-| Hybrid(SimpleSpi)               |   1550/   53 |  1094/   42 |
-| Hybrid(SimpleSpiFast)           |   1428/   48 |   972/   37 |
+| Hybrid(HardSpi)                 |   1612/   56 |  1156/   45 |
+| Hybrid(HardSpiFast)             |   1564/   54 |  1108/   43 |
+| Hybrid(SimpleSpi)               |   1560/   53 |  1104/   42 |
+| Hybrid(SimpleSpiFast)           |   1432/   48 |   976/   37 |
 |---------------------------------+--------------+-------------|
 | Hc595(HardSpi)                  |   1552/   55 |  1096/   44 |
-| Hc595(HardSpiFast)              |   1478/   53 |  1022/   42 |
+| Hc595(HardSpiFast)              |   1526/   54 |  1070/   43 |
 | Hc595(SimpleSpi)                |   1492/   53 |  1036/   42 |
-| Hc595(SimpleSpiFast)            |   1082/   48 |   626/   37 |
+| Hc595(SimpleSpiFast)            |   1094/   48 |   638/   37 |
 |---------------------------------+--------------+-------------|
 | Tm1637(SimpleTmi)               |   1424/   31 |   968/   20 |
 | Tm1637(SimpleTmiFast)           |    858/   26 |   402/   15 |
 |---------------------------------+--------------+-------------|
-| Max7219(HardSpi)                |   1260/   39 |   804/   28 |
-| Max7219(HardSpiFast)            |   1170/   37 |   714/   26 |
-| Max7219(SimpleSpi)              |   1174/   37 |   718/   26 |
-| Max7219(SimpleSpiFast)          |    756/   32 |   300/   21 |
+| Tm1638(SimpleTmi1638)           |   1264/   32 |   808/   21 |
+| Tm1638(SimpleTmi1638Fast)       |    762/   25 |   306/   14 |
 |---------------------------------+--------------+-------------|
-| Ht16k33(TwoWire)                |   2846/  243 |  2390/  232 |
-| Ht16k33(SimpleWire)             |   1450/   33 |   994/   22 |
-| Ht16k33(SimpleWireFast)         |    916/   27 |   460/   16 |
+| Max7219(HardSpi)                |   1240/   39 |   784/   28 |
+| Max7219(HardSpiFast)            |   1232/   37 |   776/   26 |
+| Max7219(SimpleSpi)              |   1182/   37 |   726/   26 |
+| Max7219(SimpleSpiFast)          |    764/   32 |   308/   21 |
+|---------------------------------+--------------+-------------|
+| Ht16k33(TwoWire)                |   2856/  243 |  2400/  232 |
+| Ht16k33(SimpleWire)             |   1458/   33 |  1002/   22 |
+| Ht16k33(SimpleWireFast)         |    926/   27 |   470/   16 |
 +--------------------------------------------------------------+
 ```
 
@@ -1895,23 +2112,25 @@ Here are 2 samples of the flash and static memory consumptions.
 +--------------------------------------------------------------+
 | functionality                   |  flash/  ram |       delta |
 |---------------------------------+--------------+-------------|
-| baseline                        | 256700/26784 |     0/    0 |
+| baseline                        | 260089/27892 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| DirectModule                    | 257736/27056 |  1036/  272 |
+| DirectModule                    | 261537/28260 |  1448/  368 |
 |---------------------------------+--------------+-------------|
-| Hybrid(HardSpi)                 | 258896/27072 |  2196/  288 |
-| Hybrid(SimpleSpi)               | 257824/27056 |  1124/  272 |
+| Hybrid(HardSpi)                 | 262681/28260 |  2592/  368 |
+| Hybrid(SimpleSpi)               | 261625/28244 |  1536/  352 |
 |---------------------------------+--------------+-------------|
-| Hc595(HardSpi)                  | 258892/27076 |  2192/  292 |
-| Hc595(SimpleSpi)                | 257724/27060 |  1024/  276 |
+| Hc595(HardSpi)                  | 262661/28272 |  2572/  380 |
+| Hc595(SimpleSpi)                | 261509/28256 |  1420/  364 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SimpleTmi)               | 257868/27028 |  1168/  244 |
+| Tm1637(SimpleTmi)               | 261625/28224 |  1536/  332 |
 |---------------------------------+--------------+-------------|
-| Max7219(HardSpi)                | 258804/27044 |  2104/  260 |
-| Max7219(SimpleSpi)              | 257604/27028 |   904/  244 |
+| Tm1638(SimpleTmi1638)           | 261385/28224 |  1296/  332 |
 |---------------------------------+--------------+-------------|
-| Ht16k33(TwoWire)                | 261348/27500 |  4648/  716 |
-| Ht16k33(SimpleWire)             | 257980/27028 |  1280/  244 |
+| Max7219(HardSpi)                | 262541/28240 |  2452/  348 |
+| Max7219(SimpleSpi)              | 261389/28224 |  1300/  332 |
+|---------------------------------+--------------+-------------|
+| Ht16k33(TwoWire)                | 264381/28592 |  4292/  700 |
+| Ht16k33(SimpleWire)             | 261705/28224 |  1616/  332 |
 +--------------------------------------------------------------+
 ```
 
@@ -1928,53 +2147,51 @@ timing numbers are in units of microseconds.
 +-------------------------------------------+-------------------+---------+
 | Functionality                             |   min/  avg/  max | samples |
 |-------------------------------------------+-------------------+---------|
-| Direct(4)                                 |    80/   83/   88 |      40 |
-| Direct(4,subfields)                       |     4/   14/   88 |     640 |
-| DirectFast4(4)                            |    28/   30/   44 |      40 |
+| Direct(4)                                 |    76/   82/   84 |      40 |
+| Direct(4,subfields)                       |     4/   14/   84 |     640 |
+| DirectFast4(4)                            |    28/   29/   40 |      40 |
 | DirectFast4(4,subfields)                  |     4/    9/   36 |     640 |
 |-------------------------------------------+-------------------+---------|
-| Hybrid(4,HardSpi)                         |    36/   41/   52 |      40 |
+| Hybrid(4,HardSpi)                         |    36/   41/   48 |      40 |
 | Hybrid(4,HardSpi,subfields)               |     4/    9/   44 |     640 |
-| Hybrid(4,HardSpiFast)                     |    20/   26/   32 |      40 |
+| Hybrid(4,HardSpiFast)                     |    24/   27/   36 |      40 |
 | Hybrid(4,HardSpiFast,subfields)           |     4/    8/   32 |     640 |
-| Hybrid(4,SimpleSpi)                       |   152/  162/  176 |      40 |
-| Hybrid(4,SimpleSpi,subfields)             |     4/   23/  180 |     640 |
-| Hybrid(4,SimpleSpiFast)                   |    28/   32/   40 |      40 |
+| Hybrid(4,SimpleSpi)                       |   152/  162/  180 |      40 |
+| Hybrid(4,SimpleSpi,subfields)             |     4/   23/  172 |     640 |
+| Hybrid(4,SimpleSpiFast)                   |    28/   33/   40 |      40 |
 | Hybrid(4,SimpleSpiFast,subfields)         |     4/    9/   40 |     640 |
 |-------------------------------------------+-------------------+---------|
-| Hc595(8,HardSpi)                          |    24/   31/   44 |      80 |
+| Hc595(8,HardSpi)                          |    28/   30/   40 |      80 |
 | Hc595(8,HardSpi,subfields)                |     4/    9/   36 |    1280 |
 | Hc595(8,HardSpiFast)                      |    12/   18/   28 |      80 |
 | Hc595(8,HardSpiFast,subfields)            |     4/    8/   28 |    1280 |
-| Hc595(8,SimpleSpi)                        |   268/  274/  304 |      80 |
-| Hc595(8,SimpleSpi,subfields)              |     4/   38/  300 |    1280 |
-| Hc595(8,SimpleSpiFast)                    |    24/   28/   40 |      80 |
-| Hc595(8,SimpleSpiFast,subfields)          |     4/    9/   40 |    1280 |
+| Hc595(8,SimpleSpi)                        |   268/  274/  308 |      80 |
+| Hc595(8,SimpleSpi,subfields)              |     4/   37/  308 |    1280 |
+| Hc595(8,SimpleSpiFast)                    |    24/   29/   36 |      80 |
+| Hc595(8,SimpleSpiFast,subfields)          |     4/    9/   36 |    1280 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi,100us)                 | 22312/22343/22576 |      10 |
-| Tm1637(4,SimpleTmi,100us,incremental)     |  3612/ 8807/10360 |      50 |
-| Tm1637(4,SimpleTmiFast,100us)             | 21064/21099/21368 |      10 |
-| Tm1637(4,SimpleTmiFast,100us,incremental) |  3412/ 8316/ 9828 |      50 |
+| Tm1637(4,SimpleTmi,100us)                 | 22312/22344/22580 |      10 |
+| Tm1637(4,SimpleTmi,100us,incremental)     |  3612/ 8807/10356 |      50 |
+| Tm1637(4,SimpleTmiFast,100us)             | 21064/21100/21372 |      10 |
+| Tm1637(4,SimpleTmiFast,100us,incremental) |  3412/ 8316/ 9820 |      50 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi,5us)                   |  2248/ 2284/ 2484 |      10 |
-| Tm1637(4,SimpleTmi,5us,incremental)       |   364/  894/ 1124 |      50 |
-| Tm1637(4,SimpleTmiFast,5us)               |  1000/ 1032/ 1104 |      10 |
-| Tm1637(4,SimpleTmiFast,5us,incremental)   |   164/  402/  508 |      50 |
+| Tm1637(4,SimpleTmi,5us)                   |  2244/ 2282/ 2480 |      10 |
+| Tm1637(4,SimpleTmi,5us,incremental)       |   364/  893/ 1120 |      50 |
+| Tm1637(4,SimpleTmiFast,5us)               |   996/ 1030/ 1112 |      10 |
+| Tm1637(4,SimpleTmiFast,5us,incremental)   |   164/  403/  508 |      50 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(6,SimpleTmi,100us)                 | 28056/28090/28368 |      10 |
-| Tm1637(6,SimpleTmi,100us,incremental)     |  3612/ 9177/10356 |      70 |
-| Tm1637(6,SimpleTmiFast,100us)             | 26484/26519/26788 |      10 |
-| Tm1637(6,SimpleTmiFast,100us,incremental) |  3412/ 8664/ 9820 |      70 |
+| Tm1638(8,SimpleTmi1638,1us)               |  2904/ 2941/ 3204 |      10 |
+| Tm1638(8,SimpleTmi1638Fast,1us)           |   296/  321/  332 |      10 |
 |-------------------------------------------+-------------------+---------|
-| Max7219(8,HardSpi)                        |   208/  225/  236 |      20 |
-| Max7219(8,HardSpiFast)                    |   100/  107/  124 |      20 |
-| Max7219(8,SimpleSpi)                      |  2380/ 2390/ 2516 |      20 |
-| Max7219(8,SimpleSpiFast)                  |   208/  218/  240 |      20 |
+| Max7219(8,HardSpi)                        |   220/  232/  248 |      20 |
+| Max7219(8,HardSpiFast)                    |    96/  107/  120 |      20 |
+| Max7219(8,SimpleSpi)                      |  2384/ 2393/ 2524 |      20 |
+| Max7219(8,SimpleSpiFast)                  |   204/  216/  236 |      20 |
 |-------------------------------------------+-------------------+---------|
-| Ht16k33(4,TwoWire,100kHz)                 |  1460/ 1463/ 1476 |      20 |
-| Ht16k33(4,TwoWire,400kHz)                 |   500/  507/  524 |      20 |
-| Ht16k33(4,SimpleWire,1us)                 |  2544/ 2556/ 2696 |      20 |
-| Ht16k33(4,SimpleWireFast,1us)             |   224/  234/  256 |      20 |
+| Ht16k33(4,TwoWire,100kHz)                 |  1460/ 1463/ 1484 |      20 |
+| Ht16k33(4,TwoWire,400kHz)                 |   500/  507/  540 |      20 |
+| Ht16k33(4,SimpleWire,1us)                 |  2544/ 2557/ 2696 |      20 |
+| Ht16k33(4,SimpleWireFast,1us)             |   228/  238/  256 |      20 |
 +-------------------------------------------+-------------------+---------+
 ```
 
@@ -1987,34 +2204,33 @@ just as fast as hardware SPI, **and** consumes 500 bytes of less flash memory.
 +-------------------------------------------+-------------------+---------+
 | Functionality                             |   min/  avg/  max | samples |
 |-------------------------------------------+-------------------+---------|
-| Direct(4)                                 |    12/   13/   36 |      40 |
-| Direct(4,subfields)                       |     1/    2/   33 |     640 |
+| Direct(4)                                 |    18/   19/   42 |      40 |
+| Direct(4,subfields)                       |     0/    2/   35 |     640 |
 |-------------------------------------------+-------------------+---------|
-| Hybrid(4,HardSpi)                         |    12/   12/   25 |      40 |
-| Hybrid(4,HardSpi,subfields)               |     1/    2/   24 |     640 |
-| Hybrid(4,SimpleSpi)                       |    29/   29/   42 |      40 |
-| Hybrid(4,SimpleSpi,subfields)             |     1/    4/   50 |     640 |
+| Hybrid(4,HardSpi)                         |    14/   15/   35 |      40 |
+| Hybrid(4,HardSpi,subfields)               |     0/    2/   31 |     640 |
+| Hybrid(4,SimpleSpi)                       |    47/   47/   65 |      40 |
+| Hybrid(4,SimpleSpi,subfields)             |     0/    6/   64 |     640 |
 |-------------------------------------------+-------------------+---------|
-| Hc595(8,HardSpi)                          |    14/   14/   31 |      80 |
+| Hc595(8,HardSpi)                          |    15/   15/   36 |      80 |
 | Hc595(8,HardSpi,subfields)                |     0/    2/   31 |    1280 |
-| Hc595(8,SimpleSpi)                        |    50/   51/   68 |      80 |
-| Hc595(8,SimpleSpi,subfields)              |     0/    6/   68 |    1280 |
+| Hc595(8,SimpleSpi)                        |    82/   82/   99 |      80 |
+| Hc595(8,SimpleSpi,subfields)              |     0/   10/   99 |    1280 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi,100us)                 | 21496/21502/21548 |      10 |
-| Tm1637(4,SimpleTmi,100us,incremental)     |  3481/ 8478/ 9749 |      50 |
+| Tm1637(4,SimpleTmi,100us)                 | 21467/21471/21507 |      10 |
+| Tm1637(4,SimpleTmi,100us,incremental)     |  3476/ 8465/ 9736 |      50 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi,5us)                   |  1525/ 1525/ 1526 |      10 |
-| Tm1637(4,SimpleTmi,5us,incremental)       |   247/  602/  691 |      50 |
+| Tm1637(4,SimpleTmi,5us)                   |  1496/ 1496/ 1497 |      10 |
+| Tm1637(4,SimpleTmi,5us,incremental)       |   243/  590/  681 |      50 |
 |-------------------------------------------+-------------------+---------|
-| Tm1637(6,SimpleTmi,100us)                 | 27023/27026/27043 |      10 |
-| Tm1637(6,SimpleTmi,100us,incremental)     |  3481/ 8834/ 9745 |      70 |
+| Tm1638(8,SimpleTmi1638,1us)               |  1562/ 1566/ 1598 |      10 |
 |-------------------------------------------+-------------------+---------|
-| Max7219(8,HardSpi)                        |   126/  126/  138 |      20 |
-| Max7219(8,SimpleSpi)                      |   460/  460/  472 |      20 |
+| Max7219(8,HardSpi)                        |   138/  138/  149 |      20 |
+| Max7219(8,SimpleSpi)                      |   746/  747/  755 |      20 |
 |-------------------------------------------+-------------------+---------|
-| Ht16k33(4,TwoWire,100kHz)                 |  1322/ 1325/ 1350 |      20 |
-| Ht16k33(4,TwoWire,400kHz)                 |   347/  348/  363 |      20 |
-| Ht16k33(4,SimpleWire,1us)                 |  1328/ 1330/ 1353 |      20 |
+| Ht16k33(4,TwoWire,100kHz)                 |  1724/ 1725/ 1748 |      20 |
+| Ht16k33(4,TwoWire,400kHz)                 |   359/  359/  367 |      20 |
+| Ht16k33(4,SimpleWire,1us)                 |  1270/ 1271/ 1287 |      20 |
 +-------------------------------------------+-------------------+---------+
 ```
 
@@ -2074,17 +2290,17 @@ compiler errors:
 <a name="ToolChain"></a>
 ### Tool Chain
 
-* [Arduino IDE 1.8.13](https://www.arduino.cc/en/Main/Software)
-* [Arduino CLI 0.14.0](https://arduino.github.io/arduino-cli)
+* [Arduino IDE 1.8.19](https://www.arduino.cc/en/Main/Software)
+* [Arduino CLI 0.19.2](https://arduino.github.io/arduino-cli)
 * [SpenceKonde ATTinyCore 1.5.2](https://github.com/SpenceKonde/ATTinyCore)
-* [Arduino AVR Boards 1.8.3](https://github.com/arduino/ArduinoCore-avr)
+* [Arduino AVR Boards 1.8.4](https://github.com/arduino/ArduinoCore-avr)
 * [Arduino SAMD Boards 1.8.9](https://github.com/arduino/ArduinoCore-samd)
 * [SparkFun AVR Boards 1.1.13](https://github.com/sparkfun/Arduino_Boards)
 * [SparkFun SAMD Boards 1.8.3](https://github.com/sparkfun/Arduino_Boards)
-* [STM32duino 2.0.0](https://github.com/stm32duino/Arduino_Core_STM32)
-* [ESP8266 Arduino 2.7.4](https://github.com/esp8266/Arduino)
-* [ESP32 Arduino 1.0.6](https://github.com/espressif/arduino-esp32)
-* [Teensyduino 1.53](https://www.pjrc.com/teensy/td_download.html)
+* [STM32duino 2.2.0](https://github.com/stm32duino/Arduino_Core_STM32)
+* [ESP8266 Arduino 3.0.2](https://github.com/esp8266/Arduino)
+* [ESP32 Arduino 2.0.2](https://github.com/espressif/arduino-esp32)
+* [Teensyduino 1.56](https://www.pjrc.com/teensy/td_download.html)
 
 This library is *not* compatible with:
 
