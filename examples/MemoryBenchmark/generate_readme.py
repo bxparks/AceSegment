@@ -246,6 +246,7 @@ before substantional refactoring in 2021.
     * `HardSpiInterface` and `HardSpiFastInterface`, even though nothing really
       changed functionally.
     * On 32-bit processors, no significant difference.
+* Add benchmarks for `Tm1638Module`.
 
 ## Results
 
@@ -260,6 +261,7 @@ program for various LED modules.
 * `HybridModule`
 * `Hc595Module`
 * `Tm1637Module`
+* `Tm1638Module`
 * `Max7219Module`
 * `Ht16k33Module`
 
