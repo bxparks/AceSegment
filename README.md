@@ -14,7 +14,7 @@ of LED displays:
 * modules using a hybrid of one 74HC595 chip and direct GPIO connections
 * modules directly connected to the GPIO pins, no controller chips
 
-The first 4 types are readily available from retail outlets such as Amazon and
+The first 5 types are readily available from retail outlets such as Amazon and
 eBay, in multiple colors and sizes. They look like these:
 
 ![TM1637 LED Module](docs/tm1637/tm1637_sample.jpg)
@@ -28,15 +28,18 @@ eBay, in multiple colors and sizes. They look like these:
 ![HC595 LED Module](docs/hc595/hc595_sample.jpg)
 
 The final 2 types of modules (hybrid and directly connected) are usually custom
-creations. The AceSegment library hopes to support as many seven-segment
-displays as practical within a single framework.
+creations. Here is an example of an LED module that I built myself a few years
+ago using a single 74HC595 chips and 4 transistors:
 
-Different types of seven-segment LED modules using different controller chips
-are similar enough to each other that code at the application layer can be
-mostly agnostic to the hardware differences. The AceSegment library is organized
-into hardware-dependent components and hardware-independent components to allow
-application code to be written without worrying too much about the low-level
-details of the specific LED module.
+![Custom Module](docs/custom_modules/custom_module_sample.jpg)
+
+The AceSegment library hopes to support as many seven-segment displays as
+practical within a single framework. Different types of seven-segment LED
+modules using different controller chips are similar enough to each other that
+code at the application layer can be mostly agnostic to the hardware
+differences. The library is organized into hardware-dependent components and
+hardware-independent components to allow application code to be written without
+worrying too much about the low-level details of the specific LED module.
 
 This library is designed to ensure that client applications pay only for what
 they use. Most of the code is written as C++ templates to avoid creating static
