@@ -1,7 +1,9 @@
 # Changelog
 
 * Unreleased
+* 0.10.0 (2022-02-02)
     * Add support for TM1638 LED modules using the `Tm1638Module`.
+        * Depends on AceTMI library v0.4.
     * Upgrade tool chain:
         * Arduino IDE from 1.8.13 to 1.8.19
         * Arduino AVR from 1.8.3 to 1.8.4
