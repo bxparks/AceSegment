@@ -8,11 +8,21 @@
  *  * AUNITER_MICRO_CUSTOM_DUAL: SparkFun Pro Micro
  *
  * The following configurations are defined, but I don't think they work because
- * <TimerOne.h> library mahy not be compatible with these:
+ * <TimerOne.h> library may not be compatible with these:
  *
  *  * AUNITER_STM32_HC595: STM32 F1 Blue Pill
  *  * AUNITER_D1MINILARGE_HC595: WeMos D1 Mini ESP8266
  *  * AUNITER_ESP32_HC595: ESP32 Dev Kit v1
+ *
+ * CAUTION: The digitalWriteFast libraries are not interrupt-safe, so the
+ * SimpleSpiFastInterface or HardSpiFastInterface classes are not
+ * interrupt-safe. In this simple example, no other GPIO port mutations are
+ * performed, so the act of writing to the 74HC595 chip within the interrupt
+ * handler (through the Timer1 library) is probably safe. But if the application
+ * code performs any other GPIO operation using the digitalWriteFast library,
+ * then the interrupt handler may interrupt GPIO operation cause spurious
+ * results. Interrupt-safety of the various "Fast" classes in this library may
+ * be addressed in the future.
  */
 
 #include <Arduino.h>

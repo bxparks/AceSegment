@@ -156,7 +156,7 @@ const uint8_t PATTERNS[6] = {
 
 TimingStats stats;
 uint8_t digitIndex = 0;
-uint8_t brightness = 1;
+uint8_t brightness = 0; // [0, 7] with 0 being dimmest
 
 // Every second, scroll the display and change the brightness.
 void updateDisplay() {
@@ -176,9 +176,9 @@ void updateDisplay() {
     }
     incrementMod(digitIndex, (uint8_t) NUM_DIGITS);
 
-    // Update the brightness. The TM1637 has 8 levels of brightness.
+    // Update the brightness. The TM1637 has 8 levels of brightness [0, 7].
     ledModule.setBrightness(brightness);
-    incrementModOffset(brightness, (uint8_t) 7, (uint8_t) 1);
+    incrementModOffset(brightness, (uint8_t) 8, (uint8_t) 0);
   }
 }
 

@@ -19,13 +19,15 @@ BEGIN {
   labels[10] = "Hc595(SimpleSpiFast)";
   labels[11] = "Tm1637(SimpleTmi)";
   labels[12] = "Tm1637(SimpleTmiFast)";
-  labels[13] = "Max7219(HardSpi)";
-  labels[14] = "Max7219(HardSpiFast)";
-  labels[15] = "Max7219(SimpleSpi)";
-  labels[16] = "Max7219(SimpleSpiFast)";
-  labels[17] = "Ht16k33(TwoWire)";
-  labels[18] = "Ht16k33(SimpleWire)";
-  labels[19] = "Ht16k33(SimpleWireFast)";
+  labels[13] = "Tm1638(SimpleTmi1638)";
+  labels[14] = "Tm1638(SimpleTmi1638Fast)";
+  labels[15] = "Max7219(HardSpi)";
+  labels[16] = "Max7219(HardSpiFast)";
+  labels[17] = "Max7219(SimpleSpi)";
+  labels[18] = "Max7219(SimpleSpiFast)";
+  labels[19] = "Ht16k33(TwoWire)";
+  labels[20] = "Ht16k33(SimpleWire)";
+  labels[21] = "Ht16k33(SimpleWireFast)";
   record_index = 0
 }
 {
@@ -60,6 +62,7 @@ END {
         || name ~ /Hybrid\(HardSpi\)/ \
         || name ~ /Hc595\(HardSpi\)/ \
         || name ~ /Tm1637\(SimpleTmi\)/ \
+        || name ~ /Tm1638\(SimpleTmi1638\)/ \
         || name ~ /Max7219\(HardSpi\)/ \
         || name ~ /Ht16k33\(TwoWire\)/) {
       printf(\

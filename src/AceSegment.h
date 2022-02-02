@@ -43,8 +43,8 @@ SOFTWARE.
 #endif
 
 // Version format: xxyyzz == "xx.yy.zz"
-#define ACE_SEGMENT_VERSION 901
-#define ACE_SEGMENT_VERSION_STRING "0.9.1"
+#define ACE_SEGMENT_VERSION 1000
+#define ACE_SEGMENT_VERSION_STRING "0.10.0"
 
 #include "ace_segment/hw/ClockInterface.h"
 #include "ace_segment/hw/GpioInterface.h"
@@ -58,6 +58,7 @@ SOFTWARE.
 #include "ace_segment/hybrid/HybridModule.h"
 #include "ace_segment/hc595/Hc595Module.h"
 #include "ace_segment/tm1637/Tm1637Module.h"
+#include "ace_segment/tm1638/Tm1638Module.h"
 #include "ace_segment/max7219/Max7219Module.h"
 #include "ace_segment/ht16k33/Ht16k33Module.h"
 

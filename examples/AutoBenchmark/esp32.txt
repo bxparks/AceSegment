@@ -9,29 +9,29 @@ sizeof(HybridModule<SimpleSpiInterface, 4>): 48
 sizeof(Hc595Module<SimpleSpiInterface, 8>): 64
 sizeof(Tm1637Module<SimpleTmiInterface, 4>): 24
 sizeof(Tm1637Module<SimpleTmiInterface, 6>): 24
+sizeof(Tm1638Module<SimpleTmi1638Interface, 8>): 28
 sizeof(Max7219Module<SimpleSpiInterface, 8>): 24
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 20
 sizeof(Ht16k33Module<SimpleWireInterface, 4>): 20
 BENCHMARKS
-Direct(4) 2 2 7 40
-Direct(4,subfields) 0 1 9 640
-Hybrid(4,HardSpi) 10 10 19 40
-Hybrid(4,HardSpi,subfields) 0 1 19 640
+Direct(4) 2 2 12 40
+Direct(4,subfields) 0 0 8 640
+Hybrid(4,HardSpi) 10 10 23 40
+Hybrid(4,HardSpi,subfields) 0 1 18 640
 Hybrid(4,SimpleSpi) 4 4 8 40
 Hybrid(4,SimpleSpi,subfields) 0 1 9 640
-Hc595(8,HardSpi) 11 11 19 80
-Hc595(8,HardSpi,subfields) 0 2 19 1280
-Hc595(8,SimpleSpi) 7 7 16 80
+Hc595(8,HardSpi) 11 11 16 80
+Hc595(8,HardSpi,subfields) 0 1 19 1280
+Hc595(8,SimpleSpi) 7 7 15 80
 Hc595(8,SimpleSpi,subfields) 0 1 15 1280
-Tm1637(4,SimpleTmi,100us) 21230 21237 21243 10
-Tm1637(4,SimpleTmi,100us,incremental) 3435 8372 9617 50
-Tm1637(4,SimpleTmi,5us) 1271 1278 1287 10
-Tm1637(4,SimpleTmi,5us,incremental) 206 505 586 50
-Tm1637(6,SimpleTmi,100us) 26691 26696 26702 10
-Tm1637(6,SimpleTmi,100us,incremental) 3436 8726 9615 70
-Max7219(8,HardSpi) 90 91 103 20
-Max7219(8,SimpleSpi) 60 60 68 20
-Ht16k33(4,TwoWire,100kHz) 1382 1383 1392 20
-Ht16k33(4,TwoWire,400kHz) 422 424 431 20
-Ht16k33(4,SimpleWire,1us) 824 831 835 20
+Tm1637(4,SimpleTmi,100us) 21215 21217 21224 10
+Tm1637(4,SimpleTmi,100us,incremental) 3434 8367 9611 50
+Tm1637(4,SimpleTmi,5us) 1264 1267 1273 10
+Tm1637(4,SimpleTmi,5us,incremental) 204 501 579 50
+Tm1638(8,SimpleTmi1638,1us) 799 812 821 10
+Max7219(8,HardSpi) 92 92 100 20
+Max7219(8,SimpleSpi) 63 63 72 20
+Ht16k33(4,TwoWire,100kHz) 257 258 271 20
+Ht16k33(4,TwoWire,400kHz) 106 110 119 20
+Ht16k33(4,SimpleWire,1us) 778 785 791 20
 END

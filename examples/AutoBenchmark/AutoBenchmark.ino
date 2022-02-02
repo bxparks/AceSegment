@@ -48,6 +48,7 @@ SOFTWARE.
 #include <ace_spi/SimpleSpiFastInterface.h>
 #include <ace_spi/HardSpiFastInterface.h>
 #include <ace_tmi/SimpleTmiFastInterface.h>
+#include <ace_tmi/SimpleTmi1638FastInterface.h>
 #include <ace_wire/SimpleWireFastInterface.h>
 #include <ace_segment/direct/DirectFast4Module.h>
 #endif
@@ -74,75 +75,75 @@ const uint8_t NUM_SEGMENTS = 8;
 
 const uint8_t BIT_DELAY = 100;
 const uint8_t BIT_DELAY_SHORT = 5;
+const uint8_t BIT_DELAY_TM1638 = 1;
 
 #if defined(EPOXY_DUINO)
   // numbers don't matter
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {1, 2, 3, 4};
   const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {5, 6, 7, 8, 9, 10, 11, 12};
 
-  // TM1637
+  // TM1637, TM1638
   const uint8_t CLK_PIN = 1;
   const uint8_t DIO_PIN = 2;
+  const uint8_t STB_PIN = 3;
 
 #elif defined(ARDUINO_ARCH_AVR)
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {4, 5, 6, 7};
   const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {8, 9, 10, 16, 14, 18, 19, 15};
 
-  // TM1637
+  // TM1637, TM1638
   const uint8_t CLK_PIN = 4;
   const uint8_t DIO_PIN = 5;
-
-#elif defined(ARDUINO_ARCH_SAMD)
-  const uint8_t DIGIT_PINS[NUM_DIGITS] = {2, 3, 4, 5};
-  const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {6, 7, 8, 9, 10, 11, 12, 13};
-
-  // TM1637
-  const uint8_t CLK_PIN = 2;
-  const uint8_t DIO_PIN = 3;
+  const uint8_t STB_PIN = 6;
 
 #elif defined(ARDUINO_ARCH_STM32)
   // I think this is the F1, because there exists a ARDUINO_ARCH_STM32F4
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {2, 3, 4, 5};
   const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {6, 7, 8, 9, 10, 11, 12, 13};
 
-  // TM1637
+  // TM1637, TM1638
   const uint8_t CLK_PIN = 2;
   const uint8_t DIO_PIN = 3;
+  const uint8_t STB_PIN = 4;
 
 #elif defined(ESP8266)
   // Don't have enough pins so reuse some.
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {D4, D5, D4, D5};
   const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {D6, D7, D6, D7, D6, D7, D6, D7};
 
-  // TM1637
+  // TM1637, TM1638
   const uint8_t CLK_PIN = D4;
   const uint8_t DIO_PIN = D5;
+  const uint8_t STB_PIN = D6;
 
 #elif defined(ESP32)
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {21, 22, 23, 24};
   const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {12, 13, 14, 15, 16, 17, 18, 19};
 
-  // TM1637
+  // TM1637, TM1638
   const uint8_t CLK_PIN = 21;
   const uint8_t DIO_PIN = 22;
+  const uint8_t STB_PIN = 23;
 
 #elif defined(TEENSYDUINO)
   // Teensy 3.2
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {2, 3, 4, 5};
   const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {6, 7, 8, 9, 10, 11, 12, 13};
 
-  // TM1637
+  // TM1637, TM1638
   const uint8_t CLK_PIN = 2;
   const uint8_t DIO_PIN = 3;
+  const uint8_t STB_PIN = 4;
 
 #else
   #warning Unknown hardware, using defaults which may interfere with Serial
   const uint8_t DIGIT_PINS[NUM_DIGITS] = {2, 3, 4, 5};
   const uint8_t SEGMENT_PINS[NUM_SEGMENTS] = {6, 7, 8, 9, 10, 11, 12, 13};
 
-  // TM1637
+  // TM1637, TM1638
   const uint8_t CLK_PIN = 2;
   const uint8_t DIO_PIN = 3;
+  const uint8_t STB_PIN = 4;
 
 #endif
 
@@ -617,6 +618,7 @@ void runTm1637SimpleTmiFast() {
 }
 #endif
 
+// Use 5 micros instead of 100 micros.
 void runTm1637SimpleTmiShort() {
   using TmiInterface = SimpleTmiInterface;
   TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY_SHORT);
@@ -650,36 +652,66 @@ void runTm1637SimpleTmiFastShort() {
 }
 #endif
 
-void runTm1637SixSimpleTmi() {
-  using TmiInterface = SimpleTmiInterface;
-  TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY);
+//-----------------------------------------------------------------------------
+// TM1638 LED Modules
+//-----------------------------------------------------------------------------
+
+static uint8_t kTm1638Patterns[8] = {
+  0x13, 0x35, 0x57, 0x79, 0x9B, 0xBD, 0xDE, 0xEF
+};
+
+template <typename LM>
+void runTm1638Benchmark(
+    const __FlashStringHelper* name,
+    LM& ledModule,
+    uint8_t numDigits
+) {
+  // Run through 10 full cycles to eliminate any variances.
+  const uint16_t numSamples = 10;
+
+  timingStats.reset();
+  for (uint16_t i = 0; i < numSamples; ++i) {
+    // Update patterns and brightness to mark them dirty.
+    for (uint8_t i = 0; i < numDigits; ++i) {
+      ledModule.setPatternAt(i, kTm1638Patterns[i]);
+    }
+    ledModule.setBrightness(1);
+
+    uint16_t startMicros;
+    uint16_t endMicros;
+    startMicros = micros();
+    ledModule.flush();
+    endMicros = micros();
+    timingStats.update(endMicros - startMicros);
+  }
+
+  printStats(name, timingStats, numSamples);
+}
+
+void runTm1638SimpleTmi() {
+  using TmiInterface = SimpleTmi1638Interface;
+  TmiInterface tmiInterface(DIO_PIN, CLK_PIN, STB_PIN, BIT_DELAY_TM1638);
   tmiInterface.begin();
 
-  Tm1637Module<TmiInterface, 6> tm1637SixModule(tmiInterface);
-  tm1637SixModule.begin();
-  runTm1637Benchmark(
-      F("Tm1637(6,SimpleTmi,100us)"), tm1637SixModule, 6, false);
-  runTm1637Benchmark(
-      F("Tm1637(6,SimpleTmi,100us,incremental)"), tm1637SixModule, 6, true);
-  tm1637SixModule.end();
+  Tm1638Module<TmiInterface, 8> tm1638Module(tmiInterface);
+  tm1638Module.begin();
+  runTm1638Benchmark(F("Tm1638(8,SimpleTmi1638,1us)"), tm1638Module, 8);
+  tm1638Module.end();
 
   tmiInterface.end();
 }
 
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-void runTm1637SixSimpleTmiFast() {
-  using TmiInterface = SimpleTmiFastInterface<DIO_PIN, CLK_PIN, BIT_DELAY>;
+void runTm1638SimpleTmiFast() {
+  using TmiInterface = SimpleTmi1638FastInterface<
+      DIO_PIN, CLK_PIN, STB_PIN, BIT_DELAY_TM1638>;
   TmiInterface tmiInterface;
   tmiInterface.begin();
 
-  Tm1637Module<TmiInterface, 6> tm1637SixModule(tmiInterface);
-  tm1637SixModule.begin();
-  runTm1637Benchmark(
-      F("Tm1637(6,SimpleTmiFast,100us)"), tm1637SixModule, 6, false);
-  runTm1637Benchmark(
-      F("Tm1637(6,SimpleTmiFast,100us,incremental)"),
-      tm1637SixModule, 6, true);
-  tm1637SixModule.end();
+  Tm1638Module<TmiInterface, 8> tm1638Module(tmiInterface);
+  tm1638Module.begin();
+  runTm1638Benchmark(F("Tm1638(8,SimpleTmi1638Fast,1us)"), tm1638Module, 8);
+  tm1638Module.end();
 
   tmiInterface.end();
 }
@@ -692,9 +724,9 @@ void runTm1637SixSimpleTmiFast() {
 template <typename LM>
 void runMax7219Benchmark(const __FlashStringHelper* name, LM& ledModule) {
   ledModule.setPatternAt(0, 0x13);
-  ledModule.setPatternAt(0, 0x37);
-  ledModule.setPatternAt(0, 0x7F);
-  ledModule.setPatternAt(0, 0xFF);
+  ledModule.setPatternAt(1, 0x37);
+  ledModule.setPatternAt(2, 0x7F);
+  ledModule.setPatternAt(3, 0xFF);
 
   timingStats.reset();
   const uint16_t numSamples = 20;
@@ -703,7 +735,6 @@ void runMax7219Benchmark(const __FlashStringHelper* name, LM& ledModule) {
     ledModule.flush();
     uint16_t endMicros = micros();
     timingStats.update(endMicros - startMicros);
-    yield();
   }
 
   printStats(name, timingStats, numSamples);
@@ -774,9 +805,9 @@ const uint8_t HT16K33_I2C_ADDRESS = 0x70;
 template <typename LM>
 void runHt16k33Benchmark(const __FlashStringHelper* name, LM& ledModule) {
   ledModule.setPatternAt(0, 0x13);
-  ledModule.setPatternAt(0, 0x37);
-  ledModule.setPatternAt(0, 0x7F);
-  ledModule.setPatternAt(0, 0xFF);
+  ledModule.setPatternAt(1, 0x37);
+  ledModule.setPatternAt(2, 0x7F);
+  ledModule.setPatternAt(3, 0xFF);
 
   timingStats.reset();
   const uint16_t numSamples = 20;
@@ -785,7 +816,6 @@ void runHt16k33Benchmark(const __FlashStringHelper* name, LM& ledModule) {
     ledModule.flush();
     uint16_t endMicros = micros();
     timingStats.update(endMicros - startMicros);
-    yield();
   }
 
   printStats(name, timingStats, numSamples);
@@ -889,9 +919,11 @@ void runBenchmarks() {
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
   runTm1637SimpleTmiFastShort();
 #endif
-  runTm1637SixSimpleTmi();
+
+  // Tm1638Module
+  runTm1638SimpleTmi();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
-  runTm1637SixSimpleTmiFast();
+  runTm1638SimpleTmiFast();
 #endif
 
   // Max7219Module
@@ -975,6 +1007,10 @@ void printSizeOf() {
   SERIAL_PORT_MONITOR.print(
       F("sizeof(Tm1637Module<SimpleTmiInterface, 6>): "));
   SERIAL_PORT_MONITOR.println(sizeof(Tm1637Module<SimpleTmiInterface, 6>));
+
+  SERIAL_PORT_MONITOR.print(
+      F("sizeof(Tm1638Module<SimpleTmi1638Interface, 8>): "));
+  SERIAL_PORT_MONITOR.println(sizeof(Tm1638Module<SimpleTmi1638Interface, 8>));
 
   SERIAL_PORT_MONITOR.print(
       F("sizeof(Max7219Module<SimpleSpiInterface, 8>): "));
