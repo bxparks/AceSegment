@@ -65,6 +65,7 @@ END {
         || name ~ /^Tm1637\(4,SimpleTmi,100us\)/ \
         || name ~ /^Tm1637\(4,SimpleTmi,5us\)/ \
         || name ~ /^Tm1637\(6,SimpleTmi,100us\)/ \
+        || name ~ /^Tm1638\(8,SimpleTmi1638,1us\)/ \
         || name ~ /^Max7219\(8,HardSpi\)/ \
         || name ~ /^Ht16k33\(4,TwoWire,100kHz)/ \
     ) {
