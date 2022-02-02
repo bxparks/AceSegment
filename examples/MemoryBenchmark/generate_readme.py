@@ -38,7 +38,7 @@ by the runtime environment of the processor. For example, it often seems like
 the ESP8266 allocates flash memory in blocks of a certain quantity, so the
 calculated flash size can jump around in unexpected ways.
 
-**Version**: AceSegment v0.10.0
+**Version**: AceSegment v0.11.0
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -136,10 +136,10 @@ before substantional refactoring in 2021.
   changes are due to some removal/addition of some methods in `PatternWriter`.
 * Add memory usage for `Tm1637Module`. Seems to consume something in between
   similar to the `ScanningModule` w/ SW SPI and `ScanningModule` with HW SPI.
-* Add memory usage for `Tm1637Module` using `SimpleTmiFastInterface` which uses
-  `digitalWriteFast` library for AVR processors. Saves 662 - 776 bytes of flash
-  on AVR processors compared to `Tm1637Module` using normal
-  `SimpleTmiInterface`.
+* Add memory usage for `Tm1637Module` using `SimpleTmi1637FastInterface` which
+  uses `digitalWriteFast` library for AVR processors. Saves 662 - 776 bytes of
+  flash on AVR processors compared to `Tm1637Module` using normal
+  `SimpleTmi1637Interface`.
 * Save 150-200 bytes of flash on AVR processors by lifting all of the
   `PatternWriter::writePatternAt()` type of methods to `PatternWriter`, making
   them non-virtual, then funneling these methods through just 2 lower-level
@@ -180,8 +180,8 @@ before substantional refactoring in 2021.
   `HardSpiFastInterface`) becomes slightly smaller (30 bytes of flash, 2 bytes
   of static RAM on AVR) due to removal of explicit `pinMode(dataPin, X)` and
   `pinMode(clockPin, X)`. These are deferred to `SPIClass::begin()`.
-* Extract out `readAck()`, saving 10 bytes of flash for `SimpleTmiInterface` and
-  6 bytes of flash for `SimpleTmiFastInterface`.
+* Extract out `readAck()`, saving 10 bytes of flash for `SimpleTmi1637Interface` and
+  6 bytes of flash for `SimpleTmi1637FastInterface`.
 * Add `Ht16k33Module(SimpleWire)` and `Ht16k33Module(SimpleWireFast)`.
 * Rename `LedDisplay` to `PatternWriter` and remove one layer of abstraction.
   Saves 10-22 bytes of flash and 2 bytes of static RAM for most Writer
@@ -209,7 +209,7 @@ before substantional refactoring in 2021.
       of indirection through a pointer to the interface objects.
     * On AVR processors, this saves between 0 to 90 bytes of flash on most
       configurations. The most significant savings occur with the following:
-        * Tm1637Module(SimpleTmi) saves 90 bytes,
+        * Tm1637Module(SimpleTmi1637) saves 90 bytes,
         * Ht16k33Module(SimpleWire) saves 68 bytes of flash,
         * Max7219Module(SimpleSpi) saves 30 bytes of flash.
     * On 32-bit processors, the flash consumption usually goes *up* by 4-20
@@ -237,11 +237,11 @@ before substantional refactoring in 2021.
 
 * Moved Writer classes to AceSegmentWriter library.
 
-**v0.9+**
+**v0.10**
 
 * Add `beginTransmission()`, `endTransmission()`, `transfer()`, and
   `transfer16()` methods to AceSPI library, which become the building blocks for
-  the `send8()` and `send16()` convenience fnctions.
+  the `send8()` and `send16()` convenience functions.
     * Seems to increase flash usage by about 20 bytes on AVR for
     * `HardSpiInterface` and `HardSpiFastInterface`, even though nothing really
       changed functionally.

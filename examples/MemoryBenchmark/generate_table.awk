@@ -17,8 +17,8 @@ BEGIN {
   labels[8] = "Hc595(HardSpiFast)";
   labels[9] = "Hc595(SimpleSpi)";
   labels[10] = "Hc595(SimpleSpiFast)";
-  labels[11] = "Tm1637(SimpleTmi)";
-  labels[12] = "Tm1637(SimpleTmiFast)";
+  labels[11] = "Tm1637(SimpleTmi1637)";
+  labels[12] = "Tm1637(SimpleTmi1637Fast)";
   labels[13] = "Tm1638(SimpleTmi1638)";
   labels[14] = "Tm1638(SimpleTmi1638Fast)";
   labels[15] = "Max7219(HardSpi)";
@@ -61,7 +61,7 @@ END {
         || name ~ /DirectModule/ \
         || name ~ /Hybrid\(HardSpi\)/ \
         || name ~ /Hc595\(HardSpi\)/ \
-        || name ~ /Tm1637\(SimpleTmi\)/ \
+        || name ~ /Tm1637\(SimpleTmi1637\)/ \
         || name ~ /Tm1638\(SimpleTmi1638\)/ \
         || name ~ /Max7219\(HardSpi\)/ \
         || name ~ /Ht16k33\(TwoWire\)/) {

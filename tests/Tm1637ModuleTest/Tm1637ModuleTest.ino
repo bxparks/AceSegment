@@ -10,10 +10,10 @@
 #include <AUnitVerbose.h>
 #include <AceSegment.h>
 #include <ace_segment/testing/EventLog.h>
-#include <ace_segment/testing/TestableTmiInterface.h>
+#include <ace_segment/testing/TestableTmi1637Interface.h>
 
 using aunit::TestRunner;
-using ace_segment::testing::TestableTmiInterface;
+using ace_segment::testing::TestableTmi1637Interface;
 using ace_segment::testing::EventType;
 using ace_segment::testing::gEventLog;
 using ace_segment::Tm1637Module;
@@ -21,8 +21,8 @@ using ace_segment::Tm1637Module;
 //----------------------------------------------------------------------------
 
 const uint8_t NUM_DIGITS = 4;
-TestableTmiInterface tmiInterface;
-using TmModule = Tm1637Module<TestableTmiInterface, NUM_DIGITS>;
+TestableTmi1637Interface tmiInterface;
+using TmModule = Tm1637Module<TestableTmi1637Interface, NUM_DIGITS>;
 TmModule tm1637Module(tmiInterface);
 
 test(Tm1637ModuleTest, flushIncremental) {
@@ -62,13 +62,13 @@ test(Tm1637ModuleTest, flushIncremental) {
   assertEqual(7, gEventLog.getNumRecords());
   assertTrue(gEventLog.assertEvents(
     7,
-    (int) EventType::kTmiStartCondition,
-    (int) EventType::kTmiSendByte, TmModule::kDataCmdFixedAddress,
-    (int) EventType::kTmiStopCondition,
-    (int) EventType::kTmiStartCondition,
-    (int) EventType::kTmiSendByte, TmModule::kAddressCmd | 0x1,
-    (int) EventType::kTmiSendByte, 0x11,
-    (int) EventType::kTmiStopCondition
+    (int) EventType::kTmi1637StartCondition,
+    (int) EventType::kTmi1637SendByte, TmModule::kDataCmdFixedAddress,
+    (int) EventType::kTmi1637StopCondition,
+    (int) EventType::kTmi1637StartCondition,
+    (int) EventType::kTmi1637SendByte, TmModule::kAddressCmd | 0x1,
+    (int) EventType::kTmi1637SendByte, 0x11,
+    (int) EventType::kTmi1637StopCondition
   ));
   assertFalse(tm1637Module.isDigitDirty(1));
   assertEqual(2, tm1637Module.mFlushStage);
@@ -96,10 +96,10 @@ test(Tm1637ModuleTest, flushIncremental) {
   assertEqual(3, gEventLog.getNumRecords());
   assertTrue(gEventLog.assertEvents(
     3,
-    (int) EventType::kTmiStartCondition,
-    (int) EventType::kTmiSendByte,
+    (int) EventType::kTmi1637StartCondition,
+    (int) EventType::kTmi1637SendByte,
         TmModule::kBrightnessCmd | TmModule::kBrightnessLevelOn | 2,
-    (int) EventType::kTmiStopCondition
+    (int) EventType::kTmi1637StopCondition
   ));
   assertFalse(tm1637Module.isDigitDirty(4));
   assertEqual(0, tm1637Module.mFlushStage);
@@ -134,24 +134,24 @@ test(Tm1637ModuleTest, flush) {
     13,
 
     // auto increment mode (3 records)
-    (int) EventType::kTmiStartCondition,
-    (int) EventType::kTmiSendByte, TmModule::kDataCmdAutoAddress,
-    (int) EventType::kTmiStopCondition,
+    (int) EventType::kTmi1637StartCondition,
+    (int) EventType::kTmi1637SendByte, TmModule::kDataCmdAutoAddress,
+    (int) EventType::kTmi1637StopCondition,
 
     // send 4 digits (7 records)
-    (int) EventType::kTmiStartCondition,
-    (int) EventType::kTmiSendByte, TmModule::kAddressCmd,
-    (int) EventType::kTmiSendByte, 0x00,
-    (int) EventType::kTmiSendByte, 0x11,
-    (int) EventType::kTmiSendByte, 0x00,
-    (int) EventType::kTmiSendByte, 0x00,
-    (int) EventType::kTmiStopCondition,
+    (int) EventType::kTmi1637StartCondition,
+    (int) EventType::kTmi1637SendByte, TmModule::kAddressCmd,
+    (int) EventType::kTmi1637SendByte, 0x00,
+    (int) EventType::kTmi1637SendByte, 0x11,
+    (int) EventType::kTmi1637SendByte, 0x00,
+    (int) EventType::kTmi1637SendByte, 0x00,
+    (int) EventType::kTmi1637StopCondition,
 
     // brightness (3 records)
-    (int) EventType::kTmiStartCondition,
-    (int) EventType::kTmiSendByte,
+    (int) EventType::kTmi1637StartCondition,
+    (int) EventType::kTmi1637SendByte,
         TmModule::kBrightnessCmd | TmModule::kBrightnessLevelOn | 2,
-    (int) EventType::kTmiStopCondition
+    (int) EventType::kTmi1637StopCondition
   ));
 
   assertFalse(tm1637Module.isBrightnessDirty());

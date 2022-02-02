@@ -7,8 +7,8 @@ sizeof(ScanningModule<LedMatrixBase, 4>): 32
 sizeof(DirectModule<4>): 48
 sizeof(HybridModule<SimpleSpiInterface, 4>): 48
 sizeof(Hc595Module<SimpleSpiInterface, 8>): 64
-sizeof(Tm1637Module<SimpleTmiInterface, 4>): 24
-sizeof(Tm1637Module<SimpleTmiInterface, 6>): 24
+sizeof(Tm1637Module<SimpleTmi1637Interface, 4>): 24
+sizeof(Tm1637Module<SimpleTmi1637Interface, 6>): 24
 sizeof(Max7219Module<SimpleSpiInterface, 8>): 24
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 20
 sizeof(Ht16k33Module<SimpleWireInterface, 4>): 20
@@ -23,12 +23,12 @@ Hc595(8,HardSpi) 24 24 28 80
 Hc595(8,HardSpi,subfields) 3 5 29 1280
 Hc595(8,SimpleSpi) 89 90 95 80
 Hc595(8,SimpleSpi,subfields) 3 13 95 1280
-Tm1637(4,SimpleTmi,100us) 22218 22222 22227 10
-Tm1637(4,SimpleTmi,100us,incremental) 3599 8763 10057 50
-Tm1637(4,SimpleTmi,5us) 2114 2114 2118 10
-Tm1637(4,SimpleTmi,5us,incremental) 343 835 959 50
-Tm1637(6,SimpleTmi,100us) 27932 27936 27941 10
-Tm1637(6,SimpleTmi,100us,incremental) 3597 9131 10059 70
+Tm1637(4,SimpleTmi1637,100us) 22218 22222 22227 10
+Tm1637(4,SimpleTmi1637,100us,incremental) 3599 8763 10057 50
+Tm1637(4,SimpleTmi1637,5us) 2114 2114 2118 10
+Tm1637(4,SimpleTmi1637,5us,incremental) 343 835 959 50
+Tm1637(6,SimpleTmi1637,100us) 27932 27936 27941 10
+Tm1637(6,SimpleTmi1637,100us,incremental) 3597 9131 10059 70
 Max7219(8,HardSpi) 202 202 208 20
 Max7219(8,SimpleSpi) 794 797 798 20
 Ht16k33(4,TwoWire,100kHz) 1342 1343 1347 20

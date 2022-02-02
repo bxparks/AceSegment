@@ -51,7 +51,7 @@ volatile int disableCompilerOptimization = 0;
     #include <digitalWriteFast.h>
     #include <ace_spi/SimpleSpiFastInterface.h>
     #include <ace_spi/HardSpiFastInterface.h>
-    #include <ace_tmi/SimpleTmiFastInterface.h>
+    #include <ace_tmi/SimpleTmi1637FastInterface.h>
     #include <ace_tmi/SimpleTmi1638FastInterface.h>
     #include <ace_segment/direct/DirectFast4Module.h>
   #endif
@@ -224,7 +224,7 @@ volatile int disableCompilerOptimization = 0;
     );
 
   #elif FEATURE == FEATURE_TM1637_TMI
-    using TmiInterface = SimpleTmiInterface;
+    using TmiInterface = SimpleTmi1637Interface;
     TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY);
     Tm1637Module<TmiInterface, NUM_DIGITS> tm1637Module(tmiInterface);
 
@@ -233,7 +233,8 @@ volatile int disableCompilerOptimization = 0;
       #error Unsupported FEATURE on this platform
     #endif
 
-    using TmiInterface = SimpleTmiFastInterface<DIO_PIN, CLK_PIN, BIT_DELAY>;
+    using TmiInterface = SimpleTmi1637FastInterface<
+        DIO_PIN, CLK_PIN, BIT_DELAY>;
     TmiInterface tmiInterface;
     Tm1637Module<TmiInterface, NUM_DIGITS> tm1637Module(tmiInterface);
 

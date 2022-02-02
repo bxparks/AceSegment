@@ -61,10 +61,10 @@ called directly. ("Zero-cost abstraction").
     * `HardSpiFastInterface`
         * hardware SPI using `digitalWriteFast` for controlling the LatchPin
 * AceTMI library
-    * `SimpleTmiInterface`
+    * `SimpleTmi1637Interface`
         * software implementation of the TM1637 protocol similar to I2C
-    * `SimpleTmiFastInterface`
-        * same as `SimpleTmiInterface` but using `digitalWriteFast` library
+    * `SimpleTmi1637FastInterface`
+        * same as `SimpleTmi1637Interface` but using `digitalWriteFast` library
 * AceWire library
     * `TwoWireInterface`
     * `SimpleWireInterface`

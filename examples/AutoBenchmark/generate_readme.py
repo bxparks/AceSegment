@@ -53,7 +53,7 @@ LED module:
 * `Ht16k33Module::flush()`
     * Sends out the buffered digits using I2C
 
-**Version**: AceSegment v0.10.0
+**Version**: AceSegment v0.11.0
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -151,10 +151,10 @@ number of `TimingStats::update()` calls that were made.
   handle only 16 MHz.
 * Verified that removing the 10 nF capacitors from the CLK and DIO lines of the
   TM1637 modules allows a much shorter `DELAY_MICROS`. Added CPU benchmark
-  numbers for `DELAY_MICROS = 5` microseconds (e.g. `Tm1637(4,SimpleTmi,5us)`
-  and `Tm1637(4,SimpleTmiFast,5us)`). The `flush()` or `flushIncremental()`
-  durations are almost a factor of 10X to 20X shorter compared to `DELAY_MICROS
-  = 100`.
+  numbers for `DELAY_MICROS = 5` microseconds (e.g.
+  `Tm1637(4,SimpleTmi1637,5us)` and `Tm1637(4,SimpleTmi1637Fast,5us)`). The
+  `flush()` or `flushIncremental()` durations are almost a factor of 10X to 20X
+  shorter compared to `DELAY_MICROS = 100`.
 
 **v0.7:**
 
@@ -163,7 +163,7 @@ number of `TimingStats::update()` calls that were made.
     * On SAMD21 and STM32, the runtime of the `Ht16k33Module(TwoWire)` seems to
       depend on whether an actual HT16K33 LED module is attached to the I2C bus.
         * SAMD21: the transmission time becomes 50X longer *without* the LED
-          module attached. 
+          module attached.
         * STM32, the transmission time becomes 30-40X shorter *without* the LED
           module attached.
         * I think this is because the `<Wire.h>` library on the SAMD21 and STM32
@@ -208,7 +208,7 @@ number of `TimingStats::update()` calls that were made.
       Teensy 3.2, where `SimpleWireInterface` becomes competitive with 400 kHz
       of `<Wire.h>`.
 
-**v0.8+**
+**v0.9**
 
 * Remove `virtual` keyword from `LedModule` methods.
     * No significant changes in execution time.
@@ -247,10 +247,10 @@ The following tables show the number of microseconds taken by:
     * Sends digits in the buffer to the TM1637 LED module using the I2C-like
       protocol.
     * Results for two values of `DELAY_MICROS` are collected:
-        * SimpleTmi: software bigbanging the TM1637 protocol using
+        * SimpleTmi1637: software bigbanging the TM1637 protocol using
           `digitalWrite()` with a `delayMicros` of 100  microseconds or 5
           microseconds
-        * SimpleTmiFast: software bigbanging the TM1637 protocol using
+        * SimpleTmi1637Fast: software bigbanging the TM1637 protocol using
           `<digitalWriteFast.h>` and a `DELAY_MICROS` of 100  microseconds or 5
           microseconds
 * `Max7219Module::flush()`

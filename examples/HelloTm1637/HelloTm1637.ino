@@ -1,14 +1,14 @@
 /*
  * Write digits 0-3 into a 4-digit LED module using the TM1637 chip, set the
  * brightness, then render it by flushing the data bits to the TM1637 controller
- * using the SimpleTmiInterface class from the AceTMI library.
+ * using the SimpleTmi1637Interface class from the AceTMI library.
  */
 
 #include <Arduino.h>
-#include <AceTMI.h> // SimpleTmiInterface
+#include <AceTMI.h> // SimpleTmi1637Interface
 #include <AceSegment.h> // Tm1637Module
 
-using ace_tmi::SimpleTmiInterface;
+using ace_tmi::SimpleTmi1637Interface;
 using ace_segment::Tm1637Module;
 
 // Replace these with the PIN numbers of your dev board.
@@ -22,7 +22,7 @@ const uint8_t NUM_DIGITS = 4;
 // 1-5 micros.
 const uint8_t DELAY_MICROS = 100;
 
-using TmiInterface = SimpleTmiInterface;
+using TmiInterface = SimpleTmi1637Interface;
 TmiInterface tmiInterface(DIO_PIN, CLK_PIN, DELAY_MICROS);
 Tm1637Module<TmiInterface, NUM_DIGITS> ledModule(tmiInterface);
 

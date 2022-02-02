@@ -9,8 +9,8 @@ sizeof(DirectModule<4>): 35
 sizeof(DirectFast4Module<...>): 29
 sizeof(HybridModule<SimpleSpiInterface, 4>): 35
 sizeof(Hc595Module<SimpleSpiInterface, 8>): 51
-sizeof(Tm1637Module<SimpleTmiInterface, 4>): 17
-sizeof(Tm1637Module<SimpleTmiInterface, 6>): 19
+sizeof(Tm1637Module<SimpleTmi1637Interface, 4>): 17
+sizeof(Tm1637Module<SimpleTmi1637Interface, 6>): 19
 sizeof(Tm1638Module<SimpleTmi1638Interface, 8>): 21
 sizeof(Max7219Module<SimpleSpiInterface, 8>): 19
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 14
@@ -36,14 +36,14 @@ Hc595(8,SimpleSpi) 252 256 268 80
 Hc595(8,SimpleSpi,subfields) 4 36 264 1280
 Hc595(8,SimpleSpiFast) 24 26 36 80
 Hc595(8,SimpleSpiFast,subfields) 4 9 40 1280
-Tm1637(4,SimpleTmi,100us) 22436 22444 22452 10
-Tm1637(4,SimpleTmi,100us,incremental) 3636 8851 10164 50
-Tm1637(4,SimpleTmiFast,100us) 21172 21182 21192 10
-Tm1637(4,SimpleTmiFast,100us,incremental) 3428 8354 9596 50
-Tm1637(4,SimpleTmi,5us) 2264 2266 2276 10
-Tm1637(4,SimpleTmi,5us,incremental) 364 896 1032 50
-Tm1637(4,SimpleTmiFast,5us) 1004 1007 1008 10
-Tm1637(4,SimpleTmiFast,5us,incremental) 164 399 468 50
+Tm1637(4,SimpleTmi1637,100us) 22436 22444 22452 10
+Tm1637(4,SimpleTmi1637,100us,incremental) 3636 8851 10164 50
+Tm1637(4,SimpleTmi1637Fast,100us) 21172 21182 21192 10
+Tm1637(4,SimpleTmi1637Fast,100us,incremental) 3428 8354 9596 50
+Tm1637(4,SimpleTmi1637,5us) 2264 2266 2276 10
+Tm1637(4,SimpleTmi1637,5us,incremental) 364 896 1032 50
+Tm1637(4,SimpleTmi1637Fast,5us) 1004 1007 1008 10
+Tm1637(4,SimpleTmi1637Fast,5us,incremental) 164 399 468 50
 Tm1638(8,SimpleTmi1638,1us) 2924 2932 2936 10
 Tm1638(8,SimpleTmi1638Fast,1us) 292 298 308 10
 Max7219(8,HardSpi) 232 236 244 20
