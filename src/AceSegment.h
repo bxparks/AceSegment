@@ -58,6 +58,7 @@ SOFTWARE.
 #include "ace_segment/hybrid/HybridModule.h"
 #include "ace_segment/hc595/Hc595Module.h"
 #include "ace_segment/tm1637/Tm1637Module.h"
+#include "ace_segment/tm1638/Tm1638Module.h"
 #include "ace_segment/max7219/Max7219Module.h"
 #include "ace_segment/ht16k33/Ht16k33Module.h"
 
