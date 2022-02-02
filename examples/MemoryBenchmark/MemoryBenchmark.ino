@@ -28,13 +28,15 @@
 #define FEATURE_HC595_SIMPLE_SPI_FAST 10
 #define FEATURE_TM1637_TMI 11
 #define FEATURE_TM1637_TMI_FAST 12
-#define FEATURE_MAX7219_HARD_SPI 13
-#define FEATURE_MAX7219_HARD_SPI_FAST 14
-#define FEATURE_MAX7219_SIMPLE_SPI 15
-#define FEATURE_MAX7219_SIMPLE_SPI_FAST 16
-#define FEATURE_HT16K33_TWO_WIRE 17
-#define FEATURE_HT16K33_SIMPLE_WIRE 18
-#define FEATURE_HT16K33_SIMPLE_WIRE_FAST 19
+#define FEATURE_TM1638_TMI_1638 13
+#define FEATURE_TM1638_TMI_1638_FAST 14
+#define FEATURE_MAX7219_HARD_SPI 15
+#define FEATURE_MAX7219_HARD_SPI_FAST 16
+#define FEATURE_MAX7219_SIMPLE_SPI 17
+#define FEATURE_MAX7219_SIMPLE_SPI_FAST 18
+#define FEATURE_HT16K33_TWO_WIRE 19
+#define FEATURE_HT16K33_SIMPLE_WIRE 20
+#define FEATURE_HT16K33_SIMPLE_WIRE_FAST 21
 
 // A volatile integer to prevent the compiler from optimizing away the entire
 // program.
@@ -50,6 +52,7 @@ volatile int disableCompilerOptimization = 0;
     #include <ace_spi/SimpleSpiFastInterface.h>
     #include <ace_spi/HardSpiFastInterface.h>
     #include <ace_tmi/SimpleTmiFastInterface.h>
+    #include <ace_tmi/SimpleTmi1638FastInterface.h>
     #include <ace_segment/direct/DirectFast4Module.h>
   #endif
   using namespace ace_segment;
@@ -72,9 +75,10 @@ volatile int disableCompilerOptimization = 0;
   const uint8_t DATA_PIN = MOSI; // DS on 74HC595
   const uint8_t CLOCK_PIN = SCK; // SH_CP on 74HC595
 
-  // TM1637
+  // TM1637, TM1638
   const uint8_t CLK_PIN = 16;
   const uint8_t DIO_PIN = 10;
+  const uint8_t STB_PIN = 11;
   const uint8_t BIT_DELAY = 100;
 
   // HT16K33
@@ -232,6 +236,21 @@ volatile int disableCompilerOptimization = 0;
     using TmiInterface = SimpleTmiFastInterface<DIO_PIN, CLK_PIN, BIT_DELAY>;
     TmiInterface tmiInterface;
     Tm1637Module<TmiInterface, NUM_DIGITS> tm1637Module(tmiInterface);
+
+  #elif FEATURE == FEATURE_TM1638_TMI_1638
+    using TmiInterface = SimpleTmi1638Interface;
+    TmiInterface tmiInterface(DIO_PIN, CLK_PIN, STB_PIN, BIT_DELAY);
+    Tm1638Module<TmiInterface, NUM_DIGITS> tm1638Module(tmiInterface);
+
+  #elif FEATURE == FEATURE_TM1638_TMI_1638_FAST
+    #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
+      #error Unsupported FEATURE on this platform
+    #endif
+
+    using TmiInterface = SimpleTmi1638FastInterface<
+        DIO_PIN, CLK_PIN, STB_PIN, BIT_DELAY>;
+    TmiInterface tmiInterface;
+    Tm1638Module<TmiInterface, NUM_DIGITS> tm1638Module(tmiInterface);
 
   #elif FEATURE == FEATURE_MAX7219_HARD_SPI
     using SpiInterface = HardSpiInterface<SPIClass>;
@@ -435,6 +454,14 @@ void loop() {
 #elif FEATURE == FEATURE_TM1637_TMI_FAST
   tm1637Module.setPatternAt(0, 0xff);
   tm1637Module.flush();
+
+#elif FEATURE == FEATURE_TM1638_TMI_1638
+  tm1638Module.setPatternAt(0, 0xff);
+  tm1638Module.flush();
+
+#elif FEATURE == FEATURE_TM1638_TMI_1638_FAST
+  tm1638Module.setPatternAt(0, 0xff);
+  tm1638Module.flush();
 
 #elif FEATURE == FEATURE_MAX7219_SIMPLE_SPI
   max7219Module.setPatternAt(0, 0xff);
