@@ -24,7 +24,7 @@ using ace_segment::LedModule;
 using ace_segment::Tm1638Module;
 
 // Set to 1 to get diagnostic info.
-#define ENABLE_SERIAL_DEBUG 1
+#define ENABLE_SERIAL_DEBUG 0
 
 // Select TM1638 protocol version, either SimpleTmi1638Interface or
 // SimpleTmi1638FastInterface.

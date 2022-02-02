@@ -1,6 +1,13 @@
 # Changelog
 
 * Unreleased
+    * Add support for TM1638 LED modules using the `Tm1638Module`.
+    * Upgrade tool chain:
+        * Arduino IDE from 1.8.13 to 1.8.19
+        * Arduino AVR from 1.8.3 to 1.8.4
+        * STM32duino from 2.0.0 to 2.2.0
+        * ESP32 from 1.0.6 to 2.0.2
+        * Teensyduino from 1.53 to 1.56
 * 0.9.1 (2021-08-17)
     * Internal updates to maintain compatibility with changes in AceTMI, AceSPI,
       and AceWire.

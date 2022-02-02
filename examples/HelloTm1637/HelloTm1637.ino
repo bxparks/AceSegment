@@ -9,7 +9,6 @@
 #include <AceSegment.h> // Tm1637Module
 
 using ace_tmi::SimpleTmiInterface;
-using ace_segment::LedModule;
 using ace_segment::Tm1637Module;
 
 // Replace these with the PIN numbers of your dev board.
