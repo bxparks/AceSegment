@@ -323,23 +323,23 @@ libraries (AceTMI, AceSPI, AceWire, AceSegmentWriter) looks something like this:
 --------------------------------|----------------------------------------------
                                 |                          (hardware dependent)
                                 |
-      +-----------+-------------+------------+------------+-------------+
-      |           |             |            |            |             |
+      +-----------+-------------+-------------+-------------+-----------+
+      |           |             |             |             |           |
 Tm1637Module  Max7219Module Hc595Module HybridModule Ht16k33Module DirectModule
-Tm1638Module             \       |         /              |
-      |                   \      |        /               |
-      v                    v     v       v                v
-+---------------------+ +---------------------+ +----------------------+
-| AceTMI library      | | AceSPI library      | | AceWire library      |
-|---------------------| |---------------------| |----------------------|
-| SimpleTmiI'face     | | HardSpiI'face       | | TwoWireI'face        |
-| SimpleTmiFastI'face | | HardSpiFastI'face   | | SimpleWireI'face     |
-+---------------------+ | SimpleSpiI'face     | | SimpleWireFastI'face |
-                        | SimpleSpiFastI'face | +----------------------+
-                        +---------------------+         |
-                                |                       |
-                                v                       v
-                             <SPI.h>                 <Wire.h>
+Tm1638Module              \     |            /              |
+      |                    \    |           /               |
+      v                     v   v          v                v
++-------------------------+ +---------------------+ +----------------------+
+| AceTMI library          | | AceSPI library      | | AceWire library      |
+|-------------------------| |---------------------| |----------------------|
+| SimpleTmi1637I'face     | | HardSpiI'face       | | TwoWireI'face        |
+| SimpleTmi1637FastI'face | | HardSpiFastI'face   | | SimpleWireI'face     |
+| SimpleTmi1638I'face     | | SimpleSpiI'face     | | SimpleWireFastI'face |
+| SimpleTmi1638FastI'face | | SimpleSpiFastI'face | +----------------------+
++-------------------------+ +---------------------+         |
+                                    |                       |
+                                    v                       v
+                                 <SPI.h>                 <Wire.h>
 ```
 
 (The actual dependency among various classes is a bit more complicated than this
