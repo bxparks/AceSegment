@@ -68,21 +68,16 @@ const uint8_t NUM_DIGITS = 8;
 
 #elif defined(AUNITER_STM32_TM1638)
   #define TMI_INTERFACE_TYPE TMI_INTERFACE_TYPE_NORMAL
-  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
 
-  #if SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_PRIMARY
-    // SPI1 pins (default)
-    const uint8_t CLK_PIN = SCK;
-    const uint8_t DIO_PIN = MOSI;
-    const uint8_t STB_PIN = SS;
-  #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
-    // SPI2 pins
-    const uint8_t CLK_PIN = PB13;
-    const uint8_t DIO_PIN = PB15;
-    const uint8_t STB_PIN = PB12;
-  #else
-    #error Unknown SPI_INSTANCE_TYPE
-  #endif
+  // This dev board uses the primary SPI1 pins.
+  const uint8_t CLK_PIN = SCK;
+  const uint8_t DIO_PIN = MOSI;
+  const uint8_t STB_PIN = SS;
+
+  // These are the secondary SPI2 pins for reference.
+  // const uint8_t CLK_PIN = PB13;
+  // const uint8_t DIO_PIN = PB15;
+  // const uint8_t STB_PIN = PB12;
 
 #elif defined(AUNITER_D1MINI_LARGE_TM1638)
   #define TMI_INTERFACE_TYPE TMI_INTERFACE_TYPE_NORMAL
@@ -93,23 +88,15 @@ const uint8_t NUM_DIGITS = 8;
 
 #elif defined(AUNITER_ESP32_TM1638)
   #define TMI_INTERFACE_TYPE TMI_INTERFACE_TYPE_NORMAL
-  // My dev board uses HSPI.
-  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_SECONDARY
+  // This dev board uses the secondary HSPI pins.
+  const uint8_t CLK_PIN = 14;
+  const uint8_t DIO_PIN = 13;
+  const uint8_t STB_PIN = 15;
 
-  #if SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_PRIMARY
-    // VSPI pins (default)
-    const uint8_t CLK_PIN = SCK;
-    const uint8_t DIO_PIN = MOSI;
-    const uint8_t STB_PIN = SS;
-  #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
-    // HSPI pins
-    const uint8_t CLK_PIN = 14;
-    const uint8_t DIO_PIN = 13;
-    const uint8_t STB_PIN = 15;
-    SPIClass spiInstance(HSPI);
-  #else
-    #error Unknown SPI_INSTANCE_TYPE
-  #endif
+  // These are the pimary VSPI pins for reference.
+  // const uint8_t CLK_PIN = SCK;
+  // const uint8_t DIO_PIN = MOSI;
+  // const uint8_t STB_PIN = SS;
 
 #else
   #error Unknown AUNITER environment

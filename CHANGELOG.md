@@ -1,6 +1,7 @@
 # Changelog
 
 * Unreleased
+    * Fix invalid pins in `examples/Tm1638Demo` on ESP32 dev board.
 * 0.11.0 (2022-02-02)
     * **Breaking Change** Upgrade to AceTMI v0.5 which renames TM1637 classes
       to be consistent with the TM1638 classes:

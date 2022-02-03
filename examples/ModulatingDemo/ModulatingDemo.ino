@@ -68,12 +68,6 @@ using ace_segment::Hc595Module;
 #define INTERFACE_TYPE_HARD_SPI 2
 #define INTERFACE_TYPE_HARD_SPI_FAST 3
 
-// Some microcontrollers have 2 or more SPI buses. PRIMARY selects the default.
-// SECONDARY selects the alternate. I don't have a board with more than 2, but
-// we could add additional options here if needed.
-#define SPI_INSTANCE_TYPE_PRIMARY 0
-#define SPI_INSTANCE_TYPE_SECONDARY 1
-
 //------------------------------------------------------------------
 // Hardware environment configuration.
 //------------------------------------------------------------------
@@ -172,23 +166,18 @@ using ace_segment::Hc595Module;
   const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
-  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
 
-  #if SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_PRIMARY
-    // SPI1 pins (default)
-    const uint8_t LATCH_PIN = SS;
-    const uint8_t DATA_PIN = MOSI;
-    const uint8_t CLOCK_PIN = SCK;
-    SPIClass& spiInstance = SPI;
-  #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
-    // SPI2 pins
-    const uint8_t LATCH_PIN = PB12;
-    const uint8_t DATA_PIN = PB15;
-    const uint8_t CLOCK_PIN = PB13;
-    SPIClass spiInstance(DATA_PIN, PB14 /*miso*/, CLOCK_PIN);
-  #else
-    #error Unknown SPI_INSTANCE_TYPE
-  #endif
+  // This dev board uses the primary SPI1 pins.
+  const uint8_t LATCH_PIN = SS;
+  const uint8_t DATA_PIN = MOSI;
+  const uint8_t CLOCK_PIN = SCK;
+  SPIClass& spiInstance = SPI;
+
+  // These are the secondar SPI2 pins for reference.
+  // const uint8_t LATCH_PIN = PB12;
+  // const uint8_t DATA_PIN = PB15;
+  // const uint8_t CLOCK_PIN = PB13;
+  // SPIClass spiInstance(DATA_PIN, PB14 /*miso*/, CLOCK_PIN);
 
 #elif defined(AUNITER_D1MINI_LARGE_HC595)
   #define LED_DISPLAY_TYPE LED_DISPLAY_TYPE_HC595
@@ -215,24 +204,17 @@ using ace_segment::Hc595Module;
   const uint8_t* const REMAP_ARRAY = kDigitRemapArray8Hc595;
 
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
-  // My dev board uses HSPI.
-  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_SECONDARY
+  // This dev board uses the secondary HSPI pins.
+  const uint8_t LATCH_PIN = 15;
+  const uint8_t DATA_PIN = 13;
+  const uint8_t CLOCK_PIN = 14;
+  SPIClass spiInstance(HSPI);
 
-  #if SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_PRIMARY
-    // VSPI pins (default)
-    const uint8_t LATCH_PIN = SS;
-    const uint8_t DATA_PIN = MOSI;
-    const uint8_t CLOCK_PIN = SCK;
-    SPIClass& spiInstance = SPI;
-  #elif SPI_INSTANCE_TYPE == SPI_INSTANCE_TYPE_SECONDARY
-    // HSPI pins
-    const uint8_t LATCH_PIN = 15;
-    const uint8_t DATA_PIN = 13;
-    const uint8_t CLOCK_PIN = 14;
-    SPIClass spiInstance(HSPI);
-  #else
-    #error Unknown SPI_INSTANCE_TYPE
-  #endif
+  // These are the secondary VSPI pins for reference.
+  // const uint8_t LATCH_PIN = SS;
+  // const uint8_t DATA_PIN = MOSI;
+  // const uint8_t CLOCK_PIN = SCK;
+  // SPIClass& spiInstance = SPI;
 
 #else
   #error Unsupported AUNITER environment
