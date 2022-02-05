@@ -174,6 +174,39 @@ class Tm1638Module : public LedModule {
       clearBrightnessDirty();
     }
 
+    //-----------------------------------------------------------------------
+    // Methods related to buttons
+    //-----------------------------------------------------------------------
+
+    /**
+     * Read the 4 bytes with key information. Use little-endian ordering since
+     * the bits in each byte come out of the device in LSBFIRST order. In other
+     * words, first byte is the least signficant byte of the 32-bit result, and
+     * bit0 of the first byte is the first bit that streamed out of the device.
+     */
+    uint32_t readButtons() const {
+      mTmiInterface.beginTransaction();
+      mTmiInterface.write(kDataCmdReadKeys);
+
+      // The datasheet says that at least 2 micros are needed between the
+      // write() and the read(). On some microcontrollers (e.g. AVR), the
+      // accuracy of delayMicroseconds() is terrible for small values. So let's
+      // use 3 micros just in case.
+      delayMicroseconds(3);
+
+      uint8_t byte1 = mTmiInterface.read();
+      uint8_t byte2 = mTmiInterface.read();
+      uint8_t byte3 = mTmiInterface.read();
+      uint8_t byte4 = mTmiInterface.read();
+      mTmiInterface.endTransaction();
+
+      uint32_t data = ((uint32_t) byte4 << 24)
+          | ((uint32_t) byte3 << 16)
+          | ((uint32_t) byte2 << 8)
+          | (uint32_t) byte1;
+      return data;
+    }
+
   private:
     /** Convert a logical position into the physical position. */
     uint8_t remapLogicalToPhysical(uint8_t pos) const {

@@ -222,7 +222,7 @@ The following example sketches are provided:
         * render two TM1637 LED modules at the same time using two
           `Tm1637Module` instances
     * [ModulatingDemo.ino](examples/ModulatingDemo)
-        * demo of brightness control on a per-digit basis using `DirectModule`,
+        * Demo of brightness control on a per-digit basis using `DirectModule`,
           `HybridModule`, or `Hc595Module`
     * [ScanningDemo.ino](examples/ScanningDemo)
         * Low-level demo `ScanningModule` combined with various
@@ -237,6 +237,10 @@ The following example sketches are provided:
         * CAUTION: See note about interrupt-safety at the top of the
           [Hc595InterruptDemo.ino](examples/Hc595InterruptDemo/Hc595InterruptDemo.ino)
           file.
+    * [Tm1638ButtonDemo.ino](examples/Tm1638ButtonDemo)
+        * Demo of keypad button scanning on the TM1638.
+        * Reads the 8 buttons on the TM1638 LED module, and displays the
+          state of the buttons on each digit of the LED display.
 * Benchmarks
     * [AutoBenchmark.ino](examples/AutoBenchmark): performs CPU benchmarking of
       most of the supported configurations of the framework
@@ -2347,7 +2351,10 @@ them.
     * The TM1638 chip supports up to 10 segments per digit, but AceSegment
     * supports only 8 segments per digit.
 * Some LED controllers (e.g. TM1637, TM1638, HT16K33) have hardware support for
-  scanning key matrices. AceSegment does not support this feature.
+  scanning key matrices.
+    * Only partial support for key scanning have been added, e.g.
+      `Tm1638Module::readButtons()`.
+    * This functionality has not been extensively tested.
 
 <a name="AlternativeLibraries"></a>
 ## Alternative Libraries
