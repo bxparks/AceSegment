@@ -68,7 +68,7 @@ class Tm1638Module : public LedModule {
      * Constructor.
      * @param tmiInterface instance of TM1638 interface class
      * @param remapArray (optional, nullable) a mapping of the logical digit
-     *    positions to their physical positions, coudl beuseful for 8-digt LED
+     *    positions to their physical positions, could be useful for 8-digt LED
      *    modules whose digits are wired out of order
      */
     explicit Tm1638Module(
