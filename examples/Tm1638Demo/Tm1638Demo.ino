@@ -184,7 +184,7 @@ void flushModule() {
   if ((uint16_t) (nowMillis - prevFlushMillis) >= 100) {
     prevFlushMillis = nowMillis;
 
-    // Flush incrementally, and measure the time.
+    // Flush and measure the time.
     uint16_t startMicros = micros();
     ledModule.flush();
     uint16_t elapsedMicros = (uint16_t) micros() - startMicros;
