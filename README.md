@@ -266,14 +266,17 @@ end-users, listed roughly from low-level classes to higher-level classes:
             * `SimpleSpiInterface`: software SPI with `digitalWrite()`
             * `SimpleSpiFastInterface`: software SPI with `digitalWriteFast()`
     * [AceTMI](https://github.com/bxparks/AceTMI)
-        * Provides communication to the TM1637 controller chip needed by the
-          `Tm1637Module`
-        * There are 2 implementations:
+        * Provides communication to the TM1637 and TM1638 controller chips
+          needed by the `Tm1637Module` and `Tm1638Module`.
+        * There are 4 implementations:
             * `SimpleTmi1637Interface`: using `digitalWrite()`
             * `SimpleTmi1637FastInterface`: using `digitalWriteFast()`
+            * `SimpleTmi1638Interface`: using `digitalWrite()`
+            * `SimpleTmi1638FastInterface`: using `digitalWriteFast()`
     * [AceWire](https://github.com/bxparks/AceWire)
         * Provides the I2C communication classes Used by `Ht16k33Module`.
-        * There are 3 implementations:
+        * Currently, it provides access to at least 10 I2C implementations, but
+          the 3 that I recommend in most cases are:
             * `TwoWireInterface`: native `<Wire.h>`
             * `SimpleWireInterface`: software I2C using `digitalWrite()`
             * `SimpleWireFastInterface`: software I2C using `digitalWriteFast()`
@@ -282,6 +285,8 @@ end-users, listed roughly from low-level classes to higher-level classes:
       seven-segment LED module.
     * `Tm1637Module`
         * An implementation using a TM1637 controller.
+    * `Tm1638Module`
+        * An implementation using a TM1638 controller.
     * `Max7219Module`
         * An implementation using a MAX7219 controller.
     * `Ht16k33Module`
@@ -830,21 +835,25 @@ The range of the `brightness` parameter is determined by the underlying
 controller chip:
 
 * TM1637
-    * Supports 8 levels from 0 to 7, with 0 turning off the display and 7 being
-      the brightest.
+    * Supports 8 levels from 0 to 7, where 0 is the dimmest (but not off) and 7
+      is the brightest.
+* TM1638
+    * Supports 8 levels from 0 to 7, where 0 is the dimmest (but not off) and 7
+      is the brightest.
 * MAX7219
-    * Supports 16 levels from 0 to 15, with 0 being the dimmest level (which
-      does not turn off the display), and 15 being the brightest.
+    * Supports 16 levels from 0 to 15, where 0 is the dimmest (but not off), and
+      15 is the brightest.
 * HT16K33
-    * Supports 16 levels from 0 to 15, with 0 being the dimmest level (which
-      does not turn off the display), and 15 being the brightest.
+    * Supports 16 levels from 0 to 15, where 0 is the dimmest level (but not
+      off) and 15 being the brightest.
 * 74HC595
     * The brightness is controlled directly by the microcontroller using pulse
       width modulation (PWM).
     * The range of values could theoretically be from 0 to 255, but in practice,
       it is limited by the speed of the microcontroller and the speed of the SPI
-      transfer to the 74HC595 chip. A brightness range of 0-7 or 0-15 seems
-      practical for most configurations.
+      transfer to the 74HC595 chip.
+    * A brightness range of 0-7 or 0-15 seems practical for most configurations.
+    * A value of 0 turns off the display.
 
 If brightness control is enabled on the LED module using the 74HC595 chip, it
 can also support brightness control on a per-digit basis. But the interface for
@@ -1106,13 +1115,13 @@ milliseconds instead of 22 milliseconds.
 LED modules based on the Titan TM1638 controller chips are available on Amazon
 and eBay. There seems to be 2 kinds:
 
-* one with an 8-digit LED display with 8 microswitches and an additional set of
+* an 8-digit LED display with 8 microswitches and an additional set of
   8 discrete LEDs
-* one with an 8-digit LED display with 16 microswitches but no other LEDs
+* an 8-digit LED display with 16 microswitches but no other LEDs
 
 I have tested only the one with the 8 buttons so far. The TM1638 controller chip
-supports 10 LED segments on each digit. The dedicate LEDs are connected to the
-9th bit of each digit.
+supports 10 LED segments on each digit. The discrete LEDs are connected to bit8
+of each digit.
 
 The `Tm1638Module` class looks like this:
 
@@ -1408,7 +1417,7 @@ class Ht16k33Module : public LedModule {
 
 The `T_WIREI` template parameter is the class name of the Wire interface from
 the [AceWire](https://github.com/bxparks/AceWire) library which provides 3
-implementations: `TwoWireInterface`, `SimpleWireInterface`, and
+implementations of interest: `TwoWireInterface`, `SimpleWireInterface`, and
 `SimpleWireFastInterface`.
 
 The `T_DIGITS` template parameter is the number of digits in the module. I have
@@ -1618,7 +1627,7 @@ See the section below for an explanation.
 ### 74HC595 Module With 8 Digits
 
 The configuration of the `Hc595Module` class for the 8-digit module looks like
-this (c.f. [examples/Hc595Demo](examples/Hc595Demo):
+this (c.f. [examples/Hc595Demo](examples/Hc595Demo)):
 
 ```C++
 #include <Arduino.h>
@@ -2260,7 +2269,6 @@ These boards are tested on each release:
 
 * Arduino Nano (16 MHz ATmega328P)
 * SparkFun Pro Micro (16 MHz ATmega32U4)
-* SAMD21 M0 Mini (48 MHz ARM Cortex-M0+)
 * STM32 Blue Pill (STM32F103C8, 72 MHz ARM Cortex-M3)
 * NodeMCU 1.0 (ESP-12E module, 80MHz ESP8266)
 * WeMos D1 Mini (ESP-12E module, 80 MHz ESP8266)
