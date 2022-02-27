@@ -274,7 +274,7 @@ end-users, listed roughly from low-level classes to higher-level classes:
             * `SimpleTmi1638Interface`: using `digitalWrite()`
             * `SimpleTmi1638FastInterface`: using `digitalWriteFast()`
     * [AceWire](https://github.com/bxparks/AceWire)
-        * Provides the I2C communication classes Used by `Ht16k33Module`.
+        * Provides the I2C communication classes used by `Ht16k33Module`.
         * Currently, it provides access to at least 10 I2C implementations, but
           the 3 that I recommend in most cases are:
             * `TwoWireInterface`: native `<Wire.h>`
@@ -1196,7 +1196,7 @@ not be needed.
 <a name="Tm1638Module8"></a>
 #### TM1638 Module With 8 Digits
 
-![TM1638 LED Module](docs/tm1638/tm1638_8_buttons_sample.jpg)
+![TM1638 LED Module](docs/tm1638/tm1638_8_buttons_full.jpg)
 
 The configuration of the `Tm1638Module` class for the 8-digit module looks like
 this (c.f. [examples/Tm1638Demo](examples/Tm1638Demo)):
@@ -2357,7 +2357,7 @@ them.
       supports only 8 segments per digit.
 * `Tm1638Module`
     * The TM1638 chip supports up to 10 segments per digit, but AceSegment
-    * supports only 8 segments per digit.
+      supports only 8 segments per digit.
 * Some LED controllers (e.g. TM1637, TM1638, HT16K33) have hardware support for
   scanning key matrices.
     * Only partial support for key scanning have been added, e.g.
