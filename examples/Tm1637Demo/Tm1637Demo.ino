@@ -7,6 +7,7 @@
  *
  *  * AUNITER_MICRO_TM1637: SparkFun Pro Micro + 4-digit LED module
  *  * AUNITER_MICRO_TM1637_6: SparkFun Pro Micro + 6-digit LED module
+ *  * AUNITER_MICRO_TM1637_6B: SparkFun Pro Micro + another 6-digit LED module
  *  * AUNITER_SAMD_TM1637: SAMD21 M0 Mini + 4-digit LED module
  *  * AUNITER_STM32_TM1637: STM32 F1 Blue Pill + 4-digit LED module
  *  * AUNITER_D1MINI_LARGE_TM1637: WeMos D1 Mini ESP8266
@@ -63,6 +64,14 @@ using ace_segment::kDigitRemapArray6Tm1637;
 #elif defined(AUNITER_MICRO_TM1637_6)
   #define TMI_INTERFACE_TYPE TMI_INTERFACE_TYPE_FAST
   #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
+
+  const uint8_t CLK_PIN = A0;
+  const uint8_t DIO_PIN = 9;
+  const uint8_t NUM_DIGITS = 6;
+
+#elif defined(AUNITER_MICRO_TM1637_6B)
+  #define TMI_INTERFACE_TYPE TMI_INTERFACE_TYPE_FAST
+  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_NORMAL
 
   const uint8_t CLK_PIN = A0;
   const uint8_t DIO_PIN = 9;
