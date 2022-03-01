@@ -1122,7 +1122,7 @@ void loop() {
 <a name="Tm1637Module6Buttons"></a>
 #### TM1637 Module With 6 Digits and 6 Buttons
 
-![TM1637 LED Module](docs/tm1637/TM1637_module_6_buttons_medium.jpg)
+![TM1637 LED Module](docs/tm1637/TM1637_6_buttons_medium.jpg)
 
 This module is similar to the 6-digit module described above, with the following
 difference:
