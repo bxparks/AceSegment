@@ -17,13 +17,27 @@ of LED displays:
 The first 5 types are readily available from retail outlets such as Amazon and
 eBay, in multiple colors and sizes. They look like these:
 
-![TM1637 LED Module](docs/tm1637/tm1637_sample.jpg)
+**TM1637**
 
-![TM1638 LED Module](docs/tm1638/tm1638_8_buttons_sample.jpg)
+![TM1637 Module 4 Digits](docs/tm1637/tm1637_4_digits_small.jpg)
+![TM1637 Module 6 Digits](docs/tm1637/tm1637_6_digits_small.jpg)
+![TM1637 Module 4 Digits Alt](docs/tm1637/tm1637_4_digits_alt_small.jpg)
+![TM1637 Module 6 Digits 6 Buttons](docs/tm1637/TM1637_6_buttons_small.jpg)
 
-![MAX7219 LED Module](docs/max7219/max7219_sample.jpg)
+**TM1638**
 
-![HT16K33 LED Module](docs/ht16k33/ht16k33_sample.jpg)
+![TM1638 Module 8 Buttons](docs/tm1638/tm1638_8_buttons_small.jpg)
+![TM1638 Module 16 Buttons](docs/tm1638/tm1638-16-buttons-small.jpg)
+
+**MAX7219**
+
+![MAX7219 Module](docs/max7219/max7219_8_digits_small.jpg)
+
+**HT16K33**
+
+![HT16K33 Module](docs/ht16k33/ht16k33_4_digits_small.jpg)
+
+**74HC595**
 
 ![HC595 LED Module](docs/hc595/hc595_sample.jpg)
 
@@ -31,7 +45,13 @@ The final 2 types of modules (hybrid and directly connected) are usually custom
 creations. Here is an example of an LED module that I built myself a few years
 ago using a single 74HC595 chips and 4 transistors:
 
-![Custom Module](docs/custom_modules/custom_module_sample.jpg)
+**Hybrid**
+
+![Hybrid Module](docs/custom_modules/hybrid_module_front_small.jpg)
+
+**Direct**
+
+![Direct Module](docs/custom_modules/direct_module_front_small.jpg)
 
 The AceSegment library hopes to support as many seven-segment displays as
 practical within a single framework. Different types of seven-segment LED
