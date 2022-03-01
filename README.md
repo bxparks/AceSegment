@@ -39,7 +39,7 @@ eBay, in multiple colors and sizes. They look like these:
 
 **74HC595**
 
-![HC595 LED Module](docs/hc595/hc595_sample.jpg)
+![HC595 Module](docs/hc595/hc595_8_digits_small.jpg)
 
 The final 2 types of modules (hybrid and directly connected) are usually custom
 creations. Here is an example of an LED module that I built myself a few years
