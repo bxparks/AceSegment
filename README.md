@@ -79,6 +79,7 @@ if nothing is used from the `<Wire.h>` library.)
     * [Tm1637Module](#Tm1637Module)
         * [TM1637 Module With 4 Digits](#Tm1637Module4)
         * [TM1637 Module With 6 Digits](#Tm1637Module6)
+        * [TM1637 Module With 6 Digits and 6 Buttons](#Tm1637Module6Buttons)
         * [TM1637 Capacitor Removal](#Tm1637CapacitorRemoval)
     * [Tm1638Module](#Tm1638Module)
         * [TM1638 Module With 8 Digits](#Tm1638Module8)
@@ -1096,6 +1097,22 @@ void loop() {
   ...
 }
 ```
+
+<a name="Tm1637Module6Buttons"></a>
+#### TM1637 Module With 6 Digits and 6 Buttons
+
+![TM1637 LED Module](docs/tm1637/TM1637_module_6_buttons_medium.jpg)
+
+This module is similar to the 6-digit module described above, with the following
+difference:
+
+* Its digits do *not* need to be remapped, so you can omit the
+  `kDigitRemapArray6Tm1637` parameter from the code example above.
+* It does not have 10nF capacitors on the DIO and CLK lines, so the `BIT_DELAY`
+  can be as short as 4-5 microseconds.
+* It comes with 6 buttons, which can be read through the
+  `Tm1637Module::readButtons()` method. See
+  [Tm1637ButtonDemo](examples/Tm1637ButtonDemo/) for details.
 
 <a name="Tm1637CapacitorRemoval"></a>
 #### TM1637 Capacitor Removal
