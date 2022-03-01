@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.11.0</span>
+   &#160;<span id="projectnumber">0.12.0</span>
    </div>
    <div id="projectbrief">A library for rendering seven segment LED displays using the TM1637, TM1638, MAX7219, HT16K33, or 74HC595 controller chips</div>
   </td>
@@ -71,6 +71,7 @@ $(function() {
 , <a class="el" href="classace__segment_1_1LedModule.html#a99ce3bfda3383cef80302a91ea5ca651">ace_segment::LedModule</a>
 , <a class="el" href="classace__segment_1_1ScanningModule.html#ac0cf47c36ecb0529da5f99a0a8d1d503">ace_segment::ScanningModule&lt; T_LM, T_DIGITS, T_SUBFIELDS, T_CI &gt;</a>
 , <a class="el" href="classace__segment_1_1Tm1637Module.html#a4d398081a200564a787b2ebee1e7a699">ace_segment::Tm1637Module&lt; T_TMII, T_DIGITS &gt;</a>
+, <a class="el" href="classace__segment_1_1Tm1638AnodeModule.html#a61b584f9f27721a0d32cc6389b31254d">ace_segment::Tm1638AnodeModule&lt; T_TMII, T_DIGITS &gt;</a>
 , <a class="el" href="classace__segment_1_1Tm1638Module.html#a85d70e6b376f26dc64e3ff95f27dca70">ace_segment::Tm1638Module&lt; T_TMII, T_DIGITS &gt;</a>
 </li>
 </ul>
@@ -121,6 +122,7 @@ $(function() {
 , <a class="el" href="classace__segment_1_1LedModule.html#a21e81151039cccd5ba4332af79767955">ace_segment::LedModule</a>
 , <a class="el" href="classace__segment_1_1ScanningModule.html#a1bc81a7c5ac4c1d5ee6e2d90259e606c">ace_segment::ScanningModule&lt; T_LM, T_DIGITS, T_SUBFIELDS, T_CI &gt;</a>
 , <a class="el" href="classace__segment_1_1Tm1637Module.html#a7d731aa467e81a7be1f06bcffb2a5f64">ace_segment::Tm1637Module&lt; T_TMII, T_DIGITS &gt;</a>
+, <a class="el" href="classace__segment_1_1Tm1638AnodeModule.html#a06e443014ab65d00e678eabe5900a2a0">ace_segment::Tm1638AnodeModule&lt; T_TMII, T_DIGITS &gt;</a>
 , <a class="el" href="classace__segment_1_1Tm1638Module.html#a6d35f2434766035242f715e6700d57c3">ace_segment::Tm1638Module&lt; T_TMII, T_DIGITS &gt;</a>
 </li>
 </ul>
@@ -131,6 +133,7 @@ $(function() {
 : <a class="el" href="classace__segment_1_1Ht16k33Module.html#ad9225465a7ce3fa621eb8505edb77f6a">ace_segment::Ht16k33Module&lt; T_WIREI, T_DIGITS &gt;</a>
 , <a class="el" href="classace__segment_1_1Max7219Module.html#af8b588c48e73e6883948eb8159982a1c">ace_segment::Max7219Module&lt; T_SPII, T_DIGITS &gt;</a>
 , <a class="el" href="classace__segment_1_1Tm1637Module.html#af3a100b0d07125af76aaf8ea10bc597c">ace_segment::Tm1637Module&lt; T_TMII, T_DIGITS &gt;</a>
+, <a class="el" href="classace__segment_1_1Tm1638AnodeModule.html#a7b94991afe9a3146bd7d418ff3c516b3">ace_segment::Tm1638AnodeModule&lt; T_TMII, T_DIGITS &gt;</a>
 , <a class="el" href="classace__segment_1_1Tm1638Module.html#a76c67711f28cc6b5eba38681b62c4d4d">ace_segment::Tm1638Module&lt; T_TMII, T_DIGITS &gt;</a>
 </li>
 <li>flushIncremental()
@@ -188,6 +191,7 @@ $(function() {
 : <a class="el" href="classace__segment_1_1Ht16k33Module.html#a97e16c862a4d92012e6758fc6955017d">ace_segment::Ht16k33Module&lt; T_WIREI, T_DIGITS &gt;</a>
 , <a class="el" href="classace__segment_1_1Max7219Module.html#aa7616e49e1df60d54553c2ca8c18ef25">ace_segment::Max7219Module&lt; T_SPII, T_DIGITS &gt;</a>
 , <a class="el" href="classace__segment_1_1Tm1637Module.html#a97c42e50234ac856880703978b1dcaac">ace_segment::Tm1637Module&lt; T_TMII, T_DIGITS &gt;</a>
+, <a class="el" href="classace__segment_1_1Tm1638AnodeModule.html#a2ace022bd79065841684954b76beff7d">ace_segment::Tm1638AnodeModule&lt; T_TMII, T_DIGITS &gt;</a>
 , <a class="el" href="classace__segment_1_1Tm1638Module.html#af23a4e5cdf3ebada9f2631e156ff9bd3">ace_segment::Tm1638Module&lt; T_TMII, T_DIGITS &gt;</a>
 </li>
 </ul>
@@ -233,6 +237,11 @@ $(function() {
 
 
 <h3><a id="index_r"></a>- r -</h3><ul>
+<li>readButtons()
+: <a class="el" href="classace__segment_1_1Tm1637Module.html#a73fb704b87858583de50f61e52ff205a">ace_segment::Tm1637Module&lt; T_TMII, T_DIGITS &gt;</a>
+, <a class="el" href="classace__segment_1_1Tm1638AnodeModule.html#a7a7b28d3eb12629b522fd51a747a1ecf">ace_segment::Tm1638AnodeModule&lt; T_TMII, T_DIGITS &gt;</a>
+, <a class="el" href="classace__segment_1_1Tm1638Module.html#a8b8404c5c87a908aa2f81ef7af892d4b">ace_segment::Tm1638Module&lt; T_TMII, T_DIGITS &gt;</a>
+</li>
 <li>renderFieldNow()
 : <a class="el" href="classace__segment_1_1ScanningModule.html#ac6a00935339bb99f7a13e514a7252c77">ace_segment::ScanningModule&lt; T_LM, T_DIGITS, T_SUBFIELDS, T_CI &gt;</a>
 </li>
@@ -260,6 +269,7 @@ $(function() {
 </li>
 <li>setDisplayOn()
 : <a class="el" href="classace__segment_1_1Tm1637Module.html#ae86f7df1dc791d44feaad9253f6df184">ace_segment::Tm1637Module&lt; T_TMII, T_DIGITS &gt;</a>
+, <a class="el" href="classace__segment_1_1Tm1638AnodeModule.html#a49743e2eb9e819dc7ca97d069e26279a">ace_segment::Tm1638AnodeModule&lt; T_TMII, T_DIGITS &gt;</a>
 , <a class="el" href="classace__segment_1_1Tm1638Module.html#a982da0b0660d2dfcd8e1fcfdb1e8fdb6">ace_segment::Tm1638Module&lt; T_TMII, T_DIGITS &gt;</a>
 </li>
 <li>setPatternAt()
@@ -271,6 +281,9 @@ $(function() {
 <h3><a id="index_t"></a>- t -</h3><ul>
 <li>Tm1637Module()
 : <a class="el" href="classace__segment_1_1Tm1637Module.html#a9cc401ceeed8292b26a93d5dcc08312e">ace_segment::Tm1637Module&lt; T_TMII, T_DIGITS &gt;</a>
+</li>
+<li>Tm1638AnodeModule()
+: <a class="el" href="classace__segment_1_1Tm1638AnodeModule.html#aa981626f917c6e7bacec2e2643042797">ace_segment::Tm1638AnodeModule&lt; T_TMII, T_DIGITS &gt;</a>
 </li>
 <li>Tm1638Module()
 : <a class="el" href="classace__segment_1_1Tm1638Module.html#a0fdb90f996a0f47838a76bc500550fd4">ace_segment::Tm1638Module&lt; T_TMII, T_DIGITS &gt;</a>

@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.11.0</span>
+   &#160;<span id="projectnumber">0.12.0</span>
    </div>
    <div id="projectbrief">A library for rendering seven segment LED displays using the TM1637, TM1638, MAX7219, HT16K33, or 74HC595 controller chips</div>
   </td>
@@ -231,7 +231,7 @@ class ace_segment::ScanningModule&lt; T_LM, T_DIGITS, T_SUBFIELDS, T_CI &gt;</h3
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ScanningModule_8h_source.html#l00081">81</a> of file <a class="el" href="ScanningModule_8h_source.html">ScanningModule.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ScanningModule_8h_source.html#l00082">82</a> of file <a class="el" href="ScanningModule_8h_source.html">ScanningModule.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="aa4e9ffaca62613fa76e885565716e5a4"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa4e9ffaca62613fa76e885565716e5a4">&#9670;&nbsp;</a></span>ScanningModule()</h2>
@@ -281,7 +281,7 @@ template&lt;typename T_LM , uint8_t T_DIGITS, uint8_t T_SUBFIELDS = 1, typename 
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="ScanningModule_8h_source.html#l00094">94</a> of file <a class="el" href="ScanningModule_8h_source.html">ScanningModule.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ScanningModule_8h_source.html#l00095">95</a> of file <a class="el" href="ScanningModule_8h_source.html">ScanningModule.h</a>.</p>
 
 </div>
 </div>
@@ -314,7 +314,7 @@ template&lt;typename T_LM , uint8_t T_DIGITS, uint8_t T_SUBFIELDS = 1, typename 
 <p>Configure the driver with the parameters given by in the constructor. </p>
 <p>Normally, this should be called only once after construction. Unit tests will sometimes change a parameter of FakeDriver and call this a second time. </p>
 
-<p class="definition">Definition at line <a class="el" href="ScanningModule_8h_source.html#l00109">109</a> of file <a class="el" href="ScanningModule_8h_source.html">ScanningModule.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ScanningModule_8h_source.html#l00110">110</a> of file <a class="el" href="ScanningModule_8h_source.html">ScanningModule.h</a>.</p>
 
 </div>
 </div>
@@ -346,7 +346,7 @@ template&lt;typename T_LM , uint8_t T_DIGITS, uint8_t T_SUBFIELDS = 1, typename 
 <p>Return micros per field. </p>
 <p>This is how often <a class="el" href="classace__segment_1_1ScanningModule.html#ac6a00935339bb99f7a13e514a7252c77" title="Render the current field immediately.">renderFieldNow()</a> must be called from a timer interrupt. </p>
 
-<p class="definition">Definition at line <a class="el" href="ScanningModule_8h_source.html#l00190">190</a> of file <a class="el" href="ScanningModule_8h_source.html">ScanningModule.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ScanningModule_8h_source.html#l00192">192</a> of file <a class="el" href="ScanningModule_8h_source.html">ScanningModule.h</a>.</p>
 
 </div>
 </div>
@@ -379,7 +379,7 @@ template&lt;typename T_LM , uint8_t T_DIGITS, uint8_t T_SUBFIELDS = 1, typename 
 <p>If modulation is off (i.e. T_SUBFIELDS == 1), then the field corresponds to the single digit. If modulation is enabled (T_SUBFIELDS &gt; 1), then each digit is PWM modulated over T_SUBFIELDS number of renderings.</p>
 <p>This method is intended to be called directly from a timer interrupt handler. </p>
 
-<p class="definition">Definition at line <a class="el" href="ScanningModule_8h_source.html#l00221">221</a> of file <a class="el" href="ScanningModule_8h_source.html">ScanningModule.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ScanningModule_8h_source.html#l00223">223</a> of file <a class="el" href="ScanningModule_8h_source.html">ScanningModule.h</a>.</p>
 
 </div>
 </div>
@@ -412,7 +412,7 @@ template&lt;typename T_LM , uint8_t T_DIGITS, uint8_t T_SUBFIELDS = 1, typename 
 <p>This is a polling method, so call this slightly more frequently than <a class="el" href="classace__segment_1_1ScanningModule.html#a11de5fb5716aa5650406994ca827a7c7" title="Return the fields per second.">getFieldsPerSecond()</a> per second.</p>
 <dl class="section return"><dt>Returns</dt><dd>Returns true if <a class="el" href="classace__segment_1_1ScanningModule.html#ac6a00935339bb99f7a13e514a7252c77" title="Render the current field immediately.">renderFieldNow()</a> was called and the field was rendered. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="ScanningModule_8h_source.html#l00200">200</a> of file <a class="el" href="ScanningModule_8h_source.html">ScanningModule.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ScanningModule_8h_source.html#l00202">202</a> of file <a class="el" href="ScanningModule_8h_source.html">ScanningModule.h</a>.</p>
 
 </div>
 </div>
@@ -457,7 +457,7 @@ template&lt;typename T_LM , uint8_t T_DIGITS, uint8_t T_SUBFIELDS = 1, typename 
 <p>The maximum brightness should is exactly <code>T_SUBFIELDS</code> which turns on the LED 100% of the time. The minimum brightness is 0, which turns OFF the digit. For example, if <code>T_SUBFIELDS==16</code>, the the maximum brightness is 16 which turns ON the digit 100% of the time. The relative brightness of each brightness level is in units of 1/T_SUBFIELDS.</p>
 <p>The brightness scale is <em>not</em> normalized to [0,255]. A previous version of this class tried to do that, but I found that this introduced discretization errors which made it difficult to control the brightness at intermediate values. For example, suppose T_SUBFIELDS=16. If we changed the normalized brightness value from 32 to 40, it was impossible to determine without actually running the program if the 2 values actually differed in brightness. Instead, the calling program is expected to keep track of the value of T_SUBFIELDS, and create an array of brightness values in these raw units. The side benefit of using raw brightness values is that it makes displayCurrentFieldModulated() easier to implement. </p>
 
-<p class="definition">Definition at line <a class="el" href="ScanningModule_8h_source.html#l00164">164</a> of file <a class="el" href="ScanningModule_8h_source.html">ScanningModule.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ScanningModule_8h_source.html#l00166">166</a> of file <a class="el" href="ScanningModule_8h_source.html">ScanningModule.h</a>.</p>
 
 </div>
 </div>
