@@ -25,8 +25,9 @@ SOFTWARE.
 #ifndef ACE_SEGMENT_TM1638_MODULE_H
 #define ACE_SEGMENT_TM1638_MODULE_H
 
-#include <Arduino.h>
-#include <AceCommon.h> // incrementMod()
+#include <stdint.h>
+#include <string.h> // memset()
+#include <Arduino.h> // delayMicroseconds()
 #include "../LedModule.h"
 
 class Tm1638ModuleTest_flushIncremental;
@@ -68,8 +69,8 @@ class Tm1638Module : public LedModule {
      * Constructor.
      * @param tmiInterface instance of TM1638 interface class
      * @param remapArray (optional, nullable) a mapping of the logical digit
-     *    positions to their physical positions, could be useful for 8-digt LED
-     *    modules whose digits are wired out of order
+     *    positions to their physical positions, useful for 8-digt LED modules
+     *    whose digits are wired out of order
      */
     explicit Tm1638Module(
         const T_TMII& tmiInterface,
@@ -93,7 +94,6 @@ class Tm1638Module : public LedModule {
 
       memset(mPatterns, 0, T_DIGITS);
       setDisplayOn(true);
-      setBrightness(0x7);
     }
 
     /** Signal end of usage. Currently does nothing. */

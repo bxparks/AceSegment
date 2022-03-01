@@ -25,7 +25,7 @@ SOFTWARE.
 #ifndef ACE_SEGMENT_TM1637_MODULE_H
 #define ACE_SEGMENT_TM1637_MODULE_H
 
-#include <Arduino.h>
+#include <string.h> // memset()
 #include <AceCommon.h> // incrementMod()
 #include "../LedModule.h"
 
@@ -80,7 +80,7 @@ class Tm1637Module : public LedModule {
      * @param tmiInterface instance of TM1637 interface class
      * @param remapArray (optional, nullable) a mapping of the logical digit
      *    positions to their physical positions, useful for 6-digt LED modules
-     *    using the TM1637 chip whose digits are wired out of order
+     *    whose digits are wired out of order
      */
     explicit Tm1637Module(
         const T_TMII& tmiInterface,
@@ -96,15 +96,14 @@ class Tm1637Module : public LedModule {
     //-----------------------------------------------------------------------
 
     /**
-     * Initialize the module. The SimpleTmi1637Interface object must be
-     * initialized separately.
+     * Initialize the module. The SimpleTmi1637Interface or
+     * SimpleTmi1637FastInterface object must be initialized separately.
      */
     void begin() {
       LedModule::begin();
 
       memset(mPatterns, 0, T_DIGITS);
       setDisplayOn(true);
-      setBrightness(0x7);
       mFlushStage = 0;
     }
 
