@@ -224,6 +224,7 @@ The following example sketches are provided:
 * Intermediate
     * [Tm1637Demo.ino](examples/Tm1637Demo)
     * [Tm1638Demo.ino](examples/Tm1638Demo)
+    * [Tm1638AnodeDemo.ino](examples/Tm1638AnodeDemo)
     * [Max7219Demo.ino](examples/Max7219Demo)
     * [Ht16k33Demo.ino](examples/Ht16k33Demo)
     * [Hc595Demo.ino](examples/Hc595Demo)
@@ -362,8 +363,9 @@ libraries (AceTMI, AceSPI, AceWire, AceSegmentWriter) looks something like this:
       |           |             |             |             |           |
 Tm1637Module  Max7219Module Hc595Module HybridModule Ht16k33Module DirectModule
 Tm1638Module              \     |            /              |
-      |                    \    |           /               |
-      v                     v   v          v                v
+Tm1638AnodeModule          \    |           /               |
+      |                     \   |          /                |
+      v                      v  v         v                 v
 +-------------------------+ +---------------------+ +----------------------+
 | AceTMI library          | | AceSPI library      | | AceWire library      |
 |-------------------------| |---------------------| |----------------------|
