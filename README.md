@@ -82,7 +82,8 @@ if nothing is used from the `<Wire.h>` library.)
         * [TM1637 Module With 6 Digits and 6 Buttons](#Tm1637Module6Buttons)
         * [TM1637 Capacitor Removal](#Tm1637CapacitorRemoval)
     * [Tm1638Module](#Tm1638Module)
-        * [TM1638 Module With 8 Digits](#Tm1638Module8)
+        * [TM1638 Module With 8 Digits and 8 Buttons](#Tm1638Module8Buttons)
+        * [TM1638 Module With 8 Digits and 16 Buttons](#Tm1638Module16Buttons)
     * [Max7219Module](#Max7219Module)
         * [MAX7219 Module With 8 Digits](#Max7219Module8)
     * [Ht16k33Module](#Ht16k33Module)
@@ -1216,10 +1217,13 @@ of sync with the internal state (e.g. if the module loses power or the
 communication becomes corrupted). In simple applications, this optimization may
 not be needed.
 
-<a name="Tm1638Module8"></a>
-#### TM1638 Module With 8 Digits
+<a name="Tm1638Module8Buttons"></a>
+#### TM1638 Module With 8 Digits and 8 Buttons
 
 ![TM1638 LED Module](docs/tm1638/tm1638_8_buttons_medium.jpg)
+
+This LED module uses a TM1638 chip with an 8-digit Common Cathode LED module. So
+the segment pattern layout is similar to most of the other modules.
 
 The configuration of the `Tm1638Module` class for the 8-digit module looks like
 this (c.f. [examples/Tm1638Demo](examples/Tm1638Demo)):
@@ -1240,6 +1244,63 @@ const uint8_t NUM_DIGITS = 8;
 using TmiInterface = SimpleTmi1638Interface;
 TmiInterface tmiInterface(DIO_PIN, CLK_PIN, STB_PIN, BIT_DELAY);
 Tm1638Module<TmiInterface, NUM_DIGITS> ledModule(tmiInterface);
+
+void setupAceSegment() {
+  tmiInterface.begin();
+  ledModule.begin();
+}
+
+// Flush to LED module every 100 millis.
+void flushModule() {
+  static uint16_t prevFlushMillis;
+
+  uint16_t nowMillis = millis();
+  if ((uint16_t) (nowMillis - prevFlushMillis) >= 100) {
+    prevFlushMillis = nowMillis;
+    ledModule.flush();
+  }
+}
+
+void setup() {
+  setupAceSegment();
+  ...
+}
+
+void loop() {
+  flushModule();
+  ...
+}
+```
+
+<a name="Tm1638Module16Buttons"></a>
+#### TM1638 Module With 8 Digits and 16 Buttons
+
+![TM1638 LED Module](docs/tm1638/tm1638-16-buttons-medium.jpg)
+
+This LED module uses a TM1638 chip with an 8-digit Common **Anode** LED module.
+This requires using the `Tm1638AnodeModule` class instead of the `Tm1638Module`
+class.
+
+The configuration of the `Tm1638AnodeModule` class is basically identical to
+the `Tm1638Module` class (c.f.
+[examples/Tm1638AnodeDemo](examples/Tm1638AnodeDemo)):
+
+```C++
+#include <Arduino.h>
+#include <AceTMI.h>
+#include <AceSegment.h>
+using ace_tmi::SimpleTmi1638Interface;
+using ace_segment::Tm1638AnodeModule;
+
+const uint8_t CLK_PIN = SCK;
+const uint8_t DIO_PIN = MOSI;
+const uint8_t STB_PIN = SS;
+const uint8_t BIT_DELAY = 1;
+const uint8_t NUM_DIGITS = 8;
+
+using TmiInterface = SimpleTmi1638Interface;
+TmiInterface tmiInterface(DIO_PIN, CLK_PIN, STB_PIN, BIT_DELAY);
+Tm1638AnodeModule<TmiInterface, NUM_DIGITS> ledModule(tmiInterface);
 
 void setupAceSegment() {
   tmiInterface.begin();

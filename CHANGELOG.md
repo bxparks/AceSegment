@@ -13,6 +13,13 @@
         * Returns a `uint8_t` encoded with the location of the single button
           that was pressed. TM1637 supports only a single button pressed at
           once.
+    * Add `Tm1638AnodeModule` which handles a TM1638 LED using Common Anode LEDs
+      instead of the usual Common Cathode.
+        * The `SEGn` and `GRn` lines are switched, so the
+          `Tm1638AnodeModule::flush()` has to loop over the same segment for
+          all the digits to construct the `GRIDn` byte to send to the controller
+          chip.
+        * Add `examples/Tm1638AnodeDemo`.
 * 0.11.0 (2022-02-02)
     * **Breaking Change** Upgrade to AceTMI v0.5 which renames TM1637 classes
       to be consistent with the TM1638 classes:
