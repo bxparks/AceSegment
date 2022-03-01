@@ -14,13 +14,13 @@
 #include <Arduino.h>
 #include <AceCommon.h> // incrementMod()
 #include <AceTMI.h> // SimpleTmi1638Interface
-#include <AceSegment.h> // Tm1638Module
+#include <AceSegment.h> // Tm1638AnodeModule
 
 using ace_common::incrementMod;
 using ace_common::incrementModOffset;
 using ace_common::TimingStats;
 using ace_tmi::SimpleTmi1638Interface;
-using ace_segment::Tm1638Module;
+using ace_segment::Tm1638AnodeModule;
 
 // Set to 1 to get diagnostic info.
 #define ENABLE_SERIAL_DEBUG 0
@@ -125,7 +125,7 @@ const uint8_t DELAY_MICROS = 1;
   #error Unknown TMI_INTERFACE_TYPE
 #endif
 
-Tm1638Module<Tmi1638Interface, NUM_DIGITS> ledModule(tmiInterface);
+Tm1638AnodeModule<Tmi1638Interface, NUM_DIGITS> ledModule(tmiInterface);
 
 void setupAceSegment() {
   tmiInterface.begin();
