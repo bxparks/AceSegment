@@ -720,6 +720,36 @@ void runTm1638SimpleTmiFast() {
 }
 #endif
 
+void runTm1638AnodeSimpleTmi() {
+  using TmiInterface = SimpleTmi1638Interface;
+  TmiInterface tmiInterface(DIO_PIN, CLK_PIN, STB_PIN, BIT_DELAY_TM1638);
+  tmiInterface.begin();
+
+  Tm1638AnodeModule<TmiInterface, 8> tm1638Module(tmiInterface);
+  tm1638Module.begin();
+  runTm1638Benchmark(F("Tm1638Anode(8,SimpleTmi1638,1us)"), tm1638Module, 8);
+  tm1638Module.end();
+
+  tmiInterface.end();
+}
+
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+void runTm1638AnodeSimpleTmiFast() {
+  using TmiInterface = SimpleTmi1638FastInterface<
+      DIO_PIN, CLK_PIN, STB_PIN, BIT_DELAY_TM1638>;
+  TmiInterface tmiInterface;
+  tmiInterface.begin();
+
+  Tm1638AnodeModule<TmiInterface, 8> tm1638Module(tmiInterface);
+  tm1638Module.begin();
+  runTm1638Benchmark(
+      F("Tm1638Anode(8,SimpleTmi1638Fast,1us)"), tm1638Module, 8);
+  tm1638Module.end();
+
+  tmiInterface.end();
+}
+#endif
+
 //-----------------------------------------------------------------------------
 // MAX7219 LED Modules
 //-----------------------------------------------------------------------------
@@ -929,6 +959,12 @@ void runBenchmarks() {
   runTm1638SimpleTmiFast();
 #endif
 
+  // Tm1638AnodeModule
+  runTm1638AnodeSimpleTmi();
+#if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
+  runTm1638AnodeSimpleTmiFast();
+#endif
+
   // Max7219Module
   runMax7219HardSpi();
 #if defined(ARDUINO_ARCH_AVR) || defined(EPOXY_DUINO)
@@ -1014,6 +1050,11 @@ void printSizeOf() {
   SERIAL_PORT_MONITOR.print(
       F("sizeof(Tm1638Module<SimpleTmi1638Interface, 8>): "));
   SERIAL_PORT_MONITOR.println(sizeof(Tm1638Module<SimpleTmi1638Interface, 8>));
+
+  SERIAL_PORT_MONITOR.print(
+      F("sizeof(Tm1638AnodeModule<SimpleTmi1638Interface, 8>): "));
+  SERIAL_PORT_MONITOR.println(
+      sizeof(Tm1638AnodeModule<SimpleTmi1638Interface, 8>));
 
   SERIAL_PORT_MONITOR.print(
       F("sizeof(Max7219Module<SimpleSpiInterface, 8>): "));

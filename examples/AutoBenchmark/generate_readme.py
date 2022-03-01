@@ -53,7 +53,7 @@ LED module:
 * `Ht16k33Module::flush()`
     * Sends out the buffered digits using I2C
 
-**Version**: AceSegment v0.11.0
+**Version**: AceSegment v0.12.0
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -214,6 +214,15 @@ number of `TimingStats::update()` calls that were made.
     * No significant changes in execution time.
 * Templatize Writer classes on `T_LED_MODULE` instead of hardcoded `LedModule`.
     * No significant changes in execution time.
+
+**v0.12**
+
+* Add `Tm1638AnodeModule`.
+    * On 8-bit processors, this is slightly slower than `Tm1638Module` because
+      of the extra loop required for each `GRIDn` byte.
+    * On 32-bit processors, the loop happens so quickly, it's hardly noticeable.
+    * The majority of the time is spent on the `bitDelay()` between bit
+      transitions in the protocol.
 
 ## Results
 
