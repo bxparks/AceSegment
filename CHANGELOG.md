@@ -3,10 +3,16 @@
 * Unreleased
     * Fix invalid pins in `examples/Tm1638Demo` on ESP32 dev board.
     * Add `uint32_t Tm1638Module::readButtons()` method.
-        * Calls `SimpleTmiInterface::read()` to read the keypad scans from the
-          TM1638 controller.
+        * Calls `SimpleTmi1638Interface::read()` to read the keypad scans from
+          the TM1638 controller.
         * Returns a `uint32_t` encoded with the states of the 3x8=24 possible
           buttons supported by the TM1638.
+    * Add `uint8_t Tm1637Module::readButtons()` method.
+        * Calls `SimpleTmi1637Interface::read()` to read the keypad scans from
+          the TM1638 controller.
+        * Returns a `uint8_t` encoded with the location of the single button
+          that was pressed. TM1637 supports only a single button pressed at
+          once.
 * 0.11.0 (2022-02-02)
     * **Breaking Change** Upgrade to AceTMI v0.5 which renames TM1637 classes
       to be consistent with the TM1638 classes:

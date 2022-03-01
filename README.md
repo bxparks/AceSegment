@@ -79,6 +79,7 @@ if nothing is used from the `<Wire.h>` library.)
     * [Tm1637Module](#Tm1637Module)
         * [TM1637 Module With 4 Digits](#Tm1637Module4)
         * [TM1637 Module With 6 Digits](#Tm1637Module6)
+        * [TM1637 Module With 6 Digits and 6 Buttons](#Tm1637Module6Buttons)
         * [TM1637 Capacitor Removal](#Tm1637CapacitorRemoval)
     * [Tm1638Module](#Tm1638Module)
         * [TM1638 Module With 8 Digits](#Tm1638Module8)
@@ -237,6 +238,10 @@ The following example sketches are provided:
         * CAUTION: See note about interrupt-safety at the top of the
           [Hc595InterruptDemo.ino](examples/Hc595InterruptDemo/Hc595InterruptDemo.ino)
           file.
+    * [Tm1637ButtonDemo.ino](examples/Tm1637ButtonDemo)
+        * Demo of keypad button scanning on the TM1637.
+        * Reads the 6 buttons on the TM1637 LED module, and displays which
+          button was pressed.
     * [Tm1638ButtonDemo.ino](examples/Tm1638ButtonDemo)
         * Demo of keypad button scanning on the TM1638.
         * Reads the 8 buttons on the TM1638 LED module, and displays the
@@ -837,9 +842,11 @@ controller chip:
 * TM1637
     * Supports 8 levels from 0 to 7, where 0 is the dimmest (but not off) and 7
       is the brightest.
+    * Supports 2x8 buttons through the `readButtons()` method.
 * TM1638
     * Supports 8 levels from 0 to 7, where 0 is the dimmest (but not off) and 7
       is the brightest.
+    * Supports 3x8 buttons through the `readButtons()` method.
 * MAX7219
     * Supports 16 levels from 0 to 15, where 0 is the dimmest (but not off), and
       15 is the brightest.
@@ -1090,6 +1097,22 @@ void loop() {
   ...
 }
 ```
+
+<a name="Tm1637Module6Buttons"></a>
+#### TM1637 Module With 6 Digits and 6 Buttons
+
+![TM1637 LED Module](docs/tm1637/TM1637_module_6_buttons_medium.jpg)
+
+This module is similar to the 6-digit module described above, with the following
+difference:
+
+* Its digits do *not* need to be remapped, so you can omit the
+  `kDigitRemapArray6Tm1637` parameter from the code example above.
+* It does not have 10nF capacitors on the DIO and CLK lines, so the `BIT_DELAY`
+  can be as short as 4-5 microseconds.
+* It comes with 6 buttons, which can be read through the
+  `Tm1637Module::readButtons()` method. See
+  [Tm1637ButtonDemo](examples/Tm1637ButtonDemo/) for details.
 
 <a name="Tm1637CapacitorRemoval"></a>
 #### TM1637 Capacitor Removal
@@ -2358,10 +2381,10 @@ them.
 * `Tm1638Module`
     * The TM1638 chip supports up to 10 segments per digit, but AceSegment
       supports only 8 segments per digit.
-* Some LED controllers (e.g. TM1637, TM1638, HT16K33) have hardware support for
-  scanning key matrices.
-    * Only partial support for key scanning have been added, e.g.
-      `Tm1638Module::readButtons()`.
+* Partial support for reading buttons through the key scanning functionality
+  of some controller chips are available:
+    * `Tm1638Module::readButtons()`
+    * `Tm1637Module::readButtons()`
     * This functionality has not been extensively tested.
 
 <a name="AlternativeLibraries"></a>
