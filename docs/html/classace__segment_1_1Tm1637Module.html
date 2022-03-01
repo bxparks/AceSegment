@@ -22,7 +22,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">AceSegment
-   &#160;<span id="projectnumber">0.11.0</span>
+   &#160;<span id="projectnumber">0.12.0</span>
    </div>
    <div id="projectbrief">A library for rendering seven segment LED displays using the TM1637, TM1638, MAX7219, HT16K33, or 74HC595 controller chips</div>
   </td>
@@ -123,6 +123,9 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:a1bf9dcdafb5b1a08a18da697d29e5235"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1Tm1637Module.html#a1bf9dcdafb5b1a08a18da697d29e5235">flushIncremental</a> ()</td></tr>
 <tr class="memdesc:a1bf9dcdafb5b1a08a18da697d29e5235"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update only a single digit or the brightness.  <a href="classace__segment_1_1Tm1637Module.html#a1bf9dcdafb5b1a08a18da697d29e5235">More...</a><br /></td></tr>
 <tr class="separator:a1bf9dcdafb5b1a08a18da697d29e5235"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a73fb704b87858583de50f61e52ff205a"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1Tm1637Module.html#a73fb704b87858583de50f61e52ff205a">readButtons</a> () const</td></tr>
+<tr class="memdesc:a73fb704b87858583de50f61e52ff205a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the 1 byte with key scan with the bits coming out in LSBFIRST order with the following bits: <code>S0 S1 S2 K1 K2 X X X</code>.  <a href="classace__segment_1_1Tm1637Module.html#a73fb704b87858583de50f61e52ff205a">More...</a><br /></td></tr>
+<tr class="separator:a73fb704b87858583de50f61e52ff205a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classace__segment_1_1LedModule"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classace__segment_1_1LedModule')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classace__segment_1_1LedModule.html">ace_segment::LedModule</a></td></tr>
 <tr class="memitem:a4228fa75eb4c92c207423e91b755b05b inherit pub_methods_classace__segment_1_1LedModule"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classace__segment_1_1LedModule.html#a4228fa75eb4c92c207423e91b755b05b">LedModule</a> (uint8_t *patterns, uint8_t numDigits)</td></tr>
 <tr class="memdesc:a4228fa75eb4c92c207423e91b755b05b inherit pub_methods_classace__segment_1_1LedModule"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="classace__segment_1_1LedModule.html#a4228fa75eb4c92c207423e91b755b05b">More...</a><br /></td></tr>
@@ -255,7 +258,7 @@ template&lt;typename T_TMII , uint8_t T_DIGITS&gt; </div>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">tmiInterface</td><td>instance of TM1637 interface class </td></tr>
-    <tr><td class="paramname">remapArray</td><td>(optional, nullable) a mapping of the logical digit positions to their physical positions, useful for 6-digt LED modules using the TM1637 chip whose digits are wired out of order </td></tr>
+    <tr><td class="paramname">remapArray</td><td>(optional, nullable) a mapping of the logical digit positions to their physical positions, useful for 6-digt LED modules whose digits are wired out of order </td></tr>
   </table>
   </dd>
 </dl>
@@ -291,7 +294,7 @@ template&lt;typename T_TMII , uint8_t T_DIGITS&gt; </div>
 </div><div class="memdoc">
 
 <p>Initialize the module. </p>
-<p>The SimpleTmi1637Interface object must be initialized separately. </p>
+<p>The SimpleTmi1637Interface or SimpleTmi1637FastInterface object must be initialized separately. </p>
 
 <p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00102">102</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
 
@@ -325,7 +328,7 @@ template&lt;typename T_TMII , uint8_t T_DIGITS&gt; </div>
 <p>Signal end of usage. </p>
 <p>Currently does nothing. </p>
 
-<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00112">112</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00111">111</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
 
 </div>
 </div>
@@ -358,7 +361,7 @@ template&lt;typename T_TMII , uint8_t T_DIGITS&gt; </div>
 <p>Takes about 22 ms using a 100 microsecond delay.</p>
 <p>The <a class="el" href="classace__segment_1_1Tm1637Module.html#a97c42e50234ac856880703978b1dcaac" title="Return true if flushing required.">isFlushRequired()</a> method can be used to optimize the number of calls to <a class="el" href="classace__segment_1_1Tm1637Module.html#af3a100b0d07125af76aaf8ea10bc597c" title="Send segment patterns of all digits plus the brightness to the display.">flush()</a>, but often it is not necessary. </p>
 
-<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00145">145</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00144">144</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
 
 </div>
 </div>
@@ -396,7 +399,40 @@ template&lt;typename T_TMII , uint8_t T_DIGITS&gt; </div>
 <p>The incremental flushing must use fixed addressing mode to write specific digits, which adds extra commands to the wire protocol to the LED module. If this algorithm is used to send all the digits in one-shot, then this method is about 50% slower (30 ms), compared to <a class="el" href="classace__segment_1_1Tm1637Module.html#af3a100b0d07125af76aaf8ea10bc597c" title="Send segment patterns of all digits plus the brightness to the display.">flush()</a> (22 ms).</p>
 <p>Technical note: The TM1637 datasheet seems to suggest that the brightness must always be sent after a set of digits are sent. However, experimentation shows that the brightness can be sent as an independent transimission, so this method splits out each digit and the brightness as separate iterations. </p>
 
-<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00212">212</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00211">211</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
+
+</div>
+</div>
+<a id="a73fb704b87858583de50f61e52ff205a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a73fb704b87858583de50f61e52ff205a">&#9670;&nbsp;</a></span>readButtons()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T_TMII , uint8_t T_DIGITS&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint8_t <a class="el" href="classace__segment_1_1Tm1637Module.html">ace_segment::Tm1637Module</a>&lt; T_TMII, T_DIGITS &gt;::readButtons </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Read the 1 byte with key scan with the bits coming out in LSBFIRST order with the following bits: <code>S0 S1 S2 K1 K2 X X X</code>. </p>
+<p>The S0,S1,S2 bits are the binary encoding of one of the SG1 to SG8 segment lines using a 0-index, so SG1 is 0 and SG8 is 7. The K1 and K2 bits are not encoded and correspond directly to the K1 and K2 control lines.</p>
+<p>The Sn and Kn lines seem to be pulled up high, so when no buttons are pressed, the data value from the TM1637 controller is 0xFF. When a button is pressed, the corresponding Kn and Sn lines go to 0. For example, if the button on SG2 and K1 is pressed, the SG2 generates a bit pattern of <code>0b??101</code> and the K1 line corresponds to bit pattern <code>0b10???</code>, so when these are combined, the final button data is <code>0b11110101</code> or 0xF5. </p>
+
+<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00265">265</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
 
 </div>
 </div>
@@ -429,7 +465,7 @@ template&lt;typename T_TMII , uint8_t T_DIGITS&gt; </div>
 <p>Turn off the entire display. </p>
 <p>The brightness is not affected so when it is turned back on, the previous brightness will be used. </p>
 
-<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00124">124</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Tm1637Module_8h_source.html#l00123">123</a> of file <a class="el" href="Tm1637Module_8h_source.html">Tm1637Module.h</a>.</p>
 
 </div>
 </div>

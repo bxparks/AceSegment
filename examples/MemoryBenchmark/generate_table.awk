@@ -21,13 +21,15 @@ BEGIN {
   labels[12] = "Tm1637(SimpleTmi1637Fast)";
   labels[13] = "Tm1638(SimpleTmi1638)";
   labels[14] = "Tm1638(SimpleTmi1638Fast)";
-  labels[15] = "Max7219(HardSpi)";
-  labels[16] = "Max7219(HardSpiFast)";
-  labels[17] = "Max7219(SimpleSpi)";
-  labels[18] = "Max7219(SimpleSpiFast)";
-  labels[19] = "Ht16k33(TwoWire)";
-  labels[20] = "Ht16k33(SimpleWire)";
-  labels[21] = "Ht16k33(SimpleWireFast)";
+  labels[15] = "Tm1638Anode(SimpleTmi1638)";
+  labels[16] = "Tm1638Anode(SimpleTmi1638Fast)";
+  labels[17] = "Max7219(HardSpi)";
+  labels[18] = "Max7219(HardSpiFast)";
+  labels[19] = "Max7219(SimpleSpi)";
+  labels[20] = "Max7219(SimpleSpiFast)";
+  labels[21] = "Ht16k33(TwoWire)";
+  labels[22] = "Ht16k33(SimpleWire)";
+  labels[23] = "Ht16k33(SimpleWireFast)";
   record_index = 0
 }
 {

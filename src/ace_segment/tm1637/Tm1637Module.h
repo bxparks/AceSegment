@@ -25,7 +25,7 @@ SOFTWARE.
 #ifndef ACE_SEGMENT_TM1637_MODULE_H
 #define ACE_SEGMENT_TM1637_MODULE_H
 
-#include <Arduino.h>
+#include <string.h> // memset()
 #include <AceCommon.h> // incrementMod()
 #include "../LedModule.h"
 
@@ -80,7 +80,7 @@ class Tm1637Module : public LedModule {
      * @param tmiInterface instance of TM1637 interface class
      * @param remapArray (optional, nullable) a mapping of the logical digit
      *    positions to their physical positions, useful for 6-digt LED modules
-     *    using the TM1637 chip whose digits are wired out of order
+     *    whose digits are wired out of order
      */
     explicit Tm1637Module(
         const T_TMII& tmiInterface,
@@ -96,15 +96,14 @@ class Tm1637Module : public LedModule {
     //-----------------------------------------------------------------------
 
     /**
-     * Initialize the module. The SimpleTmi1637Interface object must be
-     * initialized separately.
+     * Initialize the module. The SimpleTmi1637Interface or
+     * SimpleTmi1637FastInterface object must be initialized separately.
      */
     void begin() {
       LedModule::begin();
 
       memset(mPatterns, 0, T_DIGITS);
       setDisplayOn(true);
-      setBrightness(0x7);
       mFlushStage = 0;
     }
 
@@ -243,6 +242,32 @@ class Tm1637Module : public LedModule {
 
       // An extra dirty bit is used for the brightness so use `T_DIGITS + 1`.
       ace_common::incrementMod(mFlushStage, (uint8_t) (T_DIGITS + 1));
+    }
+
+    //-----------------------------------------------------------------------
+    // Methods related to buttons
+    //-----------------------------------------------------------------------
+
+    /**
+     * Read the 1 byte with key scan with the bits coming out in LSBFIRST order
+     * with the following bits: `S0 S1 S2 K1 K2 X X X`. The S0,S1,S2 bits are
+     * the binary encoding of one of the SG1 to SG8 segment lines using a
+     * 0-index, so SG1 is 0 and SG8 is 7. The K1 and K2 bits are not encoded and
+     * correspond directly to the K1 and K2 control lines.
+     *
+     * The Sn and Kn lines seem to be pulled up high, so when no buttons are
+     * pressed, the data value from the TM1637 controller is 0xFF. When a button
+     * is pressed, the corresponding Kn and Sn lines go to 0. For example, if
+     * the button on SG2 and K1 is pressed, the SG2 generates a bit pattern of
+     * `0b??101` and the K1 line corresponds to bit pattern `0b10???`, so when
+     * these are combined, the final button data is `0b11110101` or 0xF5.
+     */
+    uint8_t readButtons() const {
+      mTmiInterface.startCondition();
+      mTmiInterface.write(kDataCmdReadKeys);
+      uint8_t data = mTmiInterface.read();
+      mTmiInterface.stopCondition();
+      return data;
     }
 
   private:

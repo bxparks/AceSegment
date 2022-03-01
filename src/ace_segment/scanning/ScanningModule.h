@@ -26,6 +26,7 @@ SOFTWARE.
 #define ACE_SEGMENT_SCANNING_MODULE_H
 
 #include <stdint.h>
+#include <string.h> // memset()
 #include <AceCommon.h> // incrementMod()
 #include "../hw/ClockInterface.h" // ClockInterface
 #include "../LedModule.h"
@@ -108,6 +109,7 @@ class ScanningModule : public LedModule {
      */
     void begin() {
       LedModule::begin();
+      memset(mPatterns, 0, T_DIGITS);
 
       // Set up durations for the renderFieldWhenReady() polling function.
       mMicrosPerField = (uint32_t) 1000000UL / getFieldsPerSecond();

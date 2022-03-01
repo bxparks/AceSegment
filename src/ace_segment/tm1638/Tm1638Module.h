@@ -25,8 +25,9 @@ SOFTWARE.
 #ifndef ACE_SEGMENT_TM1638_MODULE_H
 #define ACE_SEGMENT_TM1638_MODULE_H
 
-#include <Arduino.h>
-#include <AceCommon.h> // incrementMod()
+#include <stdint.h>
+#include <string.h> // memset()
+#include <Arduino.h> // delayMicroseconds()
 #include "../LedModule.h"
 
 class Tm1638ModuleTest_flushIncremental;
@@ -68,8 +69,8 @@ class Tm1638Module : public LedModule {
      * Constructor.
      * @param tmiInterface instance of TM1638 interface class
      * @param remapArray (optional, nullable) a mapping of the logical digit
-     *    positions to their physical positions, coudl beuseful for 8-digt LED
-     *    modules whose digits are wired out of order
+     *    positions to their physical positions, useful for 8-digt LED modules
+     *    whose digits are wired out of order
      */
     explicit Tm1638Module(
         const T_TMII& tmiInterface,
@@ -93,7 +94,6 @@ class Tm1638Module : public LedModule {
 
       memset(mPatterns, 0, T_DIGITS);
       setDisplayOn(true);
-      setBrightness(0x7);
     }
 
     /** Signal end of usage. Currently does nothing. */
@@ -172,6 +172,39 @@ class Tm1638Module : public LedModule {
 
       clearDigitsDirty();
       clearBrightnessDirty();
+    }
+
+    //-----------------------------------------------------------------------
+    // Methods related to buttons
+    //-----------------------------------------------------------------------
+
+    /**
+     * Read the 4 bytes with key information. Use little-endian ordering since
+     * the bits in each byte come out of the device in LSBFIRST order. In other
+     * words, first byte is the least signficant byte of the 32-bit result, and
+     * bit0 of the first byte is the first bit that streamed out of the device.
+     */
+    uint32_t readButtons() const {
+      mTmiInterface.beginTransaction();
+      mTmiInterface.write(kDataCmdReadKeys);
+
+      // The datasheet says that at least 2 micros are needed between the
+      // write() and the read(). On some microcontrollers (e.g. AVR), the
+      // accuracy of delayMicroseconds() is terrible for small values. So let's
+      // use 3 micros just in case.
+      delayMicroseconds(3);
+
+      uint8_t byte1 = mTmiInterface.read();
+      uint8_t byte2 = mTmiInterface.read();
+      uint8_t byte3 = mTmiInterface.read();
+      uint8_t byte4 = mTmiInterface.read();
+      mTmiInterface.endTransaction();
+
+      uint32_t data = ((uint32_t) byte4 << 24)
+          | ((uint32_t) byte3 << 16)
+          | ((uint32_t) byte2 << 8)
+          | (uint32_t) byte1;
+      return data;
     }
 
   private:

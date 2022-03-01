@@ -40,12 +40,6 @@ using ace_segment::kActiveHighPattern;
 #define INTERFACE_TYPE_SIMPLE_TMI 4
 #define INTERFACE_TYPE_SIMPLE_TMI_FAST 5
 
-// Some microcontrollers have 2 or more SPI buses. PRIMARY selects the default.
-// SECONDARY selects the alternate. I don't have a board with more than 2, but
-// we could add additional options here if needed.
-#define SPI_INSTANCE_TYPE_PRIMARY 0
-#define SPI_INSTANCE_TYPE_SECONDARY 1
-
 //----------------------------------------------------------------------------
 // Hardware configuration.
 //----------------------------------------------------------------------------
@@ -57,12 +51,10 @@ using ace_segment::kActiveHighPattern;
 
 #if defined(EPOXY_DUINO)
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
-  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
   SPIClass& spiInstance = SPI;
 
 #elif defined(AUNITER_MICRO_CUSTOM_SINGLE)
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI_FAST
-  #define SPI_INSTANCE_TYPE SPI_INSTANCE_TYPE_PRIMARY
   SPIClass& spiInstance = SPI;
 
 #else
