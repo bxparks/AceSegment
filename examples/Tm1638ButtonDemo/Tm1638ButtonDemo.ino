@@ -178,7 +178,19 @@ const uint8_t kButtonBitPosition[] = {
   0, 8, 16, 24, 4, 12, 20, 28
 };
 
-// Update the display with the key scan result.
+// Read buttons.
+//  * SparkFun Pro Micro: min/avg/max:752/757/764
+//  * ESP32: min/avg/max:241/243/246
+uint32_t readButtons() {
+  uint16_t startMicros = micros();
+  uint32_t buttonCode = ledModule.readButtons();
+  uint16_t elapsedMicros = (uint16_t) micros() - startMicros;
+  stats.update(elapsedMicros);
+  return buttonCode;
+}
+
+// Update the display with the key scan result. Display "0" if button is
+// unpressed; a "1" if corresponding button is pressed.
 void updateDisplay(uint32_t buttonCode) {
   for (uint8_t i = 0; i < NUM_BUTTONS; ++i) {
     uint32_t buttonMask = (uint32_t) 0x1 << kButtonBitPosition[i];
@@ -195,25 +207,14 @@ void updateDisplay(uint32_t buttonCode) {
 
 // Every 100 ms, read the buttons, update the display, and flush() to the LED
 // module which updates all digits, including brightness.
-void flushModule() {
+void update() {
   static uint16_t prevFlushMillis;
 
   uint16_t nowMillis = millis();
   if ((uint16_t) (nowMillis - prevFlushMillis) >= 100) {
     prevFlushMillis = nowMillis;
-
-    // Read buttons.
-    //  * SparkFun Pro Micro: min/avg/max:752/757/764
-    //  * ESP32: min/avg/max:241/243/246
-    uint16_t startMicros = micros();
-    uint32_t buttonCode = ledModule.readButtons();
-    uint16_t elapsedMicros = (uint16_t) micros() - startMicros;
-    stats.update(elapsedMicros);
-
-    // Update the LED display with button status (0 or 1).
+    uint32_t buttonCode = readButtons();
     updateDisplay(buttonCode);
-
-    // Flush the display.
     ledModule.flush();
   }
 }
@@ -255,6 +256,6 @@ void setup() {
 }
 
 void loop() {
-  flushModule();
+  update();
   printStats();
 }
