@@ -43,8 +43,8 @@ SOFTWARE.
 #endif
 
 // Version format: xxyyzz == "xx.yy.zz"
-#define ACE_SEGMENT_VERSION 1100
-#define ACE_SEGMENT_VERSION_STRING "0.11.0"
+#define ACE_SEGMENT_VERSION 1200
+#define ACE_SEGMENT_VERSION_STRING "0.12.0"
 
 #include "ace_segment/hw/ClockInterface.h"
 #include "ace_segment/hw/GpioInterface.h"

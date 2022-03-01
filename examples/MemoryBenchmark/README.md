@@ -14,7 +14,7 @@ by the runtime environment of the processor. For example, it often seems like
 the ESP8266 allocates flash memory in blocks of a certain quantity, so the
 calculated flash size can jump around in unexpected ways.
 
-**Version**: AceSegment v0.11.0
+**Version**: AceSegment v0.12.0
 
 **DO NOT EDIT**: This file was auto-generated using `make README.md`.
 
@@ -224,6 +224,10 @@ before substantional refactoring in 2021.
     * On 32-bit processors, no significant difference.
 * Add benchmarks for `Tm1638Module`.
 
+**v0.12**
+
+* Add `Tm1638AnodeModule`. Very similar to `Tm1638Module`.
+
 ## Results
 
 The following shows the flash and static memory sizes of the `MemoryBenchmark`
@@ -238,6 +242,7 @@ program for various LED modules.
 * `Hc595Module`
 * `Tm1637Module`
 * `Tm1638Module`
+* `Tm1638AnodeModule`
 * `Max7219Module`
 * `Ht16k33Module`
 

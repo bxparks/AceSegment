@@ -1,6 +1,7 @@
 # Changelog
 
 * Unreleased
+* 0.12.0 (2022-03-01)
     * Fix invalid pins in `examples/Tm1638Demo` on ESP32 dev board.
     * Add `uint32_t Tm1638Module::readButtons()` method.
         * Calls `SimpleTmi1638Interface::read()` to read the keypad scans from
@@ -13,8 +14,8 @@
         * Returns a `uint8_t` encoded with the location of the single button
           that was pressed. TM1637 supports only a single button pressed at
           once.
-    * Add `Tm1638AnodeModule` which handles a TM1638 LED using Common Anode LEDs
-      instead of the usual Common Cathode.
+    * Add `Tm1638AnodeModule` which handles a TM1638 LED Module using Common
+      Anode LEDs instead of the usual Common Cathode.
         * The `SEGn` and `GRn` lines are switched, so the
           `Tm1638AnodeModule::flush()` has to loop over the same segment for
           all the digits to construct the `GRIDn` byte to send to the controller
