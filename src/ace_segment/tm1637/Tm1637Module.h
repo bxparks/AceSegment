@@ -245,6 +245,32 @@ class Tm1637Module : public LedModule {
       ace_common::incrementMod(mFlushStage, (uint8_t) (T_DIGITS + 1));
     }
 
+    //-----------------------------------------------------------------------
+    // Methods related to buttons
+    //-----------------------------------------------------------------------
+
+    /**
+     * Read the 1 byte with key scan with the bits coming out in LSBFIRST order
+     * with the following bits: `S0 S1 S2 K1 K2 X X X`. The S0,S1,S2 bits are
+     * the binary encoding of one of the SG1 to SG8 segment lines using a
+     * 0-index, so SG1 is 0 and SG8 is 7. The K1 and K2 bits are not encoded and
+     * correspond directly to the K1 and K2 control lines.
+     *
+     * The Sn and Kn lines seem to be pulled up high, so when no buttons are
+     * pressed, the data value from the TM1637 controller is 0xFF. When a button
+     * is pressed, the corresponding Kn and Sn lines go to 0. For example, if
+     * the button on SG2 and K1 is pressed, the SG2 generates a bit pattern of
+     * `0b??101` and the K1 line corresponds to bit pattern `0b10???`, so when
+     * these are combined, the final button data is `0b11110101` or 0xF5.
+     */
+    uint8_t readButtons() const {
+      mTmiInterface.startCondition();
+      mTmiInterface.write(kDataCmdReadKeys);
+      uint8_t data = mTmiInterface.read();
+      mTmiInterface.stopCondition();
+      return data;
+    }
+
   private:
     /** Convert a logical position into the physical position. */
     uint8_t remapLogicalToPhysical(uint8_t pos) const {

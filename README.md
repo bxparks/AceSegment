@@ -237,6 +237,10 @@ The following example sketches are provided:
         * CAUTION: See note about interrupt-safety at the top of the
           [Hc595InterruptDemo.ino](examples/Hc595InterruptDemo/Hc595InterruptDemo.ino)
           file.
+    * [Tm1637ButtonDemo.ino](examples/Tm1637ButtonDemo)
+        * Demo of keypad button scanning on the TM1637.
+        * Reads the 6 buttons on the TM1637 LED module, and displays which
+          button was pressed.
     * [Tm1638ButtonDemo.ino](examples/Tm1638ButtonDemo)
         * Demo of keypad button scanning on the TM1638.
         * Reads the 8 buttons on the TM1638 LED module, and displays the
@@ -837,9 +841,11 @@ controller chip:
 * TM1637
     * Supports 8 levels from 0 to 7, where 0 is the dimmest (but not off) and 7
       is the brightest.
+    * Supports 2x8 buttons through the `readButtons()` method.
 * TM1638
     * Supports 8 levels from 0 to 7, where 0 is the dimmest (but not off) and 7
       is the brightest.
+    * Supports 3x8 buttons through the `readButtons()` method.
 * MAX7219
     * Supports 16 levels from 0 to 15, where 0 is the dimmest (but not off), and
       15 is the brightest.
@@ -2358,10 +2364,10 @@ them.
 * `Tm1638Module`
     * The TM1638 chip supports up to 10 segments per digit, but AceSegment
       supports only 8 segments per digit.
-* Some LED controllers (e.g. TM1637, TM1638, HT16K33) have hardware support for
-  scanning key matrices.
-    * Only partial support for key scanning have been added, e.g.
-      `Tm1638Module::readButtons()`.
+* Partial support for reading buttons through the key scanning functionality
+  of some controller chips are available:
+    * `Tm1638Module::readButtons()`
+    * `Tm1637Module::readButtons()`
     * This functionality has not been extensively tested.
 
 <a name="AlternativeLibraries"></a>
