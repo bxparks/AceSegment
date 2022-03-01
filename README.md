@@ -80,7 +80,6 @@ if nothing is used from the `<Wire.h>` library.)
         * [TM1637 Module With 4 Digits](#Tm1637Module4)
         * [TM1637 Module With 6 Digits](#Tm1637Module6)
         * [TM1637 Module With 6 Digits and 6 Buttons](#Tm1637Module6Buttons)
-        * [TM1637 Capacitor Removal](#Tm1637CapacitorRemoval)
     * [Tm1638Module](#Tm1638Module)
         * [TM1638 Module With 8 Digits and 8 Buttons](#Tm1638Module8Buttons)
         * [TM1638 Module With 8 Digits and 16 Buttons](#Tm1638Module16Buttons)
@@ -95,6 +94,7 @@ if nothing is used from the `<Wire.h>` library.)
     * [HybridModule](#HybridModule)
     * [DirectModule](#DirectModule)
 * [Advanced Usage](#AdvancedUsage)
+    * [TM1637 Capacitor Removal](#Tm1637CapacitorRemoval)
     * [DigitalWriteFast on AVR](#DigitalWriteFast)
     * [Multiple SPI Buses](#MultipleSpiBuses)
     * [ScanningModule](#ScanningModule)
@@ -1115,24 +1115,6 @@ difference:
   `Tm1637Module::readButtons()` method. See
   [Tm1637ButtonDemo](examples/Tm1637ButtonDemo/) for details.
 
-<a name="Tm1637CapacitorRemoval"></a>
-#### TM1637 Capacitor Removal
-
-The black TM1637 LED modules from diymore.cc come with 10 nF filtering
-capacitors on the `CLK` and `DIO` lines. This forces us to use a `BIT_DELAY` of
-100 microseconds, which means that `flush()` on a 4-digit module takes 22
-milliseconds. We can do far better by removing those filtering capacitors with a
-soldering iron:
-
-* See [docs/tm1637/capacitor_removal.md](docs/tm1637/capacitor_removal.md) for
-  information on how to remove the 10 nF capacitors.
-
-After removing them, I verified that these TM1637 LED modules will work with a
-`BIT_DELAY` as low 1 microseconds (sometimes even a 0 microsecond delay will
-work). The transmission time for `flush()` becomes proportionally faster. For
-example, using 5 microsecond `BIT_DELAY` allows `flush()` to take only 1 to 2.3
-milliseconds instead of 22 milliseconds.
-
 <a name="Tm1638Module"></a>
 ### Tm1638Module
 
@@ -2024,6 +2006,24 @@ void loop() {
 
 <a name="AdvancedUsage"></a>
 ## Advanced Usage
+
+<a name="Tm1637CapacitorRemoval"></a>
+### TM1637 Capacitor Removal
+
+The black TM1637 LED modules from diymore.cc come with 10 nF filtering
+capacitors on the `CLK` and `DIO` lines. This forces us to use a `BIT_DELAY` of
+100 microseconds, which means that `flush()` on a 4-digit module takes 22
+milliseconds. We can do far better by removing those filtering capacitors with a
+soldering iron:
+
+* See [docs/tm1637/capacitor_removal.md](docs/tm1637/capacitor_removal.md) for
+  information on how to remove the 10 nF capacitors.
+
+After removing them, I verified that these TM1637 LED modules will work with a
+`BIT_DELAY` as low 1 microseconds (sometimes even a 0 microsecond delay will
+work). The transmission time for `flush()` becomes proportionally faster. For
+example, using 5 microsecond `BIT_DELAY` allows `flush()` to take only 1 to 2.3
+milliseconds instead of 22 milliseconds.
 
 <a name="DigitalWriteFast"></a>
 ### DigitalWriteFast on AVR Processors
