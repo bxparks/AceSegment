@@ -2192,6 +2192,7 @@ sizeof(Hc595Module<SimpleSpiInterface, 8>): 51
 sizeof(Tm1637Module<SimpleTmi1637Interface, 4>): 17
 sizeof(Tm1637Module<SimpleTmi1637Interface, 6>): 19
 sizeof(Tm1638Module<SimpleTmi1638Interface, 8>): 21
+sizeof(Tm1638AnodeModule<SimpleTmi1638Interface, 8>): 19
 sizeof(Max7219Module<SimpleSpiInterface, 8>): 19
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 14
 sizeof(Ht16k33Module<SimpleWireInterface, 4>): 17
@@ -2211,6 +2212,7 @@ sizeof(Hc595Module<SimpleSpiInterface, 8>): 64
 sizeof(Tm1637Module<SimpleTmi1637Interface, 4>): 24
 sizeof(Tm1637Module<SimpleTmi1637Interface, 6>): 24
 sizeof(Tm1638Module<SimpleTmi1638Interface, 8>): 28
+sizeof(Tm1638AnodeModule<SimpleTmi1638Interface, 8>): 24
 sizeof(Max7219Module<SimpleSpiInterface, 8>): 24
 sizeof(Ht16k33Module<TwoWireInterface, 4>): 20
 sizeof(Ht16k33Module<SimpleWireInterface, 4>): 20
@@ -2231,24 +2233,26 @@ Here are 2 samples of the flash and static memory consumptions.
 |---------------------------------+--------------+-------------|
 | baseline                        |    456/   11 |     0/    0 |
 |---------------------------------+--------------+-------------|
-| DirectModule                    |   1534/   58 |  1078/   47 |
-| DirectFast4Module               |   1290/   88 |   834/   77 |
+| DirectModule                    |   1548/   58 |  1092/   47 |
+| DirectFast4Module               |   1304/   88 |   848/   77 |
 |---------------------------------+--------------+-------------|
-| Hybrid(HardSpi)                 |   1612/   56 |  1156/   45 |
-| Hybrid(HardSpiFast)             |   1564/   54 |  1108/   43 |
-| Hybrid(SimpleSpi)               |   1560/   53 |  1104/   42 |
-| Hybrid(SimpleSpiFast)           |   1432/   48 |   976/   37 |
+| Hybrid(HardSpi)                 |   1626/   56 |  1170/   45 |
+| Hybrid(HardSpiFast)             |   1578/   54 |  1122/   43 |
+| Hybrid(SimpleSpi)               |   1574/   53 |  1118/   42 |
+| Hybrid(SimpleSpiFast)           |   1446/   48 |   990/   37 |
 |---------------------------------+--------------+-------------|
-| Hc595(HardSpi)                  |   1552/   55 |  1096/   44 |
-| Hc595(HardSpiFast)              |   1526/   54 |  1070/   43 |
-| Hc595(SimpleSpi)                |   1492/   53 |  1036/   42 |
-| Hc595(SimpleSpiFast)            |   1094/   48 |   638/   37 |
+| Hc595(HardSpi)                  |   1566/   55 |  1110/   44 |
+| Hc595(HardSpiFast)              |   1542/   54 |  1086/   43 |
+| Hc595(SimpleSpi)                |   1506/   53 |  1050/   42 |
+| Hc595(SimpleSpiFast)            |   1110/   48 |   654/   37 |
 |---------------------------------+--------------+-------------|
-| Tm1637(SimpleTmi1637)           |   1424/   31 |   968/   20 |
-| Tm1637(SimpleTmi1637Fast)       |    858/   26 |   402/   15 |
+| Tm1637(SimpleTmi1637)           |   1422/   31 |   966/   20 |
+| Tm1637(SimpleTmi1637Fast)       |    856/   26 |   400/   15 |
 |---------------------------------+--------------+-------------|
-| Tm1638(SimpleTmi1638)           |   1264/   32 |   808/   21 |
-| Tm1638(SimpleTmi1638Fast)       |    762/   25 |   306/   14 |
+| Tm1638(SimpleTmi1638)           |   1372/   32 |   916/   21 |
+| Tm1638(SimpleTmi1638Fast)       |    842/   25 |   386/   14 |
+| Tm1638Anode(SimpleTmi1638)      |   1368/   30 |   912/   19 |
+| Tm1638Anode(SimpleTmi1638Fast)  |    838/   23 |   382/   12 |
 |---------------------------------+--------------+-------------|
 | Max7219(HardSpi)                |   1240/   39 |   784/   28 |
 | Max7219(HardSpiFast)            |   1232/   37 |   776/   26 |
@@ -2279,7 +2283,8 @@ Here are 2 samples of the flash and static memory consumptions.
 |---------------------------------+--------------+-------------|
 | Tm1637(SimpleTmi1637)           | 261625/28224 |  1536/  332 |
 |---------------------------------+--------------+-------------|
-| Tm1638(SimpleTmi1638)           | 261385/28224 |  1296/  332 |
+| Tm1638(SimpleTmi1638)           | 261529/28224 |  1440/  332 |
+| Tm1638Anode(SimpleTmi1638)      | 261561/28224 |  1472/  332 |
 |---------------------------------+--------------+-------------|
 | Max7219(HardSpi)                | 262541/28240 |  2452/  348 |
 | Max7219(SimpleSpi)              | 261389/28224 |  1300/  332 |
@@ -2302,51 +2307,53 @@ timing numbers are in units of microseconds.
 +-----------------------------------------------+-------------------+---------+
 | Functionality                                 |   min/  avg/  max | samples |
 |-----------------------------------------------+-------------------+---------|
-| Direct(4)                                     |    76/   82/   84 |      40 |
+| Direct(4)                                     |    80/   83/   88 |      40 |
 | Direct(4,subfields)                           |     4/   14/   84 |     640 |
-| DirectFast4(4)                                |    28/   29/   40 |      40 |
-| DirectFast4(4,subfields)                      |     4/    9/   36 |     640 |
+| DirectFast4(4)                                |    28/   30/   44 |      40 |
+| DirectFast4(4,subfields)                      |     4/    9/   40 |     640 |
 |-----------------------------------------------+-------------------+---------|
-| Hybrid(4,HardSpi)                             |    36/   41/   48 |      40 |
-| Hybrid(4,HardSpi,subfields)                   |     4/    9/   44 |     640 |
-| Hybrid(4,HardSpiFast)                         |    24/   27/   36 |      40 |
+| Hybrid(4,HardSpi)                             |    36/   42/   52 |      40 |
+| Hybrid(4,HardSpi,subfields)                   |     4/    9/   48 |     640 |
+| Hybrid(4,HardSpiFast)                         |    20/   27/   32 |      40 |
 | Hybrid(4,HardSpiFast,subfields)               |     4/    8/   32 |     640 |
-| Hybrid(4,SimpleSpi)                           |   152/  162/  180 |      40 |
-| Hybrid(4,SimpleSpi,subfields)                 |     4/   23/  172 |     640 |
-| Hybrid(4,SimpleSpiFast)                       |    28/   33/   40 |      40 |
-| Hybrid(4,SimpleSpiFast,subfields)             |     4/    9/   40 |     640 |
+| Hybrid(4,SimpleSpi)                           |   156/  162/  180 |      40 |
+| Hybrid(4,SimpleSpi,subfields)                 |     4/   23/  184 |     640 |
+| Hybrid(4,SimpleSpiFast)                       |    28/   32/   40 |      40 |
+| Hybrid(4,SimpleSpiFast,subfields)             |     4/    9/   44 |     640 |
 |-----------------------------------------------+-------------------+---------|
-| Hc595(8,HardSpi)                              |    28/   30/   40 |      80 |
-| Hc595(8,HardSpi,subfields)                    |     4/    9/   36 |    1280 |
-| Hc595(8,HardSpiFast)                          |    12/   18/   28 |      80 |
-| Hc595(8,HardSpiFast,subfields)                |     4/    8/   28 |    1280 |
+| Hc595(8,HardSpi)                              |    28/   31/   40 |      80 |
+| Hc595(8,HardSpi,subfields)                    |     4/    9/   44 |    1280 |
+| Hc595(8,HardSpiFast)                          |    16/   19/   28 |      80 |
+| Hc595(8,HardSpiFast,subfields)                |     4/    7/   28 |    1280 |
 | Hc595(8,SimpleSpi)                            |   268/  274/  308 |      80 |
-| Hc595(8,SimpleSpi,subfields)                  |     4/   37/  308 |    1280 |
-| Hc595(8,SimpleSpiFast)                        |    24/   29/   36 |      80 |
+| Hc595(8,SimpleSpi,subfields)                  |     4/   37/  304 |    1280 |
+| Hc595(8,SimpleSpiFast)                        |    24/   28/   40 |      80 |
 | Hc595(8,SimpleSpiFast,subfields)              |     4/    9/   36 |    1280 |
 |-----------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi1637,100us)                 | 22312/22344/22580 |      10 |
-| Tm1637(4,SimpleTmi1637,100us,incremental)     |  3612/ 8807/10356 |      50 |
-| Tm1637(4,SimpleTmi1637Fast,100us)             | 21064/21100/21372 |      10 |
-| Tm1637(4,SimpleTmi1637Fast,100us,incremental) |  3412/ 8316/ 9820 |      50 |
+| Tm1637(4,SimpleTmi1637,100us)                 | 22312/22343/22576 |      10 |
+| Tm1637(4,SimpleTmi1637,100us,incremental)     |  3612/ 8808/10388 |      50 |
+| Tm1637(4,SimpleTmi1637Fast,100us)             | 21064/21101/21400 |      10 |
+| Tm1637(4,SimpleTmi1637Fast,100us,incremental) |  3412/ 8316/ 9848 |      50 |
 |-----------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi1637,5us)                   |  2244/ 2282/ 2480 |      10 |
-| Tm1637(4,SimpleTmi1637,5us,incremental)       |   364/  893/ 1120 |      50 |
-| Tm1637(4,SimpleTmi1637Fast,5us)               |   996/ 1030/ 1112 |      10 |
-| Tm1637(4,SimpleTmi1637Fast,5us,incremental)   |   164/  403/  508 |      50 |
+| Tm1637(4,SimpleTmi1637,5us)                   |  2248/ 2286/ 2480 |      10 |
+| Tm1637(4,SimpleTmi1637,5us,incremental)       |   368/  894/ 1128 |      50 |
+| Tm1637(4,SimpleTmi1637Fast,5us)               |  1000/ 1034/ 1104 |      10 |
+| Tm1637(4,SimpleTmi1637Fast,5us,incremental)   |   164/  402/  504 |      50 |
 |-----------------------------------------------+-------------------+---------|
-| Tm1638(8,SimpleTmi1638,1us)                   |  2904/ 2941/ 3204 |      10 |
-| Tm1638(8,SimpleTmi1638Fast,1us)               |   296/  321/  332 |      10 |
+| Tm1638(8,SimpleTmi1638,1us)                   |  2940/ 2980/ 3244 |      10 |
+| Tm1638(8,SimpleTmi1638Fast,1us)               |   316/  345/  364 |      10 |
+| Tm1638Anode(8,SimpleTmi1638,1us)              |  2972/ 3004/ 3252 |      10 |
+| Tm1638Anode(8,SimpleTmi1638Fast,1us)          |   352/  381/  396 |      10 |
 |-----------------------------------------------+-------------------+---------|
-| Max7219(8,HardSpi)                            |   220/  232/  248 |      20 |
-| Max7219(8,HardSpiFast)                        |    96/  107/  120 |      20 |
-| Max7219(8,SimpleSpi)                          |  2384/ 2393/ 2524 |      20 |
+| Max7219(8,HardSpi)                            |   220/  236/  252 |      20 |
+| Max7219(8,HardSpiFast)                        |    96/  108/  120 |      20 |
+| Max7219(8,SimpleSpi)                          |  2384/ 2392/ 2520 |      20 |
 | Max7219(8,SimpleSpiFast)                      |   204/  216/  236 |      20 |
 |-----------------------------------------------+-------------------+---------|
-| Ht16k33(4,TwoWire,100kHz)                     |  1460/ 1463/ 1484 |      20 |
-| Ht16k33(4,TwoWire,400kHz)                     |   500/  507/  540 |      20 |
+| Ht16k33(4,TwoWire,100kHz)                     |  1460/ 1463/ 1488 |      20 |
+| Ht16k33(4,TwoWire,400kHz)                     |   500/  506/  528 |      20 |
 | Ht16k33(4,SimpleWire,1us)                     |  2544/ 2557/ 2696 |      20 |
-| Ht16k33(4,SimpleWireFast,1us)                 |   228/  238/  256 |      20 |
+| Ht16k33(4,SimpleWireFast,1us)                 |   228/  238/  260 |      20 |
 +-----------------------------------------------+-------------------+---------+
 ```
 
@@ -2360,31 +2367,32 @@ just as fast as hardware SPI, **and** consumes 500 bytes of less flash memory.
 | Functionality                                 |   min/  avg/  max | samples |
 |-----------------------------------------------+-------------------+---------|
 | Direct(4)                                     |    18/   19/   42 |      40 |
-| Direct(4,subfields)                           |     0/    2/   35 |     640 |
+| Direct(4,subfields)                           |     0/    2/   34 |     640 |
 |-----------------------------------------------+-------------------+---------|
-| Hybrid(4,HardSpi)                             |    14/   15/   35 |      40 |
+| Hybrid(4,HardSpi)                             |    14/   15/   33 |      40 |
 | Hybrid(4,HardSpi,subfields)                   |     0/    2/   31 |     640 |
-| Hybrid(4,SimpleSpi)                           |    47/   47/   65 |      40 |
-| Hybrid(4,SimpleSpi,subfields)                 |     0/    6/   64 |     640 |
+| Hybrid(4,SimpleSpi)                           |    47/   47/   63 |      40 |
+| Hybrid(4,SimpleSpi,subfields)                 |     0/    6/   63 |     640 |
 |-----------------------------------------------+-------------------+---------|
-| Hc595(8,HardSpi)                              |    15/   15/   36 |      80 |
-| Hc595(8,HardSpi,subfields)                    |     0/    2/   31 |    1280 |
+| Hc595(8,HardSpi)                              |    15/   15/   35 |      80 |
+| Hc595(8,HardSpi,subfields)                    |     0/    2/   35 |    1280 |
 | Hc595(8,SimpleSpi)                            |    82/   82/   99 |      80 |
-| Hc595(8,SimpleSpi,subfields)                  |     0/   10/   99 |    1280 |
+| Hc595(8,SimpleSpi,subfields)                  |     0/   10/  102 |    1280 |
 |-----------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi1637,100us)                 | 21467/21471/21507 |      10 |
-| Tm1637(4,SimpleTmi1637,100us,incremental)     |  3476/ 8465/ 9736 |      50 |
+| Tm1637(4,SimpleTmi1637,100us)                 | 21468/21472/21508 |      10 |
+| Tm1637(4,SimpleTmi1637,100us,incremental)     |  3476/ 8466/ 9736 |      50 |
 |-----------------------------------------------+-------------------+---------|
-| Tm1637(4,SimpleTmi1637,5us)                   |  1496/ 1496/ 1497 |      10 |
-| Tm1637(4,SimpleTmi1637,5us,incremental)       |   243/  590/  681 |      50 |
+| Tm1637(4,SimpleTmi1637,5us)                   |  1497/ 1497/ 1501 |      10 |
+| Tm1637(4,SimpleTmi1637,5us,incremental)       |   243/  591/  681 |      50 |
 |-----------------------------------------------+-------------------+---------|
-| Tm1638(8,SimpleTmi1638,1us)                   |  1562/ 1566/ 1598 |      10 |
+| Tm1638(8,SimpleTmi1638,1us)                   |  1582/ 1586/ 1622 |      10 |
+| Tm1638Anode(8,SimpleTmi1638,1us)              |  1589/ 1591/ 1606 |      10 |
 |-----------------------------------------------+-------------------+---------|
-| Max7219(8,HardSpi)                            |   138/  138/  149 |      20 |
-| Max7219(8,SimpleSpi)                          |   746/  747/  755 |      20 |
+| Max7219(8,HardSpi)                            |   138/  138/  150 |      20 |
+| Max7219(8,SimpleSpi)                          |   746/  746/  754 |      20 |
 |-----------------------------------------------+-------------------+---------|
-| Ht16k33(4,TwoWire,100kHz)                     |  1724/ 1725/ 1748 |      20 |
-| Ht16k33(4,TwoWire,400kHz)                     |   359/  359/  367 |      20 |
+| Ht16k33(4,TwoWire,100kHz)                     |  1724/ 1725/ 1747 |      20 |
+| Ht16k33(4,TwoWire,400kHz)                     |   359/  359/  363 |      20 |
 | Ht16k33(4,SimpleWire,1us)                     |  1270/ 1271/ 1287 |      20 |
 +-----------------------------------------------+-------------------+---------+
 ```
