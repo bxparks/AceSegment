@@ -1219,7 +1219,7 @@ not be needed.
 <a name="Tm1638Module8"></a>
 #### TM1638 Module With 8 Digits
 
-![TM1638 LED Module](docs/tm1638/tm1638_8_buttons_full.jpg)
+![TM1638 LED Module](docs/tm1638/tm1638_8_buttons_medium.jpg)
 
 The configuration of the `Tm1638Module` class for the 8-digit module looks like
 this (c.f. [examples/Tm1638Demo](examples/Tm1638Demo)):
