@@ -30,13 +30,15 @@
 #define FEATURE_TM1637_TMI_FAST 12
 #define FEATURE_TM1638_TMI_1638 13
 #define FEATURE_TM1638_TMI_1638_FAST 14
-#define FEATURE_MAX7219_HARD_SPI 15
-#define FEATURE_MAX7219_HARD_SPI_FAST 16
-#define FEATURE_MAX7219_SIMPLE_SPI 17
-#define FEATURE_MAX7219_SIMPLE_SPI_FAST 18
-#define FEATURE_HT16K33_TWO_WIRE 19
-#define FEATURE_HT16K33_SIMPLE_WIRE 20
-#define FEATURE_HT16K33_SIMPLE_WIRE_FAST 21
+#define FEATURE_TM1638_ANODE_TMI_1638 15
+#define FEATURE_TM1638_ANODE_TMI_1638_FAST 16
+#define FEATURE_MAX7219_HARD_SPI 17
+#define FEATURE_MAX7219_HARD_SPI_FAST 18
+#define FEATURE_MAX7219_SIMPLE_SPI 19
+#define FEATURE_MAX7219_SIMPLE_SPI_FAST 20
+#define FEATURE_HT16K33_TWO_WIRE 21
+#define FEATURE_HT16K33_SIMPLE_WIRE 22
+#define FEATURE_HT16K33_SIMPLE_WIRE_FAST 23
 
 // A volatile integer to prevent the compiler from optimizing away the entire
 // program.
@@ -253,6 +255,21 @@ volatile int disableCompilerOptimization = 0;
     TmiInterface tmiInterface;
     Tm1638Module<TmiInterface, NUM_DIGITS> tm1638Module(tmiInterface);
 
+  #elif FEATURE == FEATURE_TM1638_ANODE_TMI_1638
+    using TmiInterface = SimpleTmi1638Interface;
+    TmiInterface tmiInterface(DIO_PIN, CLK_PIN, STB_PIN, BIT_DELAY);
+    Tm1638AnodeModule<TmiInterface, NUM_DIGITS> tm1638Module(tmiInterface);
+
+  #elif FEATURE == FEATURE_TM1638_ANODE_TMI_1638_FAST
+    #if ! defined(ARDUINO_ARCH_AVR) && ! defined(EPOXY_DUINO)
+      #error Unsupported FEATURE on this platform
+    #endif
+
+    using TmiInterface = SimpleTmi1638FastInterface<
+        DIO_PIN, CLK_PIN, STB_PIN, BIT_DELAY>;
+    TmiInterface tmiInterface;
+    Tm1638AnodeModule<TmiInterface, NUM_DIGITS> tm1638Module(tmiInterface);
+
   #elif FEATURE == FEATURE_MAX7219_HARD_SPI
     using SpiInterface = HardSpiInterface<SPIClass>;
     SpiInterface spiInterface(SPI, LATCH_PIN);
@@ -399,6 +416,22 @@ void setup() {
   tmiInterface.begin();
   tm1637Module.begin();
 
+#elif FEATURE == FEATURE_TM1638_TMI_1638
+  tmiInterface.begin();
+  tm1638Module.begin();
+
+#elif FEATURE == FEATURE_TM1638_TMI_1638_FAST
+  tmiInterface.begin();
+  tm1638Module.begin();
+
+#elif FEATURE == FEATURE_TM1638_ANODE_TMI_1638
+  tmiInterface.begin();
+  tm1638Module.begin();
+
+#elif FEATURE == FEATURE_TM1638_ANODE_TMI_1638_FAST
+  tmiInterface.begin();
+  tm1638Module.begin();
+
 #elif FEATURE == FEATURE_MAX7219_SIMPLE_SPI
   spiInterface.begin();
   max7219Module.begin();
@@ -431,7 +464,7 @@ void setup() {
   ht16k33Module.begin();
 
 #else
-  // No setup() needed for Writers.
+  #error Unknown FEATURE
 
 #endif
 }
@@ -461,6 +494,14 @@ void loop() {
   tm1638Module.flush();
 
 #elif FEATURE == FEATURE_TM1638_TMI_1638_FAST
+  tm1638Module.setPatternAt(0, 0xff);
+  tm1638Module.flush();
+
+#elif FEATURE == FEATURE_TM1638_ANODE_TMI_1638
+  tm1638Module.setPatternAt(0, 0xff);
+  tm1638Module.flush();
+
+#elif FEATURE == FEATURE_TM1638_ANODE_TMI_1638_FAST
   tm1638Module.setPatternAt(0, 0xff);
   tm1638Module.flush();
 
