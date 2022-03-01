@@ -1115,21 +1115,41 @@ difference:
   `Tm1637Module::readButtons()` method. See
   [Tm1637ButtonDemo](examples/Tm1637ButtonDemo/) for details.
 
+The configuration of `Tm1637Module` looks like this:
+
+```C++
+#include <Arduino.h>
+#include <AceTMI.h>
+#include <AceSegment.h>
+using ace_tmi::SimpleTmi1637Interface;
+using ace_segment::Tm1637Module;
+using ace_segment::kDigitRemapArray6Tm1637;
+
+const uint8_t CLK_PIN = 10;
+const uint8_t DIO_PIN = 9;
+const uint8_t BIT_DELAY = 5;
+const uint8_t NUM_DIGITS = 4;
+
+using TmiInterface = SimpleTmi1637Interface;
+TmiInterface tmiInterface(DIO_PIN, CLK_PIN, BIT_DELAY);
+Tm1637Module<TmiInterface, NUM_DIGITS> ledModule(tmiInterface);
+
+...
+```
+
 <a name="Tm1638Module"></a>
 ### Tm1638Module
 
 LED modules based on the Titan TM1638 controller chips are available on Amazon
-and eBay. There seems to be 2 kinds:
+and eBay. There seems to be 2 kinds readily available:
 
-* an 8-digit LED display with 8 microswitches and an additional set of
-  8 discrete LEDs
-* an 8-digit LED display with 16 microswitches but no other LEDs
+* an 8-digit LED display with 8 buttons and an additional set of 8 discrete LEDs
+    * uses a Common Cathode LED module
+* an 8-digit LED display with 16 buttons but no other LEDs
+    * uses a Common Anode LED module
 
-I have tested only the one with the 8 buttons so far. The TM1638 controller chip
-supports 10 LED segments on each digit. The discrete LEDs are connected to bit8
-of each digit.
-
-The `Tm1638Module` class looks like this:
+The `Tm1638Module` class is used for the Common Cathode version, which is
+similar to most of the other modules in this library.
 
 ```C++
 namespace ace_segment {
@@ -1140,6 +1160,38 @@ class Tm1638Module : public LedModule {
     explicit Tm1638Module(
         const T_TMII& tmiInterface,
         const uint8_t* remapArray = nullptr
+    );
+
+    void begin();
+    void end();
+
+    // Following inherited from LedModule:
+    // uint8_t getNumDigits();
+    // void setPatternAt(uint8_t pos, uint8_t pattern);
+    // uint8_t getPatternAt(uint8_t pos);
+    // void setBrightness(uint8_t brightness);
+
+    void setDisplayOn(bool on = true);
+
+    bool isFlushRequired() const;
+    void flush();
+};
+
+}
+```
+
+The `Tme1638ModuleAnode` is used for the Common Anode version and looks very
+similar to the `Tm1638Module` class (except for the missing `remapArray`
+parameter):
+
+```C++
+namespace ace_segment {
+
+template <typename T_TMII, uint8_t T_DIGITS>
+class Tm1638AnodeModule : public LedModule {
+  public:
+    explicit Tm1638AnodeModule(
+        const T_TMII& tmiInterface
     );
 
     void begin();
@@ -1204,7 +1256,7 @@ not be needed.
 
 ![TM1638 LED Module](docs/tm1638/tm1638_8_buttons_medium.jpg)
 
-This LED module uses a TM1638 chip with an 8-digit Common Cathode LED module. So
+This dev module uses a TM1638 chip with an 8-digit Common Cathode LED module. So
 the segment pattern layout is similar to most of the other modules.
 
 The configuration of the `Tm1638Module` class for the 8-digit module looks like
@@ -1259,7 +1311,7 @@ void loop() {
 
 ![TM1638 LED Module](docs/tm1638/tm1638-16-buttons-medium.jpg)
 
-This LED module uses a TM1638 chip with an 8-digit Common **Anode** LED module.
+This dev module uses a TM1638 chip with an 8-digit Common **Anode** LED module.
 This requires using the `Tm1638AnodeModule` class instead of the `Tm1638Module`
 class.
 
