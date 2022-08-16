@@ -135,7 +135,7 @@ if nothing is used from the `<Wire.h>` library.)
 <a name="Installation"></a>
 ## Installation
 
-The latest stable release isbe available in the Arduino IDE Library Manager.
+The latest stable release is available in the Arduino IDE Library Manager.
 Search for "AceSegment". Click install.
 
 The development version can be installed by cloning the
