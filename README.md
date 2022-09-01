@@ -2533,7 +2533,32 @@ them.
 <a name="AlternativeLibraries"></a>
 ## Alternative Libraries
 
-Tracked using [AceSegment Wiki](https://github.com/bxparks/AceSegment/wiki).
+Here are some alternative seven-segment LED module libraries that I found on the
+internet. I have looked at some briefly, but I have not used any of them, so I
+cannot make any informed comments about them.
+
+* TM1637 modules
+    * https://github.com/avishorp/TM1637
+    * https://github.com/jasonacox/TM1637TinyDisplay, fork of avishorp/TM1637
+    * https://github.com/bremme/arduino-tm1637
+    * https://github.com/maxint-rd/TM16xx
+    * https://github.com/AKJ7/TM1637
+* MAX7219 modules
+    * https://github.com/wayoda/LedControl
+    * https://github.com/ozhantr/DigitLedDisplay
+* HT16K33 modules
+    * https://github.com/RobTillaart/HT16K33
+    * https://github.com/adafruit/Adafruit_LED_Backpack
+    * https://github.com/jonpearse/ht16k33-arduino
+    * https://github.com/rileyjshaw/Seg16
+    * https://github.com/sparkfun/SparkFun_Alphanumeric_Display_Arduino_Library
+* 74HC595 modules
+    * https://github.com/MiguelPynto/ShiftDisplay
+    * https://github.com/LuBossCzech/Led4digit74HC595
+    * https://github.com/pseudoVella/shift7seg
+    * https://github.com/crapp/sevseg
+    * https://github.com/MiguelPynto/ShiftDisplay
+    * https://github.com/ameer1234567890/ShiftDisplay2
 
 <a name="License"></a>
 ## License
