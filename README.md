@@ -1060,10 +1060,13 @@ theoretically, the `BIT_DELAY` could be as low as 1 microseconds.
 
 The black LED modules manufactured by diymore.cc (shown above)
 contains a 10 nF capacitor and a 10k ohm pullup resistor on each of the `DIO`
-and `CLK` lines. This requires a `BIT_DELAY` of 100 microseconds.
+and `CLK` lines. This requires a `BIT_DELAY` of 100 microseconds. See [TM1637
+Capacitor Removal](#Tm1637CapacitorRemoval) for instructions on how to remove
+these capacitors to allow the bit delay to be significantly lowered.
 
 The blue LED modules (shown above) seem to use much smaller filtering
-capacitors. These modules seem to work with a `BIT_DELAY` of 7 microseconds.
+capacitors. These modules seem to work with a `BIT_DELAY` as low as 7
+microseconds.
 
 <a name="Tm1637Module6"></a>
 #### TM1637 Module With 6 Digits
@@ -1120,6 +1123,12 @@ void loop() {
   ...
 }
 ```
+
+Just like the 4-digit versions, these 6-digit modules contain a 10 nF capacitor
+and a 10k ohm pullup resistor on each of the `DIO` and `CLK` lines. This
+requires a `BIT_DELAY` of 100 microseconds. See [TM1637 Capacitor
+Removal](#Tm1637CapacitorRemoval) for instructions on how to remove these
+capacitors to allow the bit delay to be significantly lowered.
 
 <a name="Tm1637Module6Buttons"></a>
 #### TM1637 Module With 6 Digits and 6 Buttons
