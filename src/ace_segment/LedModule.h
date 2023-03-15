@@ -60,8 +60,17 @@ class LedModule {
         mNumDigits(numDigits)
     {}
 
-    /** Return the number of digits supported by this display instance. */
+    /**
+     * Return the number of digits supported by this display instance.
+     * Deprecated but retained for backwards compatibility.
+     */
     uint8_t getNumDigits() const { return mNumDigits; }
+
+    /**
+     * Return the number of digits supported by this display instance. Alternate
+     * form of getNumDigits(). This is preferred because it's shorter.
+     */
+    uint8_t size() const { return mNumDigits; }
 
     /** Set the led digit pattern at position pos. */
     void setPatternAt(uint8_t pos, uint8_t pattern) {
@@ -86,6 +95,16 @@ class LedModule {
     /** Get the current brightness. */
     uint8_t getBrightness() const {
       return mBrightness;
+    }
+
+    /** Set decimal point. */
+    void setDecimalPointAt(uint8_t pos, bool state = true) {
+      if (pos >= mNumDigits) return;
+      if (state) {
+        mPatterns[pos] |= 0x80;
+      } else {
+        mPatterns[pos] &= ~0x80;
+      }
     }
 
   protected:

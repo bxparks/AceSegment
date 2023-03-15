@@ -1,6 +1,12 @@
 # Changelog
 
 * Unreleased
+    * `LedModule.h`
+        * Add `size()` as alternate form of `getNumDigits()`. Old version
+          retained for backwards compatibility.
+        * Pull down `setDecimalPointAt()` from `PatternWriter` layer down
+          to the `LedModule` layer. It's a low-level operation, seems more
+          appropriate at the `LedModule` layer.
 * 0.12.0 (2022-03-01)
     * Fix invalid pins in `examples/Tm1638Demo` on ESP32 dev board.
     * Add `uint32_t Tm1638Module::readButtons()` method.
