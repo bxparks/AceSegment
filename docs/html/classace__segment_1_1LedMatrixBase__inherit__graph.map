@@ -1,8 +1,8 @@
 <map id="ace_segment::LedMatrixBase" name="ace_segment::LedMatrixBase">
 <area shape="rect" id="node1" title="Class that represents the abstraction of a particular LED display wiring, and knows how to turn off a..." alt="" coords="5,143,220,170"/>
-<area shape="rect" id="node2" href="$classace__segment_1_1LedMatrixDirect.html" title="An LedMatrixBase that whose group pins and element pins are wired directly to the MCU." alt="" coords="271,5,493,47"/>
-<area shape="rect" id="node3" href="$classace__segment_1_1LedMatrixDualHc595.html" title="An LedMatrix that whose group pins are attached to one 74HC595 shift register and the element pins ar..." alt="" coords="276,71,488,112"/>
-<area shape="rect" id="node4" href="$classace__segment_1_1LedMatrixSingleHc595.html" title="An implementation of LedMatrixBase with an 74HC595 Shift Register chip on the segment pins,..." alt="" coords="271,136,493,177"/>
-<area shape="rect" id="node5" href="$classace__segment_1_1LedMatrixDirect.html" title=" " alt="" coords="271,201,493,243"/>
-<area shape="rect" id="node6" href="$classace__segment_1_1LedMatrixSingleHc595.html" title=" " alt="" coords="268,267,496,308"/>
+<area shape="rect" id="node2" href="$classace__segment_1_1LedMatrixDirect.html" title=" " alt="" coords="271,5,493,47"/>
+<area shape="rect" id="node3" href="$classace__segment_1_1LedMatrixSingleHc595.html" title=" " alt="" coords="268,71,496,112"/>
+<area shape="rect" id="node4" href="$classace__segment_1_1LedMatrixDirect.html" title="An LedMatrixBase that whose group pins and element pins are wired directly to the MCU." alt="" coords="271,136,493,177"/>
+<area shape="rect" id="node5" href="$classace__segment_1_1LedMatrixDualHc595.html" title="An LedMatrix that whose group pins are attached to one 74HC595 shift register and the element pins ar..." alt="" coords="276,201,488,243"/>
+<area shape="rect" id="node6" href="$classace__segment_1_1LedMatrixSingleHc595.html" title="An implementation of LedMatrixBase with an 74HC595 Shift Register chip on the segment pins,..." alt="" coords="271,267,493,308"/>
 </map>
