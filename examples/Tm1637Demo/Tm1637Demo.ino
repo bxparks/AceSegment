@@ -101,6 +101,15 @@ using ace_segment::kDigitRemapArray6Tm1637;
   const uint8_t DIO_PIN = D7;
   const uint8_t NUM_DIGITS = 4;
 
+// My EzSBC ESP32 in a box
+#elif defined(AUNITER_ESP32)
+  #define TMI_INTERFACE_TYPE TMI_INTERFACE_TYPE_NORMAL
+  #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL
+
+  const uint8_t CLK_PIN = 33;
+  const uint8_t DIO_PIN = 32;
+  const uint8_t NUM_DIGITS = 4;
+
 #elif defined(AUNITER_ESP32_TM1637)
   #define TMI_INTERFACE_TYPE TMI_INTERFACE_TYPE_NORMAL
   #define TM_FLUSH_METHOD TM_FLUSH_METHOD_INCREMENTAL

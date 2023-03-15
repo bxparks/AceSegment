@@ -70,7 +70,7 @@ is no direct dependency to the `<Wire.h>`, `<SPI.h>`, `<AceWire.h>`,
 simply adding `#include <Wire.h>` increases flash usage by about 1100 bytes even
 if nothing is used from the `<Wire.h>` library.)
 
-**Version**: 0.12.0 (2022-03-01)
+**Version**: 0.13.0 (2023-03-15)
 
 **Status**: First public release at 0.9.1.
 
@@ -135,7 +135,7 @@ if nothing is used from the `<Wire.h>` library.)
 <a name="Installation"></a>
 ## Installation
 
-The latest stable release isbe available in the Arduino IDE Library Manager.
+The latest stable release is available in the Arduino IDE Library Manager.
 Search for "AceSegment". Click install.
 
 The development version can be installed by cloning the
@@ -224,6 +224,7 @@ The following example sketches are provided:
 * Intermediate
     * [Tm1637Demo.ino](examples/Tm1637Demo)
     * [Tm1638Demo.ino](examples/Tm1638Demo)
+    * [Tm1638AnodeDemo.ino](examples/Tm1638AnodeDemo)
     * [Max7219Demo.ino](examples/Max7219Demo)
     * [Ht16k33Demo.ino](examples/Ht16k33Demo)
     * [Hc595Demo.ino](examples/Hc595Demo)
@@ -362,8 +363,9 @@ libraries (AceTMI, AceSPI, AceWire, AceSegmentWriter) looks something like this:
       |           |             |             |             |           |
 Tm1637Module  Max7219Module Hc595Module HybridModule Ht16k33Module DirectModule
 Tm1638Module              \     |            /              |
-      |                    \    |           /               |
-      v                     v   v          v                v
+Tm1638AnodeModule          \    |           /               |
+      |                     \   |          /                |
+      v                      v  v         v                 v
 +-------------------------+ +---------------------+ +----------------------+
 | AceTMI library          | | AceSPI library      | | AceWire library      |
 |-------------------------| |---------------------| |----------------------|
@@ -834,11 +836,12 @@ class LedModule {
   public:
     explicit LedModule(uint8_t* patterns, uint8_t numDigits);
 
-    uint8_t getNumDigits() const;
+    uint8_t size() const;
     void setPatternAt(uint8_t pos, uint8_t pattern);
     uint8_t getPatternAt(uint8_t pos) const;
     void setBrightness(uint8_t brightness);
     uint8_t getBrightness() const;
+    void setDecimalPointAt(uint8_t pos, bool state = true);
 };
 
 }
@@ -888,6 +891,13 @@ can also support brightness control on a per-digit basis. But the interface for
 that feature is *not* part of the `LedModule` class because no other controller
 chip supports this feature.
 
+The `setDecimalPointAt(uint8_t pos, bool state=true)` method turns the decimal
+point at position `pos` on (`state=true`) or off (`status=false`). The decimal
+point stored in bit 7 (most significant bit) of the `pattern` at position `pos`.
+It is possible to flip that bit manually when calling the `setPatternAt()`
+function, but using `setDecimalPointAt()` is more convenient and allows for the
+possibility that the decimal point could be stored somewhere else in the future.
+
 The rendering of each digit and segment, and how the information is transferred
 to the controller chip, is pushed down into the specific subclasses of
 `LedModule`. The rendering methods are called `flush()`, `flushIncremental()`,
@@ -934,7 +944,7 @@ class Tm1637Module : public LedModule {
     void end();
 
     // Following inherited from LedModule:
-    // uint8_t getNumDigits();
+    // uint8_t size();
     // void setPatternAt(uint8_t pos, uint8_t pattern);
     // uint8_t getPatternAt(uint8_t pos);
     // void setBrightness(uint8_t brightness);
@@ -1058,10 +1068,13 @@ theoretically, the `BIT_DELAY` could be as low as 1 microseconds.
 
 The black LED modules manufactured by diymore.cc (shown above)
 contains a 10 nF capacitor and a 10k ohm pullup resistor on each of the `DIO`
-and `CLK` lines. This requires a `BIT_DELAY` of 100 microseconds.
+and `CLK` lines. This requires a `BIT_DELAY` of 100 microseconds. See [TM1637
+Capacitor Removal](#Tm1637CapacitorRemoval) for instructions on how to remove
+these capacitors to allow the bit delay to be significantly lowered.
 
 The blue LED modules (shown above) seem to use much smaller filtering
-capacitors. These modules seem to work with a `BIT_DELAY` of 7 microseconds.
+capacitors. These modules seem to work with a `BIT_DELAY` as low as 7
+microseconds.
 
 <a name="Tm1637Module6"></a>
 #### TM1637 Module With 6 Digits
@@ -1118,6 +1131,12 @@ void loop() {
   ...
 }
 ```
+
+Just like the 4-digit versions, these 6-digit modules contain a 10 nF capacitor
+and a 10k ohm pullup resistor on each of the `DIO` and `CLK` lines. This
+requires a `BIT_DELAY` of 100 microseconds. See [TM1637 Capacitor
+Removal](#Tm1637CapacitorRemoval) for instructions on how to remove these
+capacitors to allow the bit delay to be significantly lowered.
 
 <a name="Tm1637Module6Buttons"></a>
 #### TM1637 Module With 6 Digits and 6 Buttons
@@ -1186,7 +1205,7 @@ class Tm1638Module : public LedModule {
     void end();
 
     // Following inherited from LedModule:
-    // uint8_t getNumDigits();
+    // uint8_t size();
     // void setPatternAt(uint8_t pos, uint8_t pattern);
     // uint8_t getPatternAt(uint8_t pos);
     // void setBrightness(uint8_t brightness);
@@ -1218,7 +1237,7 @@ class Tm1638AnodeModule : public LedModule {
     void end();
 
     // Following inherited from LedModule:
-    // uint8_t getNumDigits();
+    // uint8_t size();
     // void setPatternAt(uint8_t pos, uint8_t pattern);
     // uint8_t getPatternAt(uint8_t pos);
     // void setBrightness(uint8_t brightness);
@@ -1413,7 +1432,7 @@ class Max7219Module : public LedModule {
     void end();
 
     // Following inherited from LedModule:
-    // uint8_t getNumDigits();
+    // uint8_t size();
     // void setPatternAt(uint8_t pos, uint8_t pattern);
     // uint8_t getPatternAt(uint8_t pos);
     // void setBrightness(uint8_t brightness);
@@ -1541,7 +1560,7 @@ class Ht16k33Module : public LedModule {
     void end();
 
     // Following inherited from LedModule:
-    // uint8_t getNumDigits();
+    // uint8_t size();
     // void setPatternAt(uint8_t pos, uint8_t pattern);
     // uint8_t getPatternAt(uint8_t pos);
     // void setBrightness(uint8_t brightness);
@@ -1701,7 +1720,7 @@ class Hc595Module : public ScanningModule<[snip]> {
     uint16_t getFieldsPerFrame() const;
 
     // Following inherited from LedModule through ScanningModule:
-    // uint8_t getNumDigits();
+    // uint8_t size();
     // void setPatternAt(uint8_t pos, uint8_t pattern);
     // uint8_t getPatternAt(uint8_t pos);
     // void setBrightness(uint8_t brightness);
@@ -2473,16 +2492,16 @@ compiler errors:
 ### Tool Chain
 
 * [Arduino IDE 1.8.19](https://www.arduino.cc/en/Main/Software)
-* [Arduino CLI 0.19.2](https://arduino.github.io/arduino-cli)
+* [Arduino CLI 0.31.0](https://arduino.github.io/arduino-cli)
 * [SpenceKonde ATTinyCore 1.5.2](https://github.com/SpenceKonde/ATTinyCore)
-* [Arduino AVR Boards 1.8.4](https://github.com/arduino/ArduinoCore-avr)
+* [Arduino AVR Boards 1.8.5](https://github.com/arduino/ArduinoCore-avr)
 * [Arduino SAMD Boards 1.8.9](https://github.com/arduino/ArduinoCore-samd)
 * [SparkFun AVR Boards 1.1.13](https://github.com/sparkfun/Arduino_Boards)
-* [SparkFun SAMD Boards 1.8.3](https://github.com/sparkfun/Arduino_Boards)
-* [STM32duino 2.2.0](https://github.com/stm32duino/Arduino_Core_STM32)
+* [SparkFun SAMD Boards 1.8.9](https://github.com/sparkfun/Arduino_Boards)
+* [STM32duino 2.4.0](https://github.com/stm32duino/Arduino_Core_STM32)
 * [ESP8266 Arduino 3.0.2](https://github.com/esp8266/Arduino)
-* [ESP32 Arduino 2.0.2](https://github.com/espressif/arduino-esp32)
-* [Teensyduino 1.56](https://www.pjrc.com/teensy/td_download.html)
+* [ESP32 Arduino 2.0.7](https://github.com/espressif/arduino-esp32)
+* [Teensyduino 1.57](https://www.pjrc.com/teensy/td_download.html)
 
 This library is *not* compatible with:
 
@@ -2502,7 +2521,7 @@ emulation layer.
 <a name="OperatingSystem"></a>
 ### Operating System
 
-I use Ubuntu 20.04 for the vast majority of my development. I expect that the
+I use Ubuntu 22.04 for the vast majority of my development. I expect that the
 library will work fine under MacOS and Windows, but I have not explicitly tested
 them.
 
@@ -2531,7 +2550,32 @@ them.
 <a name="AlternativeLibraries"></a>
 ## Alternative Libraries
 
-Tracked using [AceSegment Wiki](https://github.com/bxparks/AceSegment/wiki).
+Here are some alternative seven-segment LED module libraries that I found on the
+internet. I have looked at some briefly, but I have not used any of them, so I
+cannot make any informed comments about them.
+
+* TM1637 modules
+    * https://github.com/avishorp/TM1637
+    * https://github.com/jasonacox/TM1637TinyDisplay, fork of avishorp/TM1637
+    * https://github.com/bremme/arduino-tm1637
+    * https://github.com/maxint-rd/TM16xx
+    * https://github.com/AKJ7/TM1637
+* MAX7219 modules
+    * https://github.com/wayoda/LedControl
+    * https://github.com/ozhantr/DigitLedDisplay
+* HT16K33 modules
+    * https://github.com/RobTillaart/HT16K33
+    * https://github.com/adafruit/Adafruit_LED_Backpack
+    * https://github.com/jonpearse/ht16k33-arduino
+    * https://github.com/rileyjshaw/Seg16
+    * https://github.com/sparkfun/SparkFun_Alphanumeric_Display_Arduino_Library
+* 74HC595 modules
+    * https://github.com/MiguelPynto/ShiftDisplay
+    * https://github.com/LuBossCzech/Led4digit74HC595
+    * https://github.com/pseudoVella/shift7seg
+    * https://github.com/crapp/sevseg
+    * https://github.com/MiguelPynto/ShiftDisplay
+    * https://github.com/ameer1234567890/ShiftDisplay2
 
 <a name="License"></a>
 ## License

@@ -49,19 +49,25 @@ class LedModule {
      * @param patterns pointer to an array of bytes representing LED segment
      *    patterns
      * @param numDigits number of digits in the LED module; this value is
-     *    returned by getNumDigits(). The value is usually a compile-time
+     *    returned by size(). The value is usually a compile-time
      *    constant passed in through a template parameter, so it is faster and
-     *    cheaper to use the template parameterx. However, sometimes the calling
+     *    cheaper to use the template parameter. However, sometimes the calling
      *    code needs this value but it has only a reference or pointer to the
-     *    LedModule. Then getNumDigits() can be used.
+     *    LedModule. Then size() can be used.
      */
     explicit LedModule(uint8_t* patterns, uint8_t numDigits) :
         mPatterns(patterns),
         mNumDigits(numDigits)
     {}
 
-    /** Return the number of digits supported by this display instance. */
+    /**
+     * Return the number of digits supported by this display instance.
+     * Deprecated, but retained for backwards compatibility.
+     */
     uint8_t getNumDigits() const { return mNumDigits; }
+
+    /** Return the number of digits supported by this display instance. */
+    uint8_t size() const { return mNumDigits; }
 
     /** Set the led digit pattern at position pos. */
     void setPatternAt(uint8_t pos, uint8_t pattern) {
@@ -86,6 +92,16 @@ class LedModule {
     /** Get the current brightness. */
     uint8_t getBrightness() const {
       return mBrightness;
+    }
+
+    /** Set decimal point. */
+    void setDecimalPointAt(uint8_t pos, bool state = true) {
+      if (pos >= mNumDigits) return;
+      if (state) {
+        mPatterns[pos] |= 0x80;
+      } else {
+        mPatterns[pos] &= ~0x80;
+      }
     }
 
   protected:

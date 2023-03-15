@@ -1,17 +1,17 @@
 <map id="ace_segment::LedModule" name="ace_segment::LedModule">
-<area shape="rect" id="node1" title="General interface that represents a generic seven&#45;segment LED module with multiple digits." alt="" coords="5,323,193,350"/>
-<area shape="rect" id="node2" href="$classace__segment_1_1Ht16k33Module.html" title="An implementation of LedModule using the HT16K33 chip." alt="" coords="265,5,485,47"/>
-<area shape="rect" id="node3" href="$classace__segment_1_1Max7219Module.html" title="An implementation of LedModule using the MAX7219 chip." alt="" coords="263,71,488,112"/>
-<area shape="rect" id="node4" href="$classace__segment_1_1ScanningModule.html" title="An implementation of LedModule for display modules which do not have hardware controller chips,..." alt="" coords="257,137,494,193"/>
-<area shape="rect" id="node5" href="$classace__segment_1_1Tm1637Module.html" title="An implementation of LedModule using the TM1637 chip." alt="" coords="266,217,485,259"/>
-<area shape="rect" id="node6" href="$classace__segment_1_1Tm1638AnodeModule.html" title="An implementation of LedModule using the TM1638 chip." alt="" coords="270,283,481,324"/>
-<area shape="rect" id="node7" href="$classace__segment_1_1Tm1638Module.html" title="An implementation of LedModule using the TM1638 chip." alt="" coords="266,348,485,389"/>
-<area shape="rect" id="node8" href="$classace__segment_1_1ScanningModule.html" title=" " alt="" coords="253,414,497,470"/>
-<area shape="rect" id="node10" href="$classace__segment_1_1ScanningModule.html" title=" " alt="" coords="263,494,487,579"/>
-<area shape="rect" id="node12" href="$classace__segment_1_1ScanningModule.html" title=" " alt="" coords="241,603,509,659"/>
-<area shape="rect" id="node14" href="$classace__segment_1_1ScanningModule.html" title=" " alt="" coords="263,684,487,755"/>
-<area shape="rect" id="node9" href="$classace__segment_1_1DirectModule.html" title="An implementation of LedModule whose segment and digit pins are directly connected to the GPIO pins o..." alt="" coords="577,414,781,470"/>
-<area shape="rect" id="node11" href="$classace__segment_1_1DirectFast4Module.html" title="An implementation of LedModule whose segment and digit pins are directly connected to the GPIO pins o..." alt="" coords="563,494,795,579"/>
-<area shape="rect" id="node13" href="$classace__segment_1_1Hc595Module.html" title="An implementation of LedModule class that supports an LED module using 2 74HC595 Shift Register chips..." alt="" coords="557,603,800,659"/>
-<area shape="rect" id="node15" href="$classace__segment_1_1HybridModule.html" title="An implementation of LedModule class that supports an LED module using a single 74HC595 Shift Registe..." alt="" coords="557,691,800,747"/>
+<area shape="rect" id="node1" title="General interface that represents a generic seven&#45;segment LED module with multiple digits." alt="" coords="5,411,193,438"/>
+<area shape="rect" id="node2" href="$classace__segment_1_1ScanningModule.html" title=" " alt="" coords="263,5,487,76"/>
+<area shape="rect" id="node4" href="$classace__segment_1_1ScanningModule.html" title=" " alt="" coords="253,101,497,157"/>
+<area shape="rect" id="node6" href="$classace__segment_1_1ScanningModule.html" title=" " alt="" coords="263,181,487,266"/>
+<area shape="rect" id="node8" href="$classace__segment_1_1ScanningModule.html" title=" " alt="" coords="241,290,509,346"/>
+<area shape="rect" id="node10" href="$classace__segment_1_1Ht16k33Module.html" title="An implementation of LedModule using the HT16K33 chip." alt="" coords="265,371,485,412"/>
+<area shape="rect" id="node11" href="$classace__segment_1_1Max7219Module.html" title="An implementation of LedModule using the MAX7219 chip." alt="" coords="263,436,488,477"/>
+<area shape="rect" id="node12" href="$classace__segment_1_1ScanningModule.html" title="An implementation of LedModule for display modules which do not have hardware controller chips,..." alt="" coords="257,502,494,558"/>
+<area shape="rect" id="node13" href="$classace__segment_1_1Tm1637Module.html" title="An implementation of LedModule using the TM1637 chip." alt="" coords="266,583,485,624"/>
+<area shape="rect" id="node14" href="$classace__segment_1_1Tm1638AnodeModule.html" title="An implementation of LedModule using the TM1638 chip." alt="" coords="270,648,481,689"/>
+<area shape="rect" id="node15" href="$classace__segment_1_1Tm1638Module.html" title="An implementation of LedModule using the TM1638 chip." alt="" coords="266,713,485,755"/>
+<area shape="rect" id="node3" href="$classace__segment_1_1HybridModule.html" title="An implementation of LedModule class that supports an LED module using a single 74HC595 Shift Registe..." alt="" coords="557,13,800,69"/>
+<area shape="rect" id="node5" href="$classace__segment_1_1DirectModule.html" title="An implementation of LedModule whose segment and digit pins are directly connected to the GPIO pins o..." alt="" coords="577,101,781,157"/>
+<area shape="rect" id="node7" href="$classace__segment_1_1DirectFast4Module.html" title="An implementation of LedModule whose segment and digit pins are directly connected to the GPIO pins o..." alt="" coords="563,181,795,266"/>
+<area shape="rect" id="node9" href="$classace__segment_1_1Hc595Module.html" title="An implementation of LedModule class that supports an LED module using 2 74HC595 Shift Register chips..." alt="" coords="557,290,800,346"/>
 </map>
