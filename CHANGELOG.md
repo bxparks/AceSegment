@@ -4,7 +4,7 @@
     * `LedModule.h`
         * Add `size()` as alternate form of `getNumDigits()`. Old version
           retained for backwards compatibility.
-        * Pull down `setDecimalPointAt()` from `PatternWriter` layer down
+        * Pull `setDecimalPointAt()` from `PatternWriter` down
           to the `LedModule` layer. It's a low-level operation, seems more
           appropriate at the `LedModule` layer.
 * 0.12.0 (2022-03-01)

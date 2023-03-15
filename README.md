@@ -841,6 +841,7 @@ class LedModule {
     uint8_t getPatternAt(uint8_t pos) const;
     void setBrightness(uint8_t brightness);
     uint8_t getBrightness() const;
+    void setDecimalPointAt(uint8_t pos, bool state = true);
 };
 
 }
@@ -889,6 +890,13 @@ If brightness control is enabled on the LED module using the 74HC595 chip, it
 can also support brightness control on a per-digit basis. But the interface for
 that feature is *not* part of the `LedModule` class because no other controller
 chip supports this feature.
+
+The `setDecimalPointAt(uint8_t pos, bool state=true)` method turns the decimal
+point at position `pos` on (`state=true`) or off (`status=false`). The decimal
+point stored in bit 7 (most significant bit) of the `pattern` at position `pos`.
+It is possible to flip that bit manually when calling the `setPatternAt()`
+function, but using `setDecimalPointAt()` is more convenient and allows for the
+possibility that the decimal point could be stored somewhere else in the future.
 
 The rendering of each digit and segment, and how the information is transferred
 to the controller chip, is pushed down into the specific subclasses of
