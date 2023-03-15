@@ -1,6 +1,7 @@
 # Changelog
 
 * Unreleased
+* 0.13.0 (2023-03-15)
     * `LedModule.h`
         * Add `size()` as alternate form of `getNumDigits()`. Old version
           retained for backwards compatibility.

@@ -70,7 +70,7 @@ is no direct dependency to the `<Wire.h>`, `<SPI.h>`, `<AceWire.h>`,
 simply adding `#include <Wire.h>` increases flash usage by about 1100 bytes even
 if nothing is used from the `<Wire.h>` library.)
 
-**Version**: 0.12.0 (2022-03-01)
+**Version**: 0.13.0 (2023-03-15)
 
 **Status**: First public release at 0.9.1.
 
