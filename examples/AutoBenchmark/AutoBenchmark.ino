@@ -182,7 +182,7 @@ TimingStats timingStats;
 template <typename LM>
 void runScanningBenchmark(const __FlashStringHelper* name, LM& scanningModule) {
 
-  for (uint8_t i = 0; i < scanningModule.getNumDigits(); ++i) {
+  for (uint8_t i = 0; i < scanningModule.size(); ++i) {
     scanningModule.setPatternAt(i, i);
   }
 

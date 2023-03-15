@@ -836,7 +836,7 @@ class LedModule {
   public:
     explicit LedModule(uint8_t* patterns, uint8_t numDigits);
 
-    uint8_t getNumDigits() const;
+    uint8_t size() const;
     void setPatternAt(uint8_t pos, uint8_t pattern);
     uint8_t getPatternAt(uint8_t pos) const;
     void setBrightness(uint8_t brightness);
@@ -936,7 +936,7 @@ class Tm1637Module : public LedModule {
     void end();
 
     // Following inherited from LedModule:
-    // uint8_t getNumDigits();
+    // uint8_t size();
     // void setPatternAt(uint8_t pos, uint8_t pattern);
     // uint8_t getPatternAt(uint8_t pos);
     // void setBrightness(uint8_t brightness);
@@ -1197,7 +1197,7 @@ class Tm1638Module : public LedModule {
     void end();
 
     // Following inherited from LedModule:
-    // uint8_t getNumDigits();
+    // uint8_t size();
     // void setPatternAt(uint8_t pos, uint8_t pattern);
     // uint8_t getPatternAt(uint8_t pos);
     // void setBrightness(uint8_t brightness);
@@ -1229,7 +1229,7 @@ class Tm1638AnodeModule : public LedModule {
     void end();
 
     // Following inherited from LedModule:
-    // uint8_t getNumDigits();
+    // uint8_t size();
     // void setPatternAt(uint8_t pos, uint8_t pattern);
     // uint8_t getPatternAt(uint8_t pos);
     // void setBrightness(uint8_t brightness);
@@ -1424,7 +1424,7 @@ class Max7219Module : public LedModule {
     void end();
 
     // Following inherited from LedModule:
-    // uint8_t getNumDigits();
+    // uint8_t size();
     // void setPatternAt(uint8_t pos, uint8_t pattern);
     // uint8_t getPatternAt(uint8_t pos);
     // void setBrightness(uint8_t brightness);
@@ -1552,7 +1552,7 @@ class Ht16k33Module : public LedModule {
     void end();
 
     // Following inherited from LedModule:
-    // uint8_t getNumDigits();
+    // uint8_t size();
     // void setPatternAt(uint8_t pos, uint8_t pattern);
     // uint8_t getPatternAt(uint8_t pos);
     // void setBrightness(uint8_t brightness);
@@ -1712,7 +1712,7 @@ class Hc595Module : public ScanningModule<[snip]> {
     uint16_t getFieldsPerFrame() const;
 
     // Following inherited from LedModule through ScanningModule:
-    // uint8_t getNumDigits();
+    // uint8_t size();
     // void setPatternAt(uint8_t pos, uint8_t pattern);
     // uint8_t getPatternAt(uint8_t pos);
     // void setBrightness(uint8_t brightness);
