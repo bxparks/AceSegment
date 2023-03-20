@@ -49,6 +49,10 @@ ago using a single 74HC595 chips and 4 transistors:
 
 ![Hybrid Module](docs/custom_modules/hybrid_module_front_small.jpg)
 
+Here is another one which uses only 4 transistors without any controller chip.
+The 8 segment lines and the 4 digit lines are controlled directly by 12 GPIO
+pins of the microcontroller:
+
 **Direct**
 
 ![Direct Module](docs/custom_modules/direct_module_front_small.jpg)
