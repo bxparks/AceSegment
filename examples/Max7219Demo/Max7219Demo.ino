@@ -62,11 +62,11 @@ using ace_segment::kDigitRemapArray8Max7219;
   const uint8_t CLOCK_PIN = SCK;
   SPIClass& spiInstance = SPI;
 
-#elif defined(AUNITER_SAMD_MAX7219)
+#elif defined(AUNITER_XIAO_MAX7219)
   #define INTERFACE_TYPE INTERFACE_TYPE_HARD_SPI
 
   // SPI pins
-  const uint8_t LATCH_PIN = SS;
+  const uint8_t LATCH_PIN = 6;
   const uint8_t DATA_PIN = MOSI;
   const uint8_t CLOCK_PIN = SCK;
   SPIClass& spiInstance = SPI;
