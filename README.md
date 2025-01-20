@@ -2489,8 +2489,11 @@ the compiler to print useful error messages instead of hundreds of lines of
 compiler errors:
 
 * Any platform using the ArduinoCore-API
-  (https://github.com/arduino/ArduinoCore-api).
-    * For example, Nano Every, MKRZero, and Raspberry Pi Pico RP2040.
+  (https://github.com/arduino/ArduinoCore-api). For example:
+    * Arduino Nano Every
+    * Arduino MKRZero
+    * Arduino UNO R4
+    * Raspberry Pi Pico RP2040
 
 <a name="ToolChain"></a>
 ### Tool Chain
@@ -2502,6 +2505,8 @@ compiler errors:
 * [Arduino SAMD Boards 1.8.9](https://github.com/arduino/ArduinoCore-samd)
 * [SparkFun AVR Boards 1.1.13](https://github.com/sparkfun/Arduino_Boards)
 * [SparkFun SAMD Boards 1.8.9](https://github.com/sparkfun/Arduino_Boards)
+* [Adafruit SAMD Boards 1.7.11](https://github.com/adafruit/ArduinoCore-samd)
+* [Seeeduino SAMD Boards 1.8.4](https://github.com/Seeed-Studio/ArduinoCore-samd)
 * [STM32duino 2.4.0](https://github.com/stm32duino/Arduino_Core_STM32)
 * [ESP8266 Arduino 3.0.2](https://github.com/esp8266/Arduino)
 * [ESP32 Arduino 2.0.7](https://github.com/espressif/arduino-esp32)
